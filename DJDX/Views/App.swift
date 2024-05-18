@@ -12,7 +12,7 @@ import SwiftData
 struct DJDXApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            EPOLISSongRecord.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +25,7 @@ struct DJDXApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
         }
         .modelContainer(sharedModelContainer)
     }
