@@ -38,11 +38,9 @@ struct ScoresView: View {
                                     VStack {
                                         Text(String(item.beginnerScore.difficulty))
                                             .italic()
-                                            .fontWidth(.standard)
                                             .fontWeight(.black)
                                         Text(verbatim: "BEGINNER")
                                             .font(.caption2)
-                                            .fontWidth(.expanded)
                                             .fontWeight(.semibold)
                                     }
                                     .foregroundStyle(.green)
@@ -51,11 +49,9 @@ struct ScoresView: View {
                                     VStack {
                                         Text(String(item.normalScore.difficulty))
                                             .italic()
-                                            .fontWidth(.standard)
                                             .fontWeight(.black)
                                         Text(verbatim: "NORMAL")
                                             .font(.caption2)
-                                            .fontWidth(.expanded)
                                             .fontWeight(.semibold)
                                     }
                                     .foregroundStyle(.blue)
@@ -64,11 +60,9 @@ struct ScoresView: View {
                                     VStack {
                                         Text(String(item.hyperScore.difficulty))
                                             .italic()
-                                            .fontWidth(.standard)
                                             .fontWeight(.black)
                                         Text(verbatim: "HYPER")
                                             .font(.caption2)
-                                            .fontWidth(.expanded)
                                             .fontWeight(.semibold)
                                     }
                                     .foregroundStyle(.orange)
@@ -77,11 +71,9 @@ struct ScoresView: View {
                                     VStack {
                                         Text(String(item.anotherScore.difficulty))
                                             .italic()
-                                            .fontWidth(.standard)
                                             .fontWeight(.black)
                                         Text(verbatim: "ANOTHER")
                                             .font(.caption2)
-                                            .fontWidth(.expanded)
                                             .fontWeight(.semibold)
                                     }
                                     .foregroundStyle(.red)
@@ -90,11 +82,9 @@ struct ScoresView: View {
                                     VStack {
                                         Text(String(item.leggendariaScore.difficulty))
                                             .italic()
-                                            .fontWidth(.standard)
                                             .fontWeight(.black)
                                         Text(verbatim: "LEGGENDARIA")
                                             .font(.caption2)
-                                            .fontWidth(.expanded)
                                             .fontWeight(.semibold)
                                     }
                                     .foregroundStyle(.purple)
