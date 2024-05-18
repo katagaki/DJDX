@@ -12,7 +12,7 @@ struct MoreView: View {
     var body: some View {
         NavigationStack {
             MoreList(repoName: "katagaki/DJDX") {
-                
+                // TODO: Add CSwiftV license
             }
         }
     }
