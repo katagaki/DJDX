@@ -9,94 +9,32 @@ import SwiftUI
 import SwiftData
 
 struct ScoresView: View {
+
     @Environment(\.modelContext) var modelContext
-    @Query(sort: \EPOLISSongRecord.title) var items: [EPOLISSongRecord]
+    @EnvironmentObject var navigationManager: NavigationManager
+
+    @Query(sort: \EPOLISSongRecord.title) var songRecords: [EPOLISSongRecord]
 
     @State var isSelectingCSVFile: Bool = false
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationManager.scoresTabPath) {
             List {
-                ForEach(items) { item in
-                    VStack(alignment: .leading, spacing: 4.0) {
-                        VStack(alignment: .leading, spacing: 2.0) {
-                            Text(item.genre)
-                                .font(.caption2)
-                                .fontWidth(.condensed)
-                                .foregroundStyle(.secondary)
-                            Text(item.title)
-                                .bold()
-                                .fontWidth(.condensed)
-                            Text(item.artist)
-                                .font(.caption2)
-                                .fontWidth(.condensed)
-                        }
-                        HStack(alignment: .top) {
-                            Spacer()
-                            Group {
-                                if item.beginnerScore.difficulty != 0 {
-                                    VStack {
-                                        Text(String(item.beginnerScore.difficulty))
-                                            .italic()
-                                            .fontWeight(.black)
-                                        Text(verbatim: "BEGINNER")
-                                            .font(.caption2)
-                                            .fontWeight(.semibold)
-                                    }
-                                    .foregroundStyle(.green)
-                                }
-                                if item.normalScore.difficulty != 0 {
-                                    VStack {
-                                        Text(String(item.normalScore.difficulty))
-                                            .italic()
-                                            .fontWeight(.black)
-                                        Text(verbatim: "NORMAL")
-                                            .font(.caption2)
-                                            .fontWeight(.semibold)
-                                    }
-                                    .foregroundStyle(.blue)
-                                }
-                                if item.hyperScore.difficulty != 0 {
-                                    VStack {
-                                        Text(String(item.hyperScore.difficulty))
-                                            .italic()
-                                            .fontWeight(.black)
-                                        Text(verbatim: "HYPER")
-                                            .font(.caption2)
-                                            .fontWeight(.semibold)
-                                    }
-                                    .foregroundStyle(.orange)
-                                }
-                                if item.anotherScore.difficulty != 0 {
-                                    VStack {
-                                        Text(String(item.anotherScore.difficulty))
-                                            .italic()
-                                            .fontWeight(.black)
-                                        Text(verbatim: "ANOTHER")
-                                            .font(.caption2)
-                                            .fontWeight(.semibold)
-                                    }
-                                    .foregroundStyle(.red)
-                                }
-                                if item.leggendariaScore.difficulty != 0 {
-                                    VStack {
-                                        Text(String(item.leggendariaScore.difficulty))
-                                            .italic()
-                                            .fontWeight(.black)
-                                        Text(verbatim: "LEGGENDARIA")
-                                            .font(.caption2)
-                                            .fontWeight(.semibold)
-                                    }
-                                    .foregroundStyle(.purple)
-                                }
+                ForEach(songRecords) { songRecord in
+                    NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
+                        VStack(alignment: .leading, spacing: 4.0) {
+                            VStack(alignment: .leading, spacing: 2.0) {
+                                DetailedSongTitle(songRecord: songRecord)
                             }
-                            .kerning(-0.2)
-                            .lineLimit(1)
+                            HStack {
+                                Spacer()
+                                LevelShowcase(songRecord: songRecord)
+                            }
                         }
                     }
                 }
             }
-            .navigationTitle("EPOLIS")
+            .navigationTitle("スコア一覧")
             .listStyle(.plain)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -130,6 +68,12 @@ struct ScoresView: View {
                     }
                 })
                 .ignoresSafeArea(edges: [.bottom])
+            }
+            .navigationDestination(for: ViewPath.self) { viewPath in
+                switch viewPath {
+                case .scoreViewer(let songRecord): ScoreViewer(songRecord: songRecord)
+                default: Color.clear
+                }
             }
         }
     }

@@ -10,6 +10,7 @@ import SwiftData
 
 @main
 struct DJDXApp: App {
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             EPOLISSongRecord.self,
@@ -23,10 +24,15 @@ struct DJDXApp: App {
         }
     }()
 
+    @StateObject var tabManager = TabManager()
+    @StateObject var navigationManager = NavigationManager()
+
     var body: some Scene {
         WindowGroup {
             MainTabView()
         }
         .modelContainer(sharedModelContainer)
+        .environmentObject(tabManager)
+        .environmentObject(navigationManager)
     }
 }

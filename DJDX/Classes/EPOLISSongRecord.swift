@@ -33,7 +33,7 @@ final class EPOLISSongRecord {
         self.playCount = Int(csvRowData["プレー回数"] as? String ?? "0") ?? 0
 
         let emptyScore = ScoreForLevel(
-            level: .unknown(name: ""),
+            level: .unknown,
             difficulty: 0,
             score: 0,
             perfectGreatCount: 0,
@@ -49,16 +49,7 @@ final class EPOLISSongRecord {
         leggendariaScore = emptyScore
 
         for songLevelCSVHeader in songLevelCSVHeaders {
-            var songLevel: SongLevel?
-            switch songLevelCSVHeader {
-            case "BEGINNER": songLevel = .beginner(name: songLevelCSVHeader)
-            case "NORMAL": songLevel = .normal(name: songLevelCSVHeader)
-            case "HYPER": songLevel = .hyper(name: songLevelCSVHeader)
-            case "ANOTHER": songLevel = .another(name: songLevelCSVHeader)
-            case "LEGGENDARIA": songLevel = .leggendaria(name: songLevelCSVHeader)
-            default: break
-            }
-            if let songLevel {
+            if let songLevel = SongLevel(rawValue: songLevelCSVHeader) {
                 let score = ScoreForLevel(
                     level: songLevel,
                     difficulty: Int(csvRowData["\(songLevelCSVHeader) 難易度"] as? String ?? "0") ?? 0,
@@ -101,11 +92,11 @@ struct ScoreForLevel: Codable {
     var djLevel: String
 }
 
-enum SongLevel: Codable {
-    case beginner(name: String)
-    case normal(name: String)
-    case hyper(name: String)
-    case another(name: String)
-    case leggendaria(name: String)
-    case unknown(name: String)
+enum SongLevel: String, Codable {
+    case beginner = "BEGINNER"
+    case normal = "NORMAL"
+    case hyper = "HYPER"
+    case another = "ANOTHER"
+    case leggendaria = "LEGGENDARIA"
+    case unknown = ""
 }
