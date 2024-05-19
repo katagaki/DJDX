@@ -16,7 +16,7 @@ struct MainTabView: View {
         TabView(selection: $tabManager.selectedTab) {
             ScoresView()
                 .tabItem {
-                    Label("スコア", systemImage: "list.star")
+                    Label("譜面一覧", systemImage: "list.star")
                 }
             Color.clear
                 .tabItem {

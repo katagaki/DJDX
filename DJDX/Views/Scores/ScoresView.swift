@@ -34,7 +34,7 @@ struct ScoresView: View {
                     }
                 }
             }
-            .navigationTitle("スコア一覧")
+            .navigationTitle("譜面")
             .listStyle(.plain)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
