@@ -10,12 +10,15 @@ import Foundation
 class NavigationManager: ObservableObject {
 
     @Published var scoresTabPath: [ViewPath] = []
+    @Published var importerTabPath: [ViewPath] = []
     @Published var moreTabPath: [ViewPath] = []
 
     func popToRoot(for tab: TabType) {
         switch tab {
         case .scores:
             scoresTabPath.removeAll()
+        case .importer:
+            importerTabPath.removeAll()
         case .more:
             moreTabPath.removeAll()
         }
@@ -25,6 +28,8 @@ class NavigationManager: ObservableObject {
         switch tab {
         case .scores:
             scoresTabPath.append(viewPath)
+        case .importer:
+            importerTabPath.append(viewPath)
         case .more:
             moreTabPath.append(viewPath)
         }

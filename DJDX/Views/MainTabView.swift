@@ -18,18 +18,21 @@ struct MainTabView: View {
                 .tabItem {
                     Label("譜面一覧", systemImage: "list.star")
                 }
-            Color.clear
+                .tag(TabType.scores)
+            ContentUnavailableView("未実装の機能です", systemImage: "hourglass.bottomhalf.filled")
                 .tabItem {
                     Label("アナリティクス", systemImage: "chart.xyaxis.line")
                 }
-            Color.clear
+            ImportView()
                 .tabItem {
-                    Label("検索", systemImage: "magnifyingglass")
+                    Label("インポート", systemImage: "square.and.arrow.down")
                 }
+                .tag(TabType.importer)
             MoreView()
-            .tabItem {
-                Label("その他", systemImage: "ellipsis")
-            }
+                .tabItem {
+                    Label("その他", systemImage: "ellipsis")
+                }
+                .tag(TabType.more)
         }
         .onReceive(tabManager.$selectedTab, perform: { newValue in
             if newValue == tabManager.previouslySelectedTab {
