@@ -16,7 +16,7 @@ struct MainTabView: View {
         TabView(selection: $tabManager.selectedTab) {
             ScoresView()
                 .tabItem {
-                    Label("譜面一覧", systemImage: "list.star")
+                    Label("スコアデータ", systemImage: "list.star")
                 }
                 .tag(TabType.scores)
             ChartsView()

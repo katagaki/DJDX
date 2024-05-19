@@ -55,7 +55,7 @@ struct ScoreSection: View {
                     .bold()
                     .font(.caption)
                 } else {
-                    Text("現バージョンのプレイ記録はありません。")
+                    Text("現バージョンのプレー記録はありません。")
                         .bold()
                         .font(.caption)
                         .foregroundStyle(.secondary)

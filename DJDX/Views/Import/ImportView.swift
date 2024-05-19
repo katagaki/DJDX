@@ -38,6 +38,7 @@ struct ImportView: View {
                 }
             }
             .padding()
+            .navigationTitle("データインポートツール")
         }
         .sheet(isPresented: $isSelectingCSVFile) {
             DocumentPicker(allowedUTIs: [.commaSeparatedText], onDocumentPicked: { url in
