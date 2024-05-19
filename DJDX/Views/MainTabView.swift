@@ -18,6 +18,14 @@ struct MainTabView: View {
                 .tabItem {
                     Label("スコア", systemImage: "list.star")
                 }
+            Color.clear
+                .tabItem {
+                    Label("アナリティクス", systemImage: "chart.xyaxis.line")
+                }
+            Color.clear
+                .tabItem {
+                    Label("検索", systemImage: "magnifyingglass")
+                }
             MoreView()
             .tabItem {
                 Label("その他", systemImage: "ellipsis")
