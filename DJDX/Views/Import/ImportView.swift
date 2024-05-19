@@ -82,10 +82,12 @@ struct ImportView: View {
             .navigationTitle("データインポート")
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
-                case .autoImporter: WebImporter(
+                case .autoImporter:
+                    WebImporter(
                     isAutoImportFailed: $isAutoImportFailed,
                     autoImportFailedReason: $autoImportFailedReason
-                )
+                    )
+                    .navigationBarTitleDisplayMode(.inline)
                 default: Color.clear
                 }
             }

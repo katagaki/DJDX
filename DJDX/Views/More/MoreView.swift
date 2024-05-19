@@ -28,15 +28,13 @@ struct MoreView: View {
                                 }
                             }
                     } label: {
-                        Text("クッキーをクリア")
+                        Text("すべてのウェブデータを削除")
                             .foregroundStyle(.red)
                     }
-                }
-                Section {
                     Button {
                         try? modelContext.delete(model: EPOLISSongRecord.self)
                     } label: {
-                        Text("すべてのデータを削除")
+                        Text("すべてのスコアデータを削除")
                             .foregroundStyle(.red)
                     }
                 }
