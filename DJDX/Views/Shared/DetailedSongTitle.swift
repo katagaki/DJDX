@@ -9,12 +9,15 @@ import SwiftUI
 
 struct DetailedSongTitle: View {
     var songRecord: EPOLISSongRecord
+    var isGenreVisible: Bool = true
 
     var body: some View {
-        Text(songRecord.genre)
-            .font(.caption2)
-            .fontWidth(.condensed)
-            .foregroundStyle(.secondary)
+        if isGenreVisible {
+            Text(songRecord.genre)
+                .font(.caption2)
+                .fontWidth(.condensed)
+                .foregroundStyle(.secondary)
+        }
         Text(songRecord.title)
             .bold()
             .fontWidth(.condensed)
