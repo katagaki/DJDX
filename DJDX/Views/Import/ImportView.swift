@@ -16,6 +16,7 @@ struct ImportView: View {
 
     @State var isSelectingCSVFile: Bool = false
     @State var isAutoImportFailed: Bool = false
+    @State var didAutoImportSucceed: Bool = false
     @State var autoImportFailedReason: ImportFailedReason?
 
     var body: some View {
@@ -84,9 +85,11 @@ struct ImportView: View {
                 switch viewPath {
                 case .autoImporter:
                     WebImporter(
-                    isAutoImportFailed: $isAutoImportFailed,
-                    autoImportFailedReason: $autoImportFailedReason
+                        didAutoImportSucceed: $didAutoImportSucceed,
+                        isAutoImportFailed: $isAutoImportFailed,
+                        autoImportFailedReason: $autoImportFailedReason
                     )
+                    .navigationTitle("自動インポート")
                     .navigationBarTitleDisplayMode(.inline)
                 default: Color.clear
                 }
@@ -103,6 +106,13 @@ struct ImportView: View {
             })
             .ignoresSafeArea(edges: [.bottom])
         }
+        .alert("インポートが成功しました。",
+               isPresented: $didAutoImportSucceed,
+               actions: {
+            Button("OK", role: .cancel) {
+                didAutoImportSucceed = false
+            }
+        })
         .alert(errorMessage(for: autoImportFailedReason ?? .serverError),
                isPresented: $isAutoImportFailed,
                actions: {
@@ -122,6 +132,8 @@ struct ImportView: View {
             return "プレーデータがないため、インポートが失敗しました。"
         case .serverError:
             return "サーバーエラーが発生したため、インポートが失敗しました。"
+        case .maintenance:
+            return "e-amusementはただいまメンテナンス中のため、ご利用いただけません。"
         }
     }
 

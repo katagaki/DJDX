@@ -29,6 +29,7 @@ struct WebImporter: UIViewRepresentable, UpdateScoreDataDelegate {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
 
+    @Binding var didAutoImportSucceed: Bool
     @Binding var isAutoImportFailed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
     @State var observers = [NSKeyValueObservation]()
@@ -57,8 +58,9 @@ struct WebImporter: UIViewRepresentable, UpdateScoreDataDelegate {
                 let scoreForSong: EPOLISSongRecord = EPOLISSongRecord(csvRowData: keyedRow)
                 modelContext.insert(scoreForSong)
             }
-            autoImportFailedReason = nil
             dismiss()
+            autoImportFailedReason = nil
+            didAutoImportSucceed = true
         }
     }
 
@@ -94,11 +96,11 @@ var head = document.head || document.getElementsByTagName('head')[0]
 // ダークモード
 var darkModeCSS = `
 @media (prefers-color-scheme: dark) {
-    body {
+    body, #id_ea_common_content_whole {
         background-color: #000000;
         color: #ffffff;
     }
-    .Header_logo__konami--default__lYPft {
+    header, .Header_logo__konami--default__lYPft {
         background-color: #000000!important;
     }
     .Form_login__layout--narrow-frame__SnckF,
@@ -159,11 +161,15 @@ waitForElementToExist('#onetrust-consent-sdk').then((element) => {
 
     let selectSPButtonJS = """
 var submitButtons = document.getElementsByClassName('submit_btn')
-Array.from(submitButtons).forEach(button => {
-    if (button.value === "SP") {
-        button.click()
-    }
-})
+if (submitButtons.length > 0) {
+    Array.from(submitButtons).forEach(button => {
+        if (button.value === "SP") {
+            button.click()
+        }
+    })
+} else {
+    throw 1
+}
 """
 
     let getScoreDataJS = """
@@ -185,7 +191,11 @@ document.getElementById('score_data').value
             if urlString.starts(with: downloadPageURL.absoluteString) {
                 webView.isUserInteractionEnabled = false
                 if !waitingForDownloadPageFormSubmit {
-                    webView.evaluateJavaScript(self.selectSPButtonJS)
+                    webView.evaluateJavaScript(self.selectSPButtonJS) { result, error in
+                        if error != nil {
+                            self.updateScoreDataDelegate.stopProcessing(with: .maintenance)
+                        }
+                    }
                     waitingForDownloadPageFormSubmit = true
                 } else {
                     webView.evaluateJavaScript(getScoreDataJS) { result, _ in
@@ -207,9 +217,10 @@ document.getElementById('score_data').value
                 } else if urlString.hasSuffix("?err=4") {
                     self.updateScoreDataDelegate.stopProcessing(with: .serverError)
                 }
+            } else {
+                webView.layer.opacity = 1.0
             }
         }
-        webView.layer.opacity = 1.0
     }
 }
 

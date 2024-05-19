@@ -12,4 +12,5 @@ enum ImportFailedReason {
     case noEAmusementPass
     case noPlayData
     case serverError
+    case maintenance
 }
