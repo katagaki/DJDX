@@ -31,6 +31,7 @@ struct ImportView: View {
 アプリをご利用いただく前に、お客様のCSVデータをインポートすることをお勧めします。
 お手数ですが、データのインポートを手動で実行してください。
 """)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .listRowBackground(Color.clear)
                 } header: {
@@ -91,8 +92,28 @@ struct ImportView: View {
                     )
                     .navigationTitle("自動インポート")
                     .navigationBarTitleDisplayMode(.inline)
+                    .toolbarBackground(.visible, for: .navigationBar)
+                    .toolbarBackground(.hidden, for: .tabBar)
                     .background {
                         ProgressView("読み込み中…")
+                    }
+                    .padding(0.0)
+                    .safeAreaInset(edge: .bottom, spacing: 0.0) {
+                        HStack {
+                            Image(systemName: "info.circle")
+                            Text("認証情報はこの端末外に送信することはありません。")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding([.leading, .trailing], 12.0)
+                        .padding([.top, .bottom], 8.0)
+                        .background(.bar)
+                        .overlay(alignment: .top) {
+                            Rectangle()
+                                .frame(height: 1/3)
+                                .foregroundColor(.primary.opacity(0.2))
+                        }
                     }
                 default: Color.clear
                 }
