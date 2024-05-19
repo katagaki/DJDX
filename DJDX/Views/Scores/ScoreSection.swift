@@ -63,13 +63,18 @@ struct ScoreSection: View {
         }
     }
 
-    func clearTypeColor() -> Color {
+    func clearTypeColor() -> any ShapeStyle {
         switch levelScore.clearType {
+        case "FULLCOMBO CLEAR": return LinearGradient(
+            gradient: Gradient(colors: [.cyan, .white, .purple]),
+            startPoint: .top,
+            endPoint: .bottom
+        )
         case "FAILED": return Color.red
         case "ASSIST CLEAR": return Color.purple
         case "EASY CLEAR": return Color.green
         case "CLEAR": return Color.cyan
-        case "HARD CLEAR": return Color.red
+        case "HARD CLEAR": return Color.pink
         case "EX HARD CLEAR": return Color.yellow
         default: return Color.primary
         }

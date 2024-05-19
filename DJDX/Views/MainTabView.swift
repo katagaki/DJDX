@@ -19,10 +19,11 @@ struct MainTabView: View {
                     Label("譜面一覧", systemImage: "list.star")
                 }
                 .tag(TabType.scores)
-            ContentUnavailableView("未実装の機能です", systemImage: "hourglass.bottomhalf.filled")
+            ChartsView()
                 .tabItem {
                     Label("アナリティクス", systemImage: "chart.xyaxis.line")
                 }
+                .tag(TabType.analytics)
             ImportView()
                 .tabItem {
                     Label("インポート", systemImage: "square.and.arrow.down")

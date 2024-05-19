@@ -9,6 +9,7 @@ import Foundation
 
 enum TabType: Int {
     case scores = 0
-    case importer = 1
-    case more = 2
+    case analytics = 1
+    case importer = 2
+    case more = 3
 }

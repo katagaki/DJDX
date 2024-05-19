@@ -10,6 +10,7 @@ import Foundation
 class NavigationManager: ObservableObject {
 
     @Published var scoresTabPath: [ViewPath] = []
+    @Published var analyticsTabPath: [ViewPath] = []
     @Published var importerTabPath: [ViewPath] = []
     @Published var moreTabPath: [ViewPath] = []
 
@@ -17,6 +18,8 @@ class NavigationManager: ObservableObject {
         switch tab {
         case .scores:
             scoresTabPath.removeAll()
+        case .analytics:
+            analyticsTabPath.removeAll()
         case .importer:
             importerTabPath.removeAll()
         case .more:
@@ -28,6 +31,8 @@ class NavigationManager: ObservableObject {
         switch tab {
         case .scores:
             scoresTabPath.append(viewPath)
+        case .analytics:
+            analyticsTabPath.append(viewPath)
         case .importer:
             importerTabPath.append(viewPath)
         case .more:
