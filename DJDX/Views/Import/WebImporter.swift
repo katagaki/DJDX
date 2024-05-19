@@ -191,7 +191,7 @@ document.getElementById('score_data').value
             if urlString.starts(with: downloadPageURL.absoluteString) {
                 webView.isUserInteractionEnabled = false
                 if !waitingForDownloadPageFormSubmit {
-                    webView.evaluateJavaScript(self.selectSPButtonJS) { result, error in
+                    webView.evaluateJavaScript(self.selectSPButtonJS) { _, error in
                         if error != nil {
                             self.updateScoreDataDelegate.stopProcessing(with: .maintenance)
                         }

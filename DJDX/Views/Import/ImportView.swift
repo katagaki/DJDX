@@ -57,6 +57,14 @@ struct ImportView: View {
                         .font(.body)
                 }
                 Section {
+                    NavigationLink(value: ViewPath.autoImporter) {
+                        Label("インポート開始", systemImage: "square.and.arrow.down")
+                    }
+                } header: {
+                    ListSectionHeader(text: "自動インポート（ベータ）")
+                        .font(.body)
+                }
+                Section {
                     Button {
                         loadCSVData()
                     } label: {
@@ -69,14 +77,6 @@ struct ImportView: View {
                         Text("アプリを試したい場合、サンプルデータを読み込んでご利用いただけます。")
                             .font(.subheadline)
                     }
-                }
-                Section {
-                    NavigationLink(value: ViewPath.autoImporter) {
-                        Label("インポート開始", systemImage: "square.and.arrow.down")
-                    }
-                } header: {
-                    ListSectionHeader(text: "自動インポート（ベータ）")
-                        .font(.body)
                 }
             }
             .listSectionSpacing(.compact)
@@ -91,6 +91,9 @@ struct ImportView: View {
                     )
                     .navigationTitle("自動インポート")
                     .navigationBarTitleDisplayMode(.inline)
+                    .background {
+                        ProgressView("読み込み中…")
+                    }
                 default: Color.clear
                 }
             }
