@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ScoreSection: View {
+
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
+
     var levelScore: ScoreForLevel
 
     var body: some View {
@@ -25,14 +28,14 @@ struct ScoreSection: View {
                             Text("CLEAR TYPE")
                                 .fontWidth(.expanded)
                             Spacer()
-                            Text(String(levelScore.clearType))
+                            Text(levelScore.clearType)
                                 .foregroundStyle(clearTypeColor())
                         }
                         HStack {
                             Text("DJ LEVEL")
                                 .fontWidth(.expanded)
                             Spacer()
-                            Text(String(levelScore.djLevel))
+                            Text(levelScore.djLevel)
                         }
                         HStack {
                             Text("SCORE")
@@ -52,10 +55,22 @@ struct ScoreSection: View {
                     .bold()
                     .font(.caption)
                 } else {
-                    Text("NO PLAY")
+                    Text("現バージョンのプレイ記録はありません。")
                         .bold()
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    if levelScore.clearType != "NO PLAY" {
+                        Divider()
+                        HStack {
+                            Text("CLEAR TYPE")
+                                .fontWidth(.expanded)
+                            Spacer()
+                            Text(levelScore.clearType)
+                                .foregroundStyle(clearTypeColor())
+                        }
+                        .bold()
+                        .font(.caption)
+                    }
                 }
             }
         } header: {
@@ -66,7 +81,7 @@ struct ScoreSection: View {
     func clearTypeColor() -> any ShapeStyle {
         switch levelScore.clearType {
         case "FULLCOMBO CLEAR": return LinearGradient(
-            gradient: Gradient(colors: [.cyan, .white, .purple]),
+            gradient: Gradient(colors: [.cyan, (colorScheme == .dark ? .white : .blue), .purple]),
             startPoint: .top,
             endPoint: .bottom
         )
