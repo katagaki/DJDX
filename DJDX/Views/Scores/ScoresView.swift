@@ -21,7 +21,15 @@ struct ScoresView: View {
     var body: some View {
         NavigationStack(path: $navigationManager.scoresTabPath) {
             List {
-                ForEach(songRecords) { songRecord in
+                ForEach(songRecords.filter({ songRecord in
+                    if searchTerm.trimmingCharacters(in: .whitespaces) == "" {
+                        return true
+                    } else {
+                        let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
+                        return songRecord.title.lowercased().contains(searchTermTrimmed) ||
+                               songRecord.artist.lowercased().contains(searchTermTrimmed)
+                    }
+                })) { songRecord in
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
                         VStack(alignment: .leading, spacing: 4.0) {
                             VStack(alignment: .leading, spacing: 2.0) {
