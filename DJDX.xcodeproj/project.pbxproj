@@ -48,6 +48,7 @@
 		E4E3D0CF2BF9959A001942FE /* LevelShowcase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelShowcase.swift; sourceTree = "<group>"; };
 		E4E3D0D12BF99790001942FE /* DetailedSongTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedSongTitle.swift; sourceTree = "<group>"; };
 		E4E3D0D32BF99A86001942FE /* ScoreSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreSection.swift; sourceTree = "<group>"; };
+		E4E3D0D82BF9A2D1001942FE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +82,7 @@
 		E4B123AE2BF8E8E400D4A3D1 /* DJDX */ = {
 			isa = PBXGroup;
 			children = (
+				E4E3D0D82BF9A2D1001942FE /* Info.plist */,
 				E4B123CA2BF8F7DC00D4A3D1 /* SampleData.csv */,
 				E4B123D02BF902B600D4A3D1 /* Views */,
 				E4B123CF2BF9028C00D4A3D1 /* Classes */,
@@ -378,6 +380,7 @@
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DJDX/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -406,6 +409,7 @@
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DJDX/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
