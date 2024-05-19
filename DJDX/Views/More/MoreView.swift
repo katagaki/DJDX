@@ -7,6 +7,7 @@
 
 import Komponents
 import SwiftUI
+import WebKit
 
 struct MoreView: View {
 
@@ -16,11 +17,28 @@ struct MoreView: View {
     var body: some View {
         NavigationStack(path: $navigationManager.moreTabPath) {
             MoreList(repoName: "katagaki/DJDX", viewPath: ViewPath.moreAttributions) {
-                Button {
-                    try? modelContext.delete(model: EPOLISSongRecord.self)
-                } label: {
-                    Text("すべてのデータを削除")
-                        .foregroundStyle(.red)
+                Section {
+                    Button {
+                        WKWebsiteDataStore.default()
+                            .fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                                records.forEach { record in
+                                    WKWebsiteDataStore.default().removeData(ofTypes: record.dataTypes,
+                                                                            for: [record],
+                                                                            completionHandler: {})
+                                }
+                            }
+                    } label: {
+                        Text("クッキーをクリア")
+                            .foregroundStyle(.red)
+                    }
+                }
+                Section {
+                    Button {
+                        try? modelContext.delete(model: EPOLISSongRecord.self)
+                    } label: {
+                        Text("すべてのデータを削除")
+                            .foregroundStyle(.red)
+                    }
                 }
             }
             .navigationDestination(for: ViewPath.self, destination: { viewPath in

@@ -15,30 +15,80 @@ struct ImportView: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @State var isSelectingCSVFile: Bool = false
+    @State var isAutoImportFailed: Bool = false
+    @State var autoImportFailedReason: ImportFailedReason?
 
     var body: some View {
         NavigationStack(path: $navigationManager.importerTabPath) {
-            VStack(spacing: 16.0) {
-                ActionButton(text: "CSVをダウンロード",
-                             icon: "safari",
-                             isPrimary: true) {
-                    openURL(URL(string: "https://p.eagate.573.jp/game/2dx/31/djdata/score_download.html")!)
+            List {
+                Section {
+                    VStack(spacing: 16.0) {
+                        Image(systemName: "arrow.down.doc")
+                            .font(.system(size: 64.0))
+                            .foregroundStyle(.accent)
+                        Text("""
+アプリをご利用いただく前に、お客様のCSVデータをインポートすることをお勧めします。
+お手数ですが、データのインポートを手動で実行してください。
+""")
+                    }
+                    .listRowBackground(Color.clear)
+                } header: {
+                    Text(verbatim: " ")
                 }
-                             .foregroundStyle(.text)
-                ActionButton(text: "CSVを読み込む",
-                             icon: "square.and.arrow.down",
-                             isPrimary: true) {
-                    isSelectingCSVFile = true
+                Section {
+                    Button {
+                        openURL(URL(string: "https://p.eagate.573.jp/game/2dx/31/djdata/score_download.html")!)
+                    } label: {
+                        Label("CSVをダウンロード", systemImage: "safari")
+                    }
+                } header: {
+                    ListSectionHeader(text: "1. CSVファイルをダウンロード")
+                        .font(.body)
                 }
-                             .foregroundStyle(.text)
-                ActionButton(text: "サンプルデータを書き込む",
-                             icon: "sparkles",
-                             isPrimary: false) {
-                    loadCSVData()
+                Section {
+                    Button {
+                        isSelectingCSVFile = true
+                    } label: {
+                        Label("CSVを読み込む", systemImage: "square.and.arrow.down")
+                    }
+                } header: {
+                    ListSectionHeader(text: "2. CSVファイルを読み込む")
+                        .font(.body)
+                }
+                Section {
+                    Button {
+                        loadCSVData()
+                    } label: {
+                        Label("サンプルデータを書き込む", systemImage: "sparkles")
+                    }
+                } header: {
+                    VStack(alignment: .leading, spacing: 4.0) {
+                        ListSectionHeader(text: "お困りですか？")
+                            .font(.body)
+                        Text("アプリを試したい場合、サンプルデータを読み込んでご利用いただけます。")
+                            .font(.subheadline)
+                    }
+                }
+                Section {
+                    NavigationLink(value: ViewPath.autoImporter) {
+                        Label("インポート開始", systemImage: "square.and.arrow.down")
+                    }
+                } header: {
+                    ListSectionHeader(text: "自動インポート（ベータ）")
+                        .font(.body)
                 }
             }
-            .padding()
-            .navigationTitle("データインポートツール")
+            .listSectionSpacing(.compact)
+            .navigationTitle("データインポート")
+            .navigationDestination(for: ViewPath.self) { viewPath in
+                switch viewPath {
+                case .autoImporter: WebImporter(
+                    isAutoImportFailed: $isAutoImportFailed,
+                    autoImportFailedReason: $autoImportFailedReason
+                )
+                default: Color.clear
+                }
+            }
         }
         .sheet(isPresented: $isSelectingCSVFile) {
             DocumentPicker(allowedUTIs: [.commaSeparatedText], onDocumentPicked: { url in
@@ -50,6 +100,26 @@ struct ImportView: View {
                 }
             })
             .ignoresSafeArea(edges: [.bottom])
+        }
+        .alert(errorMessage(for: autoImportFailedReason ?? .serverError),
+               isPresented: $isAutoImportFailed,
+               actions: {
+            Button("OK", role: .cancel) {
+                isAutoImportFailed = false
+            }
+        })
+    }
+
+    func errorMessage(for reason: ImportFailedReason) -> String {
+        switch reason {
+        case .noPremiumCourse:
+            return "e-amusementプレミアムコースに入会されていないため、インポートが失敗しました。"
+        case .noEAmusementPass:
+            return "e-amusement passが登録されていないため、インポートが失敗しました。"
+        case .noPlayData:
+            return "プレーデータがないため、インポートが失敗しました。"
+        case .serverError:
+            return "サーバーエラーが発生したため、インポートが失敗しました。"
         }
     }
 
@@ -65,8 +135,4 @@ struct ImportView: View {
             }
         }
     }
-}
-
-#Preview {
-    ImportView()
 }

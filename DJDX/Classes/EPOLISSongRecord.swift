@@ -12,17 +12,17 @@ let songLevelCSVHeaders: [String] = ["BEGINNER", "NORMAL", "HYPER", "ANOTHER", "
 
 @Model
 final class EPOLISSongRecord {
-    var version: String
-    var title: String
-    var genre: String
-    var artist: String
-    var playCount: Int
-    var beginnerScore: ScoreForLevel
-    var normalScore: ScoreForLevel
-    var hyperScore: ScoreForLevel
-    var anotherScore: ScoreForLevel
-    var leggendariaScore: ScoreForLevel
-    var lastPlayDate: Date
+    var version: String = ""
+    var title: String = ""
+    var genre: String = ""
+    var artist: String = ""
+    var playCount: Int = 0
+    var beginnerScore: ScoreForLevel = ScoreForLevel()
+    var normalScore: ScoreForLevel = ScoreForLevel()
+    var hyperScore: ScoreForLevel = ScoreForLevel()
+    var anotherScore: ScoreForLevel = ScoreForLevel()
+    var leggendariaScore: ScoreForLevel = ScoreForLevel()
+    var lastPlayDate: Date = Date.distantPast
 
     // Based on EPOLIS CSV format
     init(csvRowData: [String: Any]) {
@@ -31,22 +31,6 @@ final class EPOLISSongRecord {
         self.genre = csvRowData["ジャンル"] as? String ?? ""
         self.artist = csvRowData["アーティスト"] as? String ?? ""
         self.playCount = Int(csvRowData["プレー回数"] as? String ?? "0") ?? 0
-
-        let emptyScore = ScoreForLevel(
-            level: .unknown,
-            difficulty: 0,
-            score: 0,
-            perfectGreatCount: 0,
-            greatCount: 0,
-            missCount: 0,
-            clearType: "",
-            djLevel: ""
-        )
-        beginnerScore = emptyScore
-        normalScore = emptyScore
-        hyperScore = emptyScore
-        anotherScore = emptyScore
-        leggendariaScore = emptyScore
 
         for songLevelCSVHeader in songLevelCSVHeaders {
             if let songLevel = SongLevel(rawValue: songLevelCSVHeader) {
@@ -90,6 +74,35 @@ struct ScoreForLevel: Codable {
     var missCount: Int
     var clearType: String
     var djLevel: String
+
+    init(level: SongLevel,
+         difficulty: Int,
+         score: Int,
+         perfectGreatCount: Int,
+         greatCount: Int,
+         missCount: Int,
+         clearType: String,
+         djLevel: String) {
+        self.level = level
+        self.difficulty = difficulty
+        self.score = score
+        self.perfectGreatCount = perfectGreatCount
+        self.greatCount = greatCount
+        self.missCount = missCount
+        self.clearType = clearType
+        self.djLevel = djLevel
+    }
+
+    init() {
+        self.level = .unknown
+        self.difficulty = 0
+        self.score = 0
+        self.perfectGreatCount = 0
+        self.greatCount = 0
+        self.missCount = 0
+        self.clearType = "NO PLAY"
+        self.djLevel = "---"
+    }
 }
 
 enum SongLevel: String, Codable {
