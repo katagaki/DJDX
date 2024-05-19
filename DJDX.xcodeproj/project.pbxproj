@@ -27,6 +27,8 @@
 		E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0D32BF99A86001942FE /* ScoreSection.swift */; };
 		E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4E3D0D62BF9A220001942FE /* Komponents */; };
 		E4E3D0DB2BF9A3DB001942FE /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0DA2BF9A3DB001942FE /* ImportView.swift */; };
+		E4E3D0DE2BF9D662001942FE /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0DD2BF9D662001942FE /* ChartsView.swift */; };
+		E4E3D0E12BF9D743001942FE /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = E4E3D0E02BF9D743001942FE /* .swiftlint.yml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +53,8 @@
 		E4E3D0D32BF99A86001942FE /* ScoreSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreSection.swift; sourceTree = "<group>"; };
 		E4E3D0D82BF9A2D1001942FE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E4E3D0DA2BF9A3DB001942FE /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
+		E4E3D0DD2BF9D662001942FE /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
+		E4E3D0E02BF9D743001942FE /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +72,7 @@
 		E4B123A32BF8E8E400D4A3D1 = {
 			isa = PBXGroup;
 			children = (
+				E4E3D0E02BF9D743001942FE /* .swiftlint.yml */,
 				E4B123AE2BF8E8E400D4A3D1 /* DJDX */,
 				E4B123AD2BF8E8E400D4A3D1 /* Products */,
 			);
@@ -111,6 +116,7 @@
 				E4B123AF2BF8E8E400D4A3D1 /* App.swift */,
 				E4B123D12BF909CD00D4A3D1 /* MainTabView.swift */,
 				E4B123DB2BF90D1F00D4A3D1 /* Scores */,
+				E4E3D0DC2BF9D645001942FE /* Analytics */,
 				E4E3D0D92BF9A3D3001942FE /* Import */,
 				E4B123DC2BF90D2600D4A3D1 /* More */,
 				E4B123D82BF90C1300D4A3D1 /* Shared */,
@@ -164,6 +170,14 @@
 			path = Import;
 			sourceTree = "<group>";
 		};
+		E4E3D0DC2BF9D645001942FE /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				E4E3D0DD2BF9D662001942FE /* ChartsView.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -174,6 +188,7 @@
 				E4B123A82BF8E8E400D4A3D1 /* Sources */,
 				E4B123A92BF8E8E400D4A3D1 /* Frameworks */,
 				E4B123AA2BF8E8E400D4A3D1 /* Resources */,
+				E4E3D0DF2BF9D695001942FE /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -228,12 +243,34 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4E3D0E12BF9D743001942FE /* .swiftlint.yml in Resources */,
 				E4B123CB2BF8F7DC00D4A3D1 /* SampleData.csv in Resources */,
 				E4B123B62BF8E8E500D4A3D1 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E4E3D0DF2BF9D695001942FE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E4B123A82BF8E8E400D4A3D1 /* Sources */ = {
@@ -251,6 +288,7 @@
 				E4E3D0CC2BF98DC7001942FE /* ViewPath.swift in Sources */,
 				E4E3D0C72BF98DA2001942FE /* TabManager.swift in Sources */,
 				E4B123CE2BF8FEC900D4A3D1 /* CSwiftV.swift in Sources */,
+				E4E3D0DE2BF9D662001942FE /* ChartsView.swift in Sources */,
 				E4B123B02BF8E8E400D4A3D1 /* App.swift in Sources */,
 				E4B123DA2BF90C1D00D4A3D1 /* DocumentPicker.swift in Sources */,
 				E4E3D0DB2BF9A3DB001942FE /* ImportView.swift in Sources */,
@@ -391,6 +429,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DJDX/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -420,6 +459,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DJDX/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

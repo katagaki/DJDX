@@ -13,7 +13,7 @@ struct DJDXApp: App {
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            EPOLISSongRecord.self,
+            EPOLISSongRecord.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

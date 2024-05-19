@@ -13,7 +13,7 @@ struct ImportView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.openURL) var openURL
     @EnvironmentObject var navigationManager: NavigationManager
-    
+
     @State var isSelectingCSVFile: Bool = false
 
     var body: some View {

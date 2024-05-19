@@ -23,7 +23,7 @@ final class EPOLISSongRecord {
     var anotherScore: ScoreForLevel
     var leggendariaScore: ScoreForLevel
     var lastPlayDate: Date
-    
+
     // Based on EPOLIS CSV format
     init(csvRowData: [String: Any]) {
         self.version = csvRowData["バージョン"] as? String ?? ""

@@ -10,7 +10,6 @@ import SwiftData
 
 struct ScoresView: View {
 
-    @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
 
     @Query(sort: \EPOLISSongRecord.title) var songRecords: [EPOLISSongRecord]
