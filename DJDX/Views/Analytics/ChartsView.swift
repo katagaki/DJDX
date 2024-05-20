@@ -21,7 +21,18 @@ struct ChartsView: View {
     @State var isInitialScoresLoaded: Bool = false
     @State var clearLampPerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [Clear Type: Count]]
     @State var scoresPerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [DJ Level: Count]]
+
+    let difficulties: [Int] = Array(1...12)
     let djLevels: [String] = ["F", "E", "D", "C", "B", "A", "AA", "AAA"]
+    let clearTypes: [String] = [
+        "FULLCOMBO CLEAR",
+        "CLEAR",
+        "ASSIST CLEAR",
+        "EASY CLEAR",
+        "HARD CLEAR",
+        "EX HARD CLEAR",
+        "FAILED"
+    ]
 
     var body: some View {
         NavigationStack(path: $navigationManager.analyticsTabPath) {
@@ -48,7 +59,7 @@ struct ChartsView: View {
                     .chartXAxis {
                         AxisMarks(values: .automatic(desiredCount: 13))
                     }
-                    .chartXScale(domain: 1...12)
+                    .chartXScale(domain: 1...13)
                     .chartForegroundStyleScale([
                         "FULLCOMBO CLEAR": .white,
                         "CLEAR": .cyan,
@@ -65,19 +76,10 @@ struct ChartsView: View {
                         .font(.body)
                 }
                 Section {
-                    Picker(selection: $levelFilterForScoreRate.animation()) {
-                        Text("LEVEL 1").tag(1)
-                        Text("LEVEL 2").tag(2)
-                        Text("LEVEL 3").tag(3)
-                        Text("LEVEL 4").tag(4)
-                        Text("LEVEL 5").tag(5)
-                        Text("LEVEL 6").tag(6)
-                        Text("LEVEL 7").tag(7)
-                        Text("LEVEL 8").tag(8)
-                        Text("LEVEL 9").tag(9)
-                        Text("LEVEL 10").tag(10)
-                        Text("LEVEL 11").tag(11)
-                        Text("LEVEL 12").tag(12)
+                    Picker(selection: $levelFilterForScoreRate.animation(.snappy.speed(2.0))) {
+                        ForEach(difficulties, id: \.self) { difficulty in
+                            Text("LEVEL \(difficulty)").tag(difficulty)
+                        }
                     } label: {
                         Text("レベル")
                     }
@@ -116,7 +118,7 @@ struct ChartsView: View {
     }
 
     func reloadScores() {
-        withAnimation {
+        withAnimation(.snappy.speed(2.0)) {
             clearLampPerDifficulty.removeAll()
             scoresPerDifficulty.removeAll()
         }
@@ -125,17 +127,9 @@ struct ChartsView: View {
 
             var newClearLampPerDifficulty: [Int: [String: Int]] = [:]
             var newScoresPerDifficulty: [Int: [String: Int]] = [:]
-            for difficulty in 1...12 {
-                newScoresPerDifficulty[difficulty] = ["F": 0, "E": 0, "D": 0, "C": 0, "B": 0, "A": 0, "AA": 0, "AAA": 0]
-                newClearLampPerDifficulty[difficulty] = [
-                    "FULLCOMBO CLEAR": 0,
-                    "CLEAR": 0,
-                    "ASSIST CLEAR": 0,
-                    "EASY CLEAR": 0,
-                    "HARD CLEAR": 0,
-                    "EX HARD CLEAR": 0,
-                    "FAILED": 0
-                ]
+            for difficulty in difficulties {
+                newScoresPerDifficulty[difficulty] = djLevels.reduce(into: [String: Int]()) { $0[$1] = 0 }
+                newClearLampPerDifficulty[difficulty] = clearTypes.reduce(into: [String: Int]()) { $0[$1] = 0 }
             }
 
             var scores: [ScoreForLevel] = []
@@ -161,7 +155,7 @@ struct ChartsView: View {
             }
 
             await MainActor.run { [newClearLampPerDifficulty, newScoresPerDifficulty] in
-                withAnimation {
+                withAnimation(.snappy.speed(2.0)) {
                     self.clearLampPerDifficulty = newClearLampPerDifficulty
                     self.scoresPerDifficulty = newScoresPerDifficulty
                 }
