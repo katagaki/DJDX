@@ -16,11 +16,12 @@ struct ChartsView: View {
     @Environment(\.modelContext) var modelContext
     @Query var songRecords: [EPOLISSongRecord]
 
+    @AppStorage(wrappedValue: 1, "SelectedLevelFilterForClearLampInAnalyticsView") var levelFilterForClearLamp: Int
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForScoreRateInAnalyticsView") var levelFilterForScoreRate: Int
 
     @State var isInitialScoresLoaded: Bool = false
     @State var clearLampPerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [Clear Type: Count]]
-    @State var scoresPerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [DJ Level: Count]]
+    @State var scoreRatePerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [DJ Level: Count]]
 
     let difficulties: [Int] = Array(1...12)
     let djLevels: [String] = ["F", "E", "D", "C", "B", "A", "AA", "AAA"]
@@ -72,7 +73,39 @@ struct ChartsView: View {
                     .frame(height: 200.0)
                     .listRowInsets(.init(top: 18.0, leading: 18.0, bottom: 18.0, trailing: 18.0))
                 } header: {
-                    ListSectionHeader(text: "クリアランプ")
+                    ListSectionHeader(text: "クリアランプ（全体）")
+                        .font(.body)
+                }
+                Section {
+                    Picker(selection: $levelFilterForClearLamp.animation(.snappy.speed(2.0))) {
+                        ForEach(difficulties, id: \.self) { difficulty in
+                            Text("LEVEL \(difficulty)").tag(difficulty)
+                        }
+                    } label: {
+                        Text("レベル")
+                    }
+                    Chart(clearLampPerDifficulty[levelFilterForClearLamp]?.sorted(by: <) ??
+                          [:].sorted(by: <), id: \.key) { clearType, count in
+                        SectorMark(angle: .value(clearType, count))
+                            .foregroundStyle(
+                                by: .value("CLEAR TYPE", clearType)
+                            )
+                    }
+                    .chartLegend(.visible)
+                    .chartXScale(domain: clearTypes)
+                    .chartForegroundStyleScale([
+                      "FULLCOMBO CLEAR": .white,
+                      "CLEAR": .cyan,
+                      "ASSIST CLEAR": .purple,
+                      "EASY CLEAR": .green,
+                      "HARD CLEAR": .pink,
+                      "EX HARD CLEAR": .yellow,
+                      "FAILED": .red
+                    ])
+                    .frame(height: 158.0)
+                    .listRowInsets(.init(top: 18.0, leading: 18.0, bottom: 18.0, trailing: 18.0))
+                } header: {
+                    ListSectionHeader(text: "クリアランプ（レベル別）")
                         .font(.body)
                 }
                 Section {
@@ -83,7 +116,7 @@ struct ChartsView: View {
                     } label: {
                         Text("レベル")
                     }
-                    Chart(scoresPerDifficulty[levelFilterForScoreRate]?.sorted(by: <) ??
+                    Chart(scoreRatePerDifficulty[levelFilterForScoreRate]?.sorted(by: <) ??
                           [:].sorted(by: <), id: \.key) { djLevel, count in
                         BarMark(
                             x: .value("DJ LEVEL", djLevel),
@@ -93,10 +126,10 @@ struct ChartsView: View {
                     }
                     .chartLegend(.visible)
                     .chartXScale(domain: djLevels)
-                    .frame(height: 200.0)
+                    .frame(height: 158.0)
                     .listRowInsets(.init(top: 18.0, leading: 18.0, bottom: 18.0, trailing: 18.0))
                 } header: {
-                    ListSectionHeader(text: "スコアレート")
+                    ListSectionHeader(text: "スコアレート（レベル別）")
                         .font(.body)
                 }
             }
@@ -120,7 +153,7 @@ struct ChartsView: View {
     func reloadScores() {
         withAnimation(.snappy.speed(2.0)) {
             clearLampPerDifficulty.removeAll()
-            scoresPerDifficulty.removeAll()
+            scoreRatePerDifficulty.removeAll()
         }
         Task.detached {
             let songRecords = await songRecords
@@ -157,7 +190,7 @@ struct ChartsView: View {
             await MainActor.run { [newClearLampPerDifficulty, newScoresPerDifficulty] in
                 withAnimation(.snappy.speed(2.0)) {
                     self.clearLampPerDifficulty = newClearLampPerDifficulty
-                    self.scoresPerDifficulty = newScoresPerDifficulty
+                    self.scoreRatePerDifficulty = newScoresPerDifficulty
                 }
             }
         }
