@@ -31,6 +31,7 @@
 		E4E3D0E12BF9D743001942FE /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = E4E3D0E02BF9D743001942FE /* .swiftlint.yml */; };
 		E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E72BFA2B95001942FE /* WebImporter.swift */; };
 		E4E3D0EA2BFA47B1001942FE /* ImportFailedReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */; };
+		E4E3D0EC2BFB9F42001942FE /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E4E3D0EB2BFB9F42001942FE /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +61,7 @@
 		E4E3D0E42BFA243A001942FE /* DJDX.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DJDX.entitlements; sourceTree = "<group>"; };
 		E4E3D0E72BFA2B95001942FE /* WebImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImporter.swift; sourceTree = "<group>"; };
 		E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFailedReason.swift; sourceTree = "<group>"; };
+		E4E3D0EB2BFB9F42001942FE /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 				E4E3D0E42BFA243A001942FE /* DJDX.entitlements */,
 				E4E3D0D82BF9A2D1001942FE /* Info.plist */,
 				E4B123B52BF8E8E500D4A3D1 /* Assets.xcassets */,
+				E4E3D0EB2BFB9F42001942FE /* Localizable.xcstrings */,
 				E4B123CA2BF8F7DC00D4A3D1 /* SampleData.csv */,
 				E4B123D02BF902B600D4A3D1 /* Views */,
 				E4B123CF2BF9028C00D4A3D1 /* Classes */,
@@ -232,6 +235,7 @@
 			knownRegions = (
 				Base,
 				ja,
+				en,
 			);
 			mainGroup = E4B123A32BF8E8E400D4A3D1;
 			packageReferences = (
@@ -253,6 +257,7 @@
 			files = (
 				E4E3D0E12BF9D743001942FE /* .swiftlint.yml in Resources */,
 				E4B123CB2BF8F7DC00D4A3D1 /* SampleData.csv in Resources */,
+				E4E3D0EC2BFB9F42001942FE /* Localizable.xcstrings in Resources */,
 				E4B123B62BF8E8E500D4A3D1 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -77,6 +77,7 @@ struct ImportView: View {
                             .font(.body)
                         Text("アプリを試したい場合、サンプルデータを読み込んでご利用いただけます。")
                             .font(.subheadline)
+                            .textCase(.none)
                     }
                 }
             }
