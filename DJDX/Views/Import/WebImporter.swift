@@ -106,7 +106,8 @@ var darkModeCSS = `
     .Form_login__layout--narrow-frame__SnckF,
     .Form_login__layout--default__bEjGz,
     .Form_login__form--default__3G_u1,
-    .Form_login__form--narrow-frame__Rvksw {
+    .Form_login__form--narrow-frame__Rvksw,
+    #email-form {
         border: unset;
         background-color: #1c1c1e!important;
     }
