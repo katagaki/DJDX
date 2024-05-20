@@ -62,7 +62,7 @@ struct ChartsView: View {
                     }
                     .chartXScale(domain: 1...13)
                     .chartForegroundStyleScale([
-                        "FULLCOMBO CLEAR": .white,
+                        "FULLCOMBO CLEAR": .blue,
                         "CLEAR": .cyan,
                         "ASSIST CLEAR": .purple,
                         "EASY CLEAR": .green,
@@ -94,7 +94,7 @@ struct ChartsView: View {
                     .chartLegend(.visible)
                     .chartXScale(domain: clearTypes)
                     .chartForegroundStyleScale([
-                      "FULLCOMBO CLEAR": .white,
+                      "FULLCOMBO CLEAR": .blue,
                       "CLEAR": .cyan,
                       "ASSIST CLEAR": .purple,
                       "EASY CLEAR": .green,
