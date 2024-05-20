@@ -41,7 +41,7 @@ struct ChartsView: View {
                 Section {
                     ClearLampOverviewChart(clearLampPerDifficulty: $clearLampPerDifficulty)
                     .frame(height: 200.0)
-                    .listRowInsets(.init(top: 18.0, leading: 18.0, bottom: 18.0, trailing: 18.0))
+                    .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                 } header: {
                     ListSectionHeader(text: "クリアランプ（全体）")
                         .font(.body)
@@ -53,7 +53,7 @@ struct ChartsView: View {
                                                 clearTypes: .constant(clearTypes),
                                                 selectedDifficulty: $levelFilterForClearLamp)
                     .frame(height: 158.0)
-                    .listRowInsets(.init(top: 18.0, leading: 18.0, bottom: 18.0, trailing: 18.0))
+                    .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                 } header: {
                     ListSectionHeader(text: "クリアランプ（レベル別）")
                         .font(.body)
@@ -65,7 +65,7 @@ struct ChartsView: View {
                                                 djLevels: .constant(djLevels),
                                                 selectedDifficulty: $levelFilterForScoreRate)
                     .frame(height: 158.0)
-                    .listRowInsets(.init(top: 18.0, leading: 18.0, bottom: 18.0, trailing: 18.0))
+                    .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                 } header: {
                     ListSectionHeader(text: "スコアレート（レベル別）")
                         .font(.body)
