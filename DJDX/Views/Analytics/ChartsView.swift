@@ -70,6 +70,23 @@ struct ChartsView: View {
                         "EX HARD CLEAR": .yellow,
                         "FAILED": .red
                     ])
+                    .chartOverlay { proxy in
+                        GeometryReader { geometry in
+                            Rectangle().fill(.clear).contentShape(Rectangle())
+                                .gesture(
+                                    DragGesture()
+                                        .onChanged { value in
+                                            let origin: CGPoint = geometry[proxy.plotFrame].origin
+                                            let location: CGPoint = CGPoint(
+                                                x: value.location.x - origin.x,
+                                                y: value.location.y - origin.y
+                                            )
+                                            let (difficulty, _) = proxy.value(at: location, as: (Int, Int).self) ?? (0, 0)
+                                            // TODO: Display floating detail popup for difficulty
+                                        }
+                                )
+                        }
+                    }
                     .frame(height: 200.0)
                     .listRowInsets(.init(top: 18.0, leading: 18.0, bottom: 18.0, trailing: 18.0))
                 } header: {
