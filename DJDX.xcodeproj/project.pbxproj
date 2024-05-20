@@ -32,6 +32,10 @@
 		E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E72BFA2B95001942FE /* WebImporter.swift */; };
 		E4E3D0EA2BFA47B1001942FE /* ImportFailedReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */; };
 		E4E3D0EC2BFB9F42001942FE /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E4E3D0EB2BFB9F42001942FE /* Localizable.xcstrings */; };
+		E4E3D0EE2BFC034C001942FE /* ClearLampOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0ED2BFC034C001942FE /* ClearLampOverviewChart.swift */; };
+		E4E3D0F02BFC03CB001942FE /* ClearLampPerDifficultyChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0EF2BFC03CB001942FE /* ClearLampPerDifficultyChart.swift */; };
+		E4E3D0F22BFC0489001942FE /* ScoreRatePerDifficultyChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F12BFC0489001942FE /* ScoreRatePerDifficultyChart.swift */; };
+		E4E3D0F42BFC053D001942FE /* DifficultyPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +66,10 @@
 		E4E3D0E72BFA2B95001942FE /* WebImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImporter.swift; sourceTree = "<group>"; };
 		E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFailedReason.swift; sourceTree = "<group>"; };
 		E4E3D0EB2BFB9F42001942FE /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		E4E3D0ED2BFC034C001942FE /* ClearLampOverviewChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearLampOverviewChart.swift; sourceTree = "<group>"; };
+		E4E3D0EF2BFC03CB001942FE /* ClearLampPerDifficultyChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearLampPerDifficultyChart.swift; sourceTree = "<group>"; };
+		E4E3D0F12BFC0489001942FE /* ScoreRatePerDifficultyChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreRatePerDifficultyChart.swift; sourceTree = "<group>"; };
+		E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyPicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,6 +193,10 @@
 			isa = PBXGroup;
 			children = (
 				E4E3D0DD2BF9D662001942FE /* ChartsView.swift */,
+				E4E3D0ED2BFC034C001942FE /* ClearLampOverviewChart.swift */,
+				E4E3D0EF2BFC03CB001942FE /* ClearLampPerDifficultyChart.swift */,
+				E4E3D0F12BFC0489001942FE /* ScoreRatePerDifficultyChart.swift */,
+				E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */,
 			);
 			path = Analytics;
 			sourceTree = "<group>";
@@ -294,18 +306,22 @@
 				E4E3D0D02BF9959A001942FE /* LevelShowcase.swift in Sources */,
 				E4E3D0D22BF99790001942FE /* DetailedSongTitle.swift in Sources */,
 				E4E3D0CE2BF990CC001942FE /* SingleLevelLabel.swift in Sources */,
+				E4E3D0F22BFC0489001942FE /* ScoreRatePerDifficultyChart.swift in Sources */,
 				E4B123D72BF90A4300D4A3D1 /* MoreView.swift in Sources */,
 				E4E3D0C52BF98D79001942FE /* NavigationManager.swift in Sources */,
 				E4E3D0C32BF98D57001942FE /* ScoreViewer.swift in Sources */,
 				E4B123B42BF8E8E400D4A3D1 /* EPOLISSongRecord.swift in Sources */,
 				E4E3D0CC2BF98DC7001942FE /* ViewPath.swift in Sources */,
+				E4E3D0F42BFC053D001942FE /* DifficultyPicker.swift in Sources */,
 				E4E3D0C72BF98DA2001942FE /* TabManager.swift in Sources */,
 				E4B123CE2BF8FEC900D4A3D1 /* CSwiftV.swift in Sources */,
 				E4E3D0DE2BF9D662001942FE /* ChartsView.swift in Sources */,
 				E4B123B02BF8E8E400D4A3D1 /* App.swift in Sources */,
+				E4E3D0EE2BFC034C001942FE /* ClearLampOverviewChart.swift in Sources */,
 				E4B123DA2BF90C1D00D4A3D1 /* DocumentPicker.swift in Sources */,
 				E4E3D0DB2BF9A3DB001942FE /* ImportView.swift in Sources */,
 				E4B123D22BF909CD00D4A3D1 /* MainTabView.swift in Sources */,
+				E4E3D0F02BFC03CB001942FE /* ClearLampPerDifficultyChart.swift in Sources */,
 				E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */,
 				E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */,
 				E4E3D0CA2BF98DB7001942FE /* TabType.swift in Sources */,

@@ -39,54 +39,7 @@ struct ChartsView: View {
         NavigationStack(path: $navigationManager.analyticsTabPath) {
             List {
                 Section {
-                    Chart(Array(clearLampPerDifficulty.keys), id: \.self) { difficulty in
-                        ForEach(clearLampPerDifficulty[difficulty]!.sorted(by: <), id: \.key) { clearType, count in
-                            BarMark(
-                                x: .value("LEVEL", difficulty),
-                                y: .value("CLEAR COUNT", count),
-                                width: .fixed(10.0)
-                            )
-                            .foregroundStyle(
-                                by: .value("CLEAR TYPE", clearType)
-                            )
-                            .position(
-                                by: .value("CLEAR TYPE", clearType),
-                                axis: .horizontal,
-                                span: .ratio(1)
-                            )
-                        }
-                    }
-                    .chartLegend(.visible)
-                    .chartXAxis {
-                        AxisMarks(values: .automatic(desiredCount: 13))
-                    }
-                    .chartXScale(domain: 1...13)
-                    .chartForegroundStyleScale([
-                        "FULLCOMBO CLEAR": .blue,
-                        "CLEAR": .cyan,
-                        "ASSIST CLEAR": .purple,
-                        "EASY CLEAR": .green,
-                        "HARD CLEAR": .pink,
-                        "EX HARD CLEAR": .yellow,
-                        "FAILED": .red
-                    ])
-                    .chartOverlay { proxy in
-                        GeometryReader { geometry in
-                            Rectangle().fill(.clear).contentShape(Rectangle())
-                                .gesture(
-                                    DragGesture()
-                                        .onChanged { value in
-                                            let origin: CGPoint = geometry[proxy.plotFrame].origin
-                                            let location: CGPoint = CGPoint(
-                                                x: value.location.x - origin.x,
-                                                y: value.location.y - origin.y
-                                            )
-                                            let (difficulty, _) = proxy.value(at: location, as: (Int, Int).self) ?? (0, 0)
-                                            // TODO: Display floating detail popup for difficulty
-                                        }
-                                )
-                        }
-                    }
+                    ClearLampOverviewChart(clearLampPerDifficulty: $clearLampPerDifficulty)
                     .frame(height: 200.0)
                     .listRowInsets(.init(top: 18.0, leading: 18.0, bottom: 18.0, trailing: 18.0))
                 } header: {
@@ -94,31 +47,11 @@ struct ChartsView: View {
                         .font(.body)
                 }
                 Section {
-                    Picker(selection: $levelFilterForClearLamp.animation(.snappy.speed(2.0))) {
-                        ForEach(difficulties, id: \.self) { difficulty in
-                            Text("LEVEL \(difficulty)").tag(difficulty)
-                        }
-                    } label: {
-                        Text("レベル")
-                    }
-                    Chart(clearLampPerDifficulty[levelFilterForClearLamp]?.sorted(by: <) ??
-                          [:].sorted(by: <), id: \.key) { clearType, count in
-                        SectorMark(angle: .value(clearType, count))
-                            .foregroundStyle(
-                                by: .value("CLEAR TYPE", clearType)
-                            )
-                    }
-                    .chartLegend(.visible)
-                    .chartXScale(domain: clearTypes)
-                    .chartForegroundStyleScale([
-                      "FULLCOMBO CLEAR": .blue,
-                      "CLEAR": .cyan,
-                      "ASSIST CLEAR": .purple,
-                      "EASY CLEAR": .green,
-                      "HARD CLEAR": .pink,
-                      "EX HARD CLEAR": .yellow,
-                      "FAILED": .red
-                    ])
+                    DifficultyPicker(selection: $levelFilterForClearLamp,
+                                     difficulties: .constant(difficulties))
+                    ClearLampPerDifficultyChart(clearLampPerDifficulty: $clearLampPerDifficulty,
+                                                clearTypes: .constant(clearTypes),
+                                                selectedDifficulty: $levelFilterForClearLamp)
                     .frame(height: 158.0)
                     .listRowInsets(.init(top: 18.0, leading: 18.0, bottom: 18.0, trailing: 18.0))
                 } header: {
@@ -126,23 +59,11 @@ struct ChartsView: View {
                         .font(.body)
                 }
                 Section {
-                    Picker(selection: $levelFilterForScoreRate.animation(.snappy.speed(2.0))) {
-                        ForEach(difficulties, id: \.self) { difficulty in
-                            Text("LEVEL \(difficulty)").tag(difficulty)
-                        }
-                    } label: {
-                        Text("レベル")
-                    }
-                    Chart(scoreRatePerDifficulty[levelFilterForScoreRate]?.sorted(by: <) ??
-                          [:].sorted(by: <), id: \.key) { djLevel, count in
-                        BarMark(
-                            x: .value("DJ LEVEL", djLevel),
-                            y: .value("CLEAR COUNT", count),
-                            width: .fixed(10.0)
-                        )
-                    }
-                    .chartLegend(.visible)
-                    .chartXScale(domain: djLevels)
+                    DifficultyPicker(selection: $levelFilterForScoreRate,
+                                     difficulties: .constant(difficulties))
+                    ScoreRatePerDifficultyChart(scoreRatePerDifficulty: $scoreRatePerDifficulty,
+                                                djLevels: .constant(djLevels),
+                                                selectedDifficulty: $levelFilterForScoreRate)
                     .frame(height: 158.0)
                     .listRowInsets(.init(top: 18.0, leading: 18.0, bottom: 18.0, trailing: 18.0))
                 } header: {
