@@ -21,16 +21,16 @@ struct ClearLampPerDifficultyChart: View {
                     by: .value("CLEAR TYPE", clearType)
                 )
         }
-        .chartLegend(.visible)
-        .chartXScale(domain: clearTypes)
-        .chartForegroundStyleScale([
-          "FULLCOMBO CLEAR": .blue,
-          "CLEAR": .cyan,
-          "ASSIST CLEAR": .purple,
-          "EASY CLEAR": .green,
-          "HARD CLEAR": .pink,
-          "EX HARD CLEAR": .yellow,
-          "FAILED": .red
-        ])
+              .chartLegend(position: .trailing, alignment: .leading, spacing: 2.0)
+              .chartXScale(domain: clearTypes)
+              .chartForegroundStyleScale([
+                "FULLCOMBO CLEAR": .blue,
+                "CLEAR": .cyan,
+                "ASSIST CLEAR": .purple,
+                "EASY CLEAR": .green,
+                "HARD CLEAR": .pink,
+                "EX HARD CLEAR": .yellow,
+                "FAILED": .red
+              ])
     }
 }
