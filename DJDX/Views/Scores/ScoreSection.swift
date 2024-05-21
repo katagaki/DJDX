@@ -56,8 +56,8 @@ struct ScoreSection: View {
                     .font(.caption)
                 } else {
                     Text("現バージョンのプレー記録はありません。")
-                        .bold()
-                        .font(.caption)
+//                        .bold()
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                     if levelScore.clearType != "NO PLAY" {
                         Divider()

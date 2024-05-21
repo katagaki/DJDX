@@ -256,7 +256,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Date Last Played: %@"
+            "value" : "Last Played: %@"
           }
         }
       }
