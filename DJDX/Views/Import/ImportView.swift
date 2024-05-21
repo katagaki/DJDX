@@ -6,6 +6,7 @@
 //
 
 import Komponents
+import SwiftData
 import SwiftUI
 
 struct ImportView: View {
@@ -13,6 +14,8 @@ struct ImportView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.openURL) var openURL
     @EnvironmentObject var navigationManager: NavigationManager
+
+    @Query var songRecords: [EPOLISSongRecord]
 
     @State var isSelectingCSVFile: Bool = false
     @State var isAutoImportFailed: Bool = false
@@ -27,10 +30,18 @@ struct ImportView: View {
                         Image(systemName: "arrow.down.doc")
                             .font(.system(size: 64.0))
                             .foregroundStyle(.accent)
-                        Text("""
-アプリをご利用いただく前に、お客様のCSVデータをインポートすることをお勧めします。
+                        Group {
+                            if songRecords.count == 0 {
+                                Text("""
+アプリをご利用いただく前に、お客様のCSVデータをインポートすることをおすすめします。
 お手数ですが、データのインポートを手動で実行してください。
 """)
+                            } else {
+                                Text("""
+beatmaniaIIDXをやり終わった後、CSVデータのインポートをおすすめします。
+""")
+                            }
+                        }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .listRowBackground(Color.clear)
@@ -38,46 +49,55 @@ struct ImportView: View {
                     Text(verbatim: " ")
                 }
                 Section {
-                    Button {
-                        openURL(URL(string: "https://p.eagate.573.jp/game/2dx/31/djdata/score_download.html")!)
-                    } label: {
-                        Label("CSVをダウンロード", systemImage: "safari")
-                    }
-                } header: {
-                    ListSectionHeader(text: "1. CSVファイルをダウンロード")
-                        .font(.body)
-                }
-                Section {
-                    Button {
-                        isSelectingCSVFile = true
-                    } label: {
-                        Label("CSVを読み込む", systemImage: "square.and.arrow.down")
-                    }
-                } header: {
-                    ListSectionHeader(text: "2. CSVファイルを読み込む")
-                        .font(.body)
-                }
-                Section {
                     NavigationLink(value: ViewPath.autoImporter) {
                         Label("インポート開始", systemImage: "square.and.arrow.down")
                     }
-                } header: {
-                    ListSectionHeader(text: "自動インポート（ベータ）")
-                        .font(.body)
                 }
-                Section {
-                    Button {
-                        loadCSVData()
-                    } label: {
-                        Label("サンプルデータを書き込む", systemImage: "sparkles")
-                    }
-                } header: {
-                    VStack(alignment: .leading, spacing: 4.0) {
-                        ListSectionHeader(text: "お困りですか？")
-                            .font(.body)
-                        Text("アプリを試したい場合、サンプルデータを読み込んでご利用いただけます。")
-                            .font(.subheadline)
-                            .textCase(.none)
+                if songRecords.count == 0 {
+                    Section {
+                        Group {
+                            Button {
+                                openURL(URL(string: "https://p.eagate.573.jp/game/2dx/31/djdata/score_download.html")!)
+                            } label: {
+                                HStack {
+                                    Label("CSVをダウンロード", systemImage: "arrow.down.circle")
+                                    Spacer()
+                                    Image(systemName: "safari")
+                                        .foregroundStyle(.secondary)
+                                }
+                                .contentShape(.rect)
+                            }
+                            Button {
+                                isSelectingCSVFile = true
+                            } label: {
+                                HStack {
+                                    Label("CSVを読み込む", systemImage: "folder")
+                                    Spacer()
+                                }
+                                .contentShape(.rect)
+                            }
+                            Button {
+                                loadCSVData()
+                            } label: {
+                                HStack {
+                                    Label("サンプルデータを書き込む", systemImage: "sparkles")
+                                    Spacer()
+                                }
+                                .contentShape(.rect)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    } header: {
+                        VStack(alignment: .leading, spacing: 4.0) {
+                            ListSectionHeader(text: "お困りですか？")
+                                .font(.body)
+                            Text("""
+手動でCSVファイルをダウンロードすることもできます。
+アプリを試したい場合、サンプルデータを読み込んでご利用いただけます。
+""")
+                                .font(.subheadline)
+                                .textCase(.none)
+                        }
                     }
                 }
             }

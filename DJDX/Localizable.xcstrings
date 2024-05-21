@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "beatmaniaIIDXをやり終わった後、CSVデータのインポートをおすすめします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After playing beatmaniaIIDX, it is recommended that you import your CSV data."
+          }
+        }
+      }
+    },
     "CLEAR COUNT" : {
       "localizations" : {
         "en" : {
@@ -36,7 +46,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Read CSV File"
+            "value" : "Open CSV File"
           }
         }
       }
@@ -111,22 +121,12 @@
         }
       }
     },
-    "アプリをご利用いただく前に、お客様のCSVデータをインポートすることをお勧めします。\nお手数ですが、データのインポートを手動で実行してください。" : {
+    "アプリをご利用いただく前に、お客様のCSVデータをインポートすることをおすすめします。\nお手数ですが、データのインポートを手動で実行してください。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Before you can use the app, you will need to import your CSV data manually."
-          }
-        }
-      }
-    },
-    "アプリを試したい場合、サンプルデータを読み込んでご利用いただけます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "If you would like to try out the app, you can use the provided sample data."
+            "value" : "Before you can use the app, it is recommended that you import your CSV data."
           }
         }
       }
@@ -257,6 +257,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Date Last Played: %@"
+          }
+        }
+      }
+    },
+    "手動でCSVファイルをダウンロードすることもできます。\nアプリを試したい場合、サンプルデータを読み込んでご利用いただけます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can also download and import your data manually.\nIf you would just like to try out the app, you can use the provided sample data."
           }
         }
       }
