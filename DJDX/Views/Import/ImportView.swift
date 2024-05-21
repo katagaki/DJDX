@@ -53,29 +53,29 @@ beatmaniaIIDXをやり終わった後、CSVデータのインポートをおす�
                         Label("インポート開始", systemImage: "square.and.arrow.down")
                     }
                 }
-                if songRecords.count == 0 {
-                    Section {
-                        Group {
-                            Button {
-                                openURL(URL(string: "https://p.eagate.573.jp/game/2dx/31/djdata/score_download.html")!)
-                            } label: {
-                                HStack {
-                                    Label("CSVをダウンロード", systemImage: "arrow.down.circle")
-                                    Spacer()
-                                    Image(systemName: "safari")
-                                        .foregroundStyle(.secondary)
-                                }
-                                .contentShape(.rect)
+                Section {
+                    Group {
+                        Button {
+                            openURL(URL(string: "https://p.eagate.573.jp/game/2dx/31/djdata/score_download.html")!)
+                        } label: {
+                            HStack {
+                                Label("CSVをダウンロード", systemImage: "arrow.down.circle")
+                                Spacer()
+                                Image(systemName: "safari")
+                                    .foregroundStyle(.secondary)
                             }
-                            Button {
-                                isSelectingCSVFile = true
-                            } label: {
-                                HStack {
-                                    Label("CSVを読み込む", systemImage: "folder")
-                                    Spacer()
-                                }
-                                .contentShape(.rect)
+                            .contentShape(.rect)
+                        }
+                        Button {
+                            isSelectingCSVFile = true
+                        } label: {
+                            HStack {
+                                Label("CSVを読み込む", systemImage: "folder")
+                                Spacer()
                             }
+                            .contentShape(.rect)
+                        }
+                        if songRecords.count == 0 {
                             Button {
                                 loadCSVData()
                             } label: {
@@ -86,18 +86,26 @@ beatmaniaIIDXをやり終わった後、CSVデータのインポートをおす�
                                 .contentShape(.rect)
                             }
                         }
-                        .buttonStyle(.plain)
-                    } header: {
-                        VStack(alignment: .leading, spacing: 4.0) {
-                            ListSectionHeader(text: "お困りですか？")
-                                .font(.body)
-                            Text("""
+                    }
+                    .buttonStyle(.plain)
+                } header: {
+                    VStack(alignment: .leading, spacing: 4.0) {
+                        ListSectionHeader(text: "お困りですか？")
+                            .font(.body)
+                        Group {
+                            if songRecords.count == 0 {
+                                    Text("""
 手動でCSVファイルをダウンロードすることもできます。
 アプリを試したい場合、サンプルデータを読み込んでご利用いただけます。
 """)
-                                .font(.subheadline)
-                                .textCase(.none)
+                            } else {
+                                    Text("""
+手動でCSVファイルをダウンロードすることもできます。
+""")
+                            }
                         }
+                        .font(.subheadline)
+                        .textCase(.none)
                     }
                 }
             }

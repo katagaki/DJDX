@@ -261,6 +261,16 @@
         }
       }
     },
+    "手動でCSVファイルをダウンロードすることもできます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can also download and import your data manually."
+          }
+        }
+      }
+    },
     "手動でCSVファイルをダウンロードすることもできます。\nアプリを試したい場合、サンプルデータを読み込んでご利用いただけます。" : {
       "localizations" : {
         "en" : {
