@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DetailedSongTitle: View {
     var songRecord: EPOLISSongRecord
-    var isGenreVisible: Bool = true
+    @Binding var isGenreVisible: Bool
 
     var body: some View {
         if isGenreVisible {

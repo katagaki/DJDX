@@ -34,13 +34,15 @@ struct ScoresView: View {
                         VStack(alignment: .leading, spacing: 4.0) {
                             VStack(alignment: .leading, spacing: 2.0) {
                                 DetailedSongTitle(songRecord: songRecord,
-                                                  isGenreVisible: isGenreVisible)
+                                                  isGenreVisible: $isGenreVisible)
                             }
+                            .id(songRecord.title)
                             if isLevelShowcaseVisible {
                                 HStack {
                                     Spacer()
                                     LevelShowcase(songRecord: songRecord)
                                 }
+                                .frame(alignment: .top)
                             }
                         }
                     }

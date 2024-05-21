@@ -33,7 +33,8 @@ struct ScoreViewer: View {
         .safeAreaInset(edge: .top) {
             VStack(alignment: .center, spacing: 8.0) {
                 VStack(alignment: .center, spacing: 2.0) {
-                    DetailedSongTitle(songRecord: songRecord)
+                    DetailedSongTitle(songRecord: songRecord,
+                                      isGenreVisible: .constant(true))
                 }
                 Divider()
                 LevelShowcase(songRecord: songRecord)
