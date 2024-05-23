@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LevelShowcase: View {
-    var songRecord: EPOLISSongRecord
+    var songRecord: IIDXSongRecord
 
     var body: some View {
         HStack(alignment: .top) {

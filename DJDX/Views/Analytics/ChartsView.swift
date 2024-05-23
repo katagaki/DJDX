@@ -14,7 +14,7 @@ struct ChartsView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(\.modelContext) var modelContext
-    @Query var songRecords: [EPOLISSongRecord]
+    @Query var songRecords: [IIDXSongRecord]
 
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForClearLampInAnalyticsView") var levelFilterForClearLamp: Int
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForScoreRateInAnalyticsView") var levelFilterForScoreRate: Int
@@ -36,7 +36,7 @@ struct ChartsView: View {
     ]
 
     var body: some View {
-        NavigationStack(path: $navigationManager.analyticsTabPath) {
+        NavigationStack(path: $navigationManager[.analytics]) {
             List {
                 Section {
                     ClearLampOverviewChart(clearLampPerDifficulty: $clearLampPerDifficulty)

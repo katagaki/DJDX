@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DetailedSongTitle: View {
-    var songRecord: EPOLISSongRecord
+    var songRecord: IIDXSongRecord
     @Binding var isGenreVisible: Bool
 
     var body: some View {

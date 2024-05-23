@@ -9,11 +9,15 @@ import SwiftUI
 
 struct MainTabView: View {
 
-    @EnvironmentObject var tabManager: TabManager
     @EnvironmentObject var navigationManager: NavigationManager
 
     var body: some View {
-        TabView(selection: $tabManager.selectedTab) {
+        TabView(selection: $navigationManager.selectedTab) {
+            CalendarView()
+                .tabItem {
+                    Label("カレンダー", systemImage: "calendar")
+                }
+                .tag(TabType.calendar)
             ScoresView()
                 .tabItem {
                     Label("スコアデータ", systemImage: "list.star")
@@ -24,26 +28,17 @@ struct MainTabView: View {
                     Label("アナリティクス", systemImage: "chart.xyaxis.line")
                 }
                 .tag(TabType.analytics)
-            ImportView()
-                .tabItem {
-                    Label("インポート", systemImage: "square.and.arrow.down")
-                }
-                .tag(TabType.importer)
             MoreView()
                 .tabItem {
                     Label("その他", systemImage: "ellipsis")
                 }
                 .tag(TabType.more)
         }
-        .onReceive(tabManager.$selectedTab, perform: { newValue in
-            if newValue == tabManager.previouslySelectedTab {
+        .onReceive(navigationManager.$selectedTab, perform: { newValue in
+            if newValue == navigationManager.previouslySelectedTab {
                 navigationManager.popToRoot(for: newValue)
             }
-            tabManager.previouslySelectedTab = newValue
+            navigationManager.previouslySelectedTab = newValue
         })
     }
-}
-
-#Preview {
-    MainTabView()
 }

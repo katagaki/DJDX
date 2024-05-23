@@ -8,8 +8,8 @@
 import Foundation
 
 enum TabType: Int {
-    case scores = 0
-    case analytics = 1
-    case importer = 2
+    case calendar = 0
+    case scores = 1
+    case analytics = 2
     case more = 3
 }

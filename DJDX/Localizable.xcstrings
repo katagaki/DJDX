@@ -2,6 +2,7 @@
   "sourceLanguage" : "ja",
   "strings" : {
     "beatmaniaIIDXをやり終わった後、CSVデータのインポートをおすすめします。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -122,6 +123,7 @@
       }
     },
     "アプリをご利用いただく前に、お客様のCSVデータをインポートすることをおすすめします。\nお手数ですが、データのインポートを手動で実行してください。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -131,7 +133,11 @@
         }
       }
     },
+    "アプリを試したい場合、サンプルデータを読み込んでご利用いただけます。" : {
+
+    },
     "インポート" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -152,6 +158,7 @@
       }
     },
     "インポート開始" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -160,6 +167,12 @@
           }
         }
       }
+    },
+    "お困りですか？" : {
+
+    },
+    "カレンダー" : {
+
     },
     "サンプルデータを書き込む" : {
       "localizations" : {
@@ -222,6 +235,7 @@
       }
     },
     "データインポート" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -251,6 +265,9 @@
         }
       }
     },
+    "今日に戻る" : {
+
+    },
     "最終プレー日時：%@" : {
       "localizations" : {
         "en" : {
@@ -272,6 +289,7 @@
       }
     },
     "手動でCSVファイルをダウンロードすることもできます。\nアプリを試したい場合、サンプルデータを読み込んでご利用いただけます。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -280,6 +298,12 @@
           }
         }
       }
+    },
+    "手動でインポート" : {
+
+    },
+    "曲名、アーティスト名" : {
+
     },
     "現バージョンのプレー記録はありません。" : {
       "localizations" : {
@@ -350,6 +374,9 @@
           }
         }
       }
+    },
+    "選択した日のデータをインポート" : {
+
     },
     "非表示" : {
       "localizations" : {

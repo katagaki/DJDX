@@ -15,7 +15,7 @@ struct MoreView: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     var body: some View {
-        NavigationStack(path: $navigationManager.moreTabPath) {
+        NavigationStack(path: $navigationManager[.more]) {
             MoreList(repoName: "katagaki/DJDX", viewPath: ViewPath.moreAttributions) {
                 Section {
                     Button {
@@ -32,7 +32,7 @@ struct MoreView: View {
                             .foregroundStyle(.red)
                     }
                     Button {
-                        try? modelContext.delete(model: EPOLISSongRecord.self)
+                        try? modelContext.delete(model: IIDXSongRecord.self)
                     } label: {
                         Text("すべてのスコアデータを削除")
                             .foregroundStyle(.red)

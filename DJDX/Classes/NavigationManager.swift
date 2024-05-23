@@ -8,36 +8,31 @@
 import Foundation
 
 class NavigationManager: ObservableObject {
+    @Published var selectedTab: TabType = .scores
+    @Published var previouslySelectedTab: TabType = .scores
 
-    @Published var scoresTabPath: [ViewPath] = []
-    @Published var analyticsTabPath: [ViewPath] = []
-    @Published var importerTabPath: [ViewPath] = []
-    @Published var moreTabPath: [ViewPath] = []
+    @Published var tabPaths: [TabType: [ViewPath]] = [
+        .calendar: [],
+        .scores: [],
+        .analytics: [],
+        .more: []
+    ]
 
-    func popToRoot(for tab: TabType) {
-        switch tab {
-        case .scores:
-            scoresTabPath.removeAll()
-        case .analytics:
-            analyticsTabPath.removeAll()
-        case .importer:
-            importerTabPath.removeAll()
-        case .more:
-            moreTabPath.removeAll()
+    subscript(tabType: TabType) -> [ViewPath] {
+        get {
+            return tabPaths[tabType] ?? []
+        }
+        set(newViewPath) {
+            tabPaths[tabType] = newViewPath
         }
     }
 
+    func popToRoot(for tab: TabType) {
+        tabPaths[tab]?.removeAll()
+    }
+
     func push(_ viewPath: ViewPath, for tab: TabType) {
-        switch tab {
-        case .scores:
-            scoresTabPath.append(viewPath)
-        case .analytics:
-            analyticsTabPath.append(viewPath)
-        case .importer:
-            importerTabPath.append(viewPath)
-        case .more:
-            moreTabPath.append(viewPath)
-        }
+        tabPaths[tab]?.append(viewPath)
     }
 
 }

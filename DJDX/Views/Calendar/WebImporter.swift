@@ -8,6 +8,7 @@
 import SwiftUI
 import UIKit
 import WebKit
+import SwiftData
 
 // swiftlint:disable line_length
 let loginPageRedirectURL: URL = URL(string: """
@@ -28,6 +29,7 @@ struct WebImporter: UIViewRepresentable, UpdateScoreDataDelegate {
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
+    @EnvironmentObject var calendar: CalendarManager
 
     @Binding var didAutoImportSucceed: Bool
     @Binding var isAutoImportFailed: Bool
@@ -53,11 +55,26 @@ struct WebImporter: UIViewRepresentable, UpdateScoreDataDelegate {
     func updateScore(with newScoreData: String) {
         let parsedCSV = CSwiftV(with: newScoreData)
         if let keyedRows = parsedCSV.keyedRows {
-            try? modelContext.delete(model: EPOLISSongRecord.self)
-            for keyedRow in keyedRows {
-                let scoreForSong: EPOLISSongRecord = EPOLISSongRecord(csvRowData: keyedRow)
-                modelContext.insert(scoreForSong)
+            // Delete selected date's import group
+            let fetchDescriptor = FetchDescriptor<ImportGroup>(
+                predicate: importGroups(in: calendar)
+                )
+            if let importGroupsOnSelectedDate: [ImportGroup] = try? modelContext.fetch(fetchDescriptor) {
+                for importGroup in importGroupsOnSelectedDate {
+                    modelContext.delete(importGroup)
+                }
             }
+            // Create new import group for selected date
+            let newImportGroup: ImportGroup = ImportGroup(importDate: calendar.selectedDate, iidxData: [])
+            modelContext.insert(newImportGroup)
+            try? modelContext.save()
+            // Read song records
+            for keyedRow in keyedRows {
+                let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
+                modelContext.insert(scoreForSong)
+                scoreForSong.importGroup = newImportGroup
+            }
+            try? modelContext.save()
             dismiss()
             autoImportFailedReason = nil
             didAutoImportSucceed = true

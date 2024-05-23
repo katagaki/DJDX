@@ -13,7 +13,7 @@ struct DJDXApp: App {
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            EPOLISSongRecord.self
+            IIDXSongRecord.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -24,15 +24,15 @@ struct DJDXApp: App {
         }
     }()
 
-    @StateObject var tabManager = TabManager()
     @StateObject var navigationManager = NavigationManager()
+    @StateObject var calendar = CalendarManager()
 
     var body: some Scene {
         WindowGroup {
             MainTabView()
         }
         .modelContainer(sharedModelContainer)
-        .environmentObject(tabManager)
         .environmentObject(navigationManager)
+        .environmentObject(calendar)
     }
 }

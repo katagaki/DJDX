@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ScoreViewer: View {
-    var songRecord: EPOLISSongRecord
+    var songRecord: IIDXSongRecord
 
     var body: some View {
         List {
@@ -69,7 +69,7 @@ struct ScoreViewer: View {
 }
 
 #Preview {
-    ScoreViewer(songRecord: EPOLISSongRecord(csvRowData: [
+    ScoreViewer(songRecord: IIDXSongRecord(csvRowData: [
         "バージョン": "CastHour",
         "タイトル": "禊",
         "ジャンル": "HARD PSY TRANCE",

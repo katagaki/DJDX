@@ -10,25 +10,32 @@ import SwiftData
 
 struct ScoresView: View {
 
-    @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(\.modelContext) var modelContext
 
-    @Query(sort: \EPOLISSongRecord.title) var songRecords: [EPOLISSongRecord]
+    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var calendar: CalendarManager
+
+    @State var songRecords: [IIDXSongRecord] = []
 
     @State var searchTerm: String = ""
     @AppStorage(wrappedValue: true, "LevelShowcaseVisibleInScoresView") var isLevelShowcaseVisible: Bool
     @AppStorage(wrappedValue: true, "GenreVisibleInScoresView") var isGenreVisible: Bool
 
     var body: some View {
-        NavigationStack(path: $navigationManager.scoresTabPath) {
+        NavigationStack(path: $navigationManager[.scores]) {
             List {
                 ForEach(songRecords.filter({ songRecord in
-                    if searchTerm.trimmingCharacters(in: .whitespaces) == "" {
-                        return true
-                    } else {
-                        let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
-                        return songRecord.title.lowercased().contains(searchTermTrimmed) ||
-                               songRecord.artist.lowercased().contains(searchTermTrimmed)
+                    if let importGroup = songRecord.importGroup, let songRecordImportGroup = songRecord.importGroup,
+                       Calendar.current.isDate(importGroup.importDate, inSameDayAs: songRecordImportGroup.importDate) {
+                        if searchTerm.trimmingCharacters(in: .whitespaces) == "" {
+                            return true
+                        } else {
+                            let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
+                            return songRecord.title.lowercased().contains(searchTermTrimmed) ||
+                                   songRecord.artist.lowercased().contains(searchTermTrimmed)
+                        }
                     }
+                    return false
                 })) { songRecord in
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
                         VStack(alignment: .leading, spacing: 4.0) {
@@ -50,7 +57,7 @@ struct ScoresView: View {
             }
             .navigationTitle("譜面一覧")
             .listStyle(.plain)
-            .searchable(text: $searchTerm, placement: .navigationBarDrawer(displayMode: .always))
+            .searchable(text: $searchTerm, placement: .navigationBarDrawer(displayMode: .always), prompt: "曲名、アーティスト名")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
@@ -72,6 +79,15 @@ struct ScoresView: View {
                     } label: {
                         Image(systemName: "gearshape")
                     }
+                }
+            }
+            .task {
+                let fetchDescriptor = FetchDescriptor<IIDXSongRecord>(
+                    predicate: iidxSongRecords(in: calendar),
+                    sortBy: [SortDescriptor(\.title, order: .forward)]
+                )
+                withAnimation(.snappy.speed(2.0)) {
+                    songRecords = (try? modelContext.fetch(fetchDescriptor)) ?? []
                 }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in

@@ -8,7 +8,8 @@
 import Foundation
 
 enum ViewPath: Hashable {
-    case scoreViewer(songRecord: EPOLISSongRecord)
-    case autoImporter
+    case scoreViewer(songRecord: IIDXSongRecord)
+    case importerWeb
+    case importerManual
     case moreAttributions
 }
