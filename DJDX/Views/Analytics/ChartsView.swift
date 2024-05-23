@@ -25,6 +25,8 @@ struct ChartsView: View {
     @State var clearLampPerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [Clear Type: Count]]
     @State var scoreRatePerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [DJ Level: Count]]
 
+    @State var isInitialScoreLoaded: Bool = false
+
     let difficulties: [Int] = Array(1...12)
     let djLevels: [String] = ["F", "E", "D", "C", "B", "A", "AA", "AAA"]
     let clearTypes: [String] = [
@@ -80,25 +82,31 @@ struct ChartsView: View {
                 }
             }
             .task {
-                withAnimation {
-                    let fetchDescriptor = FetchDescriptor<IIDXSongRecord>(
-                        predicate: iidxSongRecords(in: calendar),
-                        sortBy: [SortDescriptor(\.title, order: .forward)]
-                    )
-                    withAnimation(.snappy.speed(2.0)) {
-                        songRecords = (try? modelContext.fetch(fetchDescriptor)) ?? []
-                    }
+                if !isInitialScoreLoaded {
+                    isInitialScoreLoaded = true
                     reloadScores()
+                }
+            }
+            .onChange(of: calendar.selectedDate) { oldValue, newValue in
+                if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
+                    isInitialScoreLoaded = false
                 }
             }
         }
     }
 
     func reloadScores() {
+        let fetchDescriptor = FetchDescriptor<IIDXSongRecord>(
+            predicate: iidxSongRecords(in: calendar),
+            sortBy: [SortDescriptor(\.title, order: .forward)]
+        )
+        songRecords = (try? modelContext.fetch(fetchDescriptor)) ?? []
+
         withAnimation(.snappy.speed(2.0)) {
             clearLampPerDifficulty.removeAll()
             scoreRatePerDifficulty.removeAll()
         }
+
         Task.detached {
             let songRecords = await songRecords
 
