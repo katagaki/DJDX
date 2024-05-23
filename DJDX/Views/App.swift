@@ -13,6 +13,7 @@ struct DJDXApp: App {
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
+            ImportGroup.self,
             IIDXSongRecord.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)

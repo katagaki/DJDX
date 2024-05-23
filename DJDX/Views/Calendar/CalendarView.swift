@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2024/05/23.
 //
 
+import SwiftData
 import SwiftUI
 
 struct CalendarView: View {
@@ -186,11 +187,26 @@ struct CalendarView: View {
         if let urlOfData: URL = url, let stringFromData: String = try? String(contentsOf: urlOfData) {
             let parsedCSV = CSwiftV(with: stringFromData)
             if let keyedRows = parsedCSV.keyedRows {
-                try? modelContext.delete(model: IIDXSongRecord.self)
+                // Delete selected date's import group
+                let fetchDescriptor = FetchDescriptor<ImportGroup>(
+                    predicate: importGroups(in: calendar)
+                    )
+                if let importGroupsOnSelectedDate: [ImportGroup] = try? modelContext.fetch(fetchDescriptor) {
+                    for importGroup in importGroupsOnSelectedDate {
+                        modelContext.delete(importGroup)
+                    }
+                }
+                // Create new import group for selected date
+                let newImportGroup: ImportGroup = ImportGroup(importDate: calendar.selectedDate, iidxData: [])
+                modelContext.insert(newImportGroup)
+                try? modelContext.save()
+                // Read song records
                 for keyedRow in keyedRows {
                     let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
                     modelContext.insert(scoreForSong)
+                    scoreForSong.importGroup = newImportGroup
                 }
+                try? modelContext.save()
             }
         }
     }

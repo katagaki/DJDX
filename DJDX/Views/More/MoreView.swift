@@ -32,6 +32,7 @@ struct MoreView: View {
                             .foregroundStyle(.red)
                     }
                     Button {
+                        try? modelContext.delete(model: ImportGroup.self)
                         try? modelContext.delete(model: IIDXSongRecord.self)
                     } label: {
                         Text("すべてのスコアデータを削除")
