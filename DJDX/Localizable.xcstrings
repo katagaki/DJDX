@@ -1,17 +1,6 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
-    "beatmaniaIIDXをやり終わった後、CSVデータのインポートをおすすめします。" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "After playing beatmaniaIIDX, it is recommended that you import your CSV data."
-          }
-        }
-      }
-    },
     "CLEAR COUNT" : {
       "localizations" : {
         "en" : {
@@ -122,27 +111,12 @@
         }
       }
     },
-    "アプリをご利用いただく前に、お客様のCSVデータをインポートすることをおすすめします。\nお手数ですが、データのインポートを手動で実行してください。" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Before you can use the app, it is recommended that you import your CSV data."
-          }
-        }
-      }
-    },
     "アプリを試したい場合、サンプルデータを読み込んでご利用いただけます。" : {
-
-    },
-    "インポート" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Import"
+            "value" : "If you would just like to try out the app, you can also load sample data."
           }
         }
       }
@@ -157,22 +131,25 @@
         }
       }
     },
-    "インポート開始" : {
-      "extractionState" : "stale",
+    "お困りですか？" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start Import"
+            "value" : "Need Help?"
           }
         }
       }
     },
-    "お困りですか？" : {
-
-    },
     "カレンダー" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calendar"
+          }
+        }
+      }
     },
     "サンプルデータを書き込む" : {
       "localizations" : {
@@ -234,17 +211,6 @@
         }
       }
     },
-    "データインポート" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import Data"
-          }
-        }
-      }
-    },
     "プレー分析" : {
       "localizations" : {
         "en" : {
@@ -266,7 +232,14 @@
       }
     },
     "今日に戻る" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to Today"
+          }
+        }
+      }
     },
     "最終プレー日時：%@" : {
       "localizations" : {
@@ -288,22 +261,25 @@
         }
       }
     },
-    "手動でCSVファイルをダウンロードすることもできます。\nアプリを試したい場合、サンプルデータを読み込んでご利用いただけます。" : {
-      "extractionState" : "stale",
+    "手動でインポート" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can also download and import your data manually.\nIf you would just like to try out the app, you can use the provided sample data."
+            "value" : "Manual Import"
           }
         }
       }
     },
-    "手動でインポート" : {
-
-    },
     "曲名、アーティスト名" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Song Name, Artist Name"
+          }
+        }
+      }
     },
     "現バージョンのプレー記録はありません。" : {
       "localizations" : {
@@ -376,7 +352,14 @@
       }
     },
     "選択した日のデータをインポート" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Data for Selected Date"
+          }
+        }
+      }
     },
     "非表示" : {
       "localizations" : {

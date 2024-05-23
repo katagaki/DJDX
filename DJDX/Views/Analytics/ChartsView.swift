@@ -12,9 +12,12 @@ import SwiftUI
 
 struct ChartsView: View {
 
-    @EnvironmentObject var navigationManager: NavigationManager
     @Environment(\.modelContext) var modelContext
-    @Query var songRecords: [IIDXSongRecord]
+
+    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var calendar: CalendarManager
+
+    @State var songRecords: [IIDXSongRecord] = []
 
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForClearLampInAnalyticsView") var levelFilterForClearLamp: Int
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForScoreRateInAnalyticsView") var levelFilterForScoreRate: Int
@@ -81,6 +84,13 @@ struct ChartsView: View {
                 if !isInitialScoresLoaded {
                     isInitialScoresLoaded = true
                     withAnimation {
+                        let fetchDescriptor = FetchDescriptor<IIDXSongRecord>(
+                            predicate: iidxSongRecords(in: calendar),
+                            sortBy: [SortDescriptor(\.title, order: .forward)]
+                        )
+                        withAnimation(.snappy.speed(2.0)) {
+                            songRecords = (try? modelContext.fetch(fetchDescriptor)) ?? []
+                        }
                         reloadScores()
                     }
                 }
