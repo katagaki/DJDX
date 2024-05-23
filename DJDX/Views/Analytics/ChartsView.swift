@@ -22,7 +22,6 @@ struct ChartsView: View {
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForClearLampInAnalyticsView") var levelFilterForClearLamp: Int
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForScoreRateInAnalyticsView") var levelFilterForScoreRate: Int
 
-    @State var isInitialScoresLoaded: Bool = false
     @State var clearLampPerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [Clear Type: Count]]
     @State var scoreRatePerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [DJ Level: Count]]
 
@@ -81,18 +80,15 @@ struct ChartsView: View {
                 }
             }
             .task {
-                if !isInitialScoresLoaded {
-                    isInitialScoresLoaded = true
-                    withAnimation {
-                        let fetchDescriptor = FetchDescriptor<IIDXSongRecord>(
-                            predicate: iidxSongRecords(in: calendar),
-                            sortBy: [SortDescriptor(\.title, order: .forward)]
-                        )
-                        withAnimation(.snappy.speed(2.0)) {
-                            songRecords = (try? modelContext.fetch(fetchDescriptor)) ?? []
-                        }
-                        reloadScores()
+                withAnimation {
+                    let fetchDescriptor = FetchDescriptor<IIDXSongRecord>(
+                        predicate: iidxSongRecords(in: calendar),
+                        sortBy: [SortDescriptor(\.title, order: .forward)]
+                    )
+                    withAnimation(.snappy.speed(2.0)) {
+                        songRecords = (try? modelContext.fetch(fetchDescriptor)) ?? []
                     }
+                    reloadScores()
                 }
             }
         }
