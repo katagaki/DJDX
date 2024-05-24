@@ -11,6 +11,8 @@ import SwiftUI
 struct ClearLampOverviewChart: View {
     @Binding var clearLampPerDifficulty: [Int: [String: Int]]
 
+    @State var difficultyBelowFinger: Int?
+
     var body: some View {
         Chart(Array(clearLampPerDifficulty.keys), id: \.self) { difficulty in
             ForEach(clearLampPerDifficulty[difficulty]!.sorted(by: <), id: \.key) { clearType, count in
@@ -27,6 +29,21 @@ struct ClearLampOverviewChart: View {
                     axis: .horizontal,
                     span: .ratio(1)
                 )
+            }
+            .annotation(position: .top) {
+                if let difficultyBelowFinger, difficulty == difficultyBelowFinger {
+                    let totalPlayedPerDifficulty: Int = clearLampPerDifficulty[difficulty]?
+                        .reduce(into: 0) { partialResult, keyValue in
+                            partialResult += keyValue.value
+                        } ?? 0
+                    Text("\(totalPlayedPerDifficulty)曲")
+                        .padding([.top, .bottom], 2.0)
+                        .padding([.leading, .trailing], 4.0)
+                        .background(Color.accentColor)
+                        .foregroundStyle(.text)
+                        .clipShape(RoundedRectangle(cornerRadius: 99.0))
+                        .shadow(color: .black.opacity(0.2), radius: 2.0, y: 1.5)
+                }
             }
         }
         .chartLegend(.visible)
@@ -56,9 +73,11 @@ struct ClearLampOverviewChart: View {
                                         y: value.location.y - origin.y
                                     )
                                     let (difficulty, _) = proxy.value(at: location, as: (Int, Int).self) ?? (0, 0)
-                                    debugPrint(difficulty)
-                                        // TODO: Display floating detail popup for difficulty
+                                    difficultyBelowFinger = difficulty
                                 }
+                            }
+                            .onEnded { _ in
+                                difficultyBelowFinger = nil
                             }
                     )
             }

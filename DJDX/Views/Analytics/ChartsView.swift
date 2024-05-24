@@ -49,25 +49,25 @@ struct ChartsView: View {
                         .font(.body)
                 }
                 Section {
-                    DifficultyPicker(selection: $levelFilterForClearLamp,
-                                     difficulties: .constant(difficulties))
                     ClearLampPerDifficultyChart(clearLampPerDifficulty: $clearLampPerDifficulty,
                                                 clearTypes: .constant(clearTypes),
                                                 selectedDifficulty: $levelFilterForClearLamp)
-                    .frame(height: 158.0)
+                    .frame(height: 156.0)
                     .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                    DifficultyPicker(selection: $levelFilterForClearLamp,
+                                     difficulties: .constant(difficulties))
                 } header: {
                     ListSectionHeader(text: "クリアランプ（レベル別）")
                         .font(.body)
                 }
                 Section {
-                    DifficultyPicker(selection: $levelFilterForScoreRate,
-                                     difficulties: .constant(difficulties))
                     ScoreRatePerDifficultyChart(scoreRatePerDifficulty: $scoreRatePerDifficulty,
                                                 djLevels: .constant(djLevels),
                                                 selectedDifficulty: $levelFilterForScoreRate)
-                    .frame(height: 158.0)
+                    .frame(height: 156.0)
                     .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                    DifficultyPicker(selection: $levelFilterForScoreRate,
+                                     difficulties: .constant(difficulties))
                 } header: {
                     ListSectionHeader(text: "スコアレート（レベル別）")
                         .font(.body)
