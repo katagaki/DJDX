@@ -5,10 +5,10 @@
 //  Created by シン・ジャスティン on 2024/05/19.
 //
 
+import SwiftData
 import SwiftUI
 import UIKit
 import WebKit
-import SwiftData
 
 // swiftlint:disable line_length
 let loginPageRedirectURL: URL = URL(string: """
@@ -25,14 +25,60 @@ https://p.eagate.573.jp/game/2dx/31/error/error.html
 """)!
 // swiftlint:enable line_length
 
-struct WebImporter: UIViewRepresentable, UpdateScoreDataDelegate {
+struct WebImporter: View {
+    @Binding var isAutoImportFailed: Bool
+    @Binding var didImportSucceed: Bool
+    @Binding var autoImportFailedReason: ImportFailedReason?
+
+    var body: some View {
+        WebViewForImporter(
+            isAutoImportFailed: $isAutoImportFailed,
+            didImportSucceed: $didImportSucceed,
+            autoImportFailedReason: $autoImportFailedReason
+        )
+        .navigationTitle("自動インポート")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(.hidden, for: .tabBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(value: ViewPath.importerManual) {
+                    Text("お困りですか？")
+                }
+            }
+        }
+        .background {
+            ProgressView("読み込み中…")
+        }
+        .padding(0.0)
+        .safeAreaInset(edge: .bottom, spacing: 0.0) {
+            HStack {
+                Image(systemName: "info.circle")
+                Text("認証情報はこの端末外に送信することはありません。")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .padding([.leading, .trailing], 12.0)
+            .padding([.top, .bottom], 8.0)
+            .background(.bar)
+            .overlay(alignment: .top) {
+                Rectangle()
+                    .frame(height: 1/3)
+                    .foregroundColor(.primary.opacity(0.2))
+            }
+        }
+    }
+}
+
+struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var calendar: CalendarManager
 
-    @Binding var didAutoImportSucceed: Bool
     @Binding var isAutoImportFailed: Bool
+    @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
     @State var observers = [NSKeyValueObservation]()
 
@@ -44,8 +90,8 @@ struct WebImporter: UIViewRepresentable, UpdateScoreDataDelegate {
         return webView
     }
 
-    func makeCoordinator() -> WebImporterCoordinator {
-        WebImporterCoordinator(updateScoreDataDelegate: self)
+    func makeCoordinator() -> Coordinator {
+        Coordinator(updateScoreDataDelegate: self)
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
@@ -77,7 +123,7 @@ struct WebImporter: UIViewRepresentable, UpdateScoreDataDelegate {
             try? modelContext.save()
             dismiss()
             autoImportFailedReason = nil
-            didAutoImportSucceed = true
+            didImportSucceed = true
         }
     }
 
@@ -86,10 +132,9 @@ struct WebImporter: UIViewRepresentable, UpdateScoreDataDelegate {
         autoImportFailedReason = reason
         isAutoImportFailed = true
     }
-}
 
-class WebImporterCoordinator: NSObject, WKNavigationDelegate {
-    let cleanupJS = """
+    class Coordinator: NSObject, WKNavigationDelegate {
+        let cleanupJS = """
 function waitForElementToExist(selector) {
     return new Promise(resolve => {
         if (document.querySelector(selector)) {
@@ -177,7 +222,7 @@ waitForElementToExist('#onetrust-consent-sdk').then((element) => {
 })
 """
 
-    let selectSPButtonJS = """
+        let selectSPButtonJS = """
 var submitButtons = document.getElementsByClassName('submit_btn')
 if (submitButtons.length > 0) {
     Array.from(submitButtons).forEach(button => {
@@ -190,53 +235,54 @@ if (submitButtons.length > 0) {
 }
 """
 
-    let getScoreDataJS = """
+        let getScoreDataJS = """
 document.getElementById('score_data').value
 """
 
-    var updateScoreDataDelegate: UpdateScoreDataDelegate
-    var waitingForDownloadPageFormSubmit: Bool = false
+        var updateScoreDataDelegate: UpdateScoreDataDelegate
+        var waitingForDownloadPageFormSubmit: Bool = false
 
-    init(updateScoreDataDelegate: UpdateScoreDataDelegate) {
-        self.updateScoreDataDelegate = updateScoreDataDelegate
-        super.init()
-    }
+        init(updateScoreDataDelegate: UpdateScoreDataDelegate) {
+            self.updateScoreDataDelegate = updateScoreDataDelegate
+            super.init()
+        }
 
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        if let webViewURL = webView.url {
-            let urlString = webViewURL.absoluteString
-            webView.evaluateJavaScript(self.cleanupJS)
-            if urlString.starts(with: downloadPageURL.absoluteString) {
-                webView.isUserInteractionEnabled = false
-                if !waitingForDownloadPageFormSubmit {
-                    webView.evaluateJavaScript(self.selectSPButtonJS) { _, error in
-                        if error != nil {
-                            self.updateScoreDataDelegate.stopProcessing(with: .maintenance)
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            if let webViewURL = webView.url {
+                let urlString = webViewURL.absoluteString
+                webView.evaluateJavaScript(self.cleanupJS)
+                if urlString.starts(with: downloadPageURL.absoluteString) {
+                    webView.isUserInteractionEnabled = false
+                    if !waitingForDownloadPageFormSubmit {
+                        webView.evaluateJavaScript(self.selectSPButtonJS) { _, error in
+                            if error != nil {
+                                self.updateScoreDataDelegate.stopProcessing(with: .maintenance)
+                            }
                         }
+                        waitingForDownloadPageFormSubmit = true
+                    } else {
+                        webView.evaluateJavaScript(getScoreDataJS) { result, _ in
+                            if let result: String = result as? String {
+                                self.updateScoreDataDelegate.updateScore(with: result)
+                            } else {
+                                self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                            }
+                        }
+                        waitingForDownloadPageFormSubmit = false
                     }
-                    waitingForDownloadPageFormSubmit = true
+                } else if urlString.starts(with: errorPageURL.absoluteString) {
+                    if urlString.hasSuffix("?err=1") {
+                        self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
+                    } else if urlString.hasSuffix("?err=2") {
+                        self.updateScoreDataDelegate.stopProcessing(with: .noEAmusementPass)
+                    } else if urlString.hasSuffix("?err=3") {
+                        self.updateScoreDataDelegate.stopProcessing(with: .noPlayData)
+                    } else if urlString.hasSuffix("?err=4") {
+                        self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                    }
                 } else {
-                    webView.evaluateJavaScript(getScoreDataJS) { result, _ in
-                        if let result: String = result as? String {
-                            self.updateScoreDataDelegate.updateScore(with: result)
-                        } else {
-                            self.updateScoreDataDelegate.stopProcessing(with: .serverError)
-                        }
-                    }
-                    waitingForDownloadPageFormSubmit = false
+                    webView.layer.opacity = 1.0
                 }
-            } else if urlString.starts(with: errorPageURL.absoluteString) {
-                if urlString.hasSuffix("?err=1") {
-                    self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
-                } else if urlString.hasSuffix("?err=2") {
-                    self.updateScoreDataDelegate.stopProcessing(with: .noEAmusementPass)
-                } else if urlString.hasSuffix("?err=3") {
-                    self.updateScoreDataDelegate.stopProcessing(with: .noPlayData)
-                } else if urlString.hasSuffix("?err=4") {
-                    self.updateScoreDataDelegate.stopProcessing(with: .serverError)
-                }
-            } else {
-                webView.layer.opacity = 1.0
             }
         }
     }

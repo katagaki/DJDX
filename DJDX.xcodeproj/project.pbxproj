@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
+		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
 		E4B123B02BF8E8E400D4A3D1 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123AF2BF8E8E400D4A3D1 /* App.swift */; };
 		E4B123B22BF8E8E400D4A3D1 /* ScoresView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123B12BF8E8E400D4A3D1 /* ScoresView.swift */; };
 		E4B123B42BF8E8E400D4A3D1 /* IIDXSongRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123B32BF8E8E400D4A3D1 /* IIDXSongRecord.swift */; };
@@ -43,6 +44,7 @@
 
 /* Begin PBXFileReference section */
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
+		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
 		E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DJDX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B123AF2BF8E8E400D4A3D1 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E4B123B12BF8E8E400D4A3D1 /* ScoresView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoresView.swift; sourceTree = "<group>"; };
@@ -214,6 +216,7 @@
 			children = (
 				E4EB2CA72BFF7E3700A00796 /* CalendarView.swift */,
 				E4E3D0E72BFA2B95001942FE /* WebImporter.swift */,
+				E49359DB2C00C29C0022E385 /* ManualImporter.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -326,6 +329,7 @@
 				E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */,
 				E4E3D0F22BFC0489001942FE /* ScoreRatePerDifficultyChart.swift in Sources */,
 				E4EB2CA82BFF7E3700A00796 /* CalendarView.swift in Sources */,
+				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,
 				E4B123D72BF90A4300D4A3D1 /* MoreView.swift in Sources */,
 				E4EB2CAB2BFF8CC500A00796 /* Predicates.swift in Sources */,
 				E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */,

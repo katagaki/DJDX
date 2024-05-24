@@ -57,7 +57,7 @@ struct ClearLampOverviewChart: View {
                                     )
                                     let (difficulty, _) = proxy.value(at: location, as: (Int, Int).self) ?? (0, 0)
                                     debugPrint(difficulty)
-                                    // TODO: Display floating detail popup for difficulty
+                                        // TODO: Display floating detail popup for difficulty
                                 }
                             }
                     )
