@@ -33,3 +33,9 @@ func iidxSongRecords(in calendar: CalendarManager) -> Predicate<IIDXSongRecord> 
         }
     }
 }
+
+func iidxSongRecords(inImportGroupWithID id: String) -> Predicate<IIDXSongRecord> {
+    return #Predicate<IIDXSongRecord> {
+        $0.importGroup?.id == id
+    }
+}

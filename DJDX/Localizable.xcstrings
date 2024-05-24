@@ -231,7 +231,7 @@
         }
       }
     },
-    "今日に戻る" : {
+    "今日の日付に戻る" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -357,6 +357,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import Data for Selected Date"
+          }
+        }
+      }
+    },
+    "選択した日付にプレーデータがありません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Play Data for Selected Date"
           }
         }
       }

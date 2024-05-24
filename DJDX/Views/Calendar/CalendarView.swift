@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2024/05/23.
 //
 
+import Komponents
 import SwiftData
 import SwiftUI
 
@@ -25,21 +26,13 @@ struct CalendarView: View {
         NavigationStack(path: $navigationManager[.calendar]) {
             List {
                 Section {
-                    DatePicker("カレンダー", selection: $calendar.selectedDate, displayedComponents: .date)
-                        .datePickerStyle(.graphical)
-                    Button {
-                        calendar.selectedDate = .now
-                    } label: {
-                        Label("今日に戻る", systemImage: "arrowshape.turn.up.backward.badge.clock")
-                    }
-                }
-                Section {
                     NavigationLink(value: ViewPath.importerWeb) {
-                        Text("選択した日のデータをインポート")
+                        Label("選択した日のデータをインポート", systemImage: "square.and.arrow.down")
                     }
                 }
             }
             .navigationTitle("カレンダー")
+            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .importerWeb:
@@ -138,6 +131,39 @@ struct CalendarView: View {
                     .navigationTitle("手動でインポート")
                     .navigationBarTitleDisplayMode(.inline)
                 default: Color.clear
+                }
+            }
+            .listStyle(.plain)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0.0) {
+                VStack(spacing: 0.0) {
+                    DatePicker("カレンダー",
+                               selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
+                               in: ...Date.now,
+                               displayedComponents: .date)
+                    .datePickerStyle(.graphical)
+                    if !Calendar.current.isDate(calendar.selectedDate, inSameDayAs: .now) {
+                        Button {
+                            withAnimation(.snappy.speed(2.0)) {
+                                calendar.selectedDate = .now
+                            }
+                        } label: {
+                            Label("今日の日付に戻る", systemImage: "arrowshape.turn.up.backward.badge.clock")
+                                .bold()
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .foregroundStyle(.text)
+                        .clipShape(RoundedRectangle(cornerRadius: 99.0))
+                    }
+                }
+                .padding([.bottom, .leading, .trailing], 20.0)
+                .frame(maxWidth: .infinity)
+                .background(Material.bar)
+                .overlay(alignment: .bottom) {
+                    Rectangle()
+                        .frame(height: 1/3)
+                        .foregroundColor(.primary.opacity(0.2))
                 }
             }
             .sheet(isPresented: $isSelectingCSVFile) {

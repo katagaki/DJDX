@@ -17,15 +17,13 @@ struct ChartsView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var calendar: CalendarManager
 
-    @State var songRecords: [IIDXSongRecord] = []
-
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForClearLampInAnalyticsView") var levelFilterForClearLamp: Int
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForScoreRateInAnalyticsView") var levelFilterForScoreRate: Int
 
     @State var clearLampPerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [Clear Type: Count]]
     @State var scoreRatePerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [DJ Level: Count]]
 
-    @State var isInitialScoreLoaded: Bool = false
+    @State var dataState: DataState = .initializing
 
     let difficulties: [Int] = Array(1...12)
     let djLevels: [String] = ["F", "E", "D", "C", "B", "A", "AA", "AAA"]
@@ -77,39 +75,27 @@ struct ChartsView: View {
             }
             .navigationTitle("プレー分析")
             .refreshable {
-                withAnimation {
+                withAnimation(.snappy.speed(2.0)) {
                     reloadScores()
                 }
             }
             .task {
-                if !isInitialScoreLoaded {
-                    isInitialScoreLoaded = true
+                if dataState == .initializing {
                     reloadScores()
                 }
             }
             .onChange(of: calendar.selectedDate) { oldValue, newValue in
                 if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
-                    isInitialScoreLoaded = false
+                    dataState = .initializing
                 }
             }
         }
     }
 
     func reloadScores() {
-        let fetchDescriptor = FetchDescriptor<IIDXSongRecord>(
-            predicate: iidxSongRecords(in: calendar),
-            sortBy: [SortDescriptor(\.title, order: .forward)]
-        )
-        songRecords = (try? modelContext.fetch(fetchDescriptor)) ?? []
-
-        withAnimation(.snappy.speed(2.0)) {
-            clearLampPerDifficulty.removeAll()
-            scoreRatePerDifficulty.removeAll()
-        }
-
-        Task.detached {
-            let songRecords = await songRecords
-
+        dataState = .loading
+        let songRecords = ScoresView.latestAvailableIIDXSongRecords(in: modelContext, using: calendar)
+        Task.detached { [songRecords] in
             var newClearLampPerDifficulty: [Int: [String: Int]] = [:]
             var newScoresPerDifficulty: [Int: [String: Int]] = [:]
             for difficulty in difficulties {
@@ -141,8 +127,11 @@ struct ChartsView: View {
 
             await MainActor.run { [newClearLampPerDifficulty, newScoresPerDifficulty] in
                 withAnimation(.snappy.speed(2.0)) {
-                    self.clearLampPerDifficulty = newClearLampPerDifficulty
-                    self.scoreRatePerDifficulty = newScoresPerDifficulty
+                    clearLampPerDifficulty.removeAll()
+                    scoreRatePerDifficulty.removeAll()
+                    newClearLampPerDifficulty.forEach { clearLampPerDifficulty[$0] = $1 }
+                    newScoresPerDifficulty.forEach { scoreRatePerDifficulty[$0] = $1 }
+                    dataState = .presenting
                 }
             }
         }

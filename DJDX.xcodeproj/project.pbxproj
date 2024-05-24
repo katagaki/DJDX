@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E4B123B02BF8E8E400D4A3D1 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123AF2BF8E8E400D4A3D1 /* App.swift */; };
 		E4B123B22BF8E8E400D4A3D1 /* ScoresView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123B12BF8E8E400D4A3D1 /* ScoresView.swift */; };
 		E4B123B42BF8E8E400D4A3D1 /* IIDXSongRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123B32BF8E8E400D4A3D1 /* IIDXSongRecord.swift */; };
@@ -41,6 +42,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DJDX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B123AF2BF8E8E400D4A3D1 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E4B123B12BF8E8E400D4A3D1 /* ScoresView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoresView.swift; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 				E4E3D0CB2BF98DC7001942FE /* ViewPath.swift */,
 				E4E3D0C92BF98DB7001942FE /* TabType.swift */,
 				E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */,
+				E49359D92C00AD060022E385 /* DataState.swift */,
 			);
 			path = Enums;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				E4E3D0F02BFC03CB001942FE /* ClearLampPerDifficultyChart.swift in Sources */,
 				E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */,
 				E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */,
+				E49359DA2C00AD060022E385 /* DataState.swift in Sources */,
 				E4E3D0CA2BF98DB7001942FE /* TabType.swift in Sources */,
 				E4E3D0EA2BFA47B1001942FE /* ImportFailedReason.swift in Sources */,
 			);
