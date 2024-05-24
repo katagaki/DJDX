@@ -14,11 +14,30 @@ struct MoreView: View {
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
 
+    @AppStorage(wrappedValue: true, "LevelShowcaseVisibleInScoresView") var isLevelShowcaseVisible: Bool
+    @AppStorage(wrappedValue: true, "GenreVisibleInScoresView") var isGenreVisible: Bool
+
     var body: some View {
         NavigationStack(path: $navigationManager[.more]) {
             MoreList(repoName: "katagaki/DJDX", viewPath: ViewPath.moreAttributions) {
                 Section {
+                    Toggle(isOn: $isLevelShowcaseVisible) {
+                        ListRow(image: "ListIcon.ShowDifficulty",
+                                title: "レベルを表示",
+                                includeSpacer: true)
+                    }
+                    Toggle(isOn: $isGenreVisible) {
+                        ListRow(image: "ListIcon.ShowGenre",
+                                title: "ジャンルを表示",
+                                includeSpacer: true)
+                    }
+                } header: {
+                    ListSectionHeader(text: "リスト表示")
+                        .font(.body)
+                }
+                Section {
                     Button {
+                        // TODO: Confirm before deletion
                         WKWebsiteDataStore.default()
                             .fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
                                 records.forEach { record in
@@ -28,16 +47,20 @@ struct MoreView: View {
                                 }
                             }
                     } label: {
-                        Text("すべてのウェブデータを削除")
+                        Text("ウェブデータを消去")
                             .foregroundStyle(.red)
                     }
                     Button {
+                        // TODO: Confirm before deletion
                         try? modelContext.delete(model: ImportGroup.self)
                         try? modelContext.delete(model: IIDXSongRecord.self)
                     } label: {
-                        Text("すべてのスコアデータを削除")
+                        Text("スコアデータを消去")
                             .foregroundStyle(.red)
                     }
+                } header: {
+                    ListSectionHeader(text: "データ管理")
+                        .font(.body)
                 }
             }
             .navigationDestination(for: ViewPath.self, destination: { viewPath in

@@ -18,6 +18,8 @@ struct CalendarView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var calendar: CalendarManager
 
+    @Query(sort: \ImportGroup.importDate, order: .reverse) var importGroups: [ImportGroup]
+
     @State var isAutoImportFailed: Bool = false
     @State var didImportSucceed: Bool = false
     @State var autoImportFailedReason: ImportFailedReason?
@@ -25,8 +27,29 @@ struct CalendarView: View {
     var body: some View {
         NavigationStack(path: $navigationManager[.calendar]) {
             List {
-                Section {
+                ForEach(importGroups) { importGroup in
+                    Button {
+                        withAnimation(.snappy.speed(2.0)) {
+                            calendar.selectedDate = importGroup.importDate
+                        }
+                    } label: {
+                        VStack(alignment: .leading, spacing: 2.0) {
+                            Text(importGroup.importDate, style: .date)
+                            Text("\(importGroup.iidxData?.count ?? 0)曲")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
+                .onDelete(perform: { indexSet in
+                    var importGroupsToDelete: [ImportGroup] = []
+                    indexSet.forEach { index in
+                        importGroupsToDelete.append(importGroups[index])
+                    }
+                    importGroupsToDelete.forEach { importGroup in
+                        modelContext.delete(importGroup)
+                    }
+                })
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
@@ -94,11 +117,15 @@ struct CalendarView: View {
             .alert("インポートが成功しました。", isPresented: $didImportSucceed, actions: {
                 Button("OK", role: .cancel) {
                     didImportSucceed = false
+                    navigationManager.popToRoot(for: .calendar)
                 }
             })
-            .alert(errorMessage(for: autoImportFailedReason ?? .serverError), isPresented: $isAutoImportFailed, actions: {
+            .alert(errorMessage(for: autoImportFailedReason ?? .serverError),
+                   isPresented: $isAutoImportFailed,
+                   actions: {
                 Button("OK", role: .cancel) {
                     isAutoImportFailed = false
+                    navigationManager.popToRoot(for: .calendar)
                 }
             })
         }

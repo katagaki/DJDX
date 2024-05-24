@@ -57,34 +57,11 @@ struct ScoresView: View {
                     }
                 }
             }
-            .navigationTitle("譜面一覧")
+            .navigationTitle("プレーデータ")
             .listStyle(.plain)
             .searchable(text: $searchTerm, placement: .navigationBarDrawer(displayMode: .always), prompt: "曲名、アーティスト名")
             .refreshable {
                 reloadScores()
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Text("表示設定")
-                        Picker("レベル", selection: $isLevelShowcaseVisible) {
-                            Text("表示")
-                                .tag(true)
-                            Text("非表示")
-                                .tag(false)
-                        }
-                        .pickerStyle(.menu)
-                        Picker("ジャンル", selection: $isGenreVisible) {
-                            Text("表示")
-                                .tag(true)
-                            Text("非表示")
-                                .tag(false)
-                        }
-                        .pickerStyle(.menu)
-                    } label: {
-                        Image(systemName: "gearshape")
-                    }
-                }
             }
             .background {
                 switch dataState {

@@ -20,7 +20,7 @@ struct MainTabView: View {
                 .tag(TabType.calendar)
             ScoresView()
                 .tabItem {
-                    Label("スコアデータ", systemImage: "list.star")
+                    Label("プレーデータ", image: "TabIcon.Scores")
                 }
                 .tag(TabType.scores)
             ChartsView()

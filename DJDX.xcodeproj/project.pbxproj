@@ -31,7 +31,6 @@
 		E4E3D0E12BF9D743001942FE /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = E4E3D0E02BF9D743001942FE /* .swiftlint.yml */; };
 		E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E72BFA2B95001942FE /* WebImporter.swift */; };
 		E4E3D0EA2BFA47B1001942FE /* ImportFailedReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */; };
-		E4E3D0EC2BFB9F42001942FE /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E4E3D0EB2BFB9F42001942FE /* Localizable.xcstrings */; };
 		E4E3D0EE2BFC034C001942FE /* ClearLampOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0ED2BFC034C001942FE /* ClearLampOverviewChart.swift */; };
 		E4E3D0F02BFC03CB001942FE /* ClearLampPerDifficultyChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0EF2BFC03CB001942FE /* ClearLampPerDifficultyChart.swift */; };
 		E4E3D0F22BFC0489001942FE /* ScoreRatePerDifficultyChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F12BFC0489001942FE /* ScoreRatePerDifficultyChart.swift */; };
@@ -69,7 +68,6 @@
 		E4E3D0E42BFA243A001942FE /* DJDX.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DJDX.entitlements; sourceTree = "<group>"; };
 		E4E3D0E72BFA2B95001942FE /* WebImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImporter.swift; sourceTree = "<group>"; };
 		E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFailedReason.swift; sourceTree = "<group>"; };
-		E4E3D0EB2BFB9F42001942FE /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		E4E3D0ED2BFC034C001942FE /* ClearLampOverviewChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearLampOverviewChart.swift; sourceTree = "<group>"; };
 		E4E3D0EF2BFC03CB001942FE /* ClearLampPerDifficultyChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearLampPerDifficultyChart.swift; sourceTree = "<group>"; };
 		E4E3D0F12BFC0489001942FE /* ScoreRatePerDifficultyChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreRatePerDifficultyChart.swift; sourceTree = "<group>"; };
@@ -92,6 +90,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E49359DD2C00CCE30022E385 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Search;
+			sourceTree = "<group>";
+		};
 		E4B123A32BF8E8E400D4A3D1 = {
 			isa = PBXGroup;
 			children = (
@@ -115,7 +120,6 @@
 				E4E3D0E42BFA243A001942FE /* DJDX.entitlements */,
 				E4E3D0D82BF9A2D1001942FE /* Info.plist */,
 				E4B123B52BF8E8E500D4A3D1 /* Assets.xcassets */,
-				E4E3D0EB2BFB9F42001942FE /* Localizable.xcstrings */,
 				E4B123CA2BF8F7DC00D4A3D1 /* SampleData.csv */,
 				E4B123D02BF902B600D4A3D1 /* Views */,
 				E4B123CF2BF9028C00D4A3D1 /* Classes */,
@@ -143,6 +147,7 @@
 				E4B123D12BF909CD00D4A3D1 /* MainTabView.swift */,
 				E4EB2CA62BFF7E2C00A00796 /* Calendar */,
 				E4B123DB2BF90D1F00D4A3D1 /* Scores */,
+				E49359DD2C00CCE30022E385 /* Search */,
 				E4E3D0DC2BF9D645001942FE /* Analytics */,
 				E4B123DC2BF90D2600D4A3D1 /* More */,
 				E4B123D82BF90C1300D4A3D1 /* Shared */,
@@ -289,7 +294,6 @@
 			files = (
 				E4E3D0E12BF9D743001942FE /* .swiftlint.yml in Resources */,
 				E4B123CB2BF8F7DC00D4A3D1 /* SampleData.csv in Resources */,
-				E4E3D0EC2BFB9F42001942FE /* Localizable.xcstrings in Resources */,
 				E4B123B62BF8E8E500D4A3D1 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -73,7 +73,6 @@ struct WebImporter: View {
 
 struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
 
-    @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var calendar: CalendarManager
 
@@ -82,8 +81,9 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
     @Binding var autoImportFailedReason: ImportFailedReason?
     @State var observers = [NSKeyValueObservation]()
 
+    let webView = WKWebView()
+
     func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView()
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
         webView.load(URLRequest(url: loginPageRedirectURL))
@@ -98,8 +98,8 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
         // Blank function to conform to protocol
     }
 
-    func updateScore(with newScoreData: String) {
-        let parsedCSV = CSwiftV(with: newScoreData)
+    func importScoreData(using csvString: String) {
+        let parsedCSV = CSwiftV(with: csvString)
         if let keyedRows = parsedCSV.keyedRows {
             // Delete selected date's import group
             let fetchDescriptor = FetchDescriptor<ImportGroup>(
@@ -121,14 +121,12 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
                 scoreForSong.importGroup = newImportGroup
             }
             try? modelContext.save()
-            dismiss()
             autoImportFailedReason = nil
             didImportSucceed = true
         }
     }
 
     func stopProcessing(with reason: ImportFailedReason) {
-        dismiss()
         autoImportFailedReason = reason
         isAutoImportFailed = true
     }
@@ -252,6 +250,7 @@ document.getElementById('score_data').value
                 let urlString = webViewURL.absoluteString
                 webView.evaluateJavaScript(self.cleanupJS)
                 if urlString.starts(with: downloadPageURL.absoluteString) {
+                    webView.layer.opacity = 0.0
                     webView.isUserInteractionEnabled = false
                     if !waitingForDownloadPageFormSubmit {
                         webView.evaluateJavaScript(self.selectSPButtonJS) { _, error in
@@ -263,7 +262,7 @@ document.getElementById('score_data').value
                     } else {
                         webView.evaluateJavaScript(getScoreDataJS) { result, _ in
                             if let result: String = result as? String {
-                                self.updateScoreDataDelegate.updateScore(with: result)
+                                self.updateScoreDataDelegate.importScoreData(using: result)
                             } else {
                                 self.updateScoreDataDelegate.stopProcessing(with: .serverError)
                             }
@@ -271,6 +270,7 @@ document.getElementById('score_data').value
                         waitingForDownloadPageFormSubmit = false
                     }
                 } else if urlString.starts(with: errorPageURL.absoluteString) {
+                    webView.layer.opacity = 0.0
                     if urlString.hasSuffix("?err=1") {
                         self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
                     } else if urlString.hasSuffix("?err=2") {
@@ -290,7 +290,7 @@ document.getElementById('score_data').value
 
 // swiftlint:disable class_delegate_protocol
 protocol UpdateScoreDataDelegate {
-    func updateScore(with newScoreData: String)
+    func importScoreData(using newScoreData: String)
     func stopProcessing(with reason: ImportFailedReason)
 }
 // swiftlint:enable class_delegate_protocol
