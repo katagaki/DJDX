@@ -36,7 +36,7 @@ struct WebImporter: View {
             didImportSucceed: $didImportSucceed,
             autoImportFailedReason: $autoImportFailedReason
         )
-        .navigationTitle("自動インポート")
+        .navigationTitle("データインポート")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarBackground(.hidden, for: .tabBar)

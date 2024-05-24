@@ -30,7 +30,7 @@ struct ScoreViewer: View {
         }
         .listSectionSpacing(.compact)
         .navigationBarTitleDisplayMode(.inline)
-        .safeAreaInset(edge: .top) {
+        .safeAreaInset(edge: .top, spacing: 0.0) {
             VStack(alignment: .center, spacing: 8.0) {
                 VStack(alignment: .center, spacing: 2.0) {
                     DetailedSongTitle(songRecord: songRecord,

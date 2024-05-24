@@ -51,6 +51,8 @@ struct CalendarView: View {
                     }
                 })
             }
+            .navigationTitle("データ履歴")
+            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .importerWeb:
@@ -64,6 +66,22 @@ struct CalendarView: View {
             }
             .listStyle(.plain)
             .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if !Calendar.current.isDate(calendar.selectedDate, inSameDayAs: .now) {
+                        Button {
+                            calendar.selectedDate = .now
+                        } label: {
+                            Label("今日の日付に戻る", systemImage: "arrowshape.turn.up.backward.badge.clock")
+                        }
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(value: ViewPath.importerWeb) {
+                        Text("インポート")
+                    }
+                }
+            }
             .safeAreaInset(edge: .top, spacing: 0.0) {
                 VStack(spacing: 0.0) {
                     if horizontalSizeClass == .compact && verticalSizeClass == .regular {
@@ -82,29 +100,6 @@ struct CalendarView: View {
                         .padding([.top, .bottom], 10.0)
                         .padding([.leading, .trailing], 20.0)
                     }
-                    if !Calendar.current.isDate(calendar.selectedDate, inSameDayAs: .now) {
-                        Button {
-                            withAnimation(.snappy.speed(2.0)) {
-                                calendar.selectedDate = .now
-                            }
-                        } label: {
-                            Label("今日の日付に戻る", systemImage: "arrowshape.turn.up.backward.badge.clock")
-                                .bold()
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.plain)
-                        .clipShape(RoundedRectangle(cornerRadius: 99.0))
-                        .padding([.bottom, .leading, .trailing], 20.0)
-                    }
-                    NavigationLink(value: ViewPath.importerWeb) {
-                        Label("選択した日のデータをインポート", systemImage: "square.and.arrow.down")
-                            .bold()
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .foregroundStyle(.text)
-                    .clipShape(RoundedRectangle(cornerRadius: 99.0))
-                    .padding([.bottom, .leading, .trailing], 20.0)
                 }
                 .frame(maxWidth: .infinity)
                 .background(Material.bar)
@@ -114,20 +109,32 @@ struct CalendarView: View {
                         .foregroundColor(.primary.opacity(0.2))
                 }
             }
-            .alert("インポートが成功しました。", isPresented: $didImportSucceed, actions: {
-                Button("OK", role: .cancel) {
-                    didImportSucceed = false
-                    navigationManager.popToRoot(for: .calendar)
+            .alert(
+                "データ正常にインポートされました。",
+                isPresented: $didImportSucceed,
+                actions: {
+                    Button("OK", role: .cancel) {
+                        didImportSucceed = false
+                        navigationManager.popToRoot(for: .calendar)
+                    }
+                },
+                message: {
+                    Text("インポートが成功しました")
                 }
-            })
-            .alert(errorMessage(for: autoImportFailedReason ?? .serverError),
-                   isPresented: $isAutoImportFailed,
-                   actions: {
-                Button("OK", role: .cancel) {
-                    isAutoImportFailed = false
-                    navigationManager.popToRoot(for: .calendar)
+            )
+            .alert(
+                "データがインポートできませんでした",
+                isPresented: $isAutoImportFailed,
+                actions: {
+                    Button("OK", role: .cancel) {
+                        isAutoImportFailed = false
+                        navigationManager.popToRoot(for: .calendar)
+                    }
+                },
+                message: {
+                    Text(errorMessage(for: autoImportFailedReason ?? .serverError))
                 }
-            })
+            )
         }
     }
 

@@ -16,37 +16,39 @@ struct ScoresView: View {
     @EnvironmentObject var calendar: CalendarManager
 
     @State var songRecords: [IIDXSongRecord] = []
+    @State var filteredSongRecords: [IIDXSongRecord]?
 
     @State var searchTerm: String = ""
     @AppStorage(wrappedValue: true, "LevelShowcaseVisibleInScoresView") var isLevelShowcaseVisible: Bool
     @AppStorage(wrappedValue: true, "GenreVisibleInScoresView") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: "ALL", "DifficultyToFilterByInScoresView") var difficultyToShow: String
 
     @State var dataState: DataState = .initializing
 
     var body: some View {
         NavigationStack(path: $navigationManager[.scores]) {
             List {
-                ForEach(songRecords.filter({ songRecord in
-                    if let importGroup = songRecord.importGroup, let songRecordImportGroup = songRecord.importGroup,
-                       Calendar.current.isDate(importGroup.importDate, inSameDayAs: songRecordImportGroup.importDate) {
-                        if searchTerm.trimmingCharacters(in: .whitespaces) == "" {
-                            return true
-                        } else {
-                            let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
-                            return songRecord.title.lowercased().contains(searchTermTrimmed) ||
-                                   songRecord.artist.lowercased().contains(searchTermTrimmed)
-                        }
-                    }
-                    return false
-                })) { songRecord in
+                ForEach(filteredSongRecords ?? songRecords) { songRecord in
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
                         VStack(alignment: .leading, spacing: 4.0) {
-                            VStack(alignment: .leading, spacing: 2.0) {
-                                DetailedSongTitle(songRecord: songRecord,
-                                                  isGenreVisible: $isGenreVisible)
+                            HStack(alignment: .center, spacing: 8.0) {
+                                VStack(alignment: .leading, spacing: 2.0) {
+                                    DetailedSongTitle(songRecord: songRecord,
+                                                      isGenreVisible: $isGenreVisible)
+                                }
+                                if isLevelShowcaseVisible && difficultyToShow != "ALL" {
+                                    Spacer()
+                                    switch difficultyToShow {
+                                    case "BEGINNER": SingleLevelLabel(levelType: .beginner, score: songRecord.beginnerScore)
+                                    case "NORMAL": SingleLevelLabel(levelType: .normal, score: songRecord.normalScore)
+                                    case "HYPER": SingleLevelLabel(levelType: .hyper, score: songRecord.hyperScore)
+                                    case "ANOTHER": SingleLevelLabel(levelType: .another, score: songRecord.anotherScore)
+                                    case "LEGGENDARIA": SingleLevelLabel(levelType: .leggendaria, score: songRecord.leggendariaScore)
+                                    default: Color.clear
+                                    }
+                                }
                             }
-                            .id(songRecord.title)
-                            if isLevelShowcaseVisible {
+                            if isLevelShowcaseVisible && difficultyToShow == "ALL" {
                                 HStack {
                                     Spacer()
                                     LevelShowcase(songRecord: songRecord)
@@ -55,13 +57,68 @@ struct ScoresView: View {
                             }
                         }
                     }
+                    .padding([.top, .bottom], 8.0)
+                    .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
+                    .safeAreaInset(edge: .leading) {
+                        Group {
+                            if let score = score(for: songRecord) {
+                                switch score.clearType {
+                                case "FULLCOMBO CLEAR":
+                                    LinearGradient(gradient: Gradient(colors: [Color.red,
+                                                                               Color.orange,
+                                                                               Color.yellow,
+                                                                               Color.green,
+                                                                               Color.blue,
+                                                                               Color.indigo,
+                                                                               Color.purple]),
+                                                   startPoint: .top,
+                                                   endPoint: .bottom)
+                                case "CLEAR": Color.cyan
+                                case "ASSIST CLEAR": Color.purple
+                                case "EASY CLEAR": Color.green
+                                case "HARD CLEAR": Color.pink
+                                case "EX HARD CLEAR": Color.yellow
+                                case "FAILED": Color.red
+                                default: Color.clear
+                                }
+                            }
+                        }
+                        .frame(width: 12.0)
+                        .shadow(color: .black.opacity(0.2), radius: 1.0, x: 2.0)
+                    }
                 }
             }
             .navigationTitle("プレーデータ")
             .listStyle(.plain)
-            .searchable(text: $searchTerm, placement: .navigationBarDrawer(displayMode: .always), prompt: "曲名、アーティスト名")
+            .searchable(text: $searchTerm.animation(.snappy.speed(2.0)),
+                        placement: .navigationBarDrawer(displayMode: .always),
+                        prompt: "曲名、アーティスト名")
             .refreshable {
                 reloadScores()
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Picker(selection: $difficultyToShow) {
+                            Text("すべて")
+                                .tag("ALL")
+                            Text("BEGINNER")
+                                .tag("BEGINNER")
+                            Text("NORMAL")
+                                .tag("NORMAL")
+                            Text("HYPER")
+                                .tag("HYPER")
+                            Text("ANOTHER")
+                                .tag("ANOTHER")
+                            Text("LEGGENDARIA")
+                                .tag("LEGGENDARIA")
+                        } label: {
+                            Text("レベル")
+                        }
+                    } label: {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                    }
+                }
             }
             .background {
                 switch dataState {
@@ -81,6 +138,12 @@ struct ScoresView: View {
                     reloadScores()
                 }
             }
+            .onChange(of: searchTerm) { _, _ in
+                filterSongRecords()
+            }
+            .onChange(of: difficultyToShow, { _, _ in
+                filterSongRecords()
+            })
             .onChange(of: calendar.selectedDate) { oldValue, newValue in
                 if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
                     dataState = .initializing
@@ -106,6 +169,39 @@ struct ScoresView: View {
                     dataState = .presenting
                 }
             }
+        }
+    }
+
+    func filterSongRecords() {
+        var filteredSongRecords: [IIDXSongRecord] = songRecords
+        if searchTerm.trimmingCharacters(in: .whitespaces) != "" {
+            filteredSongRecords = filteredSongRecords.filter({ songRecord in
+                let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
+                return songRecord.title.lowercased().contains(searchTermTrimmed) ||
+                songRecord.artist.lowercased().contains(searchTermTrimmed)
+            })
+        } else {
+            self.filteredSongRecords = nil
+        }
+        switch difficultyToShow {
+        case "BEGINNER": filteredSongRecords = filteredSongRecords.filter({ $0.beginnerScore.difficulty != 0 })
+        case "NORMAL": filteredSongRecords = filteredSongRecords.filter({ $0.normalScore.difficulty != 0 })
+        case "HYPER": filteredSongRecords = filteredSongRecords.filter({ $0.hyperScore.difficulty != 0 })
+        case "ANOTHER": filteredSongRecords = filteredSongRecords.filter({ $0.anotherScore.difficulty != 0 })
+        case "LEGGENDARIA": filteredSongRecords = filteredSongRecords.filter({ $0.leggendariaScore.difficulty != 0 })
+        default: break
+        }
+        self.filteredSongRecords = filteredSongRecords
+    }
+
+    func score(for songRecord: IIDXSongRecord) -> ScoreForLevel? {
+        switch difficultyToShow {
+        case "BEGINNER": return songRecord.beginnerScore
+        case "NORMAL": return songRecord.normalScore
+        case "HYPER": return songRecord.hyperScore
+        case "ANOTHER": return songRecord.anotherScore
+        case "LEGGENDARIA": return songRecord.leggendariaScore
+        default: return nil
         }
     }
 

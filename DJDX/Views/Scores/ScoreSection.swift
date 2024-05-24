@@ -56,7 +56,6 @@ struct ScoreSection: View {
                     .font(.caption)
                 } else {
                     Text("現バージョンのプレー記録はありません。")
-//                        .bold()
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     if levelScore.clearType != "NO PLAY" {
@@ -74,7 +73,7 @@ struct ScoreSection: View {
                 }
             }
         } header: {
-            SingleLevelLabel(levelType: levelScore.level, score: levelScore)
+            SingleLevelLabel(orientation: .horizontal, levelType: levelScore.level, score: levelScore)
         }
     }
 
