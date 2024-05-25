@@ -8,7 +8,9 @@
 import Foundation
 
 enum SortMode: String {
-    case title
-    case clearType
-    case difficulty
+    case title = "タイトル"
+    case clearType = "クリアタイプ"
+    case difficulty = "難易度"
+
+    static let all: [SortMode] = [.title, .clearType, .difficulty]
 }

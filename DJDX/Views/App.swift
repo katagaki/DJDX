@@ -11,20 +11,6 @@ import SwiftData
 @main
 struct DJDXApp: App {
 
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            ImportGroup.self,
-            IIDXSongRecord.self
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
-
     @StateObject var navigationManager = NavigationManager()
     @StateObject var calendar = CalendarManager()
 
@@ -37,3 +23,17 @@ struct DJDXApp: App {
         .environmentObject(calendar)
     }
 }
+
+var sharedModelContainer: ModelContainer = {
+    let schema = Schema([
+        ImportGroup.self,
+        IIDXSongRecord.self
+    ])
+    let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+
+    do {
+        return try ModelContainer(for: schema, configurations: [modelConfiguration])
+    } catch {
+        fatalError("Could not create ModelContainer: \(error)")
+    }
+}()
