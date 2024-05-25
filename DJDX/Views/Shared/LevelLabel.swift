@@ -1,5 +1,5 @@
 //
-//  SingleLevelLabel.swift
+//  LevelLabel.swift
 //  DJDX
 //
 //  Created by シン・ジャスティン on 2024/05/19.
@@ -7,19 +7,43 @@
 
 import SwiftUI
 
-struct SingleLevelLabel: View {
+struct LevelLabel: View {
 
     var orientation: LevelLabelOrientation
-    var levelType: SongLevel
-    var score: ScoreForLevel
+    var levelType: IIDXLevel
+    var score: IIDXLevelScore
 
-    init(levelType: SongLevel, score: ScoreForLevel) {
+    init(levelType: IIDXLevel, songRecord: IIDXSongRecord) {
+        self.orientation = .vertical
+        switch levelType {
+        case .beginner:
+            self.levelType = .beginner
+            self.score = songRecord.beginnerScore
+        case .normal:
+            self.levelType = .normal
+            self.score = songRecord.normalScore
+        case .hyper:
+            self.levelType = .hyper
+            self.score = songRecord.hyperScore
+        case .another:
+            self.levelType = .another
+            self.score = songRecord.anotherScore
+        case .leggendaria:
+            self.levelType = .leggendaria
+            self.score = songRecord.leggendariaScore
+        default:
+            self.levelType = .unknown
+            self.score = IIDXLevelScore()
+        }
+    }
+
+    init(levelType: IIDXLevel, score: IIDXLevelScore) {
         self.orientation = .vertical
         self.levelType = levelType
         self.score = score
     }
 
-    init(orientation: LevelLabelOrientation, levelType: SongLevel, score: ScoreForLevel) {
+    init(orientation: LevelLabelOrientation, levelType: IIDXLevel, score: IIDXLevelScore) {
         self.orientation = orientation
         self.levelType = levelType
         self.score = score
@@ -53,6 +77,7 @@ struct SingleLevelLabel: View {
         .kerning(-0.2)
         .lineLimit(1)
         .foregroundStyle(foregroundColor())
+        .offset(y: -1.0) // HACK: Fixes weird offset when using black font weight
     }
 
     func foregroundColor() -> Color {
@@ -62,7 +87,7 @@ struct SingleLevelLabel: View {
         case .hyper: return Color.orange
         case .another: return Color.red
         case .leggendaria: return Color.purple
-        case .unknown: return Color.primary
+        default: return Color.primary
         }
     }
 }

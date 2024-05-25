@@ -14,14 +14,14 @@ struct MoreView: View {
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
 
-    @AppStorage(wrappedValue: true, "LevelShowcaseVisibleInScoresView") var isLevelShowcaseVisible: Bool
-    @AppStorage(wrappedValue: true, "GenreVisibleInScoresView") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScorewView.GenreVisible") var isGenreVisible: Bool
 
     var body: some View {
         NavigationStack(path: $navigationManager[.more]) {
             MoreList(repoName: "katagaki/DJDX", viewPath: ViewPath.moreAttributions) {
                 Section {
-                    Toggle(isOn: $isLevelShowcaseVisible) {
+                    Toggle(isOn: $isLevelVisible) {
                         ListRow(image: "ListIcon.ShowDifficulty",
                                 title: "レベルを表示",
                                 includeSpacer: true)

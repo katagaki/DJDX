@@ -19,48 +19,38 @@ struct ScoresView: View {
     @State var filteredSongRecords: [IIDXSongRecord]?
 
     @State var searchTerm: String = ""
-    @AppStorage(wrappedValue: true, "LevelShowcaseVisibleInScoresView") var isLevelShowcaseVisible: Bool
-    @AppStorage(wrappedValue: true, "GenreVisibleInScoresView") var isGenreVisible: Bool
-    @AppStorage(wrappedValue: "ALL", "DifficultyToFilterByInScoresView") var difficultyToShow: String
+    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScorewView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
+    @AppStorage(wrappedValue: .title, "ScoresView.SortOrder") var sortMode: SortMode
 
     @State var dataState: DataState = .initializing
 
     var body: some View {
         NavigationStack(path: $navigationManager[.scores]) {
             List {
-                ForEach(filteredSongRecords ?? songRecords) { songRecord in
+                ForEach(filteredSongRecords ?? songRecords, id: \.title) { songRecord in
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
-                        VStack(alignment: .leading, spacing: 4.0) {
+                        VStack(alignment: .trailing, spacing: 4.0) {
                             HStack(alignment: .center, spacing: 8.0) {
                                 VStack(alignment: .leading, spacing: 2.0) {
                                     DetailedSongTitle(songRecord: songRecord,
                                                       isGenreVisible: $isGenreVisible)
                                 }
-                                if isLevelShowcaseVisible && difficultyToShow != "ALL" {
-                                    Spacer()
-                                    switch difficultyToShow {
-                                    case "BEGINNER": SingleLevelLabel(levelType: .beginner, score: songRecord.beginnerScore)
-                                    case "NORMAL": SingleLevelLabel(levelType: .normal, score: songRecord.normalScore)
-                                    case "HYPER": SingleLevelLabel(levelType: .hyper, score: songRecord.hyperScore)
-                                    case "ANOTHER": SingleLevelLabel(levelType: .another, score: songRecord.anotherScore)
-                                    case "LEGGENDARIA": SingleLevelLabel(levelType: .leggendaria, score: songRecord.leggendariaScore)
-                                    default: Color.clear
-                                    }
+                                Spacer(minLength: 0.0)
+                                if isLevelVisible, levelToShow != .all {
+                                    LevelLabel(levelType: levelToShow, songRecord: songRecord)
                                 }
                             }
-                            if isLevelShowcaseVisible && difficultyToShow == "ALL" {
-                                HStack {
-                                    Spacer()
-                                    LevelShowcase(songRecord: songRecord)
-                                }
-                                .frame(alignment: .top)
+                            if isLevelVisible, levelToShow == .all {
+                                LevelShowcase(songRecord: songRecord)
                             }
                         }
                     }
                     .padding([.top, .bottom], 8.0)
                     .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
                     .safeAreaInset(edge: .leading) {
-                        Group {
+                        VStack {
                             if let score = score(for: songRecord) {
                                 switch score.clearType {
                                 case "FULLCOMBO CLEAR":
@@ -81,6 +71,8 @@ struct ScoresView: View {
                                 case "FAILED": Color.red
                                 default: Color.clear
                                 }
+                            } else {
+                                Color.clear
                             }
                         }
                         .frame(width: 12.0)
@@ -90,7 +82,7 @@ struct ScoresView: View {
             }
             .navigationTitle("プレーデータ")
             .listStyle(.plain)
-            .searchable(text: $searchTerm.animation(.snappy.speed(2.0)),
+            .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "曲名、アーティスト名")
             .refreshable {
@@ -99,19 +91,11 @@ struct ScoresView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Picker(selection: $difficultyToShow) {
-                            Text("すべて")
-                                .tag("ALL")
-                            Text("BEGINNER")
-                                .tag("BEGINNER")
-                            Text("NORMAL")
-                                .tag("NORMAL")
-                            Text("HYPER")
-                                .tag("HYPER")
-                            Text("ANOTHER")
-                                .tag("ANOTHER")
-                            Text("LEGGENDARIA")
-                                .tag("LEGGENDARIA")
+                        Picker(selection: $levelToShow) {
+                            ForEach(IIDXLevel.sortLevels, id: \.self) { sortLevel in
+                                Text(sortLevel.rawValue)
+                                    .tag(sortLevel)
+                            }
                         } label: {
                             Text("レベル")
                         }
@@ -141,7 +125,7 @@ struct ScoresView: View {
             .onChange(of: searchTerm) { _, _ in
                 filterSongRecords()
             }
-            .onChange(of: difficultyToShow, { _, _ in
+            .onChange(of: levelToShow, { _, _ in
                 filterSongRecords()
             })
             .onChange(of: calendar.selectedDate) { oldValue, newValue in
@@ -166,6 +150,7 @@ struct ScoresView: View {
                 withAnimation(.snappy.speed(2.0)) {
                     songRecords.removeAll()
                     songRecords.append(contentsOf: newSongRecords)
+                    filterSongRecords()
                     dataState = .presenting
                 }
             }
@@ -183,24 +168,24 @@ struct ScoresView: View {
         } else {
             self.filteredSongRecords = nil
         }
-        switch difficultyToShow {
-        case "BEGINNER": filteredSongRecords = filteredSongRecords.filter({ $0.beginnerScore.difficulty != 0 })
-        case "NORMAL": filteredSongRecords = filteredSongRecords.filter({ $0.normalScore.difficulty != 0 })
-        case "HYPER": filteredSongRecords = filteredSongRecords.filter({ $0.hyperScore.difficulty != 0 })
-        case "ANOTHER": filteredSongRecords = filteredSongRecords.filter({ $0.anotherScore.difficulty != 0 })
-        case "LEGGENDARIA": filteredSongRecords = filteredSongRecords.filter({ $0.leggendariaScore.difficulty != 0 })
+        switch levelToShow {
+        case .beginner: filteredSongRecords = filteredSongRecords.filter({ $0.beginnerScore.difficulty != 0 })
+        case .normal: filteredSongRecords = filteredSongRecords.filter({ $0.normalScore.difficulty != 0 })
+        case .hyper: filteredSongRecords = filteredSongRecords.filter({ $0.hyperScore.difficulty != 0 })
+        case .another: filteredSongRecords = filteredSongRecords.filter({ $0.anotherScore.difficulty != 0 })
+        case .leggendaria: filteredSongRecords = filteredSongRecords.filter({ $0.leggendariaScore.difficulty != 0 })
         default: break
         }
         self.filteredSongRecords = filteredSongRecords
     }
 
-    func score(for songRecord: IIDXSongRecord) -> ScoreForLevel? {
-        switch difficultyToShow {
-        case "BEGINNER": return songRecord.beginnerScore
-        case "NORMAL": return songRecord.normalScore
-        case "HYPER": return songRecord.hyperScore
-        case "ANOTHER": return songRecord.anotherScore
-        case "LEGGENDARIA": return songRecord.leggendariaScore
+    func score(for songRecord: IIDXSongRecord) -> IIDXLevelScore? {
+        switch levelToShow {
+        case .beginner: return songRecord.beginnerScore
+        case .normal: return songRecord.normalScore
+        case .hyper: return songRecord.hyperScore
+        case .another: return songRecord.anotherScore
+        case .leggendaria: return songRecord.leggendariaScore
         default: return nil
         }
     }

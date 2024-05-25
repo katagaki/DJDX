@@ -11,7 +11,7 @@ struct ScoreSection: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
-    var levelScore: ScoreForLevel
+    var levelScore: IIDXLevelScore
 
     var body: some View {
         Section {
@@ -73,7 +73,7 @@ struct ScoreSection: View {
                 }
             }
         } header: {
-            SingleLevelLabel(orientation: .horizontal, levelType: levelScore.level, score: levelScore)
+            LevelLabel(orientation: .horizontal, levelType: levelScore.level, score: levelScore)
         }
     }
 

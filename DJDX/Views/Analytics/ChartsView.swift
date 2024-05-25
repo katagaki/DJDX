@@ -103,9 +103,9 @@ struct ChartsView: View {
                 newClearLampPerDifficulty[difficulty] = clearTypes.reduce(into: [String: Int]()) { $0[$1] = 0 }
             }
 
-            var scores: [ScoreForLevel] = []
+            var scores: [IIDXLevelScore] = []
             for songRecord in songRecords {
-                let scoresAvailable: [ScoreForLevel] = [
+                let scoresAvailable: [IIDXLevelScore] = [
                     songRecord.beginnerScore,
                     songRecord.normalScore,
                     songRecord.hyperScore,

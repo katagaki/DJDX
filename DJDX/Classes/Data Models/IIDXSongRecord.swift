@@ -17,11 +17,11 @@ final class IIDXSongRecord {
     var genre: String = ""
     var artist: String = ""
     var playCount: Int = 0
-    var beginnerScore: ScoreForLevel = ScoreForLevel()
-    var normalScore: ScoreForLevel = ScoreForLevel()
-    var hyperScore: ScoreForLevel = ScoreForLevel()
-    var anotherScore: ScoreForLevel = ScoreForLevel()
-    var leggendariaScore: ScoreForLevel = ScoreForLevel()
+    var beginnerScore: IIDXLevelScore = IIDXLevelScore()
+    var normalScore: IIDXLevelScore = IIDXLevelScore()
+    var hyperScore: IIDXLevelScore = IIDXLevelScore()
+    var anotherScore: IIDXLevelScore = IIDXLevelScore()
+    var leggendariaScore: IIDXLevelScore = IIDXLevelScore()
     var lastPlayDate: Date = Date.distantPast
 
     var importGroup: ImportGroup?
@@ -35,8 +35,8 @@ final class IIDXSongRecord {
         self.playCount = Int(csvRowData["プレー回数"] as? String ?? "0") ?? 0
 
         for songLevelCSVHeader in songLevelCSVHeaders {
-            if let songLevel = SongLevel(rawValue: songLevelCSVHeader) {
-                let score = ScoreForLevel(
+            if let songLevel = IIDXLevel(rawValue: songLevelCSVHeader) {
+                let score = IIDXLevelScore(
                     level: songLevel,
                     difficulty: Int(csvRowData["\(songLevelCSVHeader) 難易度"] as? String ?? "0") ?? 0,
                     score: Int(csvRowData["\(songLevelCSVHeader) スコア"] as? String ?? "0") ?? 0,
@@ -67,8 +67,8 @@ final class IIDXSongRecord {
     }
 }
 
-struct ScoreForLevel: Codable {
-    var level: SongLevel
+struct IIDXLevelScore: Codable {
+    var level: IIDXLevel
     var difficulty: Int
     var score: Int
     var perfectGreatCount: Int
@@ -77,7 +77,7 @@ struct ScoreForLevel: Codable {
     var clearType: String
     var djLevel: String
 
-    init(level: SongLevel,
+    init(level: IIDXLevel,
          difficulty: Int,
          score: Int,
          perfectGreatCount: Int,
@@ -105,13 +105,4 @@ struct ScoreForLevel: Codable {
         self.clearType = "NO PLAY"
         self.djLevel = "---"
     }
-}
-
-enum SongLevel: String, Codable {
-    case beginner = "BEGINNER"
-    case normal = "NORMAL"
-    case hyper = "HYPER"
-    case another = "ANOTHER"
-    case leggendaria = "LEGGENDARIA"
-    case unknown = ""
 }
