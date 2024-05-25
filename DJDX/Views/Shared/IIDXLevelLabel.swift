@@ -75,9 +75,9 @@ struct IIDXLevelLabel: View {
         }
         .kerning(-0.2)
         .lineLimit(1)
-        .modifier(LevelLabelGlow(color: foregroundColor()))
-        .offset(y: -1.0) // HACK: Fixes weird offset when using black font weight
         .drawingGroup()
+        .offset(y: -1.0) // HACK: Fixes weird offset when using black font weight
+        .modifier(LevelLabelGlow(color: foregroundColor()))
     }
 
     func foregroundColor() -> Color {
@@ -104,8 +104,13 @@ struct LevelLabelGlow: ViewModifier {
         case .dark:
             content
                 .foregroundStyle(.white)
-                .shadow(color: color.opacity(0.8), radius: 1.0)
-                .shadow(color: color.opacity(0.9), radius: 8.0)
+                .drawingGroup()
+                .shadow(color: color, radius: 6.0, x: 0.0, y: 0.0)
+                .overlay {
+                    content
+                        .foregroundStyle(color)
+                        .opacity(0.2)
+                }
         @unknown default:
             content
         }

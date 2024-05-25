@@ -27,6 +27,7 @@ struct ScoreSection: View {
                                 .foregroundStyle(LinearGradient(colors: [.white, .cyan],
                                                                 startPoint: .top,
                                                                 endPoint: .bottom))
+                                .drawingGroup()
                                 .shadow(color: .cyan, radius: 5.0)
                         @unknown default:
                             Text(levelScore.djLevel)
@@ -35,7 +36,6 @@ struct ScoreSection: View {
                     .font(.largeTitle)
                     .fontWidth(.expanded)
                     .fontWeight(.black)
-                    .drawingGroup()
                     Divider()
                     Group {
                         HStack {
@@ -87,7 +87,7 @@ struct ScoreSection: View {
 
     func clearTypeColor() -> any ShapeStyle {
         switch levelScore.clearType {
-        case "FULLCOMBO CLEAR": 
+        case "FULLCOMBO CLEAR":
             return LinearGradient(gradient: Gradient(colors: [.cyan,
                                                               (colorScheme == .dark ? .white : .blue),
                                                               .purple]),
