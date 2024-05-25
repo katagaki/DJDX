@@ -39,11 +39,11 @@ struct ScoresView: View {
                                 }
                                 Spacer(minLength: 0.0)
                                 if isLevelVisible, levelToShow != .all {
-                                    LevelLabel(levelType: levelToShow, songRecord: songRecord)
+                                    IIDXLevelLabel(levelType: levelToShow, songRecord: songRecord)
                                 }
                             }
                             if isLevelVisible, levelToShow == .all {
-                                LevelShowcase(songRecord: songRecord)
+                                IIDXLevelShowcase(songRecord: songRecord)
                             }
                         }
                     }

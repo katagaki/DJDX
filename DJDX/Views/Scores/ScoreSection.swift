@@ -17,11 +17,24 @@ struct ScoreSection: View {
         Section {
             VStack(alignment: .leading, spacing: 8.0) {
                 if levelScore.djLevel != "---" {
-                    Text(levelScore.djLevel)
-                        .font(.largeTitle)
-                        .fontWidth(.expanded)
-                        .fontWeight(.black)
-                        .foregroundStyle(.cyan)
+                    Group {
+                        switch colorScheme {
+                        case .light:
+                            Text(levelScore.djLevel)
+                                .foregroundStyle(.cyan)
+                        case .dark:
+                            Text(levelScore.djLevel)
+                                .foregroundStyle(LinearGradient(colors: [.white, .cyan],
+                                                                startPoint: .top,
+                                                                endPoint: .bottom))
+                                .shadow(color: .cyan, radius: 5.0)
+                        @unknown default:
+                            Text(levelScore.djLevel)
+                        }
+                    }
+                    .font(.largeTitle)
+                    .fontWidth(.expanded)
+                    .fontWeight(.black)
                     Divider()
                     Group {
                         HStack {
@@ -32,27 +45,21 @@ struct ScoreSection: View {
                                 .foregroundStyle(clearTypeColor())
                         }
                         HStack {
-                            Text("DJ LEVEL")
-                                .fontWidth(.expanded)
-                            Spacer()
-                            Text(levelScore.djLevel)
-                        }
-                        HStack {
                             Text("SCORE")
                                 .fontWidth(.expanded)
                             Spacer()
                             Text(String(levelScore.score))
-                                .foregroundStyle(.cyan)
+                                .foregroundStyle(scoreColor())
                         }
                         HStack {
                             Text("MISS COUNT")
                                 .fontWidth(.expanded)
                             Spacer()
                             Text(String(levelScore.missCount))
-                                .foregroundStyle(.cyan)
+                                .foregroundStyle(scoreColor())
                         }
                     }
-                    .bold()
+                    .fontWeight(.heavy)
                     .font(.caption)
                 } else {
                     Text("現バージョンのプレー記録はありません。")
@@ -67,30 +74,65 @@ struct ScoreSection: View {
                             Text(levelScore.clearType)
                                 .foregroundStyle(clearTypeColor())
                         }
-                        .bold()
+                        .fontWeight(.heavy)
                         .font(.caption)
                     }
                 }
             }
         } header: {
-            LevelLabel(orientation: .horizontal, levelType: levelScore.level, score: levelScore)
+            IIDXLevelLabel(orientation: .horizontal, levelType: levelScore.level, score: levelScore)
         }
     }
 
     func clearTypeColor() -> any ShapeStyle {
         switch levelScore.clearType {
-        case "FULLCOMBO CLEAR": return LinearGradient(
-            gradient: Gradient(colors: [.cyan, (colorScheme == .dark ? .white : .blue), .purple]),
-            startPoint: .top,
-            endPoint: .bottom
-        )
-        case "FAILED": return Color.red
-        case "ASSIST CLEAR": return Color.purple
-        case "EASY CLEAR": return Color.green
-        case "CLEAR": return Color.cyan
-        case "HARD CLEAR": return Color.pink
-        case "EX HARD CLEAR": return Color.yellow
+        case "FULLCOMBO CLEAR": 
+            return LinearGradient(gradient: Gradient(colors: [.cyan,
+                                                              (colorScheme == .dark ? .white : .blue),
+                                                              .purple]),
+                                  startPoint: .top,
+                                  endPoint: .bottom)
+        case "FAILED":
+            return LinearGradient(gradient: Gradient(colors: [.orange,
+                                                              .red,
+                                                              .orange]),
+                                  startPoint: .top,
+                                  endPoint: .bottom)
+        case "ASSIST CLEAR":
+            return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .indigo),
+                                                              .purple,
+                                                              (colorScheme == .dark ? .white : .indigo)]),
+                                  startPoint: .top,
+                                  endPoint: .bottom)
+        case "EASY CLEAR":
+            return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .mint),
+                                                              .green,
+                                                              .mint]),
+                                  startPoint: .top,
+                                  endPoint: .bottom)
+        case "CLEAR":
+            return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .blue),
+                                                              .cyan,
+                                                              .blue]),
+                                  startPoint: .top,
+                                  endPoint: .bottom)
+        case "HARD CLEAR":
+            return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .red),
+                                                              .pink,
+                                                              (colorScheme == .dark ? .white : .red)]),
+                                  startPoint: .top,
+                                  endPoint: .bottom)
+        case "EX HARD CLEAR":
+            return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .orange),
+                                                              .yellow,
+                                                              (colorScheme == .dark ? .white : .orange)]),
+                                  startPoint: .top,
+                                  endPoint: .bottom)
         default: return Color.primary
         }
+    }
+
+    func scoreColor() -> any ShapeStyle {
+        return LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom)
     }
 }

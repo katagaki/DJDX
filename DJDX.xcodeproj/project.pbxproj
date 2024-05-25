@@ -25,8 +25,8 @@
 		E4E3D0C52BF98D79001942FE /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0C42BF98D79001942FE /* NavigationManager.swift */; };
 		E4E3D0CA2BF98DB7001942FE /* TabType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0C92BF98DB7001942FE /* TabType.swift */; };
 		E4E3D0CC2BF98DC7001942FE /* ViewPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0CB2BF98DC7001942FE /* ViewPath.swift */; };
-		E4E3D0CE2BF990CC001942FE /* LevelLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0CD2BF990CC001942FE /* LevelLabel.swift */; };
-		E4E3D0D02BF9959A001942FE /* LevelShowcase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0CF2BF9959A001942FE /* LevelShowcase.swift */; };
+		E4E3D0CE2BF990CC001942FE /* IIDXLevelLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0CD2BF990CC001942FE /* IIDXLevelLabel.swift */; };
+		E4E3D0D02BF9959A001942FE /* IIDXLevelShowcase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0CF2BF9959A001942FE /* IIDXLevelShowcase.swift */; };
 		E4E3D0D22BF99790001942FE /* DetailedSongTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0D12BF99790001942FE /* DetailedSongTitle.swift */; };
 		E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0D32BF99A86001942FE /* ScoreSection.swift */; };
 		E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4E3D0D62BF9A220001942FE /* Komponents */; };
@@ -64,8 +64,8 @@
 		E4E3D0C42BF98D79001942FE /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
 		E4E3D0C92BF98DB7001942FE /* TabType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabType.swift; sourceTree = "<group>"; };
 		E4E3D0CB2BF98DC7001942FE /* ViewPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPath.swift; sourceTree = "<group>"; };
-		E4E3D0CD2BF990CC001942FE /* LevelLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabel.swift; sourceTree = "<group>"; };
-		E4E3D0CF2BF9959A001942FE /* LevelShowcase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelShowcase.swift; sourceTree = "<group>"; };
+		E4E3D0CD2BF990CC001942FE /* IIDXLevelLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXLevelLabel.swift; sourceTree = "<group>"; };
+		E4E3D0CF2BF9959A001942FE /* IIDXLevelShowcase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXLevelShowcase.swift; sourceTree = "<group>"; };
 		E4E3D0D12BF99790001942FE /* DetailedSongTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedSongTitle.swift; sourceTree = "<group>"; };
 		E4E3D0D32BF99A86001942FE /* ScoreSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreSection.swift; sourceTree = "<group>"; };
 		E4E3D0D82BF9A2D1001942FE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -158,8 +158,8 @@
 			children = (
 				E4E3D0D12BF99790001942FE /* DetailedSongTitle.swift */,
 				E4B123D92BF90C1D00D4A3D1 /* DocumentPicker.swift */,
-				E4E3D0CD2BF990CC001942FE /* LevelLabel.swift */,
-				E4E3D0CF2BF9959A001942FE /* LevelShowcase.swift */,
+				E4E3D0CD2BF990CC001942FE /* IIDXLevelLabel.swift */,
+				E4E3D0CF2BF9959A001942FE /* IIDXLevelShowcase.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -329,9 +329,9 @@
 			files = (
 				E49359DF2C00E4230022E385 /* LevelLabelOrientation.swift in Sources */,
 				E4B123B22BF8E8E400D4A3D1 /* ScoresView.swift in Sources */,
-				E4E3D0D02BF9959A001942FE /* LevelShowcase.swift in Sources */,
+				E4E3D0D02BF9959A001942FE /* IIDXLevelShowcase.swift in Sources */,
 				E4E3D0D22BF99790001942FE /* DetailedSongTitle.swift in Sources */,
-				E4E3D0CE2BF990CC001942FE /* LevelLabel.swift in Sources */,
+				E4E3D0CE2BF990CC001942FE /* IIDXLevelLabel.swift in Sources */,
 				E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */,
 				E4E3D0F22BFC0489001942FE /* ScoreRatePerDifficultyChart.swift in Sources */,
 				E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */,

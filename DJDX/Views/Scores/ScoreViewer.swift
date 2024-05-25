@@ -37,7 +37,7 @@ struct ScoreViewer: View {
                                       isGenreVisible: .constant(true))
                 }
                 Divider()
-                LevelShowcase(songRecord: songRecord)
+                IIDXLevelShowcase(songRecord: songRecord)
                 Divider()
                 HStack {
                     Text("最終プレー日時：\(songRecord.lastPlayDate.formatted(date: .long, time: .shortened))")
