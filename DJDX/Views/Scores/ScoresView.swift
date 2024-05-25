@@ -21,7 +21,7 @@ struct ScoresView: View {
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
     @AppStorage(wrappedValue: true, "ScorewView.GenreVisible") var isGenreVisible: Bool
     @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
-    @AppStorage(wrappedValue: false, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
     @AppStorage(wrappedValue: .title, "ScoresView.SortOrder") var sortMode: SortMode
 
     var displayParameters: [String] {[
@@ -106,7 +106,8 @@ struct ScoresView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Section("レベル") {
+                        Toggle("スコアのない曲を非表示", isOn: $isShowingOnlyPlayDataWithScores)
+                        Section("フィルター") {
                             Picker(selection: $levelToShow) {
                                 ForEach(IIDXLevel.sortLevels, id: \.self) { sortLevel in
                                     Text(sortLevel.rawValue)
@@ -116,20 +117,19 @@ struct ScoresView: View {
                                 Text("レベル")
                             }
                         }
-                        if levelToShow != .all {
-                            Section("並べ替え") {
+                        .pickerStyle(.menu)
+                        Section("並べ替え") {
+                            if levelToShow != .all {
                                 Picker(selection: $sortMode) {
                                     ForEach(SortMode.all, id: \.self) { sortMode in
                                         Text(sortMode.rawValue)
                                             .tag(sortMode)
                                     }
                                 } label: {
-                                    Text("並べ替え")
+                                    Text("曲")
                                 }
+                                .pickerStyle(.menu)
                             }
-                        }
-                        Section {
-                            Toggle("スコアのある曲のみ表示", isOn: $isShowingOnlyPlayDataWithScores)
                         }
                     } label: {
                         Image(systemName: "line.3.horizontal.decrease.circle")
