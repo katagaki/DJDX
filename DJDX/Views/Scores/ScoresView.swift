@@ -15,7 +15,9 @@ struct ScoresView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var calendar: CalendarManager
 
+    @State var allSongRecords: [IIDXSongRecord] = []
     @State var songRecords: [IIDXSongRecord] = []
+    @State var displayedSongRecords: [IIDXSongRecord] = []
 
     @State var searchTerm: String = ""
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
@@ -23,10 +25,6 @@ struct ScoresView: View {
     @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
     @AppStorage(wrappedValue: true, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
     @AppStorage(wrappedValue: .title, "ScoresView.SortOrder") var sortMode: SortMode
-
-    var displayParameters: [String] {[
-        searchTerm, levelToShow.rawValue, String(isShowingOnlyPlayDataWithScores), sortMode.rawValue
-    ]}
 
     @State var dataState: DataState = .initializing
 
@@ -44,7 +42,7 @@ struct ScoresView: View {
     var body: some View {
         NavigationStack(path: $navigationManager[.scores]) {
             List {
-                ForEach(songRecords, id: \.title) { songRecord in
+                ForEach(displayedSongRecords, id: \.title) { songRecord in
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
                         VStack(alignment: .trailing, spacing: 4.0) {
                             HStack(alignment: .center, spacing: 8.0) {
@@ -91,7 +89,7 @@ struct ScoresView: View {
                             }
                         }
                         .frame(width: 12.0)
-                        .shadow(color: .black.opacity(0.2), radius: 1.0, x: 2.0)
+                        .modifier(ConditionalShadow(color: .black.opacity(0.2), radius: 1.0, x: 2.0))
                     }
                 }
             }
@@ -101,7 +99,7 @@ struct ScoresView: View {
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "曲名、アーティスト名")
             .refreshable {
-                reloadScores()
+                reloadDisplayedScores()
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -151,11 +149,23 @@ struct ScoresView: View {
             }
             .task {
                 if dataState == .initializing {
-                    reloadScores()
+                    reloadAllScores()
+                    reloadDisplayedScores()
                 }
             }
-            .onChange(of: displayParameters) { _, _ in
-                reloadScores()
+            .onChange(of: searchTerm) { _, _ in
+                displayedSongRecords = searchSongRecords(songRecords, searchTerm: searchTerm)
+            }
+            .onChange(of: levelToShow) { _, _ in
+                reloadDisplayedScores()
+            }
+            .onChange(of: isShowingOnlyPlayDataWithScores) { _, _ in
+                reloadDisplayedScores()
+            }
+            .onChange(of: sortMode) { _, _ in
+                withAnimation(.snappy.speed(2.0)) {
+                    displayedSongRecords = sortSongRecords(displayedSongRecords)
+                }
             }
             .onChange(of: calendar.selectedDate) { oldValue, newValue in
                 if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
@@ -171,36 +181,52 @@ struct ScoresView: View {
         }
     }
 
-    func reloadScores() {
-        withAnimation(.snappy.speed(2.0)) {
-            songRecords.removeAll()
-            dataState = .loading
-            Task.detached(priority: .high) {
-                let newSongRecords: [IIDXSongRecord] = await ScoresView
-                    .latestAvailableIIDXSongRecords(in: ModelContext(sharedModelContainer),
-                                                    using: calendar)
-                let filteredSongRecords = await filterSongRecords(newSongRecords)
-                await MainActor.run { [filteredSongRecords] in
-                    withAnimation(.snappy.speed(2.0)) {
-                        songRecords.append(contentsOf: filteredSongRecords)
-                        dataState = .presenting
-                    }
+    func reloadAllScores() {
+        allSongRecords = ScoresView
+            .latestAvailableIIDXSongRecords(in: ModelContext(sharedModelContainer), using: calendar)
+    }
+
+    func reloadDisplayedScores() {
+        Task.detached { [allSongRecords] in
+            await MainActor.run {
+                withAnimation(.snappy.speed(2.0)) {
+                    dataState = .loading
+                }
+            }
+            let filteredSongRecords = await filterSongRecords(allSongRecords)
+            let searchedSongRecords = await searchSongRecords(filteredSongRecords, searchTerm: searchTerm)
+            let sortedSongRecords = await sortSongRecords(searchedSongRecords)
+            await MainActor.run { [filteredSongRecords, sortedSongRecords] in
+                withAnimation(.snappy.speed(2.0)) {
+                    songRecords = filteredSongRecords
+                    displayedSongRecords = sortedSongRecords
+                    dataState = .presenting
                 }
             }
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity
-    func filterSongRecords(_ songRecords: [IIDXSongRecord]) -> [IIDXSongRecord] {
+    func searchSongRecords(_ songRecords: [IIDXSongRecord], searchTerm: String) -> [IIDXSongRecord] {
+        var foundSongRecords: [IIDXSongRecord] = songRecords
+
         // Filter by search term
-        var filteredSongRecords: [IIDXSongRecord] = songRecords
-        if searchTerm.trimmingCharacters(in: .whitespaces) != "" {
-            let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
-            filteredSongRecords = filteredSongRecords.filter({ songRecord in
+        let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
+        if searchTermTrimmed != "" && searchTermTrimmed.count >= 2 {
+            foundSongRecords = foundSongRecords.filter({ songRecord in
                 return songRecord.title.lowercased().contains(searchTermTrimmed) ||
                 songRecord.artist.lowercased().contains(searchTermTrimmed)
             })
         }
+
+        return foundSongRecords
+    }
+
+    // swiftlint:disable cyclomatic_complexity
+    func filterSongRecords(_ songRecords: [IIDXSongRecord]) -> [IIDXSongRecord] {
+        var filteredSongRecords: [IIDXSongRecord] = songRecords
+
+        // Filter by search term
+        filteredSongRecords = searchSongRecords(filteredSongRecords, searchTerm: searchTerm)
 
         // Filter song records
         switch levelToShow {
@@ -233,33 +259,46 @@ struct ScoresView: View {
         }
 
         // Sort song records
+        if sortMode != .title {
+            filteredSongRecords = sortSongRecords(filteredSongRecords)
+        }
+
+        return filteredSongRecords
+    }
+    // swiftlint:enable cyclomatic_complexity
+
+    func sortSongRecords(_ songRecords: [IIDXSongRecord]) -> [IIDXSongRecord] {
+        var sortedSongRecords: [IIDXSongRecord] = songRecords
         if !(levelToShow == .all || levelToShow == .unknown) {
             switch sortMode {
-            case .title: break
+            case .title:
+                sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
+                    lhs.title < rhs.title
+                }
             case .clearType:
                 switch levelToShow {
                 case .beginner:
-                    filteredSongRecords = filteredSongRecords.sorted { lhs, rhs in
+                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
                         return clearTypes.firstIndex(of: lhs.beginnerScore.clearType) ?? 0 <
                             clearTypes.firstIndex(of: rhs.beginnerScore.clearType) ?? 1
                     }
                 case .normal:
-                    filteredSongRecords = filteredSongRecords.sorted { lhs, rhs in
+                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
                         return clearTypes.firstIndex(of: lhs.normalScore.clearType) ?? 0 <
                             clearTypes.firstIndex(of: rhs.normalScore.clearType) ?? 1
                     }
                 case .hyper:
-                    filteredSongRecords = filteredSongRecords.sorted { lhs, rhs in
+                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
                         return clearTypes.firstIndex(of: lhs.hyperScore.clearType) ?? 0 <
                             clearTypes.firstIndex(of: rhs.hyperScore.clearType) ?? 1
                     }
                 case .another:
-                    filteredSongRecords = filteredSongRecords.sorted { lhs, rhs in
+                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
                         return clearTypes.firstIndex(of: lhs.anotherScore.clearType) ?? 0 <
                             clearTypes.firstIndex(of: rhs.anotherScore.clearType) ?? 1
                     }
                 case .leggendaria:
-                    filteredSongRecords = filteredSongRecords.sorted { lhs, rhs in
+                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
                         return clearTypes.firstIndex(of: lhs.leggendariaScore.clearType) ?? 0 <
                             clearTypes.firstIndex(of: rhs.leggendariaScore.clearType) ?? 1
                     }
@@ -268,33 +307,31 @@ struct ScoresView: View {
             case .difficulty:
                 switch levelToShow {
                 case .beginner:
-                    filteredSongRecords = filteredSongRecords.sorted { lhs, rhs in
+                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
                         return lhs.beginnerScore.difficulty < rhs.beginnerScore.difficulty
                     }
                 case .normal:
-                    filteredSongRecords = filteredSongRecords.sorted { lhs, rhs in
+                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
                         return lhs.normalScore.difficulty < rhs.normalScore.difficulty
                     }
                 case .hyper:
-                    filteredSongRecords = filteredSongRecords.sorted { lhs, rhs in
+                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
                         return lhs.hyperScore.difficulty < rhs.hyperScore.difficulty
                     }
                 case .another:
-                    filteredSongRecords = filteredSongRecords.sorted { lhs, rhs in
+                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
                         return lhs.anotherScore.difficulty < rhs.anotherScore.difficulty
                     }
                 case .leggendaria:
-                    filteredSongRecords = filteredSongRecords.sorted { lhs, rhs in
+                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
                         return lhs.leggendariaScore.difficulty < rhs.leggendariaScore.difficulty
                     }
                 default: break
                 }
             }
         }
-
-        return filteredSongRecords
+        return sortedSongRecords
     }
-    // swiftlint:enable cyclomatic_complexity
 
     func score(for songRecord: IIDXSongRecord) -> IIDXLevelScore? {
         switch levelToShow {
@@ -348,5 +385,27 @@ struct ScoresView: View {
             return songRecordsInImportGroup
         }
         return []
+    }
+}
+
+struct ConditionalShadow: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+    var color: Color
+    var radius: CGFloat = 2.0
+    // swiftlint:disable identifier_name
+    var x: CGFloat = 0.0
+    var y: CGFloat = 0.0
+    // swiftlint:enable identifier_name
+
+    func body(content: Content) -> some View {
+        switch colorScheme {
+        case .light:
+            content
+                .shadow(color: color, radius: radius, x: x, y: y)
+        case .dark:
+            content
+        @unknown default:
+            content
+        }
     }
 }
