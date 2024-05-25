@@ -21,6 +21,12 @@ struct DJDXApp: App {
         .modelContainer(sharedModelContainer)
         .environmentObject(navigationManager)
         .environmentObject(calendar)
+        .onChange(of: navigationManager.selectedTab) { _, _ in
+            navigationManager.saveToDefaults()
+        }
+        .onChange(of: calendar.selectedDate) { _, _ in
+            calendar.saveToDefaults()
+        }
     }
 }
 

@@ -221,7 +221,6 @@ struct ScoresView: View {
         return foundSongRecords
     }
 
-    // swiftlint:disable cyclomatic_complexity
     func filterSongRecords(_ songRecords: [IIDXSongRecord]) -> [IIDXSongRecord] {
         var filteredSongRecords: [IIDXSongRecord] = songRecords
 
@@ -265,7 +264,6 @@ struct ScoresView: View {
 
         return filteredSongRecords
     }
-    // swiftlint:enable cyclomatic_complexity
 
     func sortSongRecords(_ songRecords: [IIDXSongRecord]) -> [IIDXSongRecord] {
         var sortedSongRecords: [IIDXSongRecord] = songRecords

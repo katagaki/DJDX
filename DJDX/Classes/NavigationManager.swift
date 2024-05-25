@@ -8,15 +8,28 @@
 import Foundation
 
 class NavigationManager: ObservableObject {
-    @Published var selectedTab: TabType = .scores
-    @Published var previouslySelectedTab: TabType = .scores
 
+    let defaults = UserDefaults.standard
+    let selectedTabKey = "NavigationManager.SelectedTab"
+
+    @Published var selectedTab: TabType
+    @Published var previouslySelectedTab: TabType
     @Published var tabPaths: [TabType: [ViewPath]] = [
         .calendar: [],
         .scores: [],
         .analytics: [],
         .more: []
     ]
+
+    init() {
+        if let selectedTab = TabType(rawValue: defaults.integer(forKey: selectedTabKey)) {
+            self.selectedTab = selectedTab
+            self.previouslySelectedTab = selectedTab
+        } else {
+            self.selectedTab = .scores
+            self.previouslySelectedTab = .scores
+        }
+    }
 
     subscript(tabType: TabType) -> [ViewPath] {
         get {
@@ -35,4 +48,8 @@ class NavigationManager: ObservableObject {
         tabPaths[tab]?.append(viewPath)
     }
 
+    func saveToDefaults() {
+        defaults.setValue(selectedTab.rawValue, forKey: selectedTabKey)
+        defaults.synchronize()
+    }
 }
