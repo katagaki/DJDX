@@ -36,17 +36,10 @@ struct WebImporter: View {
             didImportSucceed: $didImportSucceed,
             autoImportFailedReason: $autoImportFailedReason
         )
-        .navigationTitle("データインポート")
+        .navigationTitle("Webインポート")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarBackground(.hidden, for: .tabBar)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink(value: ViewPath.importerManual) {
-                    Text("お困りですか？")
-                }
-            }
-        }
         .background {
             ProgressView("読み込み中…")
         }

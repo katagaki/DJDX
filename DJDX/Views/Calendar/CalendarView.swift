@@ -77,7 +77,14 @@ struct CalendarView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink(value: ViewPath.importerWeb) {
+                    Menu {
+                        NavigationLink(value: ViewPath.importerWeb) {
+                            Label("Webでインポート", systemImage: "globe")
+                        }
+                        NavigationLink(value: ViewPath.importerManual) {
+                            Label("CSVファイルを開く", systemImage: "doc.badge.plus")
+                        }
+                    } label: {
                         Text("インポート")
                     }
                 }

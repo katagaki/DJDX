@@ -11,7 +11,7 @@ import SwiftData
 let songLevelCSVHeaders: [String] = ["BEGINNER", "NORMAL", "HYPER", "ANOTHER", "LEGGENDARIA"]
 
 @Model
-final class IIDXSongRecord {
+final class IIDXSongRecord: Equatable {
     var version: String = ""
     var title: String = ""
     var genre: String = ""
@@ -65,9 +65,19 @@ final class IIDXSongRecord {
             self.lastPlayDate = .distantPast
         }
     }
+
+    static func ==(lhs: IIDXSongRecord, rhs: IIDXSongRecord) -> Bool {
+        return lhs.title == rhs.title &&
+        lhs.artist == rhs.artist &&
+        lhs.beginnerScore == rhs.beginnerScore &&
+        lhs.normalScore == rhs.normalScore &&
+        lhs.hyperScore == rhs.hyperScore &&
+        lhs.anotherScore == rhs.anotherScore &&
+        lhs.leggendariaScore == rhs.leggendariaScore
+    }
 }
 
-struct IIDXLevelScore: Codable {
+struct IIDXLevelScore: Codable, Equatable {
     var level: IIDXLevel
     var difficulty: Int
     var score: Int
@@ -104,5 +114,12 @@ struct IIDXLevelScore: Codable {
         self.missCount = 0
         self.clearType = "NO PLAY"
         self.djLevel = "---"
+    }
+
+    static func ==(lhs: IIDXLevelScore, rhs: IIDXLevelScore) -> Bool {
+        return lhs.level == rhs.level &&
+        lhs.difficulty == rhs.difficulty &&
+        lhs.score == rhs.score &&
+        lhs.clearType == rhs.clearType
     }
 }

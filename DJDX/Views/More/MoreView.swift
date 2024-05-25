@@ -47,7 +47,7 @@ struct MoreView: View {
                                 }
                             }
                     } label: {
-                        Text("ウェブデータを消去")
+                        Text("Webデータを消去")
                             .foregroundStyle(.red)
                     }
                     Button {
