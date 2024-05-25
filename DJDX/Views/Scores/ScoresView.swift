@@ -136,14 +136,14 @@ struct ScoresView: View {
                     }
                 }
             }
-            .background {
+            .overlay {
                 switch dataState {
                 case .initializing, .loading:
                     ProgressView()
                         .progressViewStyle(.circular)
                 case .presenting:
                     if songRecords.count == 0 {
-                        ContentUnavailableView("選択した日付にプレーデータがありません。", systemImage: "questionmark.square.dashed")
+                        ContentUnavailableView("該当するデータはありません。", systemImage: "questionmark.square.dashed")
                     } else {
                         Color.clear
                     }
@@ -173,8 +173,8 @@ struct ScoresView: View {
 
     func reloadScores() {
         withAnimation(.snappy.speed(2.0)) {
-            dataState = .loading
             songRecords.removeAll()
+            dataState = .loading
             Task.detached(priority: .high) {
                 let newSongRecords: [IIDXSongRecord] = await ScoresView
                     .latestAvailableIIDXSongRecords(in: ModelContext(sharedModelContainer),

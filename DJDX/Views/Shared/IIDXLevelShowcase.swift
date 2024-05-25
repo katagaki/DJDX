@@ -33,5 +33,6 @@ struct IIDXLevelShowcase: View {
                                  score: songRecord.leggendariaScore)
             }
         }
+        .drawingGroup()
     }
 }

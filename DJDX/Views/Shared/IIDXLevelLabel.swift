@@ -77,6 +77,7 @@ struct IIDXLevelLabel: View {
         .lineLimit(1)
         .modifier(LevelLabelGlow(color: foregroundColor()))
         .offset(y: -1.0) // HACK: Fixes weird offset when using black font weight
+        .drawingGroup()
     }
 
     func foregroundColor() -> Color {
