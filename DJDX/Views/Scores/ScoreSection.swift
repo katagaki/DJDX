@@ -35,6 +35,7 @@ struct ScoreSection: View {
                     .font(.largeTitle)
                     .fontWidth(.expanded)
                     .fontWeight(.black)
+                    .drawingGroup()
                     Divider()
                     Group {
                         HStack {
