@@ -50,7 +50,8 @@ struct ChartsView: View {
                             .font(.body)
                         Spacer()
                         NavigationLink {
-                            ClearLampOverviewChart(clearLampPerDifficulty: $clearLampPerDifficulty)
+                            ClearLampOverviewChart(clearLampPerDifficulty: $clearLampPerDifficulty,
+                                                   isInteractive: true)
                                 .padding()
                                 .navigationTitle("クリアランプ（全体）")
                                 .navigationBarTitleDisplayMode(.inline)

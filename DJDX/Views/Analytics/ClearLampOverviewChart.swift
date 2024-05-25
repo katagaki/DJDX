@@ -11,6 +11,7 @@ import SwiftUI
 struct ClearLampOverviewChart: View {
     @Binding var clearLampPerDifficulty: [Int: [String: Int]]
 
+    @State var isInteractive: Bool = false
     @State var difficultyBelowFinger: Int?
 
     var body: some View {
@@ -61,25 +62,27 @@ struct ClearLampOverviewChart: View {
             "FAILED": .red
         ])
         .chartOverlay { proxy in
-            GeometryReader { geometry in
-                Rectangle().fill(.clear).contentShape(Rectangle())
-                    .gesture(
-                        DragGesture()
-                            .onChanged { value in
-                                if let plotFrame = proxy.plotFrame {
-                                    let origin: CGPoint = geometry[plotFrame].origin
-                                    let location: CGPoint = CGPoint(
-                                        x: value.location.x - origin.x,
-                                        y: value.location.y - origin.y
-                                    )
-                                    let (difficulty, _) = proxy.value(at: location, as: (Int, Int).self) ?? (0, 0)
-                                    difficultyBelowFinger = difficulty
+            if isInteractive {
+                GeometryReader { geometry in
+                    Rectangle().fill(.clear).contentShape(Rectangle())
+                        .gesture(
+                            DragGesture()
+                                .onChanged { value in
+                                    if let plotFrame = proxy.plotFrame {
+                                        let origin: CGPoint = geometry[plotFrame].origin
+                                        let location: CGPoint = CGPoint(
+                                            x: value.location.x - origin.x,
+                                            y: value.location.y - origin.y
+                                        )
+                                        let (difficulty, _) = proxy.value(at: location, as: (Int, Int).self) ?? (0, 0)
+                                        difficultyBelowFinger = difficulty
+                                    }
                                 }
-                            }
-                            .onEnded { _ in
-                                difficultyBelowFinger = nil
-                            }
-                    )
+                                .onEnded { _ in
+                                    difficultyBelowFinger = nil
+                                }
+                        )
+                }
             }
         }
     }
