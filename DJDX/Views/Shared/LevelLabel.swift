@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct LevelLabel: View {
-
     var orientation: LevelLabelOrientation
     var levelType: IIDXLevel
     var score: IIDXLevelScore
@@ -76,7 +75,7 @@ struct LevelLabel: View {
         }
         .kerning(-0.2)
         .lineLimit(1)
-        .foregroundStyle(foregroundColor())
+        .modifier(LevelLabelGlow(color: foregroundColor()))
         .offset(y: -1.0) // HACK: Fixes weird offset when using black font weight
     }
 
@@ -88,6 +87,26 @@ struct LevelLabel: View {
         case .another: return Color.red
         case .leggendaria: return Color.purple
         default: return Color.primary
+        }
+    }
+}
+
+struct LevelLabelGlow: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+    var color: Color
+
+    func body(content: Content) -> some View {
+        switch colorScheme {
+        case .light:
+            content
+                .foregroundStyle(color)
+        case .dark:
+            content
+                .foregroundStyle(.white)
+                .shadow(color: color.opacity(0.8), radius: 1.0)
+                .shadow(color: color.opacity(0.9), radius: 8.0)
+        @unknown default:
+            content
         }
     }
 }
