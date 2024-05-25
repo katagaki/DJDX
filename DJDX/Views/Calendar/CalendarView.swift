@@ -114,6 +114,7 @@ struct CalendarView: View {
                     Rectangle()
                         .frame(height: 1/3)
                         .foregroundColor(.primary.opacity(0.2))
+                        .ignoresSafeArea(edges: [.leading, .trailing])
                 }
             }
             .alert(

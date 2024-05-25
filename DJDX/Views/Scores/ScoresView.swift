@@ -187,22 +187,16 @@ struct ScoresView: View {
     }
 
     func reloadDisplayedScores() {
-        Task.detached { [allSongRecords] in
-            await MainActor.run {
-                withAnimation(.snappy.speed(2.0)) {
-                    dataState = .loading
-                }
-            }
-            let filteredSongRecords = await filterSongRecords(allSongRecords)
-            let searchedSongRecords = await searchSongRecords(filteredSongRecords, searchTerm: searchTerm)
-            let sortedSongRecords = await sortSongRecords(searchedSongRecords)
-            await MainActor.run { [filteredSongRecords, sortedSongRecords] in
-                withAnimation(.snappy.speed(2.0)) {
-                    songRecords = filteredSongRecords
-                    displayedSongRecords = sortedSongRecords
-                    dataState = .presenting
-                }
-            }
+        withAnimation(.snappy.speed(2.0)) {
+            dataState = .loading
+        }
+        let filteredSongRecords = filterSongRecords(allSongRecords)
+        let searchedSongRecords = searchSongRecords(filteredSongRecords, searchTerm: searchTerm)
+        let sortedSongRecords = sortSongRecords(searchedSongRecords)
+        withAnimation(.snappy.speed(2.0)) {
+            songRecords = filteredSongRecords
+            displayedSongRecords = sortedSongRecords
+            dataState = .presenting
         }
     }
 

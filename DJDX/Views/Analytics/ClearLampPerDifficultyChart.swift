@@ -13,6 +13,8 @@ struct ClearLampPerDifficultyChart: View {
     @Binding var clearTypes: [String]
     @Binding var selectedDifficulty: Int
 
+    @State var legendPosition: AnnotationPosition = .trailing
+
     var body: some View {
         Chart(clearLampPerDifficulty[selectedDifficulty]?.sorted(by: <) ??
               [:].sorted(by: <), id: \.key) { clearType, count in
@@ -21,7 +23,7 @@ struct ClearLampPerDifficultyChart: View {
                     by: .value("CLEAR TYPE", clearType)
                 )
         }
-              .chartLegend(position: .trailing, alignment: .leading, spacing: 2.0)
+              .chartLegend(position: legendPosition, alignment: .leading, spacing: 2.0)
               .chartXScale(domain: clearTypes)
               .chartForegroundStyleScale([
                 "FULLCOMBO CLEAR": .blue,
