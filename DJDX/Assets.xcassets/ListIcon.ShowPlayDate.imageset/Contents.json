@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "UI Icons (iOS).007.png",
+      "filename" : "UI Icons (iOS).005.png",
       "idiom" : "universal"
     },
     {
@@ -11,7 +11,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "UI Icons (iOS).008.png",
+      "filename" : "UI Icons (iOS).006.png",
       "idiom" : "universal"
     }
   ],

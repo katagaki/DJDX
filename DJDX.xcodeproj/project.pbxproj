@@ -21,6 +21,9 @@
 		E4B123D22BF909CD00D4A3D1 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123D12BF909CD00D4A3D1 /* MainTabView.swift */; };
 		E4B123D72BF90A4300D4A3D1 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123D62BF90A4300D4A3D1 /* MoreView.swift */; };
 		E4B123DA2BF90C1D00D4A3D1 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123D92BF90C1D00D4A3D1 /* DocumentPicker.swift */; };
+		E4BC32802C036C82006A0F7A /* ConditionalShadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BC327F2C036C82006A0F7A /* ConditionalShadow.swift */; };
+		E4BC32822C036CBD006A0F7A /* LevelLabelGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BC32812C036CBD006A0F7A /* LevelLabelGlow.swift */; };
+		E4BC32842C036DF1006A0F7A /* ScoresView+Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BC32832C036DF1006A0F7A /* ScoresView+Functions.swift */; };
 		E4E3D0C32BF98D57001942FE /* ScoreViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */; };
 		E4E3D0C52BF98D79001942FE /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0C42BF98D79001942FE /* NavigationManager.swift */; };
 		E4E3D0CA2BF98DB7001942FE /* TabType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0C92BF98DB7001942FE /* TabType.swift */; };
@@ -60,6 +63,9 @@
 		E4B123D12BF909CD00D4A3D1 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		E4B123D62BF90A4300D4A3D1 /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
 		E4B123D92BF90C1D00D4A3D1 /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
+		E4BC327F2C036C82006A0F7A /* ConditionalShadow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionalShadow.swift; sourceTree = "<group>"; };
+		E4BC32812C036CBD006A0F7A /* LevelLabelGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabelGlow.swift; sourceTree = "<group>"; };
+		E4BC32832C036DF1006A0F7A /* ScoresView+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScoresView+Functions.swift"; sourceTree = "<group>"; };
 		E4C11FF32C01F07900CFB1E4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreViewer.swift; sourceTree = "<group>"; };
 		E4E3D0C42BF98D79001942FE /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
@@ -123,6 +129,7 @@
 				E4B123B52BF8E8E500D4A3D1 /* Assets.xcassets */,
 				E4B123CA2BF8F7DC00D4A3D1 /* SampleData.csv */,
 				E4B123D02BF902B600D4A3D1 /* Views */,
+				E4BC327E2C036C6F006A0F7A /* View Modifiers */,
 				E4B123CF2BF9028C00D4A3D1 /* Classes */,
 				E4E3D0C82BF98DAA001942FE /* Enums */,
 				E4EB2CAA2BFF8CC500A00796 /* Predicates.swift */,
@@ -170,6 +177,7 @@
 			isa = PBXGroup;
 			children = (
 				E4B123B12BF8E8E400D4A3D1 /* ScoresView.swift */,
+				E4BC32832C036DF1006A0F7A /* ScoresView+Functions.swift */,
 				E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */,
 				E4E3D0D32BF99A86001942FE /* ScoreSection.swift */,
 			);
@@ -182,6 +190,15 @@
 				E4B123D62BF90A4300D4A3D1 /* MoreView.swift */,
 			);
 			path = More;
+			sourceTree = "<group>";
+		};
+		E4BC327E2C036C6F006A0F7A /* View Modifiers */ = {
+			isa = PBXGroup;
+			children = (
+				E4BC327F2C036C82006A0F7A /* ConditionalShadow.swift */,
+				E4BC32812C036CBD006A0F7A /* LevelLabelGlow.swift */,
+			);
+			path = "View Modifiers";
 			sourceTree = "<group>";
 		};
 		E4E3D0C82BF98DAA001942FE /* Enums */ = {
@@ -340,7 +357,9 @@
 				E4EB2CA82BFF7E3700A00796 /* CalendarView.swift in Sources */,
 				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,
 				E4B123D72BF90A4300D4A3D1 /* MoreView.swift in Sources */,
+				E4BC32822C036CBD006A0F7A /* LevelLabelGlow.swift in Sources */,
 				E49359E12C016F2F0022E385 /* SortMode.swift in Sources */,
+				E4BC32802C036C82006A0F7A /* ConditionalShadow.swift in Sources */,
 				E4EB2CAB2BFF8CC500A00796 /* Predicates.swift in Sources */,
 				E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */,
 				E4E3D0C52BF98D79001942FE /* NavigationManager.swift in Sources */,
@@ -356,6 +375,7 @@
 				E4B123D22BF909CD00D4A3D1 /* MainTabView.swift in Sources */,
 				E4E3D0F02BFC03CB001942FE /* ClearLampPerDifficultyChart.swift in Sources */,
 				E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */,
+				E4BC32842C036DF1006A0F7A /* ScoresView+Functions.swift in Sources */,
 				E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */,
 				E49359DA2C00AD060022E385 /* DataState.swift in Sources */,
 				E4E3D0CA2BF98DB7001942FE /* TabType.swift in Sources */,

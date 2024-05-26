@@ -60,8 +60,8 @@ struct ScoreSection: View {
                                 .foregroundStyle(scoreColor())
                         }
                     }
-                    .fontWeight(.heavy)
                     .font(.caption)
+                    .fontWeight(.heavy)
                 } else {
                     Text("現バージョンのプレー記録はありません。")
                         .font(.subheadline)

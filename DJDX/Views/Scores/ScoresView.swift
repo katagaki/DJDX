@@ -20,8 +20,11 @@ struct ScoresView: View {
     @State var displayedSongRecords: [IIDXSongRecord] = []
 
     @State var searchTerm: String = ""
+    @AppStorage(wrappedValue: false, "ScoresView.ArtistVisible") var isArtistVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScorewView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: false, "ScorewView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
+    @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
     @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
     @AppStorage(wrappedValue: true, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
     @AppStorage(wrappedValue: .title, "ScoresView.SortOrder") var sortMode: SortMode
@@ -47,8 +50,45 @@ struct ScoresView: View {
                         VStack(alignment: .trailing, spacing: 4.0) {
                             HStack(alignment: .center, spacing: 8.0) {
                                 VStack(alignment: .leading, spacing: 2.0) {
-                                    DetailedSongTitle(songRecord: songRecord,
-                                                      isGenreVisible: $isGenreVisible)
+                                    if isGenreVisible {
+                                        Text(songRecord.genre)
+                                            .font(.caption2)
+                                            .fontWidth(.condensed)
+                                    }
+                                    Text(songRecord.title)
+                                        .bold()
+                                        .fontWidth(.condensed)
+                                    if isArtistVisible {
+                                        Text(songRecord.artist)
+                                            .font(.caption)
+                                            .fontWidth(.condensed)
+                                    }
+                                    if isScoreVisible || isLastPlayDateVisible {
+                                        HStack {
+                                            if isScoreVisible, let score = score(for: songRecord)?.score, score != 0 {
+                                                Text(String(score))
+                                                    .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
+                                                                                    startPoint: .top,
+                                                                                    endPoint: .bottom))
+                                                    .font(.caption)
+                                                    .fontWeight(.heavy)
+                                            }
+                                            if isScoreVisible && isLastPlayDateVisible,
+                                               score(for: songRecord)?.score != 0 {
+                                                Divider()
+                                                    .frame(maxHeight: 14.0)
+                                            }
+                                            if isLastPlayDateVisible {
+                                                Text(RelativeDateTimeFormatter().localizedString(
+                                                    for: songRecord.lastPlayDate,
+                                                    relativeTo: .now
+                                                ))
+                                                .font(.caption2)
+                                                .fontWidth(.condensed)
+                                                .foregroundStyle(.secondary)
+                                            }
+                                        }
+                                    }
                                 }
                                 Spacer(minLength: 0.0)
                                 if isLevelVisible, levelToShow != .all {
@@ -103,34 +143,30 @@ struct ScoresView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Toggle("スコアのない曲を非表示", isOn: $isShowingOnlyPlayDataWithScores)
-                        Section("フィルター") {
-                            Picker(selection: $levelToShow) {
-                                ForEach(IIDXLevel.sortLevels, id: \.self) { sortLevel in
-                                    Text(sortLevel.rawValue)
-                                        .tag(sortLevel)
-                                }
-                            } label: {
-                                Text("レベル")
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        Section("並べ替え") {
-                            if levelToShow != .all {
-                                Picker(selection: $sortMode) {
+                    HStack {
+                        if levelToShow != .all {
+                            Menu("並べ替え") {
+                                Picker("並べ替え", selection: $sortMode) {
                                     ForEach(SortMode.all, id: \.self) { sortMode in
                                         Text(sortMode.rawValue)
                                             .tag(sortMode)
                                     }
-                                } label: {
-                                    Text("曲")
                                 }
-                                .pickerStyle(.menu)
+                                .pickerStyle(.inline)
                             }
                         }
-                    } label: {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
+                        Menu("フィルター", systemImage: "line.3.horizontal.decrease.circle") {
+                            Toggle("スコアのある曲のみ表示", isOn: $isShowingOnlyPlayDataWithScores)
+                            Section("フィルター") {
+                                Picker("レベル", selection: $levelToShow) {
+                                    ForEach(IIDXLevel.sortLevels, id: \.self) { sortLevel in
+                                        Text(sortLevel.rawValue)
+                                            .tag(sortLevel)
+                                    }
+                                }
+                            }
+                            .pickerStyle(.menu)
+                        }
                     }
                 }
             }
@@ -178,226 +214,6 @@ struct ScoresView: View {
                 default: Color.clear
                 }
             }
-        }
-    }
-
-    func reloadAllScores() {
-        allSongRecords = ScoresView
-            .latestAvailableIIDXSongRecords(in: ModelContext(sharedModelContainer), using: calendar)
-    }
-
-    func reloadDisplayedScores() {
-        withAnimation(.snappy.speed(2.0)) {
-            dataState = .loading
-        }
-        let filteredSongRecords = filterSongRecords(allSongRecords)
-        let searchedSongRecords = searchSongRecords(filteredSongRecords, searchTerm: searchTerm)
-        let sortedSongRecords = sortSongRecords(searchedSongRecords)
-        withAnimation(.snappy.speed(2.0)) {
-            songRecords = filteredSongRecords
-            displayedSongRecords = sortedSongRecords
-            dataState = .presenting
-        }
-    }
-
-    func searchSongRecords(_ songRecords: [IIDXSongRecord], searchTerm: String) -> [IIDXSongRecord] {
-        var foundSongRecords: [IIDXSongRecord] = songRecords
-
-        // Filter by search term
-        let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
-        if searchTermTrimmed != "" && searchTermTrimmed.count >= 2 {
-            foundSongRecords = foundSongRecords.filter({ songRecord in
-                return songRecord.title.lowercased().contains(searchTermTrimmed) ||
-                songRecord.artist.lowercased().contains(searchTermTrimmed)
-            })
-        }
-
-        return foundSongRecords
-    }
-
-    func filterSongRecords(_ songRecords: [IIDXSongRecord]) -> [IIDXSongRecord] {
-        var filteredSongRecords: [IIDXSongRecord] = songRecords
-
-        // Filter by search term
-        filteredSongRecords = searchSongRecords(filteredSongRecords, searchTerm: searchTerm)
-
-        // Filter song records
-        switch levelToShow {
-        case .beginner:
-            filteredSongRecords = filteredSongRecords.filter({ songRecord in
-                return songRecord.beginnerScore.difficulty != 0 &&
-                (!isShowingOnlyPlayDataWithScores || songRecord.beginnerScore.score != 0)
-            })
-        case .normal:
-            filteredSongRecords = filteredSongRecords.filter({ songRecord in
-                return songRecord.normalScore.difficulty != 0 &&
-                (!isShowingOnlyPlayDataWithScores || songRecord.normalScore.score != 0)
-            })
-        case .hyper:
-            filteredSongRecords = filteredSongRecords.filter({ songRecord in
-                return songRecord.hyperScore.difficulty != 0 &&
-                (!isShowingOnlyPlayDataWithScores || songRecord.hyperScore.score != 0)
-            })
-        case .another:
-            filteredSongRecords = filteredSongRecords.filter({ songRecord in
-                return songRecord.anotherScore.difficulty != 0 &&
-                (!isShowingOnlyPlayDataWithScores || songRecord.anotherScore.score != 0)
-            })
-        case .leggendaria:
-            filteredSongRecords = filteredSongRecords.filter({ songRecord in
-                return songRecord.leggendariaScore.difficulty != 0 &&
-                (!isShowingOnlyPlayDataWithScores || songRecord.leggendariaScore.score != 0)
-            })
-        default: break
-        }
-
-        // Sort song records
-        if sortMode != .title {
-            filteredSongRecords = sortSongRecords(filteredSongRecords)
-        }
-
-        return filteredSongRecords
-    }
-
-    func sortSongRecords(_ songRecords: [IIDXSongRecord]) -> [IIDXSongRecord] {
-        var sortedSongRecords: [IIDXSongRecord] = songRecords
-        if !(levelToShow == .all || levelToShow == .unknown) {
-            switch sortMode {
-            case .title:
-                sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
-                    lhs.title < rhs.title
-                }
-            case .clearType:
-                switch levelToShow {
-                case .beginner:
-                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
-                        return clearTypes.firstIndex(of: lhs.beginnerScore.clearType) ?? 0 <
-                            clearTypes.firstIndex(of: rhs.beginnerScore.clearType) ?? 1
-                    }
-                case .normal:
-                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
-                        return clearTypes.firstIndex(of: lhs.normalScore.clearType) ?? 0 <
-                            clearTypes.firstIndex(of: rhs.normalScore.clearType) ?? 1
-                    }
-                case .hyper:
-                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
-                        return clearTypes.firstIndex(of: lhs.hyperScore.clearType) ?? 0 <
-                            clearTypes.firstIndex(of: rhs.hyperScore.clearType) ?? 1
-                    }
-                case .another:
-                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
-                        return clearTypes.firstIndex(of: lhs.anotherScore.clearType) ?? 0 <
-                            clearTypes.firstIndex(of: rhs.anotherScore.clearType) ?? 1
-                    }
-                case .leggendaria:
-                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
-                        return clearTypes.firstIndex(of: lhs.leggendariaScore.clearType) ?? 0 <
-                            clearTypes.firstIndex(of: rhs.leggendariaScore.clearType) ?? 1
-                    }
-                default: break
-                }
-            case .difficulty:
-                switch levelToShow {
-                case .beginner:
-                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
-                        return lhs.beginnerScore.difficulty < rhs.beginnerScore.difficulty
-                    }
-                case .normal:
-                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
-                        return lhs.normalScore.difficulty < rhs.normalScore.difficulty
-                    }
-                case .hyper:
-                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
-                        return lhs.hyperScore.difficulty < rhs.hyperScore.difficulty
-                    }
-                case .another:
-                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
-                        return lhs.anotherScore.difficulty < rhs.anotherScore.difficulty
-                    }
-                case .leggendaria:
-                    sortedSongRecords = sortedSongRecords.sorted { lhs, rhs in
-                        return lhs.leggendariaScore.difficulty < rhs.leggendariaScore.difficulty
-                    }
-                default: break
-                }
-            }
-        }
-        return sortedSongRecords
-    }
-
-    func score(for songRecord: IIDXSongRecord) -> IIDXLevelScore? {
-        switch levelToShow {
-        case .beginner: return songRecord.beginnerScore
-        case .normal: return songRecord.normalScore
-        case .hyper: return songRecord.hyperScore
-        case .another: return songRecord.anotherScore
-        case .leggendaria: return songRecord.leggendariaScore
-        default: return nil
-        }
-    }
-
-    static func latestAvailableIIDXSongRecords(in modelContext: ModelContext,
-                                               using calendar: CalendarManager) -> [IIDXSongRecord] {
-        let importGroupsForSelectedDate: [ImportGroup] = (try? modelContext.fetch(
-            FetchDescriptor<ImportGroup>(
-                predicate: importGroups(in: calendar),
-                sortBy: [SortDescriptor(\.importDate, order: .forward)]
-            )
-        )) ?? []
-        var importGroupID: String?
-        if let importGroupForSelectedDate = importGroupsForSelectedDate.first {
-            // Use selected date's import group
-            importGroupID = importGroupForSelectedDate.id
-        } else {
-            // Use latest available import group
-            let allImportGroups: [ImportGroup] = (try? modelContext.fetch(
-                FetchDescriptor<ImportGroup>(
-                    sortBy: [SortDescriptor(\.importDate, order: .forward)]
-                )
-            )) ?? []
-            var importGroupClosestToTheSelectedDate: ImportGroup?
-            for importGroup in allImportGroups {
-                if importGroup.importDate <= calendar.selectedDate {
-                    importGroupClosestToTheSelectedDate = importGroup
-                } else {
-                    break
-                }
-            }
-            if let importGroupClosestToTheSelectedDate {
-                importGroupID = importGroupClosestToTheSelectedDate.id
-            }
-        }
-        if let importGroupID {
-            let songRecordsInImportGroup: [IIDXSongRecord] = (try? modelContext.fetch(
-                FetchDescriptor<IIDXSongRecord>(
-                    predicate: iidxSongRecords(inImportGroupWithID: importGroupID),
-                    sortBy: [SortDescriptor(\.title, order: .forward)]
-                )
-            )) ?? []
-            return songRecordsInImportGroup
-        }
-        return []
-    }
-}
-
-struct ConditionalShadow: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-    var color: Color
-    var radius: CGFloat = 2.0
-    // swiftlint:disable identifier_name
-    var x: CGFloat = 0.0
-    var y: CGFloat = 0.0
-    // swiftlint:enable identifier_name
-
-    func body(content: Content) -> some View {
-        switch colorScheme {
-        case .light:
-            content
-                .shadow(color: color, radius: radius, x: x, y: y)
-        case .dark:
-            content
-        @unknown default:
-            content
         }
     }
 }

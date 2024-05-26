@@ -10,7 +10,9 @@ import Foundation
 enum SortMode: String {
     case title = "タイトル"
     case clearType = "クリアタイプ"
-    case difficulty = "難易度"
+    case difficultyAscending = "難易度（昇順）"
+    case difficultyDescending = "難易度（降順）"
+    case lastPlayDate = "最終プレー日時"
 
-    static let all: [SortMode] = [.title, .clearType, .difficulty]
+    static let all: [SortMode] = [.title, .clearType, .difficultyAscending, .difficultyDescending, .lastPlayDate]
 }

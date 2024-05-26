@@ -14,13 +14,26 @@ struct MoreView: View {
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
 
+    @AppStorage(wrappedValue: false, "ScoresView.ArtistVisible") var isArtistVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScorewView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: false, "ScorewView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
+    @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
     var body: some View {
         NavigationStack(path: $navigationManager[.more]) {
             MoreList(repoName: "katagaki/DJDX", viewPath: ViewPath.moreAttributions) {
+//                Section {
+//                    ListRow(image: "ListIcon.ShowDifficultiesAsSeparateRecords",
+//                            title: "レベル別で表示",
+//                            includeSpacer: true)
+//                }
                 Section {
+                    Toggle(isOn: $isArtistVisible) {
+                        ListRow(image: "ListIcon.ShowArtist",
+                                title: "アーティストを表示",
+                                includeSpacer: true)
+                    }
                     Toggle(isOn: $isLevelVisible) {
                         ListRow(image: "ListIcon.ShowDifficulty",
                                 title: "レベルを表示",
@@ -31,8 +44,18 @@ struct MoreView: View {
                                 title: "ジャンルを表示",
                                 includeSpacer: true)
                     }
+                    Toggle(isOn: $isLastPlayDateVisible) {
+                        ListRow(image: "ListIcon.ShowPlayDate",
+                                title: "最終プレー日時を表示",
+                                includeSpacer: true)
+                    }
+                    Toggle(isOn: $isScoreVisible) {
+                        ListRow(image: "ListIcon.ShowScore",
+                                title: "スコアを表示",
+                                includeSpacer: true)
+                    }
                 } header: {
-                    ListSectionHeader(text: "リスト表示")
+                    ListSectionHeader(text: "プレーデータの表示")
                         .font(.body)
                 }
                 Section {
