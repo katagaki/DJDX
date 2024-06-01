@@ -940,7 +940,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "ANOTHER"
           }
         },
@@ -957,7 +957,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "BEGINNER"
           }
         },
@@ -974,7 +974,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "HYPER"
           }
         },
@@ -991,7 +991,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "LEGGENDARIA"
           }
         },
@@ -1008,7 +1008,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "NORMAL"
           }
         },
@@ -1033,6 +1033,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "該当するデータはありません。"
+          }
+        }
+      }
+    },
+    "Shared.NotImplemented" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feature not yet implemented."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未実装の機能です。"
           }
         }
       }

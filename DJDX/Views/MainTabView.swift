@@ -28,11 +28,11 @@ struct MainTabView: View {
                     Label("Tab.Analytics", systemImage: "chart.xyaxis.line")
                 }
                 .tag(TabType.analytics)
-            Color.clear
+            ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
                 .tabItem {
                     Label("Tab.Charts", image: "TabIcon.Charts")
                 }
-//                .tag(TabType.charts)
+                .tag(TabType.charts)
             MoreView()
                 .tabItem {
                     Label("Tab.More", systemImage: "ellipsis")
