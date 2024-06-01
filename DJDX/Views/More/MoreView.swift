@@ -54,6 +54,7 @@ struct MoreView: View {
                                     includeSpacer: true)
                         }
                     }
+                    .disabled(true)
                     Toggle(isOn: $isArtistVisible) {
                         ListRow(image: "ListIcon.ShowArtist",
                                 title: "More.PlayDataDisplay.ShowArtist",
