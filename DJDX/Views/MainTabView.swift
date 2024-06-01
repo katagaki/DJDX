@@ -24,16 +24,16 @@ struct MainTabView: View {
                     Label("Tab.Scores", image: "TabIcon.Scores")
                 }
                 .tag(TabType.scores)
-            AnalyticsView()
-                .tabItem {
-                    Label("Tab.Analytics", systemImage: "chart.xyaxis.line")
-                }
-                .tag(TabType.analytics)
             ChartsView()
                 .tabItem {
                     Label("Tab.Charts", image: "TabIcon.Charts")
                 }
                 .tag(TabType.charts)
+            AnalyticsView()
+                .tabItem {
+                    Label("Tab.Analytics", systemImage: "chart.xyaxis.line")
+                }
+                .tag(TabType.analytics)
             MoreView()
                 .tabItem {
                     Label("Tab.More", systemImage: "ellipsis")

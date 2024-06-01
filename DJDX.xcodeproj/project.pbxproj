@@ -17,6 +17,9 @@
 		E46A65F12C0B085D00D9544B /* MoreView+Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65F02C0B085D00D9544B /* MoreView+Functions.swift */; };
 		E46A65F32C0B112900D9544B /* LevelDetailRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65F22C0B112900D9544B /* LevelDetailRow.swift */; };
 		E46A65F52C0B3C9700D9544B /* ProgressAlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65F42C0B3C9700D9544B /* ProgressAlertManager.swift */; };
+		E46A65F72C0B588500D9544B /* OpenYouTubeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65F62C0B588500D9544B /* OpenYouTubeButton.swift */; };
+		E46A65F92C0B5E7300D9544B /* TextageViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65F82C0B5E7300D9544B /* TextageViewer.swift */; };
+		E46A65FB2C0B635200D9544B /* IIDXPlaySide.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65FA2C0B635200D9544B /* IIDXPlaySide.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
 		E49359DF2C00E4230022E385 /* LevelLabelOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */; };
@@ -66,6 +69,9 @@
 		E46A65F02C0B085D00D9544B /* MoreView+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoreView+Functions.swift"; sourceTree = "<group>"; };
 		E46A65F22C0B112900D9544B /* LevelDetailRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelDetailRow.swift; sourceTree = "<group>"; };
 		E46A65F42C0B3C9700D9544B /* ProgressAlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAlertManager.swift; sourceTree = "<group>"; };
+		E46A65F62C0B588500D9544B /* OpenYouTubeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenYouTubeButton.swift; sourceTree = "<group>"; };
+		E46A65F82C0B5E7300D9544B /* TextageViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextageViewer.swift; sourceTree = "<group>"; };
+		E46A65FA2C0B635200D9544B /* IIDXPlaySide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXPlaySide.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
 		E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabelOrientation.swift; sourceTree = "<group>"; };
@@ -124,6 +130,7 @@
 		E46A65E82C0AE1E500D9544B /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				E4EB2CAA2BFF8CC500A00796 /* Predicates.swift */,
 				E4EB2CA12BFF78E400A00796 /* Data Models */,
 			);
 			path = Shared;
@@ -167,7 +174,6 @@
 				E4BC327E2C036C6F006A0F7A /* View Modifiers */,
 				E4B123CF2BF9028C00D4A3D1 /* Classes */,
 				E4E3D0C82BF98DAA001942FE /* Enums */,
-				E4EB2CAA2BFF8CC500A00796 /* Predicates.swift */,
 			);
 			path = DJDX;
 			sourceTree = "<group>";
@@ -219,6 +225,8 @@
 				E4BC32832C036DF1006A0F7A /* ScoresView+Functions.swift */,
 				E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */,
 				E4E3D0D32BF99A86001942FE /* ScoreSection.swift */,
+				E46A65F62C0B588500D9544B /* OpenYouTubeButton.swift */,
+				E46A65F82C0B5E7300D9544B /* TextageViewer.swift */,
 			);
 			path = Scores;
 			sourceTree = "<group>";
@@ -247,6 +255,7 @@
 				E49359D92C00AD060022E385 /* DataState.swift */,
 				E49359E22C0170E80022E385 /* IIDXLevel.swift */,
 				E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */,
+				E46A65FA2C0B635200D9544B /* IIDXPlaySide.swift */,
 				E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */,
 				E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */,
 				E49359E02C016F2F0022E385 /* SortMode.swift */,
@@ -404,13 +413,16 @@
 				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,
 				E46A65E02C0A276800D9544B /* DetailRow.swift in Sources */,
 				E46A65F12C0B085D00D9544B /* MoreView+Functions.swift in Sources */,
+				E46A65F72C0B588500D9544B /* OpenYouTubeButton.swift in Sources */,
 				E4B123D72BF90A4300D4A3D1 /* MoreView.swift in Sources */,
 				E4BC32822C036CBD006A0F7A /* LevelLabelGlow.swift in Sources */,
 				E49359E12C016F2F0022E385 /* SortMode.swift in Sources */,
 				E4BC32802C036C82006A0F7A /* ConditionalShadow.swift in Sources */,
 				E4EB2CAB2BFF8CC500A00796 /* Predicates.swift in Sources */,
 				E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */,
+				E46A65FB2C0B635200D9544B /* IIDXPlaySide.swift in Sources */,
 				E4E3D0C52BF98D79001942FE /* NavigationManager.swift in Sources */,
+				E46A65F92C0B5E7300D9544B /* TextageViewer.swift in Sources */,
 				E46A65E72C0ACBAA00D9544B /* IIDXPlayType.swift in Sources */,
 				E4E3D0C32BF98D57001942FE /* ScoreViewer.swift in Sources */,
 				E4B123B42BF8E8E400D4A3D1 /* IIDXSongRecord.swift in Sources */,

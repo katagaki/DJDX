@@ -867,6 +867,40 @@
         }
       }
     },
+    "Scores.Viewer.OpenTextage" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Chart on Textage"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textageで譜面を確認"
+          }
+        }
+      }
+    },
+    "Scores.Viewer.OpenYouTube" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Chart on YouTube"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YouTubeで譜面を確認"
+          }
+        }
+      }
+    },
     "Shared.All" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1452,6 +1486,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレーデータ"
+          }
+        }
+      }
+    },
+    "ViewTitle.TextageViewer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textage Viewer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textage譜面"
           }
         }
       }

@@ -12,25 +12,30 @@ struct ScoreViewer: View {
 
     @Environment(\.modelContext) var modelContext
 
-    var songRecord: IIDXSongRecord
+    @State var songRecord: IIDXSongRecord
     @State var songData: IIDXSong?
 
     var body: some View {
         List {
             if songRecord.beginnerScore.difficulty != 0 {
-                ScoreSection(levelScore: songRecord.beginnerScore)
+                ScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
+                             noteCount: songData?.spNoteCount?.beginnerNoteCount)
             }
             if songRecord.normalScore.difficulty != 0 {
-                ScoreSection(levelScore: songRecord.normalScore)
+                ScoreSection(songTitle: songRecord.title, score: songRecord.normalScore,
+                             noteCount: songData?.spNoteCount?.normalNoteCount)
             }
             if songRecord.hyperScore.difficulty != 0 {
-                ScoreSection(levelScore: songRecord.hyperScore)
+                ScoreSection(songTitle: songRecord.title, score: songRecord.hyperScore,
+                             noteCount: songData?.spNoteCount?.hyperNoteCount)
             }
             if songRecord.anotherScore.difficulty != 0 {
-                ScoreSection(levelScore: songRecord.anotherScore)
+                ScoreSection(songTitle: songRecord.title, score: songRecord.anotherScore,
+                             noteCount: songData?.spNoteCount?.anotherNoteCount)
             }
             if songRecord.leggendariaScore.difficulty != 0 {
-                ScoreSection(levelScore: songRecord.leggendariaScore)
+                ScoreSection(songTitle: songRecord.title, score: songRecord.leggendariaScore,
+                             noteCount: songData?.spNoteCount?.leggendariaNoteCount)
             }
         }
         .listSectionSpacing(.compact)

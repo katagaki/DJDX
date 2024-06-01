@@ -53,4 +53,15 @@ enum IIDXLevel: String, CaseIterable, Codable {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid IIDX level")
         }
     }
+
+    func code() -> String {
+        switch self {
+        case .beginner: return "B"
+        case .normal: return "N"
+        case .hyper: return "H"
+        case .another: return "A"
+        case .leggendaria: return "L"
+        case .all, .unknown: return ""
+        }
+    }
 }
