@@ -19,7 +19,7 @@ final class IIDXSong: Equatable {
 
     init(_ tableColumnData: [String]) {
         self.title = tableColumnData[0]
-        let spBasicNoteCount = tableColumnData[1]
+        let spBeginnerNoteCount = tableColumnData[1]
         let spNormalNoteCount = tableColumnData[2]
         let spHyperNoteCount = tableColumnData[3]
         let spAnotherNoteCount = tableColumnData[4]
@@ -28,12 +28,12 @@ final class IIDXSong: Equatable {
         let dpHyperNoteCount = tableColumnData[7]
         let dpAnotherNoteCount = tableColumnData[8]
         let dpLeggendariaNoteCount = tableColumnData[9]
-        if !(spBasicNoteCount == "-" &&
+        if !(spBeginnerNoteCount == "-" &&
             spNormalNoteCount == "-" &&
             spHyperNoteCount == "-" &&
             spAnotherNoteCount == "-" &&
             spLeggendariaNoteCount == "-") {
-            self.spNoteCount = IIDXNoteCount(basicNoteCount: spBasicNoteCount,
+            self.spNoteCount = IIDXNoteCount(beginnerNoteCount: spBeginnerNoteCount,
                                              normalNoteCount: spNormalNoteCount,
                                              hyperNoteCount: spHyperNoteCount,
                                              anotherNoteCount: spAnotherNoteCount,
@@ -44,7 +44,7 @@ final class IIDXSong: Equatable {
              dpHyperNoteCount == "-" &&
              dpAnotherNoteCount == "-" &&
              dpLeggendariaNoteCount == "-" ) {
-            self.dpNoteCount = IIDXNoteCount(basicNoteCount: "-",
+            self.dpNoteCount = IIDXNoteCount(beginnerNoteCount: "-",
                                              normalNoteCount: dpNormalNoteCount,
                                              hyperNoteCount: dpHyperNoteCount,
                                              anotherNoteCount: dpAnotherNoteCount,
@@ -62,20 +62,20 @@ final class IIDXSong: Equatable {
 }
 
 struct IIDXNoteCount: Codable, Equatable {
-    var basicNoteCount: Int?
+    var beginnerNoteCount: Int?
     var normalNoteCount: Int?
     var hyperNoteCount: Int?
     var anotherNoteCount: Int?
     var leggendariaNoteCount: Int?
     var playType: IIDXPlayType
 
-    init(basicNoteCount: String,
+    init(beginnerNoteCount: String,
          normalNoteCount: String,
          hyperNoteCount: String,
          anotherNoteCount: String,
          leggendariaNoteCount: String,
          playType: IIDXPlayType) {
-        self.basicNoteCount = Int(basicNoteCount)
+        self.beginnerNoteCount = Int(beginnerNoteCount)
         self.normalNoteCount = Int(normalNoteCount)
         self.hyperNoteCount = Int(hyperNoteCount)
         self.anotherNoteCount = Int(anotherNoteCount)

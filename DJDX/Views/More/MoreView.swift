@@ -6,14 +6,12 @@
 //
 
 import Komponents
-import SwiftSoup
 import SwiftUI
-import WebKit
 
-let latestVersionPageURL = URL(string: """
+let bemaniWikiLatestVersionPageURL = URL(string: """
 https://bemaniwiki.com/?beatmania+IIDX+31+EPOLIS/%BF%B7%B6%CA%A5%EA%A5%B9%A5%C8
 """)!
-let existingVersionsPageURL = URL(string: """
+let bemaniWikiExistingVersionsPageURL = URL(string: """
 https://bemaniwiki.com/?beatmania+IIDX+31+EPOLIS/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%A5%C4%BF%F4%A5%EA%A5%B9%A5%C8
 """)!
 
@@ -204,104 +202,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 )
             }
         }
-    }
-
-    func updateProgress() async {
-        await MainActor.run {
-            let imported = Float(latestVersionDataImported) + Float(existingVersionDataImported)
-            let total = Float(latestVersionDataCount) + Float(existingVersionDataCount)
-            currentProgress = Int(imported / total * 100.0)
-        }
-    }
-
-    func reloadBemaniWikiDataForLatestVersion() async {
-        do {
-            let (data, _) = try await URLSession.shared.data(from: latestVersionPageURL)
-            if let htmlString = String(bytes: data, encoding: .japaneseEUC),
-               let htmlDocument = try? SwiftSoup.parse(htmlString),
-               let htmlDocumentBody = htmlDocument.body(),
-               let documentContents = try? htmlDocumentBody.select("#contents").first(),
-               let documentBody = try? documentContents.select("#body").first() {
-                // Get index of first h3 containing text '総ノーツ数'
-                let indexOfHeader = documentBody.children().firstIndex { element in
-                    element.tag().getName() == "h3" && (try? element.text().contains("総ノーツ数")) ?? false
-                }
-                if let indexOfHeader {
-                    // Get every element after the header
-                    let documentAfterHeader = Elements(Array(documentBody.children()[
-                        indexOfHeader..<documentBody.children().count
-                    ]))
-                    // Find the table in the document
-                    if let tablesInDocument = try? documentAfterHeader.select("div.ie5"),
-                       let table = tablesInDocument.first(),
-                       let tableRows = try? table.select("tr") {
-                        // Get all the rows in the document, and only take the rows that have 13 columns
-                        latestVersionDataCount = tableRows.count
-                        for tableRow in tableRows {
-                            if let tableRowColumns = try? tableRow.select("td"),
-                               tableRowColumns.count == 13 {
-                                let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
-                                if tableColumnData.count == 13 {
-                                    let iidxSong = IIDXSong(tableColumnData)
-                                    modelContext.insert(iidxSong)
-                                }
-                            }
-                            latestVersionDataImported += 1
-                            await updateProgress()
-                        }
-                    }
-                }
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-        }
-    }
-
-    func reloadBemaniWikiDataForExistingVersions() async {
-        do {
-            let (data, _) = try await URLSession.shared.data(from: existingVersionsPageURL)
-            if let htmlString = String(bytes: data, encoding: .japaneseEUC),
-               let htmlDocument = try? SwiftSoup.parse(htmlString),
-               let htmlDocumentBody = htmlDocument.body(),
-               let documentContents = try? htmlDocumentBody.select("#contents").first(),
-               let documentBody = try? documentContents.select("#body").first() {
-                // Find the table in the document
-                if let table = try? documentBody.select("div.ie5")[1],
-                   let tableRows = try? table.select("tr") {
-                    // Get all the rows in the document, and only take the rows that have 13 columns
-                    existingVersionDataCount = tableRows.count
-                    for tableRow in tableRows {
-                        if let tableRowColumns = try? tableRow.select("td"),
-                           tableRowColumns.count == 13 {
-                            let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
-                            if tableColumnData.count == 13 {
-                                let iidxSong = IIDXSong(tableColumnData)
-                                modelContext.insert(iidxSong)
-                            }
-                        }
-                        existingVersionDataImported += 1
-                        await updateProgress()
-                    }
-                }
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-        }
-    }
-
-    func deleteAllWebData() {
-        WKWebsiteDataStore.default()
-            .fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
-                records.forEach { record in
-                    WKWebsiteDataStore.default().removeData(ofTypes: record.dataTypes,
-                                                            for: [record],
-                                                            completionHandler: {})
-                }
-            }
-    }
-
-    func deleteAllScoreData() {
-        try? modelContext.delete(model: ImportGroup.self)
-        try? modelContext.delete(model: IIDXSongRecord.self)
     }
 }
