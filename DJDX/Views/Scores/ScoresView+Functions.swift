@@ -31,7 +31,7 @@ extension ScoresView {
 
     func searchSongRecords(_ songRecords: [IIDXSongRecord], searchTerm: String) -> [IIDXSongRecord] {
         let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
-        if !searchTermTrimmed.isEmpty && searchTermTrimmed.count >= 2 {
+        if !searchTermTrimmed.isEmpty && searchTermTrimmed.count >= 1 {
             return songRecords.filter({ songRecord in
                 return songRecord.title.lowercased().contains(searchTermTrimmed) ||
                 songRecord.artist.lowercased().contains(searchTermTrimmed)
