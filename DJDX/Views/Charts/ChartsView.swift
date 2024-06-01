@@ -14,6 +14,8 @@ struct ChartsView: View {
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
 
+    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+
     @State var allSongs: [IIDXSong] = []
 
     var body: some View {
@@ -32,7 +34,9 @@ struct ChartsView: View {
                             if let noteCount = song.spNoteCount {
                                 Section {
                                     VStack(alignment: .leading, spacing: 8.0) {
-                                        LevelDetailRow(level: .beginner, value: noteCount.beginnerNoteCount)
+                                        if !isBeginnerLevelHidden {
+                                            LevelDetailRow(level: .beginner, value: noteCount.beginnerNoteCount)
+                                        }
                                         LevelDetailRow(level: .normal, value: noteCount.normalNoteCount)
                                         LevelDetailRow(level: .hyper, value: noteCount.hyperNoteCount)
                                         LevelDetailRow(level: .another, value: noteCount.anotherNoteCount)

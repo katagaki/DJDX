@@ -23,7 +23,7 @@ struct OpenYouTubeButton: View {
         } label: {
             HStack {
                 ListRow(image: "ListIcon.YouTube", title: "Scores.Viewer.OpenYouTube", includeSpacer: true)
-                Image(systemName: "safari")
+                Image(systemName: "arrow.up.right.square")
                     .foregroundStyle(.secondary)
             }
         }

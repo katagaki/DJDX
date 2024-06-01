@@ -12,12 +12,15 @@ struct ScoreViewer: View {
 
     @Environment(\.modelContext) var modelContext
 
+    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+
     @State var songRecord: IIDXSongRecord
     @State var songData: IIDXSong?
 
     var body: some View {
         List {
-            if songRecord.beginnerScore.difficulty != 0 {
+            if !isBeginnerLevelHidden,
+               songRecord.beginnerScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
                              noteCount: songData?.spNoteCount?.beginnerNoteCount)
             }

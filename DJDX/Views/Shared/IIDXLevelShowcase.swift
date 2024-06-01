@@ -8,13 +8,17 @@
 import SwiftUI
 
 struct IIDXLevelShowcase: View {
+
+    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+
     var songRecord: IIDXSongRecord
 
     var body: some View {
         HStack(alignment: .top) {
-            if songRecord.beginnerScore.difficulty != 0 {
+            if !isBeginnerLevelHidden,
+               songRecord.beginnerScore.difficulty != 0 {
                 IIDXLevelLabel(levelType: .beginner,
-                                 score: songRecord.beginnerScore)
+                               score: songRecord.beginnerScore)
             }
             if songRecord.normalScore.difficulty != 0 {
                 IIDXLevelLabel(levelType: .normal,

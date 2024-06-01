@@ -612,6 +612,23 @@
         }
       }
     },
+    "More.General.Header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一般"
+          }
+        }
+      }
+    },
     "More.ManageData.DeleteScoreData" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -676,6 +693,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレーデータの表示"
+          }
+        }
+      }
+    },
+    "More.PlayDataDisplay.HideBeginnerLevel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide Beginner Level"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEGINNERレベルを非表示"
           }
         }
       }

@@ -22,6 +22,8 @@ struct MoreView: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: false, "ScoresView.LevelsShownSeparately") var isLevelsShownSeparately: Bool
+    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+
     @AppStorage(wrappedValue: false, "ScoresView.ArtistVisible") var isArtistVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.GenreVisible") var isGenreVisible: Bool
@@ -84,6 +86,16 @@ struct MoreView: View {
                         }
                     }
                     .disabled(true)
+                    Toggle(isOn: $isBeginnerLevelHidden) {
+                        ListRow(image: "ListIcon.HideBeginner",
+                                title: "More.PlayDataDisplay.HideBeginnerLevel",
+                                includeSpacer: true)
+                    }
+                } header: {
+                    ListSectionHeader(text: "More.General.Header")
+                        .font(.body)
+                }
+                Section {
                     Toggle(isOn: $isArtistVisible) {
                         ListRow(image: "ListIcon.ShowArtist",
                                 title: "More.PlayDataDisplay.ShowArtist",
