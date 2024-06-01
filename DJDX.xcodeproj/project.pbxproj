@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		E46A65E02C0A276800D9544B /* ScoreRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65DF2C0A276800D9544B /* ScoreRow.swift */; };
+		E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = E46A65E22C0ACAC400D9544B /* SwiftSoup */; };
+		E46A65E52C0ACADB00D9544B /* IIDXSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65E42C0ACADB00D9544B /* IIDXSong.swift */; };
+		E46A65E72C0ACBAA00D9544B /* IIDXPlayType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
 		E49359DF2C00E4230022E385 /* LevelLabelOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */; };
@@ -35,7 +38,6 @@
 		E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0D32BF99A86001942FE /* ScoreSection.swift */; };
 		E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4E3D0D62BF9A220001942FE /* Komponents */; };
 		E4E3D0DE2BF9D662001942FE /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0DD2BF9D662001942FE /* ChartsView.swift */; };
-		E4E3D0E12BF9D743001942FE /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = E4E3D0E02BF9D743001942FE /* .swiftlint.yml */; };
 		E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E72BFA2B95001942FE /* WebImporter.swift */; };
 		E4E3D0EA2BFA47B1001942FE /* ImportFailedReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */; };
 		E4E3D0EE2BFC034C001942FE /* ClearLampOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0ED2BFC034C001942FE /* ClearLampOverviewChart.swift */; };
@@ -50,6 +52,8 @@
 
 /* Begin PBXFileReference section */
 		E46A65DF2C0A276800D9544B /* ScoreRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreRow.swift; sourceTree = "<group>"; };
+		E46A65E42C0ACADB00D9544B /* IIDXSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXSong.swift; sourceTree = "<group>"; };
+		E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXPlayType.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
 		E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabelOrientation.swift; sourceTree = "<group>"; };
@@ -79,7 +83,6 @@
 		E4E3D0D32BF99A86001942FE /* ScoreSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreSection.swift; sourceTree = "<group>"; };
 		E4E3D0D82BF9A2D1001942FE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E4E3D0DD2BF9D662001942FE /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
-		E4E3D0E02BF9D743001942FE /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		E4E3D0E42BFA243A001942FE /* DJDX.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DJDX.entitlements; sourceTree = "<group>"; };
 		E4E3D0E72BFA2B95001942FE /* WebImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImporter.swift; sourceTree = "<group>"; };
 		E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFailedReason.swift; sourceTree = "<group>"; };
@@ -99,16 +102,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */,
+				E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E46A65E82C0AE1E500D9544B /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				E4EB2CA12BFF78E400A00796 /* Data Models */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		E4B123A32BF8E8E400D4A3D1 = {
 			isa = PBXGroup;
 			children = (
-				E4E3D0E02BF9D743001942FE /* .swiftlint.yml */,
+				E46A65E82C0AE1E500D9544B /* Shared */,
 				E4B123AE2BF8E8E400D4A3D1 /* DJDX */,
 				E4B123AD2BF8E8E400D4A3D1 /* Products */,
 			);
@@ -142,7 +154,6 @@
 		E4B123CF2BF9028C00D4A3D1 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				E4EB2CA12BFF78E400A00796 /* Data Models */,
 				E4B123CD2BF8FEC900D4A3D1 /* CSwiftV.swift */,
 				E4E3D0C42BF98D79001942FE /* NavigationManager.swift */,
 				E4EB2CA42BFF7C9D00A00796 /* CalendarManager.swift */,
@@ -209,6 +220,7 @@
 			children = (
 				E49359D92C00AD060022E385 /* DataState.swift */,
 				E49359E22C0170E80022E385 /* IIDXLevel.swift */,
+				E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */,
 				E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */,
 				E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */,
 				E49359E02C016F2F0022E385 /* SortMode.swift */,
@@ -233,6 +245,7 @@
 		E4EB2CA12BFF78E400A00796 /* Data Models */ = {
 			isa = PBXGroup;
 			children = (
+				E46A65E42C0ACADB00D9544B /* IIDXSong.swift */,
 				E4B123B32BF8E8E400D4A3D1 /* IIDXSongRecord.swift */,
 				E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */,
 			);
@@ -268,6 +281,7 @@
 			name = DJDX;
 			packageProductDependencies = (
 				E4E3D0D62BF9A220001942FE /* Komponents */,
+				E46A65E22C0ACAC400D9544B /* SwiftSoup */,
 			);
 			productName = DJDX;
 			productReference = E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */;
@@ -300,6 +314,7 @@
 			mainGroup = E4B123A32BF8E8E400D4A3D1;
 			packageReferences = (
 				E4E3D0D52BF9A220001942FE /* XCRemoteSwiftPackageReference "Komponents" */,
+				E46A65E12C0ACAC400D9544B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 			);
 			productRefGroup = E4B123AD2BF8E8E400D4A3D1 /* Products */;
 			projectDirPath = "";
@@ -315,7 +330,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4E3D0E12BF9D743001942FE /* .swiftlint.yml in Resources */,
 				E4B123CB2BF8F7DC00D4A3D1 /* SampleData.csv in Resources */,
 				E4B123B62BF8E8E500D4A3D1 /* Assets.xcassets in Resources */,
 			);
@@ -351,6 +365,7 @@
 			files = (
 				E49359DF2C00E4230022E385 /* LevelLabelOrientation.swift in Sources */,
 				E4B123B22BF8E8E400D4A3D1 /* ScoresView.swift in Sources */,
+				E46A65E52C0ACADB00D9544B /* IIDXSong.swift in Sources */,
 				E4E3D0D02BF9959A001942FE /* IIDXLevelShowcase.swift in Sources */,
 				E4E3D0D22BF99790001942FE /* DetailedSongTitle.swift in Sources */,
 				E4E3D0CE2BF990CC001942FE /* IIDXLevelLabel.swift in Sources */,
@@ -367,6 +382,7 @@
 				E4EB2CAB2BFF8CC500A00796 /* Predicates.swift in Sources */,
 				E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */,
 				E4E3D0C52BF98D79001942FE /* NavigationManager.swift in Sources */,
+				E46A65E72C0ACBAA00D9544B /* IIDXPlayType.swift in Sources */,
 				E4E3D0C32BF98D57001942FE /* ScoreViewer.swift in Sources */,
 				E4B123B42BF8E8E400D4A3D1 /* IIDXSongRecord.swift in Sources */,
 				E4E3D0CC2BF98DC7001942FE /* ViewPath.swift in Sources */,
@@ -599,6 +615,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		E46A65E12C0ACAC400D9544B /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 2.7.2;
+			};
+		};
 		E4E3D0D52BF9A220001942FE /* XCRemoteSwiftPackageReference "Komponents" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/katagaki/Komponents";
@@ -610,6 +634,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E46A65E22C0ACAC400D9544B /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E46A65E12C0ACAC400D9544B /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
 		E4E3D0D62BF9A220001942FE /* Komponents */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E4E3D0D52BF9A220001942FE /* XCRemoteSwiftPackageReference "Komponents" */;

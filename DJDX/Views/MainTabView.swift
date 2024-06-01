@@ -28,6 +28,11 @@ struct MainTabView: View {
                     Label("アナリティクス", systemImage: "chart.xyaxis.line")
                 }
                 .tag(TabType.analytics)
+            Color.clear
+                .tabItem {
+                    Label("譜面確認", image: "TabIcon.Charts")
+                }
+//                .tag(TabType.charts)
             MoreView()
                 .tabItem {
                     Label("その他", systemImage: "ellipsis")

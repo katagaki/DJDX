@@ -5,10 +5,15 @@
 //  Created by シン・ジャスティン on 2024/05/19.
 //
 
+import SwiftData
 import SwiftUI
 
 struct ScoreViewer: View {
+
+    @Environment(\.modelContext) var modelContext
+
     var songRecord: IIDXSongRecord
+    @State var songData: IIDXSong?
 
     var body: some View {
         List {
@@ -72,6 +77,11 @@ struct ScoreViewer: View {
                     .bold()
                     .italic()
             }
+        }
+        .task {
+            self.songData = (try? modelContext.fetch(
+                FetchDescriptor<IIDXSong>(predicate: iidxSong(for: songRecord))
+            ))?.first ?? nil
         }
     }
 }

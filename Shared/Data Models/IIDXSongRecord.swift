@@ -75,6 +75,10 @@ final class IIDXSongRecord: Equatable {
         lhs.anotherScore == rhs.anotherScore &&
         lhs.leggendariaScore == rhs.leggendariaScore
     }
+
+    static func == (lhs: IIDXSongRecord, rhs: IIDXSong) -> Bool {
+        return lhs.title == rhs.title
+    }
 }
 
 struct IIDXLevelScore: Codable, Equatable {

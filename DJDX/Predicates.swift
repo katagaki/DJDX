@@ -39,3 +39,10 @@ func iidxSongRecords(inImportGroupWithID id: String) -> Predicate<IIDXSongRecord
         $0.importGroup?.id == id
     }
 }
+
+func iidxSong(for iidxSongRecord: IIDXSongRecord) -> Predicate<IIDXSong> {
+    let title = iidxSongRecord.title
+    return #Predicate<IIDXSong> {
+        $0.title == title
+    }
+}
