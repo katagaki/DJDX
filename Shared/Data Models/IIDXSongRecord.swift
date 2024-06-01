@@ -35,7 +35,8 @@ final class IIDXSongRecord: Equatable {
         self.playCount = Int(csvRowData["プレー回数"] as? String ?? "0") ?? 0
 
         for songLevelCSVHeader in songLevelCSVHeaders {
-            if let songLevel = IIDXLevel(rawValue: songLevelCSVHeader) {
+            let songLevel = IIDXLevel(csvValue: songLevelCSVHeader)
+            if songLevel != .unknown {
                 let score = IIDXLevelScore(
                     level: songLevel,
                     difficulty: Int(csvRowData["\(songLevelCSVHeader) 難易度"] as? String ?? "0") ?? 0,

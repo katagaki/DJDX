@@ -30,6 +30,17 @@ enum IIDXLevel: String, CaseIterable, Codable {
         }
     }
 
+    init(csvValue: String) {
+        switch csvValue {
+        case "BEGINNER": self = .beginner
+        case "NORMAL": self = .normal
+        case "HYPER": self = .hyper
+        case "ANOTHER": self = .another
+        case "LEGGENDARIA": self = .leggendaria
+        default: self = .unknown
+        }
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let decodedValue = try container.decode(String.self)
