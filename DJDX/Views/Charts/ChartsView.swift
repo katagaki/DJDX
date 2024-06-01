@@ -23,31 +23,41 @@ struct ChartsView: View {
                     NavigationLink(song.title) {
                         List {
                             Section {
-                                Text(song.time)
-                                Text(song.movie)
-                                Text(song.layer)
+                                VStack(alignment: .leading, spacing: 8.0) {
+                                    DetailRow("TIME", value: song.time, style: Color.accentColor)
+                                    DetailRow("MOVIE", value: song.movie, style: Color.accentColor)
+                                    DetailRow("LAYER", value: song.layer, style: Color.accentColor)
+                                }
                             }
                             if let noteCount = song.spNoteCount {
                                 Section {
-                                    Text(String(noteCount.beginnerNoteCount ?? 0))
-                                    Text(String(noteCount.normalNoteCount ?? 0))
-                                    Text(String(noteCount.hyperNoteCount ?? 0))
-                                    Text(String(noteCount.anotherNoteCount ?? 0))
-                                    Text(String(noteCount.leggendariaNoteCount ?? 0))
+                                    VStack(alignment: .leading, spacing: 8.0) {
+                                        LevelDetailRow(level: .beginner, value: noteCount.beginnerNoteCount)
+                                        LevelDetailRow(level: .normal, value: noteCount.normalNoteCount)
+                                        LevelDetailRow(level: .hyper, value: noteCount.hyperNoteCount)
+                                        LevelDetailRow(level: .another, value: noteCount.anotherNoteCount)
+                                        LevelDetailRow(level: .leggendaria, value: noteCount.leggendariaNoteCount)
+                                    }
                                 } header: {
                                     ListSectionHeader(text: "SP")
                                         .font(.body)
+                                        .fontWidth(.expanded)
+                                        .fontWeight(.black)
                                 }
                             }
                             if let noteCount = song.dpNoteCount {
                                 Section {
-                                    Text(String(noteCount.normalNoteCount ?? 0))
-                                    Text(String(noteCount.hyperNoteCount ?? 0))
-                                    Text(String(noteCount.anotherNoteCount ?? 0))
-                                    Text(String(noteCount.leggendariaNoteCount ?? 0))
+                                    VStack(alignment: .leading, spacing: 8.0) {
+                                        LevelDetailRow(level: .normal, value: noteCount.normalNoteCount)
+                                        LevelDetailRow(level: .hyper, value: noteCount.hyperNoteCount)
+                                        LevelDetailRow(level: .another, value: noteCount.anotherNoteCount)
+                                        LevelDetailRow(level: .leggendaria, value: noteCount.leggendariaNoteCount)
+                                    }
                                 } header: {
                                     ListSectionHeader(text: "DP")
                                         .font(.body)
+                                        .fontWidth(.expanded)
+                                        .fontWeight(.black)
                                 }
                             }
                         }

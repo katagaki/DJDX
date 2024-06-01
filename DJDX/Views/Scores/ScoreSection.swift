@@ -42,18 +42,18 @@ struct ScoreSection: View {
             }
             if levelScore.djLevel != "---" {
                 VStack(alignment: .leading, spacing: 8.0) {
-                    ScoreRow("CLEAR TYPE", value: levelScore.clearType, style: clearTypeStyle())
-                    ScoreRow("SCORE", value: levelScore.score, style: scoreStyle())
-                    ScoreRow("MISS COUNT", value: levelScore.missCount, style: scoreStyle())
+                    DetailRow("CLEAR TYPE", value: levelScore.clearType, style: clearTypeStyle())
+                    DetailRow("SCORE", value: levelScore.score, style: scoreStyle())
+                    DetailRow("MISS COUNT", value: levelScore.missCount, style: scoreStyle())
                 }
                 VStack(alignment: .leading, spacing: 8.0) {
-                    ScoreRow("PERFECT GREAT", value: levelScore.perfectGreatCount, style: scoreStyle())
-                    ScoreRow("GREAT", value: levelScore.greatCount, style: scoreStyle())
-                    ScoreRow("MISS", value: levelScore.missCount, style: scoreStyle())
+                    DetailRow("PERFECT GREAT", value: levelScore.perfectGreatCount, style: scoreStyle())
+                    DetailRow("GREAT", value: levelScore.greatCount, style: scoreStyle())
+                    DetailRow("MISS", value: levelScore.missCount, style: scoreStyle())
                 }
             } else {
                 if levelScore.clearType != "NO PLAY" {
-                    ScoreRow("CLEAR TYPE", value: levelScore.clearType, style: clearTypeStyle())
+                    DetailRow("CLEAR TYPE", value: levelScore.clearType, style: clearTypeStyle())
                 }
             }
         } header: {

@@ -1,5 +1,5 @@
 //
-//  ScoreRow.swift
+//  DetailRow.swift
 //  DJDX
 //
 //  Created by シン・ジャスティン on 2024/06/01.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ScoreRow: View {
+struct DetailRow: View {
     var title: String
     var value: String
     var style: any ShapeStyle
