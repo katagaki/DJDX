@@ -1173,6 +1173,22 @@
         }
       }
     },
+    "Shared.OpenInSafari" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Safari"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Safariで開く"
+          }
+        }
+      }
+    },
     "Shared.SongCount.%lld" : {
       "localizations" : {
         "en" : {

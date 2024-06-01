@@ -13,6 +13,7 @@ https://textage.cc/score/index.html
 """)!
 
 struct TextageViewer: View {
+
     var songTitle: String
     var level: IIDXLevel
     var playSide: IIDXPlaySide
@@ -29,14 +30,24 @@ struct TextageViewer: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.visible, for: .tabBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Link(destination: textageIIDXURL) {
+                        Label("Shared.OpenInSafari", systemImage: "safari")
+                    }
+                }
+            }
             .background {
-                ProgressView("Importer.Web.Loading")
+                VStack(spacing: 16.0) {
+                    ProgressView("Importer.Web.Loading")
+                }
             }
             .padding(0.0)
     }
 }
 
 struct WebViewForTextageViewer: UIViewRepresentable {
+
     let webView = WKWebView()
     var songTitle: String
     var level: IIDXLevel
