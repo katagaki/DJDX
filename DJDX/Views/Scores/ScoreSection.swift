@@ -11,6 +11,7 @@ import SwiftUI
 struct ScoreSection: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
+    @Environment(\.openURL) var openURL
 
     var songTitle: String
     var score: IIDXLevelScore
@@ -74,25 +75,44 @@ struct ScoreSection: View {
                     DetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
                 }
             }
-            OpenYouTubeButton(songTitle: songTitle, level: score.level.code())
-            if score.level != .beginner {
+        } header: {
+            HStack(spacing: 16.0) {
+                IIDXLevelLabel(orientation: .horizontal, levelType: score.level, score: score)
+                Spacer()
                 Menu {
-                    NavigationLink {
-                        TextageViewer(songTitle: songTitle, level: score.level, playSide: .side1P)
-                    } label: {
-                        Text(verbatim: "1P")
+                    Button("Scores.Viewer.OpenYouTube", image: .listIconYouTube) {
+                        let searchQuery: String = "IIDX SP\(score.level.code()) \(songTitle)"
+                            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+                        openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
                     }
-                    NavigationLink {
-                        TextageViewer(songTitle: songTitle, level: score.level, playSide: .side2P)
-                    } label: {
-                        Text(verbatim: "2P")
+                    if score.level != .beginner {
+                        Section {
+                            NavigationLink {
+                                TextageViewer(songTitle: songTitle, level: score.level, playSide: .side1P)
+                            } label: {
+                                Label("Scores.Viewer.OpenTextage.1P", image: .listIconTextage)
+                            }
+                            NavigationLink {
+                                TextageViewer(songTitle: songTitle, level: score.level, playSide: .side2P)
+                            } label: {
+                                Label("Scores.Viewer.OpenTextage.2P", image: .listIconTextageFlipped)
+                            }
+                        } header: {
+                            Text("Scores.Viewer.OpenTextage")
+                        }
                     }
                 } label: {
-                    ListRow(image: "ListIcon.Textage", title: "Scores.Viewer.OpenTextage", includeSpacer: true)
+                    Text("Scores.Viewer.OpenChart")
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.text)
+                        .padding([.top, .bottom], 4.0)
+                        .padding([.leading, .trailing], 12.0)
+                        .background(.accent)
+                        .clipShape(.capsule(style: .continuous))
                 }
+                .textCase(.none)
             }
-        } header: {
-            IIDXLevelLabel(orientation: .horizontal, levelType: score.level, score: score)
         }
     }
 

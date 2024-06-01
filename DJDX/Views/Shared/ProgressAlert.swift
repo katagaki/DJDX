@@ -33,7 +33,7 @@ struct ProgressAlert: View {
                 .padding()
             }
             .background(.thickMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 16.0))
+            .clipShape(.rect(cornerRadius: 16.0))
             .padding(.all, 32.0)
         }
         .transition(AnyTransition.opacity)

@@ -21,12 +21,12 @@ struct MainTabView: View {
                 .tag(TabType.calendar)
             ScoresView()
                 .tabItem {
-                    Label("Tab.Scores", image: "TabIcon.Scores")
+                    Label("Tab.Scores", image: .tabIconScores)
                 }
                 .tag(TabType.scores)
             ChartsView()
                 .tabItem {
-                    Label("Tab.Charts", image: "TabIcon.Charts")
+                    Label("Tab.Charts", image: .tabIconCharts)
                 }
                 .tag(TabType.charts)
             AnalyticsView()

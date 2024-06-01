@@ -901,19 +901,70 @@
         }
       }
     },
+    "Scores.Viewer.OpenChart" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面を確認"
+          }
+        }
+      }
+    },
     "Scores.Viewer.OpenTextage" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "View Chart on Textage"
+            "value" : "Textage"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Textageで譜面を確認"
+            "value" : "Textage"
+          }
+        }
+      }
+    },
+    "Scores.Viewer.OpenTextage.1P" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open 1P Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1Pの譜面を開く"
+          }
+        }
+      }
+    },
+    "Scores.Viewer.OpenTextage.2P" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open 2P Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2Pの譜面を開く"
           }
         }
       }
@@ -924,7 +975,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search Chart on YouTube"
+            "value" : "Search on YouTube"
           }
         },
         "ja" : {

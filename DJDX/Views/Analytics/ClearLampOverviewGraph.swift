@@ -42,7 +42,7 @@ struct ClearLampOverviewGraph: View {
                         .padding([.leading, .trailing], 4.0)
                         .background(Color.accentColor)
                         .foregroundStyle(.text)
-                        .clipShape(RoundedRectangle(cornerRadius: 99.0))
+                        .clipShape(.capsule(style: .continuous))
                         .shadow(color: .black.opacity(0.2), radius: 2.0, y: 1.5)
                 }
             }
