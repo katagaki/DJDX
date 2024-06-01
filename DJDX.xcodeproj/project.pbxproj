@@ -12,6 +12,8 @@
 		E46A65E52C0ACADB00D9544B /* IIDXSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65E42C0ACADB00D9544B /* IIDXSong.swift */; };
 		E46A65E72C0ACBAA00D9544B /* IIDXPlayType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */; };
 		E46A65EA2C0AE83E00D9544B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E46A65E92C0AE83E00D9544B /* Localizable.xcstrings */; };
+		E46A65ED2C0AFC7800D9544B /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65EC2C0AFC7800D9544B /* ChartsView.swift */; };
+		E46A65EF2C0AFF0000D9544B /* ProgressAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65EE2C0AFF0000D9544B /* ProgressAlert.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
 		E49359DF2C00E4230022E385 /* LevelLabelOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */; };
@@ -56,6 +58,8 @@
 		E46A65E42C0ACADB00D9544B /* IIDXSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXSong.swift; sourceTree = "<group>"; };
 		E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXPlayType.swift; sourceTree = "<group>"; };
 		E46A65E92C0AE83E00D9544B /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		E46A65EC2C0AFC7800D9544B /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
+		E46A65EE2C0AFF0000D9544B /* ProgressAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAlert.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
 		E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabelOrientation.swift; sourceTree = "<group>"; };
@@ -119,6 +123,14 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
+		E46A65EB2C0AFC6D00D9544B /* Charts */ = {
+			isa = PBXGroup;
+			children = (
+				E46A65EC2C0AFC7800D9544B /* ChartsView.swift */,
+			);
+			path = Charts;
+			sourceTree = "<group>";
+		};
 		E4B123A32BF8E8E400D4A3D1 = {
 			isa = PBXGroup;
 			children = (
@@ -172,6 +184,7 @@
 				E4EB2CA62BFF7E2C00A00796 /* Calendar */,
 				E4B123DB2BF90D1F00D4A3D1 /* Scores */,
 				E4E3D0DC2BF9D645001942FE /* Analytics */,
+				E46A65EB2C0AFC6D00D9544B /* Charts */,
 				E4B123DC2BF90D2600D4A3D1 /* More */,
 				E4B123D82BF90C1300D4A3D1 /* Shared */,
 			);
@@ -185,6 +198,7 @@
 				E4B123D92BF90C1D00D4A3D1 /* DocumentPicker.swift */,
 				E4E3D0CD2BF990CC001942FE /* IIDXLevelLabel.swift */,
 				E4E3D0CF2BF9959A001942FE /* IIDXLevelShowcase.swift */,
+				E46A65EE2C0AFF0000D9544B /* ProgressAlert.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -372,6 +386,7 @@
 				E46A65E52C0ACADB00D9544B /* IIDXSong.swift in Sources */,
 				E4E3D0D02BF9959A001942FE /* IIDXLevelShowcase.swift in Sources */,
 				E4E3D0D22BF99790001942FE /* DetailedSongTitle.swift in Sources */,
+				E46A65ED2C0AFC7800D9544B /* ChartsView.swift in Sources */,
 				E4E3D0CE2BF990CC001942FE /* IIDXLevelLabel.swift in Sources */,
 				E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */,
 				E4E3D0F22BFC0489001942FE /* ScoreRatePerDifficultyGraph.swift in Sources */,
@@ -398,6 +413,7 @@
 				E4B123DA2BF90C1D00D4A3D1 /* DocumentPicker.swift in Sources */,
 				E4B123D22BF909CD00D4A3D1 /* MainTabView.swift in Sources */,
 				E4E3D0F02BFC03CB001942FE /* ClearLampPerDifficultyGraph.swift in Sources */,
+				E46A65EF2C0AFF0000D9544B /* ProgressAlert.swift in Sources */,
 				E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */,
 				E4BC32842C036DF1006A0F7A /* ScoresView+Functions.swift in Sources */,
 				E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */,

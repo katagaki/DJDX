@@ -103,6 +103,40 @@
         }
       }
     },
+    "Alert.ExternalData.Downloading.Text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading data from external source...\n%1% completed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外部データをダウンロード中です。\n%1%"
+          }
+        }
+      }
+    },
+    "Alert.ExternalData.Downloading.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロード中…"
+          }
+        }
+      }
+    },
     "Alert.Import.Error.Subtitle.Maintenance" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1281,7 +1315,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "譜面確認"
+            "value" : "譜面"
           }
         }
       }
@@ -1350,6 +1384,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "インポート履歴"
+          }
+        }
+      }
+    },
+    "ViewTitle.Charts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Charts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面一覧"
           }
         }
       }

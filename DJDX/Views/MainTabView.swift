@@ -28,7 +28,7 @@ struct MainTabView: View {
                     Label("Tab.Analytics", systemImage: "chart.xyaxis.line")
                 }
                 .tag(TabType.analytics)
-            ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
+            ChartsView()
                 .tabItem {
                     Label("Tab.Charts", image: "TabIcon.Charts")
                 }

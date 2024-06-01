@@ -13,9 +13,9 @@ final class IIDXSong: Equatable {
     var title: String = ""
     var spNoteCount: IIDXNoteCount?
     var dpNoteCount: IIDXNoteCount?
-    var songTime: String = ""
-    var songMovie: String = ""
-    var songLayer: String = ""
+    var time: String = ""
+    var movie: String = ""
+    var layer: String = ""
 
     init(_ tableColumnData: [String]) {
         self.title = tableColumnData[0]
@@ -51,9 +51,9 @@ final class IIDXSong: Equatable {
                                              leggendariaNoteCount: dpLeggendariaNoteCount,
                                              playType: .double)
         }
-        self.songTime = tableColumnData[10]
-        self.songMovie = tableColumnData[11]
-        self.songLayer = tableColumnData[12]
+        self.time = tableColumnData[10]
+        self.movie = tableColumnData[11]
+        self.layer = tableColumnData[12]
     }
 
     static func == (lhs: IIDXSong, rhs: IIDXSongRecord) -> Bool {
