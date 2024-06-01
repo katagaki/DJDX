@@ -20,6 +20,9 @@ struct MoreView: View {
     @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
+    @State var isConfirmingWebDataDelete: Bool = false
+    @State var isConfirmingScoreDataDelete: Bool = false
+
     var body: some View {
         NavigationStack(path: $navigationManager[.more]) {
             MoreList(repoName: "katagaki/DJDX", viewPath: ViewPath.moreAttributions) {
@@ -60,23 +63,13 @@ struct MoreView: View {
                 }
                 Section {
                     Button {
-                        // TODO: Confirm before deletion
-                        WKWebsiteDataStore.default()
-                            .fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
-                                records.forEach { record in
-                                    WKWebsiteDataStore.default().removeData(ofTypes: record.dataTypes,
-                                                                            for: [record],
-                                                                            completionHandler: {})
-                                }
-                            }
+                        isConfirmingWebDataDelete = true
                     } label: {
                         Text("Webデータを消去")
                             .foregroundStyle(.red)
                     }
                     Button {
-                        // TODO: Confirm before deletion
-                        try? modelContext.delete(model: ImportGroup.self)
-                        try? modelContext.delete(model: IIDXSongRecord.self)
+                        isConfirmingScoreDataDelete = true
                     } label: {
                         Text("スコアデータを消去")
                             .foregroundStyle(.red)
@@ -86,6 +79,34 @@ struct MoreView: View {
                         .font(.body)
                 }
             }
+            .alert(
+                "Webデータがすべて削除されます。",
+                isPresented: $isConfirmingWebDataDelete,
+                actions: {
+                    Button("Webデータを消去", role: .destructive) {
+                        deleteAllWebData()
+                    }
+                    Button("キャンセル", role: .cancel) {
+                        isConfirmingWebDataDelete = false
+                    }
+                },
+                message: {
+                    Text("次にWebでのインポートを行う際に、再度ログインする必要があります。")
+                })
+            .alert(
+                "インポートされたスコアデータがすべて削除されます。",
+                isPresented: $isConfirmingScoreDataDelete,
+                actions: {
+                    Button("スコアデータを消去", role: .destructive) {
+                        deleteAllScoreData()
+                    }
+                    Button("キャンセル", role: .cancel) {
+                        isConfirmingScoreDataDelete = false
+                    }
+                },
+                message: {
+                    Text("スコアをご覧になるために、再度インポートする必要があります。")
+                })
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
                 switch viewPath {
                 case .moreAttributions:
@@ -125,5 +146,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 }
             })
         }
+    }
+
+    func deleteAllWebData() {
+        WKWebsiteDataStore.default()
+            .fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                records.forEach { record in
+                    WKWebsiteDataStore.default().removeData(ofTypes: record.dataTypes,
+                                                            for: [record],
+                                                            completionHandler: {})
+                }
+            }
+    }
+
+    func deleteAllScoreData() {
+        try? modelContext.delete(model: ImportGroup.self)
+        try? modelContext.delete(model: IIDXSongRecord.self)
     }
 }
