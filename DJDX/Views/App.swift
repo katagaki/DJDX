@@ -14,6 +14,8 @@ struct DJDXApp: App {
     @StateObject var navigationManager = NavigationManager()
     @StateObject var calendar = CalendarManager()
 
+    @State var progressAlertManager = ProgressAlertManager()
+
     var body: some Scene {
         WindowGroup {
             MainTabView()
@@ -21,6 +23,7 @@ struct DJDXApp: App {
         .modelContainer(sharedModelContainer)
         .environmentObject(navigationManager)
         .environmentObject(calendar)
+        .environment(progressAlertManager)
         .onChange(of: navigationManager.selectedTab) { _, _ in
             navigationManager.saveToDefaults()
         }

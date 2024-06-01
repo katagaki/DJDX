@@ -20,7 +20,7 @@ struct ProgressAlert: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             VStack(alignment: .center, spacing: 0.0) {
                 VStack(alignment: .center, spacing: 10.0) {
-                    Text(NSLocalizedString(title, comment: ""))
+                    Text(LocalizedStringKey(title))
                         .bold()
                         .multilineTextAlignment(.center)
                     ProgressView(value: min(Float(percentage), 100.0), total: 100.0)

@@ -18,6 +18,7 @@ https://bemaniwiki.com/?beatmania+IIDX+31+EPOLIS/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%
 struct MoreView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: false, "ScoresView.LevelsShownSeparately") var isLevelsShownSeparately: Bool
@@ -27,11 +28,9 @@ struct MoreView: View {
     @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
-    @State var isDownloadingExternalData: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
 
-    @State var currentProgress: Int = 0
     @State var latestVersionDataCount: Int = 1
     @State var latestVersionDataImported: Int = 0
     @State var existingVersionDataCount: Int = 1
@@ -43,21 +42,27 @@ struct MoreView: View {
                 Section {
                     Button("More.ExternalData.DownloadWikiData") {
                         Task {
-                            withAnimation(.snappy.speed(2.0)) {
-                                isDownloadingExternalData = true
-                            }
+                            progressAlertManager.show(title: "Alert.ExternalData.Downloading.Title",
+                                                      message: "Alert.ExternalData.Downloading.Text")
                             try? modelContext.delete(model: IIDXSong.self)
-                            await withTaskGroup(of: Void.self) { group in
+                            let iidxSongs: [IIDXSong] = await withTaskGroup(of: [IIDXSong].self) { group in
+                                var iidxSongsFromWiki: [IIDXSong] = []
                                 group.addTask {
-                                    await reloadBemaniWikiDataForLatestVersion()
+                                    return await reloadBemaniWikiDataForLatestVersion()
                                 }
                                 group.addTask {
-                                    await reloadBemaniWikiDataForExistingVersions()
+                                    return await reloadBemaniWikiDataForExistingVersions()
                                 }
+                                for await result in group {
+                                    iidxSongsFromWiki.append(contentsOf: result)
+                                }
+                                return iidxSongsFromWiki
                             }
+                            for iidxSong in iidxSongs {
+                                modelContext.insert(iidxSong)
+                            }
+                            progressAlertManager.hide()
                             withAnimation(.snappy.speed(2.0)) {
-                                isDownloadingExternalData = false
-                                currentProgress = 0
                                 latestVersionDataCount = 1
                                 latestVersionDataImported = 0
                                 existingVersionDataCount = 1
@@ -216,15 +221,6 @@ SOFTWARE.
                 default: Color.clear
                 }
             })
-        }
-        .overlay {
-            if isDownloadingExternalData {
-                ProgressAlert(
-                    title: "Alert.ExternalData.Downloading.Title",
-                    message: "Alert.ExternalData.Downloading.Text",
-                    percentage: $currentProgress
-                )
-            }
         }
     }
 }

@@ -14,12 +14,13 @@ extension MoreView {
         await MainActor.run {
             let imported = Float(latestVersionDataImported) + Float(existingVersionDataImported)
             let total = Float(latestVersionDataCount) + Float(existingVersionDataCount)
-            currentProgress = Int(imported / total * 100.0)
+            progressAlertManager.updateProgress(Int(imported / total * 100.0))
         }
     }
 
-    func reloadBemaniWikiDataForLatestVersion() async {
+    func reloadBemaniWikiDataForLatestVersion() async -> [IIDXSong] {
         do {
+            var iidxSongsFromWiki: [IIDXSong] = []
             let (data, _) = try await URLSession.shared.data(from: bemaniWikiLatestVersionPageURL)
             if let htmlString = String(bytes: data, encoding: .japaneseEUC),
                let htmlDocument = try? SwiftSoup.parse(htmlString),
@@ -47,7 +48,7 @@ extension MoreView {
                                 let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
                                 if tableColumnData.count == 13 {
                                     let iidxSong = IIDXSong(tableColumnData)
-                                    modelContext.insert(iidxSong)
+                                    iidxSongsFromWiki.append(iidxSong)
                                 }
                             }
                             latestVersionDataImported += 1
@@ -56,13 +57,16 @@ extension MoreView {
                     }
                 }
             }
+            return iidxSongsFromWiki
         } catch {
             debugPrint(error.localizedDescription)
+            return []
         }
     }
 
-    func reloadBemaniWikiDataForExistingVersions() async {
+    func reloadBemaniWikiDataForExistingVersions() async -> [IIDXSong] {
         do {
+            var iidxSongsFromWiki: [IIDXSong] = []
             let (data, _) = try await URLSession.shared.data(from: bemaniWikiExistingVersionsPageURL)
             if let htmlString = String(bytes: data, encoding: .japaneseEUC),
                let htmlDocument = try? SwiftSoup.parse(htmlString),
@@ -80,7 +84,7 @@ extension MoreView {
                             let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
                             if tableColumnData.count == 13 {
                                 let iidxSong = IIDXSong(tableColumnData)
-                                modelContext.insert(iidxSong)
+                                iidxSongsFromWiki.append(iidxSong)
                             }
                         }
                         existingVersionDataImported += 1
@@ -88,8 +92,10 @@ extension MoreView {
                     }
                 }
             }
+            return iidxSongsFromWiki
         } catch {
             debugPrint(error.localizedDescription)
+            return []
         }
     }
 

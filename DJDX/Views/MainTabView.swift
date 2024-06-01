@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
 
+    @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
 
     var body: some View {
@@ -38,6 +39,17 @@ struct MainTabView: View {
                     Label("Tab.More", systemImage: "ellipsis")
                 }
                 .tag(TabType.more)
+        }
+        .overlay {
+            if progressAlertManager.isShowing {
+                @Bindable var progressAlertManager = progressAlertManager
+                ProgressAlert(
+                    title: progressAlertManager.title,
+                    message: progressAlertManager.message,
+                    percentage: $progressAlertManager.percentage
+                )
+                .ignoresSafeArea(.all)
+            }
         }
         .onReceive(navigationManager.$selectedTab, perform: { newValue in
             if newValue == navigationManager.previouslySelectedTab {
