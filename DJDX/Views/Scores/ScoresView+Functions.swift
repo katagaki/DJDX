@@ -19,6 +19,9 @@ extension ScoresView {
         withAnimation(.snappy.speed(2.0)) {
             dataState = .loading
         }
+        if allSongRecords.count == 0 {
+            reloadAllScores()
+        }
         let filteredSongRecords = filterSongRecords(allSongRecords)
         let searchedSongRecords = searchSongRecords(filteredSongRecords, searchTerm: searchTerm)
         let sortedSongRecords = sortSongRecords(searchedSongRecords)
