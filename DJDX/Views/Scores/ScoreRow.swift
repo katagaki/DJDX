@@ -8,11 +8,31 @@
 import SwiftUI
 
 struct ScoreRow: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
+    var title: String
+    var value: String
+    var style: any ShapeStyle
 
-#Preview {
-    ScoreRow()
+    init(_ title: String, value: String, style: any ShapeStyle) {
+        self.title = title
+        self.value = value
+        self.style = style
+    }
+
+    init(_ title: String, value: Int, style: any ShapeStyle) {
+        self.title = title
+        self.value = String(value)
+        self.style = style
+    }
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .fontWidth(.expanded)
+            Spacer()
+            Text(value)
+                .foregroundStyle(style)
+        }
+        .font(.caption)
+        .fontWeight(.heavy)
+    }
 }

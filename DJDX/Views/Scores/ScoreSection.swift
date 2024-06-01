@@ -15,69 +15,45 @@ struct ScoreSection: View {
 
     var body: some View {
         Section {
-            VStack(alignment: .leading, spacing: 8.0) {
-                if levelScore.djLevel != "---" {
-                    Group {
-                        switch colorScheme {
-                        case .light:
-                            Text(levelScore.djLevel)
-                                .foregroundStyle(.cyan)
-                        case .dark:
-                            Text(levelScore.djLevel)
-                                .foregroundStyle(LinearGradient(colors: [.white, .cyan],
-                                                                startPoint: .top,
-                                                                endPoint: .bottom))
-                                .drawingGroup()
-                                .shadow(color: .cyan, radius: 5.0)
-                        @unknown default:
-                            Text(levelScore.djLevel)
-                        }
+            if levelScore.djLevel != "---" {
+                Group {
+                    switch colorScheme {
+                    case .light:
+                        Text(levelScore.djLevel)
+                            .foregroundStyle(.cyan)
+                    case .dark:
+                        Text(levelScore.djLevel)
+                            .foregroundStyle(LinearGradient(colors: [.white, .cyan],
+                                                            startPoint: .top,
+                                                            endPoint: .bottom))
+                            .drawingGroup()
+                            .shadow(color: .cyan, radius: 5.0)
+                    @unknown default:
+                        Text(levelScore.djLevel)
                     }
-                    .font(.largeTitle)
-                    .fontWidth(.expanded)
-                    .fontWeight(.black)
-                    Divider()
-                    Group {
-                        HStack {
-                            Text("CLEAR TYPE")
-                                .fontWidth(.expanded)
-                            Spacer()
-                            Text(levelScore.clearType)
-                                .foregroundStyle(clearTypeColor())
-                        }
-                        HStack {
-                            Text("SCORE")
-                                .fontWidth(.expanded)
-                            Spacer()
-                            Text(String(levelScore.score))
-                                .foregroundStyle(scoreColor())
-                        }
-                        HStack {
-                            Text("MISS COUNT")
-                                .fontWidth(.expanded)
-                            Spacer()
-                            Text(String(levelScore.missCount))
-                                .foregroundStyle(scoreColor())
-                        }
-                    }
-                    .font(.caption)
-                    .fontWeight(.heavy)
-                } else {
-                    Text("現バージョンのプレー記録はありません。")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    if levelScore.clearType != "NO PLAY" {
-                        Divider()
-                        HStack {
-                            Text("CLEAR TYPE")
-                                .fontWidth(.expanded)
-                            Spacer()
-                            Text(levelScore.clearType)
-                                .foregroundStyle(clearTypeColor())
-                        }
-                        .fontWeight(.heavy)
-                        .font(.caption)
-                    }
+                }
+                .font(.largeTitle)
+                .fontWidth(.expanded)
+                .fontWeight(.black)
+            } else {
+                Text("現バージョンのプレー記録はありません。")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            if levelScore.djLevel != "---" {
+                VStack(alignment: .leading, spacing: 8.0) {
+                    ScoreRow("CLEAR TYPE", value: levelScore.clearType, style: clearTypeStyle())
+                    ScoreRow("SCORE", value: levelScore.score, style: scoreStyle())
+                    ScoreRow("MISS COUNT", value: levelScore.missCount, style: scoreStyle())
+                }
+                VStack(alignment: .leading, spacing: 8.0) {
+                    ScoreRow("PERFECT GREAT", value: levelScore.perfectGreatCount, style: scoreStyle())
+                    ScoreRow("GREAT", value: levelScore.greatCount, style: scoreStyle())
+                    ScoreRow("MISS", value: levelScore.missCount, style: scoreStyle())
+                }
+            } else {
+                if levelScore.clearType != "NO PLAY" {
+                    ScoreRow("CLEAR TYPE", value: levelScore.clearType, style: clearTypeStyle())
                 }
             }
         } header: {
@@ -85,7 +61,7 @@ struct ScoreSection: View {
         }
     }
 
-    func clearTypeColor() -> any ShapeStyle {
+    func clearTypeStyle() -> any ShapeStyle {
         switch levelScore.clearType {
         case "FULLCOMBO CLEAR":
             return LinearGradient(gradient: Gradient(colors: [.cyan,
@@ -133,7 +109,7 @@ struct ScoreSection: View {
         }
     }
 
-    func scoreColor() -> any ShapeStyle {
+    func scoreStyle() -> any ShapeStyle {
         return LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom)
     }
 }

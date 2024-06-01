@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E46A65E02C0A276800D9544B /* ScoreRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65DF2C0A276800D9544B /* ScoreRow.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
 		E49359DF2C00E4230022E385 /* LevelLabelOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */; };
@@ -48,6 +49,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E46A65DF2C0A276800D9544B /* ScoreRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreRow.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
 		E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabelOrientation.swift; sourceTree = "<group>"; };
@@ -180,6 +182,7 @@
 				E4BC32832C036DF1006A0F7A /* ScoresView+Functions.swift */,
 				E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */,
 				E4E3D0D32BF99A86001942FE /* ScoreSection.swift */,
+				E46A65DF2C0A276800D9544B /* ScoreRow.swift */,
 			);
 			path = Scores;
 			sourceTree = "<group>";
@@ -356,6 +359,7 @@
 				E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */,
 				E4EB2CA82BFF7E3700A00796 /* CalendarView.swift in Sources */,
 				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,
+				E46A65E02C0A276800D9544B /* ScoreRow.swift in Sources */,
 				E4B123D72BF90A4300D4A3D1 /* MoreView.swift in Sources */,
 				E4BC32822C036CBD006A0F7A /* LevelLabelGlow.swift in Sources */,
 				E49359E12C016F2F0022E385 /* SortMode.swift in Sources */,

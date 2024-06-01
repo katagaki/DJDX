@@ -73,8 +73,16 @@ extension ScoresView {
                 }
             case .clearType:
                 sortedSongRecords.sort { lhs, rhs in
-                    return clearTypes.firstIndex(of: lhs[keyPath: keyPath].clearType) ?? 0 <
+                    clearTypes.firstIndex(of: lhs[keyPath: keyPath].clearType) ?? 0 <
                         clearTypes.firstIndex(of: rhs[keyPath: keyPath].clearType) ?? 1
+                }
+            case .scoreAscending:
+                sortedSongRecords.sort { lhs, rhs in
+                    lhs[keyPath: keyPath].score < rhs[keyPath: keyPath].score
+                }
+            case .scoreDescending:
+                sortedSongRecords.sort { lhs, rhs in
+                    lhs[keyPath: keyPath].score > rhs[keyPath: keyPath].score
                 }
             case .difficultyAscending:
                 sortedSongRecords.sort { lhs, rhs in
