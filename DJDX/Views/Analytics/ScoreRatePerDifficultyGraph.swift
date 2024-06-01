@@ -1,5 +1,5 @@
 //
-//  ScoreRatePerDifficultyChart.swift
+//  ScoreRatePerDifficultyGraph.swift
 //  DJDX
 //
 //  Created by シン・ジャスティン on 2024/05/21.
@@ -8,7 +8,7 @@
 import Charts
 import SwiftUI
 
-struct ScoreRatePerDifficultyChart: View {
+struct ScoreRatePerDifficultyGraph: View {
     @Binding var scoreRatePerDifficulty: [Int: [String: Int]]
     @Binding var djLevels: [String]
     @Binding var selectedDifficulty: Int

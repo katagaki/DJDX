@@ -1,5 +1,5 @@
 //
-//  ClearLampOverviewChart.swift
+//  ClearLampOverviewGraph.swift
 //  DJDX
 //
 //  Created by シン・ジャスティン on 2024/05/21.
@@ -8,7 +8,7 @@
 import Charts
 import SwiftUI
 
-struct ClearLampOverviewChart: View {
+struct ClearLampOverviewGraph: View {
     @Binding var clearLampPerDifficulty: [Int: [String: Int]]
 
     @State var isInteractive: Bool = false
@@ -37,7 +37,7 @@ struct ClearLampOverviewChart: View {
                         .reduce(into: 0) { partialResult, keyValue in
                             partialResult += keyValue.value
                         } ?? 0
-                    Text("\(totalPlayedPerDifficulty)曲")
+                    Text("Shared.SongCount.\(totalPlayedPerDifficulty)")
                         .padding([.top, .bottom], 2.0)
                         .padding([.leading, .trailing], 4.0)
                         .background(Color.accentColor)

@@ -22,7 +22,7 @@ struct MoreView: View {
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
 
-    @AppStorage(wrappedValue: false, "ScoresView.DifficultiesShownSeparately") var isDifficultiesSeparate: Bool
+    @AppStorage(wrappedValue: false, "ScoresView.LevelsShownSeparately") var isLevelsShownSeparately: Bool
     @AppStorage(wrappedValue: false, "ScoresView.ArtistVisible") var isArtistVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.GenreVisible") var isGenreVisible: Bool
@@ -36,95 +36,98 @@ struct MoreView: View {
         NavigationStack(path: $navigationManager[.more]) {
             MoreList(repoName: "katagaki/DJDX", viewPath: ViewPath.moreAttributions) {
                 Section {
-                    Button("「BEMANIWiki 2nd」からデータを取得") {
+                    Button("More.ExternalData.DownloadWikiData") {
                         try? modelContext.delete(model: IIDXSong.self)
                         reloadBemaniWikiDataForLatestVersion()
                         reloadBemaniWikiDataForExistingVersions()
                     }
+                } header: {
+                    ListSectionHeader(text: "More.ExternalData.Header")
+                        .font(.body)
                 }
                 Section {
-                    Toggle(isOn: $isDifficultiesSeparate) {
+                    Toggle(isOn: $isLevelsShownSeparately) {
                         HStack(spacing: 0.0) {
-                            ListRow(image: "ListIcon.ShowDifficultiesAsSeparateRecords",
-                                    title: "レベル別で表示",
-                                    subtitle: "（未実装）譜面をレベルで分けて表示されます。",
+                            ListRow(image: "ListIcon.ShowLevelsAsSeparateRecords",
+                                    title: "More.PlayDataDisplay.ShowLevelsSeparately",
+                                    subtitle: "More.PlayDataDisplay.ShowLevelsSeparately.Description",
                                     includeSpacer: true)
                         }
                     }
                     Toggle(isOn: $isArtistVisible) {
                         ListRow(image: "ListIcon.ShowArtist",
-                                title: "アーティストを表示",
+                                title: "More.PlayDataDisplay.ShowArtist",
                                 includeSpacer: true)
                     }
                     Toggle(isOn: $isLevelVisible) {
-                        ListRow(image: "ListIcon.ShowDifficulty",
-                                title: "レベルを表示",
+                        ListRow(image: "ListIcon.ShowLevel",
+                                title: "More.PlayDataDisplay.ShowLevel",
                                 includeSpacer: true)
                     }
                     Toggle(isOn: $isGenreVisible) {
                         ListRow(image: "ListIcon.ShowGenre",
-                                title: "ジャンルを表示",
+                                title: "More.PlayDataDisplay.ShowGenre",
                                 includeSpacer: true)
                     }
                     Toggle(isOn: $isLastPlayDateVisible) {
                         ListRow(image: "ListIcon.ShowPlayDate",
-                                title: "最終プレー日時を表示",
+                                title: "More.PlayDataDisplay.ShowLastPlayDate",
                                 includeSpacer: true)
                     }
                     Toggle(isOn: $isScoreVisible) {
                         ListRow(image: "ListIcon.ShowScore",
-                                title: "スコアを表示",
+                                title: "More.PlayDataDisplay.ShowScore",
                                 includeSpacer: true)
                     }
                 } header: {
-                    ListSectionHeader(text: "プレーデータの表示")
+                    ListSectionHeader(text: "More.PlayDataDisplay.Header")
                         .font(.body)
                 }
                 Section {
                     Button {
                         isConfirmingWebDataDelete = true
                     } label: {
-                        Text("Webデータを消去")
+                        Text("More.ManageData.DeleteWebData")
                             .foregroundStyle(.red)
                     }
                     Button {
                         isConfirmingScoreDataDelete = true
                     } label: {
-                        Text("スコアデータを消去")
+                        Text("More.ManageData.DeleteScoreData")
                             .foregroundStyle(.red)
                     }
                 } header: {
-                    ListSectionHeader(text: "データ管理")
+                    ListSectionHeader(text: "More.ManageData.Header")
                         .font(.body)
                 }
             }
             .alert(
-                "Webデータがすべて削除されます。",
+                "Alert.DeleteData.Web.Title",
                 isPresented: $isConfirmingWebDataDelete,
                 actions: {
-                    Button("Webデータを消去", role: .destructive) {
+                    Button("Alert.DeleteData.Web.Confirm", role: .destructive) {
                         deleteAllWebData()
                     }
-                    Button("キャンセル", role: .cancel) {
+                    Button("Shared.Cancel", role: .cancel) {
                         isConfirmingWebDataDelete = false
                     }
                 },
                 message: {
-                    Text("次にWebでのインポートを行う際に、再度ログインする必要があります。")
+                    Text("Alert.DeleteData.Web.Subtitle")
                 })
             .alert(
-                "インポートされたスコアデータがすべて削除されます。",
+                "Alert.DeleteData.Score.Title",
                 isPresented: $isConfirmingScoreDataDelete,
                 actions: {
-                    Button("スコアデータを消去", role: .destructive) {
+                    Button("Alert.DeleteData.Score.Confirm", role: .destructive) {
                         deleteAllScoreData()
                     }
-                    Button("キャンセル", role: .cancel) {
+                    Button("Shared.Cancel", role: .cancel) {
                         isConfirmingScoreDataDelete = false
                     }
                 },
                 message: {
-                    Text("スコアをご覧になるために、再度インポートする必要があります。")
+                    Text("Alert.DeleteData.Score.Subtitle")
                 })
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
                 switch viewPath {

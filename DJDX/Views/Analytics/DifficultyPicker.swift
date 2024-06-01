@@ -17,7 +17,7 @@ struct DifficultyPicker: View {
                 Text("LEVEL \(difficulty)").tag(difficulty)
             }
         } label: {
-            Text("レベル")
+            Text("Shared.Difficulty")
         }
     }
 }

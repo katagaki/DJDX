@@ -15,27 +15,27 @@ struct MainTabView: View {
         TabView(selection: $navigationManager.selectedTab) {
             CalendarView()
                 .tabItem {
-                    Label("カレンダー", systemImage: "calendar")
+                    Label("Tab.Calendar", systemImage: "calendar")
                 }
                 .tag(TabType.calendar)
             ScoresView()
                 .tabItem {
-                    Label("プレーデータ", image: "TabIcon.Scores")
+                    Label("Tab.Scores", image: "TabIcon.Scores")
                 }
                 .tag(TabType.scores)
-            ChartsView()
+            AnalyticsView()
                 .tabItem {
-                    Label("アナリティクス", systemImage: "chart.xyaxis.line")
+                    Label("Tab.Analytics", systemImage: "chart.xyaxis.line")
                 }
                 .tag(TabType.analytics)
             Color.clear
                 .tabItem {
-                    Label("譜面確認", image: "TabIcon.Charts")
+                    Label("Tab.Charts", image: "TabIcon.Charts")
                 }
 //                .tag(TabType.charts)
             MoreView()
                 .tabItem {
-                    Label("その他", systemImage: "ellipsis")
+                    Label("Tab.More", systemImage: "ellipsis")
                 }
                 .tag(TabType.more)
         }

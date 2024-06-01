@@ -35,7 +35,7 @@ struct CalendarView: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 2.0) {
                             Text(importGroup.importDate, style: .date)
-                            Text("\(importGroup.iidxData?.count ?? 0)曲")
+                            Text("Shared.SongCount.\(importGroup.iidxData?.count ?? 0)")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -51,7 +51,7 @@ struct CalendarView: View {
                     }
                 })
             }
-            .navigationTitle("データ履歴")
+            .navigationTitle("ViewTitle.Calendar")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
@@ -72,34 +72,34 @@ struct CalendarView: View {
                         Button {
                             calendar.selectedDate = .now
                         } label: {
-                            Label("今日の日付に戻る", systemImage: "arrowshape.turn.up.backward.badge.clock")
+                            Label("Calendar.BackToToday", systemImage: "arrowshape.turn.up.backward.badge.clock")
                         }
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         NavigationLink(value: ViewPath.importerWeb) {
-                            Label("Webでインポート", systemImage: "globe")
+                            Label("Calendar.Import.FromWeb", systemImage: "globe")
                         }
                         NavigationLink(value: ViewPath.importerManual) {
-                            Label("CSVファイルを開く", systemImage: "doc.badge.plus")
+                            Label("Calendar.Import.FromCSV", systemImage: "doc.badge.plus")
                         }
                     } label: {
-                        Text("インポート")
+                        Text("Calendar.Import")
                     }
                 }
             }
             .safeAreaInset(edge: .top, spacing: 0.0) {
                 VStack(spacing: 0.0) {
                     if horizontalSizeClass == .compact && verticalSizeClass == .regular {
-                        DatePicker("日付",
+                        DatePicker("Shared.Date",
                                    selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
                                    in: ...Date.now,
                                    displayedComponents: .date)
                         .datePickerStyle(.graphical)
                         .padding([.leading, .trailing], 10.0)
                     } else {
-                        DatePicker("日付",
+                        DatePicker("Shared.Date",
                                    selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
                                    in: ...Date.now,
                                    displayedComponents: .date)
@@ -118,23 +118,23 @@ struct CalendarView: View {
                 }
             }
             .alert(
-                "データ正常にインポートされました。",
+                "Alert.Import.Success.Title",
                 isPresented: $didImportSucceed,
                 actions: {
-                    Button("OK", role: .cancel) {
+                    Button("Shared.OK", role: .cancel) {
                         didImportSucceed = false
                         navigationManager.popToRoot(for: .calendar)
                     }
                 },
                 message: {
-                    Text("インポートが成功しました")
+                    Text("Alert.Import.Success.Subtitle")
                 }
             )
             .alert(
-                "データがインポートできませんでした",
+                "Alert.Import.Error.Title",
                 isPresented: $isAutoImportFailed,
                 actions: {
-                    Button("OK", role: .cancel) {
+                    Button("Shared.OK", role: .cancel) {
                         isAutoImportFailed = false
                         navigationManager.popToRoot(for: .calendar)
                     }
@@ -149,15 +149,15 @@ struct CalendarView: View {
     func errorMessage(for reason: ImportFailedReason) -> String {
         switch reason {
         case .noPremiumCourse:
-            return "e-amusementプレミアムコースに入会されていないため、インポートが失敗しました。"
+            return NSLocalizedString("Alert.Import.Error.Subtitle.NoPremiumCourse", comment: "")
         case .noEAmusementPass:
-            return "e-amusement passが登録されていないため、インポートが失敗しました。"
+            return NSLocalizedString("Alert.Import.Error.Subtitle.NoEAmusementPass", comment: "")
         case .noPlayData:
-            return "プレーデータがないため、インポートが失敗しました。"
+            return NSLocalizedString("Alert.Import.Error.Subtitle.NoPlayData", comment: "")
         case .serverError:
-            return "サーバーエラーが発生したため、インポートが失敗しました。"
+            return NSLocalizedString("Alert.Import.Error.Subtitle.ServerError", comment: "")
         case .maintenance:
-            return "e-amusementはただいまメンテナンス中のため、ご利用いただけません。"
+            return NSLocalizedString("Alert.Import.Error.Subtitle.Maintenance", comment: "")
         }
     }
 }

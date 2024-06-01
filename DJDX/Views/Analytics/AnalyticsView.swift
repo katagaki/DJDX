@@ -1,5 +1,5 @@
 //
-//  ChartsView.swift
+//  AnalyticsView.swift
 //  DJDX
 //
 //  Created by シン・ジャスティン on 2024/05/19.
@@ -10,7 +10,7 @@ import Komponents
 import SwiftData
 import SwiftUI
 
-struct ChartsView: View {
+struct AnalyticsView: View {
 
     @Environment(\.modelContext) var modelContext
 
@@ -41,19 +41,19 @@ struct ChartsView: View {
         NavigationStack(path: $navigationManager[.analytics]) {
             List {
                 Section {
-                    ClearLampOverviewChart(clearLampPerDifficulty: $clearLampPerDifficulty)
+                    ClearLampOverviewGraph(clearLampPerDifficulty: $clearLampPerDifficulty)
                     .frame(height: 200.0)
                     .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                 } header: {
                     HStack(spacing: 8.0) {
-                        ListSectionHeader(text: "クリアランプ（全体）")
+                        ListSectionHeader(text: "Analytics.ClearLamp.Overall")
                             .font(.body)
                         Spacer()
                         NavigationLink {
-                            ClearLampOverviewChart(clearLampPerDifficulty: $clearLampPerDifficulty,
+                            ClearLampOverviewGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
                                                    isInteractive: true)
                                 .padding()
-                                .navigationTitle("クリアランプ（全体）")
+                                .navigationTitle("Analytics.ClearLamp.Overall")
                                 .navigationBarTitleDisplayMode(.inline)
                         } label: {
                             Image(systemName: "square.arrowtriangle.4.outward")
@@ -61,7 +61,7 @@ struct ChartsView: View {
                     }
                 }
                 Section {
-                    ClearLampPerDifficultyChart(clearLampPerDifficulty: $clearLampPerDifficulty,
+                    ClearLampPerDifficultyGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
                                                 clearTypes: .constant(clearTypes),
                                                 selectedDifficulty: $levelFilterForClearLamp)
                     .frame(height: 156.0)
@@ -70,16 +70,16 @@ struct ChartsView: View {
                                      difficulties: .constant(difficulties))
                 } header: {
                     HStack(spacing: 8.0) {
-                        ListSectionHeader(text: "クリアランプ（レベル別）")
+                        ListSectionHeader(text: "Analytics.ClearLamp.ByLevel")
                             .font(.body)
                         Spacer()
                         NavigationLink {
-                            ClearLampPerDifficultyChart(clearLampPerDifficulty: $clearLampPerDifficulty,
+                            ClearLampPerDifficultyGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
                                                         clearTypes: .constant(clearTypes),
                                                         selectedDifficulty: $levelFilterForClearLamp,
                                                         legendPosition: .bottom)
                             .padding()
-                            .navigationTitle("クリアランプ（レベル別）")
+                            .navigationTitle("Analytics.ClearLamp.ByLevel")
                             .navigationBarTitleDisplayMode(.inline)
                         } label: {
                             Image(systemName: "square.arrowtriangle.4.outward")
@@ -87,7 +87,7 @@ struct ChartsView: View {
                     }
                 }
                 Section {
-                    ScoreRatePerDifficultyChart(scoreRatePerDifficulty: $scoreRatePerDifficulty,
+                    ScoreRatePerDifficultyGraph(scoreRatePerDifficulty: $scoreRatePerDifficulty,
                                                 djLevels: .constant(djLevels),
                                                 selectedDifficulty: $levelFilterForScoreRate)
                     .frame(height: 156.0)
@@ -96,15 +96,15 @@ struct ChartsView: View {
                                      difficulties: .constant(difficulties))
                 } header: {
                     HStack(spacing: 8.0) {
-                        ListSectionHeader(text: "スコアレート（レベル別）")
+                        ListSectionHeader(text: "Analytics.ScoreRate.ByLevel")
                             .font(.body)
                         Spacer()
                         NavigationLink {
-                            ScoreRatePerDifficultyChart(scoreRatePerDifficulty: $scoreRatePerDifficulty,
+                            ScoreRatePerDifficultyGraph(scoreRatePerDifficulty: $scoreRatePerDifficulty,
                                                         djLevels: .constant(djLevels),
                                                         selectedDifficulty: $levelFilterForScoreRate)
                             .padding()
-                            .navigationTitle("スコアレート（レベル別）")
+                            .navigationTitle("Analytics.ScoreRate.ByLevel")
                             .navigationBarTitleDisplayMode(.inline)
                         } label: {
                             Image(systemName: "square.arrowtriangle.4.outward")
@@ -112,7 +112,7 @@ struct ChartsView: View {
                     }
                 }
             }
-            .navigationTitle("プレー分析")
+            .navigationTitle("ViewTitle.Analytics")
             .refreshable {
                 withAnimation(.snappy.speed(2.0)) {
                     reloadScores()

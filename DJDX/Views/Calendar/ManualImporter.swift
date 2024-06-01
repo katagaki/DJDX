@@ -22,40 +22,37 @@ struct ManualImporter: View {
     var body: some View {
         List {
             Section {
-                Button("CSVをダウンロード", systemImage: "safari") {
+                Button("Importer.CSV.Download.Button", systemImage: "safari") {
                     openURL(URL(string: "https://p.eagate.573.jp/game/2dx/31/djdata/score_download.html")!)
                 }
             } header: {
-                Text("""
-                まず、公式ウェブサイトからCSVファイルをダウンロードしてください。
-                ダウンロードできない場合、Safariのメニューから「デスクトップサイト用Webサイトを表示」を選択してください。
-                """)
+                Text("Importer.CSV.Download.Description")
                     .foregroundColor(.primary)
                     .textCase(nil)
                     .font(.body)
             }
             Section {
-                Button("CSVを読み込む", systemImage: "folder") {
+                Button("Importer.CSV.Load.Button", systemImage: "folder") {
                     isSelectingCSVFile = true
                 }
             } header: {
-                Text("CSVファイルのダウンロードができたら、こちらで読み込んでください。")
+                Text("Importer.CSV.Load.Description")
                     .foregroundColor(.primary)
                     .textCase(nil)
                     .font(.body)
             }
             Section {
-                Button("サンプルデータを読み込む", systemImage: "sparkles") {
+                Button("Importer.CSV.LoadSamples.Button", systemImage: "sparkles") {
                     loadCSVData()
                 }
             } header: {
-                Text("アプリを試したい場合、サンプルデータを読み込んでご利用いただけます。")
+                Text("Importer.CSV.LoadSamples.Description")
                 .foregroundColor(.primary)
                 .textCase(nil)
                 .font(.body)
             }
         }
-        .navigationTitle("CSVインポート")
+        .navigationTitle("ViewTitle.Importer.CSV")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isSelectingCSVFile) {
             DocumentPicker(allowedUTIs: [.commaSeparatedText], onDocumentPicked: { url in

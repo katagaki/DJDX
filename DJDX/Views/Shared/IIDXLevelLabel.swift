@@ -57,7 +57,7 @@ struct IIDXLevelLabel: View {
                         .italic()
                         .font(.system(size: 16.0))
                         .fontWeight(.black)
-                    Text(verbatim: levelType.rawValue)
+                    Text(LocalizedStringKey(levelType.rawValue))
                         .font(.system(size: 10.0))
                         .fontWeight(.semibold)
                 }
@@ -67,7 +67,7 @@ struct IIDXLevelLabel: View {
                         .italic()
                         .font(.system(size: 18.0))
                         .fontWeight(.black)
-                    Text(verbatim: levelType.rawValue)
+                    Text(LocalizedStringKey(levelType.rawValue))
                         .font(.system(size: 12.0))
                         .fontWeight(.semibold)
                 }

@@ -36,18 +36,18 @@ struct WebImporter: View {
             didImportSucceed: $didImportSucceed,
             autoImportFailedReason: $autoImportFailedReason
         )
-        .navigationTitle("Webインポート")
+        .navigationTitle("ViewTitle.Importer.Web")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarBackground(.hidden, for: .tabBar)
         .background {
-            ProgressView("読み込み中…")
+            ProgressView("Importer.Web.Loading")
         }
         .padding(0.0)
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             HStack {
                 Image(systemName: "info.circle")
-                Text("認証情報はこの端末外に送信することはありません。")
+                Text("Importer.Web.Disclaimer")
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .font(.subheadline)

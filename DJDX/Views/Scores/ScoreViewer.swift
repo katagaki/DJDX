@@ -52,7 +52,9 @@ struct ScoreViewer: View {
                 IIDXLevelShowcase(songRecord: songRecord)
                 Divider()
                 HStack {
-                    Text("最終プレー日時：\(songRecord.lastPlayDate.formatted(date: .long, time: .shortened))")
+                    Text("""
+Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time: .shortened))
+""")
                         .foregroundStyle(.tertiary)
                 }
                 .font(.caption2)

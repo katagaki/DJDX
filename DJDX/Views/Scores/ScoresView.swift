@@ -133,11 +133,11 @@ struct ScoresView: View {
                     }
                 }
             }
-            .navigationTitle("プレーデータ")
+            .navigationTitle("ViewTitle.Scores")
             .listStyle(.plain)
             .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always),
-                        prompt: "曲名、アーティスト名")
+                        prompt: "Scores.Search.Prompt")
             .refreshable {
                 reloadDisplayedScores()
             }
@@ -145,22 +145,22 @@ struct ScoresView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
                         if levelToShow != .all {
-                            Menu("並べ替え") {
-                                Picker("並べ替え", selection: $sortMode) {
+                            Menu("Shared.Sort") {
+                                Picker("Shared.Sort", selection: $sortMode) {
                                     ForEach(SortMode.all, id: \.self) { sortMode in
-                                        Text(sortMode.rawValue)
+                                        Text(LocalizedStringKey(sortMode.rawValue))
                                             .tag(sortMode)
                                     }
                                 }
                                 .pickerStyle(.inline)
                             }
                         }
-                        Menu("フィルター", systemImage: "line.3.horizontal.decrease.circle") {
-                            Toggle("スコアのある曲のみ表示", isOn: $isShowingOnlyPlayDataWithScores)
-                            Section("フィルター") {
-                                Picker("レベル", selection: $levelToShow) {
+                        Menu("Shared.Filter", systemImage: "line.3.horizontal.decrease.circle") {
+                            Toggle("Scores.Filter.ShowWithScoreOnly", isOn: $isShowingOnlyPlayDataWithScores)
+                            Section("Shared.Filter") {
+                                Picker("Shared.Level", selection: $levelToShow) {
                                     ForEach(IIDXLevel.sortLevels, id: \.self) { sortLevel in
-                                        Text(sortLevel.rawValue)
+                                        Text(LocalizedStringKey(sortLevel.rawValue))
                                             .tag(sortLevel)
                                     }
                                 }
@@ -177,7 +177,7 @@ struct ScoresView: View {
                         .progressViewStyle(.circular)
                 case .presenting:
                     if songRecords.count == 0 {
-                        ContentUnavailableView("該当するデータはありません。", systemImage: "questionmark.square.dashed")
+                        ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
                     } else {
                         Color.clear
                     }

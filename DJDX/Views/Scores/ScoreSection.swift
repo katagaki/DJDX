@@ -36,7 +36,7 @@ struct ScoreSection: View {
                 .fontWidth(.expanded)
                 .fontWeight(.black)
             } else {
-                Text("現バージョンのプレー記録はありません。")
+                Text("Scores.Viewer.NoDataForCurrentVersion")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }

@@ -1,5 +1,5 @@
 //
-//  ClearLampPerDifficultyChart.swift
+//  ClearLampPerDifficultyGraph.swift
 //  DJDX
 //
 //  Created by シン・ジャスティン on 2024/05/21.
@@ -8,7 +8,7 @@
 import Charts
 import SwiftUI
 
-struct ClearLampPerDifficultyChart: View {
+struct ClearLampPerDifficultyGraph: View {
     @Binding var clearLampPerDifficulty: [Int: [String: Int]]
     @Binding var clearTypes: [String]
     @Binding var selectedDifficulty: Int
