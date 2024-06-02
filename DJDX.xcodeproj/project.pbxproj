@@ -24,6 +24,7 @@
 		E46A66012C0C926E00D9544B /* IIDXClearType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A66002C0C926E00D9544B /* IIDXClearType.swift */; };
 		E46A66032C0CA6D000D9544B /* IIDXDifficulty.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A66022C0CA6D000D9544B /* IIDXDifficulty.swift */; };
 		E46A66052C0CA71E00D9544B /* ScoreRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A66042C0CA71E00D9544B /* ScoreRow.swift */; };
+		E46A66072C0CC12800D9544B /* ScoreSortAndFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A66062C0CC12800D9544B /* ScoreSortAndFilter.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
 		E49359DF2C00E4230022E385 /* LevelLabelOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */; };
@@ -80,6 +81,7 @@
 		E46A66002C0C926E00D9544B /* IIDXClearType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXClearType.swift; sourceTree = "<group>"; };
 		E46A66022C0CA6D000D9544B /* IIDXDifficulty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXDifficulty.swift; sourceTree = "<group>"; };
 		E46A66042C0CA71E00D9544B /* ScoreRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreRow.swift; sourceTree = "<group>"; };
+		E46A66062C0CC12800D9544B /* ScoreSortAndFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreSortAndFilter.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
 		E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabelOrientation.swift; sourceTree = "<group>"; };
@@ -231,6 +233,7 @@
 			children = (
 				E4B123B12BF8E8E400D4A3D1 /* ScoresView.swift */,
 				E4BC32832C036DF1006A0F7A /* ScoresView+Functions.swift */,
+				E46A66062C0CC12800D9544B /* ScoreSortAndFilter.swift */,
 				E46A66042C0CA71E00D9544B /* ScoreRow.swift */,
 				E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */,
 				E4E3D0D32BF99A86001942FE /* ScoreSection.swift */,
@@ -447,6 +450,7 @@
 				E46A66032C0CA6D000D9544B /* IIDXDifficulty.swift in Sources */,
 				E4B123CE2BF8FEC900D4A3D1 /* CSwiftV.swift in Sources */,
 				E4E3D0DE2BF9D662001942FE /* AnalyticsView.swift in Sources */,
+				E46A66072C0CC12800D9544B /* ScoreSortAndFilter.swift in Sources */,
 				E4B123B02BF8E8E400D4A3D1 /* App.swift in Sources */,
 				E4E3D0EE2BFC034C001942FE /* ClearLampOverviewGraph.swift in Sources */,
 				E46A65F32C0B112900D9544B /* LevelDetailRow.swift in Sources */,

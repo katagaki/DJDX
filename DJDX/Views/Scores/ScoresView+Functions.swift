@@ -51,7 +51,7 @@ extension ScoresView {
         self.filteredSongRecords = filteredSongRecords
     }
 
-    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable cyclomatic_complexity function_body_length
     func sortSongRecords() {
         var sortedSongRecords: [IIDXSongRecord] = self.filteredSongRecords
         var songLevelScores: [IIDXSongRecord: IIDXLevelScore] = [:]
@@ -123,7 +123,7 @@ extension ScoresView {
 
         self.sortedSongRecords = sortedSongRecords
     }
-    // swiftlint:enable cyclomatic_complexity
+    // swiftlint:enable cyclomatic_complexity function_body_length
 
     func searchSongRecords() {
         let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)

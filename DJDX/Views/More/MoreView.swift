@@ -24,9 +24,9 @@ struct MoreView: View {
     @AppStorage(wrappedValue: false, "ScoresView.LevelsShownSeparately") var isLevelsShownSeparately: Bool
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
+    @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
     @AppStorage(wrappedValue: false, "ScoresView.ArtistVisible") var isArtistVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
-    @AppStorage(wrappedValue: false, "ScorewView.GenreVisible") var isGenreVisible: Bool
     @AppStorage(wrappedValue: true, "ScorewView.DJLevelVisible") var isDJLevelVisible: Bool
     @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
@@ -97,6 +97,11 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
+                    Toggle(isOn: $isGenreVisible) {
+                        ListRow(image: "ListIcon.ShowGenre",
+                                title: "More.PlayDataDisplay.ShowGenre",
+                                includeSpacer: true)
+                    }
                     Toggle(isOn: $isArtistVisible) {
                         ListRow(image: "ListIcon.ShowArtist",
                                 title: "More.PlayDataDisplay.ShowArtist",
@@ -105,11 +110,6 @@ struct MoreView: View {
                     Toggle(isOn: $isLevelVisible) {
                         ListRow(image: "ListIcon.ShowLevel",
                                 title: "More.PlayDataDisplay.ShowLevel",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isGenreVisible) {
-                        ListRow(image: "ListIcon.ShowGenre",
-                                title: "More.PlayDataDisplay.ShowGenre",
                                 includeSpacer: true)
                     }
                     Toggle(isOn: $isDJLevelVisible) {
