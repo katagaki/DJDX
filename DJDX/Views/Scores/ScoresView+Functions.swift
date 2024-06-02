@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 extension ScoresView {
-    func reloadAllScores() {
+    func reloadAllSongRecords() {
         allSongRecords = calendar.latestAvailableIIDXSongRecords(in: ModelContext(sharedModelContainer))
     }
 

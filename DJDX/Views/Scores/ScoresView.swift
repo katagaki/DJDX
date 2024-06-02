@@ -72,14 +72,14 @@ struct ScoresView: View {
             }
             .task {
                 if dataState == .initializing {
-                    reloadAllScores()
+                    reloadAllSongRecords()
                 }
             }
             .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "Scores.Search.Prompt")
             .refreshable {
-                reloadAllScores()
+                reloadAllSongRecords()
             }
             .onChange(of: isShowingOnlyPlayDataWithScores) { _, _ in
                 filterSongRecords()

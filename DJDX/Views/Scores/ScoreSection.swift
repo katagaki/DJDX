@@ -72,7 +72,7 @@ struct ScoreSection: View {
                 }
             } else {
                 if score.clearType != "NO PLAY" {
-                    DetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
+                    ClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
                 }
             }
         } header: {
