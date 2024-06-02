@@ -29,6 +29,7 @@ struct ScoresView: View {
 
     @State var searchTerm: String = ""
     @State var isSystemChangingFilterAndSort: Bool = false
+    @State var isSystemChangingAllRecords: Bool = false
 
     var body: some View {
         NavigationStack(path: $navigationManager[.scores]) {
@@ -70,23 +71,30 @@ struct ScoresView: View {
                     }
                 }
             }
-            .task {
-                if dataState == .initializing {
-                    reloadAllSongRecords()
-                }
-            }
             .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "Scores.Search.Prompt")
             .refreshable {
-                reloadAllSongRecords()
+                Task.detached {
+                    await reloadAllSongRecords()
+                }
+            }
+            .onAppear {
+                if dataState == .initializing {
+                    debugPrint("Initializing")
+                    Task.detached {
+                        await reloadAllSongRecords()
+                    }
+                }
             }
             .onChange(of: isShowingOnlyPlayDataWithScores) { _, _ in
                 filterSongRecords()
             }
             .onChange(of: allSongRecords) { _, _ in
-                debugPrint("Filtering song records after all song records changed")
-                filterSongRecords()
+                if !isSystemChangingAllRecords {
+                    debugPrint("Filtering song records after all song records changed")
+                    filterSongRecords()
+                }
             }
             .onChange(of: levelToShow) { _, newValue in
                 if !isSystemChangingFilterAndSort && newValue != .all {
@@ -108,8 +116,10 @@ struct ScoresView: View {
                 }
             }
             .onChange(of: filteredSongRecords) { _, _ in
-                debugPrint("Sorting song records after filtered song records changed")
-                sortSongRecords()
+                if !isSystemChangingAllRecords {
+                    debugPrint("Sorting song records after filtered song records changed")
+                    sortSongRecords()
+                }
             }
             .onChange(of: sortMode) { _, _ in
                 if !isSystemChangingFilterAndSort {
@@ -118,8 +128,10 @@ struct ScoresView: View {
                 }
             }
             .onChange(of: sortedSongRecords) { _, _ in
-                debugPrint("Searching song records after sorted song records changed")
-                searchSongRecords()
+                if !isSystemChangingAllRecords {
+                    debugPrint("Searching song records after sorted song records changed")
+                    searchSongRecords()
+                }
             }
             .onChange(of: searchTerm) { _, _ in
                 debugPrint("Searching song records after search term changed")

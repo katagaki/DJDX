@@ -10,8 +10,31 @@ import SwiftData
 import SwiftUI
 
 extension ScoresView {
-    func reloadAllSongRecords() {
-        allSongRecords = calendar.latestAvailableIIDXSongRecords(in: ModelContext(sharedModelContainer))
+    func reloadAllSongRecords() async {
+        // TODO: Fix weird issues with reloading:
+        // - Reload triggers filter and sort chain twice
+        // - isSystemChangingAllRecords does not take effect
+        // - Freeze when not using async await
+        debugPrint("Removing all song records")
+        isSystemChangingAllRecords = true
+        await MainActor.run {
+            withAnimation(.snappy.speed(2.0)) {
+                displayedSongRecords.removeAll()
+                sortedSongRecords.removeAll()
+                filteredSongRecords.removeAll()
+                allSongRecords.removeAll()
+            }
+        }
+        let newSongRecords = calendar.latestAvailableIIDXSongRecords(
+            in: ModelContext(sharedModelContainer)
+        )
+        debugPrint("Setting new song records")
+        isSystemChangingAllRecords = false
+        await MainActor.run {
+            withAnimation(.snappy.speed(2.0)) {
+                allSongRecords = newSongRecords
+            }
+        }
     }
 
     func filterSongRecords() {
