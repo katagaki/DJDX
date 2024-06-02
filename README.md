@@ -8,3 +8,6 @@ Features:
 - Customizable chart list
 - Graphed play analytics
 - Automatic import using WKWebView, including dark mode support for the KONAMI login page
+
+Wording Clarifications:
+- **LEVEL** refers to the top level category (HYPER, ANOTHER, etc), while **DIFFICULTY** refers to the lower level difficulty number (1 to 12).
