@@ -11,22 +11,16 @@ import SwiftData
 struct ScoresView: View {
 
     @Environment(\.modelContext) var modelContext
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
 
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var calendar: CalendarManager
 
     @State var allSongRecords: [IIDXSongRecord] = []
-    @State var songRecords: [IIDXSongRecord] = []
+    @State var filteredSongRecords: [IIDXSongRecord] = []
+    @State var sortedSongRecords: [IIDXSongRecord] = []
     @State var displayedSongRecords: [IIDXSongRecord] = []
 
     @State var searchTerm: String = ""
-    @AppStorage(wrappedValue: false, "ScoresView.ArtistVisible") var isArtistVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
-    @AppStorage(wrappedValue: false, "ScorewView.GenreVisible") var isGenreVisible: Bool
-    @AppStorage(wrappedValue: true, "ScorewView.DJLevelVisible") var isDJLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
-    @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
     @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
     @AppStorage(wrappedValue: true, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
     @AppStorage(wrappedValue: .title, "ScoresView.SortOrder") var sortMode: SortMode
@@ -38,95 +32,13 @@ struct ScoresView: View {
             List {
                 ForEach(displayedSongRecords, id: \.title) { songRecord in
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
-                        VStack(alignment: .trailing, spacing: 4.0) {
-                            HStack(alignment: .center, spacing: 8.0) {
-                                VStack(alignment: .leading, spacing: 2.0) {
-                                    if isGenreVisible {
-                                        Text(songRecord.genre)
-                                            .font(.caption2)
-                                            .fontWidth(.condensed)
-                                    }
-                                    Text(songRecord.title)
-                                        .bold()
-                                        .fontWidth(.condensed)
-                                    if isArtistVisible {
-                                        Text(songRecord.artist)
-                                            .font(.caption)
-                                            .fontWidth(.condensed)
-                                    }
-                                    if isDJLevelVisible || isScoreVisible || isLastPlayDateVisible {
-                                        HStack {
-                                            if let score = score(for: songRecord), score.score != 0 {
-                                                Group {
-                                                    if isDJLevelVisible {
-                                                        Group {
-                                                            switch colorScheme {
-                                                            case .light:
-                                                                Text(score.djLevel)
-                                                                    .foregroundStyle(
-                                                                        LinearGradient(colors: [.cyan, .blue],
-                                                                                       startPoint: .top,
-                                                                                       endPoint: .bottom)
-                                                                    )
-                                                            case .dark:
-                                                                Text(score.djLevel)
-                                                                    .foregroundStyle(
-                                                                        LinearGradient(colors: [.white, .cyan],
-                                                                                       startPoint: .top,
-                                                                                       endPoint: .bottom)
-                                                                    )
-                                                            @unknown default:
-                                                                Text(score.djLevel)
-                                                            }
-                                                        }
-                                                        .fontWidth(.expanded)
-                                                        .fontWeight(.black)
-                                                    }
-                                                    if isScoreVisible {
-                                                        if isDJLevelVisible {
-                                                            Divider()
-                                                                .frame(maxHeight: 14.0)
-                                                        }
-                                                        Text(String(score.score))
-                                                            .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
-                                                                                            startPoint: .top,
-                                                                                            endPoint: .bottom))
-                                                            .fontWeight(.heavy)
-                                                    }
-                                                }
-                                                .font(.caption)
-                                                if isLastPlayDateVisible {
-                                                    if isScoreVisible {
-                                                        Divider()
-                                                            .frame(maxHeight: 14.0)
-                                                    }
-                                                    Text(RelativeDateTimeFormatter().localizedString(
-                                                        for: songRecord.lastPlayDate,
-                                                        relativeTo: .now
-                                                    ))
-                                                    .font(.caption2)
-                                                    .fontWidth(.condensed)
-                                                    .foregroundStyle(.secondary)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                Spacer(minLength: 0.0)
-                                if isLevelVisible, levelToShow != .all {
-                                    IIDXLevelLabel(levelType: levelToShow, songRecord: songRecord)
-                                }
-                            }
-                            if isLevelVisible, levelToShow == .all {
-                                IIDXLevelShowcase(songRecord: songRecord)
-                            }
-                        }
+                        ScoreRow(songRecord: songRecord, levelToShow: $levelToShow)
                     }
                     .padding([.top, .bottom], 8.0)
                     .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
                     .safeAreaInset(edge: .leading) {
                         VStack {
-                            if let score = score(for: songRecord) {
+                            if let score = songRecord.score(for: levelToShow) {
                                 switch score.clearType {
                                 case "FULLCOMBO CLEAR":
                                     LinearGradient(gradient: Gradient(colors: [Color.red,
@@ -157,12 +69,6 @@ struct ScoresView: View {
             }
             .navigationTitle("ViewTitle.Scores")
             .listStyle(.plain)
-            .searchable(text: $searchTerm,
-                        placement: .navigationBarDrawer(displayMode: .always),
-                        prompt: "Scores.Search.Prompt")
-            .refreshable {
-                reloadDisplayedScores()
-            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
@@ -198,7 +104,7 @@ struct ScoresView: View {
                     ProgressView()
                         .progressViewStyle(.circular)
                 case .presenting:
-                    if songRecords.count == 0 {
+                    if allSongRecords.count == 0 {
                         ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
                     } else {
                         Color.clear
@@ -208,22 +114,34 @@ struct ScoresView: View {
             .task {
                 if dataState == .initializing {
                     reloadAllScores()
-                    reloadDisplayedScores()
                 }
+            }
+            .searchable(text: $searchTerm,
+                        placement: .navigationBarDrawer(displayMode: .always),
+                        prompt: "Scores.Search.Prompt")
+            .refreshable {
+                reloadAllScores()
+            }
+            .onChange(of: allSongRecords) { _, _ in
+                filterSongRecords()
+            }
+            .onChange(of: filteredSongRecords) { _, _ in
+                sortSongRecords()
+            }
+            .onChange(of: sortedSongRecords) { _, _ in
+                searchSongRecords()
             }
             .onChange(of: searchTerm) { _, _ in
-                displayedSongRecords = searchSongRecords(songRecords, searchTerm: searchTerm)
+                searchSongRecords()
             }
             .onChange(of: levelToShow) { _, _ in
-                reloadDisplayedScores()
+                filterSongRecords()
             }
             .onChange(of: isShowingOnlyPlayDataWithScores) { _, _ in
-                reloadDisplayedScores()
+                filterSongRecords()
             }
             .onChange(of: sortMode) { _, _ in
-                withAnimation(.snappy.speed(2.0)) {
-                    displayedSongRecords = sortSongRecords(displayedSongRecords)
-                }
+                sortSongRecords()
             }
             .onChange(of: calendar.selectedDate) { oldValue, newValue in
                 if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {

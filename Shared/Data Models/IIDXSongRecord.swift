@@ -67,6 +67,17 @@ final class IIDXSongRecord: Equatable {
         }
     }
 
+    func score(for level: IIDXLevel) -> IIDXLevelScore? {
+        switch level {
+        case .beginner: return beginnerScore
+        case .normal: return normalScore
+        case .hyper: return hyperScore
+        case .another: return anotherScore
+        case .leggendaria: return leggendariaScore
+        default: return nil
+        }
+    }
+
     static func == (lhs: IIDXSongRecord, rhs: IIDXSongRecord) -> Bool {
         return lhs.title == rhs.title &&
         lhs.artist == rhs.artist &&

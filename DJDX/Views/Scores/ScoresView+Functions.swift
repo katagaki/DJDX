@@ -15,59 +15,38 @@ extension ScoresView {
             .latestAvailableIIDXSongRecords(in: ModelContext(sharedModelContainer), using: calendar)
     }
 
-    func reloadDisplayedScores() {
-        withAnimation(.snappy.speed(2.0)) {
-            dataState = .loading
-        }
-        if allSongRecords.count == 0 {
-            reloadAllScores()
-        }
-        let filteredSongRecords = filterSongRecords(allSongRecords)
-        let searchedSongRecords = searchSongRecords(filteredSongRecords, searchTerm: searchTerm)
-        let sortedSongRecords = sortSongRecords(searchedSongRecords)
-        withAnimation(.snappy.speed(2.0)) {
-            songRecords = filteredSongRecords
-            displayedSongRecords = sortedSongRecords
-            dataState = .presenting
-        }
-    }
+    func filterSongRecords() {
+        var filteredSongRecords: [IIDXSongRecord] = self.allSongRecords
 
-    func searchSongRecords(_ songRecords: [IIDXSongRecord], searchTerm: String) -> [IIDXSongRecord] {
-        let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
-        if !searchTermTrimmed.isEmpty && searchTermTrimmed.count >= 1 {
-            return songRecords.filter({ songRecord in
-                return songRecord.title.lowercased().contains(searchTermTrimmed) ||
-                songRecord.artist.lowercased().contains(searchTermTrimmed)
-            })
-        } else {
-            return songRecords
-        }
-    }
-
-    func filterSongRecords(_ songRecords: [IIDXSongRecord]) -> [IIDXSongRecord] {
-        var filteredSongRecords: [IIDXSongRecord] = songRecords
-
-        // Filter by search term
-        filteredSongRecords = searchSongRecords(filteredSongRecords, searchTerm: searchTerm)
-
-        // Filter song records
-        if let keyPath = keyPath(for: levelToShow) {
-            filteredSongRecords.removeAll { songRecord in
-                songRecord[keyPath: keyPath].difficulty == 0 ||
-                (isShowingOnlyPlayDataWithScores && songRecord[keyPath: keyPath].score == 0)
+        // Remove song records that have no scores
+        if isShowingOnlyPlayDataWithScores {
+            if let keyPath = keyPath(for: levelToShow) {
+                filteredSongRecords.removeAll { songRecord in
+                    songRecord[keyPath: keyPath].score == 0
+                }
+            } else {
+                filteredSongRecords.removeAll { songRecord in
+                    songRecord.beginnerScore.score == 0 &&
+                    songRecord.normalScore.score == 0 &&
+                    songRecord.hyperScore.score == 0 &&
+                    songRecord.anotherScore.score == 0 &&
+                    songRecord.leggendariaScore.score == 0
+                }
             }
         }
 
-        // Sort song records
-        if sortMode != .title {
-            filteredSongRecords = sortSongRecords(filteredSongRecords)
+        // Filter song records by level
+        if let keyPath = keyPath(for: levelToShow) {
+            filteredSongRecords.removeAll { songRecord in
+                songRecord[keyPath: keyPath].difficulty == 0
+            }
         }
 
-        return filteredSongRecords
+        self.filteredSongRecords = filteredSongRecords
     }
 
-    func sortSongRecords(_ songRecords: [IIDXSongRecord]) -> [IIDXSongRecord] {
-        var sortedSongRecords: [IIDXSongRecord] = songRecords
+    func sortSongRecords() {
+        var sortedSongRecords: [IIDXSongRecord] = self.filteredSongRecords
         if let keyPath = keyPath(for: levelToShow) {
             switch sortMode {
             case .title:
@@ -104,21 +83,25 @@ extension ScoresView {
                 }
             case .lastPlayDate:
                 sortedSongRecords.sort { lhs, rhs in
-                    return lhs.lastPlayDate > rhs.lastPlayDate
+                    lhs.lastPlayDate > rhs.lastPlayDate
                 }
             }
         }
-        return sortedSongRecords
+        self.sortedSongRecords = sortedSongRecords
     }
 
-    func score(for songRecord: IIDXSongRecord) -> IIDXLevelScore? {
-        switch levelToShow {
-        case .beginner: return songRecord.beginnerScore
-        case .normal: return songRecord.normalScore
-        case .hyper: return songRecord.hyperScore
-        case .another: return songRecord.anotherScore
-        case .leggendaria: return songRecord.leggendariaScore
-        default: return nil
+    func searchSongRecords() {
+        let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
+        withAnimation(.snappy.speed(2.0)) {
+            if !searchTermTrimmed.isEmpty && searchTermTrimmed.count >= 1 {
+                self.displayedSongRecords = self.sortedSongRecords.filter({ songRecord in
+                    songRecord.title.lowercased().contains(searchTermTrimmed) ||
+                    songRecord.artist.lowercased().contains(searchTermTrimmed)
+                })
+            } else {
+                self.displayedSongRecords = self.sortedSongRecords
+            }
+            dataState = .presenting
         }
     }
 
