@@ -1,13 +1,13 @@
 //
-//  DetailRow.swift
+//  ClearTypeDetailRow.swift
 //  DJDX
 //
-//  Created by シン・ジャスティン on 2024/06/01.
+//  Created by シン・ジャスティン on 2024/06/03.
 //
 
 import SwiftUI
 
-struct DetailRow: View {
+struct ClearTypeDetailRow: View {
     var title: String
     var value: String
     var style: any ShapeStyle
@@ -18,20 +18,14 @@ struct DetailRow: View {
         self.style = style
     }
 
-    init(_ title: String, value: Int, style: any ShapeStyle) {
-        self.title = title
-        self.value = String(value)
-        self.style = style
-    }
-
     var body: some View {
         HStack {
             Text(title)
+                .fontWidth(.expanded)
             Spacer()
             Text(value)
                 .foregroundStyle(style)
         }
-        .fontWidth(.expanded)
         .font(.caption)
         .fontWeight(.heavy)
     }

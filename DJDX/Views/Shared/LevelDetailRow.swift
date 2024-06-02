@@ -34,6 +34,7 @@ struct LevelDetailRow: View {
                 .modifier(LevelLabelGlow(color: foregroundColor()))
             Spacer()
             Text(value)
+                .fontWidth(.expanded)
                 .foregroundStyle(
                     LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom)
                 )

@@ -1,13 +1,13 @@
 //
-//  DetailRow.swift
+//  NoteTypeDetailRow.swift
 //  DJDX
 //
-//  Created by シン・ジャスティン on 2024/06/01.
+//  Created by シン・ジャスティン on 2024/06/03.
 //
 
 import SwiftUI
 
-struct DetailRow: View {
+struct NoteTypeDetailRow: View {
     var title: String
     var value: String
     var style: any ShapeStyle
@@ -27,9 +27,9 @@ struct DetailRow: View {
     var body: some View {
         HStack {
             Text(title)
+                .foregroundStyle(style)
             Spacer()
             Text(value)
-                .foregroundStyle(style)
         }
         .fontWidth(.expanded)
         .font(.caption)

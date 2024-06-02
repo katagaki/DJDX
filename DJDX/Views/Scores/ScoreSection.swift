@@ -61,14 +61,14 @@ struct ScoreSection: View {
             }
             if score.djLevelEnum() != .none {
                 VStack(alignment: .leading, spacing: 8.0) {
-                    DetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
+                    ClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
                     DetailRow("SCORE", value: score.score, style: scoreStyle())
                     DetailRow("MISS COUNT", value: score.missCount, style: scoreStyle())
                 }
                 VStack(alignment: .leading, spacing: 8.0) {
-                    DetailRow("PERFECT GREAT", value: score.perfectGreatCount, style: scoreStyle())
-                    DetailRow("GREAT", value: score.greatCount, style: scoreStyle())
-                    DetailRow("MISS", value: score.missCount, style: scoreStyle())
+                    NoteTypeDetailRow("PERFECT GREAT", value: score.perfectGreatCount, style: Color.cyan)
+                    NoteTypeDetailRow("GREAT", value: score.greatCount, style: Color.yellow)
+                    NoteTypeDetailRow("MISS", value: score.missCount, style: Color.red)
                 }
             } else {
                 if score.clearType != "NO PLAY" {
@@ -139,13 +139,13 @@ struct ScoreSection: View {
         case "EASY CLEAR":
             return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .mint),
                                                               .green,
-                                                              .mint]),
+                                                              (colorScheme == .dark ? .white : .mint)]),
                                   startPoint: .top,
                                   endPoint: .bottom)
         case "CLEAR":
             return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .blue),
                                                               .cyan,
-                                                              .blue]),
+                                                              (colorScheme == .dark ? .white : .blue)]),
                                   startPoint: .top,
                                   endPoint: .bottom)
         case "HARD CLEAR":
