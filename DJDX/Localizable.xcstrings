@@ -1336,6 +1336,23 @@
         }
       }
     },
+    "Shared.Sort.DJLevel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
+          }
+        }
+      }
+    },
     "Shared.Sort.LastPlayDate" : {
       "extractionState" : "manual",
       "localizations" : {

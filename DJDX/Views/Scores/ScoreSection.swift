@@ -19,7 +19,7 @@ struct ScoreSection: View {
 
     var body: some View {
         Section {
-            if score.djLevel != "---" {
+            if score.djLevelEnum() != .none {
                 HStack {
                     Group {
                         switch colorScheme {
@@ -59,7 +59,7 @@ struct ScoreSection: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            if score.djLevel != "---" {
+            if score.djLevelEnum() != .none {
                 VStack(alignment: .leading, spacing: 8.0) {
                     DetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
                     DetailRow("SCORE", value: score.score, style: scoreStyle())
@@ -87,14 +87,14 @@ struct ScoreSection: View {
                     }
                     if score.level != .beginner {
                         Section {
-                            NavigationLink {
-                                TextageViewer(songTitle: songTitle, level: score.level, playSide: .side1P)
-                            } label: {
+                            NavigationLink(value: ViewPath.textageViewer(songTitle: songTitle,
+                                                                         level: score.level,
+                                                                         playSide: .side1P)) {
                                 Label("Scores.Viewer.OpenTextage.1P", image: .listIconTextage)
                             }
-                            NavigationLink {
-                                TextageViewer(songTitle: songTitle, level: score.level, playSide: .side2P)
-                            } label: {
+                            NavigationLink(value: ViewPath.textageViewer(songTitle: songTitle,
+                                                                         level: score.level,
+                                                                         playSide: .side2P)) {
                                 Label("Scores.Viewer.OpenTextage.2P", image: .listIconTextageFlipped)
                             }
                         } header: {

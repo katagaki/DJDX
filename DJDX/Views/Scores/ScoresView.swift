@@ -31,17 +31,6 @@ struct ScoresView: View {
 
     @State var dataState: DataState = .initializing
 
-    let clearTypes: [String] = [
-        "FULLCOMBO CLEAR",
-        "CLEAR",
-        "ASSIST CLEAR",
-        "EASY CLEAR",
-        "HARD CLEAR",
-        "EX HARD CLEAR",
-        "FAILED",
-        "NO PLAY"
-    ]
-
     var body: some View {
         NavigationStack(path: $navigationManager[.scores]) {
             List {
@@ -159,7 +148,7 @@ struct ScoresView: View {
                             Toggle("Scores.Filter.ShowWithScoreOnly", isOn: $isShowingOnlyPlayDataWithScores)
                             Section("Shared.Filter") {
                                 Picker("Shared.Level", selection: $levelToShow) {
-                                    ForEach(IIDXLevel.sortLevels, id: \.self) { sortLevel in
+                                    ForEach(IIDXLevel.sorted, id: \.self) { sortLevel in
                                         Text(LocalizedStringKey(sortLevel.rawValue))
                                             .tag(sortLevel)
                                     }
@@ -210,7 +199,10 @@ struct ScoresView: View {
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
-                case .scoreViewer(let songRecord): ScoreViewer(songRecord: songRecord)
+                case .scoreViewer(let songRecord):
+                    ScoreViewer(songRecord: songRecord)
+                case .textageViewer(let songTitle, let level, let playSide):
+                    TextageViewer(songTitle: songTitle, level: level, playSide: playSide)
                 default: Color.clear
                 }
             }

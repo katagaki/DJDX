@@ -9,6 +9,12 @@ import Foundation
 
 enum ViewPath: Hashable {
     case scoreViewer(songRecord: IIDXSongRecord)
+    case textageViewer(songTitle: String,
+                       level: IIDXLevel,
+                       playSide: IIDXPlaySide)
+    case clearLampOverviewGraph
+    case clearLampPerDifficultyGraph
+    case scoreRatePerDifficultyGraph
     case importerWeb
     case importerManual
     case moreAttributions

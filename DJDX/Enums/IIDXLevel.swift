@@ -16,7 +16,14 @@ enum IIDXLevel: String, CaseIterable, Codable {
     case leggendaria = "Shared.Level.Leggendaria"
     case unknown = ""
 
-    static let sortLevels: [IIDXLevel] = [.all, .beginner, .normal, .hyper, .another, .leggendaria]
+    static let sorted: [IIDXLevel] = [
+        .all,
+        .beginner,
+        .normal,
+        .hyper,
+        .another,
+        .leggendaria
+    ]
 
     private var extraRawValues: [String] {
         switch self {

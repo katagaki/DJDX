@@ -75,9 +75,16 @@ extension ScoresView {
                     lhs.title < rhs.title
                 }
             case .clearType:
+                let clearTypes = IIDXClearType.sortedStrings
                 sortedSongRecords.sort { lhs, rhs in
                     clearTypes.firstIndex(of: lhs[keyPath: keyPath].clearType) ?? 0 <
                         clearTypes.firstIndex(of: rhs[keyPath: keyPath].clearType) ?? 1
+                }
+            case .djLevel:
+                let djLevels = IIDXDJLevel.sorted
+                sortedSongRecords.sort { lhs, rhs in
+                    djLevels.firstIndex(of: lhs[keyPath: keyPath].djLevelEnum()) ?? 1 >
+                        djLevels.firstIndex(of: rhs[keyPath: keyPath].djLevelEnum()) ?? 0
                 }
             case .scoreAscending:
                 sortedSongRecords.sort { lhs, rhs in

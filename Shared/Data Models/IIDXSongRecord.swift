@@ -121,6 +121,10 @@ struct IIDXLevelScore: Codable, Equatable {
         self.djLevel = "---"
     }
 
+    func djLevelEnum() -> IIDXDJLevel {
+        IIDXDJLevel(rawValue: djLevel) ?? .none
+    }
+
     static func == (lhs: IIDXLevelScore, rhs: IIDXLevelScore) -> Bool {
         return lhs.level == rhs.level &&
         lhs.difficulty == rhs.difficulty &&

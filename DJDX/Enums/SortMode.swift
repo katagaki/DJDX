@@ -10,6 +10,7 @@ import Foundation
 enum SortMode: String, CaseIterable, Codable {
     case title = "Shared.Sort.Title"
     case clearType = "Shared.Sort.ClearType"
+    case djLevel = "Shared.Sort.DJLevel"
     case scoreAscending = "Shared.Sort.ScoreAscending"
     case scoreDescending = "Shared.Sort.ScoreDescending"
     case difficultyAscending = "Shared.Sort.DifficultyAscending"
@@ -19,6 +20,7 @@ enum SortMode: String, CaseIterable, Codable {
     static let all: [SortMode] = [
         .title,
         .clearType,
+        .djLevel,
         .scoreAscending,
         .scoreDescending,
         .difficultyAscending,
@@ -30,6 +32,7 @@ enum SortMode: String, CaseIterable, Codable {
         switch self {
         case .title: return ["タイトル", "Shared.Sort.Title"]
         case .clearType: return ["クリアタイプ", "Shared.Sort.ClearType"]
+        case .djLevel: return ["DJ LEVEL", "Shared.Sort.DJLevel"]
         case .scoreAscending: return ["スコア（昇順）", "Shared.Sort.ScoreAscending"]
         case .scoreDescending: return ["スコア（降順）", "Shared.Sort.ScoreDescending"]
         case .difficultyAscending: return ["難易度（昇順）", "Shared.Sort.DifficultyAscending"]

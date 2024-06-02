@@ -10,7 +10,6 @@ import SwiftUI
 
 struct ClearLampPerDifficultyGraph: View {
     @Binding var clearLampPerDifficulty: [Int: [String: Int]]
-    @Binding var clearTypes: [String]
     @Binding var selectedDifficulty: Int
 
     @State var legendPosition: AnnotationPosition = .trailing
@@ -24,7 +23,7 @@ struct ClearLampPerDifficultyGraph: View {
                 )
         }
               .chartLegend(position: legendPosition, alignment: .leading, spacing: 2.0)
-              .chartXScale(domain: clearTypes)
+              .chartXScale(domain: IIDXClearType.sortedStrings)
               .chartForegroundStyleScale([
                 "FULLCOMBO CLEAR": .blue,
                 "CLEAR": .cyan,
