@@ -18,7 +18,7 @@ struct CalendarView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var calendar: CalendarManager
 
-    @Query(sort: \ImportGroup.importDate, order: .reverse) var importGroups: [ImportGroup]
+    @State var importGroups: [ImportGroup] = []
 
     @State var isAutoImportFailed: Bool = false
     @State var didImportSucceed: Bool = false
@@ -35,7 +35,7 @@ struct CalendarView: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 2.0) {
                             Text(importGroup.importDate, style: .date)
-                            Text("Shared.SongCount.\(importGroup.iidxData?.count ?? 0)")
+                            Text("Shared.SongCount.\(countOfIIDXSongRecords(in: importGroup))")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -51,20 +51,9 @@ struct CalendarView: View {
                     }
                 })
             }
+            .listStyle(.plain)
             .navigationTitle("ViewTitle.Calendar")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: ViewPath.self) { viewPath in
-                switch viewPath {
-                case .importerWeb:
-                    WebImporter(isAutoImportFailed: $isAutoImportFailed,
-                                didImportSucceed: $didImportSucceed,
-                                autoImportFailedReason: $autoImportFailedReason)
-                case .importerManual:
-                    ManualImporter(didImportSucceed: $didImportSucceed)
-                default: Color.clear
-                }
-            }
-            .listStyle(.plain)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -143,7 +132,31 @@ struct CalendarView: View {
                     Text(errorMessage(for: autoImportFailedReason ?? .serverError))
                 }
             )
+            .task {
+                importGroups = calendar.allImportGroups(in: modelContext)
+            }
+            .navigationDestination(for: ViewPath.self) { viewPath in
+                switch viewPath {
+                case .importerWeb:
+                    WebImporter(isAutoImportFailed: $isAutoImportFailed,
+                                didImportSucceed: $didImportSucceed,
+                                autoImportFailedReason: $autoImportFailedReason)
+                case .importerManual:
+                    ManualImporter(didImportSucceed: $didImportSucceed)
+                default: Color.clear
+                }
+            }
         }
+    }
+
+    func countOfIIDXSongRecords(in importGroup: ImportGroup) -> Int {
+        let importGroupID = importGroup.id
+        let fetchDescriptor = FetchDescriptor<IIDXSongRecord>(
+            predicate: #Predicate<IIDXSongRecord> {
+                $0.importGroup?.id == importGroupID
+            }
+        )
+        return (try? modelContext.fetchCount(fetchDescriptor)) ?? 0
     }
 
     func errorMessage(for reason: ImportFailedReason) -> String {

@@ -28,6 +28,13 @@ class CalendarManager: ObservableObject {
         defaults.synchronize()
     }
 
+    func allImportGroups(in modelContext: ModelContext) -> [ImportGroup] {
+        var fetchDescriptor = FetchDescriptor<ImportGroup>(
+            sortBy: [SortDescriptor<ImportGroup>(\.importDate, order: .reverse)]
+        )
+        fetchDescriptor.relationshipKeyPathsForPrefetching = []
+        return (try? modelContext.fetch(fetchDescriptor)) ?? []
+    }
     func latestAvailableIIDXSongRecords(in modelContext: ModelContext) -> [IIDXSongRecord] {
         let importGroupsForSelectedDate: [ImportGroup] = (try? modelContext.fetch(
             FetchDescriptor<ImportGroup>(
