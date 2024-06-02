@@ -3,7 +3,7 @@
 A score viewer for beatmaniaIIDX, built for iOS.
 
 Features:
-- Full Japanese support (with English support coming soon)
+- Full English and Japanese support
 - Beautifully crafted UI built for iOS devices
 - Customizable chart list
 - Graphed play analytics
