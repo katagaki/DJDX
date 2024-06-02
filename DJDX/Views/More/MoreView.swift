@@ -34,10 +34,8 @@ struct MoreView: View {
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
 
-    @State var latestVersionDataCount: Int = 1
-    @State var latestVersionDataImported: Int = 0
-    @State var existingVersionDataCount: Int = 1
-    @State var existingVersionDataImported: Int = 0
+    @State var dataImported: Int = 0
+    @State var dataTotal: Int = 1
 
     var body: some View {
         NavigationStack(path: $navigationManager[.more]) {
@@ -57,19 +55,20 @@ struct MoreView: View {
                                     return await reloadBemaniWikiDataForExistingVersions()
                                 }
                                 for await result in group {
+                                    dataTotal += result.count
                                     iidxSongsFromWiki.append(contentsOf: result)
                                 }
                                 return iidxSongsFromWiki
                             }
                             for iidxSong in iidxSongs {
                                 modelContext.insert(iidxSong)
+                                dataImported += 1
+                                await updateProgress()
                             }
                             progressAlertManager.hide()
                             withAnimation(.snappy.speed(2.0)) {
-                                latestVersionDataCount = 1
-                                latestVersionDataImported = 0
-                                existingVersionDataCount = 1
-                                existingVersionDataImported = 0
+                                dataImported = 0
+                                dataTotal = 1
                             }
                         }
                     }

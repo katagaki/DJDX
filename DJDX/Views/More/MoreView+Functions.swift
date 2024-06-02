@@ -12,9 +12,7 @@ import WebKit
 extension MoreView {
     func updateProgress() async {
         await MainActor.run {
-            let imported = Float(latestVersionDataImported) + Float(existingVersionDataImported)
-            let total = Float(latestVersionDataCount) + Float(existingVersionDataCount)
-            progressAlertManager.updateProgress(Int(imported / total * 100.0))
+            progressAlertManager.updateProgress(Int(Float(dataImported) / Float(dataTotal) * 100.0))
         }
     }
 
@@ -41,7 +39,6 @@ extension MoreView {
                        let table = tablesInDocument.first(),
                        let tableRows = try? table.select("tr") {
                         // Get all the rows in the document, and only take the rows that have 13 columns
-                        latestVersionDataCount = tableRows.count
                         for tableRow in tableRows {
                             if let tableRowColumns = try? tableRow.select("td"),
                                tableRowColumns.count == 13 {
@@ -51,8 +48,6 @@ extension MoreView {
                                     iidxSongsFromWiki.append(iidxSong)
                                 }
                             }
-                            latestVersionDataImported += 1
-                            await updateProgress()
                         }
                     }
                 }
@@ -77,7 +72,6 @@ extension MoreView {
                 if let table = try? documentBody.select("div.ie5")[1],
                    let tableRows = try? table.select("tr") {
                     // Get all the rows in the document, and only take the rows that have 13 columns
-                    existingVersionDataCount = tableRows.count
                     for tableRow in tableRows {
                         if let tableRowColumns = try? tableRow.select("td"),
                            tableRowColumns.count == 13 {
@@ -87,8 +81,6 @@ extension MoreView {
                                 iidxSongsFromWiki.append(iidxSong)
                             }
                         }
-                        existingVersionDataImported += 1
-                        await updateProgress()
                     }
                 }
             }

@@ -12,6 +12,7 @@ import SwiftUI
 struct ChartsView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
@@ -77,6 +78,12 @@ struct ChartsView: View {
             }
             .refreshable {
                 reloadAllSongs()
+            }
+            .onChange(of: progressAlertManager.isShowing) { _, newValue in
+                // TODO: Fix slowness when this view has loaded and a fetch is ongoing
+                if newValue {
+                    allSongs.removeAll()
+                }
             }
         }
     }
