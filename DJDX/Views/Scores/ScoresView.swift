@@ -11,6 +11,7 @@ import SwiftData
 struct ScoresView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
 
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var calendar: CalendarManager
@@ -23,6 +24,7 @@ struct ScoresView: View {
     @AppStorage(wrappedValue: false, "ScoresView.ArtistVisible") var isArtistVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: true, "ScorewView.DJLevelVisible") var isDJLevelVisible: Bool
     @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
     @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
@@ -52,29 +54,60 @@ struct ScoresView: View {
                                             .font(.caption)
                                             .fontWidth(.condensed)
                                     }
-                                    if isScoreVisible || isLastPlayDateVisible {
+                                    if isDJLevelVisible || isScoreVisible || isLastPlayDateVisible {
                                         HStack {
-                                            if isScoreVisible, let score = score(for: songRecord)?.score, score != 0 {
-                                                Text(String(score))
-                                                    .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
-                                                                                    startPoint: .top,
-                                                                                    endPoint: .bottom))
-                                                    .font(.caption)
-                                                    .fontWeight(.heavy)
-                                            }
-                                            if isScoreVisible && isLastPlayDateVisible,
-                                               score(for: songRecord)?.score != 0 {
-                                                Divider()
-                                                    .frame(maxHeight: 14.0)
-                                            }
-                                            if isLastPlayDateVisible {
-                                                Text(RelativeDateTimeFormatter().localizedString(
-                                                    for: songRecord.lastPlayDate,
-                                                    relativeTo: .now
-                                                ))
-                                                .font(.caption2)
-                                                .fontWidth(.condensed)
-                                                .foregroundStyle(.secondary)
+                                            if let score = score(for: songRecord), score.score != 0 {
+                                                Group {
+                                                    if isDJLevelVisible {
+                                                        Group {
+                                                            switch colorScheme {
+                                                            case .light:
+                                                                Text(score.djLevel)
+                                                                    .foregroundStyle(
+                                                                        LinearGradient(colors: [.cyan, .blue],
+                                                                                       startPoint: .top,
+                                                                                       endPoint: .bottom)
+                                                                    )
+                                                            case .dark:
+                                                                Text(score.djLevel)
+                                                                    .foregroundStyle(
+                                                                        LinearGradient(colors: [.white, .cyan],
+                                                                                       startPoint: .top,
+                                                                                       endPoint: .bottom)
+                                                                    )
+                                                            @unknown default:
+                                                                Text(score.djLevel)
+                                                            }
+                                                        }
+                                                        .fontWidth(.expanded)
+                                                        .fontWeight(.black)
+                                                    }
+                                                    if isScoreVisible {
+                                                        if isDJLevelVisible {
+                                                            Divider()
+                                                                .frame(maxHeight: 14.0)
+                                                        }
+                                                        Text(String(score.score))
+                                                            .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
+                                                                                            startPoint: .top,
+                                                                                            endPoint: .bottom))
+                                                            .fontWeight(.heavy)
+                                                    }
+                                                }
+                                                .font(.caption)
+                                                if isLastPlayDateVisible {
+                                                    if isScoreVisible {
+                                                        Divider()
+                                                            .frame(maxHeight: 14.0)
+                                                    }
+                                                    Text(RelativeDateTimeFormatter().localizedString(
+                                                        for: songRecord.lastPlayDate,
+                                                        relativeTo: .now
+                                                    ))
+                                                    .font(.caption2)
+                                                    .fontWidth(.condensed)
+                                                    .foregroundStyle(.secondary)
+                                                }
                                             }
                                         }
                                     }

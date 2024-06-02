@@ -27,6 +27,7 @@ struct MoreView: View {
     @AppStorage(wrappedValue: false, "ScoresView.ArtistVisible") var isArtistVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: true, "ScorewView.DJLevelVisible") var isDJLevelVisible: Bool
     @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
@@ -111,14 +112,19 @@ struct MoreView: View {
                                 title: "More.PlayDataDisplay.ShowGenre",
                                 includeSpacer: true)
                     }
-                    Toggle(isOn: $isLastPlayDateVisible) {
-                        ListRow(image: "ListIcon.ShowPlayDate",
-                                title: "More.PlayDataDisplay.ShowLastPlayDate",
+                    Toggle(isOn: $isDJLevelVisible) {
+                        ListRow(image: "ListIcon.ShowDJLevel",
+                                title: "More.PlayDataDisplay.ShowDJLevel",
                                 includeSpacer: true)
                     }
                     Toggle(isOn: $isScoreVisible) {
                         ListRow(image: "ListIcon.ShowScore",
                                 title: "More.PlayDataDisplay.ShowScore",
+                                includeSpacer: true)
+                    }
+                    Toggle(isOn: $isLastPlayDateVisible) {
+                        ListRow(image: "ListIcon.ShowPlayDate",
+                                title: "More.PlayDataDisplay.ShowLastPlayDate",
                                 includeSpacer: true)
                     }
                 } header: {

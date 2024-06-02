@@ -731,6 +731,23 @@
         }
       }
     },
+    "More.PlayDataDisplay.ShowDJLevel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show DJ Level"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVELを表示"
+          }
+        }
+      }
+    },
     "More.PlayDataDisplay.ShowGenre" : {
       "extractionState" : "manual",
       "localizations" : {
