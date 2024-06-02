@@ -92,6 +92,21 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
     }
 
     func importScoreData(using csvString: String) {
+        if let documentsDirectoryURL: URL = FileManager
+            .default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd-HH-mm-ss"
+            let dateString = dateFormatter.string(from: .now)
+            let csvFile = documentsDirectoryURL
+                .appendingPathComponent("\(dateString).csv",
+                                        conformingTo: .commaSeparatedText)
+            debugPrint(csvFile.absoluteString)
+            do {
+                try csvString.write(to: csvFile, atomically: true, encoding: .utf8)
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
         let parsedCSV = CSwiftV(with: csvString)
         if let keyedRows = parsedCSV.keyedRows {
             // Delete selected date's import group
