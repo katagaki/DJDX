@@ -19,11 +19,17 @@ struct ScoreRow: View {
     @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
     @State var songRecord: IIDXSongRecord
+
     @Binding var levelToShow: IIDXLevel
+    @Binding var difficultyToShow: IIDXDifficulty
 
     var body: some View {
         VStack(alignment: .trailing, spacing: 4.0) {
             HStack(alignment: .center, spacing: 8.0) {
+                let scores: [IIDXLevelScore?] = [
+                    songRecord.score(for: levelToShow),
+                    songRecord.score(for: difficultyToShow)
+                ]
                 VStack(alignment: .leading, spacing: 2.0) {
                     if isGenreVisible {
                         Text(songRecord.genre)
@@ -40,7 +46,9 @@ struct ScoreRow: View {
                     }
                     if isDJLevelVisible || isScoreVisible || isLastPlayDateVisible {
                         HStack {
-                            if let score = songRecord.score(for: levelToShow), score.score != 0 {
+                            if let score = scores.first(where: { $0 != nil }),
+                               let score = score,
+                               score.score != 0 {
                                 Group {
                                     if isDJLevelVisible {
                                         Group {
@@ -97,11 +105,12 @@ struct ScoreRow: View {
                     }
                 }
                 Spacer(minLength: 0.0)
-                if isLevelVisible, levelToShow != .all {
-                    IIDXLevelLabel(levelType: levelToShow, songRecord: songRecord)
+                if let score = scores.first(where: { $0 != nil }),
+                   let score = score {
+                    IIDXLevelLabel(levelType: score.level, songRecord: songRecord)
                 }
             }
-            if isLevelVisible, levelToShow == .all {
+            if isLevelVisible && levelToShow == .all && difficultyToShow == .all {
                 IIDXLevelShowcase(songRecord: songRecord)
             }
         }

@@ -11,8 +11,7 @@ import SwiftUI
 
 extension ScoresView {
     func reloadAllScores() {
-        allSongRecords = ScoresView
-            .latestAvailableIIDXSongRecords(in: ModelContext(sharedModelContainer), using: calendar)
+        allSongRecords = calendar.latestAvailableIIDXSongRecords(in: ModelContext(sharedModelContainer))
     }
 
     func filterSongRecords() {
@@ -42,53 +41,89 @@ extension ScoresView {
             }
         }
 
+        // Filter song records by level
+        if difficultyToShow != .all {
+            filteredSongRecords.removeAll { songRecord in
+                songRecord.score(for: difficultyToShow) == nil
+            }
+        }
+
         self.filteredSongRecords = filteredSongRecords
     }
 
+    // swiftlint:disable cyclomatic_complexity
     func sortSongRecords() {
         var sortedSongRecords: [IIDXSongRecord] = self.filteredSongRecords
-        if let keyPath = keyPath(for: levelToShow) {
-            switch sortMode {
-            case .title:
-                sortedSongRecords.sort { lhs, rhs in
-                    lhs.title < rhs.title
-                }
-            case .clearType:
-                let clearTypes = IIDXClearType.sortedStrings
-                sortedSongRecords.sort { lhs, rhs in
-                    clearTypes.firstIndex(of: lhs[keyPath: keyPath].clearType) ?? 0 <
-                        clearTypes.firstIndex(of: rhs[keyPath: keyPath].clearType) ?? 1
-                }
-            case .djLevel:
-                let djLevels = IIDXDJLevel.sorted
-                sortedSongRecords.sort { lhs, rhs in
-                    djLevels.firstIndex(of: lhs[keyPath: keyPath].djLevelEnum()) ?? 1 >
-                        djLevels.firstIndex(of: rhs[keyPath: keyPath].djLevelEnum()) ?? 0
-                }
-            case .scoreAscending:
-                sortedSongRecords.sort { lhs, rhs in
-                    lhs[keyPath: keyPath].score < rhs[keyPath: keyPath].score
-                }
-            case .scoreDescending:
-                sortedSongRecords.sort { lhs, rhs in
-                    lhs[keyPath: keyPath].score > rhs[keyPath: keyPath].score
-                }
-            case .difficultyAscending:
-                sortedSongRecords.sort { lhs, rhs in
-                    lhs[keyPath: keyPath].difficulty < rhs[keyPath: keyPath].difficulty
-                }
-            case .difficultyDescending:
-                sortedSongRecords.sort { lhs, rhs in
-                    lhs[keyPath: keyPath].difficulty > rhs[keyPath: keyPath].difficulty
-                }
-            case .lastPlayDate:
-                sortedSongRecords.sort { lhs, rhs in
-                    lhs.lastPlayDate > rhs.lastPlayDate
-                }
+        var songLevelScores: [IIDXSongRecord: IIDXLevelScore] = [:]
+
+        // Get the level score to be used for sorting
+        if sortMode != .title && sortMode != .lastPlayDate {
+            if levelToShow != .all, let keyPath = keyPath(for: levelToShow) {
+                songLevelScores = sortedSongRecords.reduce(into: [:], { partialResult, songRecord in
+                    partialResult[songRecord] = songRecord[keyPath: keyPath]
+                })
+            } else if difficultyToShow != .all {
+                songLevelScores = sortedSongRecords.reduce(into: [:], { partialResult, songRecord in
+                    partialResult[songRecord] = songRecord.score(for: difficultyToShow)
+                })
             }
         }
+
+        // Sort dictionary
+        switch sortMode {
+        case .title:
+            sortedSongRecords.sort { lhs, rhs in
+                lhs.title < rhs.title
+            }
+        case .clearType:
+            let clearTypes = IIDXClearType.sortedStrings
+            sortedSongRecords = songLevelScores
+                .sorted(by: { lhs, rhs in
+                    clearTypes.firstIndex(of: lhs.value.clearType) ?? 0 <
+                        clearTypes.firstIndex(of: rhs.value.clearType) ?? 1
+                })
+                .map({ $0.key })
+        case .djLevel:
+            let djLevels = IIDXDJLevel.sorted
+            sortedSongRecords = songLevelScores
+                .sorted(by: { lhs, rhs in
+                    djLevels.firstIndex(of: lhs.value.djLevelEnum()) ?? 1 >
+                    djLevels.firstIndex(of: rhs.value.djLevelEnum()) ?? 0
+                })
+                .map({ $0.key })
+        case .scoreAscending:
+            sortedSongRecords = songLevelScores
+                .sorted(by: { lhs, rhs in
+                    lhs.value.score < rhs.value.score
+                })
+                .map({ $0.key })
+        case .scoreDescending:
+            sortedSongRecords = songLevelScores
+                .sorted(by: { lhs, rhs in
+                    lhs.value.score > rhs.value.score
+                })
+                .map({ $0.key })
+        case .difficultyAscending:
+            sortedSongRecords = songLevelScores
+                .sorted(by: { lhs, rhs in
+                    lhs.value.difficulty < rhs.value.difficulty
+                })
+                .map({ $0.key })
+        case .difficultyDescending:
+            sortedSongRecords = songLevelScores
+                .sorted(by: { lhs, rhs in
+                    lhs.value.difficulty > rhs.value.difficulty
+                })
+                .map({ $0.key })
+        case .lastPlayDate:
+            sortedSongRecords.sort { lhs, rhs in
+                lhs.lastPlayDate > rhs.lastPlayDate
+            }
+        }
+
         self.sortedSongRecords = sortedSongRecords
     }
+    // swiftlint:enable cyclomatic_complexity
 
     func searchSongRecords() {
         let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
@@ -114,48 +149,5 @@ extension ScoresView {
         case .leggendaria: return \.leggendariaScore
         default: return nil
         }
-    }
-
-    static func latestAvailableIIDXSongRecords(in modelContext: ModelContext,
-                                               using calendar: CalendarManager) -> [IIDXSongRecord] {
-        let importGroupsForSelectedDate: [ImportGroup] = (try? modelContext.fetch(
-            FetchDescriptor<ImportGroup>(
-                predicate: importGroups(in: calendar),
-                sortBy: [SortDescriptor(\.importDate, order: .forward)]
-            )
-        )) ?? []
-        var importGroupID: String?
-        if let importGroupForSelectedDate = importGroupsForSelectedDate.first {
-            // Use selected date's import group
-            importGroupID = importGroupForSelectedDate.id
-        } else {
-            // Use latest available import group
-            let allImportGroups: [ImportGroup] = (try? modelContext.fetch(
-                FetchDescriptor<ImportGroup>(
-                    sortBy: [SortDescriptor(\.importDate, order: .forward)]
-                )
-            )) ?? []
-            var importGroupClosestToTheSelectedDate: ImportGroup?
-            for importGroup in allImportGroups {
-                if importGroup.importDate <= calendar.selectedDate {
-                    importGroupClosestToTheSelectedDate = importGroup
-                } else {
-                    break
-                }
-            }
-            if let importGroupClosestToTheSelectedDate {
-                importGroupID = importGroupClosestToTheSelectedDate.id
-            }
-        }
-        if let importGroupID {
-            let songRecordsInImportGroup: [IIDXSongRecord] = (try? modelContext.fetch(
-                FetchDescriptor<IIDXSongRecord>(
-                    predicate: iidxSongRecords(inImportGroupWithID: importGroupID),
-                    sortBy: [SortDescriptor(\.title, order: .forward)]
-                )
-            )) ?? []
-            return songRecordsInImportGroup
-        }
-        return []
     }
 }

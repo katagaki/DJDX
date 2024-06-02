@@ -261,9 +261,10 @@
 			isa = PBXGroup;
 			children = (
 				E49359D92C00AD060022E385 /* DataState.swift */,
+				E46A66002C0C926E00D9544B /* IIDXClearType.swift */,
+				E46A66022C0CA6D000D9544B /* IIDXDifficulty.swift */,
 				E46A65FE2C0C918300D9544B /* IIDXDJLevel.swift */,
 				E49359E22C0170E80022E385 /* IIDXLevel.swift */,
-				E46A66002C0C926E00D9544B /* IIDXClearType.swift */,
 				E46A65FA2C0B635200D9544B /* IIDXPlaySide.swift */,
 				E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */,
 				E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */,
@@ -271,7 +272,6 @@
 				E49359E02C016F2F0022E385 /* SortMode.swift */,
 				E4E3D0C92BF98DB7001942FE /* TabType.swift */,
 				E4E3D0CB2BF98DC7001942FE /* ViewPath.swift */,
-				E46A66022C0CA6D000D9544B /* IIDXDifficulty.swift */,
 			);
 			path = Enums;
 			sourceTree = "<group>";

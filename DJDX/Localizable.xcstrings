@@ -1088,6 +1088,22 @@
         }
       }
     },
+    "Shared.Filter.ResetAll" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Filters"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィルターを初期化"
+          }
+        }
+      }
+    },
     "Shared.Level" : {
       "extractionState" : "manual",
       "localizations" : {

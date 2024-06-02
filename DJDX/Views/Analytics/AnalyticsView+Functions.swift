@@ -11,7 +11,7 @@ import SwiftUI
 extension AnalyticsView {
     func reloadScores() {
         dataState = .loading
-        let songRecords = ScoresView.latestAvailableIIDXSongRecords(in: modelContext, using: calendar)
+        let songRecords = calendar.latestAvailableIIDXSongRecords(in: modelContext)
         var newClearLampPerDifficulty: [Int: [String: Int]] = [:]
         var newScoresPerDifficulty: [Int: [IIDXDJLevel: Int]] = [:]
         for difficulty in difficulties {

@@ -19,20 +19,26 @@ struct ScoresView: View {
     @State var filteredSongRecords: [IIDXSongRecord] = []
     @State var sortedSongRecords: [IIDXSongRecord] = []
     @State var displayedSongRecords: [IIDXSongRecord] = []
+    @State var dataState: DataState = .initializing
 
-    @State var searchTerm: String = ""
-    @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
     @AppStorage(wrappedValue: true, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
+    @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
+    @AppStorage(wrappedValue: .all, "ScoresView.DifficultyFilter") var difficultyToShow: IIDXDifficulty
+
     @AppStorage(wrappedValue: .title, "ScoresView.SortOrder") var sortMode: SortMode
 
-    @State var dataState: DataState = .initializing
+    @State var searchTerm: String = ""
 
     var body: some View {
         NavigationStack(path: $navigationManager[.scores]) {
             List {
                 ForEach(displayedSongRecords, id: \.title) { songRecord in
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
-                        ScoreRow(songRecord: songRecord, levelToShow: $levelToShow)
+                        ScoreRow(
+                            songRecord: songRecord,
+                            levelToShow: $levelToShow,
+                            difficultyToShow: $difficultyToShow
+                        )
                     }
                     .padding([.top, .bottom], 8.0)
                     .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
@@ -72,18 +78,31 @@ struct ScoresView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
-                        if levelToShow != .all {
-                            Menu("Shared.Sort") {
-                                Picker("Shared.Sort", selection: $sortMode) {
-                                    ForEach(SortMode.all, id: \.self) { sortMode in
+                        Menu("Shared.Sort") {
+                            Picker("Shared.Sort", selection: $sortMode) {
+                                if levelToShow != .all {
+                                    ForEach(SortMode.whenLevelFiltered, id: \.self) { sortMode in
                                         Text(LocalizedStringKey(sortMode.rawValue))
                                             .tag(sortMode)
                                     }
+                                } else if difficultyToShow != .all {
+                                    ForEach(SortMode.whenDifficultyFiltered, id: \.self) { sortMode in
+                                        Text(LocalizedStringKey(sortMode.rawValue))
+                                            .tag(sortMode)
+                                    }
+                                } else {
+                                    Text(LocalizedStringKey(SortMode.title.rawValue))
+                                        .tag(SortMode.title)
                                 }
-                                .pickerStyle(.inline)
                             }
+                            .pickerStyle(.inline)
                         }
-                        Menu("Shared.Filter", systemImage: "line.3.horizontal.decrease.circle") {
+                        Menu(
+                            "Shared.Filter",
+                            systemImage: (levelToShow == .all && difficultyToShow == .all ?
+                                          "line.3.horizontal.decrease.circle" :
+                                            "line.3.horizontal.decrease.circle.fill")
+                        ) {
                             Toggle("Scores.Filter.ShowWithScoreOnly", isOn: $isShowingOnlyPlayDataWithScores)
                             Section("Shared.Filter") {
                                 Picker("Shared.Level", selection: $levelToShow) {
@@ -91,6 +110,17 @@ struct ScoresView: View {
                                         Text(LocalizedStringKey(sortLevel.rawValue))
                                             .tag(sortLevel)
                                     }
+                                }
+                                Picker("Shared.Difficulty", selection: $difficultyToShow) {
+                                    ForEach(IIDXDifficulty.sorted, id: \.self) { sortDifficulty in
+                                        Text("LEVEL \(sortDifficulty.rawValue)")
+                                            .tag(sortDifficulty)
+                                    }
+                                }
+                                Button("Shared.Filter.ResetAll", systemImage: "arrow.clockwise") {
+                                    levelToShow = .all
+                                    difficultyToShow = .all
+                                    filterSongRecords()
                                 }
                             }
                             .pickerStyle(.menu)
@@ -134,8 +164,17 @@ struct ScoresView: View {
             .onChange(of: searchTerm) { _, _ in
                 searchSongRecords()
             }
-            .onChange(of: levelToShow) { _, _ in
-                filterSongRecords()
+            .onChange(of: levelToShow) { _, newValue in
+                if newValue != .all {
+                    difficultyToShow = .all
+                    filterSongRecords()
+                }
+            }
+            .onChange(of: difficultyToShow) { _, newValue in
+                if newValue != .all {
+                    levelToShow = .all
+                    filterSongRecords()
+                }
             }
             .onChange(of: isShowingOnlyPlayDataWithScores) { _, _ in
                 filterSongRecords()

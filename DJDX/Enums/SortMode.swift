@@ -17,7 +17,7 @@ enum SortMode: String, CaseIterable, Codable {
     case difficultyDescending = "Shared.Sort.DifficultyDescending"
     case lastPlayDate = "Shared.Sort.LastPlayDate"
 
-    static let all: [SortMode] = [
+    static let whenLevelFiltered: [SortMode] = [
         .title,
         .clearType,
         .djLevel,
@@ -25,6 +25,15 @@ enum SortMode: String, CaseIterable, Codable {
         .scoreDescending,
         .difficultyAscending,
         .difficultyDescending,
+        .lastPlayDate
+    ]
+
+    static let whenDifficultyFiltered: [SortMode] = [
+        .title,
+        .clearType,
+        .djLevel,
+        .scoreAscending,
+        .scoreDescending,
         .lastPlayDate
     ]
 

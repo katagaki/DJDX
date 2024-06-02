@@ -11,7 +11,7 @@ import SwiftData
 let songLevelCSVHeaders: [String] = ["BEGINNER", "NORMAL", "HYPER", "ANOTHER", "LEGGENDARIA"]
 
 @Model
-final class IIDXSongRecord: Equatable {
+final class IIDXSongRecord: Equatable, Hashable {
     var version: String = ""
     var title: String = ""
     var genre: String = ""
@@ -76,6 +76,11 @@ final class IIDXSongRecord: Equatable {
         case .leggendaria: return leggendariaScore
         default: return nil
         }
+    }
+
+    func score(for difficulty: IIDXDifficulty) -> IIDXLevelScore? {
+        let scores = [beginnerScore, normalScore, hyperScore, anotherScore, leggendariaScore]
+        return scores.first(where: { $0.difficulty == difficulty.rawValue })
     }
 
     static func == (lhs: IIDXSongRecord, rhs: IIDXSongRecord) -> Bool {

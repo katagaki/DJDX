@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 
 class CalendarManager: ObservableObject {
 
@@ -25,5 +26,47 @@ class CalendarManager: ObservableObject {
     func saveToDefaults() {
         defaults.setValue(selectedDate, forKey: selectedDateKey)
         defaults.synchronize()
+    }
+
+    func latestAvailableIIDXSongRecords(in modelContext: ModelContext) -> [IIDXSongRecord] {
+        let importGroupsForSelectedDate: [ImportGroup] = (try? modelContext.fetch(
+            FetchDescriptor<ImportGroup>(
+                predicate: importGroups(in: self),
+                sortBy: [SortDescriptor(\.importDate, order: .forward)]
+            )
+        )) ?? []
+        var importGroupID: String?
+        if let importGroupForSelectedDate = importGroupsForSelectedDate.first {
+            // Use selected date's import group
+            importGroupID = importGroupForSelectedDate.id
+        } else {
+            // Use latest available import group
+            let allImportGroups: [ImportGroup] = (try? modelContext.fetch(
+                FetchDescriptor<ImportGroup>(
+                    sortBy: [SortDescriptor(\.importDate, order: .forward)]
+                )
+            )) ?? []
+            var importGroupClosestToTheSelectedDate: ImportGroup?
+            for importGroup in allImportGroups {
+                if importGroup.importDate <= selectedDate {
+                    importGroupClosestToTheSelectedDate = importGroup
+                } else {
+                    break
+                }
+            }
+            if let importGroupClosestToTheSelectedDate {
+                importGroupID = importGroupClosestToTheSelectedDate.id
+            }
+        }
+        if let importGroupID {
+            let songRecordsInImportGroup: [IIDXSongRecord] = (try? modelContext.fetch(
+                FetchDescriptor<IIDXSongRecord>(
+                    predicate: iidxSongRecords(inImportGroupWithID: importGroupID),
+                    sortBy: [SortDescriptor(\.title, order: .forward)]
+                )
+            )) ?? []
+            return songRecordsInImportGroup
+        }
+        return []
     }
 }

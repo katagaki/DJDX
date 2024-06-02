@@ -17,7 +17,6 @@ enum IIDXLevel: String, CaseIterable, Codable {
     case unknown = ""
 
     static let sorted: [IIDXLevel] = [
-        .all,
         .beginner,
         .normal,
         .hyper,
