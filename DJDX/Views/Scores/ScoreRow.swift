@@ -87,7 +87,7 @@ struct ScoreRow: View {
                                 }
                                 .font(.caption)
                                 if isLastPlayDateVisible {
-                                    if isScoreVisible {
+                                    if isDJLevelVisible || isScoreVisible {
                                         Divider()
                                             .frame(maxHeight: 14.0)
                                     }
