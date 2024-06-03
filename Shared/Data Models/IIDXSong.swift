@@ -82,4 +82,15 @@ struct IIDXNoteCount: Codable, Equatable {
         self.leggendariaNoteCount = Int(leggendariaNoteCount)
         self.playType = playType
     }
+
+    func noteCount(for level: IIDXLevel) -> Int? {
+        switch level {
+        case .beginner: return beginnerNoteCount
+        case .normal: return normalNoteCount
+        case .hyper: return hyperNoteCount
+        case .another: return anotherNoteCount
+        case .leggendaria: return leggendariaNoteCount
+        default: return nil
+        }
+    }
 }

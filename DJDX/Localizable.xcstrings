@@ -273,19 +273,19 @@
         }
       }
     },
-    "Analytics.ClearLamp.ByLevel" : {
+    "Analytics.ClearLamp.ByDifficulty" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clear Lamp (By Level)"
+            "value" : "Clear Lamp (By Difficulty)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアランプ（レベル別）"
+            "value" : "クリアランプ（難易度別）"
           }
         }
       }
@@ -307,19 +307,19 @@
         }
       }
     },
-    "Analytics.ScoreRate.ByLevel" : {
+    "Analytics.DJLevel.ByDifficulty" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Score Rate (By Level)"
+            "value" : "DJ Level (By Difficulty)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "スコアレート（レベル別）"
+            "value" : "DJ LEVEL（難易度別）"
           }
         }
       }
@@ -1375,7 +1375,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJ LEVEL"
+            "value" : "DJ Level"
           }
         },
         "ja" : {
@@ -1433,6 +1433,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコア（降順）"
+          }
+        }
+      }
+    },
+    "Shared.Sort.ScoreRate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score Rate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコアレート"
           }
         }
       }

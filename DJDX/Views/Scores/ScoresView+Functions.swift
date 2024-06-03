@@ -136,6 +136,45 @@ extension ScoresView {
                     }
                 })
                 .map({ $0.key })
+        case .scoreRate:
+            let songs = (try? modelContext.fetch(FetchDescriptor<IIDXSong>(
+                sortBy: [SortDescriptor(\.title, order: .forward)]
+            ))) ?? []
+            let songsDictionary = songs.reduce(into: [:]) { partialResult, song in
+                partialResult[song.title] = song.spNoteCount
+            }
+            if songs.count > 0 {
+                sortedSongRecords = songLevelScores
+                    .sorted(by: { lhs, rhs in
+                        let lhsSong = songsDictionary[lhs.key.title]
+                        let rhsSong = songsDictionary[rhs.key.title]
+                        if lhsSong == nil && rhsSong != nil {
+                            return false
+                        } else if lhsSong != nil && rhsSong == nil {
+                            return true
+                        } else if let lhsSong, let rhsSong {
+                            if let lhsNoteCount = lhsSong.noteCount(for: lhs.value.level),
+                               let rhsNoteCount = rhsSong.noteCount(for: rhs.value.level) {
+                                let lhsScoreRate = Float(lhs.value.score) / Float(lhsNoteCount * 2)
+                                let rhsScoreRate = Float(rhs.value.score) / Float(rhsNoteCount * 2)
+                                if lhsScoreRate.isZero && rhsScoreRate > .zero {
+                                    return false
+                                } else if rhsScoreRate.isZero && rhsScoreRate > .zero {
+                                    return true
+                                } else if lhsScoreRate.isZero && rhsScoreRate.isZero {
+                                    return lhs.key.title < rhs.key.title
+                                } else {
+                                    return lhsScoreRate > rhsScoreRate
+                                }
+                            } else {
+                                return false
+                            }
+                        } else {
+                            return lhs.key.title < rhs.key.title
+                        }
+                    })
+                    .map({ $0.key })
+            }
         case .scoreAscending:
             sortedSongRecords = songLevelScores
                 .sorted(by: { lhs, rhs in

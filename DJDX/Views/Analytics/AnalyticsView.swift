@@ -53,7 +53,7 @@ struct AnalyticsView: View {
                                      difficulties: .constant(difficulties))
                 } header: {
                     HStack(spacing: 8.0) {
-                        ListSectionHeader(text: "Analytics.ClearLamp.ByLevel")
+                        ListSectionHeader(text: "Analytics.ClearLamp.ByDifficulty")
                             .font(.body)
                         Spacer()
                         NavigationLink(value: ViewPath.clearLampPerDifficultyGraph) {
@@ -62,7 +62,7 @@ struct AnalyticsView: View {
                     }
                 }
                 Section {
-                    ScoreRatePerDifficultyGraph(scoreRatePerDifficulty: $scoreRatePerDifficulty,
+                    DJLevelPerDifficultyGraph(djLevelPerDifficulty: $scoreRatePerDifficulty,
                                                 selectedDifficulty: $levelFilterForScoreRate)
                     .frame(height: 156.0)
                     .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
@@ -70,7 +70,7 @@ struct AnalyticsView: View {
                                      difficulties: .constant(difficulties))
                 } header: {
                     HStack(spacing: 8.0) {
-                        ListSectionHeader(text: "Analytics.ScoreRate.ByLevel")
+                        ListSectionHeader(text: "Analytics.DJLevel.ByDifficulty")
                             .font(.body)
                         Spacer()
                         NavigationLink(value: ViewPath.scoreRatePerDifficultyGraph) {
@@ -106,11 +106,11 @@ struct AnalyticsView: View {
                         ClearLampPerDifficultyGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
                                                     selectedDifficulty: $levelFilterForClearLamp,
                                                     legendPosition: .bottom)
-                        .navigationTitle("Analytics.ClearLamp.ByLevel")
+                        .navigationTitle("Analytics.ClearLamp.ByDifficulty")
                     case .scoreRatePerDifficultyGraph:
-                        ScoreRatePerDifficultyGraph(scoreRatePerDifficulty: $scoreRatePerDifficulty,
+                        DJLevelPerDifficultyGraph(djLevelPerDifficulty: $scoreRatePerDifficulty,
                                                     selectedDifficulty: $levelFilterForScoreRate)
-                        .navigationTitle("Analytics.ScoreRate.ByLevel")
+                        .navigationTitle("Analytics.DJLevel.ByDifficulty")
                     default: Color.clear
                     }
                 }

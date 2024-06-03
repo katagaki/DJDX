@@ -58,7 +58,7 @@
 		E4E3D0EA2BFA47B1001942FE /* ImportFailedReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */; };
 		E4E3D0EE2BFC034C001942FE /* ClearLampOverviewGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0ED2BFC034C001942FE /* ClearLampOverviewGraph.swift */; };
 		E4E3D0F02BFC03CB001942FE /* ClearLampPerDifficultyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0EF2BFC03CB001942FE /* ClearLampPerDifficultyGraph.swift */; };
-		E4E3D0F22BFC0489001942FE /* ScoreRatePerDifficultyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F12BFC0489001942FE /* ScoreRatePerDifficultyGraph.swift */; };
+		E4E3D0F22BFC0489001942FE /* DJLevelPerDifficultyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F12BFC0489001942FE /* DJLevelPerDifficultyGraph.swift */; };
 		E4E3D0F42BFC053D001942FE /* DifficultyPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */; };
 		E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */; };
 		E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA42BFF7C9D00A00796 /* CalendarManager.swift */; };
@@ -120,7 +120,7 @@
 		E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFailedReason.swift; sourceTree = "<group>"; };
 		E4E3D0ED2BFC034C001942FE /* ClearLampOverviewGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearLampOverviewGraph.swift; sourceTree = "<group>"; };
 		E4E3D0EF2BFC03CB001942FE /* ClearLampPerDifficultyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearLampPerDifficultyGraph.swift; sourceTree = "<group>"; };
-		E4E3D0F12BFC0489001942FE /* ScoreRatePerDifficultyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreRatePerDifficultyGraph.swift; sourceTree = "<group>"; };
+		E4E3D0F12BFC0489001942FE /* DJLevelPerDifficultyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DJLevelPerDifficultyGraph.swift; sourceTree = "<group>"; };
 		E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyPicker.swift; sourceTree = "<group>"; };
 		E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportGroup.swift; sourceTree = "<group>"; };
 		E4EB2CA42BFF7C9D00A00796 /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
@@ -292,7 +292,7 @@
 				E46A65FC2C0C8E9600D9544B /* AnalyticsView+Functions.swift */,
 				E4E3D0ED2BFC034C001942FE /* ClearLampOverviewGraph.swift */,
 				E4E3D0EF2BFC03CB001942FE /* ClearLampPerDifficultyGraph.swift */,
-				E4E3D0F12BFC0489001942FE /* ScoreRatePerDifficultyGraph.swift */,
+				E4E3D0F12BFC0489001942FE /* DJLevelPerDifficultyGraph.swift */,
 				E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */,
 			);
 			path = Analytics;
@@ -430,7 +430,7 @@
 				E4E3D0CE2BF990CC001942FE /* IIDXLevelLabel.swift in Sources */,
 				E46A65FD2C0C8E9600D9544B /* AnalyticsView+Functions.swift in Sources */,
 				E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */,
-				E4E3D0F22BFC0489001942FE /* ScoreRatePerDifficultyGraph.swift in Sources */,
+				E4E3D0F22BFC0489001942FE /* DJLevelPerDifficultyGraph.swift in Sources */,
 				E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */,
 				E4EB2CA82BFF7E3700A00796 /* CalendarView.swift in Sources */,
 				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,
