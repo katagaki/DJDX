@@ -12,7 +12,7 @@ struct ScoreRow: View {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
     @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
-    @AppStorage(wrappedValue: false, "ScoresView.ArtistVisible") var isArtistVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
     @AppStorage(wrappedValue: true, "ScorewView.DJLevelVisible") var isDJLevelVisible: Bool
     @AppStorage(wrappedValue: true, "ScorewView.ScoreRateVisible") var isScoreRateVisible: Bool
@@ -35,6 +35,7 @@ struct ScoreRow: View {
                 VStack(alignment: .leading, spacing: 2.0) {
                     if isGenreVisible {
                         Text(songRecord.genre)
+                            .foregroundStyle(.secondary)
                             .font(.caption2)
                             .fontWidth(.condensed)
                     }
@@ -47,7 +48,7 @@ struct ScoreRow: View {
                             .fontWidth(.condensed)
                     }
                     if isDJLevelVisible || isScoreRateVisible || isScoreVisible || isLastPlayDateVisible {
-                        HStack {
+                        HStack(alignment: .center, spacing: 6.0) {
                             if let score = scores.first(where: { $0 != nil }), let score = score,
                                score.score != 0 {
                                 Group {
@@ -83,7 +84,7 @@ struct ScoreRow: View {
                                             }
                                             Text(scoreRate, format: .percent.precision(.fractionLength(0)))
                                             .foregroundStyle(LinearGradient(
-                                                colors: [.primary.opacity(0.35), .primary.opacity(0.2)],
+                                                colors: [.primary.opacity(0.55), .primary.opacity(0.3)],
                                                 startPoint: .top,
                                                 endPoint: .bottom
                                             ))
@@ -100,6 +101,7 @@ struct ScoreRow: View {
                                             .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
                                                                             startPoint: .top,
                                                                             endPoint: .bottom))
+                                            .fontWidth(.expanded)
                                             .fontWeight(.heavy)
                                     }
                                 }
@@ -113,12 +115,14 @@ struct ScoreRow: View {
                                         for: songRecord.lastPlayDate,
                                         relativeTo: .now
                                     ))
-                                    .font(.caption2)
-                                    .fontWidth(.condensed)
                                     .foregroundStyle(.secondary)
+                                    .fontWidth(.condensed)
                                 }
                             }
                         }
+                        .frame(minHeight: 0.0)
+                        .offset(y: 1.0)
+                        .font(.caption)
                     }
                 }
                 Spacer(minLength: 0.0)

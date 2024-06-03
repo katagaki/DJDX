@@ -25,7 +25,7 @@ struct MoreView: View {
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
     @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
-    @AppStorage(wrappedValue: false, "ScoresView.ArtistVisible") var isArtistVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
     @AppStorage(wrappedValue: true, "ScorewView.DJLevelVisible") var isDJLevelVisible: Bool
     @AppStorage(wrappedValue: true, "ScorewView.ScoreRateVisible") var isScoreRateVisible: Bool

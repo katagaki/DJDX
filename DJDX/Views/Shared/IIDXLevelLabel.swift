@@ -76,7 +76,7 @@ struct IIDXLevelLabel: View {
         .kerning(-0.2)
         .lineLimit(1)
         .drawingGroup()
-        .offset(y: -1.0) // HACK: Fixes weird offset when using black font weight
+        .offset(y: -1.5) // HACK: Fixes weird offset when using black font weight
         .modifier(LevelLabelGlow(color: foregroundColor()))
     }
 
