@@ -15,8 +15,8 @@ struct ScoreHistoryViewer: View {
     @Environment(\.modelContext) var modelContext
 
     @Binding var allSongNoteCounts: [String: IIDXNoteCount]
-    @State var songTitle: String
-    @State var level: IIDXLevel
+    var songTitle: String
+    var level: IIDXLevel
 
     @State var totalNoteCount: Int = 0
     @State var scoreHistory: [Date: Int] = [:]
@@ -85,8 +85,7 @@ struct ScoreHistoryViewer: View {
                     }
                 })
                 scoreRateHistory = songRecordsForSong.reduce(into: [:] as [Date: Float], { partialResult, songRecord in
-                    if let importGroup = songRecord.importGroup,
-                       let score = songRecord.score(for: level) {
+                    if let importGroup = songRecord.importGroup, let score = songRecord.score(for: level) {
                         partialResult[importGroup.importDate] = Float(score.score) / Float(totalNoteCount * 2)
                     }
                 })
