@@ -15,10 +15,12 @@ struct ScoreRow: View {
     @AppStorage(wrappedValue: false, "ScoresView.ArtistVisible") var isArtistVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
     @AppStorage(wrappedValue: true, "ScorewView.DJLevelVisible") var isDJLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScorewView.ScoreRateVisible") var isScoreRateVisible: Bool
     @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
     @State var songRecord: IIDXSongRecord
+    @State var scoreRate: Float?
 
     @Binding var levelToShow: IIDXLevel
     @Binding var difficultyToShow: IIDXDifficulty
@@ -44,7 +46,7 @@ struct ScoreRow: View {
                             .font(.caption)
                             .fontWidth(.condensed)
                     }
-                    if isDJLevelVisible || isScoreVisible || isLastPlayDateVisible {
+                    if isDJLevelVisible || isScoreRateVisible || isScoreVisible || isLastPlayDateVisible {
                         HStack {
                             if let score = scores.first(where: { $0 != nil }), let score = score,
                                score.score != 0 {
@@ -73,8 +75,24 @@ struct ScoreRow: View {
                                         .fontWidth(.expanded)
                                         .fontWeight(.black)
                                     }
+                                    if isScoreRateVisible {
+                                        if let scoreRate {
+                                            if isDJLevelVisible {
+                                                Divider()
+                                                    .frame(maxHeight: 14.0)
+                                            }
+                                            Text(scoreRate, format: .percent.precision(.fractionLength(0)))
+                                            .foregroundStyle(LinearGradient(
+                                                colors: [.primary.opacity(0.35), .primary.opacity(0.2)],
+                                                startPoint: .top,
+                                                endPoint: .bottom
+                                            ))
+                                            .fontWidth(.expanded)
+                                            .fontWeight(.black)
+                                        }
+                                    }
                                     if isScoreVisible {
-                                        if isDJLevelVisible {
+                                        if isDJLevelVisible || isScoreRateVisible {
                                             Divider()
                                                 .frame(maxHeight: 14.0)
                                         }
@@ -87,7 +105,7 @@ struct ScoreRow: View {
                                 }
                                 .font(.caption)
                                 if isLastPlayDateVisible {
-                                    if isDJLevelVisible || isScoreVisible {
+                                    if isDJLevelVisible || isScoreRateVisible || isScoreVisible {
                                         Divider()
                                             .frame(maxHeight: 14.0)
                                     }

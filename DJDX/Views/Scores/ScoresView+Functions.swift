@@ -20,19 +20,28 @@ extension ScoresView {
         await MainActor.run {
             withAnimation(.snappy.speed(2.0)) {
                 displayedSongRecords.removeAll()
+                displayedSongRecordsWithClearRateMapping.removeAll()
                 sortedSongRecords.removeAll()
                 filteredSongRecords.removeAll()
                 allSongRecords.removeAll()
+                allSongNoteCounts.removeAll()
             }
         }
         let newSongRecords = calendar.latestAvailableIIDXSongRecords(
             in: ModelContext(sharedModelContainer)
         )
+        let newSongMappings = ((try? modelContext.fetch(FetchDescriptor<IIDXSong>(
+            sortBy: [SortDescriptor(\.title, order: .forward)]
+        ))) ?? [])
+            .reduce(into: [:]) { partialResult, song in
+                partialResult[song.title] = song.spNoteCount
+            }
         debugPrint("Setting new song records")
         isSystemChangingAllRecords = false
         await MainActor.run {
             withAnimation(.snappy.speed(2.0)) {
                 allSongRecords = newSongRecords
+                allSongNoteCounts = newSongMappings
             }
         }
     }
@@ -137,17 +146,11 @@ extension ScoresView {
                 })
                 .map({ $0.key })
         case .scoreRate:
-            let songs = (try? modelContext.fetch(FetchDescriptor<IIDXSong>(
-                sortBy: [SortDescriptor(\.title, order: .forward)]
-            ))) ?? []
-            let songsDictionary = songs.reduce(into: [:]) { partialResult, song in
-                partialResult[song.title] = song.spNoteCount
-            }
-            if songs.count > 0 {
+            if allSongNoteCounts.count > 0 {
                 sortedSongRecords = songLevelScores
                     .sorted(by: { lhs, rhs in
-                        let lhsSong = songsDictionary[lhs.key.title]
-                        let rhsSong = songsDictionary[rhs.key.title]
+                        let lhsSong = allSongNoteCounts[lhs.key.title]
+                        let rhsSong = allSongNoteCounts[rhs.key.title]
                         if lhsSong == nil && rhsSong != nil {
                             return false
                         } else if lhsSong != nil && rhsSong == nil {
@@ -235,6 +238,26 @@ extension ScoresView {
                 })
             } else {
                 self.displayedSongRecords = self.sortedSongRecords
+                self.displayedSongRecordsWithClearRateMapping = self.sortedSongRecords
+                    .reduce(into: [:], { partialResult, songRecord in
+                        let song = allSongNoteCounts[songRecord.title]
+                        if let song {
+                            var scores: [IIDXLevelScore] = [
+                                songRecord.beginnerScore,
+                                songRecord.normalScore,
+                                songRecord.hyperScore,
+                                songRecord.anotherScore,
+                                songRecord.leggendariaScore
+                            ]
+                            scores.removeAll(where: { $0.score == 0 })
+                            let scoreRates = scores.reduce(into: [:] as [IIDXLevel: Float]) { partialResult, score in
+                                if let noteCount = song.noteCount(for: score.level) {
+                                    partialResult[score.level] = Float(score.score) / Float(noteCount * 2)
+                                }
+                            }
+                            partialResult[songRecord] = scoreRates
+                        }
+                })
             }
             dataState = .presenting
         }

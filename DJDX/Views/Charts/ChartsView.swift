@@ -17,12 +17,12 @@ struct ChartsView: View {
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
-    @State var allSongs: [IIDXSong] = []
+    @State var allSongNoteCounts: [IIDXSong] = []
 
     var body: some View {
         NavigationStack(path: $navigationManager[.charts]) {
             List {
-                ForEach(allSongs) { song in
+                ForEach(allSongNoteCounts) { song in
                     NavigationLink(song.title) {
                         List {
                             Section {
@@ -82,7 +82,7 @@ struct ChartsView: View {
             .onChange(of: progressAlertManager.isShowing) { _, newValue in
                 // TODO: Fix slowness when this view has loaded and a fetch is ongoing
                 if newValue {
-                    allSongs.removeAll()
+                    allSongNoteCounts.removeAll()
                 }
             }
         }
@@ -90,8 +90,8 @@ struct ChartsView: View {
 
     func reloadAllSongs() {
         withAnimation(.snappy.speed(2.0)) {
-            allSongs.removeAll()
-            allSongs.append(contentsOf: (try? modelContext.fetch(
+            allSongNoteCounts.removeAll()
+            allSongNoteCounts.append(contentsOf: (try? modelContext.fetch(
                 FetchDescriptor<IIDXSong>(
                     sortBy: [SortDescriptor(\.title, order: .forward)]
                 )

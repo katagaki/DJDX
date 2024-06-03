@@ -83,6 +83,16 @@ final class IIDXSongRecord: Equatable, Hashable {
         return scores.first(where: { $0.difficulty == difficulty.rawValue })
     }
 
+    func level(for level: IIDXLevel, or difficulty: IIDXDifficulty) -> IIDXLevel {
+        if level != .all {
+            return level
+        } else if difficulty != .all {
+            return score(for: difficulty)?.level ?? .unknown
+        } else {
+            return .unknown
+        }
+    }
+
     static func == (lhs: IIDXSongRecord, rhs: IIDXSongRecord) -> Bool {
         return lhs.title == rhs.title &&
         lhs.artist == rhs.artist &&

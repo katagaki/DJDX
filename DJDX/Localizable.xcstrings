@@ -7,7 +7,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete Score Data"
+            "value" : "Score Data"
           }
         },
         "ja" : {
@@ -686,13 +686,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Play Data Display"
+            "value" : "Show in Scores List"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "プレーデータの表示"
+            "value" : "プレーデータに表示する項目"
           }
         }
       }
@@ -720,13 +720,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Artist Name"
+            "value" : "Artist Name"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アーティストを表示"
+            "value" : "アーティスト"
           }
         }
       }
@@ -737,13 +737,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show DJ Level"
+            "value" : "DJ Level"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJ LEVELを表示"
+            "value" : "DJ LEVEL"
           }
         }
       }
@@ -754,13 +754,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Genre"
+            "value" : "Genre"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ジャンルを表示"
+            "value" : "ジャンル"
           }
         }
       }
@@ -771,13 +771,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Last Play Date"
+            "value" : "Last Play Date"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最終プレー日時を表示"
+            "value" : "最終プレー日時"
           }
         }
       }
@@ -788,13 +788,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Level"
+            "value" : "Level & Difficulty"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "レベルを表示"
+            "value" : "レベルおよび難易度"
           }
         }
       }
@@ -839,13 +839,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Score"
+            "value" : "Score"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "スコアを表示"
+            "value" : "スコア"
+          }
+        }
+      }
+    },
+    "More.PlayDataDisplay.ShowScoreRate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score Rate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコアレート"
           }
         }
       }

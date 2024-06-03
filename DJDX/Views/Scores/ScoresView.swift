@@ -16,9 +16,11 @@ struct ScoresView: View {
     @EnvironmentObject var calendar: CalendarManager
 
     @State var allSongRecords: [IIDXSongRecord] = []
+    @State var allSongNoteCounts: [String: IIDXNoteCount] = [:]
     @State var filteredSongRecords: [IIDXSongRecord] = []
     @State var sortedSongRecords: [IIDXSongRecord] = []
     @State var displayedSongRecords: [IIDXSongRecord] = []
+    @State var displayedSongRecordsWithClearRateMapping: [IIDXSongRecord: [IIDXLevel: Float]] = [:]
     @State var dataState: DataState = .initializing
 
     @AppStorage(wrappedValue: true, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
@@ -38,6 +40,7 @@ struct ScoresView: View {
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
                         ScoreRow(
                             songRecord: songRecord,
+                            scoreRate: displayedSongRecordsWithClearRateMapping[songRecord]?[songRecord.level(for: levelToShow, or: difficultyToShow)],
                             levelToShow: $levelToShow,
                             difficultyToShow: $difficultyToShow
                         )
