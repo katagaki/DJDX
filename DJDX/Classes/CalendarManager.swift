@@ -68,7 +68,9 @@ class CalendarManager: ObservableObject {
         if let importGroupID {
             let songRecordsInImportGroup: [IIDXSongRecord] = (try? modelContext.fetch(
                 FetchDescriptor<IIDXSongRecord>(
-                    predicate: iidxSongRecords(inImportGroupWithID: importGroupID),
+                    predicate: #Predicate<IIDXSongRecord> {
+                        $0.importGroup?.id == importGroupID
+                    },
                     sortBy: [SortDescriptor(\.title, order: .forward)]
                 )
             )) ?? []

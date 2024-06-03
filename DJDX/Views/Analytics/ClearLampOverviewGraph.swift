@@ -20,7 +20,7 @@ struct ClearLampOverviewGraph: View {
                 BarMark(
                     x: .value("LEVEL", difficulty),
                     y: .value("CLEAR COUNT", count),
-                    width: .fixed(10.0)
+                    width: .inset(8.0)
                 )
                 .foregroundStyle(
                     by: .value("CLEAR TYPE", clearType)

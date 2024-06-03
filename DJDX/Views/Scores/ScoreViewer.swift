@@ -89,8 +89,13 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
             }
         }
         .task {
+            let songRecordTitle = songRecord.title
             self.songData = (try? modelContext.fetch(
-                FetchDescriptor<IIDXSong>(predicate: iidxSong(for: songRecord))
+                FetchDescriptor<IIDXSong>(
+                    predicate: #Predicate<IIDXSong> {
+                        $0.title == songRecordTitle
+                    }
+                )
             ))?.first ?? nil
         }
     }

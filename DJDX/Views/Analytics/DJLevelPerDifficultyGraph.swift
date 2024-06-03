@@ -18,7 +18,7 @@ struct DJLevelPerDifficultyGraph: View {
             BarMark(
                 x: .value("DJ LEVEL", djLevel.rawValue),
                 y: .value("CLEAR COUNT", count),
-                width: .fixed(10.0)
+                width: .inset(8.0)
             )
         }
               .chartLegend(.visible)

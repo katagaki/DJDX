@@ -1020,6 +1020,22 @@
         }
       }
     },
+    "Scores.Viewer.ShowHistory" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score History"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴を見る"
+          }
+        }
+      }
+    },
     "Shared.All" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1286,6 +1302,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Safariで開く"
+          }
+        }
+      }
+    },
+    "Shared.Score" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコア"
+          }
+        }
+      }
+    },
+    "Shared.ScoreRate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score Rate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコアレート"
           }
         }
       }
@@ -1671,6 +1719,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレーデータ"
+          }
+        }
+      }
+    },
+    "ViewTitle.Scores.History.%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score History for \"%@\""
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」のスコア履歴"
           }
         }
       }

@@ -40,7 +40,13 @@ struct ScoresView: View {
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
                         ScoreRow(
                             songRecord: songRecord,
-                            scoreRate: displayedSongRecordsWithClearRateMapping[songRecord]?[songRecord.level(for: levelToShow, or: difficultyToShow)],
+                            scoreRate: displayedSongRecordsWithClearRateMapping[
+                                songRecord
+                            ]?[
+                                songRecord.level(
+                                    for: levelToShow, or: difficultyToShow
+                                )
+                            ],
                             levelToShow: $levelToShow,
                             difficultyToShow: $difficultyToShow
                         )
@@ -149,6 +155,10 @@ struct ScoresView: View {
                 switch viewPath {
                 case .scoreViewer(let songRecord):
                     ScoreViewer(songRecord: songRecord)
+                case .scoreHistory(let songTitle, let level):
+                    ScoreHistoryViewer(allSongNoteCounts: $allSongNoteCounts,
+                                       songTitle: songTitle,
+                                       level: level)
                 case .textageViewer(let songTitle, let level, let playSide):
                     TextageViewer(songTitle: songTitle, level: level, playSide: playSide)
                 default: Color.clear

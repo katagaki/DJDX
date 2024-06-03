@@ -44,6 +44,7 @@
 		E4BC32802C036C82006A0F7A /* ConditionalShadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BC327F2C036C82006A0F7A /* ConditionalShadow.swift */; };
 		E4BC32822C036CBD006A0F7A /* LevelLabelGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BC32812C036CBD006A0F7A /* LevelLabelGlow.swift */; };
 		E4BC32842C036DF1006A0F7A /* ScoresView+Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BC32832C036DF1006A0F7A /* ScoresView+Functions.swift */; };
+		E4C5053C2C0E71D700A0C303 /* ScoreHistoryViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C5053B2C0E71D700A0C303 /* ScoreHistoryViewer.swift */; };
 		E4E3D0C32BF98D57001942FE /* ScoreViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */; };
 		E4E3D0C52BF98D79001942FE /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0C42BF98D79001942FE /* NavigationManager.swift */; };
 		E4E3D0CA2BF98DB7001942FE /* TabType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0C92BF98DB7001942FE /* TabType.swift */; };
@@ -105,6 +106,7 @@
 		E4BC32812C036CBD006A0F7A /* LevelLabelGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabelGlow.swift; sourceTree = "<group>"; };
 		E4BC32832C036DF1006A0F7A /* ScoresView+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScoresView+Functions.swift"; sourceTree = "<group>"; };
 		E4C11FF32C01F07900CFB1E4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		E4C5053B2C0E71D700A0C303 /* ScoreHistoryViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreHistoryViewer.swift; sourceTree = "<group>"; };
 		E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreViewer.swift; sourceTree = "<group>"; };
 		E4E3D0C42BF98D79001942FE /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
 		E4E3D0C92BF98DB7001942FE /* TabType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabType.swift; sourceTree = "<group>"; };
@@ -243,6 +245,7 @@
 				E46A66042C0CA71E00D9544B /* ScoreRow.swift */,
 				E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */,
 				E4E3D0D32BF99A86001942FE /* ScoreSection.swift */,
+				E4C5053B2C0E71D700A0C303 /* ScoreHistoryViewer.swift */,
 				E46A65F82C0B5E7300D9544B /* TextageViewer.swift */,
 			);
 			path = Scores;
@@ -436,6 +439,7 @@
 				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,
 				E46A65E02C0A276800D9544B /* DetailRow.swift in Sources */,
 				E46A65F12C0B085D00D9544B /* MoreView+Functions.swift in Sources */,
+				E4C5053C2C0E71D700A0C303 /* ScoreHistoryViewer.swift in Sources */,
 				E4B123D72BF90A4300D4A3D1 /* MoreView.swift in Sources */,
 				E4BC32822C036CBD006A0F7A /* LevelLabelGlow.swift in Sources */,
 				E49359E12C016F2F0022E385 /* SortMode.swift in Sources */,
