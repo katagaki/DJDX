@@ -102,40 +102,78 @@ extension ScoresView {
             let clearTypes = IIDXClearType.sortedStrings
             sortedSongRecords = songLevelScores
                 .sorted(by: { lhs, rhs in
-                    clearTypes.firstIndex(of: lhs.value.clearType) ?? 0 <
-                        clearTypes.firstIndex(of: rhs.value.clearType) ?? 1
+                    let lhsIndex = clearTypes.firstIndex(of: lhs.value.clearType)
+                    let rhsIndex = clearTypes.firstIndex(of: rhs.value.clearType)
+                    if lhsIndex == rhsIndex {
+                        return lhs.key.title < rhs.key.title
+                    } else {
+                        if let lhsIndex, let rhsIndex {
+                            return lhsIndex < rhsIndex
+                        } else {
+                            return true
+                        }
+                    }
                 })
                 .map({ $0.key })
         case .djLevel:
             let djLevels = IIDXDJLevel.sorted
             sortedSongRecords = songLevelScores
                 .sorted(by: { lhs, rhs in
-                    djLevels.firstIndex(of: lhs.value.djLevelEnum()) ?? 1 >
-                    djLevels.firstIndex(of: rhs.value.djLevelEnum()) ?? 0
+                    let lhsIndex = djLevels.firstIndex(of: lhs.value.djLevelEnum())
+                    let rhsIndex = djLevels.firstIndex(of: rhs.value.djLevelEnum())
+                    if lhsIndex == rhsIndex {
+                        return lhs.key.title < rhs.key.title
+                    } else {
+                        if let lhsIndex, let rhsIndex {
+                            return lhsIndex > rhsIndex
+                        } else {
+                            if lhsIndex == nil && rhsIndex != nil {
+                                return false
+                            } else {
+                                return true
+                            }
+                        }
+                    }
                 })
                 .map({ $0.key })
         case .scoreAscending:
             sortedSongRecords = songLevelScores
                 .sorted(by: { lhs, rhs in
-                    lhs.value.score < rhs.value.score
+                    if lhs.value.score == rhs.value.score {
+                        return lhs.key.title < rhs.key.title
+                    } else {
+                        return lhs.value.score < rhs.value.score
+                    }
                 })
                 .map({ $0.key })
         case .scoreDescending:
             sortedSongRecords = songLevelScores
                 .sorted(by: { lhs, rhs in
-                    lhs.value.score > rhs.value.score
+                    if lhs.value.score == rhs.value.score {
+                        return lhs.key.title < rhs.key.title
+                    } else {
+                        return lhs.value.score > rhs.value.score
+                    }
                 })
                 .map({ $0.key })
         case .difficultyAscending:
             sortedSongRecords = songLevelScores
                 .sorted(by: { lhs, rhs in
-                    lhs.value.difficulty < rhs.value.difficulty
+                    if lhs.value.difficulty == rhs.value.difficulty {
+                        return lhs.key.title < rhs.key.title
+                    } else {
+                        return lhs.value.difficulty < rhs.value.difficulty
+                    }
                 })
                 .map({ $0.key })
         case .difficultyDescending:
             sortedSongRecords = songLevelScores
                 .sorted(by: { lhs, rhs in
-                    lhs.value.difficulty > rhs.value.difficulty
+                    if lhs.value.difficulty == rhs.value.difficulty {
+                        return lhs.key.title < rhs.key.title
+                    } else {
+                        return lhs.value.difficulty > rhs.value.difficulty
+                    }
                 })
                 .map({ $0.key })
         case .lastPlayDate:
