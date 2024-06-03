@@ -68,8 +68,9 @@ struct ScoreHistoryViewer: View {
                     FetchDescriptor<IIDXSongRecord>(
                         predicate: #Predicate<IIDXSongRecord> {
                             $0.title == songTitle
-                        },
-                        sortBy: [SortDescriptor(\.importGroup?.importDate, order: .forward)]
+                        }
+                        // TODO: Possible data consistency issue causing this to crash app:
+                        // sortBy: [SortDescriptor(\.importGroup?.importDate, order: .forward)]
                     )
                 )) ?? []
 
