@@ -18,42 +18,45 @@ struct ScoreHistoryViewer: View {
     var songTitle: String
     var level: IIDXLevel
 
+    @State var songRecordsForSong: [IIDXSongRecord] = []
     @State var totalNoteCount: Int?
     @State var scoreHistory: [Date: Int] = [:]
     @State var scoreRateHistory: [Date: Float] = [:]
-    @State var earliestDate: Date = .distantPast
-    @State var latestDate: Date = .distantFuture
+    @State var earliestDate: Date?
+    @State var latestDate: Date?
     @State var dataState: DataState = .initializing
 
     var body: some View {
         List {
-            Section {
-                Chart(scoreHistory.sorted(by: { $0.key < $1.key }), id: \.key) { date, score in
-                    AreaMark(x: .value("Shared.Date", date), y: .value("Shared.Score", score))
+            if let earliestDate, let latestDate, let totalNoteCount {
+                Section {
+                    Chart(scoreHistory.sorted(by: { $0.key < $1.key }), id: \.key) { date, score in
+                        AreaMark(x: .value("Shared.Date", date), y: .value("Shared.Score", score))
+                    }
+                    .chartXScale(domain: earliestDate...latestDate)
+                    .chartYScale(domain: 0...(totalNoteCount * 2))
+                    .frame(height: 200.0)
+                    .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                } header: {
+                    ListSectionHeader(text: "Shared.Score")
+                        .font(.body)
                 }
-                .chartXScale(domain: earliestDate...latestDate)
-                .chartYScale(domain: 0...((totalNoteCount ?? 1) * 2))
-                .frame(height: 200.0)
-                .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
-            } header: {
-                ListSectionHeader(text: "Shared.Score")
-                    .font(.body)
-            }
-            Section {
-                Chart(scoreRateHistory.sorted(by: { $0.key < $1.key }), id: \.key) { date, scoreRate in
-                    AreaMark(x: .value("Shared.Date", date), y: .value("Shared.ScoreRate", scoreRate * 100.0))
+                Section {
+                    Chart(scoreRateHistory.sorted(by: { $0.key < $1.key }), id: \.key) { date, scoreRate in
+                        AreaMark(x: .value("Shared.Date", date), y: .value("Shared.ScoreRate", scoreRate * 100.0))
+                    }
+                    .chartXScale(domain: earliestDate...latestDate)
+                    .chartYScale(domain: 0.0...100.0)
+                    .frame(height: 200.0)
+                    .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                } header: {
+                    ListSectionHeader(text: "Shared.ScoreRate")
+                        .font(.body)
                 }
-                .chartXScale(domain: earliestDate...latestDate)
-                .chartYScale(domain: 0.0...100.0)
-                .frame(height: 200.0)
-                .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
-            } header: {
-                ListSectionHeader(text: "Shared.ScoreRate")
-                    .font(.body)
             }
         }
         .navigationTitle("ViewTitle.Scores.History.\(songTitle)")
-        .task {
+        .refreshable {
             if dataState == .initializing {
                 dataState = .loading
 
@@ -64,19 +67,27 @@ struct ScoreHistoryViewer: View {
                 }
 
                 // Get list of scores
-                let songRecordsForSong: [IIDXSongRecord] = (try? modelContext.fetch(
+                songRecordsForSong = (try? modelContext.fetch(
                     FetchDescriptor<IIDXSongRecord>(
                         predicate: #Predicate<IIDXSongRecord> {
-                            $0.title == songTitle && $0.importGroup != nil
-                        }
-                        // TODO: Possible data consistency issue causing this to crash app:
-                        // sortBy: [SortDescriptor(\.importGroup?.importDate, order: .forward)]
+                            $0.title == songTitle
+                        },
+                        sortBy: [SortDescriptor(\.importGroup?.importDate, order: .forward)]
                     )
                 )) ?? []
 
-                // Get date scales
-                earliestDate = songRecordsForSong.first?.importGroup?.importDate ?? .distantPast
-                latestDate = songRecordsForSong.last?.importGroup?.importDate ?? .distantFuture
+                // Remove orphaned scores
+                songRecordsForSong = songRecordsForSong.compactMap { songRecord in
+                    if songRecord.importGroup != nil {
+                        return songRecord
+                    } else {
+                        return nil
+                    }
+                }
+
+                // Get date range for scales
+                earliestDate = songRecordsForSong.first?.importGroup?.importDate
+                latestDate = songRecordsForSong.last?.importGroup?.importDate
 
                 // Dictionarize list of scores
                 scoreHistory = songRecordsForSong.reduce(into: [:] as [Date: Int], { partialResult, songRecord in
@@ -96,6 +107,70 @@ struct ScoreHistoryViewer: View {
                     dataState = .presenting
                 }
             }
+        }
+        .toolbar {
+            Menu {
+                Button {
+                    if let song = allSongNoteCounts[songTitle],
+                       let noteCount = song.noteCount(for: level) {
+                        totalNoteCount = noteCount
+                    }
+                } label: {
+                    Text(verbatim: "1. Get Note Count")
+                }
+                Button {
+                    songRecordsForSong = (try? modelContext.fetch(
+                        FetchDescriptor<IIDXSongRecord>(
+                            predicate: #Predicate<IIDXSongRecord> {
+                                $0.title == songTitle
+                            },
+                            sortBy: [SortDescriptor(\.importGroup?.importDate, order: .forward)]
+                        )
+                    )) ?? []
+                } label: {
+                    Text(verbatim: "2. Get Song Records")
+                }
+                Button {
+                    songRecordsForSong = songRecordsForSong.compactMap { songRecord in
+                        if songRecord.importGroup != nil {
+                            return songRecord
+                        } else {
+                            return nil
+                        }
+                    }
+                } label: {
+                    Text(verbatim: "3. Remove Orphaned Scores")
+                }
+                Button {
+                    earliestDate = songRecordsForSong.first?.importGroup?.importDate
+                    latestDate = songRecordsForSong.last?.importGroup?.importDate
+                } label: {
+                    Text(verbatim: "4. Get Date Range For Scales")
+                }
+                Button {
+                    scoreHistory = songRecordsForSong.reduce(into: [:] as [Date: Int], { partialResult, songRecord in
+                        if let importGroup = songRecord.importGroup, let score = songRecord.score(for: level) {
+                            partialResult[importGroup.importDate] = score.score
+                        }
+                    })
+                } label: {
+                    Text(verbatim: "5. Get Score History")
+                }
+                Button {
+                    scoreRateHistory = songRecordsForSong.reduce(into: [:] as [Date: Float], { partialResult, songRecord in
+                        if let importGroup = songRecord.importGroup,
+                           let score = songRecord.score(for: level),
+                           let totalNoteCount {
+                            partialResult[importGroup.importDate] = Float(score.score) / Float(totalNoteCount * 2)
+                        }
+                    })
+                } label: {
+                    Text(verbatim: "6. Get Score Rate History")
+                }
+            } label: {
+                Image(systemName: "ladybug")
+            }
+
         }
     }
 }
