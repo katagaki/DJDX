@@ -18,7 +18,7 @@ struct ScoreHistoryViewer: View {
     var songTitle: String
     var level: IIDXLevel
 
-    @State var totalNoteCount: Int = 0
+    @State var totalNoteCount: Int?
     @State var scoreHistory: [Date: Int] = [:]
     @State var scoreRateHistory: [Date: Float] = [:]
     @State var earliestDate: Date = .distantPast
@@ -32,7 +32,7 @@ struct ScoreHistoryViewer: View {
                     AreaMark(x: .value("Shared.Date", date), y: .value("Shared.Score", score))
                 }
                 .chartXScale(domain: earliestDate...latestDate)
-                .chartYScale(domain: 0...(totalNoteCount * 2))
+                .chartYScale(domain: 0...((totalNoteCount ?? 1) * 2))
                 .frame(height: 200.0)
                 .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
             } header: {
@@ -85,7 +85,9 @@ struct ScoreHistoryViewer: View {
                     }
                 })
                 scoreRateHistory = songRecordsForSong.reduce(into: [:] as [Date: Float], { partialResult, songRecord in
-                    if let importGroup = songRecord.importGroup, let score = songRecord.score(for: level) {
+                    if let importGroup = songRecord.importGroup,
+                       let score = songRecord.score(for: level),
+                       let totalNoteCount {
                         partialResult[importGroup.importDate] = Float(score.score) / Float(totalNoteCount * 2)
                     }
                 })
