@@ -73,9 +73,8 @@ struct ScoreHistoryViewer: View {
                 songRecordsForSong = (try? modelContext.fetch(
                     FetchDescriptor<IIDXSongRecord>(
                         predicate: #Predicate<IIDXSongRecord> {
-                            $0.title == songTitle
-                        },
-                        sortBy: [SortDescriptor(\.importGroup?.importDate, order: .forward)]
+                            $0.title == songTitle && $0.importGroup != nil
+                        }
                     )
                 )) ?? []
 
@@ -168,6 +167,26 @@ struct ScoreHistoryViewer: View {
                     latestDate = songRecordsForSong.last?.importGroup?.importDate
                 } label: {
                     Text(verbatim: "4. Get Date Range For Scales")
+                }
+                Button {
+                    songRecordsForSong.sort { lhs, rhs in
+                        if let lhsImportGroup = lhs.importGroup, let rhsImportGroup = rhs.importGroup {
+                            return lhsImportGroup.importDate < rhsImportGroup.importDate
+                        } else {
+                            return false
+                        }
+                    }
+                    if let firstSongRecord = songRecordsForSong.first, let lastSongRecord = songRecordsForSong.last,
+                       let firstSongRecordImportGroup = firstSongRecord.importGroup,
+                       let lastSongRecordImportGroup = lastSongRecord.importGroup {
+                        earliestDate = firstSongRecordImportGroup.importDate
+                        latestDate = lastSongRecordImportGroup.importDate
+                    } else {
+                        earliestDate = .now
+                        latestDate = .now
+                    }
+                } label: {
+                    Text(verbatim: "4. Get Date Range For Scales (Sort First)")
                 }
                 Button {
                     scoreHistory = songRecordsForSong.reduce(into: [:] as [Date: Int], { partialResult, songRecord in
