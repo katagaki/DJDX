@@ -26,6 +26,9 @@ struct ScoreHistoryViewer: View {
     @State var latestDate: Date?
     @State var dataState: DataState = .initializing
 
+    @State var debugIsAlertShowing: Bool = false
+    @State var debugSongRecordsWithoutImportGroup: Int = 0
+
     var body: some View {
         List {
             if let earliestDate, let latestDate, let totalNoteCount {
@@ -131,6 +134,25 @@ struct ScoreHistoryViewer: View {
                     Text(verbatim: "2. Get Song Records")
                 }
                 Button {
+                    songRecordsForSong = (try? modelContext.fetch(
+                        FetchDescriptor<IIDXSongRecord>(
+                            predicate: #Predicate<IIDXSongRecord> {
+                                $0.title == songTitle && $0.importGroup != nil
+                            }
+                        )
+                    )) ?? []
+                } label: {
+                    Text(verbatim: "2. Get Song Records (Predicate Check For Nil)")
+                }
+                Button {
+                    songRecordsForSong = (try? modelContext.fetch(
+                        FetchDescriptor<IIDXSongRecord>(
+                        )
+                    )) ?? []
+                } label: {
+                    Text(verbatim: "2. Get Song Records (Non Predicate)")
+                }
+                Button {
                     songRecordsForSong = songRecordsForSong.compactMap { songRecord in
                         if songRecord.importGroup != nil {
                             return songRecord
@@ -157,7 +179,8 @@ struct ScoreHistoryViewer: View {
                     Text(verbatim: "5. Get Score History")
                 }
                 Button {
-                    scoreRateHistory = songRecordsForSong.reduce(into: [:] as [Date: Float], { partialResult, songRecord in
+                    scoreRateHistory = songRecordsForSong.reduce(
+                        into: [:] as [Date: Float], { partialResult, songRecord in
                         if let importGroup = songRecord.importGroup,
                            let score = songRecord.score(for: level),
                            let totalNoteCount {
@@ -167,10 +190,30 @@ struct ScoreHistoryViewer: View {
                 } label: {
                     Text(verbatim: "6. Get Score Rate History")
                 }
+                Divider()
+                Button {
+                    let songRecordsWithoutImportGroup = (try? modelContext.fetch(
+                        FetchDescriptor<IIDXSongRecord>(
+                            predicate: #Predicate<IIDXSongRecord> {
+                                $0.importGroup == nil
+                            }
+                        )
+                    )) ?? []
+                    debugSongRecordsWithoutImportGroup = songRecordsWithoutImportGroup.count
+                    debugIsAlertShowing = true
+                } label: {
+                    Text(verbatim: "Song Records Without Import Group")
+                }
             } label: {
                 Image(systemName: "ladybug")
             }
-
+        }
+        .alert(String(debugSongRecordsWithoutImportGroup), isPresented: $debugIsAlertShowing) {
+            Button  {
+                // Intentially left empty
+            } label: {
+                Text("Shared.OK")
+            }
         }
     }
 }
