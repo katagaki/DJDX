@@ -67,7 +67,7 @@ struct ScoreHistoryViewer: View {
                 let songRecordsForSong: [IIDXSongRecord] = (try? modelContext.fetch(
                     FetchDescriptor<IIDXSongRecord>(
                         predicate: #Predicate<IIDXSongRecord> {
-                            $0.title == songTitle
+                            $0.title == songTitle && $0.importGroup != nil
                         }
                         // TODO: Possible data consistency issue causing this to crash app:
                         // sortBy: [SortDescriptor(\.importGroup?.importDate, order: .forward)]
