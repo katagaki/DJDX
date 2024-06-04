@@ -204,12 +204,26 @@ struct ScoreHistoryViewer: View {
                 } label: {
                     Text(verbatim: "Song Records Without Import Group")
                 }
+                Button(role: .destructive) {
+                    let songRecordsWithoutImportGroup = (try? modelContext.fetch(
+                        FetchDescriptor<IIDXSongRecord>(
+                            predicate: #Predicate<IIDXSongRecord> {
+                                $0.importGroup == nil
+                            }
+                        )
+                    )) ?? []
+                    for songRecord in songRecordsWithoutImportGroup {
+                        modelContext.delete(songRecord)
+                    }
+                } label: {
+                    Text(verbatim: "Delete Song Records Without Import Group")
+                }
             } label: {
                 Image(systemName: "ladybug")
             }
         }
         .alert(String(debugSongRecordsWithoutImportGroup), isPresented: $debugIsAlertShowing) {
-            Button  {
+            Button {
                 // Intentially left empty
             } label: {
                 Text("Shared.OK")
