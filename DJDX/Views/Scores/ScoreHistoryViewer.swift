@@ -124,32 +124,12 @@ struct ScoreHistoryViewer: View {
                     songRecordsForSong = (try? modelContext.fetch(
                         FetchDescriptor<IIDXSongRecord>(
                             predicate: #Predicate<IIDXSongRecord> {
-                                $0.title == songTitle
-                            },
-                            sortBy: [SortDescriptor(\.importGroup?.importDate, order: .forward)]
-                        )
-                    )) ?? []
-                } label: {
-                    Text(verbatim: "2. Get Song Records")
-                }
-                Button {
-                    songRecordsForSong = (try? modelContext.fetch(
-                        FetchDescriptor<IIDXSongRecord>(
-                            predicate: #Predicate<IIDXSongRecord> {
                                 $0.title == songTitle && $0.importGroup != nil
                             }
                         )
                     )) ?? []
                 } label: {
-                    Text(verbatim: "2. Get Song Records (Predicate Check For Nil)")
-                }
-                Button {
-                    songRecordsForSong = (try? modelContext.fetch(
-                        FetchDescriptor<IIDXSongRecord>(
-                        )
-                    )) ?? []
-                } label: {
-                    Text(verbatim: "2. Get Song Records (Non Predicate)")
+                    Text(verbatim: "2. Get Song Records")
                 }
                 Button {
                     songRecordsForSong = songRecordsForSong.compactMap { songRecord in
@@ -169,6 +149,26 @@ struct ScoreHistoryViewer: View {
                     Text(verbatim: "4. Get Date Range For Scales")
                 }
                 Button {
+                    if let firstSongRecord = songRecordsForSong.first,
+                       let lastSongRecord = songRecordsForSong.last {
+                        earliestDate = firstSongRecord.importGroup?.importDate
+                        latestDate = lastSongRecord.importGroup?.importDate
+                    }
+                } label: {
+                    Text(verbatim: "4. Get Date Range For Scales (Check Nil First)")
+                }
+                Button {
+                    if let firstSongRecord = songRecordsForSong.first,
+                       let lastSongRecord = songRecordsForSong.last,
+                       let firstImportGroup = firstSongRecord.importGroup,
+                       let lastImportGroup = lastSongRecord.importGroup {
+                        earliestDate = firstImportGroup.importDate
+                        latestDate = lastImportGroup.importDate
+                    }
+                } label: {
+                    Text(verbatim: "4. Get Date Range For Scales (Check Nil All)")
+                }
+                Button {
                     songRecordsForSong.sort { lhs, rhs in
                         if let lhsImportGroup = lhs.importGroup, let rhsImportGroup = rhs.importGroup {
                             return lhsImportGroup.importDate < rhsImportGroup.importDate
@@ -176,17 +176,8 @@ struct ScoreHistoryViewer: View {
                             return false
                         }
                     }
-                    if let firstSongRecord = songRecordsForSong.first, let lastSongRecord = songRecordsForSong.last,
-                       let firstSongRecordImportGroup = firstSongRecord.importGroup,
-                       let lastSongRecordImportGroup = lastSongRecord.importGroup {
-                        earliestDate = firstSongRecordImportGroup.importDate
-                        latestDate = lastSongRecordImportGroup.importDate
-                    } else {
-                        earliestDate = .now
-                        latestDate = .now
-                    }
                 } label: {
-                    Text(verbatim: "4. Get Date Range For Scales (Sort First)")
+                    Text(verbatim: "4. Get Date Range For Scales (Sort Only)")
                 }
                 Button {
                     scoreHistory = songRecordsForSong.reduce(into: [:] as [Date: Int], { partialResult, songRecord in
