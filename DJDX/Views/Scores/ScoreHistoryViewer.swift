@@ -26,9 +26,6 @@ struct ScoreHistoryViewer: View {
     @State var latestDate: Date?
     @State var dataState: DataState = .initializing
 
-    @State var debugIsAlertShowing: Bool = false
-    @State var debugSongRecordsWithoutImportGroup: Int = 0
-
     var body: some View {
         List {
             if let earliestDate, let latestDate, let totalNoteCount {
@@ -59,184 +56,102 @@ struct ScoreHistoryViewer: View {
             }
         }
         .navigationTitle("ViewTitle.Scores.History.\(songTitle)")
-        .refreshable {
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                VStack(alignment: .center, spacing: 2.0) {
+                    Text(songTitle)
+                        .bold()
+                        .fontWidth(.condensed)
+                    Text("ViewTitle.Scores.History")
+                        .font(.caption)
+                        .fontWidth(.condensed)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .task {
             if dataState == .initializing {
                 dataState = .loading
-
-                // Get note count
-                if let song = allSongNoteCounts[songTitle],
-                   let noteCount = song.noteCount(for: level) {
-                    totalNoteCount = noteCount
-                }
-
-                // Get list of scores
-                songRecordsForSong = (try? modelContext.fetch(
-                    FetchDescriptor<IIDXSongRecord>(
-                        predicate: #Predicate<IIDXSongRecord> {
-                            $0.title == songTitle && $0.importGroup != nil
-                        }
-                    )
-                )) ?? []
-
-                // Remove orphaned scores
-                songRecordsForSong = songRecordsForSong.compactMap { songRecord in
-                    if songRecord.importGroup != nil {
-                        return songRecord
-                    } else {
-                        return nil
-                    }
-                }
-
-                // Get date range for scales
-                earliestDate = songRecordsForSong.first?.importGroup?.importDate
-                latestDate = songRecordsForSong.last?.importGroup?.importDate
-
-                // Dictionarize list of scores
-                scoreHistory = songRecordsForSong.reduce(into: [:] as [Date: Int], { partialResult, songRecord in
-                    if let importGroup = songRecord.importGroup, let score = songRecord.score(for: level) {
-                        partialResult[importGroup.importDate] = score.score
-                    }
-                })
-                scoreRateHistory = songRecordsForSong.reduce(into: [:] as [Date: Float], { partialResult, songRecord in
-                    if let importGroup = songRecord.importGroup,
-                       let score = songRecord.score(for: level),
-                       let totalNoteCount {
-                        partialResult[importGroup.importDate] = Float(score.score) / Float(totalNoteCount * 2)
-                    }
-                })
-
+                reloadScoreHistory()
                 withAnimation(.snappy.speed(2.0)) {
                     dataState = .presenting
                 }
             }
         }
-        .toolbar {
-            Menu {
-                Button {
-                    if let song = allSongNoteCounts[songTitle],
-                       let noteCount = song.noteCount(for: level) {
-                        totalNoteCount = noteCount
-                    }
-                } label: {
-                    Text(verbatim: "1. Get Note Count")
+        .overlay {
+            switch dataState {
+            case .initializing, .loading:
+                ProgressView()
+            case .presenting:
+                if earliestDate == nil || latestDate == nil {
+                    ContentUnavailableView(
+                        "Scores.History.NoData",
+                        systemImage: "questionmark.app.dashed"
+                    )
                 }
-                Button {
-                    songRecordsForSong = (try? modelContext.fetch(
-                        FetchDescriptor<IIDXSongRecord>(
-                            predicate: #Predicate<IIDXSongRecord> {
-                                $0.title == songTitle && $0.importGroup != nil
-                            }
-                        )
-                    )) ?? []
-                } label: {
-                    Text(verbatim: "2. Get Song Records")
-                }
-                Button {
-                    songRecordsForSong = songRecordsForSong.compactMap { songRecord in
-                        if songRecord.importGroup != nil {
-                            return songRecord
-                        } else {
-                            return nil
-                        }
-                    }
-                } label: {
-                    Text(verbatim: "3. Remove Orphaned Scores")
-                }
-                Button {
-                    earliestDate = songRecordsForSong.first?.importGroup?.importDate
-                    latestDate = songRecordsForSong.last?.importGroup?.importDate
-                } label: {
-                    Text(verbatim: "4. Get Date Range For Scales")
-                }
-                Button {
-                    if let firstSongRecord = songRecordsForSong.first,
-                       let lastSongRecord = songRecordsForSong.last {
-                        earliestDate = firstSongRecord.importGroup?.importDate
-                        latestDate = lastSongRecord.importGroup?.importDate
-                    }
-                } label: {
-                    Text(verbatim: "4. Get Date Range For Scales (Check Nil First)")
-                }
-                Button {
-                    if let firstSongRecord = songRecordsForSong.first,
-                       let lastSongRecord = songRecordsForSong.last,
-                       let firstImportGroup = firstSongRecord.importGroup,
-                       let lastImportGroup = lastSongRecord.importGroup {
-                        earliestDate = firstImportGroup.importDate
-                        latestDate = lastImportGroup.importDate
-                    }
-                } label: {
-                    Text(verbatim: "4. Get Date Range For Scales (Check Nil All)")
-                }
-                Button {
-                    songRecordsForSong.sort { lhs, rhs in
-                        if let lhsImportGroup = lhs.importGroup, let rhsImportGroup = rhs.importGroup {
-                            return lhsImportGroup.importDate < rhsImportGroup.importDate
-                        } else {
-                            return false
-                        }
-                    }
-                } label: {
-                    Text(verbatim: "4. Get Date Range For Scales (Sort Only)")
-                }
-                Button {
-                    scoreHistory = songRecordsForSong.reduce(into: [:] as [Date: Int], { partialResult, songRecord in
-                        if let importGroup = songRecord.importGroup, let score = songRecord.score(for: level) {
-                            partialResult[importGroup.importDate] = score.score
-                        }
-                    })
-                } label: {
-                    Text(verbatim: "5. Get Score History")
-                }
-                Button {
-                    scoreRateHistory = songRecordsForSong.reduce(
-                        into: [:] as [Date: Float], { partialResult, songRecord in
-                        if let importGroup = songRecord.importGroup,
-                           let score = songRecord.score(for: level),
-                           let totalNoteCount {
-                            partialResult[importGroup.importDate] = Float(score.score) / Float(totalNoteCount * 2)
-                        }
-                    })
-                } label: {
-                    Text(verbatim: "6. Get Score Rate History")
-                }
-                Divider()
-                Button {
-                    let songRecordsWithoutImportGroup = (try? modelContext.fetch(
-                        FetchDescriptor<IIDXSongRecord>(
-                            predicate: #Predicate<IIDXSongRecord> {
-                                $0.importGroup == nil
-                            }
-                        )
-                    )) ?? []
-                    debugSongRecordsWithoutImportGroup = songRecordsWithoutImportGroup.count
-                    debugIsAlertShowing = true
-                } label: {
-                    Text(verbatim: "Song Records Without Import Group")
-                }
-                Button(role: .destructive) {
-                    let songRecordsWithoutImportGroup = (try? modelContext.fetch(
-                        FetchDescriptor<IIDXSongRecord>(
-                            predicate: #Predicate<IIDXSongRecord> {
-                                $0.importGroup == nil
-                            }
-                        )
-                    )) ?? []
-                    for songRecord in songRecordsWithoutImportGroup {
-                        modelContext.delete(songRecord)
-                    }
-                } label: {
-                    Text(verbatim: "Delete Song Records Without Import Group")
-                }
-            } label: {
-                Image(systemName: "ladybug")
             }
         }
-        .alert(String(debugSongRecordsWithoutImportGroup), isPresented: $debugIsAlertShowing) {
-            Button {
-                // Intentially left empty
-            } label: {
-                Text("Shared.OK")
+    }
+
+    func reloadScoreHistory() {
+        // Get note count
+        if let song = allSongNoteCounts[songTitle],
+           let noteCount = song.noteCount(for: level) {
+            totalNoteCount = noteCount
+        }
+
+        // Get list of scores
+        songRecordsForSong = (try? modelContext.fetch(
+            FetchDescriptor<IIDXSongRecord>(
+                predicate: #Predicate<IIDXSongRecord> {
+                    $0.title == songTitle && $0.importGroup != nil
+                }
+            )
+        )) ?? []
+
+        // Remove orphaned scores
+        songRecordsForSong = songRecordsForSong.compactMap { songRecord in
+            if songRecord.importGroup != nil {
+                return songRecord
+            } else {
+                return nil
+            }
+        }
+
+        // Sort song records from earliest to latest
+        songRecordsForSong.sort { lhs, rhs in
+            if let lhsImportGroup = lhs.importGroup, let rhsImportGroup = rhs.importGroup {
+                return lhsImportGroup.importDate < rhsImportGroup.importDate
+            } else {
+                return false
+            }
+        }
+
+        // Dictionarize list of scores
+        scoreHistory = songRecordsForSong.reduce(into: [:] as [Date: Int], { partialResult, songRecord in
+            if let importGroup = songRecord.importGroup, let score = songRecord.score(for: level) {
+                partialResult[importGroup.importDate] = score.score
+            }
+        })
+        scoreRateHistory = songRecordsForSong.reduce(
+            into: [:] as [Date: Float], { partialResult, songRecord in
+            if let importGroup = songRecord.importGroup,
+               let score = songRecord.score(for: level),
+               let totalNoteCount {
+                partialResult[importGroup.importDate] = Float(score.score) / Float(totalNoteCount * 2)
+            }
+        })
+
+        // Set date range for chart
+        if let firstSongRecord = songRecordsForSong.first,
+           let lastSongRecord = songRecordsForSong.last,
+           let firstImportGroup = firstSongRecord.importGroup,
+           let lastImportGroup = lastSongRecord.importGroup {
+            let earliestDate = firstImportGroup.importDate
+            let latestDate = lastImportGroup.importDate
+            if earliestDate < latestDate {
+                self.earliestDate = earliestDate
+                self.latestDate = latestDate
             }
         }
     }

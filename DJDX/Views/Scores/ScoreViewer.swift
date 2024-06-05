@@ -42,7 +42,13 @@ struct ScoreViewer: View {
             }
         }
         .listSectionSpacing(.compact)
+        .navigationTitle("ViewTitle.Scores.Song")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Spacer()
+            }
+        }
         .safeAreaInset(edge: .top, spacing: 0.0) {
             VStack(alignment: .center, spacing: 8.0) {
                 VStack(alignment: .center, spacing: 2.0) {

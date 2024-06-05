@@ -7,7 +7,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Score Data"
+            "value" : "Delete Score Data"
           }
         },
         "ja" : {
@@ -884,6 +884,22 @@
         }
       }
     },
+    "Scores.History.NoData" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No historical score data for this song."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この曲のスコア履歴はありません。"
+          }
+        }
+      }
+    },
     "Scores.Search.Prompt" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1723,6 +1739,22 @@
         }
       }
     },
+    "ViewTitle.Scores.History" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score History"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコア履歴"
+          }
+        }
+      }
+    },
     "ViewTitle.Scores.History.%@" : {
       "localizations" : {
         "en" : {
@@ -1735,6 +1767,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」のスコア履歴"
+          }
+        }
+      }
+    },
+    "ViewTitle.Scores.Song" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコアデータ"
           }
         }
       }
