@@ -10,7 +10,8 @@ import Foundation
 enum ViewPath: Hashable {
     case scoreViewer(songRecord: IIDXSongRecord)
     case scoreHistory(songTitle: String,
-                      level: IIDXLevel)
+                      level: IIDXLevel,
+                      noteCount: Int?)
     case textageViewer(songTitle: String,
                        level: IIDXLevel,
                        playSide: IIDXPlaySide)

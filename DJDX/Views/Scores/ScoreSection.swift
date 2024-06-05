@@ -80,7 +80,9 @@ struct ScoreSection: View {
                 IIDXLevelLabel(orientation: .horizontal, levelType: score.level, score: score)
                 Spacer()
                 if score.djLevelEnum() != .none {
-                    NavigationLink(value: ViewPath.scoreHistory(songTitle: songTitle, level: score.level)) {
+                    NavigationLink(value: ViewPath.scoreHistory(songTitle: songTitle,
+                                                                level: score.level,
+                                                                noteCount: noteCount)) {
                         Image(systemName: "clock.arrow.circlepath")
                     }.accessibilityLabel("Scores.Viewer.ShowHistory")
                 }
