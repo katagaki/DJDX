@@ -14,7 +14,7 @@ struct ScoreViewer: View {
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
-    @State var songRecord: IIDXSongRecord
+    var songRecord: IIDXSongRecord
     @State var songData: IIDXSong?
 
     var body: some View {

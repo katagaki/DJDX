@@ -19,7 +19,7 @@ struct ScoreRow: View {
     @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
-    @State var songRecord: IIDXSongRecord
+    var songRecord: IIDXSongRecord
     @State var scoreRate: Float?
 
     @Binding var levelToShow: IIDXLevel

@@ -111,11 +111,7 @@ struct ScoreHistoryViewer: View {
 
         // Remove orphaned scores
         songRecordsForSong = songRecordsForSong.compactMap { songRecord in
-            if songRecord.importGroup != nil {
-                return songRecord
-            } else {
-                return nil
-            }
+            return (songRecord.importGroup != nil ? songRecord : nil)
         }
 
         // Sort song records from earliest to latest
@@ -151,7 +147,10 @@ struct ScoreHistoryViewer: View {
             let latestDate = lastImportGroup.importDate
             if earliestDate < latestDate {
                 self.earliestDate = earliestDate
-                self.latestDate = latestDate
+                self.latestDate = Calendar.current.date(byAdding: .day, value: 1, to: latestDate)
+            } else if earliestDate == latestDate {
+                self.earliestDate = Calendar.current.date(byAdding: .day, value: -1, to: earliestDate)
+                self.latestDate = Calendar.current.date(byAdding: .day, value: 1, to: latestDate)
             }
         }
     }

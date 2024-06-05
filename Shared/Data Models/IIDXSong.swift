@@ -56,6 +56,10 @@ final class IIDXSong: Equatable {
         self.layer = tableColumnData[12]
     }
 
+    func titleCompact() -> String {
+        return title.compact
+    }
+
     static func == (lhs: IIDXSong, rhs: IIDXSongRecord) -> Bool {
         return lhs.title == rhs.title
     }

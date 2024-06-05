@@ -40,13 +40,8 @@ struct ScoresView: View {
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
                         ScoreRow(
                             songRecord: songRecord,
-                            scoreRate: displayedSongRecordsWithClearRateMapping[
-                                songRecord
-                            ]?[
-                                songRecord.level(
-                                    for: levelToShow, or: difficultyToShow
-                                )
-                            ],
+                            scoreRate: displayedSongRecordsWithClearRateMapping[songRecord]?[
+                                songRecord.level(for: levelToShow, or: difficultyToShow)],
                             levelToShow: $levelToShow,
                             difficultyToShow: $difficultyToShow
                         )

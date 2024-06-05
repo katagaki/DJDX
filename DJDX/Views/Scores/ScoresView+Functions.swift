@@ -34,7 +34,7 @@ extension ScoresView {
             sortBy: [SortDescriptor(\.title, order: .forward)]
         ))) ?? [])
             .reduce(into: [:]) { partialResult, song in
-                partialResult[song.title] = song.spNoteCount
+                partialResult[song.titleCompact()] = song.spNoteCount
             }
         debugPrint("Setting new song records")
         isSystemChangingAllRecords = false
@@ -149,8 +149,8 @@ extension ScoresView {
             if allSongNoteCounts.count > 0 {
                 sortedSongRecords = songLevelScores
                     .sorted(by: { lhs, rhs in
-                        let lhsSong = allSongNoteCounts[lhs.key.title]
-                        let rhsSong = allSongNoteCounts[rhs.key.title]
+                        let lhsSong = allSongNoteCounts[lhs.key.titleCompact()]
+                        let rhsSong = allSongNoteCounts[rhs.key.titleCompact()]
                         if lhsSong == nil && rhsSong != nil {
                             return false
                         } else if lhsSong != nil && rhsSong == nil {
@@ -240,7 +240,7 @@ extension ScoresView {
                 self.displayedSongRecords = self.sortedSongRecords
                 self.displayedSongRecordsWithClearRateMapping = self.sortedSongRecords
                     .reduce(into: [:], { partialResult, songRecord in
-                        let song = allSongNoteCounts[songRecord.title]
+                        let song = allSongNoteCounts[songRecord.titleCompact()]
                         if let song {
                             var scores: [IIDXLevelScore] = [
                                 songRecord.beginnerScore,

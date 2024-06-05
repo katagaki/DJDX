@@ -93,8 +93,12 @@ final class IIDXSongRecord: Equatable, Hashable {
         }
     }
 
+    func titleCompact() -> String {
+        return title.compact
+    }
+
     static func == (lhs: IIDXSongRecord, rhs: IIDXSongRecord) -> Bool {
-        return lhs.title == rhs.title &&
+        return lhs.titleCompact() == rhs.titleCompact() &&
         lhs.artist == rhs.artist &&
         lhs.beginnerScore == rhs.beginnerScore &&
         lhs.normalScore == rhs.normalScore &&
@@ -104,7 +108,9 @@ final class IIDXSongRecord: Equatable, Hashable {
     }
 
     static func == (lhs: IIDXSongRecord, rhs: IIDXSong) -> Bool {
-        return lhs.title == rhs.title
+        let lhsTitle = lhs.titleCompact()
+        let rhsTitle = rhs.titleCompact()
+        return lhsTitle == rhsTitle
     }
 }
 
