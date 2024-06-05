@@ -14,6 +14,8 @@ struct ScoreHistoryViewer: View {
 
     @Environment(\.modelContext) var modelContext
 
+    var percentageFormatter: NumberFormatter
+
     var songTitle: String
     var level: IIDXLevel
     var noteCount: Int?
@@ -25,6 +27,17 @@ struct ScoreHistoryViewer: View {
     @State var latestDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: .now)!
     @State var dataState: DataState = .initializing
 
+    init(songTitle: String, level: IIDXLevel, noteCount: Int? = nil) {
+        self.songTitle = songTitle
+        self.level = level
+        self.noteCount = noteCount
+
+        percentageFormatter = NumberFormatter()
+        percentageFormatter.numberStyle = .percent
+        percentageFormatter.minimumIntegerDigits = 1
+        percentageFormatter.maximumIntegerDigits = 3
+        percentageFormatter.maximumFractionDigits = 0
+    }
     var body: some View {
         List {
             if let noteCount, noteCount > 0 {
@@ -34,8 +47,21 @@ struct ScoreHistoryViewer: View {
                     }
                     .chartXScale(domain: earliestDate...latestDate)
                     .chartYScale(domain: 0...(noteCount * 2))
-                    .frame(height: 200.0)
+                    .frame(height: 150.0)
                     .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                    VStack(alignment: .leading, spacing: 8.0) {
+                        ForEach(scoreHistory.sorted(by: {$0.key < $1.key}), id: \.key) { date, score in
+                            DetailRow(
+                                date.formatted(date: .abbreviated, time: .omitted),
+                                value: String(score),
+                                style: LinearGradient(
+                                    colors: [.cyan, .blue],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                        }
+                    }
                 } header: {
                     ListSectionHeader(text: "Shared.Score")
                         .font(.body)
@@ -46,8 +72,19 @@ struct ScoreHistoryViewer: View {
                     }
                     .chartXScale(domain: earliestDate...latestDate)
                     .chartYScale(domain: 0.0...100.0)
-                    .frame(height: 200.0)
+                    .frame(height: 150.0)
                     .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                    VStack(alignment: .leading, spacing: 8.0) {
+                        ForEach(scoreRateHistory.sorted(by: {$0.key < $1.key}), id: \.key) { date, scoreRate in
+                            DetailRow(date.formatted(date: .abbreviated, time: .omitted),
+                                      value: percentageFormatter.string(from: NSNumber(value: scoreRate)) ?? "0%",
+                                      style: LinearGradient(
+                                        colors: [.primary.opacity(0.35), .primary.opacity(0.2)],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    ))
+                        }
+                    }
                 } header: {
                     ListSectionHeader(text: "Shared.ScoreRate")
                         .font(.body)
