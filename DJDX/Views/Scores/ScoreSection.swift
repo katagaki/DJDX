@@ -79,9 +79,11 @@ struct ScoreSection: View {
             HStack(spacing: 16.0) {
                 IIDXLevelLabel(orientation: .horizontal, levelType: score.level, score: score)
                 Spacer()
-                NavigationLink(value: ViewPath.scoreHistory(songTitle: songTitle, level: score.level)) {
-                    Image(systemName: "clock.arrow.circlepath")
-                }.accessibilityLabel("Scores.Viewer.ShowHistory")
+                if score.djLevelEnum() != .none {
+                    NavigationLink(value: ViewPath.scoreHistory(songTitle: songTitle, level: score.level)) {
+                        Image(systemName: "clock.arrow.circlepath")
+                    }.accessibilityLabel("Scores.Viewer.ShowHistory")
+                }
                 Menu {
                     Button("Scores.Viewer.OpenYouTube", image: .listIconYouTube) {
                         let searchQuery: String = "IIDX SP\(score.level.code()) \(songTitle)"
