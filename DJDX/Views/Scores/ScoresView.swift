@@ -46,6 +46,15 @@ struct ScoresView: View {
             .navigationTitle("ViewTitle.Scores")
             .listStyle(.plain)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    switch dataState {
+                    case .initializing, .loading:
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                    case .presenting:
+                        Color.clear
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     ScoreSortAndFilter(isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
                                        levelToShow: $levelToShow,
@@ -59,15 +68,13 @@ struct ScoresView: View {
             }
             .overlay {
                 switch dataState {
-                case .initializing, .loading:
-                    ProgressView()
-                        .progressViewStyle(.circular)
                 case .presenting:
                     if playData.allSongRecords.count == 0 {
                         ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
                     } else {
                         Color.clear
                     }
+                default: Color.clear
                 }
             }
             .searchable(text: $searchTerm,

@@ -80,9 +80,15 @@ struct AnalyticsView: View {
                 }
             }
             .navigationTitle("ViewTitle.Analytics")
-            .refreshable {
-                withAnimation(.snappy.speed(2.0)) {
-                    reloadScores()
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    switch dataState {
+                    case .initializing, .loading:
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                    case .presenting:
+                        Color.clear
+                    }
                 }
             }
             .task {
