@@ -50,8 +50,7 @@ class PlayDataManager: ObservableObject {
         }
         await MainActor.run { [allSongs] in
             withAnimation(.snappy.speed(2.0)) {
-                self.allSongs.removeAll()
-                self.allSongs.append(contentsOf: allSongs)
+                self.allSongs = allSongs
             }
         }
     }
