@@ -14,13 +14,8 @@ struct ScoresView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var calendar: CalendarManager
+    @EnvironmentObject var playData: PlayDataManager
 
-    @State var allSongRecords: [IIDXSongRecord] = []
-    @State var allSongNoteCounts: [String: IIDXNoteCount] = [:]
-    @State var filteredSongRecords: [IIDXSongRecord] = []
-    @State var sortedSongRecords: [IIDXSongRecord] = []
-    @State var displayedSongRecords: [IIDXSongRecord] = []
-    @State var displayedSongRecordsWithClearRateMapping: [IIDXSongRecord: [IIDXLevel: Float]] = [:]
     @State var dataState: DataState = .initializing
 
     @AppStorage(wrappedValue: true, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
@@ -36,12 +31,11 @@ struct ScoresView: View {
     var body: some View {
         NavigationStack(path: $navigationManager[.scores]) {
             List {
-                ForEach(displayedSongRecords, id: \.title) { songRecord in
+                ForEach(playData.displayedSongRecords, id: \.title) { songRecord in
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
                         ScoreRow(
                             songRecord: songRecord,
-                            scoreRate: displayedSongRecordsWithClearRateMapping[songRecord]?[
-                                songRecord.level(for: levelToShow, or: difficultyToShow)],
+                            scoreRate: playData.scoreRate(for: songRecord, of: levelToShow, or: difficultyToShow),
                             levelToShow: $levelToShow,
                             difficultyToShow: $difficultyToShow
                         )
@@ -58,7 +52,8 @@ struct ScoresView: View {
                                        difficultyToShow: $difficultyToShow,
                                        sortMode: $sortMode,
                                        isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort) {
-                        filterSongRecords()
+                        reloadDisplay(shouldReloadAll: false, shouldFilter: true,
+                                      shouldSort: true, shouldSearch: true)
                     }
                 }
             }
@@ -68,7 +63,7 @@ struct ScoresView: View {
                     ProgressView()
                         .progressViewStyle(.circular)
                 case .presenting:
-                    if allSongRecords.count == 0 {
+                    if playData.allSongRecords.count == 0 {
                         ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
                     } else {
                         Color.clear
@@ -79,32 +74,26 @@ struct ScoresView: View {
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "Scores.Search.Prompt")
             .refreshable {
-                Task.detached {
-                    await reloadAllSongRecords()
-                }
+                reloadDisplay(shouldReloadAll: true, shouldFilter: true,
+                              shouldSort: true, shouldSearch: true)
             }
             .onAppear {
                 if dataState == .initializing {
                     debugPrint("Initializing")
-                    Task.detached {
-                        await reloadAllSongRecords()
-                    }
+                    reloadDisplay(shouldReloadAll: true, shouldFilter: true,
+                                  shouldSort: true, shouldSearch: true)
                 }
             }
             .onChange(of: isShowingOnlyPlayDataWithScores) { _, _ in
-                filterSongRecords()
-            }
-            .onChange(of: allSongRecords) { _, _ in
-                if !isSystemChangingAllRecords {
-                    debugPrint("Filtering song records after all song records changed")
-                    filterSongRecords()
-                }
+                reloadDisplay(shouldReloadAll: false, shouldFilter: true,
+                              shouldSort: true, shouldSearch: true)
             }
             .onChange(of: levelToShow) { _, newValue in
                 if !isSystemChangingFilterAndSort && newValue != .all {
                     debugPrint("Filtering song records after level filter changed")
                     difficultyToShow = .all
-                    filterSongRecords()
+                    reloadDisplay(shouldReloadAll: false, shouldFilter: true,
+                                  shouldSort: true, shouldSearch: true)
                 }
             }
             .onChange(of: difficultyToShow) { _, newValue in
@@ -116,30 +105,21 @@ struct ScoresView: View {
                         sortMode = .title
                         isSystemChangingFilterAndSort = false
                     }
-                    filterSongRecords()
-                }
-            }
-            .onChange(of: filteredSongRecords) { _, _ in
-                if !isSystemChangingAllRecords {
-                    debugPrint("Sorting song records after filtered song records changed")
-                    sortSongRecords()
+                    reloadDisplay(shouldReloadAll: false, shouldFilter: true,
+                                  shouldSort: true, shouldSearch: true)
                 }
             }
             .onChange(of: sortMode) { _, _ in
                 if !isSystemChangingFilterAndSort {
                     debugPrint("Sorting song records after sort mode changed")
-                    sortSongRecords()
-                }
-            }
-            .onChange(of: sortedSongRecords) { _, _ in
-                if !isSystemChangingAllRecords {
-                    debugPrint("Searching song records after sorted song records changed")
-                    searchSongRecords()
+                    reloadDisplay(shouldReloadAll: false, shouldFilter: false,
+                                  shouldSort: true, shouldSearch: true)
                 }
             }
             .onChange(of: searchTerm) { _, _ in
                 debugPrint("Searching song records after search term changed")
-                searchSongRecords()
+                reloadDisplay(shouldReloadAll: false, shouldFilter: false,
+                              shouldSort: false, shouldSearch: true)
             }
             .onChange(of: calendar.selectedDate) { oldValue, newValue in
                 if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
@@ -157,6 +137,47 @@ struct ScoresView: View {
                 case .textageViewer(let songTitle, let level, let playSide):
                     TextageViewer(songTitle: songTitle, level: level, playSide: playSide)
                 default: Color.clear
+                }
+            }
+        }
+    }
+
+    @MainActor
+    func reloadDisplay(shouldReloadAll: Bool = false,
+                       shouldFilter: Bool = false,
+                       shouldSort: Bool = false,
+                       shouldSearch: Bool = false) {
+        Task.detached {
+            await MainActor.run {
+                withAnimation(.snappy.speed(2.0)) {
+                    dataState = .loading
+                }
+            }
+            if shouldReloadAll {
+                await playData.reloadAllSongRecords(in: calendar)
+            }
+            if shouldFilter {
+                await playData.filterSongRecords(
+                    isShowingOnlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
+                    levelToShow: levelToShow,
+                    difficultyToShow: difficultyToShow
+                )
+            }
+            if shouldSort {
+                await playData.sortSongRecords(
+                    sortMode: sortMode,
+                    levelToShow: levelToShow,
+                    difficultyToShow: difficultyToShow
+                )
+            }
+            if shouldSearch {
+                await playData.searchSongRecords(
+                    searchTerm: searchTerm
+                )
+            }
+            await MainActor.run {
+                withAnimation(.snappy.speed(2.0)) {
+                    dataState = .presenting
                 }
             }
         }

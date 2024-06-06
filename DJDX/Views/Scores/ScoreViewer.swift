@@ -99,6 +99,7 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
             self.songData = (try? modelContext.fetch(
                 FetchDescriptor<IIDXSong>(
                     predicate: #Predicate<IIDXSong> {
+                        // TODO: Compare compact titles
                         $0.title == songRecordTitle
                     }
                 )

@@ -1,34 +1,42 @@
 //
-//  ScoresView+Functions.swift
+//  PlayDataManager.swift
 //  DJDX
 //
-//  Created by シン・ジャスティン on 2024/05/26.
+//  Created by シン・ジャスティン on 2024/06/06.
 //
 
 import Foundation
 import SwiftData
 import SwiftUI
 
-extension ScoresView {
-    func reloadAllSongRecords() async {
-        // TODO: Fix weird issues with reloading:
-        // - Reload triggers filter and sort chain twice
-        // - isSystemChangingAllRecords does not take effect
-        // - Freeze when not using async await
+// swiftlint:disable type_body_length
+class PlayDataManager: ObservableObject {
+
+    var allSongRecords: [IIDXSongRecord] = []
+    var allSongNoteCounts: [String: IIDXNoteCount] = [:]
+    var filteredSongRecords: [IIDXSongRecord] = []
+    var sortedSongRecords: [IIDXSongRecord] = []
+    @Published var displayedSongRecords: [IIDXSongRecord] = []
+    @Published var displayedSongRecordClearRates: [IIDXSongRecord: [IIDXLevel: Float]] = [:]
+
+    // MARK: Master Data Functions
+
+    func reloadAllSongRecords(in calendar: CalendarManager) async {
         debugPrint("Removing all song records")
-        isSystemChangingAllRecords = true
         await MainActor.run {
             withAnimation(.snappy.speed(2.0)) {
                 displayedSongRecords.removeAll()
-                displayedSongRecordsWithClearRateMapping.removeAll()
-                sortedSongRecords.removeAll()
-                filteredSongRecords.removeAll()
-                allSongRecords.removeAll()
-                allSongNoteCounts.removeAll()
+                displayedSongRecordClearRates.removeAll()
             }
         }
+        sortedSongRecords.removeAll()
+        filteredSongRecords.removeAll()
+        allSongRecords.removeAll()
+        allSongNoteCounts.removeAll()
+        debugPrint("Loading new song records")
+        let modelContext = ModelContext(sharedModelContainer)
         let newSongRecords = calendar.latestAvailableIIDXSongRecords(
-            in: ModelContext(sharedModelContainer)
+            in: modelContext
         )
         let newSongMappings = ((try? modelContext.fetch(FetchDescriptor<IIDXSong>(
             sortBy: [SortDescriptor(\.title, order: .forward)]
@@ -36,17 +44,14 @@ extension ScoresView {
             .reduce(into: [:]) { partialResult, song in
                 partialResult[song.titleCompact()] = song.spNoteCount
             }
-        debugPrint("Setting new song records")
-        isSystemChangingAllRecords = false
-        await MainActor.run {
-            withAnimation(.snappy.speed(2.0)) {
-                allSongRecords = newSongRecords
-                allSongNoteCounts = newSongMappings
-            }
-        }
+        allSongRecords = newSongRecords
+        allSongNoteCounts = newSongMappings
     }
 
-    func filterSongRecords() {
+    func filterSongRecords(isShowingOnlyPlayDataWithScores: Bool,
+                           levelToShow: IIDXLevel,
+                           difficultyToShow: IIDXDifficulty) async {
+        debugPrint("Filtering song records")
         var filteredSongRecords: [IIDXSongRecord] = self.allSongRecords
 
         // Remove song records that have no scores
@@ -84,7 +89,10 @@ extension ScoresView {
     }
 
     // swiftlint:disable cyclomatic_complexity function_body_length
-    func sortSongRecords() {
+    func sortSongRecords(sortMode: SortMode,
+                         levelToShow: IIDXLevel,
+                         difficultyToShow: IIDXDifficulty) async {
+        debugPrint("Sorting song records")
         var sortedSongRecords: [IIDXSongRecord] = self.filteredSongRecords
         var songLevelScores: [IIDXSongRecord: IIDXLevelScore] = [:]
 
@@ -228,43 +236,68 @@ extension ScoresView {
     }
     // swiftlint:enable cyclomatic_complexity function_body_length
 
-    func searchSongRecords() {
+    func searchSongRecords(searchTerm: String) async {
+        debugPrint("Searching song records")
         let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
-        withAnimation(.snappy.speed(2.0)) {
-            if !searchTermTrimmed.isEmpty && searchTermTrimmed.count >= 1 {
-                self.displayedSongRecords = self.sortedSongRecords.filter({ songRecord in
-                    songRecord.title.lowercased().contains(searchTermTrimmed) ||
-                    songRecord.artist.lowercased().contains(searchTermTrimmed)
-                })
-            } else {
-                self.displayedSongRecords = self.sortedSongRecords
-                self.displayedSongRecordsWithClearRateMapping = self.sortedSongRecords
-                    .reduce(into: [:], { partialResult, songRecord in
-                        let song = allSongNoteCounts[songRecord.titleCompact()]
-                        if let song {
-                            var scores: [IIDXLevelScore] = [
-                                songRecord.beginnerScore,
-                                songRecord.normalScore,
-                                songRecord.hyperScore,
-                                songRecord.anotherScore,
-                                songRecord.leggendariaScore
-                            ]
-                            scores.removeAll(where: { $0.score == 0 })
-                            let scoreRates = scores.reduce(into: [:] as [IIDXLevel: Float]) { partialResult, score in
-                                if let noteCount = song.noteCount(for: score.level) {
-                                    partialResult[score.level] = Float(score.score) / Float(noteCount * 2)
-                                }
+        var displayedSongRecords: [IIDXSongRecord] = []
+        var displayedSongRecordClearRates: [IIDXSongRecord: [IIDXLevel: Float]] = [:]
+        if !searchTermTrimmed.isEmpty && searchTermTrimmed.count >= 1 {
+            displayedSongRecords = self.sortedSongRecords.filter({ songRecord in
+                songRecord.title.lowercased().contains(searchTermTrimmed) ||
+                songRecord.artist.lowercased().contains(searchTermTrimmed)
+            })
+        } else {
+            displayedSongRecords = self.sortedSongRecords
+            displayedSongRecordClearRates = self.sortedSongRecords
+                .reduce(into: [:], { partialResult, songRecord in
+                    let song = allSongNoteCounts[songRecord.titleCompact()]
+                    if let song {
+                        var scores: [IIDXLevelScore] = [
+                            songRecord.beginnerScore,
+                            songRecord.normalScore,
+                            songRecord.hyperScore,
+                            songRecord.anotherScore,
+                            songRecord.leggendariaScore
+                        ]
+                        scores.removeAll(where: { $0.score == 0 })
+                        let scoreRates = scores.reduce(into: [:] as [IIDXLevel: Float]) { partialResult, score in
+                            if let noteCount = song.noteCount(for: score.level) {
+                                partialResult[score.level] = Float(score.score) / Float(noteCount * 2)
                             }
-                            partialResult[songRecord] = scoreRates
                         }
-                })
+                        partialResult[songRecord] = scoreRates
+                    }
+            })
+        }
+        await MainActor.run { [displayedSongRecords, displayedSongRecordClearRates] in
+            withAnimation(.snappy.speed(2.0)) {
+                self.displayedSongRecords = displayedSongRecords
+                self.displayedSongRecordClearRates = displayedSongRecordClearRates
             }
-            dataState = .presenting
         }
     }
 
+    func cleanUpOrphanedSongRecords(using modelContext: ModelContext) async {
+        debugPrint("Cleaning up orphaned song records")
+        let songRecords = (try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>(
+            predicate: #Predicate<IIDXSongRecord> {
+                $0.importGroup == nil
+            }))) ?? []
+        for songRecord in songRecords {
+            modelContext.delete(songRecord)
+        }
+        try? modelContext.save()
+    }
+
+    // MARK: Convenience Functions
+
+    func scoreRate(for songRecord: IIDXSongRecord, of level: IIDXLevel, or difficulty: IIDXDifficulty) -> Float? {
+        return displayedSongRecordClearRates[songRecord]?[
+            songRecord.level(for: level, or: difficulty)]
+    }
+
     func keyPath(for level: IIDXLevel) -> KeyPath<IIDXSongRecord, IIDXLevelScore>? {
-        switch levelToShow {
+        switch level {
         case .beginner: return \.beginnerScore
         case .normal: return \.normalScore
         case .hyper: return \.hyperScore
@@ -274,3 +307,4 @@ extension ScoresView {
         }
     }
 }
+// swiftlint:enable type_body_length

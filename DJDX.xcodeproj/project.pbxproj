@@ -32,6 +32,7 @@
 		E49359DF2C00E4230022E385 /* LevelLabelOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */; };
 		E49359E12C016F2F0022E385 /* SortMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359E02C016F2F0022E385 /* SortMode.swift */; };
 		E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359E22C0170E80022E385 /* IIDXLevel.swift */; };
+		E4AD1ACD2C11FCDC00E45F59 /* PlayDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD1ACC2C11FCDC00E45F59 /* PlayDataManager.swift */; };
 		E4B123B02BF8E8E400D4A3D1 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123AF2BF8E8E400D4A3D1 /* App.swift */; };
 		E4B123B22BF8E8E400D4A3D1 /* ScoresView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123B12BF8E8E400D4A3D1 /* ScoresView.swift */; };
 		E4B123B42BF8E8E400D4A3D1 /* IIDXSongRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B123B32BF8E8E400D4A3D1 /* IIDXSongRecord.swift */; };
@@ -44,7 +45,6 @@
 		E4B4CF9F2C10AA6F0069EC8C /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B4CF9E2C10AA6F0069EC8C /* String.swift */; };
 		E4BC32802C036C82006A0F7A /* ConditionalShadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BC327F2C036C82006A0F7A /* ConditionalShadow.swift */; };
 		E4BC32822C036CBD006A0F7A /* LevelLabelGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BC32812C036CBD006A0F7A /* LevelLabelGlow.swift */; };
-		E4BC32842C036DF1006A0F7A /* ScoresView+Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BC32832C036DF1006A0F7A /* ScoresView+Functions.swift */; };
 		E4C5053C2C0E71D700A0C303 /* ScoreHistoryViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C5053B2C0E71D700A0C303 /* ScoreHistoryViewer.swift */; };
 		E4E3D0C32BF98D57001942FE /* ScoreViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */; };
 		E4E3D0C52BF98D79001942FE /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0C42BF98D79001942FE /* NavigationManager.swift */; };
@@ -93,6 +93,7 @@
 		E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabelOrientation.swift; sourceTree = "<group>"; };
 		E49359E02C016F2F0022E385 /* SortMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortMode.swift; sourceTree = "<group>"; };
 		E49359E22C0170E80022E385 /* IIDXLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXLevel.swift; sourceTree = "<group>"; };
+		E4AD1ACC2C11FCDC00E45F59 /* PlayDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayDataManager.swift; sourceTree = "<group>"; };
 		E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DJDX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B123AF2BF8E8E400D4A3D1 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E4B123B12BF8E8E400D4A3D1 /* ScoresView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoresView.swift; sourceTree = "<group>"; };
@@ -106,7 +107,6 @@
 		E4B4CF9E2C10AA6F0069EC8C /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		E4BC327F2C036C82006A0F7A /* ConditionalShadow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionalShadow.swift; sourceTree = "<group>"; };
 		E4BC32812C036CBD006A0F7A /* LevelLabelGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabelGlow.swift; sourceTree = "<group>"; };
-		E4BC32832C036DF1006A0F7A /* ScoresView+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScoresView+Functions.swift"; sourceTree = "<group>"; };
 		E4C11FF32C01F07900CFB1E4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E4C5053B2C0E71D700A0C303 /* ScoreHistoryViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreHistoryViewer.swift; sourceTree = "<group>"; };
 		E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreViewer.swift; sourceTree = "<group>"; };
@@ -204,6 +204,7 @@
 				E4E3D0C42BF98D79001942FE /* NavigationManager.swift */,
 				E4EB2CA42BFF7C9D00A00796 /* CalendarManager.swift */,
 				E46A65F42C0B3C9700D9544B /* ProgressAlertManager.swift */,
+				E4AD1ACC2C11FCDC00E45F59 /* PlayDataManager.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -243,7 +244,6 @@
 			isa = PBXGroup;
 			children = (
 				E4B123B12BF8E8E400D4A3D1 /* ScoresView.swift */,
-				E4BC32832C036DF1006A0F7A /* ScoresView+Functions.swift */,
 				E46A66062C0CC12800D9544B /* ScoreSortAndFilter.swift */,
 				E46A66042C0CA71E00D9544B /* ScoreRow.swift */,
 				E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */,
@@ -483,7 +483,7 @@
 				E4E3D0F02BFC03CB001942FE /* ClearLampPerDifficultyGraph.swift in Sources */,
 				E46A65EF2C0AFF0000D9544B /* ProgressAlert.swift in Sources */,
 				E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */,
-				E4BC32842C036DF1006A0F7A /* ScoresView+Functions.swift in Sources */,
+				E4AD1ACD2C11FCDC00E45F59 /* PlayDataManager.swift in Sources */,
 				E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */,
 				E49359DA2C00AD060022E385 /* DataState.swift in Sources */,
 				E4E3D0CA2BF98DB7001942FE /* TabType.swift in Sources */,
