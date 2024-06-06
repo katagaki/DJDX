@@ -39,8 +39,10 @@ struct AnalyticsView: View {
                         ListSectionHeader(text: "Analytics.ClearLamp.Overall")
                             .font(.body)
                         Spacer()
-                        NavigationLink(value: ViewPath.clearLampOverviewGraph) {
-                            Image(systemName: "square.arrowtriangle.4.outward")
+                        if clearLampPerDifficulty.count > 0 {
+                            NavigationLink(value: ViewPath.clearLampOverviewGraph) {
+                                Image(systemName: "square.arrowtriangle.4.outward")
+                            }
                         }
                     }
                 }
@@ -56,8 +58,10 @@ struct AnalyticsView: View {
                         ListSectionHeader(text: "Analytics.ClearLamp.ByDifficulty")
                             .font(.body)
                         Spacer()
-                        NavigationLink(value: ViewPath.clearLampPerDifficultyGraph) {
-                            Image(systemName: "square.arrowtriangle.4.outward")
+                        if clearLampPerDifficulty.count > 0 {
+                            NavigationLink(value: ViewPath.clearLampPerDifficultyGraph) {
+                                Image(systemName: "square.arrowtriangle.4.outward")
+                            }
                         }
                     }
                 }
@@ -73,8 +77,10 @@ struct AnalyticsView: View {
                         ListSectionHeader(text: "Analytics.DJLevel.ByDifficulty")
                             .font(.body)
                         Spacer()
-                        NavigationLink(value: ViewPath.scoreRatePerDifficultyGraph) {
-                            Image(systemName: "square.arrowtriangle.4.outward")
+                        if scoreRatePerDifficulty.count > 0 {
+                            NavigationLink(value: ViewPath.scoreRatePerDifficultyGraph) {
+                                Image(systemName: "square.arrowtriangle.4.outward")
+                            }
                         }
                     }
                 }

@@ -44,6 +44,7 @@ struct ClearLampOverviewGraph: View {
                         .foregroundStyle(.text)
                         .clipShape(.capsule(style: .continuous))
                         .shadow(color: .black.opacity(0.2), radius: 2.0, y: 1.5)
+                        .zIndex(-999)
                 }
             }
         }
@@ -75,11 +76,15 @@ struct ClearLampOverviewGraph: View {
                                             y: value.location.y - origin.y
                                         )
                                         let (difficulty, _) = proxy.value(at: location, as: (Int, Int).self) ?? (0, 0)
-                                        difficultyBelowFinger = difficulty
+                                        withAnimation(.snappy.speed(2.0)) {
+                                            difficultyBelowFinger = difficulty
+                                        }
                                     }
                                 }
                                 .onEnded { _ in
-                                    difficultyBelowFinger = nil
+                                    withAnimation(.snappy.speed(2.0)) {
+                                        difficultyBelowFinger = nil
+                                    }
                                 }
                         )
                 }
