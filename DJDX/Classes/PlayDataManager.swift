@@ -12,6 +12,11 @@ import SwiftUI
 // swiftlint:disable type_body_length
 class PlayDataManager: ObservableObject {
 
+    // External Data
+    @Published var allSongs: [IIDXSong]
+    var allSongCompactTitles: [String: IIDXSong] = [:]
+
+    // Play Data
     var allSongRecords: [IIDXSongRecord] = []
     var allSongNoteCounts: [String: IIDXNoteCount] = [:]
     var filteredSongRecords: [IIDXSongRecord] = []
@@ -20,6 +25,33 @@ class PlayDataManager: ObservableObject {
     @Published var displayedSongRecordClearRates: [IIDXSongRecord: [IIDXLevel: Float]] = [:]
 
     // MARK: Master Data Functions
+
+    init() {
+        let modelContext = ModelContext(sharedModelContainer)
+        allSongs = (try? modelContext.fetch(
+            FetchDescriptor<IIDXSong>(
+                sortBy: [SortDescriptor(\.title, order: .forward)]
+            )
+        )) ?? []
+    }
+
+    func reloadAllSongs() async {
+        let modelContext = ModelContext(sharedModelContainer)
+        let allSongs = (try? modelContext.fetch(
+            FetchDescriptor<IIDXSong>(
+                sortBy: [SortDescriptor(\.title, order: .forward)]
+            )
+        )) ?? []
+        allSongs.forEach { song in
+            allSongCompactTitles[song.titleCompact()] = song
+        }
+        await MainActor.run { [allSongs] in
+            withAnimation(.snappy.speed(2.0)) {
+                self.allSongs.removeAll()
+                self.allSongs.append(contentsOf: allSongs)
+            }
+        }
+    }
 
     func reloadAllSongRecords(in calendar: CalendarManager) async {
         debugPrint("Removing all song records")
@@ -56,7 +88,7 @@ class PlayDataManager: ObservableObject {
 
         // Remove song records that have no scores
         if isShowingOnlyPlayDataWithScores {
-            if let keyPath = keyPath(for: levelToShow) {
+            if let keyPath = scoreKeyPath(for: levelToShow) {
                 filteredSongRecords.removeAll { songRecord in
                     songRecord[keyPath: keyPath].score == 0
                 }
@@ -72,7 +104,7 @@ class PlayDataManager: ObservableObject {
         }
 
         // Filter song records by level
-        if let keyPath = keyPath(for: levelToShow) {
+        if let keyPath = scoreKeyPath(for: levelToShow) {
             filteredSongRecords.removeAll { songRecord in
                 songRecord[keyPath: keyPath].difficulty == 0
             }
@@ -98,7 +130,7 @@ class PlayDataManager: ObservableObject {
 
         // Get the level score to be used for sorting
         if sortMode != .title && sortMode != .lastPlayDate {
-            if levelToShow != .all, let keyPath = keyPath(for: levelToShow) {
+            if levelToShow != .all, let keyPath = scoreKeyPath(for: levelToShow) {
                 songLevelScores = sortedSongRecords.reduce(into: [:], { partialResult, songRecord in
                     partialResult[songRecord] = songRecord[keyPath: keyPath]
                 })
@@ -296,7 +328,27 @@ class PlayDataManager: ObservableObject {
             songRecord.level(for: level, or: difficulty)]
     }
 
-    func keyPath(for level: IIDXLevel) -> KeyPath<IIDXSongRecord, IIDXLevelScore>? {
+    func noteCount(for songRecord: IIDXSongRecord, of level: IIDXLevel) -> Int? {
+        let compactTitle = songRecord.titleCompact()
+        if let keyPath = noteCountKeyPath(for: level) {
+            return allSongCompactTitles[compactTitle]?.spNoteCount?[keyPath: keyPath]
+        } else {
+            return nil
+        }
+    }
+
+    func noteCountKeyPath(for level: IIDXLevel) -> KeyPath<IIDXNoteCount, Int?>? {
+        switch level {
+        case .beginner: return \.beginnerNoteCount
+        case .normal: return \.normalNoteCount
+        case .hyper: return \.hyperNoteCount
+        case .another: return \.anotherNoteCount
+        case .leggendaria: return \.leggendariaNoteCount
+        default: return nil
+        }
+    }
+
+    func scoreKeyPath(for level: IIDXLevel) -> KeyPath<IIDXSongRecord, IIDXLevelScore>? {
         switch level {
         case .beginner: return \.beginnerScore
         case .normal: return \.normalScore

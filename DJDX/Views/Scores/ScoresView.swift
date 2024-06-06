@@ -73,10 +73,6 @@ struct ScoresView: View {
             .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "Scores.Search.Prompt")
-            .refreshable {
-                reloadDisplay(shouldReloadAll: true, shouldFilter: true,
-                              shouldSort: true, shouldSearch: true)
-            }
             .onAppear {
                 if dataState == .initializing {
                     debugPrint("Initializing")

@@ -14,6 +14,7 @@ struct ChartsView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var playData: PlayDataManager
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
@@ -22,7 +23,7 @@ struct ChartsView: View {
     var body: some View {
         NavigationStack(path: $navigationManager[.charts]) {
             List {
-                ForEach(allSongNoteCounts) { song in
+                ForEach(playData.allSongs) { song in
                     NavigationLink(song.title) {
                         List {
                             Section {
@@ -73,29 +74,6 @@ struct ChartsView: View {
             }
             .listStyle(.plain)
             .navigationTitle("ViewTitle.Charts")
-            .task {
-                reloadAllSongs()
-            }
-            .refreshable {
-                reloadAllSongs()
-            }
-            .onChange(of: progressAlertManager.isShowing) { _, newValue in
-                // TODO: Fix slowness when this view has loaded and a fetch is ongoing
-                if newValue {
-                    allSongNoteCounts.removeAll()
-                }
-            }
-        }
-    }
-
-    func reloadAllSongs() {
-        withAnimation(.snappy.speed(2.0)) {
-            allSongNoteCounts.removeAll()
-            allSongNoteCounts.append(contentsOf: (try? modelContext.fetch(
-                FetchDescriptor<IIDXSong>(
-                    sortBy: [SortDescriptor(\.title, order: .forward)]
-                )
-            )) ?? [])
         }
     }
 }
