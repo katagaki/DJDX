@@ -43,13 +43,47 @@ struct ScoreHistoryViewer: View {
         List {
             if let noteCount, noteCount > 0 {
                 Section {
-                    Chart(scoreHistory.sorted(by: { $0.key < $1.key }), id: \.key) { date, score in
-                        AreaMark(x: .value("Shared.Date", date), y: .value("Shared.Score", score))
+                    Chart {
+                        ForEach(scoreHistory.sorted(by: { $0.key < $1.key }), id: \.key) { date, score in
+                            AreaMark(x: .value("Shared.Date", date), y: .value("Shared.Score", score))
+                        }
+                        RuleMark(y: .value("AAA", Float(noteCount * 2) * 8.0 / 9.0))
+                            .foregroundStyle(.red)
+                            .annotation(position: .topLeading,
+                                        overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
+                                Text("AAA")
+                                    .foregroundStyle(.red.gradient)
+                                    .font(.caption2)
+                                    .opacity(0.7)
+                            }
+                            .opacity(0.7)
+                        RuleMark(y: .value("AA", Float(noteCount * 2) * 7.0 / 9.0))
+                            .foregroundStyle(.red)
+                            .annotation(position: .topLeading,
+                                        overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
+                                Text("AA")
+                                    .foregroundStyle(.red.gradient)
+                                    .font(.caption2)
+                                    .opacity(0.55)
+                            }
+                            .opacity(0.55)
+                        RuleMark(y: .value("A", Float(noteCount * 2) * 6.0 / 9.0))
+                            .foregroundStyle(.red)
+                            .annotation(position: .topLeading,
+                                        overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
+                                Text("A")
+                                    .foregroundStyle(.red.gradient)
+                                    .font(.caption2)
+                                    .opacity(0.4)
+                            }
+                            .opacity(0.4)
                     }
                     .chartXScale(domain: earliestDate...latestDate)
                     .chartYScale(domain: 0...(noteCount * 2))
-                    .frame(height: 150.0)
+                    .frame(height: 200.0)
                     .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                }
+                Section {
                     VStack(alignment: .leading, spacing: 8.0) {
                         ForEach(scoreHistory.sorted(by: {$0.key < $1.key}), id: \.key) { date, score in
                             DetailRow(
@@ -68,13 +102,6 @@ struct ScoreHistoryViewer: View {
                         .font(.body)
                 }
                 Section {
-                    Chart(scoreRateHistory.sorted(by: { $0.key < $1.key }), id: \.key) { date, scoreRate in
-                        AreaMark(x: .value("Shared.Date", date), y: .value("Shared.ScoreRate", scoreRate * 100.0))
-                    }
-                    .chartXScale(domain: earliestDate...latestDate)
-                    .chartYScale(domain: 0.0...100.0)
-                    .frame(height: 150.0)
-                    .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                     VStack(alignment: .leading, spacing: 8.0) {
                         ForEach(scoreRateHistory.sorted(by: {$0.key < $1.key}), id: \.key) { date, scoreRate in
                             DetailRow(date.formatted(date: .abbreviated, time: .omitted),

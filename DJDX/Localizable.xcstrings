@@ -1,6 +1,36 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "A" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "AA" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "AAA" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
     "Alert.DeleteData.Score.Confirm" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1339,6 +1369,7 @@
       }
     },
     "Shared.ScoreRate" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
