@@ -312,8 +312,9 @@ class PlayDataManager: ObservableObject {
         }
     }
 
-    func cleanUpOrphanedSongRecords(using modelContext: ModelContext) async {
+    func cleanUpOrphanedSongRecords() async {
         debugPrint("Cleaning up orphaned song records")
+        let modelContext = ModelContext(sharedModelContainer)
         let songRecords = (try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>(
             predicate: #Predicate<IIDXSongRecord> {
                 $0.importGroup == nil

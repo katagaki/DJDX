@@ -11,6 +11,9 @@ struct MainTabView: View {
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var playData: PlayDataManager
+
+    @State var isFirstStartCleanupComplete: Bool = false
 
     var body: some View {
         TabView(selection: $navigationManager.selectedTab) {
@@ -49,6 +52,14 @@ struct MainTabView: View {
                     percentage: $progressAlertManager.percentage
                 )
                 .ignoresSafeArea(.all)
+            }
+        }
+        .task {
+            if !isFirstStartCleanupComplete {
+                Task.detached {
+                    await playData.cleanUpOrphanedSongRecords()
+                }
+                isFirstStartCleanupComplete = true
             }
         }
         .onReceive(navigationManager.$selectedTab, perform: { newValue in
