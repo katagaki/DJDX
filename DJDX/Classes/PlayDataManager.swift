@@ -33,6 +33,9 @@ class PlayDataManager: ObservableObject {
                 sortBy: [SortDescriptor(\.title, order: .forward)]
             )
         )) ?? []
+        allSongs.forEach { song in
+            allSongCompactTitles[song.titleCompact()] = song
+        }
     }
 
     func reloadAllSongs() async {

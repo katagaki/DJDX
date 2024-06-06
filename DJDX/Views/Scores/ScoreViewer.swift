@@ -10,35 +10,33 @@ import SwiftUI
 
 struct ScoreViewer: View {
 
-    @Environment(\.modelContext) var modelContext
+    @EnvironmentObject var playData: PlayDataManager
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
     var songRecord: IIDXSongRecord
-    @State var songData: IIDXSong?
 
     var body: some View {
         List {
-            if !isBeginnerLevelHidden,
-               songRecord.beginnerScore.difficulty != 0 {
+            if !isBeginnerLevelHidden, songRecord.beginnerScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
-                             noteCount: songData?.spNoteCount?.beginnerNoteCount)
+                             noteCount: playData.noteCount(for: songRecord, of: .beginner))
             }
             if songRecord.normalScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.normalScore,
-                             noteCount: songData?.spNoteCount?.normalNoteCount)
+                             noteCount: playData.noteCount(for: songRecord, of: .normal))
             }
             if songRecord.hyperScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.hyperScore,
-                             noteCount: songData?.spNoteCount?.hyperNoteCount)
+                             noteCount: playData.noteCount(for: songRecord, of: .hyper))
             }
             if songRecord.anotherScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.anotherScore,
-                             noteCount: songData?.spNoteCount?.anotherNoteCount)
+                             noteCount: playData.noteCount(for: songRecord, of: .another))
             }
             if songRecord.leggendariaScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.leggendariaScore,
-                             noteCount: songData?.spNoteCount?.leggendariaNoteCount)
+                             noteCount: playData.noteCount(for: songRecord, of: .leggendaria))
             }
         }
         .listSectionSpacing(.compact)
@@ -93,17 +91,6 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
                     .bold()
                     .italic()
             }
-        }
-        .task {
-            let songRecordTitle = songRecord.title
-            self.songData = (try? modelContext.fetch(
-                FetchDescriptor<IIDXSong>(
-                    predicate: #Predicate<IIDXSong> {
-                        // TODO: Compare compact titles
-                        $0.title == songRecordTitle
-                    }
-                )
-            ))?.first ?? nil
         }
     }
 }

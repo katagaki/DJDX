@@ -75,7 +75,6 @@ struct ScoresView: View {
                         prompt: "Scores.Search.Prompt")
             .onAppear {
                 if dataState == .initializing {
-                    debugPrint("Initializing")
                     reloadDisplay(shouldReloadAll: true, shouldFilter: true,
                                   shouldSort: true, shouldSearch: true)
                 }
@@ -86,7 +85,6 @@ struct ScoresView: View {
             }
             .onChange(of: levelToShow) { _, newValue in
                 if !isSystemChangingFilterAndSort && newValue != .all {
-                    debugPrint("Filtering song records after level filter changed")
                     difficultyToShow = .all
                     reloadDisplay(shouldReloadAll: false, shouldFilter: true,
                                   shouldSort: true, shouldSearch: true)
@@ -94,7 +92,6 @@ struct ScoresView: View {
             }
             .onChange(of: difficultyToShow) { _, newValue in
                 if !isSystemChangingFilterAndSort && newValue != .all {
-                    debugPrint("Filtering song records after difficulty filter changed")
                     levelToShow = .all
                     if sortMode == .difficultyAscending || sortMode == .difficultyDescending {
                         isSystemChangingFilterAndSort = true
@@ -107,13 +104,11 @@ struct ScoresView: View {
             }
             .onChange(of: sortMode) { _, _ in
                 if !isSystemChangingFilterAndSort {
-                    debugPrint("Sorting song records after sort mode changed")
                     reloadDisplay(shouldReloadAll: false, shouldFilter: false,
                                   shouldSort: true, shouldSearch: true)
                 }
             }
             .onChange(of: searchTerm) { _, _ in
-                debugPrint("Searching song records after search term changed")
                 reloadDisplay(shouldReloadAll: false, shouldFilter: false,
                               shouldSort: false, shouldSearch: true)
             }
