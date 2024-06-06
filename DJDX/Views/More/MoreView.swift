@@ -20,6 +20,7 @@ struct MoreView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var playData: PlayDataManager
 
     @AppStorage(wrappedValue: false, "ScoresView.LevelsShownSeparately") var isLevelsShownSeparately: Bool
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
@@ -36,16 +37,16 @@ struct MoreView: View {
     @State var isConfirmingScoreDataDelete: Bool = false
 
     @State var dataImported: Int = 0
-    @State var dataTotal: Int = 1
+    @State var dataTotal: Int = 2
 
     var body: some View {
         NavigationStack(path: $navigationManager[.more]) {
             MoreList(repoName: "katagaki/DJDX", viewPath: ViewPath.moreAttributions) {
                 Section {
                     Button("More.ExternalData.DownloadWikiData") {
+                        progressAlertManager.show(title: "Alert.ExternalData.Downloading.Title",
+                                                  message: "Alert.ExternalData.Downloading.Text")
                         Task {
-                            progressAlertManager.show(title: "Alert.ExternalData.Downloading.Title",
-                                                      message: "Alert.ExternalData.Downloading.Text")
                             try? modelContext.delete(model: IIDXSong.self)
                             let iidxSongs: [IIDXSong] = await withTaskGroup(of: [IIDXSong].self) { group in
                                 var iidxSongsFromWiki: [IIDXSong] = []
@@ -56,20 +57,23 @@ struct MoreView: View {
                                     return await reloadBemaniWikiDataForExistingVersions()
                                 }
                                 for await result in group {
-                                    dataTotal += result.count
                                     iidxSongsFromWiki.append(contentsOf: result)
+                                    dataImported += 1
                                 }
                                 return iidxSongsFromWiki
                             }
-                            for iidxSong in iidxSongs {
-                                modelContext.insert(iidxSong)
-                                dataImported += 1
-                                await updateProgress()
+                            try? modelContext.transaction {
+                                for iidxSong in iidxSongs {
+                                    modelContext.insert(iidxSong)
+                                }
+                                try? modelContext.save()
                             }
+                            await playData.reloadAllSongs()
                             progressAlertManager.hide()
-                            withAnimation(.snappy.speed(2.0)) {
-                                dataImported = 0
-                                dataTotal = 1
+                            await MainActor.run {
+                                withAnimation(.snappy.speed(2.0)) {
+                                    dataImported = 0
+                                }
                             }
                         }
                     }
@@ -154,6 +158,13 @@ struct MoreView: View {
                         .font(.body)
                 }
             }
+            .onChange(of: dataImported, { _, _ in
+                Task {
+                    await MainActor.run {
+                        progressAlertManager.updateProgress(Int(Float(dataImported) / Float(dataTotal) * 100.0))
+                    }
+                }
+            })
             .alert(
                 "Alert.DeleteData.Web.Title",
                 isPresented: $isConfirmingWebDataDelete,

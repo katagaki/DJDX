@@ -15,6 +15,7 @@ class ProgressAlertManager {
     var message: String = ""
     var percentage: Int = 0
 
+    @MainActor
     func show(title: String, message: String) {
         withAnimation(.snappy.speed(2.0)) {
             self.title = title
@@ -24,6 +25,7 @@ class ProgressAlertManager {
         }
     }
 
+    @MainActor
     func hide() {
         withAnimation(.snappy.speed(2.0)) {
             isShowing = false

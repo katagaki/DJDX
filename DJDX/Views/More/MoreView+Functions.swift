@@ -10,12 +10,6 @@ import SwiftSoup
 import WebKit
 
 extension MoreView {
-    func updateProgress() async {
-        await MainActor.run {
-            progressAlertManager.updateProgress(Int(Float(dataImported) / Float(dataTotal) * 100.0))
-        }
-    }
-
     func reloadBemaniWikiDataForLatestVersion() async -> [IIDXSong] {
         do {
             var iidxSongsFromWiki: [IIDXSong] = []
