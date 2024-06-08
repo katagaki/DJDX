@@ -77,7 +77,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "インポートされたスコアデータがすべて削除されます。"
+            "value" : "インポートされたスコアデータがすべて削除されます"
           }
         }
       }
@@ -128,7 +128,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Webデータがすべて削除されます。"
+            "value" : "Webデータがすべて削除されます"
           }
         }
       }
@@ -298,7 +298,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "データがインポートできませんでした。"
+            "value" : "データがインポートできませんでした"
           }
         }
       }
@@ -332,7 +332,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "データは正常にインポートされました。"
+            "value" : "データは正常にインポートされました"
           }
         }
       }
