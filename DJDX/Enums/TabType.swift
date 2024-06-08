@@ -10,7 +10,7 @@ import Foundation
 enum TabType: Int {
     case calendar = 0
     case scores = 1
-    case charts = 2
+    case notImplemented = 2
     case analytics = 3
     case more = 4
 }

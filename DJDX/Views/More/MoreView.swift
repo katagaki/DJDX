@@ -7,6 +7,7 @@
 
 import Komponents
 import SwiftUI
+import WebKit
 
 let bemaniWikiLatestVersionPageURL = URL(string: """
 https://bemaniwiki.com/?beatmania+IIDX+31+EPOLIS/%BF%B7%B6%CA%A5%EA%A5%B9%A5%C8
@@ -18,7 +19,6 @@ https://bemaniwiki.com/?beatmania+IIDX+31+EPOLIS/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%
 struct MoreView: View {
 
     @Environment(\.modelContext) var modelContext
-    @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var playData: PlayDataManager
 
@@ -36,46 +36,14 @@ struct MoreView: View {
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
 
-    @State var dataImported: Int = 0
-    @State var dataTotal: Int = 2
-
     var body: some View {
         NavigationStack(path: $navigationManager[.more]) {
             MoreList(repoName: "katagaki/DJDX", viewPath: ViewPath.moreAttributions) {
                 Section {
-                    Button("More.ExternalData.DownloadWikiData") {
-                        progressAlertManager.show(title: "Alert.ExternalData.Downloading.Title",
-                                                  message: "Alert.ExternalData.Downloading.Text")
-                        Task {
-                            try? modelContext.delete(model: IIDXSong.self)
-                            let iidxSongs: [IIDXSong] = await withTaskGroup(of: [IIDXSong].self) { group in
-                                var iidxSongsFromWiki: [IIDXSong] = []
-                                group.addTask {
-                                    return await reloadBemaniWikiDataForLatestVersion()
-                                }
-                                group.addTask {
-                                    return await reloadBemaniWikiDataForExistingVersions()
-                                }
-                                for await result in group {
-                                    iidxSongsFromWiki.append(contentsOf: result)
-                                    dataImported += 1
-                                }
-                                return iidxSongsFromWiki
-                            }
-                            try? modelContext.transaction {
-                                for iidxSong in iidxSongs {
-                                    modelContext.insert(iidxSong)
-                                }
-                                try? modelContext.save()
-                            }
-                            await playData.reloadAllSongs()
-                            progressAlertManager.hide()
-                            await MainActor.run {
-                                withAnimation(.snappy.speed(2.0)) {
-                                    dataImported = 0
-                                }
-                            }
-                        }
+                    NavigationLink(value: ViewPath.moreBemaniWikiCharts) {
+                        ListRow(image: "ListIcon.BemaniWiki2nd",
+                                title: "More.ExternalData.BemaniWiki2nd",
+                                subtitle: "More.ExternalData.BemaniWiki2nd.Description")
                     }
                 } header: {
                     ListSectionHeader(text: "More.ExternalData.Header")
@@ -158,13 +126,6 @@ struct MoreView: View {
                         .font(.body)
                 }
             }
-            .onChange(of: dataImported, { _, _ in
-                Task {
-                    await MainActor.run {
-                        progressAlertManager.updateProgress(Int(Float(dataImported) / Float(dataTotal) * 100.0))
-                    }
-                }
-            })
             .alert(
                 "Alert.DeleteData.Web.Title",
                 isPresented: $isConfirmingWebDataDelete,
@@ -195,6 +156,8 @@ struct MoreView: View {
                 })
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
                 switch viewPath {
+                case .moreBemaniWikiCharts:
+                    MoreBemaniWikiCharts()
                 case .moreAttributions:
                     LicensesView(licenses: [
                         License(libraryName: "CSwiftV", text:
@@ -256,5 +219,21 @@ SOFTWARE.
                 }
             })
         }
+    }
+
+    func deleteAllWebData() {
+        WKWebsiteDataStore.default()
+            .fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                records.forEach { record in
+                    WKWebsiteDataStore.default().removeData(ofTypes: record.dataTypes,
+                                                            for: [record],
+                                                            completionHandler: {})
+                }
+            }
+    }
+
+    func deleteAllScoreData() {
+        try? modelContext.delete(model: ImportGroup.self)
+        try? modelContext.delete(model: IIDXSongRecord.self)
     }
 }

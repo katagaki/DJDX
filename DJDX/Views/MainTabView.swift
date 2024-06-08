@@ -27,14 +27,9 @@ struct MainTabView: View {
                     Label("Tab.Scores", image: .tabIconScores)
                 }
                 .tag(TabType.scores)
-            ChartsView()
-                .tabItem {
-                    Label("Tab.Charts", image: .tabIconCharts)
-                }
-                .tag(TabType.charts)
             AnalyticsView()
                 .tabItem {
-                    Label("Tab.Analytics", systemImage: "chart.xyaxis.line")
+                    Label("Tab.Analytics", image: .tabIconAnalytics)
                 }
                 .tag(TabType.analytics)
             MoreView()

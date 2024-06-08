@@ -125,9 +125,8 @@ struct ScoreRow: View {
                         .font(.caption)
                     }
                 }
-                Spacer(minLength: 0.0)
-                if let score = scores.first(where: { $0 != nil }),
-                   let score = score {
+                if isLevelVisible, let score = scores.first(where: { $0 != nil }), let score = score {
+                    Spacer(minLength: 0.0)
                     IIDXLevelLabel(levelType: score.level, songRecord: songRecord)
                         .frame(width: 74.0, alignment: .center)
                 }

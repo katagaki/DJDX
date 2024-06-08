@@ -18,7 +18,6 @@ class NavigationManager: ObservableObject {
         .calendar: [],
         .scores: [],
         .analytics: [],
-        .charts: [],
         .more: []
     ]
 

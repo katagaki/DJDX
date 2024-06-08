@@ -16,11 +16,14 @@ class PlayDataManager: ObservableObject {
     @Published var allSongs: [IIDXSong]
     var allSongCompactTitles: [String: IIDXSong] = [:]
 
-    // Play Data
+    // Play Data Cache
     var allSongRecords: [IIDXSongRecord] = []
+    var allSongRecordLevelMaps: [IIDXSongRecord: IIDXLevelScore] = [:] // TODO: Implement show scores separately feature
     var allSongNoteCounts: [String: IIDXNoteCount] = [:]
     var filteredSongRecords: [IIDXSongRecord] = []
     var sortedSongRecords: [IIDXSongRecord] = []
+
+    // Presentation Data
     @Published var displayedSongRecords: [IIDXSongRecord] = []
     @Published var displayedSongRecordClearRates: [IIDXSongRecord: [IIDXLevel: Float]] = [:]
 

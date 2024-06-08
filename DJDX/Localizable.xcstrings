@@ -133,6 +133,40 @@
         }
       }
     },
+    "Alert.ExternalData.Completed.Text.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld charts were read successfully."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld曲の譜面データが読み込まれました。"
+          }
+        }
+      }
+    },
+    "Alert.ExternalData.Completed.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data Updated Successful"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ取得が成功しました"
+          }
+        }
+      }
+    },
     "Alert.ExternalData.Downloading.Text" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -608,19 +642,53 @@
         }
       }
     },
-    "More.ExternalData.DownloadWikiData" : {
+    "More.ExternalData.BemaniWiki2nd" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fetch Data From BEMANIWiki 2nd"
+            "value" : "BEMANIWiki 2nd"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "「BEMANIWiki 2nd」からデータを取得"
+            "value" : "BEMANIWiki 2nd"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BemaniWiki2nd.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Time, Note Counts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面の時間、ノーツ数"
+          }
+        }
+      }
+    },
+    "More.ExternalData.Charts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面一覧"
           }
         }
       }
@@ -638,6 +706,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "外部データソース"
+          }
+        }
+      }
+    },
+    "More.ExternalData.UpdateData" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データを更新"
           }
         }
       }
@@ -1617,23 +1702,6 @@
         }
       }
     },
-    "Tab.Charts" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Charts"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "譜面"
-          }
-        }
-      }
-    },
     "Tab.More" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1702,23 +1770,6 @@
         }
       }
     },
-    "ViewTitle.Charts" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Charts"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "譜面一覧"
-          }
-        }
-      }
-    },
     "ViewTitle.Importer.CSV" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1749,6 +1800,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Webインポート"
+          }
+        }
+      }
+    },
+    "ViewTitle.More.BemaniWiki2nd" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEMANIWiki 2nd"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEMANIWiki 2nd"
           }
         }
       }

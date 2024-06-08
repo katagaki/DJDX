@@ -12,9 +12,8 @@
 		E46A65E52C0ACADB00D9544B /* IIDXSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65E42C0ACADB00D9544B /* IIDXSong.swift */; };
 		E46A65E72C0ACBAA00D9544B /* IIDXPlayType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */; };
 		E46A65EA2C0AE83E00D9544B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E46A65E92C0AE83E00D9544B /* Localizable.xcstrings */; };
-		E46A65ED2C0AFC7800D9544B /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65EC2C0AFC7800D9544B /* ChartsView.swift */; };
+		E46A65ED2C0AFC7800D9544B /* MoreBemaniWikiCharts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65EC2C0AFC7800D9544B /* MoreBemaniWikiCharts.swift */; };
 		E46A65EF2C0AFF0000D9544B /* ProgressAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65EE2C0AFF0000D9544B /* ProgressAlert.swift */; };
-		E46A65F12C0B085D00D9544B /* MoreView+Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65F02C0B085D00D9544B /* MoreView+Functions.swift */; };
 		E46A65F32C0B112900D9544B /* LevelDetailRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65F22C0B112900D9544B /* LevelDetailRow.swift */; };
 		E46A65F52C0B3C9700D9544B /* ProgressAlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65F42C0B3C9700D9544B /* ProgressAlertManager.swift */; };
 		E46A65F92C0B5E7300D9544B /* TextageViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65F82C0B5E7300D9544B /* TextageViewer.swift */; };
@@ -73,9 +72,8 @@
 		E46A65E42C0ACADB00D9544B /* IIDXSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXSong.swift; sourceTree = "<group>"; };
 		E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXPlayType.swift; sourceTree = "<group>"; };
 		E46A65E92C0AE83E00D9544B /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		E46A65EC2C0AFC7800D9544B /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
+		E46A65EC2C0AFC7800D9544B /* MoreBemaniWikiCharts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreBemaniWikiCharts.swift; sourceTree = "<group>"; };
 		E46A65EE2C0AFF0000D9544B /* ProgressAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAlert.swift; sourceTree = "<group>"; };
-		E46A65F02C0B085D00D9544B /* MoreView+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoreView+Functions.swift"; sourceTree = "<group>"; };
 		E46A65F22C0B112900D9544B /* LevelDetailRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelDetailRow.swift; sourceTree = "<group>"; };
 		E46A65F42C0B3C9700D9544B /* ProgressAlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAlertManager.swift; sourceTree = "<group>"; };
 		E46A65F82C0B5E7300D9544B /* TextageViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextageViewer.swift; sourceTree = "<group>"; };
@@ -154,14 +152,6 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
-		E46A65EB2C0AFC6D00D9544B /* Charts */ = {
-			isa = PBXGroup;
-			children = (
-				E46A65EC2C0AFC7800D9544B /* ChartsView.swift */,
-			);
-			path = Charts;
-			sourceTree = "<group>";
-		};
 		E4B123A32BF8E8E400D4A3D1 = {
 			isa = PBXGroup;
 			children = (
@@ -216,7 +206,6 @@
 				E4B123D12BF909CD00D4A3D1 /* MainTabView.swift */,
 				E4EB2CA62BFF7E2C00A00796 /* Calendar */,
 				E4B123DB2BF90D1F00D4A3D1 /* Scores */,
-				E46A65EB2C0AFC6D00D9544B /* Charts */,
 				E4E3D0DC2BF9D645001942FE /* Analytics */,
 				E4B123DC2BF90D2600D4A3D1 /* More */,
 				E4B123D82BF90C1300D4A3D1 /* Shared */,
@@ -258,7 +247,7 @@
 			isa = PBXGroup;
 			children = (
 				E4B123D62BF90A4300D4A3D1 /* MoreView.swift */,
-				E46A65F02C0B085D00D9544B /* MoreView+Functions.swift */,
+				E46A65EC2C0AFC7800D9544B /* MoreBemaniWikiCharts.swift */,
 			);
 			path = More;
 			sourceTree = "<group>";
@@ -440,7 +429,7 @@
 				E46A66052C0CA71E00D9544B /* ScoreRow.swift in Sources */,
 				E4E3D0D02BF9959A001942FE /* IIDXLevelShowcase.swift in Sources */,
 				E4E3D0D22BF99790001942FE /* DetailedSongTitle.swift in Sources */,
-				E46A65ED2C0AFC7800D9544B /* ChartsView.swift in Sources */,
+				E46A65ED2C0AFC7800D9544B /* MoreBemaniWikiCharts.swift in Sources */,
 				E4E3D0CE2BF990CC001942FE /* IIDXLevelLabel.swift in Sources */,
 				E46A65FD2C0C8E9600D9544B /* AnalyticsView+Functions.swift in Sources */,
 				E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */,
@@ -449,7 +438,6 @@
 				E4EB2CA82BFF7E3700A00796 /* CalendarView.swift in Sources */,
 				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,
 				E46A65E02C0A276800D9544B /* DetailRow.swift in Sources */,
-				E46A65F12C0B085D00D9544B /* MoreView+Functions.swift in Sources */,
 				E4C5053C2C0E71D700A0C303 /* ScoreHistoryViewer.swift in Sources */,
 				E4B123D72BF90A4300D4A3D1 /* MoreView.swift in Sources */,
 				E4BC32822C036CBD006A0F7A /* LevelLabelGlow.swift in Sources */,

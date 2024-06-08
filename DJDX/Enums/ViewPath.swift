@@ -20,5 +20,6 @@ enum ViewPath: Hashable {
     case scoreRatePerDifficultyGraph
     case importerWeb
     case importerManual
+    case moreBemaniWikiCharts
     case moreAttributions
 }
