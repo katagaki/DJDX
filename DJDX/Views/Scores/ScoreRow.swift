@@ -30,7 +30,7 @@ struct ScoreRow: View {
             songRecord.score(for: levelToShow),
             songRecord.score(for: difficultyToShow)
         ]
-        VStack(alignment: .trailing, spacing: 4.0) {
+        VStack(alignment: .leading, spacing: 4.0) {
             HStack(alignment: .center, spacing: 8.0) {
                 VStack(alignment: .leading, spacing: 2.0) {
                     if isGenreVisible {
@@ -132,7 +132,10 @@ struct ScoreRow: View {
                 }
             }
             if isLevelVisible && levelToShow == .all && difficultyToShow == .all {
-                IIDXLevelShowcase(songRecord: songRecord)
+                HStack(alignment: .center, spacing: 8.0) {
+                    Spacer(minLength: 0.0)
+                    IIDXLevelShowcase(songRecord: songRecord)
+                }
             }
         }
         .padding([.top, .bottom], 8.0)
