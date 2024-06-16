@@ -112,31 +112,53 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
             let parsedCSV = CSwiftV(with: csvString)
             if let keyedRows = parsedCSV.keyedRows {
                 let modelContext = ModelContext(sharedModelContainer)
-                // Delete selected date's import group
+                let importMode = await importMode
+                var shouldCreateImportGroup = true
+                var importGroupToUse: ImportGroup?
+                // Delete selected date's import groups' song records that match the import type
                 let fetchDescriptor = await FetchDescriptor<ImportGroup>(
                     predicate: importGroups(in: calendar)
                 )
                 if let importGroupsOnSelectedDate: [ImportGroup] = try? modelContext.fetch(fetchDescriptor) {
                     for importGroup in importGroupsOnSelectedDate {
-                        modelContext.delete(importGroup)
+                        shouldCreateImportGroup = false
+                        importGroupToUse = importGroup
+                        if let songRecords: [IIDXSongRecord] = importGroup.iidxData {
+                            for songRecord in songRecords where songRecord.playType == importMode {
+                                modelContext.delete(songRecord)
+                            }
+                        }
                     }
                 }
                 let importDate = await calendar.selectedDate
-                try? modelContext.transaction {
-                    // Create new import group for selected date
-                    let newImportGroup: ImportGroup = ImportGroup(importDate: importDate, iidxData: [])
-                    modelContext.insert(newImportGroup)
-                    // Read song records
-                    var numberOfKeyedRowsProcessed = 0
-                    for keyedRow in keyedRows {
-                        debugPrint("Processing keyed row \(numberOfKeyedRowsProcessed)")
-                        let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
-                        modelContext.insert(scoreForSong)
-                        scoreForSong.importGroup = newImportGroup
-                        numberOfKeyedRowsProcessed += 1
-                        Task { [numberOfKeyedRowsProcessed] in
-                            await MainActor.run {
-                                progressAlertManager.updateProgress(numberOfKeyedRowsProcessed * 100 / keyedRows.count)
+                try? modelContext.transaction { [importMode] in
+                    var importGroup: ImportGroup?
+                    if shouldCreateImportGroup {
+                        // Create new import group for selected date
+                        let newImportGroup = ImportGroup(importDate: importDate, iidxData: [])
+                        modelContext.insert(newImportGroup)
+                        importGroup = newImportGroup
+                    } else {
+                        if let importGroupToUse {
+                            importGroup = importGroupToUse
+                        }
+                    }
+                    if let importGroup {
+                        // Read song records
+                        var numberOfKeyedRowsProcessed = 0
+                        for keyedRow in keyedRows {
+                            debugPrint("Processing keyed row \(numberOfKeyedRowsProcessed)")
+                            let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
+                            modelContext.insert(scoreForSong)
+                            scoreForSong.importGroup = importGroup
+                            scoreForSong.playType = importMode
+                            numberOfKeyedRowsProcessed += 1
+                            Task { [numberOfKeyedRowsProcessed] in
+                                await MainActor.run {
+                                    progressAlertManager.updateProgress(
+                                        numberOfKeyedRowsProcessed * 100 / keyedRows.count
+                                    )
+                                }
                             }
                         }
                     }

@@ -19,6 +19,8 @@ struct CalendarView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var calendar: CalendarManager
 
+    @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var importPlayType: IIDXPlayType
+
     @State var importGroups: [ImportGroup] = []
 
     @State var isAutoImportFailed: Bool = false
@@ -117,6 +119,27 @@ struct CalendarView: View {
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 ScrollView(.horizontal) {
                     HStack(spacing: 8.0) {
+                        PlayTypePicker(playTypeToShow: $importPlayType)
+                        switch importPlayType {
+                        case .single:
+                            NavigationLink(value: ViewPath.importerWebIIDXSingle) {
+                                Label("Calendar.Import.FromWeb", systemImage: "globe")
+                                    .fontWeight(.medium)
+                                    .padding(4.0)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .clipShape(.capsule)
+                            .foregroundStyle(.text)
+                        case .double:
+                            NavigationLink(value: ViewPath.importerWebIIDXDouble) {
+                                Label("Calendar.Import.FromWeb", systemImage: "globe")
+                                    .fontWeight(.medium)
+                                    .padding(4.0)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .clipShape(.capsule)
+                            .foregroundStyle(.text)
+                        }
                         NavigationLink(value: ViewPath.importerWebIIDXSingle) {
                             Label("Calendar.Import.FromWeb", systemImage: "globe")
                                 .fontWeight(.medium)

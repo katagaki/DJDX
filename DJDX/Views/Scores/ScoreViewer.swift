@@ -56,6 +56,7 @@ struct ScoreViewer: View {
                     Text(songRecord.title)
                         .bold()
                         .fontWidth(.condensed)
+                        .textSelection(.enabled)
                     Text(songRecord.artist)
                         .font(.caption)
                         .fontWidth(.condensed)
