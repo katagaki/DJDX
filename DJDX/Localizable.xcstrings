@@ -439,23 +439,6 @@
         }
       }
     },
-    "Calendar.Import" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "インポート"
-          }
-        }
-      }
-    },
     "Calendar.Import.FromCSV" : {
       "extractionState" : "manual",
       "localizations" : {

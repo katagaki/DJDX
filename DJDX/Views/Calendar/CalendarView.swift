@@ -56,6 +56,7 @@ struct CalendarView: View {
             .navigationTitle("ViewTitle.Calendar")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     if !Calendar.current.isDate(calendar.selectedDate, inSameDayAs: .now) {
@@ -69,14 +70,6 @@ struct CalendarView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Section {
-                            NavigationLink(value: ViewPath.importerWebIIDXSingle) {
-                                Label("Calendar.Import.FromWeb", systemImage: "globe")
-                            }
-                            NavigationLink(value: ViewPath.importerManual) {
-                                Label("Calendar.Import.FromCSV", systemImage: "doc.badge.plus")
-                            }
-                        }
-                        Section {
                             Button("Calendar.Import.LoadSamples.Button", systemImage: "sparkles") {
                                 Task.detached {
                                     await calendar.loadCSVData(reportingTo: progressAlertManager)
@@ -89,7 +82,7 @@ struct CalendarView: View {
                             Text("Calendar.Import.LoadSamples.Description")
                         }
                     } label: {
-                        Text("Calendar.Import")
+                        Image(systemName: "questionmark.circle")
                     }
                 }
             }
@@ -115,6 +108,38 @@ struct CalendarView: View {
                 .frame(maxWidth: .infinity)
                 .background(Material.bar)
                 .overlay(alignment: .bottom) {
+                    Rectangle()
+                        .frame(height: 1/3)
+                        .foregroundColor(.primary.opacity(0.2))
+                        .ignoresSafeArea(edges: [.leading, .trailing])
+                }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0.0) {
+                ScrollView(.horizontal) {
+                    HStack(spacing: 8.0) {
+                        NavigationLink(value: ViewPath.importerWebIIDXSingle) {
+                            Label("Calendar.Import.FromWeb", systemImage: "globe")
+                                .fontWeight(.medium)
+                                .padding(4.0)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .clipShape(.capsule)
+                        .foregroundStyle(.text)
+                        NavigationLink(value: ViewPath.importerManual) {
+                            Label("Calendar.Import.FromCSV", systemImage: "doc.badge.plus")
+                                .fontWeight(.medium)
+                                .padding(4.0)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .clipShape(.capsule)
+                        .foregroundStyle(.text)
+                    }
+                    .padding([.leading, .trailing], 16.0)
+                    .padding([.top, .bottom], 12.0)
+                }
+                .scrollIndicators(.hidden)
+                .background(Material.bar)
+                .overlay(alignment: .top) {
                     Rectangle()
                         .frame(height: 1/3)
                         .foregroundColor(.primary.opacity(0.2))
