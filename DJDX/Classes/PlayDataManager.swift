@@ -12,9 +12,6 @@ import SwiftUI
 // swiftlint:disable type_body_length
 class PlayDataManager: ObservableObject {
 
-    // Global Filters
-    @Published var playType: IIDXPlayType = .single
-
     // External Data
     @Published var allSongs: [IIDXSong]
     var allSongCompactTitles: [String: IIDXSong] = [:]
@@ -82,7 +79,6 @@ class PlayDataManager: ObservableObject {
         let newSongRecords = calendar.latestAvailableIIDXSongRecords(
             in: modelContext
         )
-            .filter({$0.playType == playType})
         let newSongMappings = ((try? modelContext.fetch(FetchDescriptor<IIDXSong>(
             sortBy: [SortDescriptor(\.title, order: .forward)]
         ))) ?? [])
