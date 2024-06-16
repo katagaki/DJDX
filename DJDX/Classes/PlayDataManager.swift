@@ -94,11 +94,17 @@ class PlayDataManager: ObservableObject {
         allSongNoteCounts = newSongMappings
     }
 
-    func filterSongRecords(isShowingOnlyPlayDataWithScores: Bool,
+    func filterSongRecords(playTypeToShow: IIDXPlayType,
+                           isShowingOnlyPlayDataWithScores: Bool,
                            levelToShow: IIDXLevel,
                            difficultyToShow: IIDXDifficulty) async {
         debugPrint("Filtering song records")
         var filteredSongRecords: [IIDXSongRecord] = self.allSongRecords
+
+        // Filter songs by play type
+        filteredSongRecords.removeAll(where: { songRecord in
+            songRecord.playType != playTypeToShow
+        })
 
         // Remove song records that have no scores
         if isShowingOnlyPlayDataWithScores {
@@ -357,6 +363,7 @@ class PlayDataManager: ObservableObject {
             }
         }
     }
+
     // MARK: Convenience Functions
 
     func scoreRate(for songRecord: IIDXSongRecord, of level: IIDXLevel, or difficulty: IIDXDifficulty) -> Float? {

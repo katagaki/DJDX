@@ -28,7 +28,7 @@ final class IIDXSongRecord: Equatable, Hashable {
     var importGroup: ImportGroup?
 
     // Based on EPOLIS CSV format
-    init(csvRowData: [String: Any]) {
+    init(csvRowData: [String: Any], playType: IIDXPlayType? = nil) {
         self.version = csvRowData["バージョン"] as? String ?? ""
         self.title = csvRowData["タイトル"] as? String ?? ""
         self.genre = csvRowData["ジャンル"] as? String ?? ""
@@ -65,6 +65,10 @@ final class IIDXSongRecord: Equatable, Hashable {
             self.lastPlayDate = dateFormatter.date(from: lastPlayDate)!
         } else {
             self.lastPlayDate = .distantPast
+        }
+
+        if let playType {
+            self.playType = playType
         }
     }
 

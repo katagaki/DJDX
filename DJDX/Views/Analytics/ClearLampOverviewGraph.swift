@@ -19,14 +19,14 @@ struct ClearLampOverviewGraph: View {
             ForEach(clearLampPerDifficulty[difficulty]!.sorted(by: <), id: \.key) { clearType, count in
                 BarMark(
                     x: .value("LEVEL", difficulty),
-                    y: .value("CLEAR COUNT", count),
+                    y: .value("Shared.ClearCount", count),
                     width: .inset(8.0)
                 )
                 .foregroundStyle(
-                    by: .value("CLEAR TYPE", clearType)
+                    by: .value("Shared.ClearType", clearType)
                 )
                 .position(
-                    by: .value("CLEAR TYPE", clearType),
+                    by: .value("Shared.ClearType", clearType),
                     axis: .horizontal,
                     span: .ratio(1)
                 )

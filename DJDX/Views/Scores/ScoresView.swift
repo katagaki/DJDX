@@ -18,6 +18,7 @@ struct ScoresView: View {
 
     @State var dataState: DataState = .initializing
 
+    @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: true, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
     @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
     @AppStorage(wrappedValue: .all, "ScoresView.DifficultyFilter") var difficultyToShow: IIDXDifficulty
@@ -52,7 +53,13 @@ struct ScoresView: View {
                         ProgressView()
                             .progressViewStyle(.circular)
                     case .presenting:
-                        Color.clear
+                        Picker("Shared.PlayType", selection: $playTypeToShow) {
+                            Text(verbatim: "SP")
+                                .tag(IIDXPlayType.single)
+                            Text(verbatim: "DP")
+                                .tag(IIDXPlayType.double)
+                        }
+                        .pickerStyle(.segmented)
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -85,6 +92,10 @@ struct ScoresView: View {
                     reloadDisplay(shouldReloadAll: true, shouldFilter: true,
                                   shouldSort: true, shouldSearch: true)
                 }
+            }
+            .onChange(of: playTypeToShow) { _, _ in
+                reloadDisplay(shouldReloadAll: false, shouldFilter: true,
+                              shouldSort: true, shouldSearch: true)
             }
             .onChange(of: isShowingOnlyPlayDataWithScores) { _, _ in
                 reloadDisplay(shouldReloadAll: false, shouldFilter: true,
@@ -156,6 +167,7 @@ struct ScoresView: View {
             }
             if shouldFilter {
                 await playData.filterSongRecords(
+                    playTypeToShow: playTypeToShow,
                     isShowingOnlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
                     levelToShow: levelToShow,
                     difficultyToShow: difficultyToShow

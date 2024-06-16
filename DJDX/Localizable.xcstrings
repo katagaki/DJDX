@@ -490,36 +490,6 @@
         }
       }
     },
-    "CLEAR COUNT" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CLEAR COUNT"
-          }
-        }
-      }
-    },
-    "CLEAR TYPE" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CLEAR TYPE"
-          }
-        }
-      }
-    },
-    "DJ LEVEL" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ LEVEL"
-          }
-        }
-      }
-    },
     "Importer.CSV.Download.Button" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1201,6 +1171,40 @@
         }
       }
     },
+    "Shared.ClearCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "CLEAR COUNT"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CLEAR COUNT"
+          }
+        }
+      }
+    },
+    "Shared.ClearType" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "CLEAR TYPE"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CLEAR TYPE"
+          }
+        }
+      }
+    },
     "Shared.Date" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1231,6 +1235,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "難易度"
+          }
+        }
+      }
+    },
+    "Shared.DJLevel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "DJ LEVEL"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
           }
         }
       }
@@ -1433,6 +1454,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Safariで開く"
+          }
+        }
+      }
+    },
+    "Shared.PlayType" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PLAY TYPE"
           }
         }
       }

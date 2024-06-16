@@ -51,7 +51,7 @@ struct ScoreHistoryViewer: View {
                             .foregroundStyle(.red)
                             .annotation(position: .topLeading,
                                         overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
-                                Text("AAA")
+                                Text(verbatim: "AAA")
                                     .foregroundStyle(.red.gradient)
                                     .font(.caption2)
                                     .opacity(0.7)
@@ -61,7 +61,7 @@ struct ScoreHistoryViewer: View {
                             .foregroundStyle(.red)
                             .annotation(position: .topLeading,
                                         overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
-                                Text("AA")
+                                Text(verbatim: "AA")
                                     .foregroundStyle(.red.gradient)
                                     .font(.caption2)
                                     .opacity(0.55)
@@ -71,7 +71,7 @@ struct ScoreHistoryViewer: View {
                             .foregroundStyle(.red)
                             .annotation(position: .topLeading,
                                         overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
-                                Text("A")
+                                Text(verbatim: "A")
                                     .foregroundStyle(.red.gradient)
                                     .font(.caption2)
                                     .opacity(0.4)

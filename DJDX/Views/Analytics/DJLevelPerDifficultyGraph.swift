@@ -16,8 +16,8 @@ struct DJLevelPerDifficultyGraph: View {
         Chart(djLevelPerDifficulty[selectedDifficulty]?.sorted(by: { $0.key < $1.key }) ??
               [:].sorted(by: { $0.key < $1.key }), id: \.key) { djLevel, count in
             BarMark(
-                x: .value("DJ LEVEL", djLevel.rawValue),
-                y: .value("CLEAR COUNT", count),
+                x: .value("Shared.DJLevel", djLevel.rawValue),
+                y: .value("Shared.ClearCount", count),
                 width: .inset(8.0)
             )
         }

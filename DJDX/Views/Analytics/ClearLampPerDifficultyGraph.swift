@@ -19,7 +19,7 @@ struct ClearLampPerDifficultyGraph: View {
               [:].sorted(by: <), id: \.key) { clearType, count in
             SectorMark(angle: .value(clearType, count))
                 .foregroundStyle(
-                    by: .value("CLEAR TYPE", clearType)
+                    by: .value("Shared.ClearType", clearType)
                 )
         }
               .chartLegend(position: legendPosition, alignment: .leading, spacing: 2.0)
