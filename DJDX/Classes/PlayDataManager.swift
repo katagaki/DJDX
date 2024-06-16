@@ -73,17 +73,23 @@ class PlayDataManager: ObservableObject {
         filteredSongRecords.removeAll()
         allSongRecords.removeAll()
         allSongNoteCounts.removeAll()
+
+        debugPrint("Performing required data migration (if any)")
+        await migrateDataToNewerSchema()
+
         debugPrint("Loading new song records")
         let modelContext = ModelContext(sharedModelContainer)
         let newSongRecords = calendar.latestAvailableIIDXSongRecords(
             in: modelContext
         )
+            .filter({$0.playType == playType})
         let newSongMappings = ((try? modelContext.fetch(FetchDescriptor<IIDXSong>(
             sortBy: [SortDescriptor(\.title, order: .forward)]
         ))) ?? [])
             .reduce(into: [:]) { partialResult, song in
                 partialResult[song.titleCompact()] = song.spNoteCount
             }
+
         allSongRecords = newSongRecords
         allSongNoteCounts = newSongMappings
     }
@@ -330,6 +336,27 @@ class PlayDataManager: ObservableObject {
         try? modelContext.save()
     }
 
+    func migrateDataToNewerSchema() async {
+        let defaults = UserDefaults.standard
+        let dataMigrationKeys = ["Internal.DataMigrationForBetaBuild84"]
+
+        for dataMigrationKey in dataMigrationKeys {
+            switch dataMigrationKey {
+            case "Internal.DataMigrationForBetaBuild84":
+                if !defaults.bool(forKey: dataMigrationKey) {
+                    debugPrint("Performing migration when migrating from 1.0-84 to 1.0-85+")
+                    UserDefaults.standard.set(true, forKey: dataMigrationKey)
+                    let modelContext = ModelContext(sharedModelContainer)
+                    let songRecords = try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>())
+                    for songRecord in songRecords ?? [] {
+                        songRecord.playType = .single
+                    }
+                    try? modelContext.save()
+                }
+            default: break
+            }
+        }
+    }
     // MARK: Convenience Functions
 
     func scoreRate(for songRecord: IIDXSongRecord, of level: IIDXLevel, or difficulty: IIDXDifficulty) -> Float? {

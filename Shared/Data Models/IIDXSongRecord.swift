@@ -22,6 +22,7 @@ final class IIDXSongRecord: Equatable, Hashable {
     var hyperScore: IIDXLevelScore = IIDXLevelScore()
     var anotherScore: IIDXLevelScore = IIDXLevelScore()
     var leggendariaScore: IIDXLevelScore = IIDXLevelScore()
+    var playType: IIDXPlayType = IIDXPlayType.single
     var lastPlayDate: Date = Date.distantPast
 
     var importGroup: ImportGroup?
@@ -104,7 +105,8 @@ final class IIDXSongRecord: Equatable, Hashable {
         lhs.normalScore == rhs.normalScore &&
         lhs.hyperScore == rhs.hyperScore &&
         lhs.anotherScore == rhs.anotherScore &&
-        lhs.leggendariaScore == rhs.leggendariaScore
+        lhs.leggendariaScore == rhs.leggendariaScore &&
+        lhs.playType == rhs.playType
     }
 
     static func == (lhs: IIDXSongRecord, rhs: IIDXSong) -> Bool {
