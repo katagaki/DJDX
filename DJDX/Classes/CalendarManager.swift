@@ -28,6 +28,35 @@ class CalendarManager: ObservableObject {
         defaults.synchronize()
     }
 
+    func loadCSVData(to modelContext: ModelContext,
+                     from url: URL? = Bundle.main.url(forResource: "SampleData", withExtension: "csv")) {
+        if let urlOfData: URL = url, let stringFromData: String = try? String(contentsOf: urlOfData) {
+            let parsedCSV = CSwiftV(with: stringFromData)
+            if let keyedRows = parsedCSV.keyedRows {
+                // Delete selected date's import group
+                let fetchDescriptor = FetchDescriptor<ImportGroup>(
+                    predicate: importGroups(in: self)
+                    )
+                if let importGroupsOnSelectedDate: [ImportGroup] = try? modelContext.fetch(fetchDescriptor) {
+                    for importGroup in importGroupsOnSelectedDate {
+                        modelContext.delete(importGroup)
+                    }
+                }
+                // Create new import group for selected date
+                let newImportGroup: ImportGroup = ImportGroup(importDate: selectedDate, iidxData: [])
+                modelContext.insert(newImportGroup)
+                try? modelContext.save()
+                // Read song records
+                for keyedRow in keyedRows {
+                    let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
+                    modelContext.insert(scoreForSong)
+                    scoreForSong.importGroup = newImportGroup
+                }
+                try? modelContext.save()
+            }
+        }
+    }
+
     func allImportGroups(in modelContext: ModelContext) -> [ImportGroup] {
         var fetchDescriptor = FetchDescriptor<ImportGroup>(
             sortBy: [SortDescriptor<ImportGroup>(\.importDate, order: .reverse)]
@@ -35,6 +64,7 @@ class CalendarManager: ObservableObject {
         fetchDescriptor.relationshipKeyPathsForPrefetching = []
         return (try? modelContext.fetch(fetchDescriptor)) ?? []
     }
+
     func latestAvailableIIDXSongRecords(in modelContext: ModelContext) -> [IIDXSongRecord] {
         let importGroupsForSelectedDate: [ImportGroup] = (try? modelContext.fetch(
             FetchDescriptor<ImportGroup>(

@@ -12,6 +12,9 @@ import SwiftUI
 // swiftlint:disable type_body_length
 class PlayDataManager: ObservableObject {
 
+    // Global Filters
+    @Published var playType: IIDXPlayType = .single
+
     // External Data
     @Published var allSongs: [IIDXSong]
     var allSongCompactTitles: [String: IIDXSong] = [:]

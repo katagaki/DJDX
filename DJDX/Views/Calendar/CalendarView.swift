@@ -67,11 +67,21 @@ struct CalendarView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        NavigationLink(value: ViewPath.importerWeb) {
-                            Label("Calendar.Import.FromWeb", systemImage: "globe")
+                        Section {
+                            NavigationLink(value: ViewPath.importerWeb) {
+                                Label("Calendar.Import.FromWeb", systemImage: "globe")
+                            }
+                            NavigationLink(value: ViewPath.importerManual) {
+                                Label("Calendar.Import.FromCSV", systemImage: "doc.badge.plus")
+                            }
                         }
-                        NavigationLink(value: ViewPath.importerManual) {
-                            Label("Calendar.Import.FromCSV", systemImage: "doc.badge.plus")
+                        Section {
+                            Button("Calendar.Import.LoadSamples.Button", systemImage: "sparkles") {
+                                calendar.loadCSVData(to: modelContext)
+                                didImportSucceed = true
+                            }
+                        } header: {
+                            Text("Calendar.Import.LoadSamples.Description")
                         }
                     } label: {
                         Text("Calendar.Import")

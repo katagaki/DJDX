@@ -456,6 +456,40 @@
         }
       }
     },
+    "Calendar.Import.LoadSamples.Button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load Sample Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サンプルデータを読み込む"
+          }
+        }
+      }
+    },
+    "Calendar.Import.LoadSamples.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you would like to try out the app, you can also load a set of sample data."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリの機能を試したい場合、サンプルデータを読み込んでからご利用いただけます。"
+          }
+        }
+      }
+    },
     "CLEAR COUNT" : {
       "localizations" : {
         "en" : {
@@ -550,40 +584,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CSVファイルのダウンロードができたら、こちらで読み込んでください。"
-          }
-        }
-      }
-    },
-    "Importer.CSV.LoadSamples.Button" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Load Sample Data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サンプルデータを読み込む"
-          }
-        }
-      }
-    },
-    "Importer.CSV.LoadSamples.Description" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "If you would like to try out the app, you can also load a set of sample data."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリを試したい場合、サンプルデータを読み込んでご利用いただけます。"
           }
         }
       }

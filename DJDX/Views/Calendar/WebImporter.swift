@@ -118,15 +118,16 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
                     modelContext.delete(importGroup)
                 }
             }
-            // Create new import group for selected date
-            let newImportGroup: ImportGroup = ImportGroup(importDate: calendar.selectedDate, iidxData: [])
-            modelContext.insert(newImportGroup)
-            try? modelContext.save()
-            // Read song records
-            for keyedRow in keyedRows {
-                let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
-                modelContext.insert(scoreForSong)
-                scoreForSong.importGroup = newImportGroup
+            try? modelContext.transaction {
+                // Create new import group for selected date
+                let newImportGroup: ImportGroup = ImportGroup(importDate: calendar.selectedDate, iidxData: [])
+                modelContext.insert(newImportGroup)
+                // Read song records
+                for keyedRow in keyedRows {
+                    let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
+                    modelContext.insert(scoreForSong)
+                    newImportGroup.iidxData?.append(scoreForSong)
+                }
             }
             try? modelContext.save()
             autoImportFailedReason = nil
@@ -233,6 +234,19 @@ var submitButtons = document.getElementsByClassName('submit_btn')
 if (submitButtons.length > 0) {
     Array.from(submitButtons).forEach(button => {
         if (button.value === "SP") {
+            button.click()
+        }
+    })
+} else {
+    throw 1
+}
+"""
+
+        let selectDPButtonJS = """
+var submitButtons = document.getElementsByClassName('submit_btn')
+if (submitButtons.length > 0) {
+    Array.from(submitButtons).forEach(button => {
+        if (button.value === "DP") {
             button.click()
         }
     })
