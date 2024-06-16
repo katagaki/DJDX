@@ -120,30 +120,21 @@ struct CalendarView: View {
                 ScrollView(.horizontal) {
                     HStack(spacing: 8.0) {
                         PlayTypePicker(playTypeToShow: $importPlayType)
-                        switch importPlayType {
-                        case .single:
-                            NavigationLink(value: ViewPath.importerWebIIDXSingle) {
-                                Label("Calendar.Import.FromWeb", systemImage: "globe")
-                                    .fontWeight(.medium)
-                                    .padding(4.0)
+                        Group {
+                            switch importPlayType {
+                            case .single:
+                                NavigationLink(value: ViewPath.importerWebIIDXSingle) {
+                                    Label("Calendar.Import.FromWeb", systemImage: "globe")
+                                        .fontWeight(.medium)
+                                        .padding(4.0)
+                                }
+                            case .double:
+                                NavigationLink(value: ViewPath.importerWebIIDXDouble) {
+                                    Label("Calendar.Import.FromWeb", systemImage: "globe")
+                                        .fontWeight(.medium)
+                                        .padding(4.0)
+                                }
                             }
-                            .buttonStyle(.borderedProminent)
-                            .clipShape(.capsule)
-                            .foregroundStyle(.text)
-                        case .double:
-                            NavigationLink(value: ViewPath.importerWebIIDXDouble) {
-                                Label("Calendar.Import.FromWeb", systemImage: "globe")
-                                    .fontWeight(.medium)
-                                    .padding(4.0)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .clipShape(.capsule)
-                            .foregroundStyle(.text)
-                        }
-                        NavigationLink(value: ViewPath.importerWebIIDXSingle) {
-                            Label("Calendar.Import.FromWeb", systemImage: "globe")
-                                .fontWeight(.medium)
-                                .padding(4.0)
                         }
                         .buttonStyle(.borderedProminent)
                         .clipShape(.capsule)
