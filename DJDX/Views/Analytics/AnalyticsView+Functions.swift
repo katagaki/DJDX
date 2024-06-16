@@ -11,7 +11,9 @@ import SwiftUI
 extension AnalyticsView {
     func reloadScores() {
         dataState = .loading
+        debugPrint("Calculating new values")
         let songRecords = calendar.latestAvailableIIDXSongRecords(in: modelContext)
+            .filter { $0.playType == playTypeToShow }
         var newClearLampPerDifficulty: [Int: [String: Int]] = [:]
         var newScoresPerDifficulty: [Int: [IIDXDJLevel: Int]] = [:]
         for difficulty in difficulties {

@@ -18,7 +18,8 @@ enum ViewPath: Hashable {
     case clearLampOverviewGraph
     case clearLampPerDifficultyGraph
     case scoreRatePerDifficultyGraph
-    case importerWeb
+    case importerWebIIDXSingle
+    case importerWebIIDXDouble
     case importerManual
     case moreBemaniWikiCharts
     case moreAttributions

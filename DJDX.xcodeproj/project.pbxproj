@@ -26,6 +26,7 @@
 		E46A66072C0CC12800D9544B /* ScoreSortAndFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A66062C0CC12800D9544B /* ScoreSortAndFilter.swift */; };
 		E46A66092C0CC45500D9544B /* NoteTypeDetailRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A66082C0CC45500D9544B /* NoteTypeDetailRow.swift */; };
 		E46A660B2C0CC59500D9544B /* ClearTypeDetailRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A660A2C0CC59500D9544B /* ClearTypeDetailRow.swift */; };
+		E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
 		E49359DF2C00E4230022E385 /* LevelLabelOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */; };
@@ -86,6 +87,7 @@
 		E46A66062C0CC12800D9544B /* ScoreSortAndFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreSortAndFilter.swift; sourceTree = "<group>"; };
 		E46A66082C0CC45500D9544B /* NoteTypeDetailRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypeDetailRow.swift; sourceTree = "<group>"; };
 		E46A660A2C0CC59500D9544B /* ClearTypeDetailRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearTypeDetailRow.swift; sourceTree = "<group>"; };
+		E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayTypePicker.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
 		E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabelOrientation.swift; sourceTree = "<group>"; };
@@ -224,6 +226,7 @@
 				E4E3D0CF2BF9959A001942FE /* IIDXLevelShowcase.swift */,
 				E46A65F22C0B112900D9544B /* LevelDetailRow.swift */,
 				E46A66082C0CC45500D9544B /* NoteTypeDetailRow.swift */,
+				E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */,
 				E46A65EE2C0AFF0000D9544B /* ProgressAlert.swift */,
 			);
 			path = Shared;
@@ -354,7 +357,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					E4B123AB2BF8E8E400D4A3D1 = {
 						CreatedOnToolsVersion = 15.4;
@@ -432,6 +435,7 @@
 				E46A65ED2C0AFC7800D9544B /* MoreBemaniWikiCharts.swift in Sources */,
 				E4E3D0CE2BF990CC001942FE /* IIDXLevelLabel.swift in Sources */,
 				E46A65FD2C0C8E9600D9544B /* AnalyticsView+Functions.swift in Sources */,
+				E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */,
 				E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */,
 				E4E3D0F22BFC0489001942FE /* DJLevelPerDifficultyGraph.swift in Sources */,
 				E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */,
@@ -487,6 +491,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -550,6 +555,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";

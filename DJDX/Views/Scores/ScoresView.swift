@@ -53,13 +53,7 @@ struct ScoresView: View {
                         ProgressView()
                             .progressViewStyle(.circular)
                     case .presenting:
-                        Picker("Shared.PlayType", selection: $playTypeToShow) {
-                            Text(verbatim: "SP")
-                                .tag(IIDXPlayType.single)
-                            Text(verbatim: "DP")
-                                .tag(IIDXPlayType.double)
-                        }
-                        .pickerStyle(.segmented)
+                        PlayTypePicker(playTypeToShow: $playTypeToShow)
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -94,8 +88,12 @@ struct ScoresView: View {
                 }
             }
             .onChange(of: playTypeToShow) { _, _ in
-                reloadDisplay(shouldReloadAll: false, shouldFilter: true,
-                              shouldSort: true, shouldSearch: true)
+                if navigationManager.selectedTab == .scores {
+                    reloadDisplay(shouldReloadAll: false, shouldFilter: true,
+                                  shouldSort: true, shouldSearch: true)
+                } else {
+                    dataState = .initializing
+                }
             }
             .onChange(of: isShowingOnlyPlayDataWithScores) { _, _ in
                 reloadDisplay(shouldReloadAll: false, shouldFilter: true,

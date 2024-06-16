@@ -26,12 +26,14 @@ https://p.eagate.573.jp/game/2dx/31/error/error.html
 // swiftlint:enable line_length
 
 struct WebImporter: View {
+    @State var importMode: IIDXPlayType
     @Binding var isAutoImportFailed: Bool
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
 
     var body: some View {
         WebViewForImporter(
+            importMode: $importMode,
             isAutoImportFailed: $isAutoImportFailed,
             didImportSucceed: $didImportSucceed,
             autoImportFailedReason: $autoImportFailedReason
@@ -66,9 +68,12 @@ struct WebImporter: View {
 
 struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
 
+    @Environment(ProgressAlertManager.self) var progressAlertManager
+
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var calendar: CalendarManager
 
+    @Binding var importMode: IIDXPlayType
     @Binding var isAutoImportFailed: Bool
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
@@ -83,55 +88,68 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
         return webView
     }
 
-    func makeCoordinator() -> Coordinator {
-        Coordinator(updateScoreDataDelegate: self)
+    func makeCoordinator() -> CoordinatorForImporter {
+        Coordinator(updateScoreDataDelegate: self, importMode: importMode)
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
         // Blank function to conform to protocol
     }
 
-    func importScoreData(using csvString: String) {
-        if let documentsDirectoryURL: URL = FileManager
-            .default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd-HH-mm-ss"
-            let dateString = dateFormatter.string(from: .now)
-            let csvFile = documentsDirectoryURL
-                .appendingPathComponent("\(dateString).csv",
-                                        conformingTo: .commaSeparatedText)
-            debugPrint(csvFile.absoluteString)
-            do {
-                try csvString.write(to: csvFile, atomically: true, encoding: .utf8)
-            } catch {
-                debugPrint(error.localizedDescription)
+    @MainActor
+    func importScoreData(using csvString: String) async {
+        progressAlertManager.show(title: "Alert.Importing.Title", message: "Alert.Importing.Text")
+        Task.detached {
+            if let documentsDirectoryURL: URL = FileManager
+                .default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd-HH-mm-ss"
+                let dateString = dateFormatter.string(from: .now)
+                let csvFile = documentsDirectoryURL.appendingPathComponent("\(dateString).csv",
+                                                                           conformingTo: .commaSeparatedText)
+                try? csvString.write(to: csvFile, atomically: true, encoding: .utf8)
             }
-        }
-        let parsedCSV = CSwiftV(with: csvString)
-        if let keyedRows = parsedCSV.keyedRows {
-            // Delete selected date's import group
-            let fetchDescriptor = FetchDescriptor<ImportGroup>(
-                predicate: importGroups(in: calendar)
+            let parsedCSV = CSwiftV(with: csvString)
+            if let keyedRows = parsedCSV.keyedRows {
+                let modelContext = ModelContext(sharedModelContainer)
+                // Delete selected date's import group
+                let fetchDescriptor = await FetchDescriptor<ImportGroup>(
+                    predicate: importGroups(in: calendar)
                 )
-            if let importGroupsOnSelectedDate: [ImportGroup] = try? modelContext.fetch(fetchDescriptor) {
-                for importGroup in importGroupsOnSelectedDate {
-                    modelContext.delete(importGroup)
+                if let importGroupsOnSelectedDate: [ImportGroup] = try? modelContext.fetch(fetchDescriptor) {
+                    for importGroup in importGroupsOnSelectedDate {
+                        modelContext.delete(importGroup)
+                    }
+                }
+                let importDate = await calendar.selectedDate
+                try? modelContext.transaction {
+                    // Create new import group for selected date
+                    let newImportGroup: ImportGroup = ImportGroup(importDate: importDate, iidxData: [])
+                    modelContext.insert(newImportGroup)
+                    // Read song records
+                    var numberOfKeyedRowsProcessed = 0
+                    for keyedRow in keyedRows {
+                        debugPrint("Processing keyed row \(numberOfKeyedRowsProcessed)")
+                        let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
+                        modelContext.insert(scoreForSong)
+                        scoreForSong.importGroup = newImportGroup
+                        numberOfKeyedRowsProcessed += 1
+                        Task { [numberOfKeyedRowsProcessed] in
+                            await MainActor.run {
+                                progressAlertManager.updateProgress(numberOfKeyedRowsProcessed * 100 / keyedRows.count)
+                            }
+                        }
+                    }
+                }
+                try? modelContext.save()
+                await MainActor.run {
+                    autoImportFailedReason = nil
+                    didImportSucceed = true
                 }
             }
-            try? modelContext.transaction {
-                // Create new import group for selected date
-                let newImportGroup: ImportGroup = ImportGroup(importDate: calendar.selectedDate, iidxData: [])
-                modelContext.insert(newImportGroup)
-                // Read song records
-                for keyedRow in keyedRows {
-                    let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
-                    modelContext.insert(scoreForSong)
-                    newImportGroup.iidxData?.append(scoreForSong)
-                }
+            await MainActor.run {
+                progressAlertManager.hide()
             }
-            try? modelContext.save()
-            autoImportFailedReason = nil
-            didImportSucceed = true
         }
     }
 
@@ -139,25 +157,26 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
         autoImportFailedReason = reason
         isAutoImportFailed = true
     }
+}
 
-    class Coordinator: NSObject, WKNavigationDelegate {
-        let cleanupJS = """
+class CoordinatorForImporter: NSObject, WKNavigationDelegate {
+    let cleanupJS = """
 function waitForElementToExist(selector) {
-    return new Promise(resolve => {
+return new Promise(resolve => {
+    if (document.querySelector(selector)) {
+        return resolve(document.querySelector(selector))
+    }
+    const observer = new MutationObserver(mutations => {
         if (document.querySelector(selector)) {
-            return resolve(document.querySelector(selector))
+            observer.disconnect()
+            resolve(document.querySelector(selector))
         }
-        const observer = new MutationObserver(mutations => {
-            if (document.querySelector(selector)) {
-                observer.disconnect()
-                resolve(document.querySelector(selector))
-            }
-        })
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        })
     })
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    })
+})
 }
 
 var head = document.head || document.getElementsByTagName('head')[0]
@@ -165,35 +184,35 @@ var head = document.head || document.getElementsByTagName('head')[0]
 // ダークモード
 var darkModeCSS = `
 @media (prefers-color-scheme: dark) {
-    body, #id_ea_common_content_whole {
-        background-color: #000000;
-        color: #ffffff;
-    }
-    header, .Header_logo__konami--default__lYPft {
-        background-color: #000000!important;
-    }
-    .Form_login__layout--narrow-frame__SnckF,
-    .Form_login__layout--default__bEjGz,
-    .Form_login__form--default__3G_u1,
-    .Form_login__form--narrow-frame__Rvksw,
-    #email-form {
-        border: unset;
-        background-color: #1c1c1e!important;
-    }
-    .form-control, .form-control:focus {
-        background-color: #000000!important;
-        color: #fff!important;
-    }
-    .card {
-        background-color: #1c1c1e!important;
-    }
+body, #id_ea_common_content_whole {
+    background-color: #000000;
+    color: #ffffff;
+}
+header, .Header_logo__konami--default__lYPft {
+    background-color: #000000!important;
+}
+.Form_login__layout--narrow-frame__SnckF,
+.Form_login__layout--default__bEjGz,
+.Form_login__form--default__3G_u1,
+.Form_login__form--narrow-frame__Rvksw,
+#email-form {
+    border: unset;
+    background-color: #1c1c1e!important;
+}
+.form-control, .form-control:focus {
+    background-color: #000000!important;
+    color: #fff!important;
+}
+.card {
+    background-color: #1c1c1e!important;
+}
 }
 
 @media (prefers-color-scheme: light) {
-    body {
-        background-color: #ffffff;
-        color: #000000;
-    }
+body {
+    background-color: #ffffff;
+    color: #000000;
+}
 }
 
 `
@@ -212,99 +231,119 @@ head.appendChild(style)
 // フッターを取り除く
 document.body.style.setProperty('margin-bottom', '0', 'important')
 waitForElementToExist('footer').then((element) => {
-    document.getElementsByTagName('footer')[0].remove()
+document.getElementsByTagName('footer')[0].remove()
 })
 waitForElementToExist('#synalio-iframe').then((element) => {
-    document.getElementById('synalio-iframe').remove()
+document.getElementById('synalio-iframe').remove()
 })
 
 // チャットポップアップを取り除く
 waitForElementToExist('.fs-6').then((element) => {
-    document.getElementsByClassName('fs-6')[0].remove()
+document.getElementsByClassName('fs-6')[0].remove()
 })
 
 // Cookieバナーを取り除く
 waitForElementToExist('#onetrust-consent-sdk').then((element) => {
-    document.getElementById('onetrust-consent-sdk').remove()
+document.getElementById('onetrust-consent-sdk').remove()
 })
 """
 
-        let selectSPButtonJS = """
+    let selectSPButtonJS = """
 var submitButtons = document.getElementsByClassName('submit_btn')
 if (submitButtons.length > 0) {
-    Array.from(submitButtons).forEach(button => {
-        if (button.value === "SP") {
-            button.click()
-        }
-    })
+Array.from(submitButtons).forEach(button => {
+    if (button.value === "SP") {
+        button.click()
+    }
+})
 } else {
-    throw 1
+throw 1
 }
 """
 
-        let selectDPButtonJS = """
+    let selectDPButtonJS = """
 var submitButtons = document.getElementsByClassName('submit_btn')
 if (submitButtons.length > 0) {
-    Array.from(submitButtons).forEach(button => {
-        if (button.value === "DP") {
-            button.click()
-        }
-    })
+Array.from(submitButtons).forEach(button => {
+    if (button.value === "DP") {
+        button.click()
+    }
+})
 } else {
-    throw 1
+throw 1
 }
 """
 
-        let getScoreDataJS = """
+    let getScoreDataJS = """
 document.getElementById('score_data').value
 """
 
-        var updateScoreDataDelegate: UpdateScoreDataDelegate
-        var waitingForDownloadPageFormSubmit: Bool = false
+    var updateScoreDataDelegate: UpdateScoreDataDelegate
+    var importMode: IIDXPlayType
+    var waitingForDownloadPageFormSubmit: Bool = false
 
-        init(updateScoreDataDelegate: UpdateScoreDataDelegate) {
-            self.updateScoreDataDelegate = updateScoreDataDelegate
-            super.init()
-        }
+    init(updateScoreDataDelegate: UpdateScoreDataDelegate, importMode: IIDXPlayType = .single) {
+        self.updateScoreDataDelegate = updateScoreDataDelegate
+        self.importMode = importMode
+        super.init()
+    }
 
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            if let webViewURL = webView.url {
-                let urlString = webViewURL.absoluteString
-                webView.evaluateJavaScript(self.cleanupJS)
-                if urlString.starts(with: downloadPageURL.absoluteString) {
-                    webView.layer.opacity = 0.0
-                    webView.isUserInteractionEnabled = false
-                    if !waitingForDownloadPageFormSubmit {
-                        webView.evaluateJavaScript(self.selectSPButtonJS) { _, error in
-                            if error != nil {
-                                self.updateScoreDataDelegate.stopProcessing(with: .maintenance)
-                            }
-                        }
-                        waitingForDownloadPageFormSubmit = true
-                    } else {
-                        webView.evaluateJavaScript(getScoreDataJS) { result, _ in
-                            if let result: String = result as? String {
-                                self.updateScoreDataDelegate.importScoreData(using: result)
-                            } else {
-                                self.updateScoreDataDelegate.stopProcessing(with: .serverError)
-                            }
-                        }
-                        waitingForDownloadPageFormSubmit = false
+    // swiftlint:disable cyclomatic_complexity
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        if let webViewURL = webView.url {
+            let urlString = webViewURL.absoluteString
+            webView.evaluateJavaScript(self.cleanupJS)
+            if urlString.starts(with: downloadPageURL.absoluteString) {
+                webView.layer.opacity = 0.0
+                webView.isUserInteractionEnabled = false
+                if !waitingForDownloadPageFormSubmit {
+                    switch importMode {
+                    case .single: evaluateIIDXSPScript(webView)
+                    case .double: evaluateIIDXDPScript(webView)
                     }
-                } else if urlString.starts(with: errorPageURL.absoluteString) {
-                    webView.layer.opacity = 0.0
-                    if urlString.hasSuffix("?err=1") {
-                        self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
-                    } else if urlString.hasSuffix("?err=2") {
-                        self.updateScoreDataDelegate.stopProcessing(with: .noEAmusementPass)
-                    } else if urlString.hasSuffix("?err=3") {
-                        self.updateScoreDataDelegate.stopProcessing(with: .noPlayData)
-                    } else if urlString.hasSuffix("?err=4") {
-                        self.updateScoreDataDelegate.stopProcessing(with: .serverError)
-                    }
+                    waitingForDownloadPageFormSubmit = true
                 } else {
-                    webView.layer.opacity = 1.0
+                    webView.evaluateJavaScript(getScoreDataJS) { result, _ in
+                        if let result: String = result as? String {
+                            Task {
+                                await self.updateScoreDataDelegate.importScoreData(using: result)
+                            }
+                        } else {
+                            self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                        }
+                    }
+                    waitingForDownloadPageFormSubmit = false
                 }
+            } else if urlString.starts(with: errorPageURL.absoluteString) {
+                webView.layer.opacity = 0.0
+                if urlString.hasSuffix("?err=1") {
+                    self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
+                } else if urlString.hasSuffix("?err=2") {
+                    self.updateScoreDataDelegate.stopProcessing(with: .noEAmusementPass)
+                } else if urlString.hasSuffix("?err=3") {
+                    self.updateScoreDataDelegate.stopProcessing(with: .noPlayData)
+                } else if urlString.hasSuffix("?err=4") {
+                    self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                }
+            } else {
+                webView.layer.opacity = 1.0
+            }
+        }
+    }
+    // swiftlint:enable cyclomatic_complexity
+
+    func evaluateIIDXSPScript(_ webView: WKWebView) {
+        webView.evaluateJavaScript(self.selectSPButtonJS) { _, error in
+            if error != nil {
+                self.updateScoreDataDelegate.stopProcessing(with: .maintenance)
+            }
+        }
+    }
+
+    func evaluateIIDXDPScript(_ webView: WKWebView) {
+        webView.evaluateJavaScript(self.selectDPButtonJS) { _, error in
+            if error != nil {
+                self.updateScoreDataDelegate.stopProcessing(with: .maintenance)
             }
         }
     }
@@ -312,7 +351,7 @@ document.getElementById('score_data').value
 
 // swiftlint:disable class_delegate_protocol
 protocol UpdateScoreDataDelegate {
-    func importScoreData(using newScoreData: String)
+    func importScoreData(using newScoreData: String) async
     func stopProcessing(with reason: ImportFailedReason)
 }
 // swiftlint:enable class_delegate_protocol

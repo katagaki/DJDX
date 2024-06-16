@@ -9,7 +9,7 @@ import Foundation
 
 extension String {
     var compact: String {
-        let charactersToFilter = CharacterSet("“”\"'‘’ 　！!？?(（)）~〜-ー■□☆★♡♥".unicodeScalars)
+        let charactersToFilter = CharacterSet("“”\"'‘’ 　！!¡？?:(（)）~〜-ー■□☆★♡♥Ø".unicodeScalars)
         return String(self.unicodeScalars.filter(charactersToFilter.inverted.contains))
             .lowercased()
     }

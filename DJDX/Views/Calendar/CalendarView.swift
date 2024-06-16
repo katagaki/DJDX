@@ -15,6 +15,7 @@ struct CalendarView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
+    @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var calendar: CalendarManager
 
@@ -68,7 +69,7 @@ struct CalendarView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Section {
-                            NavigationLink(value: ViewPath.importerWeb) {
+                            NavigationLink(value: ViewPath.importerWebIIDXSingle) {
                                 Label("Calendar.Import.FromWeb", systemImage: "globe")
                             }
                             NavigationLink(value: ViewPath.importerManual) {
@@ -77,8 +78,12 @@ struct CalendarView: View {
                         }
                         Section {
                             Button("Calendar.Import.LoadSamples.Button", systemImage: "sparkles") {
-                                calendar.loadCSVData(to: modelContext)
-                                didImportSucceed = true
+                                Task.detached {
+                                    await calendar.loadCSVData(reportingTo: progressAlertManager)
+                                    await MainActor.run {
+                                        didImportSucceed = true
+                                    }
+                                }
                             }
                         } header: {
                             Text("Calendar.Import.LoadSamples.Description")
@@ -147,8 +152,14 @@ struct CalendarView: View {
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
-                case .importerWeb:
-                    WebImporter(isAutoImportFailed: $isAutoImportFailed,
+                case .importerWebIIDXSingle:
+                    WebImporter(importMode: .single,
+                                isAutoImportFailed: $isAutoImportFailed,
+                                didImportSucceed: $didImportSucceed,
+                                autoImportFailedReason: $autoImportFailedReason)
+                case .importerWebIIDXDouble:
+                    WebImporter(importMode: .double,
+                                isAutoImportFailed: $isAutoImportFailed,
                                 didImportSucceed: $didImportSucceed,
                                 autoImportFailedReason: $autoImportFailedReason)
                 case .importerManual:

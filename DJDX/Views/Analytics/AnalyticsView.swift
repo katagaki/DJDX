@@ -17,6 +17,7 @@ struct AnalyticsView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var calendar: CalendarManager
 
+    @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForClearLampInAnalyticsView") var levelFilterForClearLamp: Int
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForScoreRateInAnalyticsView") var levelFilterForScoreRate: Int
 
@@ -93,7 +94,7 @@ struct AnalyticsView: View {
                         ProgressView()
                             .progressViewStyle(.circular)
                     case .presenting:
-                        Color.clear
+                        PlayTypePicker(playTypeToShow: $playTypeToShow)
                     }
                 }
             }
@@ -104,6 +105,13 @@ struct AnalyticsView: View {
             }
             .onChange(of: calendar.selectedDate) { oldValue, newValue in
                 if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
+                    dataState = .initializing
+                }
+            }
+            .onChange(of: playTypeToShow) { _, _ in
+                if navigationManager.selectedTab == .analytics {
+                    reloadScores()
+                } else {
                     dataState = .initializing
                 }
             }

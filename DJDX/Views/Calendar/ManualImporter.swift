@@ -14,6 +14,7 @@ struct ManualImporter: View {
     @Environment(\.openURL) var openURL
     @Environment(\.modelContext) var modelContext
 
+    @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var calendar: CalendarManager
 
     @State var isSelectingCSVFile: Bool = false
@@ -48,7 +49,9 @@ struct ManualImporter: View {
             DocumentPicker(allowedUTIs: [.commaSeparatedText], onDocumentPicked: { url in
                 let isAccessSuccessful = url.startAccessingSecurityScopedResource()
                 if isAccessSuccessful {
-                    calendar.loadCSVData(to: modelContext, from: url)
+                    Task.detached {
+                        await calendar.loadCSVData(reportingTo: progressAlertManager, from: url)
+                    }
                 } else {
                     url.stopAccessingSecurityScopedResource()
                 }

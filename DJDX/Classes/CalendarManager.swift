@@ -28,9 +28,13 @@ class CalendarManager: ObservableObject {
         defaults.synchronize()
     }
 
-    func loadCSVData(to modelContext: ModelContext,
-                     from url: URL? = Bundle.main.url(forResource: "SampleData", withExtension: "csv")) {
+    func loadCSVData(reportingTo progressAlertManager: ProgressAlertManager,
+                     from url: URL? = Bundle.main.url(forResource: "SampleData", withExtension: "csv")) async {
+        await MainActor.run {
+            progressAlertManager.show(title: "Alert.Importing.Title", message: "Alert.Importing.Text")
+        }
         if let urlOfData: URL = url, let stringFromData: String = try? String(contentsOf: urlOfData) {
+            let modelContext = ModelContext(sharedModelContainer)
             let parsedCSV = CSwiftV(with: stringFromData)
             if let keyedRows = parsedCSV.keyedRows {
                 // Delete selected date's import group
@@ -47,13 +51,26 @@ class CalendarManager: ObservableObject {
                 modelContext.insert(newImportGroup)
                 try? modelContext.save()
                 // Read song records
-                for keyedRow in keyedRows {
-                    let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
-                    modelContext.insert(scoreForSong)
-                    scoreForSong.importGroup = newImportGroup
+                var numberOfKeyedRowsProcessed = 0
+                try? modelContext.transaction {
+                    for keyedRow in keyedRows {
+                        debugPrint("Processing keyed row \(numberOfKeyedRowsProcessed)")
+                        let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
+                        modelContext.insert(scoreForSong)
+                        scoreForSong.importGroup = newImportGroup
+                        numberOfKeyedRowsProcessed += 1
+                        Task { [numberOfKeyedRowsProcessed] in
+                            await MainActor.run {
+                                progressAlertManager.updateProgress(numberOfKeyedRowsProcessed * 100 / keyedRows.count)
+                            }
+                        }
+                    }
                 }
                 try? modelContext.save()
             }
+        }
+        await MainActor.run {
+            progressAlertManager.hide()
         }
     }
 
