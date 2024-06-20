@@ -34,7 +34,7 @@ struct DJDXApp: App {
     }
 }
 
-var sharedModelContainer: ModelContainer = {
+let sharedModelContainer: ModelContainer = {
     let schema = Schema([
         ImportGroup.self,
         IIDXSongRecord.self,

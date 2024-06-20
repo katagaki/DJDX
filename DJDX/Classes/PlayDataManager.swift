@@ -104,18 +104,26 @@ class PlayDataManager: ObservableObject {
 
         // Remove song records that have no scores
         if isShowingOnlyPlayDataWithScores {
-            if let keyPath = scoreKeyPath(for: levelToShow) {
+            if levelToShow != .all,
+               let keyPath = scoreKeyPath(for: levelToShow) {
+                    filteredSongRecords.removeAll { songRecord in
+                        songRecord[keyPath: keyPath].score == 0
+                    }
+            }
+            if difficultyToShow != .all {
                 filteredSongRecords.removeAll { songRecord in
-                    songRecord[keyPath: keyPath].score == 0
+                    if let score = songRecord.score(for: difficultyToShow) {
+                        return score.score == 0
+                    }
+                    return false
                 }
-            } else {
-                filteredSongRecords.removeAll { songRecord in
-                    songRecord.beginnerScore.score == 0 &&
-                    songRecord.normalScore.score == 0 &&
-                    songRecord.hyperScore.score == 0 &&
-                    songRecord.anotherScore.score == 0 &&
-                    songRecord.leggendariaScore.score == 0
-                }
+            }
+            filteredSongRecords.removeAll { songRecord in
+                songRecord.beginnerScore.score == 0 &&
+                songRecord.normalScore.score == 0 &&
+                songRecord.hyperScore.score == 0 &&
+                songRecord.anotherScore.score == 0 &&
+                songRecord.leggendariaScore.score == 0
             }
         }
 
@@ -126,7 +134,7 @@ class PlayDataManager: ObservableObject {
             }
         }
 
-        // Filter song records by level
+        // Filter song records by difficulty
         if difficultyToShow != .all {
             filteredSongRecords.removeAll { songRecord in
                 songRecord.score(for: difficultyToShow) == nil
@@ -325,6 +333,7 @@ class PlayDataManager: ObservableObject {
         }
     }
 
+    @MainActor
     func cleanUpOrphanedSongRecords() async {
         debugPrint("Cleaning up orphaned song records")
         let modelContext = ModelContext(sharedModelContainer)
@@ -332,10 +341,12 @@ class PlayDataManager: ObservableObject {
             predicate: #Predicate<IIDXSongRecord> {
                 $0.importGroup == nil
             }))) ?? []
-        for songRecord in songRecords {
-            modelContext.delete(songRecord)
+        try? modelContext.transaction {
+            for songRecord in songRecords {
+                modelContext.delete(songRecord)
+            }
+            try? modelContext.save()
         }
-        try? modelContext.save()
     }
 
     func migrateDataToNewerSchema() async {

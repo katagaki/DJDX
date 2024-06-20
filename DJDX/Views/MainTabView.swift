@@ -51,9 +51,7 @@ struct MainTabView: View {
         }
         .task {
             if !isFirstStartCleanupComplete {
-                Task.detached {
-                    await playData.cleanUpOrphanedSongRecords()
-                }
+                await playData.cleanUpOrphanedSongRecords()
                 isFirstStartCleanupComplete = true
             }
         }
