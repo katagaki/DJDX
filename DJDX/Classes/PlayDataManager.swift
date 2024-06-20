@@ -13,7 +13,7 @@ import SwiftUI
 class PlayDataManager: ObservableObject {
 
     // External Data
-    @Published var allSongs: [IIDXSong]
+    var allSongs: [IIDXSong] = []
     var allSongCompactTitles: [String: IIDXSong] = [:]
 
     // Play Data Cache
@@ -326,10 +326,16 @@ class PlayDataManager: ObservableObject {
             })
         }
         await MainActor.run { [displayedSongRecords, displayedSongRecordClearRates] in
-            withAnimation(.snappy.speed(2.0)) {
-                self.displayedSongRecords = displayedSongRecords
-                self.displayedSongRecordClearRates = displayedSongRecordClearRates
-            }
+            updateDisplayedSongRecords(displayedSongRecords, with: displayedSongRecordClearRates)
+        }
+    }
+
+    @MainActor
+    func updateDisplayedSongRecords(_ records: [IIDXSongRecord],
+                                    with clearRates: [IIDXSongRecord: [IIDXLevel: Float]]) {
+        withAnimation(.snappy.speed(2.0)) {
+            self.displayedSongRecords = records
+            self.displayedSongRecordClearRates = clearRates
         }
     }
 
