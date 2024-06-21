@@ -103,6 +103,12 @@ struct AnalyticsView: View {
                     reloadScores()
                 }
             }
+            .onChange(of: calendar.didUserRecentlyImportSomeData, { oldValue, newValue in
+                if !oldValue && newValue {
+                    calendar.didUserRecentlyImportSomeData = false
+                    dataState = .initializing
+                }
+            })
             .onChange(of: calendar.selectedDate) { oldValue, newValue in
                 if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
                     dataState = .initializing

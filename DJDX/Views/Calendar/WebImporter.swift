@@ -100,78 +100,7 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
     func importScoreData(using csvString: String) async {
         progressAlertManager.show(title: "Alert.Importing.Title", message: "Alert.Importing.Text")
         Task.detached {
-            if let documentsDirectoryURL: URL = FileManager
-                .default.urls(for: .documentDirectory, in: .userDomainMask).first {
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd-HH-mm-ss"
-                let dateString = dateFormatter.string(from: .now)
-                let csvFile = documentsDirectoryURL.appendingPathComponent("\(dateString).csv",
-                                                                           conformingTo: .commaSeparatedText)
-                try? csvString.write(to: csvFile, atomically: true, encoding: .utf8)
-            }
-            let parsedCSV = CSwiftV(with: csvString)
-            if let keyedRows = parsedCSV.keyedRows {
-                let modelContext = ModelContext(sharedModelContainer)
-                let importMode = await importMode
-                var shouldCreateImportGroup = true
-                var importGroupToUse: ImportGroup?
-                // Delete selected date's import groups' song records that match the import type
-                let fetchDescriptor = await FetchDescriptor<ImportGroup>(
-                    predicate: importGroups(in: calendar)
-                )
-                if let importGroupsOnSelectedDate: [ImportGroup] = try? modelContext.fetch(fetchDescriptor) {
-                    for importGroup in importGroupsOnSelectedDate {
-                        shouldCreateImportGroup = false
-                        importGroupToUse = importGroup
-                        if let songRecords: [IIDXSongRecord] = importGroup.iidxData {
-                            for songRecord in songRecords where songRecord.playType == importMode {
-                                modelContext.delete(songRecord)
-                            }
-                        }
-                    }
-                }
-                let importDate = await calendar.selectedDate
-                try? modelContext.transaction { [importMode] in
-                    var importGroup: ImportGroup?
-                    if shouldCreateImportGroup {
-                        // Create new import group for selected date
-                        let newImportGroup = ImportGroup(importDate: importDate, iidxData: [])
-                        modelContext.insert(newImportGroup)
-                        importGroup = newImportGroup
-                    } else {
-                        if let importGroupToUse {
-                            importGroup = importGroupToUse
-                        }
-                    }
-                    if let importGroup {
-                        // Read song records
-                        var numberOfKeyedRowsProcessed = 0
-                        for keyedRow in keyedRows {
-                            debugPrint("Processing keyed row \(numberOfKeyedRowsProcessed)")
-                            let scoreForSong: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
-                            modelContext.insert(scoreForSong)
-                            scoreForSong.importGroup = importGroup
-                            scoreForSong.playType = importMode
-                            numberOfKeyedRowsProcessed += 1
-                            Task { [numberOfKeyedRowsProcessed] in
-                                await MainActor.run {
-                                    progressAlertManager.updateProgress(
-                                        numberOfKeyedRowsProcessed * 100 / keyedRows.count
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-                try? modelContext.save()
-                await MainActor.run {
-                    autoImportFailedReason = nil
-                    didImportSucceed = true
-                }
-            }
-            await MainActor.run {
-                progressAlertManager.hide()
-            }
+            await calendar.loadCSVData(reportingTo: progressAlertManager, using: csvString, for: importMode)
         }
     }
 
