@@ -100,7 +100,10 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
     func importScoreData(using csvString: String) async {
         progressAlertManager.show(title: "Alert.Importing.Title", message: "Alert.Importing.Text")
         Task.detached {
-            await calendar.loadCSVData(reportingTo: progressAlertManager, using: csvString, for: importMode)
+            await calendar.importCSV(csvString: csvString, reportingTo: progressAlertManager, for: importMode)
+            await MainActor.run {
+                didImportSucceed = true
+            }
         }
     }
 

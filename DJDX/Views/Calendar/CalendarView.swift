@@ -74,7 +74,7 @@ struct CalendarView: View {
                         Section {
                             Button("Calendar.Import.LoadSamples.Button", systemImage: "sparkles") {
                                 Task.detached {
-                                    await calendar.loadCSVData(reportingTo: progressAlertManager)
+                                    await calendar.importCSV(reportingTo: progressAlertManager, for: .single)
                                     await MainActor.run {
                                         didImportSucceed = true
                                     }
@@ -202,7 +202,8 @@ struct CalendarView: View {
                                 didImportSucceed: $didImportSucceed,
                                 autoImportFailedReason: $autoImportFailedReason)
                 case .importerManual:
-                    ManualImporter(didImportSucceed: $didImportSucceed)
+                    ManualImporter(importPlayType: $importPlayType,
+                                   didImportSucceed: $didImportSucceed)
                 default: Color.clear
                 }
             }

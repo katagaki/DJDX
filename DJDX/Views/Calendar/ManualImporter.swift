@@ -17,6 +17,8 @@ struct ManualImporter: View {
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var calendar: CalendarManager
 
+    @Binding var importPlayType: IIDXPlayType
+
     @State var isSelectingCSVFile: Bool = false
     @Binding var didImportSucceed: Bool
 
@@ -50,7 +52,10 @@ struct ManualImporter: View {
                 let isAccessSuccessful = url.startAccessingSecurityScopedResource()
                 if isAccessSuccessful {
                     Task.detached {
-                        await calendar.loadCSVData(reportingTo: progressAlertManager, from: url)
+                        await calendar.importCSV(url: url, reportingTo: progressAlertManager, for: importPlayType)
+                        await MainActor.run {
+                            didImportSucceed = true
+                        }
                     }
                 } else {
                     url.stopAccessingSecurityScopedResource()
