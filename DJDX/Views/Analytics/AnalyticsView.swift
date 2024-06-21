@@ -103,9 +103,9 @@ struct AnalyticsView: View {
                     reloadScores()
                 }
             }
-            .onChange(of: calendar.didUserRecentlyImportSomeData, { oldValue, newValue in
+            .onChange(of: calendar.didUserPerformChangesRequiringDisplayDataReload, { oldValue, newValue in
                 if !oldValue && newValue {
-                    calendar.didUserRecentlyImportSomeData = false
+                    calendar.didUserPerformChangesRequiringDisplayDataReload = false
                     dataState = .initializing
                 }
             })

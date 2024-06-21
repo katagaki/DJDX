@@ -52,6 +52,7 @@ struct CalendarView: View {
                     importGroupsToDelete.forEach { importGroup in
                         modelContext.delete(importGroup)
                     }
+                    calendar.didUserPerformChangesRequiringDisplayDataReload = true
                 })
             }
             .listStyle(.plain)

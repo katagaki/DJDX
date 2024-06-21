@@ -128,9 +128,9 @@ struct ScoresView: View {
                 reloadDisplay(shouldReloadAll: false, shouldFilter: false,
                               shouldSort: false, shouldSearch: true)
             }
-            .onChange(of: calendar.didUserRecentlyImportSomeData, { oldValue, newValue in
+            .onChange(of: calendar.didUserPerformChangesRequiringDisplayDataReload, { oldValue, newValue in
                 if !oldValue && newValue {
-                    calendar.didUserRecentlyImportSomeData = false
+                    calendar.didUserPerformChangesRequiringDisplayDataReload = false
                     dataState = .initializing
                 }
             })

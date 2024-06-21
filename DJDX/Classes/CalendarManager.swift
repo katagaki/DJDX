@@ -14,7 +14,7 @@ class CalendarManager: ObservableObject {
     let selectedDateKey = "CalendarManager.SelectedDate"
 
     @Published var selectedDate: Date
-    @Published var didUserRecentlyImportSomeData: Bool = false
+    @Published var didUserPerformChangesRequiringDisplayDataReload: Bool = false
 
     init(selectedDate: Date? = nil) {
         if let selectedDate = defaults.object(forKey: selectedDateKey) as? Date {
@@ -83,7 +83,7 @@ class CalendarManager: ObservableObject {
 
     func finishImport(_ progressAlertManager: ProgressAlertManager) async {
         await MainActor.run {
-            didUserRecentlyImportSomeData = true
+            didUserPerformChangesRequiringDisplayDataReload = true
             progressAlertManager.hide()
         }
     }
