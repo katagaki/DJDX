@@ -26,6 +26,7 @@
 		E46A66072C0CC12800D9544B /* ScoreSortAndFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A66062C0CC12800D9544B /* ScoreSortAndFilter.swift */; };
 		E46A66092C0CC45500D9544B /* NoteTypeDetailRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A66082C0CC45500D9544B /* NoteTypeDetailRow.swift */; };
 		E46A660B2C0CC59500D9544B /* ClearTypeDetailRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A660A2C0CC59500D9544B /* ClearTypeDetailRow.swift */; };
+		E46D51AB2C25BDFA000524B9 /* AnalyticsViewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51AA2C25BDFA000524B9 /* AnalyticsViewMode.swift */; };
 		E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
@@ -87,6 +88,7 @@
 		E46A66062C0CC12800D9544B /* ScoreSortAndFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreSortAndFilter.swift; sourceTree = "<group>"; };
 		E46A66082C0CC45500D9544B /* NoteTypeDetailRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypeDetailRow.swift; sourceTree = "<group>"; };
 		E46A660A2C0CC59500D9544B /* ClearTypeDetailRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearTypeDetailRow.swift; sourceTree = "<group>"; };
+		E46D51AA2C25BDFA000524B9 /* AnalyticsViewMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewMode.swift; sourceTree = "<group>"; };
 		E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayTypePicker.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
@@ -275,6 +277,7 @@
 		E4E3D0C82BF98DAA001942FE /* Enums */ = {
 			isa = PBXGroup;
 			children = (
+				E46D51AA2C25BDFA000524B9 /* AnalyticsViewMode.swift */,
 				E49359D92C00AD060022E385 /* DataState.swift */,
 				E46A66002C0C926E00D9544B /* IIDXClearType.swift */,
 				E46A66022C0CA6D000D9544B /* IIDXDifficulty.swift */,
@@ -440,6 +443,7 @@
 				E4E3D0F22BFC0489001942FE /* DJLevelPerDifficultyGraph.swift in Sources */,
 				E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */,
 				E4EB2CA82BFF7E3700A00796 /* CalendarView.swift in Sources */,
+				E46D51AB2C25BDFA000524B9 /* AnalyticsViewMode.swift in Sources */,
 				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,
 				E46A65E02C0A276800D9544B /* DetailRow.swift in Sources */,
 				E4C5053C2C0E71D700A0C303 /* ScoreHistoryViewer.swift in Sources */,

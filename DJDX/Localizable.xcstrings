@@ -422,6 +422,38 @@
         }
       }
     },
+    "Analytics.Overall" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overall"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在データ"
+          }
+        }
+      }
+    },
+    "Analytics.Trend" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trends"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トレンド"
+          }
+        }
+      }
+    },
     "Calendar.BackToToday" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1193,7 +1225,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "CLEAR COUNT"
           }
         },
@@ -1210,7 +1242,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "CLEAR TYPE"
           }
         },
@@ -1261,7 +1293,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "DJ LEVEL"
           }
         },
@@ -1478,6 +1510,12 @@
     "Shared.PlayType" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PLAY TYPE"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",

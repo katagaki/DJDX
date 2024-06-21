@@ -136,14 +136,11 @@ struct CalendarView: View {
                                         .padding(4.0)
                                 }
                             }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .clipShape(.capsule)
-                        .foregroundStyle(.text)
-                        NavigationLink(value: ViewPath.importerManual) {
-                            Label("Calendar.Import.FromCSV", systemImage: "doc.badge.plus")
-                                .fontWeight(.medium)
-                                .padding(4.0)
+                            NavigationLink(value: ViewPath.importerManual) {
+                                Label("Calendar.Import.FromCSV", systemImage: "doc.badge.plus")
+                                    .fontWeight(.medium)
+                                    .padding(4.0)
+                            }
                         }
                         .buttonStyle(.borderedProminent)
                         .clipShape(.capsule)

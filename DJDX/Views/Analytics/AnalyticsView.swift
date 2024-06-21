@@ -25,77 +25,126 @@ struct AnalyticsView: View {
     @State var scoreRatePerDifficulty: [Int: [IIDXDJLevel: Int]] = [:] // [Difficulty: [DJ Level: Count]]
 
     @State var dataState: DataState = .initializing
+    @State var viewMode: AnalyticsViewMode = .overall
 
     let difficulties: [Int] = Array(1...12)
 
     var body: some View {
         NavigationStack(path: $navigationManager[.analytics]) {
             List {
-                Section {
-                    ClearLampOverviewGraph(clearLampPerDifficulty: $clearLampPerDifficulty)
-                    .frame(height: 200.0)
-                    .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
-                } header: {
-                    HStack(spacing: 8.0) {
-                        ListSectionHeader(text: "Analytics.ClearLamp.Overall")
-                            .font(.body)
-                        Spacer()
-                        if clearLampPerDifficulty.count > 0 {
-                            NavigationLink(value: ViewPath.clearLampOverviewGraph) {
-                                Image(systemName: "square.arrowtriangle.4.outward")
+                switch viewMode {
+                case .overall:
+                    Section {
+                        ClearLampOverviewGraph(clearLampPerDifficulty: $clearLampPerDifficulty)
+                        .frame(height: 200.0)
+                        .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                    } header: {
+                        HStack(spacing: 8.0) {
+                            ListSectionHeader(text: "Analytics.ClearLamp.Overall")
+                                .font(.body)
+                            Spacer()
+                            if clearLampPerDifficulty.count > 0 {
+                                NavigationLink(value: ViewPath.clearLampOverviewGraph) {
+                                    Image(systemName: "square.arrowtriangle.4.outward")
+                                }
                             }
                         }
                     }
-                }
-                Section {
-                    ClearLampPerDifficultyGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
-                                                selectedDifficulty: $levelFilterForClearLamp)
-                    .frame(height: 156.0)
-                    .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
-                    DifficultyPicker(selection: $levelFilterForClearLamp,
-                                     difficulties: .constant(difficulties))
-                } header: {
-                    HStack(spacing: 8.0) {
-                        ListSectionHeader(text: "Analytics.ClearLamp.ByDifficulty")
-                            .font(.body)
-                        Spacer()
-                        if clearLampPerDifficulty.count > 0 {
-                            NavigationLink(value: ViewPath.clearLampPerDifficultyGraph) {
-                                Image(systemName: "square.arrowtriangle.4.outward")
+                    Section {
+                        ClearLampPerDifficultyGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
+                                                    selectedDifficulty: $levelFilterForClearLamp)
+                        .frame(height: 156.0)
+                        .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                        DifficultyPicker(selection: $levelFilterForClearLamp,
+                                         difficulties: .constant(difficulties))
+                    } header: {
+                        HStack(spacing: 8.0) {
+                            ListSectionHeader(text: "Analytics.ClearLamp.ByDifficulty")
+                                .font(.body)
+                            Spacer()
+                            if clearLampPerDifficulty.count > 0 {
+                                NavigationLink(value: ViewPath.clearLampPerDifficultyGraph) {
+                                    Image(systemName: "square.arrowtriangle.4.outward")
+                                }
                             }
                         }
                     }
-                }
-                Section {
-                    DJLevelPerDifficultyGraph(djLevelPerDifficulty: $scoreRatePerDifficulty,
-                                                selectedDifficulty: $levelFilterForScoreRate)
-                    .frame(height: 156.0)
-                    .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
-                    DifficultyPicker(selection: $levelFilterForScoreRate,
-                                     difficulties: .constant(difficulties))
-                } header: {
-                    HStack(spacing: 8.0) {
-                        ListSectionHeader(text: "Analytics.DJLevel.ByDifficulty")
-                            .font(.body)
-                        Spacer()
-                        if scoreRatePerDifficulty.count > 0 {
-                            NavigationLink(value: ViewPath.scoreRatePerDifficultyGraph) {
-                                Image(systemName: "square.arrowtriangle.4.outward")
+                    Section {
+                        DJLevelPerDifficultyGraph(djLevelPerDifficulty: $scoreRatePerDifficulty,
+                                                    selectedDifficulty: $levelFilterForScoreRate)
+                        .frame(height: 156.0)
+                        .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                        DifficultyPicker(selection: $levelFilterForScoreRate,
+                                         difficulties: .constant(difficulties))
+                    } header: {
+                        HStack(spacing: 8.0) {
+                            ListSectionHeader(text: "Analytics.DJLevel.ByDifficulty")
+                                .font(.body)
+                            Spacer()
+                            if scoreRatePerDifficulty.count > 0 {
+                                NavigationLink(value: ViewPath.scoreRatePerDifficultyGraph) {
+                                    Image(systemName: "square.arrowtriangle.4.outward")
+                                }
                             }
                         }
                     }
+                case .trends:
+                    ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.app.dashed")
                 }
             }
             .navigationTitle("ViewTitle.Analytics")
+            .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    switch dataState {
-                    case .initializing, .loading:
+                    if dataState == .initializing || dataState == .loading {
                         ProgressView()
                             .progressViewStyle(.circular)
-                    case .presenting:
-                        PlayTypePicker(playTypeToShow: $playTypeToShow)
                     }
+                }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0.0) {
+                ScrollView(.horizontal) {
+                    HStack(spacing: 8.0) {
+                        PlayTypePicker(playTypeToShow: $playTypeToShow)
+                        Group {
+                            Button {
+                                withAnimation(.snappy.speed(2.0)) {
+                                    viewMode = .overall
+                                }
+                            } label: {
+                                Label("Analytics.Overall", systemImage: "chart.pie.fill")
+                                    .fontWeight(.medium)
+                                    .padding([.top, .bottom], 12.0)
+                                    .padding([.leading, .trailing], 16.0)
+                                    .background(viewMode == .overall ? .accent : .clear)
+                                    .foregroundStyle(viewMode == .overall ? .text : .primary)
+                            }
+                            Button {
+                                withAnimation(.snappy.speed(2.0)) {
+                                    viewMode = .trends
+                                }
+                            } label: {
+                                Label("Analytics.Trend", systemImage: "chart.line.uptrend.xyaxis")
+                                    .fontWeight(.medium)
+                                    .padding([.top, .bottom], 12.0)
+                                    .padding([.leading, .trailing], 16.0)
+                                    .background(viewMode == .trends ? .accent : .clear)
+                                    .foregroundStyle(viewMode == .trends ? .text : .primary)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .clipShape(.capsule)
+                    }
+                    .padding([.leading, .trailing], 16.0)
+                    .padding([.top, .bottom], 12.0)
+                }
+                .scrollIndicators(.hidden)
+                .background(Material.bar)
+                .overlay(alignment: .top) {
+                    Rectangle()
+                        .frame(height: 1/3)
+                        .foregroundColor(.primary.opacity(0.2))
+                        .ignoresSafeArea(edges: [.leading, .trailing])
                 }
             }
             .task {
