@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class IIDXSong: Equatable {
+final class IIDXSong: Equatable, Sendable {
     var title: String = ""
     var spNoteCount: IIDXNoteCount?
     var dpNoteCount: IIDXNoteCount?

@@ -11,7 +11,7 @@ import SwiftData
 let songLevelCSVHeaders: [String] = ["BEGINNER", "NORMAL", "HYPER", "ANOTHER", "LEGGENDARIA"]
 
 @Model
-final class IIDXSongRecord: Equatable, Hashable {
+final class IIDXSongRecord: Equatable, Hashable, Sendable {
     var version: String = ""
     var title: String = ""
     var genre: String = ""
