@@ -61,31 +61,37 @@ struct CalendarView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Spacer()
+                }
                 ToolbarItem(placement: .topBarLeading) {
-                    if !Calendar.current.isDate(calendar.selectedDate, inSameDayAs: .now) {
-                        Button {
-                            calendar.selectedDate = .now
-                        } label: {
-                            Label("Calendar.BackToToday", systemImage: "arrowshape.turn.up.backward.badge.clock")
-                        }
-                    }
+                    LargeInlineTitle("ViewTitle.Calendar")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Section {
-                            Button("Calendar.Import.LoadSamples.Button", systemImage: "sparkles") {
-                                Task.detached {
-                                    await calendar.importCSV(reportingTo: progressAlertManager, for: .single)
-                                    await MainActor.run {
-                                        didImportSucceed = true
+                    HStack {
+                        if !Calendar.current.isDate(calendar.selectedDate, inSameDayAs: .now) {
+                            Button {
+                                calendar.selectedDate = .now
+                            } label: {
+                                Label("Calendar.BackToToday", systemImage: "arrowshape.turn.up.backward.badge.clock")
+                            }
+                        }
+                        Menu {
+                            Section {
+                                Button("Calendar.Import.LoadSamples.Button", systemImage: "sparkles") {
+                                    Task.detached {
+                                        await calendar.importCSV(reportingTo: progressAlertManager, for: .single)
+                                        await MainActor.run {
+                                            didImportSucceed = true
+                                        }
                                     }
                                 }
+                            } header: {
+                                Text("Calendar.Import.LoadSamples.Description")
                             }
-                        } header: {
-                            Text("Calendar.Import.LoadSamples.Description")
+                        } label: {
+                            Image(systemName: "questionmark.circle")
                         }
-                    } label: {
-                        Image(systemName: "questionmark.circle")
                     }
                 }
             }

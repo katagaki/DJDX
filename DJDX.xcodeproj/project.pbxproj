@@ -29,6 +29,7 @@
 		E46D51AB2C25BDFA000524B9 /* AnalyticsViewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51AA2C25BDFA000524B9 /* AnalyticsViewMode.swift */; };
 		E46D51AD2C2648B1000524B9 /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51AC2C2648B1000524B9 /* ToolbarButton.swift */; };
 		E46D51AF2C264E73000524B9 /* TabBarAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51AE2C264E73000524B9 /* TabBarAccessory.swift */; };
+		E46D51B12C26501D000524B9 /* LargeInlineTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51B02C26501D000524B9 /* LargeInlineTitle.swift */; };
 		E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
@@ -93,6 +94,7 @@
 		E46D51AA2C25BDFA000524B9 /* AnalyticsViewMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewMode.swift; sourceTree = "<group>"; };
 		E46D51AC2C2648B1000524B9 /* ToolbarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
 		E46D51AE2C264E73000524B9 /* TabBarAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarAccessory.swift; sourceTree = "<group>"; };
+		E46D51B02C26501D000524B9 /* LargeInlineTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeInlineTitle.swift; sourceTree = "<group>"; };
 		E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayTypePicker.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
@@ -230,12 +232,13 @@
 				E4B123D92BF90C1D00D4A3D1 /* DocumentPicker.swift */,
 				E4E3D0CD2BF990CC001942FE /* IIDXLevelLabel.swift */,
 				E4E3D0CF2BF9959A001942FE /* IIDXLevelShowcase.swift */,
+				E46D51B02C26501D000524B9 /* LargeInlineTitle.swift */,
 				E46A65F22C0B112900D9544B /* LevelDetailRow.swift */,
 				E46A66082C0CC45500D9544B /* NoteTypeDetailRow.swift */,
 				E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */,
 				E46A65EE2C0AFF0000D9544B /* ProgressAlert.swift */,
-				E46D51AC2C2648B1000524B9 /* ToolbarButton.swift */,
 				E46D51AE2C264E73000524B9 /* TabBarAccessory.swift */,
+				E46D51AC2C2648B1000524B9 /* ToolbarButton.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -450,6 +453,7 @@
 				E4E3D0F22BFC0489001942FE /* DJLevelPerDifficultyGraph.swift in Sources */,
 				E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */,
 				E4EB2CA82BFF7E3700A00796 /* CalendarView.swift in Sources */,
+				E46D51B12C26501D000524B9 /* LargeInlineTitle.swift in Sources */,
 				E46D51AB2C25BDFA000524B9 /* AnalyticsViewMode.swift in Sources */,
 				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,
 				E46A65E02C0A276800D9544B /* DetailRow.swift in Sources */,

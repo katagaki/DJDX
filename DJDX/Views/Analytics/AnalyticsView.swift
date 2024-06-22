@@ -93,9 +93,16 @@ struct AnalyticsView: View {
                 }
             }
             .navigationTitle("ViewTitle.Analytics")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Spacer()
+                }
                 ToolbarItem(placement: .topBarLeading) {
+                    LargeInlineTitle("ViewTitle.Analytics")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
                     if dataState == .initializing || dataState == .loading {
                         ProgressView()
                             .progressViewStyle(.circular)

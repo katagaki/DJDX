@@ -1891,6 +1891,16 @@
         }
       }
     },
+    "ViewTitle.More" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
+          }
+        }
+      }
+    },
     "ViewTitle.More.BemaniWiki2nd" : {
       "extractionState" : "manual",
       "localizations" : {

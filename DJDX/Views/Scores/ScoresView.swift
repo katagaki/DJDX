@@ -45,10 +45,17 @@ struct ScoresView: View {
                 }
             }
             .navigationTitle("ViewTitle.Scores")
+            .navigationBarTitleDisplayMode(.inline)
             .listStyle(.plain)
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Spacer()
+                }
                 ToolbarItem(placement: .topBarLeading) {
+                    LargeInlineTitle("ViewTitle.Scores")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
                     if dataState == .initializing || dataState == .loading {
                         ProgressView()
                             .progressViewStyle(.circular)

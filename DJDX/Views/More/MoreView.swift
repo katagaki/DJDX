@@ -126,6 +126,15 @@ struct MoreView: View {
                         .font(.body)
                 }
             }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Spacer()
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    LargeInlineTitle("ViewTitle.More")
+                }
+            }
             .alert(
                 "Alert.DeleteData.Web.Title",
                 isPresented: $isConfirmingWebDataDelete,
