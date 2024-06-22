@@ -158,7 +158,8 @@ struct ScoreHistoryViewer: View {
                 if noteCount == nil {
                     ContentUnavailableView(
                         "Scores.History.NoData",
-                        systemImage: "questionmark.app.dashed"
+                        systemImage: "questionmark.app.dashed",
+                        description: Text("Scores.History.NoData.Description")
                     )
                 }
             }

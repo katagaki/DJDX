@@ -1034,6 +1034,23 @@
         }
       }
     },
+    "Scores.History.NoData.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To view historical score data, you will first need to update the BEMANIWiki 2nd data from the More tab."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコア履歴を閲覧するには、「その他」画面でBEMANIWiki 2ndのデータを取得する必要があります。"
+          }
+        }
+      }
+    },
     "Scores.Search.Prompt" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1897,6 +1914,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "More"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他"
           }
         }
       }
