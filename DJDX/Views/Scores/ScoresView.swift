@@ -46,25 +46,33 @@ struct ScoresView: View {
             }
             .navigationTitle("ViewTitle.Scores")
             .listStyle(.plain)
+            .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    switch dataState {
-                    case .initializing, .loading:
+                    if dataState == .initializing || dataState == .loading {
                         ProgressView()
                             .progressViewStyle(.circular)
-                    case .presenting:
-                        PlayTypePicker(playTypeToShow: $playTypeToShow)
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    ScoreSortAndFilter(isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                                       levelToShow: $levelToShow,
-                                       difficultyToShow: $difficultyToShow,
-                                       sortMode: $sortMode,
-                                       isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort) {
-                        reloadDisplay(shouldReloadAll: false, shouldFilter: true,
-                                      shouldSort: true, shouldSearch: true)
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0.0) {
+                TabBarAccessory(placement: .bottom) {
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 8.0) {
+                            PlayTypePicker(playTypeToShow: $playTypeToShow)
+                            ScoreSortAndFilter(isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
+                                               levelToShow: $levelToShow,
+                                               difficultyToShow: $difficultyToShow,
+                                               sortMode: $sortMode,
+                                               isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort) {
+                                reloadDisplay(shouldReloadAll: false, shouldFilter: true,
+                                              shouldSort: true, shouldSearch: true)
+                            }
+                        }
+                        .padding([.leading, .trailing], 16.0)
+                        .padding([.top, .bottom], 12.0)
                     }
+                    .scrollIndicators(.hidden)
                 }
             }
             .overlay {

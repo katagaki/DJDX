@@ -42,55 +42,54 @@ struct ScoreViewer: View {
         .listSectionSpacing(.compact)
         .navigationTitle("ViewTitle.Scores.Song")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbarBackground(.visible, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Spacer()
             }
-        }
-        .safeAreaInset(edge: .top, spacing: 0.0) {
-            VStack(alignment: .center, spacing: 8.0) {
-                VStack(alignment: .center, spacing: 2.0) {
-                    Text(songRecord.genre)
-                        .font(.caption2)
-                        .fontWidth(.condensed)
-                    Text(songRecord.title)
-                        .bold()
-                        .fontWidth(.condensed)
-                        .textSelection(.enabled)
-                    Text(songRecord.artist)
-                        .font(.caption)
-                        .fontWidth(.condensed)
-                }
-                Divider()
-                IIDXLevelShowcase(songRecord: songRecord)
-                Divider()
-                HStack {
-                    Text("""
-Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time: .shortened))
-""")
-                        .foregroundStyle(.tertiary)
-                }
-                .font(.caption2)
-            }
-            .padding([.bottom], 8.0)
-            .padding([.leading, .trailing], 20.0)
-            .frame(maxWidth: .infinity)
-            .background(Material.bar)
-            .overlay(alignment: .bottom) {
-                Rectangle()
-                    .frame(height: 1/3)
-                    .foregroundColor(.primary.opacity(0.2))
-                    .ignoresSafeArea(edges: [.leading, .trailing])
-            }
-        }
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Text(songRecord.version)
                     .foregroundStyle(.secondary)
                     .font(.caption)
                     .bold()
                     .italic()
+            }
+        }
+        .safeAreaInset(edge: .top, spacing: 0.0) {
+            TabBarAccessory(placement: .top) {
+                VStack(alignment: .center, spacing: 8.0) {
+                    VStack(alignment: .center, spacing: 2.0) {
+                        Text(songRecord.genre)
+                            .font(.caption2)
+                            .fontWidth(.condensed)
+                        Text(songRecord.title)
+                            .bold()
+                            .fontWidth(.condensed)
+                            .textSelection(.enabled)
+                        Text(songRecord.artist)
+                            .font(.caption)
+                            .fontWidth(.condensed)
+                    }
+                    Divider()
+                    IIDXLevelShowcase(songRecord: songRecord)
+                    Divider()
+                    HStack {
+                        Text("""
+Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time: .shortened))
+""")
+                        .foregroundStyle(.tertiary)
+                    }
+                    .font(.caption2)
+                }
+                .padding([.bottom], 8.0)
+                .padding([.leading, .trailing], 20.0)
+            }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0.0) {
+            TabBarAccessory(placement: .bottom) {
+                Color.clear
+                    .frame(height: 0.0)
             }
         }
     }

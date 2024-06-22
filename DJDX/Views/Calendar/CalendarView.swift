@@ -90,72 +90,50 @@ struct CalendarView: View {
                 }
             }
             .safeAreaInset(edge: .top, spacing: 0.0) {
-                VStack(spacing: 0.0) {
-                    if horizontalSizeClass == .compact && verticalSizeClass == .regular {
-                        DatePicker("Shared.Date",
-                                   selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
-                                   in: ...Date.now,
-                                   displayedComponents: .date)
-                        .datePickerStyle(.graphical)
-                        .padding([.leading, .trailing], 10.0)
-                    } else {
-                        DatePicker("Shared.Date",
-                                   selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
-                                   in: ...Date.now,
-                                   displayedComponents: .date)
-                        .datePickerStyle(.compact)
-                        .padding([.top, .bottom], 10.0)
-                        .padding([.leading, .trailing], 20.0)
+                TabBarAccessory(placement: .top) {
+                    VStack(spacing: 0.0) {
+                        if horizontalSizeClass == .compact && verticalSizeClass == .regular {
+                            DatePicker("Shared.Date",
+                                       selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
+                                       in: ...Date.now,
+                                       displayedComponents: .date)
+                            .datePickerStyle(.graphical)
+                            .padding([.leading, .trailing], 10.0)
+                        } else {
+                            DatePicker("Shared.Date",
+                                       selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
+                                       in: ...Date.now,
+                                       displayedComponents: .date)
+                            .datePickerStyle(.compact)
+                            .padding([.top, .bottom], 10.0)
+                            .padding([.leading, .trailing], 20.0)
+                        }
                     }
-                }
-                .frame(maxWidth: .infinity)
-                .background(Material.bar)
-                .overlay(alignment: .bottom) {
-                    Rectangle()
-                        .frame(height: 1/3)
-                        .foregroundColor(.primary.opacity(0.2))
-                        .ignoresSafeArea(edges: [.leading, .trailing])
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                ScrollView(.horizontal) {
-                    HStack(spacing: 8.0) {
-                        PlayTypePicker(playTypeToShow: $importPlayType)
-                        Group {
+                TabBarAccessory(placement: .bottom) {
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 8.0) {
+                            PlayTypePicker(playTypeToShow: $importPlayType)
                             switch importPlayType {
                             case .single:
-                                NavigationLink(value: ViewPath.importerWebIIDXSingle) {
-                                    Label("Calendar.Import.FromWeb", systemImage: "globe")
-                                        .fontWeight(.medium)
-                                        .padding(4.0)
+                                ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
+                                    navigationManager.push(ViewPath.importerWebIIDXSingle, for: .calendar)
                                 }
                             case .double:
-                                NavigationLink(value: ViewPath.importerWebIIDXDouble) {
-                                    Label("Calendar.Import.FromWeb", systemImage: "globe")
-                                        .fontWeight(.medium)
-                                        .padding(4.0)
+                                ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
+                                    navigationManager.push(ViewPath.importerWebIIDXDouble, for: .calendar)
                                 }
                             }
-                            NavigationLink(value: ViewPath.importerManual) {
-                                Label("Calendar.Import.FromCSV", systemImage: "doc.badge.plus")
-                                    .fontWeight(.medium)
-                                    .padding(4.0)
+                            ToolbarButton("Calendar.Import.FromCSV", icon: "doc.badge.plus") {
+                                navigationManager.push(ViewPath.importerManual, for: .calendar)
                             }
                         }
-                        .buttonStyle(.borderedProminent)
-                        .clipShape(.capsule)
-                        .foregroundStyle(.text)
+                        .padding([.leading, .trailing], 16.0)
+                        .padding([.top, .bottom], 12.0)
                     }
-                    .padding([.leading, .trailing], 16.0)
-                    .padding([.top, .bottom], 12.0)
-                }
-                .scrollIndicators(.hidden)
-                .background(Material.bar)
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .frame(height: 1/3)
-                        .foregroundColor(.primary.opacity(0.2))
-                        .ignoresSafeArea(edges: [.leading, .trailing])
+                    .scrollIndicators(.hidden)
                 }
             }
             .alert(

@@ -9,8 +9,13 @@ import Foundation
 
 extension String {
     var compact: String {
-        let charactersToFilter = CharacterSet("“”\"'‘’ 　！!¡？?:(（)）~〜-ー■□☆★♡♥Ø".unicodeScalars)
-        return String(self.unicodeScalars.filter(charactersToFilter.inverted.contains))
+        let charactersToFilter = CharacterSet(",，“”\"'‘’ 　！!¡？?:(（)）~〜-ー■□☆★♡♥".unicodeScalars)
+        let charactersToReplace = [ "Ø" : "O" ]
+        var filteredString = String(self.unicodeScalars.filter(charactersToFilter.inverted.contains))
             .lowercased()
+        for (characterToReplace, characterToReplaceWith) in charactersToReplace {
+            filteredString = filteredString.replacingOccurrences(of: characterToReplace, with: characterToReplaceWith)
+        }
+        return filteredString
     }
 }

@@ -27,6 +27,8 @@
 		E46A66092C0CC45500D9544B /* NoteTypeDetailRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A66082C0CC45500D9544B /* NoteTypeDetailRow.swift */; };
 		E46A660B2C0CC59500D9544B /* ClearTypeDetailRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A660A2C0CC59500D9544B /* ClearTypeDetailRow.swift */; };
 		E46D51AB2C25BDFA000524B9 /* AnalyticsViewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51AA2C25BDFA000524B9 /* AnalyticsViewMode.swift */; };
+		E46D51AD2C2648B1000524B9 /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51AC2C2648B1000524B9 /* ToolbarButton.swift */; };
+		E46D51AF2C264E73000524B9 /* TabBarAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51AE2C264E73000524B9 /* TabBarAccessory.swift */; };
 		E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
@@ -89,6 +91,8 @@
 		E46A66082C0CC45500D9544B /* NoteTypeDetailRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypeDetailRow.swift; sourceTree = "<group>"; };
 		E46A660A2C0CC59500D9544B /* ClearTypeDetailRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearTypeDetailRow.swift; sourceTree = "<group>"; };
 		E46D51AA2C25BDFA000524B9 /* AnalyticsViewMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewMode.swift; sourceTree = "<group>"; };
+		E46D51AC2C2648B1000524B9 /* ToolbarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
+		E46D51AE2C264E73000524B9 /* TabBarAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarAccessory.swift; sourceTree = "<group>"; };
 		E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayTypePicker.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
@@ -230,6 +234,8 @@
 				E46A66082C0CC45500D9544B /* NoteTypeDetailRow.swift */,
 				E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */,
 				E46A65EE2C0AFF0000D9544B /* ProgressAlert.swift */,
+				E46D51AC2C2648B1000524B9 /* ToolbarButton.swift */,
+				E46D51AE2C264E73000524B9 /* TabBarAccessory.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -434,6 +440,7 @@
 				E46A65E52C0ACADB00D9544B /* IIDXSong.swift in Sources */,
 				E46A66052C0CA71E00D9544B /* ScoreRow.swift in Sources */,
 				E4E3D0D02BF9959A001942FE /* IIDXLevelShowcase.swift in Sources */,
+				E46D51AD2C2648B1000524B9 /* ToolbarButton.swift in Sources */,
 				E4E3D0D22BF99790001942FE /* DetailedSongTitle.swift in Sources */,
 				E46A65ED2C0AFC7800D9544B /* MoreBemaniWikiCharts.swift in Sources */,
 				E4E3D0CE2BF990CC001942FE /* IIDXLevelLabel.swift in Sources */,
@@ -480,6 +487,7 @@
 				E46A65EF2C0AFF0000D9544B /* ProgressAlert.swift in Sources */,
 				E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */,
 				E4AD1ACD2C11FCDC00E45F59 /* PlayDataManager.swift in Sources */,
+				E46D51AF2C264E73000524B9 /* TabBarAccessory.swift in Sources */,
 				E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */,
 				E49359DA2C00AD060022E385 /* DataState.swift in Sources */,
 				E4E3D0CA2BF98DB7001942FE /* TabType.swift in Sources */,

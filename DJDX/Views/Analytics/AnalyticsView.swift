@@ -106,34 +106,18 @@ struct AnalyticsView: View {
                 ScrollView(.horizontal) {
                     HStack(spacing: 8.0) {
                         PlayTypePicker(playTypeToShow: $playTypeToShow)
-                        Group {
-                            Button {
-                                withAnimation(.snappy.speed(2.0)) {
-                                    viewMode = .overall
-                                }
-                            } label: {
-                                Label("Analytics.Overall", systemImage: "chart.pie.fill")
-                                    .fontWeight(.medium)
-                                    .padding([.top, .bottom], 12.0)
-                                    .padding([.leading, .trailing], 16.0)
-                                    .background(viewMode == .overall ? .accent : .clear)
-                                    .foregroundStyle(viewMode == .overall ? .text : .primary)
-                            }
-                            Button {
-                                withAnimation(.snappy.speed(2.0)) {
-                                    viewMode = .trends
-                                }
-                            } label: {
-                                Label("Analytics.Trend", systemImage: "chart.line.uptrend.xyaxis")
-                                    .fontWeight(.medium)
-                                    .padding([.top, .bottom], 12.0)
-                                    .padding([.leading, .trailing], 16.0)
-                                    .background(viewMode == .trends ? .accent : .clear)
-                                    .foregroundStyle(viewMode == .trends ? .text : .primary)
+                        ToolbarButton("Analytics.Overall", icon: "chart.pie",
+                                      isSecondary: viewMode != .overall) {
+                            withAnimation(.snappy.speed(2.0)) {
+                                viewMode = .overall
                             }
                         }
-                        .buttonStyle(.plain)
-                        .clipShape(.capsule)
+                        ToolbarButton("Analytics.Trend", icon: "chart.line.uptrend.xyaxis",
+                                      isSecondary: viewMode != .trends) {
+                            withAnimation(.snappy.speed(2.0)) {
+                                viewMode = .trends
+                            }
+                        }
                     }
                     .padding([.leading, .trailing], 16.0)
                     .padding([.top, .bottom], 12.0)
