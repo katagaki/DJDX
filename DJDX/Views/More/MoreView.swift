@@ -50,15 +50,17 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
-                    Toggle(isOn: $isLevelsShownSeparately) {
-                        HStack(spacing: 0.0) {
-                            ListRow(image: "ListIcon.ShowLevelsAsSeparateRecords",
-                                    title: "More.PlayDataDisplay.ShowLevelsSeparately",
-                                    subtitle: "More.PlayDataDisplay.ShowLevelsSeparately.Description",
-                                    includeSpacer: true)
+                    // TODO: Implement this feature
+                    if (false) {
+                        Toggle(isOn: $isLevelsShownSeparately) {
+                            HStack(spacing: 0.0) {
+                                ListRow(image: "ListIcon.ShowLevelsAsSeparateRecords",
+                                        title: "More.PlayDataDisplay.ShowLevelsSeparately",
+                                        subtitle: "More.PlayDataDisplay.ShowLevelsSeparately.Description",
+                                        includeSpacer: true)
+                            }
                         }
                     }
-                    .disabled(true)
                     Toggle(isOn: $isBeginnerLevelHidden) {
                         ListRow(image: "ListIcon.HideBeginner",
                                 title: "More.PlayDataDisplay.HideBeginnerLevel",
