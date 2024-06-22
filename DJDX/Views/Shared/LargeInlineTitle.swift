@@ -17,6 +17,6 @@ struct LargeInlineTitle: View {
     var body: some View {
         Text(text)
             .fontWeight(.bold)
-            .font(.largeTitle)
+            .font(.title)
     }
 }
