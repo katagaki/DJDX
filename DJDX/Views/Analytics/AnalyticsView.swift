@@ -110,7 +110,7 @@ struct AnalyticsView: View {
                             ListSectionHeader(text: "Analytics.Trends.ClearLamp")
                                 .font(.body)
                             Spacer()
-                            if scoreRatePerDifficulty.count > 0 {
+                            if clearLampPerImportGroup.count > 0 {
                                 NavigationLink(value: ViewPath.trendsClearLampGraph) {
                                     Image(systemName: "square.arrowtriangle.4.outward")
                                 }
