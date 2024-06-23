@@ -48,7 +48,7 @@ struct WebImporter: View {
         .padding(0.0)
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             HStack {
-                Image(systemName: "info.circle")
+                Image(systemName: "hand.raised.fill")
                 Text("Importer.Web.Disclaimer")
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
