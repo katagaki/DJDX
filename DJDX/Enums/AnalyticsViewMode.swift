@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum AnalyticsViewMode {
-    case overall
+enum AnalyticsViewMode: String, Codable {
+    case overview
     case trends
 }

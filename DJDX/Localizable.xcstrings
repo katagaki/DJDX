@@ -454,6 +454,22 @@
         }
       }
     },
+    "Analytics.Trends.ClearLamp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Lamp"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランプ"
+          }
+        }
+      }
+    },
     "Calendar.BackToToday" : {
       "extractionState" : "manual",
       "localizations" : {

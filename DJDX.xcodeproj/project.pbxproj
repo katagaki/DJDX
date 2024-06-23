@@ -31,6 +31,7 @@
 		E46D51AF2C264E73000524B9 /* TabBarAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51AE2C264E73000524B9 /* TabBarAccessory.swift */; };
 		E46D51B12C26501D000524B9 /* LargeInlineTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51B02C26501D000524B9 /* LargeInlineTitle.swift */; };
 		E46D51B42C284CFE000524B9 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = E46D51B32C284CFE000524B9 /* Collections */; };
+		E46D51B62C2858E3000524B9 /* TrendsClearLampGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51B52C2858E3000524B9 /* TrendsClearLampGraph.swift */; };
 		E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
@@ -96,6 +97,7 @@
 		E46D51AC2C2648B1000524B9 /* ToolbarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
 		E46D51AE2C264E73000524B9 /* TabBarAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarAccessory.swift; sourceTree = "<group>"; };
 		E46D51B02C26501D000524B9 /* LargeInlineTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeInlineTitle.swift; sourceTree = "<group>"; };
+		E46D51B52C2858E3000524B9 /* TrendsClearLampGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsClearLampGraph.swift; sourceTree = "<group>"; };
 		E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayTypePicker.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
@@ -313,6 +315,7 @@
 				E4E3D0ED2BFC034C001942FE /* OverviewClearLampOverallGraph.swift */,
 				E4E3D0EF2BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift */,
 				E4E3D0F12BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift */,
+				E46D51B52C2858E3000524B9 /* TrendsClearLampGraph.swift */,
 				E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */,
 			);
 			path = Analytics;
@@ -486,6 +489,7 @@
 				E4E3D0DE2BF9D662001942FE /* AnalyticsView.swift in Sources */,
 				E46A66072C0CC12800D9544B /* ScoreSortAndFilter.swift in Sources */,
 				E4B123B02BF8E8E400D4A3D1 /* App.swift in Sources */,
+				E46D51B62C2858E3000524B9 /* TrendsClearLampGraph.swift in Sources */,
 				E4E3D0EE2BFC034C001942FE /* OverviewClearLampOverallGraph.swift in Sources */,
 				E46A65F32C0B112900D9544B /* LevelDetailRow.swift in Sources */,
 				E4B123DA2BF90C1D00D4A3D1 /* DocumentPicker.swift in Sources */,
