@@ -30,6 +30,7 @@
 		E46D51AD2C2648B1000524B9 /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51AC2C2648B1000524B9 /* ToolbarButton.swift */; };
 		E46D51AF2C264E73000524B9 /* TabBarAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51AE2C264E73000524B9 /* TabBarAccessory.swift */; };
 		E46D51B12C26501D000524B9 /* LargeInlineTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51B02C26501D000524B9 /* LargeInlineTitle.swift */; };
+		E46D51B42C284CFE000524B9 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = E46D51B32C284CFE000524B9 /* Collections */; };
 		E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
@@ -62,9 +63,9 @@
 		E4E3D0DE2BF9D662001942FE /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0DD2BF9D662001942FE /* AnalyticsView.swift */; };
 		E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E72BFA2B95001942FE /* WebImporter.swift */; };
 		E4E3D0EA2BFA47B1001942FE /* ImportFailedReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */; };
-		E4E3D0EE2BFC034C001942FE /* ClearLampOverviewGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0ED2BFC034C001942FE /* ClearLampOverviewGraph.swift */; };
-		E4E3D0F02BFC03CB001942FE /* ClearLampPerDifficultyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0EF2BFC03CB001942FE /* ClearLampPerDifficultyGraph.swift */; };
-		E4E3D0F22BFC0489001942FE /* DJLevelPerDifficultyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F12BFC0489001942FE /* DJLevelPerDifficultyGraph.swift */; };
+		E4E3D0EE2BFC034C001942FE /* OverviewClearLampOverallGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0ED2BFC034C001942FE /* OverviewClearLampOverallGraph.swift */; };
+		E4E3D0F02BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0EF2BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift */; };
+		E4E3D0F22BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F12BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift */; };
 		E4E3D0F42BFC053D001942FE /* DifficultyPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */; };
 		E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */; };
 		E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA42BFF7C9D00A00796 /* CalendarManager.swift */; };
@@ -130,9 +131,9 @@
 		E4E3D0E42BFA243A001942FE /* DJDX.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DJDX.entitlements; sourceTree = "<group>"; };
 		E4E3D0E72BFA2B95001942FE /* WebImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImporter.swift; sourceTree = "<group>"; };
 		E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFailedReason.swift; sourceTree = "<group>"; };
-		E4E3D0ED2BFC034C001942FE /* ClearLampOverviewGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearLampOverviewGraph.swift; sourceTree = "<group>"; };
-		E4E3D0EF2BFC03CB001942FE /* ClearLampPerDifficultyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearLampPerDifficultyGraph.swift; sourceTree = "<group>"; };
-		E4E3D0F12BFC0489001942FE /* DJLevelPerDifficultyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DJLevelPerDifficultyGraph.swift; sourceTree = "<group>"; };
+		E4E3D0ED2BFC034C001942FE /* OverviewClearLampOverallGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewClearLampOverallGraph.swift; sourceTree = "<group>"; };
+		E4E3D0EF2BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewClearLampPerDifficultyGraph.swift; sourceTree = "<group>"; };
+		E4E3D0F12BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewDJLevelPerDifficultyGraph.swift; sourceTree = "<group>"; };
 		E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyPicker.swift; sourceTree = "<group>"; };
 		E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportGroup.swift; sourceTree = "<group>"; };
 		E4EB2CA42BFF7C9D00A00796 /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
@@ -145,6 +146,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E46D51B42C284CFE000524B9 /* Collections in Frameworks */,
 				E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */,
 				E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */,
 			);
@@ -308,9 +310,9 @@
 			children = (
 				E4E3D0DD2BF9D662001942FE /* AnalyticsView.swift */,
 				E46A65FC2C0C8E9600D9544B /* AnalyticsView+Functions.swift */,
-				E4E3D0ED2BFC034C001942FE /* ClearLampOverviewGraph.swift */,
-				E4E3D0EF2BFC03CB001942FE /* ClearLampPerDifficultyGraph.swift */,
-				E4E3D0F12BFC0489001942FE /* DJLevelPerDifficultyGraph.swift */,
+				E4E3D0ED2BFC034C001942FE /* OverviewClearLampOverallGraph.swift */,
+				E4E3D0EF2BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift */,
+				E4E3D0F12BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift */,
 				E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */,
 			);
 			path = Analytics;
@@ -356,6 +358,7 @@
 			packageProductDependencies = (
 				E4E3D0D62BF9A220001942FE /* Komponents */,
 				E46A65E22C0ACAC400D9544B /* SwiftSoup */,
+				E46D51B32C284CFE000524B9 /* Collections */,
 			);
 			productName = DJDX;
 			productReference = E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */;
@@ -389,6 +392,7 @@
 			packageReferences = (
 				E4E3D0D52BF9A220001942FE /* XCRemoteSwiftPackageReference "Komponents" */,
 				E46A65E12C0ACAC400D9544B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				E46D51B22C284CFE000524B9 /* XCRemoteSwiftPackageReference "swift-collections" */,
 			);
 			productRefGroup = E4B123AD2BF8E8E400D4A3D1 /* Products */;
 			projectDirPath = "";
@@ -450,7 +454,7 @@
 				E46A65FD2C0C8E9600D9544B /* AnalyticsView+Functions.swift in Sources */,
 				E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */,
 				E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */,
-				E4E3D0F22BFC0489001942FE /* DJLevelPerDifficultyGraph.swift in Sources */,
+				E4E3D0F22BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift in Sources */,
 				E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */,
 				E4EB2CA82BFF7E3700A00796 /* CalendarView.swift in Sources */,
 				E46D51B12C26501D000524B9 /* LargeInlineTitle.swift in Sources */,
@@ -482,12 +486,12 @@
 				E4E3D0DE2BF9D662001942FE /* AnalyticsView.swift in Sources */,
 				E46A66072C0CC12800D9544B /* ScoreSortAndFilter.swift in Sources */,
 				E4B123B02BF8E8E400D4A3D1 /* App.swift in Sources */,
-				E4E3D0EE2BFC034C001942FE /* ClearLampOverviewGraph.swift in Sources */,
+				E4E3D0EE2BFC034C001942FE /* OverviewClearLampOverallGraph.swift in Sources */,
 				E46A65F32C0B112900D9544B /* LevelDetailRow.swift in Sources */,
 				E4B123DA2BF90C1D00D4A3D1 /* DocumentPicker.swift in Sources */,
 				E4B123D22BF909CD00D4A3D1 /* MainTabView.swift in Sources */,
 				E46A660B2C0CC59500D9544B /* ClearTypeDetailRow.swift in Sources */,
-				E4E3D0F02BFC03CB001942FE /* ClearLampPerDifficultyGraph.swift in Sources */,
+				E4E3D0F02BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift in Sources */,
 				E46A65EF2C0AFF0000D9544B /* ProgressAlert.swift in Sources */,
 				E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */,
 				E4AD1ACD2C11FCDC00E45F59 /* PlayDataManager.swift in Sources */,
@@ -723,6 +727,14 @@
 				minimumVersion = 2.7.2;
 			};
 		};
+		E46D51B22C284CFE000524B9 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.1;
+			};
+		};
 		E4E3D0D52BF9A220001942FE /* XCRemoteSwiftPackageReference "Komponents" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/katagaki/Komponents";
@@ -738,6 +750,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E46A65E12C0ACAC400D9544B /* XCRemoteSwiftPackageReference "SwiftSoup" */;
 			productName = SwiftSoup;
+		};
+		E46D51B32C284CFE000524B9 /* Collections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E46D51B22C284CFE000524B9 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = Collections;
 		};
 		E4E3D0D62BF9A220001942FE /* Komponents */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -1,35 +1,32 @@
 //
-//  ClearLampOverviewGraph.swift
+//  OverviewClearLampOverallGraph.swift
 //  DJDX
 //
 //  Created by シン・ジャスティン on 2024/05/21.
 //
 
 import Charts
+import OrderedCollections
 import SwiftUI
 
-struct ClearLampOverviewGraph: View {
-    @Binding var clearLampPerDifficulty: [Int: [String: Int]]
+struct OverviewClearLampOverallGraph: View {
+    @Binding var clearLampPerDifficulty: [Int: OrderedDictionary<String, Int>]
 
     @State var isInteractive: Bool = false
     @State var difficultyBelowFinger: Int?
 
     var body: some View {
         Chart(Array(clearLampPerDifficulty.keys), id: \.self) { difficulty in
-            ForEach(clearLampPerDifficulty[difficulty]!.sorted(by: <), id: \.key) { clearType, count in
+            ForEach(clearLampPerDifficulty[difficulty]!.keys.reversed(), id: \.self) { clearType in
+                let count = clearLampPerDifficulty[difficulty]![clearType]!
                 BarMark(
                     x: .value("LEVEL", difficulty),
                     y: .value("Shared.ClearCount", count),
-                    width: .inset(8.0)
+                    width: .inset(8.0),
+                    stacking: .standard
                 )
-                .foregroundStyle(
-                    by: .value("Shared.ClearType", clearType)
-                )
-                .position(
-                    by: .value("Shared.ClearType", clearType),
-                    axis: .horizontal,
-                    span: .ratio(1)
-                )
+                .foregroundStyle(by: .value("Shared.ClearType", clearType))
+                .zIndex(0)
             }
             .annotation(position: .top) {
                 if let difficultyBelowFinger, difficulty == difficultyBelowFinger {
@@ -44,7 +41,7 @@ struct ClearLampOverviewGraph: View {
                         .foregroundStyle(.text)
                         .clipShape(.capsule(style: .continuous))
                         .shadow(color: .black.opacity(0.2), radius: 2.0, y: 1.5)
-                        .zIndex(-999)
+                        .zIndex(999)
                 }
             }
         }

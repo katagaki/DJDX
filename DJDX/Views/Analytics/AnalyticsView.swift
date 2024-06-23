@@ -7,6 +7,7 @@
 
 import Charts
 import Komponents
+import OrderedCollections
 import SwiftData
 import SwiftUI
 
@@ -21,8 +22,12 @@ struct AnalyticsView: View {
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForClearLampInAnalyticsView") var levelFilterForClearLamp: Int
     @AppStorage(wrappedValue: 1, "SelectedLevelFilterForScoreRateInAnalyticsView") var levelFilterForScoreRate: Int
 
-    @State var clearLampPerDifficulty: [Int: [String: Int]] = [:] // [Difficulty: [Clear Type: Count]]
+    // Overall
+    @State var clearLampPerDifficulty: [Int: OrderedDictionary<String, Int>] = [:] // [Difficulty: [Clear Type: Count]]
     @State var scoreRatePerDifficulty: [Int: [IIDXDJLevel: Int]] = [:] // [Difficulty: [DJ Level: Count]]
+
+    // Trends
+//    @State var clearLamp
 
     @State var dataState: DataState = .initializing
     @State var viewMode: AnalyticsViewMode = .overall
@@ -35,7 +40,7 @@ struct AnalyticsView: View {
                 switch viewMode {
                 case .overall:
                     Section {
-                        ClearLampOverviewGraph(clearLampPerDifficulty: $clearLampPerDifficulty)
+                        OverviewClearLampOverallGraph(clearLampPerDifficulty: $clearLampPerDifficulty)
                         .frame(height: 200.0)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                     } header: {
@@ -51,7 +56,7 @@ struct AnalyticsView: View {
                         }
                     }
                     Section {
-                        ClearLampPerDifficultyGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
+                        OverviewClearLampPerDifficultyGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
                                                     selectedDifficulty: $levelFilterForClearLamp)
                         .frame(height: 156.0)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
@@ -70,7 +75,7 @@ struct AnalyticsView: View {
                         }
                     }
                     Section {
-                        DJLevelPerDifficultyGraph(djLevelPerDifficulty: $scoreRatePerDifficulty,
+                        OverviewDJLevelPerDifficultyGraph(djLevelPerDifficulty: $scoreRatePerDifficulty,
                                                     selectedDifficulty: $levelFilterForScoreRate)
                         .frame(height: 156.0)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
@@ -165,16 +170,16 @@ struct AnalyticsView: View {
                 Group {
                     switch viewPath {
                     case .clearLampOverviewGraph:
-                        ClearLampOverviewGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
+                        OverviewClearLampOverallGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
                                                isInteractive: true)
                         .navigationTitle("Analytics.ClearLamp.Overall")
                     case .clearLampPerDifficultyGraph:
-                        ClearLampPerDifficultyGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
+                        OverviewClearLampPerDifficultyGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
                                                     selectedDifficulty: $levelFilterForClearLamp,
                                                     legendPosition: .bottom)
                         .navigationTitle("Analytics.ClearLamp.ByDifficulty")
                     case .scoreRatePerDifficultyGraph:
-                        DJLevelPerDifficultyGraph(djLevelPerDifficulty: $scoreRatePerDifficulty,
+                        OverviewDJLevelPerDifficultyGraph(djLevelPerDifficulty: $scoreRatePerDifficulty,
                                                     selectedDifficulty: $levelFilterForScoreRate)
                         .navigationTitle("Analytics.DJLevel.ByDifficulty")
                     default: Color.clear

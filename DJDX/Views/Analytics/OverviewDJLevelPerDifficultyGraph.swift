@@ -1,5 +1,5 @@
 //
-//  DJLevelPerDifficultyGraph.swift
+//  OverviewDJLevelPerDifficultyGraph.swift
 //  DJDX
 //
 //  Created by シン・ジャスティン on 2024/05/21.
@@ -8,7 +8,7 @@
 import Charts
 import SwiftUI
 
-struct DJLevelPerDifficultyGraph: View {
+struct OverviewDJLevelPerDifficultyGraph: View {
     @Binding var djLevelPerDifficulty: [Int: [IIDXDJLevel: Int]]
     @Binding var selectedDifficulty: Int
 

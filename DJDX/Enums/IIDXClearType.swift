@@ -16,6 +16,7 @@ enum IIDXClearType: String, Codable {
     case exHardClear = "EX HARD CLEAR"
     case failed = "FAILED"
     case noPlay = "NO PLAY"
+    case unknown = ""
 
     static let sorted: [IIDXClearType] = [
         .fullComboClear,
