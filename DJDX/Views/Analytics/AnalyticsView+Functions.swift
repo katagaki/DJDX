@@ -73,11 +73,10 @@ extension AnalyticsView {
             var newClearLampPerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
             await withTaskGroup(of: (Date, [Int: OrderedDictionary<String, Int>]).self) { group in
                 for importGroup in importGroups {
+                    let songRecords = importGroup.iidxData?.filter({ $0.playType == playTypeToShow }) ?? []
                     group.addTask {
                         let date = await dateWithTimeSetToMidnight(importGroup.importDate)
-                        let clearLampPerDifficultyForImportGroup = await clearLampPerDifficulty(
-                            for: importGroup.iidxData ?? []
-                        )
+                        let clearLampPerDifficultyForImportGroup = await clearLampPerDifficulty(for: songRecords)
                         debugPrint("Processing: \(date)")
                         return (date, clearLampPerDifficultyForImportGroup)
                     }
@@ -107,7 +106,8 @@ extension AnalyticsView {
         }
 
         // Add scores to dictionary
-        for score in scores(in: songRecords) where score.clearType != "NO PLAY" {
+        let scores = scores(in: songRecords).filter({ $0.clearType != "NO PLAY" })
+        for score in scores {
             newClearLampPerDifficulty[score.difficulty]?[score.clearType]? += 1
         }
 
@@ -123,7 +123,8 @@ extension AnalyticsView {
         }
 
         // Add scores to dictionary
-        for score in scores(in: songRecords) where score.djLevelEnum() != .none {
+        let scores = scores(in: songRecords).filter({ $0.djLevelEnum() != .none})
+        for score in scores {
             newScoresPerDifficulty[score.difficulty]?[score.djLevelEnum()]? += 1
         }
         return newScoresPerDifficulty
