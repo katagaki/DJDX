@@ -12,14 +12,17 @@ import SwiftUI
 
 extension AnalyticsView {
 
-    func reload() async {
-        switch viewMode {
-        case .overview: await reloadScores()
-        case .trends: await reloadTrends()
-        }
-        await MainActor.run {
-            withAnimation(.snappy.speed(2.0)) {
-                dataState = .presenting
+    func reload() {
+        Task.detached(priority: .userInitiated) {
+            let viewMode = await viewMode
+            switch viewMode {
+            case .overview: await reloadScores()
+            case .trends: await reloadTrends()
+            }
+            await MainActor.run {
+                withAnimation(.snappy.speed(2.0)) {
+                    dataState = .presenting
+                }
             }
         }
     }
@@ -71,16 +74,18 @@ extension AnalyticsView {
             await withTaskGroup(of: (Date, [Int: OrderedDictionary<String, Int>]).self) { group in
                 for importGroup in importGroups {
                     group.addTask {
-                        let date = importGroup.importDate
+                        let date = await dateWithTimeSetToMidnight(importGroup.importDate)
                         let clearLampPerDifficultyForImportGroup = await clearLampPerDifficulty(
                             for: importGroup.iidxData ?? []
                         )
+                        debugPrint("Processing: \(date)")
                         return (date, clearLampPerDifficultyForImportGroup)
                     }
                 }
                 for await result in group {
                     let (date, clearLampPerDifficultyForImportGroup) = result
                     newClearLampPerImportGroup[date] = clearLampPerDifficultyForImportGroup
+                    debugPrint("Processed: \(result.0)")
                 }
             }
             await MainActor.run {
@@ -91,7 +96,7 @@ extension AnalyticsView {
         }
     }
 
-    func clearLampPerDifficulty(for songRecords: [IIDXSongRecord]) async -> [Int: OrderedDictionary<String, Int>] {
+    func clearLampPerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>] {
         // Generate skeleton for calculation
         var newClearLampPerDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
         for difficulty in difficulties {
@@ -109,7 +114,7 @@ extension AnalyticsView {
         return newClearLampPerDifficulty
     }
 
-    func scoresPerDifficulty(for songRecords: [IIDXSongRecord]) async -> [Int: [IIDXDJLevel: Int]] {
+    func scoresPerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: [IIDXDJLevel: Int]] {
         // Generate skeleton for calculation
         var newScoresPerDifficulty: [Int: [IIDXDJLevel: Int]] = [:]
         for difficulty in difficulties {
@@ -138,5 +143,11 @@ extension AnalyticsView {
             scores.append(contentsOf: scoresAvailable)
         }
         return scores
+    }
+
+    func dateWithTimeSetToMidnight(_ date: Date) -> Date {
+        return Calendar.current.date(
+            from: Calendar.current.dateComponents([.year, .month, .day], from: date)
+        ) ?? date
     }
 }

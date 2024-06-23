@@ -101,7 +101,7 @@ struct AnalyticsView: View {
                     Section {
                         TrendsClearLampGraph(clearLampPerImportGroup: $clearLampPerImportGroup,
                                              selectedDifficulty: $levelFilterForTrendsClearLamp)
-                        .frame(height: 156.0)
+                        .frame(height: 256.0)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                         DifficultyPicker(selection: $levelFilterForTrendsClearLamp,
                                          difficulties: .constant(difficulties))
@@ -166,10 +166,8 @@ struct AnalyticsView: View {
                 }
             }
             .onAppear {
-                Task.detached {
-                    if await dataState == .initializing {
-                        await reload()
-                    }
+                if dataState == .initializing {
+                    reload()
                 }
             }
             .onChange(of: calendar.didUserPerformChangesRequiringDisplayDataReload, { oldValue, newValue in
@@ -183,16 +181,19 @@ struct AnalyticsView: View {
                     dataState = .initializing
                 }
             }
-            .onChange(of: viewMode) { _, _ in
-                Task.detached {
-                    await reload()
+            .onChange(of: viewMode) { _, newValue in
+                var shouldReload: Bool = false
+                switch newValue {
+                case .overview: shouldReload = clearLampPerDifficulty.count == 0 && scoreRatePerDifficulty.count == 0
+                case .trends: shouldReload = clearLampPerImportGroup.count == 0
+                }
+                if shouldReload {
+                    reload()
                 }
             }
             .onChange(of: playTypeToShow) { _, _ in
                 if navigationManager.selectedTab == .analytics {
-                    Task.detached {
-                        await reload()
-                    }
+                    reload()
                 } else {
                     dataState = .initializing
                 }
