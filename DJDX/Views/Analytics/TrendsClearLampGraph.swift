@@ -22,6 +22,7 @@ struct TrendsClearLampGraph: View {
                     y: .value("Shared.ClearCount", count)
                 )
                 .foregroundStyle(by: .value("Shared.ClearType", clearType))
+                .interpolationMethod(.monotone)
             }
         }
         .chartLegend(.visible)

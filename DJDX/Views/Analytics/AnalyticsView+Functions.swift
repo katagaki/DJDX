@@ -97,11 +97,12 @@ extension AnalyticsView {
 
     func clearLampPerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>] {
         // Generate skeleton for calculation
+        let clearTypes = IIDXClearType.sortedStringsWithoutNoPlay
         var newClearLampPerDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
         for difficulty in difficulties {
             newClearLampPerDifficulty[difficulty] = OrderedDictionary(
-                uniqueKeys: IIDXClearType.sortedStringsWithoutNoPlay,
-                values: IIDXClearType.sortedStringsWithoutNoPlay.map({ _ in return 0 })
+                uniqueKeys: clearTypes,
+                values: clearTypes.map({ _ in return 0 })
             )
         }
 
