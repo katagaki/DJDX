@@ -377,13 +377,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clear Lamp (By Difficulty)"
+            "value" : "Clear Type (By Difficulty)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアランプ（難易度別）"
+            "value" : "クリアタイプ（難易度別）"
           }
         }
       }
@@ -394,13 +394,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clear Lamp (Overall)"
+            "value" : "Clear Type (Overall)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアランプ（全体）"
+            "value" : "クリアタイプ（全体）"
           }
         }
       }
@@ -459,13 +459,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clear Lamp"
+            "value" : "Clear Type"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアランプ"
+            "value" : "クリアタイプ"
           }
         }
       }
