@@ -71,20 +71,44 @@ extension AnalyticsView {
         )) ?? []
         if importGroups.count > 0 {
             var newClearLampPerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-            await withTaskGroup(of: (Date, [Int: OrderedDictionary<String, Int>]).self) { group in
+            await withTaskGroup(of: (ImportGroup, [Int: OrderedDictionary<String, Int>]).self) { group in
+                var cachedData: [String: [Int: OrderedDictionary<String, Int>]] = [:]
+                if let decodedCachedData = try? JSONDecoder().decode(
+                    [String: [Int: OrderedDictionary<String, Int>]].self,
+                    from: clearLampPerImportGroupCache
+                ) {
+                    cachedData = decodedCachedData
+                }
                 for importGroup in importGroups {
-                    let songRecords = importGroup.iidxData?.filter({ $0.playType == playTypeToShow }) ?? []
-                    group.addTask {
-                        let date = await dateWithTimeSetToMidnight(importGroup.importDate)
-                        let clearLampPerDifficultyForImportGroup = await clearLampPerDifficulty(for: songRecords)
-                        debugPrint("Processing: \(date)")
-                        return (date, clearLampPerDifficultyForImportGroup)
+                    let date = dateWithTimeSetToMidnight(importGroup.importDate)
+                    if let clearLampPerDifficultyForImportGroup = cachedData[importGroup.id] {
+                        group.addTask {
+                            debugPrint("Returning from cache: \(date)")
+                            return (importGroup, clearLampPerDifficultyForImportGroup)
+                        }
+                    } else {
+                        group.addTask { [playTypeToShow] in
+                            debugPrint("Processing: \(date)")
+                            let songRecords = importGroup.iidxData?.filter({ $0.playType == playTypeToShow }) ?? []
+                            let clearLampPerDifficultyForImportGroup = await clearLampPerDifficulty(for: songRecords)
+                            return (importGroup, clearLampPerDifficultyForImportGroup)
+                        }
                     }
                 }
                 for await result in group {
-                    let (date, clearLampPerDifficultyForImportGroup) = result
-                    newClearLampPerImportGroup[date] = clearLampPerDifficultyForImportGroup
+                    let (importGroup, clearLampPerDifficultyForImportGroup) = result
+                    newClearLampPerImportGroup[importGroup.importDate] = clearLampPerDifficultyForImportGroup
                     debugPrint("Processed: \(result.0)")
+                    if cachedData[importGroup.id] == nil {
+                        debugPrint("Storing to cache: \(importGroup.importDate)")
+                        cachedData[importGroup.id] = clearLampPerDifficultyForImportGroup
+                    }
+                }
+                do {
+                    debugPrint("Updating cache")
+                    clearLampPerImportGroupCache = try JSONEncoder().encode(cachedData)
+                } catch {
+                    debugPrint("Could not update cache: \(error)")
                 }
             }
             await MainActor.run {
@@ -148,7 +172,9 @@ extension AnalyticsView {
     }
 
     func dateWithTimeSetToMidnight(_ date: Date) -> Date {
-        return Calendar.current.date(
+        var calendar = Calendar.current
+        calendar.timeZone = .current
+        return calendar.date(
             from: Calendar.current.dateComponents([.year, .month, .day], from: date)
         ) ?? date
     }

@@ -32,6 +32,7 @@ struct AnalyticsView: View {
     // Trends
     @State var clearLampPerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
     // [Import Group Date: [Difficulty: [Clear Type: Count]]]
+    @AppStorage(wrappedValue: Data(), "Analytics.Trends.ClearLamp.Level.Cache") var clearLampPerImportGroupCache: Data
 
     @State var dataState: DataState = .initializing
     @AppStorage(wrappedValue: .overview, "Analytics.ViewMode") var viewMode: AnalyticsViewMode
@@ -128,6 +129,11 @@ struct AnalyticsView: View {
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     LargeInlineTitle("ViewTitle.Analytics")
+                        .onTapGesture(count: 5) {
+                            debugPrint("Clearing cache")
+                            clearLampPerImportGroupCache = Data()
+                            reload()
+                        }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     if dataState == .initializing || dataState == .loading {
