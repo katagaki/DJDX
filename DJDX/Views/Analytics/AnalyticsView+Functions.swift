@@ -106,6 +106,7 @@ extension AnalyticsView {
                 }
                 do {
                     debugPrint("Updating cache")
+                    // TODO: Invalidate cache for import groups that have been deleted
                     clearLampPerImportGroupCache = try JSONEncoder().encode(cachedData)
                 } catch {
                     debugPrint("Could not update cache: \(error)")
