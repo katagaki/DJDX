@@ -72,19 +72,21 @@ extension AnalyticsView {
         if importGroups.count > 0 {
             var newClearLampPerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
             await withTaskGroup(of: (ImportGroup, [Int: OrderedDictionary<String, Int>]).self) { group in
-                var cachedData: [String: [Int: OrderedDictionary<String, Int>]] = [:]
+                var cachedData: [CachedTrendData] = []
                 if let decodedCachedData = try? JSONDecoder().decode(
-                    [String: [Int: OrderedDictionary<String, Int>]].self,
+                    [CachedTrendData].self,
                     from: clearLampPerImportGroupCache
                 ) {
                     cachedData = decodedCachedData
                 }
                 for importGroup in importGroups {
                     let date = dateWithTimeSetToMidnight(importGroup.importDate)
-                    if let clearLampPerDifficultyForImportGroup = cachedData[importGroup.id] {
+                    if let cachedDataForImportGroupAndPlayType = cachedData.first(where: {
+                        $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
+                    }) {
                         group.addTask {
                             debugPrint("Returning from cache: \(date)")
-                            return (importGroup, clearLampPerDifficultyForImportGroup)
+                            return (importGroup, cachedDataForImportGroupAndPlayType.data)
                         }
                     } else {
                         group.addTask { [playTypeToShow] in
@@ -99,9 +101,15 @@ extension AnalyticsView {
                     let (importGroup, clearLampPerDifficultyForImportGroup) = result
                     newClearLampPerImportGroup[importGroup.importDate] = clearLampPerDifficultyForImportGroup
                     debugPrint("Processed: \(result.0)")
-                    if cachedData[importGroup.id] == nil {
+                    if cachedData.first(where: {
+                        $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
+                    }) == nil {
                         debugPrint("Storing to cache: \(importGroup.importDate)")
-                        cachedData[importGroup.id] = clearLampPerDifficultyForImportGroup
+                        cachedData.append(
+                            CachedTrendData(importGroupID: importGroup.id,
+                                            playType: playTypeToShow,
+                                            data: clearLampPerDifficultyForImportGroup)
+                        )
                     }
                 }
                 do {
