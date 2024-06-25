@@ -162,8 +162,8 @@ struct ScoresView: View {
                     ScoreHistoryViewer(songTitle: songTitle,
                                        level: level,
                                        noteCount: noteCount)
-                case .textageViewer(let songTitle, let level, let playSide):
-                    TextageViewer(songTitle: songTitle, level: level, playSide: playSide)
+                case .textageViewer(let songTitle, let level, let playSide, let playType):
+                    TextageViewer(songTitle: songTitle, level: level, playSide: playSide, playType: playType)
                 default: Color.clear
                 }
             }

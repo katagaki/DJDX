@@ -14,7 +14,8 @@ enum ViewPath: Hashable {
                       noteCount: Int?)
     case textageViewer(songTitle: String,
                        level: IIDXLevel,
-                       playSide: IIDXPlaySide)
+                       playSide: IIDXPlaySide,
+                       playType: IIDXPlayType)
     case clearLampOverviewGraph
     case clearLampPerDifficultyGraph
     case scoreRatePerDifficultyGraph

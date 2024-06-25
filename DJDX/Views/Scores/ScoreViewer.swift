@@ -20,23 +20,28 @@ struct ScoreViewer: View {
         List {
             if !isBeginnerLevelHidden, songRecord.beginnerScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
-                             noteCount: playData.noteCount(for: songRecord, of: .beginner))
+                             noteCount: playData.noteCount(for: songRecord, of: .beginner),
+                             playType: .single) // Only SP has Beginner level
             }
             if songRecord.normalScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.normalScore,
-                             noteCount: playData.noteCount(for: songRecord, of: .normal))
+                             noteCount: playData.noteCount(for: songRecord, of: .normal),
+                             playType: songRecord.playType)
             }
             if songRecord.hyperScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.hyperScore,
-                             noteCount: playData.noteCount(for: songRecord, of: .hyper))
+                             noteCount: playData.noteCount(for: songRecord, of: .hyper),
+                             playType: songRecord.playType)
             }
             if songRecord.anotherScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.anotherScore,
-                             noteCount: playData.noteCount(for: songRecord, of: .another))
+                             noteCount: playData.noteCount(for: songRecord, of: .another),
+                             playType: songRecord.playType)
             }
             if songRecord.leggendariaScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.leggendariaScore,
-                             noteCount: playData.noteCount(for: songRecord, of: .leggendaria))
+                             noteCount: playData.noteCount(for: songRecord, of: .leggendaria),
+                             playType: songRecord.playType)
             }
         }
         .listSectionSpacing(.compact)

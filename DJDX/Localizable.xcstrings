@@ -1186,6 +1186,22 @@
         }
       }
     },
+    "Scores.Viewer.OpenTextage.DP" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open DP Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DPの譜面を開く"
+          }
+        }
+      }
+    },
     "Scores.Viewer.OpenYouTube" : {
       "extractionState" : "manual",
       "localizations" : {

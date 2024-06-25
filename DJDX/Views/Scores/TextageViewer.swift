@@ -17,15 +17,18 @@ struct TextageViewer: View {
     var songTitle: String
     var level: IIDXLevel
     var playSide: IIDXPlaySide
+    var playType: IIDXPlayType
 
-    init(songTitle: String, level: IIDXLevel, playSide: IIDXPlaySide) {
+    init(songTitle: String, level: IIDXLevel, playSide: IIDXPlaySide, playType: IIDXPlayType) {
         self.songTitle = songTitle
         self.level = level
         self.playSide = playSide
+        self.playType = playType
     }
 
     var body: some View {
-        WebViewForTextageViewer(songTitle: songTitle, level: level, playSide: playSide)
+        WebViewForTextageViewer(songTitle: songTitle, level: level,
+                                playSide: playSide, playType: playType)
             .navigationTitle("ViewTitle.TextageViewer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -51,12 +54,14 @@ struct WebViewForTextageViewer: UIViewRepresentable {
     let webView = WKWebView()
     var songTitle: String
     var level: IIDXLevel
-    var playSide: IIDXPlaySide
+    var playSide: IIDXPlaySide = .notApplicable
+    var playType: IIDXPlayType = .single
 
-    init(songTitle: String, level: IIDXLevel, playSide: IIDXPlaySide) {
+    init(songTitle: String, level: IIDXLevel, playSide: IIDXPlaySide, playType: IIDXPlayType) {
         self.songTitle = songTitle
         self.level = level
         self.playSide = playSide
+        self.playType = playType
     }
 
     func makeUIView(context: Context) -> WKWebView {
@@ -67,7 +72,7 @@ struct WebViewForTextageViewer: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(songTitle: songTitle, level: level, playSide: playSide)
+        Coordinator(songTitle: songTitle, level: level, playSide: playSide, playType: playType)
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
@@ -87,12 +92,14 @@ do_djauto();
 """
         var songTitle: String
         var level: IIDXLevel
-        var playSide: IIDXPlaySide
+        var playSide: IIDXPlaySide = .notApplicable
+        var playType: IIDXPlayType = .single
 
-        init(songTitle: String, level: IIDXLevel, playSide: IIDXPlaySide) {
+        init(songTitle: String, level: IIDXLevel, playSide: IIDXPlaySide, playType: IIDXPlayType) {
             self.songTitle = songTitle
             self.level = level
             self.playSide = playSide
+            self.playType = playType
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -112,23 +119,40 @@ do_djauto();
 
         // swiftlint: disable cyclomatic_complexity
         func levelValue() -> String {
-            switch playSide {
-            case .side1P:
-                switch level {
-                case .normal: return "102"
-                case .hyper: return "103"
-                case .another: return "104"
-                case .leggendaria: return "105"
+            switch playType {
+            case .single:
+                switch playSide {
+                case .side1P:
+                    switch level {
+                    case .normal: return "102"
+                    case .hyper: return "103"
+                    case .another: return "104"
+                    case .leggendaria: return "105"
+                    default: break
+                    }
+                case .side2P:
+                    switch level {
+                    case .normal: return "202"
+                    case .hyper: return "203"
+                    case .another: return "204"
+                    case .leggendaria: return "205"
+                    default: break
+                    }
                 default: break
                 }
-            case .side2P:
-                switch level {
-                case .normal: return "202"
-                case .hyper: return "203"
-                case .another: return "204"
-                case .leggendaria: return "205"
+            case .double:
+                switch playSide {
+                case .notApplicable:
+                    switch level {
+                    case .normal: return "307"
+                    case .hyper: return "308"
+                    case .another: return "309"
+                    case .leggendaria: return "310"
+                    default: break
+                    }
                 default: break
                 }
+            default: break
             }
             return "102"
         }

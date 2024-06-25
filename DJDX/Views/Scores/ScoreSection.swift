@@ -16,6 +16,7 @@ struct ScoreSection: View {
     var songTitle: String
     var score: IIDXLevelScore
     var noteCount: Int?
+    var playType: IIDXPlayType
 
     var body: some View {
         Section {
@@ -88,21 +89,40 @@ struct ScoreSection: View {
                 }
                 Menu {
                     Button("Scores.Viewer.OpenYouTube", image: .listIconYouTube) {
-                        let searchQuery: String = "IIDX SP\(score.level.code()) \(songTitle)"
-                            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-                        openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
+                        switch playType {
+                        case .single:
+                            let searchQuery: String = "IIDX SP\(score.level.code()) \(songTitle)"
+                                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+                            openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
+                        case .double:
+                            let searchQuery: String = "IIDX DP\(score.level.code()) \(songTitle)"
+                                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+                            openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
+                        }
                     }
                     if score.level != .beginner {
                         Section {
-                            NavigationLink(value: ViewPath.textageViewer(songTitle: songTitle,
-                                                                         level: score.level,
-                                                                         playSide: .side1P)) {
-                                Label("Scores.Viewer.OpenTextage.1P", image: .listIconTextage)
-                            }
-                            NavigationLink(value: ViewPath.textageViewer(songTitle: songTitle,
-                                                                         level: score.level,
-                                                                         playSide: .side2P)) {
-                                Label("Scores.Viewer.OpenTextage.2P", image: .listIconTextageFlipped)
+                            switch playType {
+                            case .single:
+                                NavigationLink(value: ViewPath.textageViewer(songTitle: songTitle,
+                                                                             level: score.level,
+                                                                             playSide: .side1P,
+                                                                             playType: playType)) {
+                                    Label("Scores.Viewer.OpenTextage.1P", image: .listIconTextage)
+                                }
+                                NavigationLink(value: ViewPath.textageViewer(songTitle: songTitle,
+                                                                             level: score.level,
+                                                                             playSide: .side2P,
+                                                                             playType: playType)) {
+                                    Label("Scores.Viewer.OpenTextage.2P", image: .listIconTextageFlipped)
+                                }
+                            case .double:
+                                NavigationLink(value: ViewPath.textageViewer(songTitle: songTitle,
+                                                                             level: score.level,
+                                                                             playSide: .notApplicable,
+                                                                             playType: playType)) {
+                                    Label("Scores.Viewer.OpenTextage.DP", image: .listIconTextage)
+                                }
                             }
                         } header: {
                             Text("Scores.Viewer.OpenTextage")
