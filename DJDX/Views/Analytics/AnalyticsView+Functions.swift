@@ -99,8 +99,10 @@ extension AnalyticsView {
                 }
                 for await result in group {
                     let (importGroup, clearLampPerDifficultyForImportGroup) = result
-                    newClearLampPerImportGroup[importGroup.importDate] = clearLampPerDifficultyForImportGroup
-                    debugPrint("Processed: \(result.0)")
+                    if sumOfCounts(clearLampPerDifficultyForImportGroup) > 0 {
+                        debugPrint("Adding: \(result.0.importDate)")
+                        newClearLampPerImportGroup[importGroup.importDate] = clearLampPerDifficultyForImportGroup
+                    }
                     if cachedData.first(where: {
                         $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
                     }) == nil {
@@ -178,6 +180,16 @@ extension AnalyticsView {
             scores.append(contentsOf: scoresAvailable)
         }
         return scores
+    }
+
+    func sumOfCounts(_ data: [Int: OrderedDictionary<String, Int>]) -> Int {
+        var sum = 0
+        for (_, clearTypeDictionary) in data {
+            for (_, count) in clearTypeDictionary {
+                sum += count
+            }
+        }
+        return sum
     }
 
     func dateWithTimeSetToMidnight(_ date: Date) -> Date {
