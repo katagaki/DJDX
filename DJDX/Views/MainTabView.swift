@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TipKit
 
 struct MainTabView: View {
 
@@ -54,6 +55,10 @@ struct MainTabView: View {
                 await playData.cleanUpOrphanedSongRecords()
                 isFirstStartCleanupComplete = true
             }
+            try? Tips.configure([
+                .displayFrequency(.immediate),
+                .datastoreLocation(.applicationDefault)
+            ])
         }
         .onReceive(navigationManager.$selectedTab, perform: { newValue in
             if newValue == navigationManager.previouslySelectedTab {

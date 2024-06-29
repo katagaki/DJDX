@@ -1872,6 +1872,72 @@
         }
       }
     },
+    "Tips.ImportWikiData.Text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading BEMANIWiki 2nd data allows you to see your score rates and additional information about the game’s charts."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEMANIWiki 2ndのデータをダウンロードすると、スコアレートや譜面の追加情報が見えるようになります。"
+          }
+        }
+      }
+    },
+    "Tips.ImportWikiData.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download BEMANIWiki 2nd Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEMANIWiki 2ndのデータをダウンロードしましょう"
+          }
+        }
+      }
+    },
+    "Tips.StartHere.Text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To import your play data, tap here."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公式ウェブサイトからデータをインポートするには、こちらにタッチしてください。"
+          }
+        }
+      }
+    },
+    "Tips.StartHere.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Here"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここから始めましょう"
+          }
+        }
+      }
+    },
     "ViewTitle.Analytics" : {
       "extractionState" : "manual",
       "localizations" : {

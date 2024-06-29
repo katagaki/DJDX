@@ -127,6 +127,7 @@ struct CalendarView: View {
                                 ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
                                     navigationManager.push(ViewPath.importerWebIIDXSingle, for: .calendar)
                                 }
+                                .popoverTip(StartHereTip(), arrowEdge: .bottom)
                             case .double:
                                 ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
                                     navigationManager.push(ViewPath.importerWebIIDXDouble, for: .calendar)

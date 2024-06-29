@@ -46,6 +46,7 @@ struct MoreView: View {
                                 title: "More.ExternalData.BemaniWiki2nd",
                                 subtitle: "More.ExternalData.BemaniWiki2nd.Description")
                     }
+                    .popoverTip(ImportWikiDataTip())
                 } header: {
                     ListSectionHeader(text: "More.ExternalData.Header")
                         .font(.body)
