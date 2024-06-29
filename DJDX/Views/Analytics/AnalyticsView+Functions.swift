@@ -61,6 +61,7 @@ extension AnalyticsView {
         }
     }
 
+    // swiftlint:disable function_body_length
     func reloadTrends() async {
         dataState = .loading
         debugPrint("Calculating trends")
@@ -129,6 +130,7 @@ extension AnalyticsView {
             }
         }
     }
+    // swiftlint:enable function_body_length
 
     func clearLampPerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>] {
         // Generate skeleton for calculation

@@ -16,7 +16,7 @@ let bemaniWikiExistingVersionsPageURL = URL(string: """
 https://bemaniwiki.com/?beatmania+IIDX+31+EPOLIS/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%A5%C4%BF%F4%A5%EA%A5%B9%A5%C8
 """)!
 
-// swiftlint:disable type_body_length
+// swiftlint:disable type_body_length file_length
 struct MoreView: View {
 
     @Environment(\.modelContext) var modelContext
@@ -464,4 +464,4 @@ SOFTWARE.
         try? modelContext.delete(model: IIDXSongRecord.self)
     }
 }
-// swiftlint:enable type_body_length
+// swiftlint:enable type_body_length file_length

@@ -29,7 +29,7 @@ struct ToolbarButton: View {
 
     var body: some View {
         Group {
-            if !isSecondary{
+            if !isSecondary {
                 Button {
                     action()
                 } label: {
