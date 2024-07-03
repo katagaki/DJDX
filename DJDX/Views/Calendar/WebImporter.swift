@@ -278,6 +278,10 @@ document.getElementById('score_data').value
                     self.updateScoreDataDelegate.stopProcessing(with: .noPlayData)
                 } else if urlString.hasSuffix("?err=4") {
                     self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                } else if urlString.hasSuffix("?err=5") {
+                    self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
+                } else {
+                    self.updateScoreDataDelegate.stopProcessing(with: .serverError)
                 }
             } else {
                 webView.layer.opacity = 1.0
