@@ -8,6 +8,7 @@
 import Foundation
 
 enum IIDXClearType: String, Codable {
+    case all = "Shared.All"
     case fullComboClear = "FULLCOMBO CLEAR"
     case clear = "CLEAR"
     case assistClear = "ASSIST CLEAR"

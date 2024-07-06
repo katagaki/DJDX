@@ -383,7 +383,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアタイプ（難易度別）"
+            "value" : "クリアランプ（難易度別）"
           }
         }
       }
@@ -400,7 +400,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアタイプ（全体）"
+            "value" : "クリアランプ（全体）"
           }
         }
       }
@@ -465,7 +465,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアタイプ"
+            "value" : "クリアランプ"
           }
         }
       }
@@ -1298,7 +1298,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CLEAR TYPE"
+            "value" : "クリアランプ"
           }
         }
       }
@@ -1663,7 +1663,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアタイプ"
+            "value" : "クリアランプ"
           }
         }
       }

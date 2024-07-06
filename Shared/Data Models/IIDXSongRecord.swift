@@ -72,6 +72,10 @@ final class IIDXSongRecord: Equatable, Hashable, Sendable {
         }
     }
 
+    func scores() -> [IIDXLevelScore] {
+        return [beginnerScore, normalScore, hyperScore, anotherScore, leggendariaScore]
+    }
+
     func score(for level: IIDXLevel) -> IIDXLevelScore? {
         switch level {
         case .beginner: return beginnerScore

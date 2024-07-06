@@ -93,7 +93,8 @@ class PlayDataManager: ObservableObject {
     func filterSongRecords(playTypeToShow: IIDXPlayType,
                            isShowingOnlyPlayDataWithScores: Bool,
                            levelToShow: IIDXLevel,
-                           difficultyToShow: IIDXDifficulty) async {
+                           difficultyToShow: IIDXDifficulty,
+                           clearTypeToShow: IIDXClearType) async {
         debugPrint("Filtering song records")
         var filteredSongRecords: [IIDXSongRecord] = self.allSongRecords
 
@@ -127,18 +128,41 @@ class PlayDataManager: ObservableObject {
             }
         }
 
-        // Filter song records by level
-        if let keyPath = scoreKeyPath(for: levelToShow) {
-            filteredSongRecords.removeAll { songRecord in
-                songRecord[keyPath: keyPath].difficulty == 0
-            }
-        }
+        filteredSongRecords.removeAll { songRecord in
 
-        // Filter song records by difficulty
-        if difficultyToShow != .all {
-            filteredSongRecords.removeAll { songRecord in
-                songRecord.score(for: difficultyToShow) == nil
+
+            // Filter song records by difficulty
+            if difficultyToShow != .all,
+               songRecord.score(for: difficultyToShow) == nil {
+                return true
             }
+
+            // Filter song records by level
+            if let keyPath = scoreKeyPath(for: levelToShow),
+               songRecord[keyPath: keyPath].difficulty == 0 {
+                return true
+            }
+
+            // Filter song records by clear type
+            if clearTypeToShow != .all {
+                if difficultyToShow != .all && levelToShow == .all,
+                   songRecord.score(for: difficultyToShow)?.clearType != clearTypeToShow.rawValue {
+                    return true
+                } else if difficultyToShow == .all && levelToShow != .all,
+                          songRecord.score(for: levelToShow)?.clearType != clearTypeToShow.rawValue {
+                    return true
+                } else if difficultyToShow != .all && levelToShow != .all,
+                          songRecord.score(for: difficultyToShow)?.level == songRecord.score(for: levelToShow)?.level,
+                          songRecord.score(for: difficultyToShow)?.clearType != clearTypeToShow.rawValue {
+                    return true
+                } else {
+                    if !songRecord.scores().contains(where: { $0.clearType == clearTypeToShow.rawValue }) {
+                        return true
+                    }
+                }
+            }
+
+            return false
         }
 
         self.filteredSongRecords = filteredSongRecords

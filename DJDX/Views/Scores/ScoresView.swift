@@ -20,14 +20,19 @@ struct ScoresView: View {
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: true, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
-    @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
     @AppStorage(wrappedValue: .all, "ScoresView.DifficultyFilter") var difficultyToShow: IIDXDifficulty
+    @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
+    @AppStorage(wrappedValue: .all, "ScoresView.ClearTypeFilter") var clearTypeToShow: IIDXClearType
 
     @AppStorage(wrappedValue: .title, "ScoresView.SortOrder") var sortMode: SortMode
 
     @State var searchTerm: String = ""
     @State var isSystemChangingFilterAndSort: Bool = false
     @State var isSystemChangingAllRecords: Bool = false
+
+    var filters: [String] {
+        [String(difficultyToShow.rawValue), levelToShow.rawValue, clearTypeToShow.rawValue]
+    }
 
     var body: some View {
         NavigationStack(path: $navigationManager[.scores]) {
@@ -68,8 +73,9 @@ struct ScoresView: View {
                         HStack(spacing: 8.0) {
                             PlayTypePicker(playTypeToShow: $playTypeToShow)
                             ScoreSortAndFilter(isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                                               levelToShow: $levelToShow,
                                                difficultyToShow: $difficultyToShow,
+                                               levelToShow: $levelToShow,
+                                               clearTypeToShow: $clearTypeToShow,
                                                sortMode: $sortMode,
                                                isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort) {
                                 reloadDisplay(shouldReloadAll: false, shouldFilter: true,
@@ -114,21 +120,8 @@ struct ScoresView: View {
                 reloadDisplay(shouldReloadAll: false, shouldFilter: true,
                               shouldSort: true, shouldSearch: true)
             }
-            .onChange(of: levelToShow) { _, newValue in
-                if !isSystemChangingFilterAndSort && newValue != .all {
-                    difficultyToShow = .all
-                    reloadDisplay(shouldReloadAll: false, shouldFilter: true,
-                                  shouldSort: true, shouldSearch: true)
-                }
-            }
-            .onChange(of: difficultyToShow) { _, newValue in
-                if !isSystemChangingFilterAndSort && newValue != .all {
-                    levelToShow = .all
-                    if sortMode == .difficultyAscending || sortMode == .difficultyDescending {
-                        isSystemChangingFilterAndSort = true
-                        sortMode = .title
-                        isSystemChangingFilterAndSort = false
-                    }
+            .onChange(of: filters) {_, _ in
+                if !isSystemChangingFilterAndSort {
                     reloadDisplay(shouldReloadAll: false, shouldFilter: true,
                                   shouldSort: true, shouldSearch: true)
                 }
@@ -189,7 +182,8 @@ struct ScoresView: View {
                     playTypeToShow: playTypeToShow,
                     isShowingOnlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
                     levelToShow: levelToShow,
-                    difficultyToShow: difficultyToShow
+                    difficultyToShow: difficultyToShow,
+                    clearTypeToShow: clearTypeToShow
                 )
             }
             if shouldSort {
