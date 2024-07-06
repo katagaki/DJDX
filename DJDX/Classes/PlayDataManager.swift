@@ -130,16 +130,13 @@ class PlayDataManager: ObservableObject {
 
         filteredSongRecords.removeAll { songRecord in
 
-
             // Filter song records by difficulty
-            if difficultyToShow != .all,
-               songRecord.score(for: difficultyToShow) == nil {
+            if difficultyToShow != .all, songRecord.score(for: difficultyToShow) == nil {
                 return true
             }
 
             // Filter song records by level
-            if let keyPath = scoreKeyPath(for: levelToShow),
-               songRecord[keyPath: keyPath].difficulty == 0 {
+            if levelToShow != .all, songRecord.score(for: levelToShow) == nil {
                 return true
             }
 
