@@ -18,9 +18,9 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $navigationManager.selectedTab) {
-            CalendarView()
+            ImportView()
                 .tabItem {
-                    Label("Tab.Calendar", systemImage: "calendar")
+                    Label("Tab.Import", systemImage: "arrow.down.circle.dotted")
                 }
                 .tag(TabType.calendar)
             ScoresView()

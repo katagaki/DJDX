@@ -73,7 +73,7 @@
 		E4E3D0F42BFC053D001942FE /* DifficultyPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */; };
 		E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */; };
 		E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA42BFF7C9D00A00796 /* CalendarManager.swift */; };
-		E4EB2CA82BFF7E3700A00796 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA72BFF7E3700A00796 /* CalendarView.swift */; };
+		E4EB2CA82BFF7E3700A00796 /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA72BFF7E3700A00796 /* ImportView.swift */; };
 		E4EB2CAB2BFF8CC500A00796 /* Predicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CAA2BFF8CC500A00796 /* Predicates.swift */; };
 /* End PBXBuildFile section */
 
@@ -145,7 +145,7 @@
 		E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyPicker.swift; sourceTree = "<group>"; };
 		E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportGroup.swift; sourceTree = "<group>"; };
 		E4EB2CA42BFF7C9D00A00796 /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
-		E4EB2CA72BFF7E3700A00796 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
+		E4EB2CA72BFF7E3700A00796 /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
 		E4EB2CAA2BFF8CC500A00796 /* Predicates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Predicates.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -243,7 +243,7 @@
 			children = (
 				E4B123AF2BF8E8E400D4A3D1 /* App.swift */,
 				E4B123D12BF909CD00D4A3D1 /* MainTabView.swift */,
-				E4EB2CA62BFF7E2C00A00796 /* Calendar */,
+				E4EB2CA62BFF7E2C00A00796 /* Importer */,
 				E4B123DB2BF90D1F00D4A3D1 /* Scores */,
 				E4E3D0DC2BF9D645001942FE /* Analytics */,
 				E4B123DC2BF90D2600D4A3D1 /* More */,
@@ -356,14 +356,14 @@
 			path = "Data Models";
 			sourceTree = "<group>";
 		};
-		E4EB2CA62BFF7E2C00A00796 /* Calendar */ = {
+		E4EB2CA62BFF7E2C00A00796 /* Importer */ = {
 			isa = PBXGroup;
 			children = (
-				E4EB2CA72BFF7E3700A00796 /* CalendarView.swift */,
+				E4EB2CA72BFF7E3700A00796 /* ImportView.swift */,
 				E4E3D0E72BFA2B95001942FE /* WebImporter.swift */,
 				E49359DB2C00C29C0022E385 /* ManualImporter.swift */,
 			);
-			path = Calendar;
+			path = Importer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -485,7 +485,7 @@
 				E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */,
 				E4E3D0F22BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift in Sources */,
 				E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */,
-				E4EB2CA82BFF7E3700A00796 /* CalendarView.swift in Sources */,
+				E4EB2CA82BFF7E3700A00796 /* ImportView.swift in Sources */,
 				E46D51B12C26501D000524B9 /* LargeInlineTitle.swift in Sources */,
 				E46D51AB2C25BDFA000524B9 /* AnalyticsViewMode.swift in Sources */,
 				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,

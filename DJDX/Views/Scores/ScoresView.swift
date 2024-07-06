@@ -28,10 +28,18 @@ struct ScoresView: View {
 
     @State var searchTerm: String = ""
     @State var isSystemChangingFilterAndSort: Bool = false
+    @State var isSystemChangingCalendarDate: Bool = false
     @State var isSystemChangingAllRecords: Bool = false
+
+    var isTimeTravellingKey: String = "ScoresView.IsTimeTravelling"
+    @State var isTimeTravelling: Bool
 
     var filters: [String] {
         [String(difficultyToShow.rawValue), levelToShow.rawValue, clearTypeToShow.rawValue]
+    }
+
+    init() {
+        self.isTimeTravelling = UserDefaults.standard.bool(forKey: isTimeTravellingKey)
     }
 
     var body: some View {
@@ -69,26 +77,46 @@ struct ScoresView: View {
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 TabBarAccessory(placement: .bottom) {
-                    ScrollView(.horizontal) {
-                        HStack(spacing: 8.0) {
-                            PlayTypePicker(playTypeToShow: $playTypeToShow)
-                            ScoreSortAndFilter(isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                                               difficultyToShow: $difficultyToShow,
-                                               levelToShow: $levelToShow,
-                                               clearTypeToShow: $clearTypeToShow,
-                                               sortMode: $sortMode,
-                                               isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort) {
-                                reloadDisplay(shouldReloadAll: false, shouldFilter: true,
-                                              shouldSort: true, shouldSearch: true)
-                            }
+                    VStack(spacing: 8.0) {
+                        if isTimeTravelling {
+                            DatePicker("Shared.SelectDate",
+                                       selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
+                                       in: ...Date.now,
+                                       displayedComponents: .date)
+                            .datePickerStyle(.compact)
+                            .padding([.leading, .trailing], 16.0)
+                            .padding([.top], 12.0)
                         }
-                        .padding([.leading, .trailing], 16.0)
-                        .padding([.top, .bottom], 12.0)
+                        ScrollView(.horizontal) {
+                            HStack(spacing: 8.0) {
+                                PlayTypePicker(playTypeToShow: $playTypeToShow)
+                                ScoreSortAndFilter(isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
+                                                   difficultyToShow: $difficultyToShow,
+                                                   levelToShow: $levelToShow,
+                                                   clearTypeToShow: $clearTypeToShow,
+                                                   sortMode: $sortMode,
+                                                   isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort) {
+                                    reloadDisplay(shouldReloadAll: false, shouldFilter: true,
+                                                  shouldSort: true, shouldSearch: true)
+                                }
+                                ToolbarButton("Shared.ShowPastData", icon: "calendar",
+                                              isSecondary: !isTimeTravelling) {
+                                    withAnimation {
+                                        isTimeTravelling.toggle()
+                                    }
+                                    if !isTimeTravelling {
+                                        calendar.selectedDate = .now
+                                    }
+                                }
+                            }
+                            .padding([.leading, .trailing], 16.0)
+                            .padding([.top, .bottom], 12.0)
+                        }
+                        .scrollIndicators(.hidden)
                     }
-                    .scrollIndicators(.hidden)
                 }
             }
-            .overlay {
+            .background {
                 switch dataState {
                 case .presenting:
                     if playData.allSongRecords.count == 0 {
@@ -103,7 +131,15 @@ struct ScoresView: View {
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "Scores.Search.Prompt")
             .onAppear {
+                if !Calendar.current.isDate(.now, inSameDayAs: calendar.selectedDate) {
+                    isTimeTravelling = true
+                }
                 if dataState == .initializing {
+                    if !isTimeTravelling {
+                        isSystemChangingCalendarDate = true
+                        calendar.selectedDate = .now
+                        isSystemChangingCalendarDate = false
+                    }
                     reloadDisplay(shouldReloadAll: true, shouldFilter: true,
                                   shouldSort: true, shouldSearch: true)
                 }
@@ -136,6 +172,12 @@ struct ScoresView: View {
                 reloadDisplay(shouldReloadAll: false, shouldFilter: false,
                               shouldSort: false, shouldSearch: true)
             }
+            .onChange(of: isTimeTravelling) { _, newValue in
+                UserDefaults.standard.set(newValue, forKey: isTimeTravellingKey)
+                if !isTimeTravelling {
+                    calendar.selectedDate = .now
+                }
+            }
             .onChange(of: calendar.didUserPerformChangesRequiringDisplayDataReload, { oldValue, newValue in
                 if !oldValue && newValue {
                     calendar.didUserPerformChangesRequiringDisplayDataReload = false
@@ -143,8 +185,10 @@ struct ScoresView: View {
                 }
             })
             .onChange(of: calendar.selectedDate) { oldValue, newValue in
-                if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
-                    dataState = .initializing
+                if !isSystemChangingCalendarDate,
+                   !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
+                    reloadDisplay(shouldReloadAll: true, shouldFilter: true,
+                                  shouldSort: true, shouldSearch: true)
                 }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in

@@ -1,5 +1,5 @@
 //
-//  CalendarView.swift
+//  ImportView.swift
 //  DJDX
 //
 //  Created by シン・ジャスティン on 2024/05/23.
@@ -9,7 +9,7 @@ import Komponents
 import SwiftData
 import SwiftUI
 
-struct CalendarView: View {
+struct ImportView: View {
 
     @Environment(\.modelContext) var modelContext
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
@@ -31,17 +31,11 @@ struct CalendarView: View {
         NavigationStack(path: $navigationManager[.calendar]) {
             List {
                 ForEach(importGroups) { importGroup in
-                    Button {
-                        withAnimation(.snappy.speed(2.0)) {
-                            calendar.selectedDate = importGroup.importDate
-                        }
-                    } label: {
-                        VStack(alignment: .leading, spacing: 2.0) {
-                            Text(importGroup.importDate, style: .date)
-                            Text("Shared.SongCount.\(countOfIIDXSongRecords(in: importGroup))")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
+                    VStack(alignment: .leading, spacing: 2.0) {
+                        Text(importGroup.importDate, style: .date)
+                        Text("Shared.SongCount.\(countOfIIDXSongRecords(in: importGroup))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .onDelete(perform: { indexSet in
@@ -69,16 +63,9 @@ struct CalendarView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
-                        if !Calendar.current.isDate(calendar.selectedDate, inSameDayAs: .now) {
-                            Button {
-                                calendar.selectedDate = .now
-                            } label: {
-                                Label("Calendar.BackToToday", systemImage: "arrowshape.turn.up.backward.badge.clock")
-                            }
-                        }
                         Menu {
                             Section {
-                                Button("Calendar.Import.LoadSamples.Button", systemImage: "sparkles") {
+                                Button("Calendar.Import.LoadSamples.Button") {
                                     Task.detached {
                                         await calendar.importCSV(reportingTo: progressAlertManager, for: .single)
                                         await MainActor.run {
@@ -95,52 +82,39 @@ struct CalendarView: View {
                     }
                 }
             }
-            .safeAreaInset(edge: .top, spacing: 0.0) {
-                TabBarAccessory(placement: .top) {
-                    VStack(spacing: 0.0) {
-                        if horizontalSizeClass == .compact && verticalSizeClass == .regular {
-                            DatePicker("Shared.Date",
-                                       selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
-                                       in: ...Date.now,
-                                       displayedComponents: .date)
-                            .datePickerStyle(.graphical)
-                            .padding([.leading, .trailing], 10.0)
-                        } else {
-                            DatePicker("Shared.Date",
-                                       selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
-                                       in: ...Date.now,
-                                       displayedComponents: .date)
-                            .datePickerStyle(.compact)
-                            .padding([.top, .bottom], 10.0)
-                            .padding([.leading, .trailing], 20.0)
-                        }
-                    }
-                }
-            }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 TabBarAccessory(placement: .bottom) {
-                    ScrollView(.horizontal) {
-                        HStack(spacing: 8.0) {
-                            PlayTypePicker(playTypeToShow: $importPlayType)
-                            switch importPlayType {
-                            case .single:
-                                ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
-                                    navigationManager.push(ViewPath.importerWebIIDXSingle, for: .calendar)
-                                }
-                                .popoverTip(StartHereTip(), arrowEdge: .bottom)
-                            case .double:
-                                ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
-                                    navigationManager.push(ViewPath.importerWebIIDXDouble, for: .calendar)
-                                }
-                            }
-                            ToolbarButton("Calendar.Import.FromCSV", icon: "doc.badge.plus") {
-                                navigationManager.push(ViewPath.importerManual, for: .calendar)
-                            }
-                        }
+                    VStack(spacing: 8.0) {
+                        DatePicker("Calendar.Import.SelectDate",
+                                   selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
+                                   in: ...Date.now,
+                                   displayedComponents: .date)
+                        .datePickerStyle(.compact)
                         .padding([.leading, .trailing], 16.0)
-                        .padding([.top, .bottom], 12.0)
+                        .padding([.top], 12.0)
+                        ScrollView(.horizontal) {
+                            HStack(spacing: 8.0) {
+                                PlayTypePicker(playTypeToShow: $importPlayType)
+                                switch importPlayType {
+                                case .single:
+                                    ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
+                                        navigationManager.push(ViewPath.importerWebIIDXSingle, for: .calendar)
+                                    }
+                                    .popoverTip(StartHereTip(), arrowEdge: .bottom)
+                                case .double:
+                                    ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
+                                        navigationManager.push(ViewPath.importerWebIIDXDouble, for: .calendar)
+                                    }
+                                }
+                                ToolbarButton("Calendar.Import.FromCSV", icon: "doc.badge.plus") {
+                                    navigationManager.push(ViewPath.importerManual, for: .calendar)
+                                }
+                            }
+                            .padding([.leading, .trailing], 16.0)
+                            .padding([.top, .bottom], 12.0)
+                        }
+                        .scrollIndicators(.hidden)
                     }
-                    .scrollIndicators(.hidden)
                 }
             }
             .alert(

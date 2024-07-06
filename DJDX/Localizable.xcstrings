@@ -555,6 +555,22 @@
         }
       }
     },
+    "Calendar.Import.SelectDate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Import To Date"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポート日付を選択"
+          }
+        }
+      }
+    },
     "Importer.CSV.Download.Button" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1606,6 +1622,38 @@
         }
       }
     },
+    "Shared.SelectDate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Date"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日付を選択"
+          }
+        }
+      }
+    },
+    "Shared.ShowPastData" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遡る"
+          }
+        }
+      }
+    },
     "Shared.SongCount.%lld" : {
       "localizations" : {
         "en" : {
@@ -1620,7 +1668,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld songs"
+                  "value" : "%lld songs (SP/DP)"
                 }
               }
             }
@@ -1629,7 +1677,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld曲"
+            "value" : "%lld曲（SP/DP合計）"
           }
         }
       }
@@ -1821,19 +1869,19 @@
         }
       }
     },
-    "Tab.Calendar" : {
+    "Tab.Import" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Calendar"
+            "value" : "Import"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "カレンダー"
+            "value" : "インポート"
           }
         }
       }
