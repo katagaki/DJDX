@@ -137,7 +137,11 @@ class PlayDataManager: ObservableObject {
 
             // Filter song records by level
             if levelToShow != .all, songRecord.score(for: levelToShow) == nil {
-                return true
+                if difficultyToShow != .all {
+                    return songRecord.score(for: levelToShow)?.difficulty != difficultyToShow.rawValue
+                } else {
+                    return true
+                }
             }
 
             // Filter song records by clear type

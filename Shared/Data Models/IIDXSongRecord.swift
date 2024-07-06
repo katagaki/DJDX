@@ -76,6 +76,11 @@ final class IIDXSongRecord: Equatable, Hashable, Sendable {
         return [beginnerScore, normalScore, hyperScore, anotherScore, leggendariaScore]
     }
 
+    func score(for difficulty: IIDXDifficulty) -> IIDXLevelScore? {
+        let scores = [beginnerScore, normalScore, hyperScore, anotherScore, leggendariaScore]
+        return scores.first(where: { $0.difficulty == difficulty.rawValue })
+    }
+
     func score(for level: IIDXLevel) -> IIDXLevelScore? {
         switch level {
         case .beginner: return beginnerScore
@@ -85,11 +90,6 @@ final class IIDXSongRecord: Equatable, Hashable, Sendable {
         case .leggendaria: return leggendariaScore
         default: return nil
         }
-    }
-
-    func score(for difficulty: IIDXDifficulty) -> IIDXLevelScore? {
-        let scores = [beginnerScore, normalScore, hyperScore, anotherScore, leggendariaScore]
-        return scores.first(where: { $0.difficulty == difficulty.rawValue })
     }
 
     func level(for level: IIDXLevel, or difficulty: IIDXDifficulty) -> IIDXLevel {
