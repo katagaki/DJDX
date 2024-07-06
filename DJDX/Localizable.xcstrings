@@ -559,7 +559,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Import To Date"
           }
         },
@@ -1308,7 +1308,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CLEAR TYPE"
+            "value" : "Clear Type"
           }
         },
         "ja" : {
