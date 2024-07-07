@@ -48,31 +48,31 @@ struct ScoreHistoryViewer: View {
                             AreaMark(x: .value("Shared.Date", date), y: .value("Shared.Score", score))
                         }
                         RuleMark(y: .value("AAA", Float(noteCount * 2) * 8.0 / 9.0))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.orange)
                             .annotation(position: .topLeading,
                                         overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
                                 Text(verbatim: "AAA")
-                                    .foregroundStyle(.red.gradient)
+                                    .foregroundStyle(.orange.gradient)
                                     .font(.caption2)
                                     .opacity(0.7)
                             }
                             .opacity(0.7)
                         RuleMark(y: .value("AA", Float(noteCount * 2) * 7.0 / 9.0))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.gray)
                             .annotation(position: .topLeading,
                                         overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
                                 Text(verbatim: "AA")
-                                    .foregroundStyle(.red.gradient)
+                                    .foregroundStyle(.gray.gradient)
                                     .font(.caption2)
                                     .opacity(0.55)
                             }
                             .opacity(0.55)
                         RuleMark(y: .value("A", Float(noteCount * 2) * 6.0 / 9.0))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.teal)
                             .annotation(position: .topLeading,
                                         overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
                                 Text(verbatim: "A")
-                                    .foregroundStyle(.red.gradient)
+                                    .foregroundStyle(.teal.gradient)
                                     .font(.caption2)
                                     .opacity(0.4)
                             }
