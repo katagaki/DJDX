@@ -53,23 +53,23 @@ struct AnalyticsView: View {
                 switch viewMode {
                 case .overview:
                     Section {
-                        OverviewClearLampOverallGraph(graphData: $clearTypePerDifficulty)
+                        OverviewClearTypeOverallGraph(graphData: $clearTypePerDifficulty)
                         .frame(height: 200.0)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                     } header: {
                         HStack(spacing: 8.0) {
-                            ListSectionHeader(text: "Analytics.ClearLamp.Overall")
+                            ListSectionHeader(text: "Analytics.ClearType.Overall")
                                 .font(.body)
                             Spacer()
                             if clearTypePerDifficulty.count > 0 {
-                                NavigationLink(value: ViewPath.clearLampOverviewGraph) {
+                                NavigationLink(value: ViewPath.clearTypeOverviewGraph) {
                                     Image(systemName: "square.arrowtriangle.4.outward")
                                 }
                             }
                         }
                     }
                     Section {
-                        OverviewClearLampPerDifficultyGraph(graphData: $clearTypePerDifficulty,
+                        OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
                                                             difficulty: $levelFilterForOverviewClearType)
                         .frame(height: 156.0)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
@@ -77,11 +77,11 @@ struct AnalyticsView: View {
                                          difficulties: .constant(difficulties))
                     } header: {
                         HStack(spacing: 8.0) {
-                            ListSectionHeader(text: "Analytics.ClearLamp.ByDifficulty")
+                            ListSectionHeader(text: "Analytics.ClearType.ByDifficulty")
                                 .font(.body)
                             Spacer()
                             if clearTypePerDifficulty.count > 0 {
-                                NavigationLink(value: ViewPath.clearLampPerDifficultyGraph) {
+                                NavigationLink(value: ViewPath.clearTypePerDifficultyGraph) {
                                     Image(systemName: "square.arrowtriangle.4.outward")
                                 }
                             }
@@ -108,7 +108,7 @@ struct AnalyticsView: View {
                     }
                 case .trends:
                     Section {
-                        TrendsClearLampGraph(graphData: $clearTypePerImportGroup,
+                        TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
                                              difficulty: $levelFilterForTrendsClearType)
                         .frame(height: 256.0)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
@@ -116,11 +116,11 @@ struct AnalyticsView: View {
                                          difficulties: .constant(difficulties))
                     } header: {
                         HStack(spacing: 8.0) {
-                            ListSectionHeader(text: "Analytics.Trends.ClearLamp")
+                            ListSectionHeader(text: "Analytics.Trends.ClearType")
                                 .font(.body)
                             Spacer()
                             if clearTypePerImportGroup.count > 0 {
-                                NavigationLink(value: ViewPath.trendsClearLampGraph) {
+                                NavigationLink(value: ViewPath.trendsClearTypeGraph) {
                                     Image(systemName: "square.arrowtriangle.4.outward")
                                 }
                             }
@@ -231,23 +231,23 @@ struct AnalyticsView: View {
             .navigationDestination(for: ViewPath.self) { viewPath in
                 Group {
                     switch viewPath {
-                    case .clearLampOverviewGraph:
-                        OverviewClearLampOverallGraph(graphData: $clearTypePerDifficulty,
+                    case .clearTypeOverviewGraph:
+                        OverviewClearTypeOverallGraph(graphData: $clearTypePerDifficulty,
                                                       isInteractive: true)
-                        .navigationTitle("Analytics.ClearLamp.Overall")
-                    case .clearLampPerDifficultyGraph:
-                        OverviewClearLampPerDifficultyGraph(graphData: $clearTypePerDifficulty,
+                        .navigationTitle("Analytics.ClearType.Overall")
+                    case .clearTypePerDifficultyGraph:
+                        OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
                                                             difficulty: $levelFilterForOverviewClearType,
                                                             legendPosition: .bottom)
-                        .navigationTitle("Analytics.ClearLamp.ByDifficulty")
+                        .navigationTitle("Analytics.ClearType.ByDifficulty")
                     case .scoreRatePerDifficultyGraph:
                         OverviewDJLevelPerDifficultyGraph(graphData: $djLevelPerDifficulty,
                                                           difficulty: $levelFilterForOverviewScoreRate)
                         .navigationTitle("Analytics.DJLevel.ByDifficulty")
-                    case .trendsClearLampGraph:
-                        TrendsClearLampGraph(graphData: $clearTypePerImportGroup,
+                    case .trendsClearTypeGraph:
+                        TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
                                              difficulty: $levelFilterForTrendsClearType)
-                        .navigationTitle("Analytics.Trends.ClearLamp")
+                        .navigationTitle("Analytics.Trends.ClearType")
                     case .trendsDJLevelGraph:
                         TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
                                            difficulty: $levelFilterForTrendsDJLevel)

@@ -16,10 +16,10 @@ enum ViewPath: Hashable {
                        level: IIDXLevel,
                        playSide: IIDXPlaySide,
                        playType: IIDXPlayType)
-    case clearLampOverviewGraph
-    case clearLampPerDifficultyGraph
+    case clearTypeOverviewGraph
+    case clearTypePerDifficultyGraph
     case scoreRatePerDifficultyGraph
-    case trendsClearLampGraph
+    case trendsClearTypeGraph
     case trendsDJLevelGraph
     case importerWebIIDXSingle
     case importerWebIIDXDouble

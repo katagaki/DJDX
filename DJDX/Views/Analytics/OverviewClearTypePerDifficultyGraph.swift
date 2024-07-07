@@ -1,5 +1,5 @@
 //
-//  OverviewClearLampPerDifficultyGraph.swift
+//  OverviewClearTypePerDifficultyGraph.swift
 //  DJDX
 //
 //  Created by シン・ジャスティン on 2024/05/21.
@@ -9,7 +9,7 @@ import Charts
 import OrderedCollections
 import SwiftUI
 
-struct OverviewClearLampPerDifficultyGraph: View {
+struct OverviewClearTypePerDifficultyGraph: View {
     @Binding var graphData: [Int: OrderedDictionary<String, Int>]
     @Binding var difficulty: Int
 

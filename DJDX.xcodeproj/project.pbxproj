@@ -31,7 +31,7 @@
 		E46D51AF2C264E73000524B9 /* TabBarAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51AE2C264E73000524B9 /* TabBarAccessory.swift */; };
 		E46D51B12C26501D000524B9 /* LargeInlineTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51B02C26501D000524B9 /* LargeInlineTitle.swift */; };
 		E46D51B42C284CFE000524B9 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = E46D51B32C284CFE000524B9 /* Collections */; };
-		E46D51B62C2858E3000524B9 /* TrendsClearLampGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51B52C2858E3000524B9 /* TrendsClearLampGraph.swift */; };
+		E46D51B62C2858E3000524B9 /* TrendsClearTypeGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51B52C2858E3000524B9 /* TrendsClearTypeGraph.swift */; };
 		E46D51BC2C2B095E000524B9 /* CachedTrendData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51BB2C2B095E000524B9 /* CachedTrendData.swift */; };
 		E46D51BF2C2FF5FF000524B9 /* StartHereTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51BE2C2FF5F6000524B9 /* StartHereTip.swift */; };
 		E46D51C12C2FF737000524B9 /* ImportWikiDataTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51C02C2FF737000524B9 /* ImportWikiDataTip.swift */; };
@@ -68,8 +68,8 @@
 		E4E3D0DE2BF9D662001942FE /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0DD2BF9D662001942FE /* AnalyticsView.swift */; };
 		E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E72BFA2B95001942FE /* WebImporter.swift */; };
 		E4E3D0EA2BFA47B1001942FE /* ImportFailedReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */; };
-		E4E3D0EE2BFC034C001942FE /* OverviewClearLampOverallGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0ED2BFC034C001942FE /* OverviewClearLampOverallGraph.swift */; };
-		E4E3D0F02BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0EF2BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift */; };
+		E4E3D0EE2BFC034C001942FE /* OverviewClearTypeOverallGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0ED2BFC034C001942FE /* OverviewClearTypeOverallGraph.swift */; };
+		E4E3D0F02BFC03CB001942FE /* OverviewClearTypePerDifficultyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0EF2BFC03CB001942FE /* OverviewClearTypePerDifficultyGraph.swift */; };
 		E4E3D0F22BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F12BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift */; };
 		E4E3D0F42BFC053D001942FE /* DifficultyPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */; };
 		E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */; };
@@ -101,7 +101,7 @@
 		E46D51AC2C2648B1000524B9 /* ToolbarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
 		E46D51AE2C264E73000524B9 /* TabBarAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarAccessory.swift; sourceTree = "<group>"; };
 		E46D51B02C26501D000524B9 /* LargeInlineTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeInlineTitle.swift; sourceTree = "<group>"; };
-		E46D51B52C2858E3000524B9 /* TrendsClearLampGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsClearLampGraph.swift; sourceTree = "<group>"; };
+		E46D51B52C2858E3000524B9 /* TrendsClearTypeGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsClearTypeGraph.swift; sourceTree = "<group>"; };
 		E46D51BB2C2B095E000524B9 /* CachedTrendData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedTrendData.swift; sourceTree = "<group>"; };
 		E46D51BE2C2FF5F6000524B9 /* StartHereTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartHereTip.swift; sourceTree = "<group>"; };
 		E46D51C02C2FF737000524B9 /* ImportWikiDataTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportWikiDataTip.swift; sourceTree = "<group>"; };
@@ -141,8 +141,8 @@
 		E4E3D0E42BFA243A001942FE /* DJDX.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DJDX.entitlements; sourceTree = "<group>"; };
 		E4E3D0E72BFA2B95001942FE /* WebImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImporter.swift; sourceTree = "<group>"; };
 		E4E3D0E92BFA47B1001942FE /* ImportFailedReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFailedReason.swift; sourceTree = "<group>"; };
-		E4E3D0ED2BFC034C001942FE /* OverviewClearLampOverallGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewClearLampOverallGraph.swift; sourceTree = "<group>"; };
-		E4E3D0EF2BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewClearLampPerDifficultyGraph.swift; sourceTree = "<group>"; };
+		E4E3D0ED2BFC034C001942FE /* OverviewClearTypeOverallGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewClearTypeOverallGraph.swift; sourceTree = "<group>"; };
+		E4E3D0EF2BFC03CB001942FE /* OverviewClearTypePerDifficultyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewClearTypePerDifficultyGraph.swift; sourceTree = "<group>"; };
 		E4E3D0F12BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewDJLevelPerDifficultyGraph.swift; sourceTree = "<group>"; };
 		E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyPicker.swift; sourceTree = "<group>"; };
 		E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportGroup.swift; sourceTree = "<group>"; };
@@ -339,10 +339,10 @@
 			children = (
 				E4E3D0DD2BF9D662001942FE /* AnalyticsView.swift */,
 				E46A65FC2C0C8E9600D9544B /* AnalyticsView+Functions.swift */,
-				E4E3D0ED2BFC034C001942FE /* OverviewClearLampOverallGraph.swift */,
-				E4E3D0EF2BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift */,
+				E4E3D0ED2BFC034C001942FE /* OverviewClearTypeOverallGraph.swift */,
+				E4E3D0EF2BFC03CB001942FE /* OverviewClearTypePerDifficultyGraph.swift */,
 				E4E3D0F12BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift */,
-				E46D51B52C2858E3000524B9 /* TrendsClearLampGraph.swift */,
+				E46D51B52C2858E3000524B9 /* TrendsClearTypeGraph.swift */,
 				E47269002C3A2A5C00D5335D /* TrendsDJLevelGraph.swift */,
 				E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */,
 			);
@@ -521,13 +521,13 @@
 				E4E3D0DE2BF9D662001942FE /* AnalyticsView.swift in Sources */,
 				E46A66072C0CC12800D9544B /* ScoreSortAndFilter.swift in Sources */,
 				E4B123B02BF8E8E400D4A3D1 /* App.swift in Sources */,
-				E46D51B62C2858E3000524B9 /* TrendsClearLampGraph.swift in Sources */,
-				E4E3D0EE2BFC034C001942FE /* OverviewClearLampOverallGraph.swift in Sources */,
+				E46D51B62C2858E3000524B9 /* TrendsClearTypeGraph.swift in Sources */,
+				E4E3D0EE2BFC034C001942FE /* OverviewClearTypeOverallGraph.swift in Sources */,
 				E46A65F32C0B112900D9544B /* LevelDetailRow.swift in Sources */,
 				E4B123DA2BF90C1D00D4A3D1 /* DocumentPicker.swift in Sources */,
 				E4B123D22BF909CD00D4A3D1 /* MainTabView.swift in Sources */,
 				E46A660B2C0CC59500D9544B /* ClearTypeDetailRow.swift in Sources */,
-				E4E3D0F02BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift in Sources */,
+				E4E3D0F02BFC03CB001942FE /* OverviewClearTypePerDifficultyGraph.swift in Sources */,
 				E46A65EF2C0AFF0000D9544B /* ProgressAlert.swift in Sources */,
 				E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */,
 				E4AD1ACD2C11FCDC00E45F59 /* PlayDataManager.swift in Sources */,

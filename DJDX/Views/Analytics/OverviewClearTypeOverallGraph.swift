@@ -1,5 +1,5 @@
 //
-//  OverviewClearLampOverallGraph.swift
+//  OverviewClearTypeOverallGraph.swift
 //  DJDX
 //
 //  Created by シン・ジャスティン on 2024/05/21.
@@ -9,7 +9,7 @@ import Charts
 import OrderedCollections
 import SwiftUI
 
-struct OverviewClearLampOverallGraph: View {
+struct OverviewClearTypeOverallGraph: View {
     @Binding var graphData: [Int: OrderedDictionary<String, Int>]
 
     @State var isInteractive: Bool = false

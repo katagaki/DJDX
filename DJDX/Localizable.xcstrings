@@ -371,7 +371,7 @@
         }
       }
     },
-    "Analytics.ClearLamp.ByDifficulty" : {
+    "Analytics.ClearType.ByDifficulty" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -388,7 +388,7 @@
         }
       }
     },
-    "Analytics.ClearLamp.Overall" : {
+    "Analytics.ClearType.Overall" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -454,7 +454,8 @@
         }
       }
     },
-    "Analytics.Trends.ClearLamp" : {
+    "Analytics.Trends.ClearType" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {

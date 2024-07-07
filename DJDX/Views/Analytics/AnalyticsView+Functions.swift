@@ -38,10 +38,10 @@ extension AnalyticsView {
         if songRecords.count > 0 {
             await withDiscardingTaskGroup { group in
                 group.addTask {
-                    let newClearLampPerDifficulty = await clearTypePerDifficulty(for: songRecords)
+                    let newClearTypePerDifficulty = await clearTypePerDifficulty(for: songRecords)
                     await MainActor.run {
                         withAnimation(.snappy.speed(2.0)) {
-                            self.clearTypePerDifficulty = newClearLampPerDifficulty
+                            self.clearTypePerDifficulty = newClearTypePerDifficulty
                         }
                     }
                 }
