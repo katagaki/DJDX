@@ -19,20 +19,28 @@ struct AnalyticsView: View {
     @EnvironmentObject var calendar: CalendarManager
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
-    @AppStorage(wrappedValue: 1, "Analytics.Overview.ClearLamp.Level") var levelFilterForOverviewClearLamp: Int
+    @AppStorage(wrappedValue: 1, "Analytics.Overview.ClearType.Level") var levelFilterForOverviewClearType: Int
     @AppStorage(wrappedValue: 1, "Analytics.Overview.ScoreRate.Level") var levelFilterForOverviewScoreRate: Int
-    @AppStorage(wrappedValue: 1, "Analytics.Trends.ClearLamp.Level") var levelFilterForTrendsClearLamp: Int
+    @AppStorage(wrappedValue: 1, "Analytics.Trends.ClearType.Level") var levelFilterForTrendsClearType: Int
+    @AppStorage(wrappedValue: 1, "Analytics.Trends.DJLevel.Level") var levelFilterForTrendsDJLevel: Int
 
     // Overall
-    @State var clearLampPerDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
+
+    @State var clearTypePerDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
     // [Difficulty: [Clear Type: Count]]
-    @State var scoreRatePerDifficulty: [Int: [IIDXDJLevel: Int]] = [:]
+
+    @State var djLevelPerDifficulty: [Int: [IIDXDJLevel: Int]] = [:]
     // [Difficulty: [DJ Level: Count]]
 
     // Trends
-    @State var clearLampPerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
+
+    @State var clearTypePerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
     // [Import Group Date: [Difficulty: [Clear Type: Count]]]
-    @AppStorage(wrappedValue: Data(), "Analytics.Trends.ClearLamp.Level.Cache") var clearLampPerImportGroupCache: Data
+    @AppStorage(wrappedValue: Data(), "Analytics.Trends.ClearType.Level.Cache") var clearTypePerImportGroupCache: Data
+
+    @State var djLevelPerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
+    // [Import Group Date: [DJ Level: Count]]
+    @AppStorage(wrappedValue: Data(), "Analytics.Trends.DJLevel.Level.Cache") var djLevelPerImportGroupCache: Data
 
     @State var dataState: DataState = .initializing
     @AppStorage(wrappedValue: .overview, "Analytics.ViewMode") var viewMode: AnalyticsViewMode
@@ -45,7 +53,7 @@ struct AnalyticsView: View {
                 switch viewMode {
                 case .overview:
                     Section {
-                        OverviewClearLampOverallGraph(clearLampPerDifficulty: $clearLampPerDifficulty)
+                        OverviewClearLampOverallGraph(graphData: $clearTypePerDifficulty)
                         .frame(height: 200.0)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                     } header: {
@@ -53,7 +61,7 @@ struct AnalyticsView: View {
                             ListSectionHeader(text: "Analytics.ClearLamp.Overall")
                                 .font(.body)
                             Spacer()
-                            if clearLampPerDifficulty.count > 0 {
+                            if clearTypePerDifficulty.count > 0 {
                                 NavigationLink(value: ViewPath.clearLampOverviewGraph) {
                                     Image(systemName: "square.arrowtriangle.4.outward")
                                 }
@@ -61,18 +69,18 @@ struct AnalyticsView: View {
                         }
                     }
                     Section {
-                        OverviewClearLampPerDifficultyGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
-                                                    selectedDifficulty: $levelFilterForOverviewClearLamp)
+                        OverviewClearLampPerDifficultyGraph(graphData: $clearTypePerDifficulty,
+                                                            difficulty: $levelFilterForOverviewClearType)
                         .frame(height: 156.0)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
-                        DifficultyPicker(selection: $levelFilterForOverviewClearLamp,
+                        DifficultyPicker(selection: $levelFilterForOverviewClearType,
                                          difficulties: .constant(difficulties))
                     } header: {
                         HStack(spacing: 8.0) {
                             ListSectionHeader(text: "Analytics.ClearLamp.ByDifficulty")
                                 .font(.body)
                             Spacer()
-                            if clearLampPerDifficulty.count > 0 {
+                            if clearTypePerDifficulty.count > 0 {
                                 NavigationLink(value: ViewPath.clearLampPerDifficultyGraph) {
                                     Image(systemName: "square.arrowtriangle.4.outward")
                                 }
@@ -80,8 +88,8 @@ struct AnalyticsView: View {
                         }
                     }
                     Section {
-                        OverviewDJLevelPerDifficultyGraph(djLevelPerDifficulty: $scoreRatePerDifficulty,
-                                                    selectedDifficulty: $levelFilterForOverviewScoreRate)
+                        OverviewDJLevelPerDifficultyGraph(graphData: $djLevelPerDifficulty,
+                                                          difficulty: $levelFilterForOverviewScoreRate)
                         .frame(height: 156.0)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                         DifficultyPicker(selection: $levelFilterForOverviewScoreRate,
@@ -91,7 +99,7 @@ struct AnalyticsView: View {
                             ListSectionHeader(text: "Analytics.DJLevel.ByDifficulty")
                                 .font(.body)
                             Spacer()
-                            if scoreRatePerDifficulty.count > 0 {
+                            if djLevelPerDifficulty.count > 0 {
                                 NavigationLink(value: ViewPath.scoreRatePerDifficultyGraph) {
                                     Image(systemName: "square.arrowtriangle.4.outward")
                                 }
@@ -100,19 +108,38 @@ struct AnalyticsView: View {
                     }
                 case .trends:
                     Section {
-                        TrendsClearLampGraph(clearLampPerImportGroup: $clearLampPerImportGroup,
-                                             selectedDifficulty: $levelFilterForTrendsClearLamp)
+                        TrendsClearLampGraph(graphData: $clearTypePerImportGroup,
+                                             difficulty: $levelFilterForTrendsClearType)
                         .frame(height: 256.0)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
-                        DifficultyPicker(selection: $levelFilterForTrendsClearLamp,
+                        DifficultyPicker(selection: $levelFilterForTrendsClearType,
                                          difficulties: .constant(difficulties))
                     } header: {
                         HStack(spacing: 8.0) {
                             ListSectionHeader(text: "Analytics.Trends.ClearLamp")
                                 .font(.body)
                             Spacer()
-                            if clearLampPerImportGroup.count > 0 {
+                            if clearTypePerImportGroup.count > 0 {
                                 NavigationLink(value: ViewPath.trendsClearLampGraph) {
+                                    Image(systemName: "square.arrowtriangle.4.outward")
+                                }
+                            }
+                        }
+                    }
+                    Section {
+                        TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
+                                           difficulty: $levelFilterForTrendsDJLevel)
+                        .frame(height: 256.0)
+                        .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                        DifficultyPicker(selection: $levelFilterForTrendsDJLevel,
+                                         difficulties: .constant(difficulties))
+                    } header: {
+                        HStack(spacing: 8.0) {
+                            ListSectionHeader(text: "Analytics.Trends.DJLevel")
+                                .font(.body)
+                            Spacer()
+                            if clearTypePerImportGroup.count > 0 {
+                                NavigationLink(value: ViewPath.trendsDJLevelGraph) {
                                     Image(systemName: "square.arrowtriangle.4.outward")
                                 }
                             }
@@ -131,7 +158,8 @@ struct AnalyticsView: View {
                     LargeInlineTitle("ViewTitle.Analytics")
                         .onTapGesture(count: 5) {
                             debugPrint("Clearing cache")
-                            clearLampPerImportGroupCache = Data()
+                            clearTypePerImportGroupCache = Data()
+                            djLevelPerImportGroupCache = Data()
                             reload()
                         }
                 }
@@ -143,32 +171,27 @@ struct AnalyticsView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                ScrollView(.horizontal) {
-                    HStack(spacing: 8.0) {
-                        PlayTypePicker(playTypeToShow: $playTypeToShow)
-                        ToolbarButton("Analytics.Overall", icon: "chart.pie",
-                                      isSecondary: viewMode != .overview) {
-                            withAnimation(.snappy.speed(2.0)) {
-                                viewMode = .overview
+                TabBarAccessory(placement: .bottom) {
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 8.0) {
+                            PlayTypePicker(playTypeToShow: $playTypeToShow)
+                            ToolbarButton("Analytics.Overall", icon: "chart.pie",
+                                          isSecondary: viewMode != .overview) {
+                                withAnimation(.snappy.speed(2.0)) {
+                                    viewMode = .overview
+                                }
+                            }
+                            ToolbarButton("Analytics.Trend", icon: "chart.line.uptrend.xyaxis",
+                                          isSecondary: viewMode != .trends) {
+                                withAnimation(.snappy.speed(2.0)) {
+                                    viewMode = .trends
+                                }
                             }
                         }
-                        ToolbarButton("Analytics.Trend", icon: "chart.line.uptrend.xyaxis",
-                                      isSecondary: viewMode != .trends) {
-                            withAnimation(.snappy.speed(2.0)) {
-                                viewMode = .trends
-                            }
-                        }
+                        .padding([.leading, .trailing], 16.0)
+                        .padding([.top, .bottom], 12.0)
                     }
-                    .padding([.leading, .trailing], 16.0)
-                    .padding([.top, .bottom], 12.0)
-                }
-                .scrollIndicators(.hidden)
-                .background(Material.bar)
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .frame(height: 1/3)
-                        .foregroundColor(.primary.opacity(0.2))
-                        .ignoresSafeArea(edges: [.leading, .trailing])
+                    .scrollIndicators(.hidden)
                 }
             }
             .onAppear {
@@ -191,8 +214,8 @@ struct AnalyticsView: View {
             .onChange(of: viewMode) { _, newValue in
                 var shouldReload: Bool = false
                 switch newValue {
-                case .overview: shouldReload = clearLampPerDifficulty.count == 0 && scoreRatePerDifficulty.count == 0
-                case .trends: shouldReload = clearLampPerImportGroup.count == 0
+                case .overview: shouldReload = clearTypePerDifficulty.count == 0 || djLevelPerDifficulty.count == 0
+                case .trends: shouldReload = clearTypePerImportGroup.count == 0 || djLevelPerImportGroup.count == 0
                 }
                 if shouldReload {
                     reload()
@@ -209,22 +232,26 @@ struct AnalyticsView: View {
                 Group {
                     switch viewPath {
                     case .clearLampOverviewGraph:
-                        OverviewClearLampOverallGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
-                                               isInteractive: true)
+                        OverviewClearLampOverallGraph(graphData: $clearTypePerDifficulty,
+                                                      isInteractive: true)
                         .navigationTitle("Analytics.ClearLamp.Overall")
                     case .clearLampPerDifficultyGraph:
-                        OverviewClearLampPerDifficultyGraph(clearLampPerDifficulty: $clearLampPerDifficulty,
-                                                    selectedDifficulty: $levelFilterForOverviewClearLamp,
-                                                    legendPosition: .bottom)
+                        OverviewClearLampPerDifficultyGraph(graphData: $clearTypePerDifficulty,
+                                                            difficulty: $levelFilterForOverviewClearType,
+                                                            legendPosition: .bottom)
                         .navigationTitle("Analytics.ClearLamp.ByDifficulty")
                     case .scoreRatePerDifficultyGraph:
-                        OverviewDJLevelPerDifficultyGraph(djLevelPerDifficulty: $scoreRatePerDifficulty,
-                                                    selectedDifficulty: $levelFilterForOverviewScoreRate)
+                        OverviewDJLevelPerDifficultyGraph(graphData: $djLevelPerDifficulty,
+                                                          difficulty: $levelFilterForOverviewScoreRate)
                         .navigationTitle("Analytics.DJLevel.ByDifficulty")
                     case .trendsClearLampGraph:
-                        TrendsClearLampGraph(clearLampPerImportGroup: $clearLampPerImportGroup,
-                                             selectedDifficulty: $levelFilterForTrendsClearLamp)
+                        TrendsClearLampGraph(graphData: $clearTypePerImportGroup,
+                                             difficulty: $levelFilterForTrendsClearType)
                         .navigationTitle("Analytics.Trends.ClearLamp")
+                    case .trendsDJLevelGraph:
+                        TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
+                                           difficulty: $levelFilterForTrendsDJLevel)
+                        .navigationTitle("Analytics.Trends.DJLevel")
                     default: Color.clear
                     }
                 }

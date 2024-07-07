@@ -470,6 +470,23 @@
         }
       }
     },
+    "Analytics.Trends.DJLevel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
+          }
+        }
+      }
+    },
     "Calendar.BackToToday" : {
       "extractionState" : "manual",
       "localizations" : {

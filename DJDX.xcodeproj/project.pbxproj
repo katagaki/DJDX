@@ -35,6 +35,7 @@
 		E46D51BC2C2B095E000524B9 /* CachedTrendData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51BB2C2B095E000524B9 /* CachedTrendData.swift */; };
 		E46D51BF2C2FF5FF000524B9 /* StartHereTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51BE2C2FF5F6000524B9 /* StartHereTip.swift */; };
 		E46D51C12C2FF737000524B9 /* ImportWikiDataTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51C02C2FF737000524B9 /* ImportWikiDataTip.swift */; };
+		E47269012C3A2A5F00D5335D /* TrendsDJLevelGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47269002C3A2A5C00D5335D /* TrendsDJLevelGraph.swift */; };
 		E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
 		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
@@ -104,6 +105,7 @@
 		E46D51BB2C2B095E000524B9 /* CachedTrendData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedTrendData.swift; sourceTree = "<group>"; };
 		E46D51BE2C2FF5F6000524B9 /* StartHereTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartHereTip.swift; sourceTree = "<group>"; };
 		E46D51C02C2FF737000524B9 /* ImportWikiDataTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportWikiDataTip.swift; sourceTree = "<group>"; };
+		E47269002C3A2A5C00D5335D /* TrendsDJLevelGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsDJLevelGraph.swift; sourceTree = "<group>"; };
 		E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayTypePicker.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
 		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
@@ -341,6 +343,7 @@
 				E4E3D0EF2BFC03CB001942FE /* OverviewClearLampPerDifficultyGraph.swift */,
 				E4E3D0F12BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift */,
 				E46D51B52C2858E3000524B9 /* TrendsClearLampGraph.swift */,
+				E47269002C3A2A5C00D5335D /* TrendsDJLevelGraph.swift */,
 				E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */,
 			);
 			path = Analytics;
@@ -501,6 +504,7 @@
 				E46A65FB2C0B635200D9544B /* IIDXPlaySide.swift in Sources */,
 				E46A65FF2C0C918300D9544B /* IIDXDJLevel.swift in Sources */,
 				E4E3D0C52BF98D79001942FE /* NavigationManager.swift in Sources */,
+				E47269012C3A2A5F00D5335D /* TrendsDJLevelGraph.swift in Sources */,
 				E46A65F92C0B5E7300D9544B /* TextageViewer.swift in Sources */,
 				E46A65E72C0ACBAA00D9544B /* IIDXPlayType.swift in Sources */,
 				E4E3D0C32BF98D57001942FE /* ScoreViewer.swift in Sources */,

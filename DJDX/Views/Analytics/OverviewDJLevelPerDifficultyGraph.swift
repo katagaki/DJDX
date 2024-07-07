@@ -9,11 +9,11 @@ import Charts
 import SwiftUI
 
 struct OverviewDJLevelPerDifficultyGraph: View {
-    @Binding var djLevelPerDifficulty: [Int: [IIDXDJLevel: Int]]
-    @Binding var selectedDifficulty: Int
+    @Binding var graphData: [Int: [IIDXDJLevel: Int]]
+    @Binding var difficulty: Int
 
     var body: some View {
-        Chart(djLevelPerDifficulty[selectedDifficulty]?.sorted(by: { $0.key < $1.key }) ??
+        Chart(graphData[difficulty]?.sorted(by: { $0.key < $1.key }) ??
               [:].sorted(by: { $0.key < $1.key }), id: \.key) { djLevel, count in
             BarMark(
                 x: .value("Shared.DJLevel", djLevel.rawValue),

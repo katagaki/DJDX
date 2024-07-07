@@ -10,13 +10,13 @@ import OrderedCollections
 import SwiftUI
 
 struct TrendsClearLampGraph: View {
-    @Binding var clearLampPerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]]
-    @Binding var selectedDifficulty: Int
+    @Binding var graphData: [Date: [Int: OrderedDictionary<String, Int>]]
+    @Binding var difficulty: Int
 
     var body: some View {
-        Chart(Array(clearLampPerImportGroup.keys).sorted(), id: \.self) { date in
-            ForEach(clearLampPerImportGroup[date]![selectedDifficulty]!.keys.reversed(), id: \.self) { clearType in
-                let count = clearLampPerImportGroup[date]![selectedDifficulty]![clearType]!
+        Chart(Array(graphData.keys).sorted(), id: \.self) { date in
+            ForEach(graphData[date]![difficulty]!.keys.reversed(), id: \.self) { clearType in
+                let count = graphData[date]![difficulty]![clearType]!
                 AreaMark(
                     x: .value("Shared.Date", date),
                     y: .value("Shared.ClearCount", count)

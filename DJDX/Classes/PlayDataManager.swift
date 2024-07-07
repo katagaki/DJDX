@@ -337,14 +337,7 @@ class PlayDataManager: ObservableObject {
                 .reduce(into: [:], { partialResult, songRecord in
                     let song = allSongNoteCounts[songRecord.titleCompact()]
                     if let song {
-                        var scores: [IIDXLevelScore] = [
-                            songRecord.beginnerScore,
-                            songRecord.normalScore,
-                            songRecord.hyperScore,
-                            songRecord.anotherScore,
-                            songRecord.leggendariaScore
-                        ]
-                        scores.removeAll(where: { $0.score == 0 })
+                        var scores: [IIDXLevelScore] = songRecord.scores()
                         let scoreRates = scores.reduce(into: [:] as [IIDXLevel: Float]) { partialResult, score in
                             if let noteCount = song.noteCount(for: score.level) {
                                 partialResult[score.level] = Float(score.score) / Float(noteCount * 2)

@@ -73,7 +73,8 @@ final class IIDXSongRecord: Equatable, Hashable, Sendable {
     }
 
     func scores() -> [IIDXLevelScore] {
-        return [beginnerScore, normalScore, hyperScore, anotherScore, leggendariaScore]
+        var scores = [beginnerScore, normalScore, hyperScore, anotherScore, leggendariaScore]
+        return scores.filter({ $0.difficulty != 0 })
     }
 
     func score(for difficulty: IIDXDifficulty) -> IIDXLevelScore? {

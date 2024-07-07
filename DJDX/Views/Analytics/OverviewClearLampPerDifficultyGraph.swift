@@ -10,15 +10,15 @@ import OrderedCollections
 import SwiftUI
 
 struct OverviewClearLampPerDifficultyGraph: View {
-    @Binding var clearLampPerDifficulty: [Int: OrderedDictionary<String, Int>]
-    @Binding var selectedDifficulty: Int
+    @Binding var graphData: [Int: OrderedDictionary<String, Int>]
+    @Binding var difficulty: Int
 
     @State var legendPosition: AnnotationPosition = .trailing
 
     var body: some View {
-        Chart(clearLampPerDifficulty[selectedDifficulty]?.keys ??
+        Chart(graphData[difficulty]?.keys ??
               [], id: \.self) { (clearType) in
-            let count = clearLampPerDifficulty[selectedDifficulty]![clearType]!
+            let count = graphData[difficulty]![clearType]!
             SectorMark(angle: .value(clearType, count))
                 .foregroundStyle(by: .value("Shared.ClearType", clearType))
         }

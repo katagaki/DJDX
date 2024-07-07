@@ -10,15 +10,15 @@ import OrderedCollections
 import SwiftUI
 
 struct OverviewClearLampOverallGraph: View {
-    @Binding var clearLampPerDifficulty: [Int: OrderedDictionary<String, Int>]
+    @Binding var graphData: [Int: OrderedDictionary<String, Int>]
 
     @State var isInteractive: Bool = false
     @State var difficultyBelowFinger: Int?
 
     var body: some View {
-        Chart(Array(clearLampPerDifficulty.keys), id: \.self) { difficulty in
-            ForEach(clearLampPerDifficulty[difficulty]!.keys.reversed(), id: \.self) { clearType in
-                let count = clearLampPerDifficulty[difficulty]![clearType]!
+        Chart(Array(graphData.keys), id: \.self) { difficulty in
+            ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
+                let count = graphData[difficulty]![clearType]!
                 BarMark(
                     x: .value("LEVEL", difficulty),
                     y: .value("Shared.ClearCount", count),
@@ -30,7 +30,7 @@ struct OverviewClearLampOverallGraph: View {
             }
             .annotation(position: .top) {
                 if let difficultyBelowFinger, difficulty == difficultyBelowFinger {
-                    let totalPlayedPerDifficulty: Int = clearLampPerDifficulty[difficulty]?
+                    let totalPlayedPerDifficulty: Int = graphData[difficulty]?
                         .reduce(into: 0) { partialResult, keyValue in
                             partialResult += keyValue.value
                         } ?? 0

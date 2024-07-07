@@ -38,10 +38,10 @@ extension AnalyticsView {
         if songRecords.count > 0 {
             await withDiscardingTaskGroup { group in
                 group.addTask {
-                    let newClearLampPerDifficulty = await clearLampPerDifficulty(for: songRecords)
+                    let newClearLampPerDifficulty = await clearTypePerDifficulty(for: songRecords)
                     await MainActor.run {
                         withAnimation(.snappy.speed(2.0)) {
-                            self.clearLampPerDifficulty = newClearLampPerDifficulty
+                            self.clearTypePerDifficulty = newClearLampPerDifficulty
                         }
                     }
                 }
@@ -49,7 +49,7 @@ extension AnalyticsView {
                     let newScoresPerDifficulty = await scoresPerDifficulty(for: songRecords)
                     await MainActor.run { [newScoresPerDifficulty] in
                         withAnimation(.snappy.speed(2.0)) {
-                            self.scoreRatePerDifficulty = newScoresPerDifficulty
+                            self.djLevelPerDifficulty = newScoresPerDifficulty
                         }
                     }
                 }
@@ -57,8 +57,8 @@ extension AnalyticsView {
         } else {
             await MainActor.run {
                 withAnimation(.snappy.speed(2.0)) {
-                    self.clearLampPerDifficulty.removeAll()
-                    self.scoreRatePerDifficulty.removeAll()
+                    self.clearTypePerDifficulty.removeAll()
+                    self.djLevelPerDifficulty.removeAll()
                 }
             }
         }
@@ -74,73 +74,141 @@ extension AnalyticsView {
             )
         )) ?? []
         if importGroups.count > 0 {
-            var newClearLampPerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-            await withTaskGroup(of: (ImportGroup, [Int: OrderedDictionary<String, Int>]).self) { group in
-                var cachedData: [CachedTrendData] = []
-                if let decodedCachedData = try? JSONDecoder().decode(
-                    [CachedTrendData].self,
-                    from: clearLampPerImportGroupCache
-                ) {
-                    cachedData = decodedCachedData
-                }
-                for importGroup in importGroups {
-                    let date = dateWithTimeSetToMidnight(importGroup.importDate)
-                    if let cachedDataForImportGroupAndPlayType = cachedData.first(where: {
-                        $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-                    }) {
-                        group.addTask {
-                            debugPrint("Returning from cache: \(date)")
-                            return (importGroup, cachedDataForImportGroupAndPlayType.data)
-                        }
-                    } else {
-                        group.addTask { [playTypeToShow] in
-                            debugPrint("Processing: \(date)")
-                            let songRecords = importGroup.iidxData?.filter({ $0.playType == playTypeToShow }) ?? []
-                            let clearLampPerDifficultyForImportGroup = await clearLampPerDifficulty(for: songRecords)
-                            return (importGroup, clearLampPerDifficultyForImportGroup)
-                        }
-                    }
-                }
-                for await result in group {
-                    let (importGroup, clearLampPerDifficultyForImportGroup) = result
-                    if sumOfCounts(clearLampPerDifficultyForImportGroup) > 0 {
-                        debugPrint("Adding: \(result.0.importDate)")
-                        newClearLampPerImportGroup[importGroup.importDate] = clearLampPerDifficultyForImportGroup
-                    }
-                    if cachedData.first(where: {
-                        $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-                    }) == nil {
-                        debugPrint("Storing to cache: \(importGroup.importDate)")
-                        cachedData.append(
-                            CachedTrendData(importGroupID: importGroup.id,
-                                            playType: playTypeToShow,
-                                            data: clearLampPerDifficultyForImportGroup)
-                        )
-                    }
-                }
-                do {
-                    debugPrint("Updating cache")
-                    // TODO: Invalidate cache for import groups that have been deleted
-                    clearLampPerImportGroupCache = try JSONEncoder().encode(cachedData)
-                } catch {
-                    debugPrint("Could not update cache: \(error)")
-                }
-            }
+            let newClearTypePerImportGroup = await trendDataForClearTypePerDifficulty(importGroups)
+            let newDJLevelPerImportGroup = await trendDataForDJLevelPerDifficulty(importGroups)
+
             await MainActor.run {
                 withAnimation(.snappy.speed(2.0)) {
-                    self.clearLampPerImportGroup = newClearLampPerImportGroup
+                    self.clearTypePerImportGroup = newClearTypePerImportGroup
+                    self.djLevelPerImportGroup = newDJLevelPerImportGroup
                 }
             }
         }
     }
     // swiftlint:enable function_body_length
 
-    func clearLampPerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>] {
+    // MARK: Trends
+
+    func trendDataForClearTypePerDifficulty(_ importGroups: [ImportGroup]) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
+        var newData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
+        await withTaskGroup(of: (ImportGroup, [Int: OrderedDictionary<String, Int>]).self) { group in
+            var cache = trendData(using: clearTypePerImportGroupCache)
+
+            // Determine whether to load new data for import group or just take from cache
+            for importGroup in importGroups {
+                let date = dateWithTimeSetToMidnight(importGroup.importDate)
+                if let cachedDataForImportGroupAndPlayType = cache.first(where: {
+                    $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
+                }) {
+                    group.addTask {
+                        debugPrint("Returning from cache: \(date)")
+                        return (importGroup, cachedDataForImportGroupAndPlayType.data)
+                    }
+                } else {
+                    group.addTask { [playTypeToShow] in
+                        debugPrint("Processing clear types: \(date)")
+                        let songRecords = importGroup.iidxData?.filter({ $0.playType == playTypeToShow }) ?? []
+                        let data = await clearTypePerDifficulty(for: songRecords)
+                        return (importGroup, data)
+                    }
+                }
+            }
+
+            // Wait for results
+            for await result in group {
+                let (importGroup, clearTypePerDifficultyForImportGroup) = result
+                if sumOfCounts(clearTypePerDifficultyForImportGroup) > 0 {
+                    debugPrint("Adding: \(result.0.importDate)")
+                    newData[importGroup.importDate] = clearTypePerDifficultyForImportGroup
+                }
+                if cache.first(where: {
+                    $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
+                }) == nil {
+                    debugPrint("Storing to cache: \(importGroup.importDate)")
+                    cache.append(
+                        CachedTrendData(importGroupID: importGroup.id,
+                                        playType: playTypeToShow,
+                                        data: clearTypePerDifficultyForImportGroup)
+                    )
+                }
+            }
+
+            // Update cache
+            do {
+                debugPrint("Updating cache")
+                // TODO: Invalidate cache for import groups that have been deleted
+                clearTypePerImportGroupCache = try JSONEncoder().encode(cache)
+            } catch {
+                debugPrint("Could not update cache: \(error)")
+            }
+        }
+        return newData
+    }
+
+    func trendDataForDJLevelPerDifficulty(_ importGroups: [ImportGroup]) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
+        var newData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
+        await withTaskGroup(of: (ImportGroup, [Int: OrderedDictionary<String, Int>]).self) { group in
+            var cache = trendData(using: djLevelPerImportGroupCache)
+
+            // Determine whether to load new data for import group or just take from cache
+            for importGroup in importGroups {
+                let date = dateWithTimeSetToMidnight(importGroup.importDate)
+                if let cachedDataForImportGroupAndPlayType = cache.first(where: {
+                    $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
+                }) {
+                    group.addTask {
+                        debugPrint("Returning from cache: \(date)")
+                        return (importGroup, cachedDataForImportGroupAndPlayType.data)
+                    }
+                } else {
+                    group.addTask { [playTypeToShow] in
+                        debugPrint("Processing DJ levels: \(date)")
+                        let songRecords = importGroup.iidxData?.filter({ $0.playType == playTypeToShow }) ?? []
+                        let data = await djLevelPerDifficulty(for: songRecords)
+                        return (importGroup, data)
+                    }
+                }
+            }
+
+            // Wait for results
+            for await result in group {
+                let (importGroup, djLevelPerDifficultyForImportGroup) = result
+                if sumOfCounts(djLevelPerDifficultyForImportGroup) > 0 {
+                    debugPrint("Adding: \(result.0.importDate)")
+                    newData[importGroup.importDate] = djLevelPerDifficultyForImportGroup
+                }
+                if cache.first(where: {
+                    $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
+                }) == nil {
+                    debugPrint("Storing to cache: \(importGroup.importDate)")
+                    cache.append(
+                        CachedTrendData(importGroupID: importGroup.id,
+                                        playType: playTypeToShow,
+                                        data: djLevelPerDifficultyForImportGroup)
+                    )
+                }
+            }
+
+            // Update cache
+            do {
+                debugPrint("Updating cache")
+                // TODO: Invalidate cache for import groups that have been deleted
+                djLevelPerImportGroupCache = try JSONEncoder().encode(cache)
+            } catch {
+                debugPrint("Could not update cache: \(error)")
+            }
+        }
+        return newData
+    }
+
+    // MARK: Overview
+
+    func clearTypePerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>] {
         // Generate skeleton for calculation
         let clearTypes = IIDXClearType.sortedStringsWithoutNoPlay
-        var newClearLampPerDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
+        var newClearTypePerDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
         for difficulty in difficulties {
-            newClearLampPerDifficulty[difficulty] = OrderedDictionary(
+            newClearTypePerDifficulty[difficulty] = OrderedDictionary(
                 uniqueKeys: clearTypes,
                 values: clearTypes.map({ _ in return 0 })
             )
@@ -149,10 +217,32 @@ extension AnalyticsView {
         // Add scores to dictionary
         let scores = scores(in: songRecords).filter({ $0.clearType != "NO PLAY" })
         for score in scores {
-            newClearLampPerDifficulty[score.difficulty]?[score.clearType]? += 1
+            newClearTypePerDifficulty[score.difficulty]?[score.clearType]? += 1
         }
 
-        return newClearLampPerDifficulty
+        return newClearTypePerDifficulty
+    }
+
+    func djLevelPerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>] {
+        // Generate skeleton for calculation
+        let djLevels = IIDXDJLevel.sortedStrings.reversed()
+        var newDJLevelForDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
+        for difficulty in difficulties {
+            newDJLevelForDifficulty[difficulty] = OrderedDictionary(
+                uniqueKeys: djLevels,
+                values: djLevels.map({ _ in return 0 })
+            )
+        }
+
+        // Add scores to dictionary
+        for songRecord in songRecords {
+            let scores: [IIDXLevelScore] = songRecord.scores()
+            for score in scores {
+                newDJLevelForDifficulty[score.difficulty]?[score.djLevel]? += 1
+            }
+        }
+
+        return newDJLevelForDifficulty
     }
 
     func scoresPerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: [IIDXDJLevel: Int]] {
@@ -169,6 +259,16 @@ extension AnalyticsView {
             newScoresPerDifficulty[score.difficulty]?[score.djLevelEnum()]? += 1
         }
         return newScoresPerDifficulty
+    }
+
+    // MARK: Shared
+
+    func trendData(using data: Data) -> [CachedTrendData] {
+        if let decodedCachedData = try? JSONDecoder().decode([CachedTrendData].self, from: data) {
+            return decodedCachedData
+        } else {
+            return []
+        }
     }
 
     func scores(in songRecords: [IIDXSongRecord]) -> [IIDXLevelScore] {
