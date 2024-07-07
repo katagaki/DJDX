@@ -30,7 +30,10 @@ extension AnalyticsView {
     func reloadScores() async {
         dataState = .loading
         debugPrint("Calculating overview")
-        let songRecords = calendar.latestAvailableIIDXSongRecords(in: modelContext)
+        let songRecords = calendar.latestAvailableIIDXSongRecords(
+            in: modelContext,
+            on: calendar.analyticsDate
+        )
             .filter { $0.playType == playTypeToShow }
         if songRecords.count > 0 {
             await withDiscardingTaskGroup { group in

@@ -46,6 +46,7 @@ struct ImportView: View {
                     importGroupsToDelete.forEach { importGroup in
                         modelContext.delete(importGroup)
                     }
+                    refreshImportGroups()
                     calendar.didUserPerformChangesRequiringDisplayDataReload = true
                 })
             }
@@ -69,6 +70,7 @@ struct ImportView: View {
                                         await calendar.importCSV(reportingTo: progressAlertManager, for: .single)
                                         await MainActor.run {
                                             didImportSucceed = true
+                                            refreshImportGroups()
                                         }
                                     }
                                 }
@@ -85,7 +87,7 @@ struct ImportView: View {
                 TabBarAccessory(placement: .bottom) {
                     VStack(spacing: 8.0) {
                         DatePicker("Calendar.Import.SelectDate",
-                                   selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
+                                   selection: $calendar.importToDate.animation(.snappy.speed(2.0)),
                                    in: ...Date.now,
                                    displayedComponents: .date)
                         .datePickerStyle(.compact)
@@ -143,7 +145,8 @@ struct ImportView: View {
                 }
             )
             .task {
-                importGroups = calendar.allImportGroups(in: modelContext)
+                calendar.importToDate = .now
+                refreshImportGroups()
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
@@ -164,6 +167,10 @@ struct ImportView: View {
                 }
             }
         }
+    }
+
+    func refreshImportGroups() {
+        importGroups = calendar.allImportGroups(in: modelContext)
     }
 
     func countOfIIDXSongRecords(in importGroup: ImportGroup) -> Int {

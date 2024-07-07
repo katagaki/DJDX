@@ -77,7 +77,8 @@ class PlayDataManager: ObservableObject {
         debugPrint("Loading new song records")
         let modelContext = ModelContext(sharedModelContainer)
         let newSongRecords = calendar.latestAvailableIIDXSongRecords(
-            in: modelContext
+            in: modelContext,
+            on: calendar.playDataDate
         )
         let newSongMappings = ((try? modelContext.fetch(FetchDescriptor<IIDXSong>(
             sortBy: [SortDescriptor(\.title, order: .forward)]

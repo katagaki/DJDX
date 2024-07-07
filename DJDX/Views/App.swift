@@ -28,7 +28,10 @@ struct DJDXApp: App {
         .onChange(of: navigationManager.selectedTab) { _, _ in
             navigationManager.saveToDefaults()
         }
-        .onChange(of: calendar.selectedDate) { _, _ in
+        .onChange(of: calendar.importToDate) { _, _ in
+            calendar.saveToDefaults()
+        }
+        .onChange(of: calendar.playDataDate) { _, _ in
             calendar.saveToDefaults()
         }
     }

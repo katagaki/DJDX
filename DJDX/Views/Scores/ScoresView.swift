@@ -80,7 +80,7 @@ struct ScoresView: View {
                     VStack(spacing: 8.0) {
                         if isTimeTravelling {
                             DatePicker("Shared.SelectDate",
-                                       selection: $calendar.selectedDate.animation(.snappy.speed(2.0)),
+                                       selection: $calendar.playDataDate.animation(.snappy.speed(2.0)),
                                        in: ...Date.now,
                                        displayedComponents: .date)
                             .datePickerStyle(.compact)
@@ -99,13 +99,13 @@ struct ScoresView: View {
                                     reloadDisplay(shouldReloadAll: false, shouldFilter: true,
                                                   shouldSort: true, shouldSearch: true)
                                 }
-                                ToolbarButton("Shared.ShowPastData", icon: "calendar",
+                                ToolbarButton("Shared.ShowPastData", icon: "arrowshape.turn.up.backward.badge.clock",
                                               isSecondary: !isTimeTravelling) {
                                     withAnimation {
                                         isTimeTravelling.toggle()
                                     }
                                     if !isTimeTravelling {
-                                        calendar.selectedDate = .now
+                                        calendar.playDataDate = .now
                                     }
                                 }
                             }
@@ -131,13 +131,13 @@ struct ScoresView: View {
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "Scores.Search.Prompt")
             .onAppear {
-                if !Calendar.current.isDate(.now, inSameDayAs: calendar.selectedDate) {
+                if !Calendar.current.isDate(.now, inSameDayAs: calendar.playDataDate) {
                     isTimeTravelling = true
                 }
                 if dataState == .initializing {
                     if !isTimeTravelling {
                         isSystemChangingCalendarDate = true
-                        calendar.selectedDate = .now
+                        calendar.playDataDate = .now
                         isSystemChangingCalendarDate = false
                     }
                     reloadDisplay(shouldReloadAll: true, shouldFilter: true,
@@ -175,7 +175,7 @@ struct ScoresView: View {
             .onChange(of: isTimeTravelling) { _, newValue in
                 UserDefaults.standard.set(newValue, forKey: isTimeTravellingKey)
                 if !isTimeTravelling {
-                    calendar.selectedDate = .now
+                    calendar.playDataDate = .now
                 }
             }
             .onChange(of: calendar.didUserPerformChangesRequiringDisplayDataReload, { oldValue, newValue in
@@ -184,7 +184,7 @@ struct ScoresView: View {
                     dataState = .initializing
                 }
             })
-            .onChange(of: calendar.selectedDate) { oldValue, newValue in
+            .onChange(of: calendar.playDataDate) { oldValue, newValue in
                 if !isSystemChangingCalendarDate,
                    !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
                     reloadDisplay(shouldReloadAll: true, shouldFilter: true,

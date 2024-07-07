@@ -173,6 +173,7 @@ struct AnalyticsView: View {
             }
             .onAppear {
                 if dataState == .initializing {
+                    calendar.analyticsDate = .now
                     reload()
                 }
             }
@@ -182,7 +183,7 @@ struct AnalyticsView: View {
                     dataState = .initializing
                 }
             })
-            .onChange(of: calendar.selectedDate) { oldValue, newValue in
+            .onChange(of: calendar.analyticsDate) { oldValue, newValue in
                 if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
                     dataState = .initializing
                 }

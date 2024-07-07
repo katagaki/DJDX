@@ -11,21 +11,32 @@ import SwiftData
 class CalendarManager: ObservableObject {
 
     let defaults = UserDefaults.standard
-    let selectedDateKey = "CalendarManager.SelectedDate"
+    let importToDateKey = "CalendarManager.ImportToDate"
+    let playDataDateKey = "CalendarManager.SelectedDate"
+    let analyticsDateKey = "CalendarManager.AnalyticsDate"
 
-    @Published var selectedDate: Date
+    @Published var importToDate: Date
+    @Published var playDataDate: Date
+    @Published var analyticsDate: Date
     @Published var didUserPerformChangesRequiringDisplayDataReload: Bool = false
 
-    init(selectedDate: Date? = nil) {
-        if let selectedDate = defaults.object(forKey: selectedDateKey) as? Date {
-            self.selectedDate = selectedDate
+    init() {
+        self.importToDate = CalendarManager.readDate(from: importToDateKey)
+        self.playDataDate = CalendarManager.readDate(from: playDataDateKey)
+        self.analyticsDate = CalendarManager.readDate(from: analyticsDateKey)
+    }
+
+    static func readDate(from key: String) -> Date {
+        if let date = UserDefaults.standard.object(forKey: key) as? Date {
+            return date
         } else {
-            self.selectedDate = .now
+            return .now
         }
     }
 
     func saveToDefaults() {
-        defaults.setValue(selectedDate, forKey: selectedDateKey)
+        defaults.setValue(importToDate, forKey: importToDateKey)
+        defaults.setValue(playDataDate, forKey: playDataDateKey)
         defaults.synchronize()
     }
 
@@ -116,7 +127,7 @@ class CalendarManager: ObservableObject {
             }
         }
         // If all conditions fail, create new import group and return it
-        let newImportGroup = ImportGroup(importDate: selectedDate, iidxData: [])
+        let newImportGroup = ImportGroup(importDate: importToDate, iidxData: [])
         modelContext.insert(newImportGroup)
         return newImportGroup
     }
@@ -129,7 +140,7 @@ class CalendarManager: ObservableObject {
         return (try? modelContext.fetch(fetchDescriptor)) ?? []
     }
 
-    func latestAvailableIIDXSongRecords(in modelContext: ModelContext) -> [IIDXSongRecord] {
+    func latestAvailableIIDXSongRecords(in modelContext: ModelContext, on date: Date) -> [IIDXSongRecord] {
         let importGroupsForSelectedDate: [ImportGroup] = (try? modelContext.fetch(
             FetchDescriptor<ImportGroup>(
                 predicate: importGroups(in: self),
@@ -149,7 +160,7 @@ class CalendarManager: ObservableObject {
             )) ?? []
             var importGroupClosestToTheSelectedDate: ImportGroup?
             for importGroup in allImportGroups {
-                if importGroup.importDate <= selectedDate {
+                if importGroup.importDate <= date {
                     importGroupClosestToTheSelectedDate = importGroup
                 } else {
                     break
