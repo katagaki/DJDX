@@ -113,7 +113,7 @@ class CalendarManager: ObservableObject {
 
     func prepareImportGroupForPartialImport(_ modelContext: ModelContext, playType: IIDXPlayType) -> ImportGroup {
         let fetchDescriptor = FetchDescriptor<ImportGroup>(
-            predicate: importGroups(in: self)
+            predicate: importGroups(from: importToDate)
         )
         // Find existing import group and return it after cleaning it up
         if let importGroupsOnSelectedDate: [ImportGroup] = try? modelContext.fetch(fetchDescriptor) {
@@ -143,7 +143,7 @@ class CalendarManager: ObservableObject {
     func latestAvailableIIDXSongRecords(in modelContext: ModelContext, on date: Date) -> [IIDXSongRecord] {
         let importGroupsForSelectedDate: [ImportGroup] = (try? modelContext.fetch(
             FetchDescriptor<ImportGroup>(
-                predicate: importGroups(in: self),
+                predicate: importGroups(from: playDataDate),
                 sortBy: [SortDescriptor(\.importDate, order: .forward)]
             )
         )) ?? []

@@ -7,8 +7,7 @@
 
 import Foundation
 
-func importGroups(in calendar: CalendarManager) -> Predicate<ImportGroup> {
-    let startDate: Date = Calendar.current.startOfDay(for: calendar.playDataDate)
+func importGroups(from startDate: Date) -> Predicate<ImportGroup> {
     var components = DateComponents()
     components.day = 1
     components.second = -1
