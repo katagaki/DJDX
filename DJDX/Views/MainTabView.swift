@@ -12,7 +12,10 @@ struct MainTabView: View {
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var calendar: CalendarManager
     @EnvironmentObject var playData: PlayDataManager
+
+    @AppStorage(wrappedValue: false, "ScoresView.IsTimeTravelling") var isTimeTravelling: Bool
 
     @State var isFirstStartCleanupComplete: Bool = false
 
@@ -52,6 +55,9 @@ struct MainTabView: View {
         }
         .task {
             if !isFirstStartCleanupComplete {
+                if !isTimeTravelling {
+                    calendar.playDataDate = .now
+                }
                 await playData.cleanUpOrphanedSongRecords()
                 isFirstStartCleanupComplete = true
             }
