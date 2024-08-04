@@ -7,11 +7,38 @@
 
 import Foundation
 
+let charactersToReplace = [
+    "Ø": "O",
+    "！": "!",
+    "？": "?",
+    "（": "(",
+    "）": ")",
+    "〜": "~",
+    "ー": "-",
+    "，": ",",
+    "　": "",
+    " ": "",
+    "・": "•",
+    "“": "\"",
+    "”": "\"",
+    "‘": "'",
+    "’": "'",
+    "／": "/",
+    "¡": "!",
+    "：": ":",
+    "■": "",
+    "□": "",
+    "★": "",
+    "☆": "",
+    "♥": "",
+    "♡": "",
+    "Ʞ": "K",
+    "И": "N"
+]
+
 extension String {
     var compact: String {
-        let charactersToFilter = CharacterSet(",，“”\"'‘’ 　！!¡？?:/(（)）~〜-ー■□☆★♡♥".unicodeScalars)
-        let charactersToReplace = [ "Ø": "O" ]
-        var filteredString = String(self.unicodeScalars.filter(charactersToFilter.inverted.contains))
+        var filteredString = self
         for (characterToReplace, characterToReplaceWith) in charactersToReplace {
             filteredString = filteredString.replacingOccurrences(of: characterToReplace, with: characterToReplaceWith)
         }
