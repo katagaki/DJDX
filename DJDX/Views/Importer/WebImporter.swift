@@ -264,25 +264,33 @@ document.getElementById('score_data').value
                                 await self.updateScoreDataDelegate.importScoreData(using: result)
                             }
                         } else {
-                            self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                            Task {
+                                await MainActor.run {
+                                    self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                                }
+                            }
                         }
                     }
                     waitingForDownloadPageFormSubmit = false
                 }
             } else if urlString.starts(with: errorPageURL.absoluteString) {
                 webView.layer.opacity = 0.0
-                if urlString.hasSuffix("?err=1") {
-                    self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
-                } else if urlString.hasSuffix("?err=2") {
-                    self.updateScoreDataDelegate.stopProcessing(with: .noEAmusementPass)
-                } else if urlString.hasSuffix("?err=3") {
-                    self.updateScoreDataDelegate.stopProcessing(with: .noPlayData)
-                } else if urlString.hasSuffix("?err=4") {
-                    self.updateScoreDataDelegate.stopProcessing(with: .serverError)
-                } else if urlString.hasSuffix("?err=5") {
-                    self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
-                } else {
-                    self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                Task { [urlString] in
+                    await MainActor.run {
+                        if urlString.hasSuffix("?err=1") {
+                            self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
+                        } else if urlString.hasSuffix("?err=2") {
+                            self.updateScoreDataDelegate.stopProcessing(with: .noEAmusementPass)
+                        } else if urlString.hasSuffix("?err=3") {
+                            self.updateScoreDataDelegate.stopProcessing(with: .noPlayData)
+                        } else if urlString.hasSuffix("?err=4") {
+                            self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                        } else if urlString.hasSuffix("?err=5") {
+                            self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
+                        } else {
+                            self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                        }
+                    }
                 }
             } else {
                 webView.layer.opacity = 1.0
