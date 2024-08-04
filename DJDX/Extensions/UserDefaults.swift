@@ -7,4 +7,4 @@
 
 import Foundation
 
-extension UserDefaults: @unchecked @retroactive Sendable {}
+extension UserDefaults: @unchecked Sendable {}
