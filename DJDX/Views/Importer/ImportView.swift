@@ -47,7 +47,7 @@ struct ImportView: View {
                         modelContext.delete(importGroup)
                     }
                     refreshImportGroups()
-                    calendar.didUserPerformChangesRequiringDisplayDataReload = true
+                    calendar.shouldReloadDisplayedData = true
                 })
             }
             .listStyle(.plain)

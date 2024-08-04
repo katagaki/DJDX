@@ -64,7 +64,6 @@ extension AnalyticsView {
         }
     }
 
-    // swiftlint:disable function_body_length
     func reloadTrends() async {
         dataState = .loading
         debugPrint("Calculating trends")
@@ -85,30 +84,38 @@ extension AnalyticsView {
             }
         }
     }
-    // swiftlint:enable function_body_length
 
     // MARK: Trends
 
-    func trendDataForClearTypePerDifficulty(_ importGroups: [ImportGroup]) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
+    func trendDataPerDifficulty(
+        _ importGroups: [ImportGroup],
+        using cacheData: Data,
+        get trendDataFrom: @escaping @Sendable ([IIDXSongRecord]) async -> [Int: OrderedDictionary<String, Int>]
+    ) async -> (data: [Date: [Int: OrderedDictionary<String, Int>]], cache: [CachedTrendData]) {
+
         var newData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
+        var newCache: [CachedTrendData] = []
+
         await withTaskGroup(of: (ImportGroup, [Int: OrderedDictionary<String, Int>]).self) { group in
-            var cache = trendData(using: clearTypePerImportGroupCache)
+            let existingCache = trendData(using: cacheData)
 
             // Determine whether to load new data for import group or just take from cache
             for importGroup in importGroups {
                 let date = dateWithTimeSetToMidnight(importGroup.importDate)
-                if let cachedDataForImportGroupAndPlayType = cache.first(where: {
+                if let existingCacheData = existingCache.first(where: {
                     $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
                 }) {
                     group.addTask {
                         debugPrint("Returning from cache: \(date)")
-                        return (importGroup, cachedDataForImportGroupAndPlayType.data)
+                        return (importGroup, existingCacheData.data)
                     }
                 } else {
                     group.addTask { [playTypeToShow] in
-                        debugPrint("Processing clear types: \(date)")
-                        let songRecords = importGroup.iidxData?.filter({ $0.playType == playTypeToShow }) ?? []
-                        let data = await clearTypePerDifficulty(for: songRecords)
+                        debugPrint("Processing data: \(date)")
+                        let songRecords: [IIDXSongRecord] = importGroup.iidxData?.filter({
+                            $0.playType == playTypeToShow
+                        }) ?? []
+                        let data = await trendDataFrom(songRecords)
                         return (importGroup, data)
                     }
                 }
@@ -116,88 +123,62 @@ extension AnalyticsView {
 
             // Wait for results
             for await result in group {
-                let (importGroup, clearTypePerDifficultyForImportGroup) = result
-                if sumOfCounts(clearTypePerDifficultyForImportGroup) > 0 {
+                let (importGroup, trendData) = result
+                if sumOfCounts(trendData) > 0 {
                     debugPrint("Adding: \(result.0.importDate)")
-                    newData[importGroup.importDate] = clearTypePerDifficultyForImportGroup
+                    newData[importGroup.importDate] = trendData
                 }
-                if cache.first(where: {
+                if let existingCacheData = existingCache.first(where: {
                     $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-                }) == nil {
-                    debugPrint("Storing to cache: \(importGroup.importDate)")
-                    cache.append(
+                }) {
+                    debugPrint("Storing existing data to new cache: \(importGroup.importDate)")
+                    newCache.append(existingCacheData)
+                } else {
+                    debugPrint("Storing new data to new cache: \(importGroup.importDate)")
+                    newCache.append(
                         CachedTrendData(importGroupID: importGroup.id,
                                         playType: playTypeToShow,
-                                        data: clearTypePerDifficultyForImportGroup)
+                                        data: trendData)
                     )
                 }
             }
-
-            // Update cache
-            do {
-                debugPrint("Updating cache")
-                // TODO: Invalidate cache for import groups that have been deleted
-                clearTypePerImportGroupCache = try JSONEncoder().encode(cache)
-            } catch {
-                debugPrint("Could not update cache: \(error)")
-            }
         }
+        return (newData, newCache)
+    }
+
+    func trendDataForClearTypePerDifficulty(
+        _ importGroups: [ImportGroup]
+    ) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
+        let (newData, newCache) = await trendDataPerDifficulty(importGroups,
+                                                               using: clearTypePerImportGroupCache) { songRecords in
+            await clearTypePerDifficulty(for: songRecords)
+        }
+
+        do {
+            debugPrint("Updating Clear Type cache")
+            clearTypePerImportGroupCache = try JSONEncoder().encode(newCache)
+        } catch {
+            debugPrint("Could not update cache: \(error)")
+        }
+
         return newData
     }
 
-    func trendDataForDJLevelPerDifficulty(_ importGroups: [ImportGroup]) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
-        var newData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-        await withTaskGroup(of: (ImportGroup, [Int: OrderedDictionary<String, Int>]).self) { group in
-            var cache = trendData(using: djLevelPerImportGroupCache)
-
-            // Determine whether to load new data for import group or just take from cache
-            for importGroup in importGroups {
-                let date = dateWithTimeSetToMidnight(importGroup.importDate)
-                if let cachedDataForImportGroupAndPlayType = cache.first(where: {
-                    $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-                }) {
-                    group.addTask {
-                        debugPrint("Returning from cache: \(date)")
-                        return (importGroup, cachedDataForImportGroupAndPlayType.data)
-                    }
-                } else {
-                    group.addTask { [playTypeToShow] in
-                        debugPrint("Processing DJ levels: \(date)")
-                        let songRecords = importGroup.iidxData?.filter({ $0.playType == playTypeToShow }) ?? []
-                        let data = await djLevelPerDifficulty(for: songRecords)
-                        return (importGroup, data)
-                    }
-                }
-            }
-
-            // Wait for results
-            for await result in group {
-                let (importGroup, djLevelPerDifficultyForImportGroup) = result
-                if sumOfCounts(djLevelPerDifficultyForImportGroup) > 0 {
-                    debugPrint("Adding: \(result.0.importDate)")
-                    newData[importGroup.importDate] = djLevelPerDifficultyForImportGroup
-                }
-                if cache.first(where: {
-                    $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-                }) == nil {
-                    debugPrint("Storing to cache: \(importGroup.importDate)")
-                    cache.append(
-                        CachedTrendData(importGroupID: importGroup.id,
-                                        playType: playTypeToShow,
-                                        data: djLevelPerDifficultyForImportGroup)
-                    )
-                }
-            }
-
-            // Update cache
-            do {
-                debugPrint("Updating cache")
-                // TODO: Invalidate cache for import groups that have been deleted
-                djLevelPerImportGroupCache = try JSONEncoder().encode(cache)
-            } catch {
-                debugPrint("Could not update cache: \(error)")
-            }
+    func trendDataForDJLevelPerDifficulty(
+        _ importGroups: [ImportGroup]
+    ) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
+        let (newData, newCache) = await trendDataPerDifficulty(importGroups,
+                                                               using: djLevelPerImportGroupCache) { songRecords in
+            await clearTypePerDifficulty(for: songRecords)
         }
+
+        do {
+            debugPrint("Updating DJ Level trend cache")
+            djLevelPerImportGroupCache = try JSONEncoder().encode(newCache)
+        } catch {
+            debugPrint("Could not update cache: \(error)")
+        }
+
         return newData
     }
 

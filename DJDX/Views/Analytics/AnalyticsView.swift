@@ -200,9 +200,9 @@ struct AnalyticsView: View {
                     reload()
                 }
             }
-            .onChange(of: calendar.didUserPerformChangesRequiringDisplayDataReload, { oldValue, newValue in
+            .onChange(of: calendar.shouldReloadDisplayedData, { oldValue, newValue in
                 if !oldValue && newValue {
-                    calendar.didUserPerformChangesRequiringDisplayDataReload = false
+                    calendar.shouldReloadDisplayedData = false
                     dataState = .initializing
                 }
             })

@@ -18,7 +18,7 @@ class CalendarManager: ObservableObject {
     @Published var importToDate: Date
     @Published var playDataDate: Date
     @Published var analyticsDate: Date
-    @Published var didUserPerformChangesRequiringDisplayDataReload: Bool = false
+    @Published var shouldReloadDisplayedData: Bool = false
 
     init() {
         self.importToDate = CalendarManager.readDate(from: importToDateKey)
@@ -94,7 +94,7 @@ class CalendarManager: ObservableObject {
 
     func finishImport(_ progressAlertManager: ProgressAlertManager) async {
         await MainActor.run {
-            didUserPerformChangesRequiringDisplayDataReload = true
+            shouldReloadDisplayedData = true
             progressAlertManager.hide()
         }
     }
