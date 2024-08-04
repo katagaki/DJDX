@@ -8,7 +8,7 @@
 import Foundation
 import SwiftData
 
-class CalendarManager: ObservableObject {
+final class CalendarManager: ObservableObject, Sendable {
 
     let defaults = UserDefaults.standard
     let importToDateKey = "CalendarManager.ImportToDate"

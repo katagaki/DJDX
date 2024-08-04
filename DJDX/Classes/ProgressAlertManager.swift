@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 @Observable
-class ProgressAlertManager {
+final class ProgressAlertManager: Sendable {
     var isShowing: Bool = false
     var title: String = ""
     var message: String = ""

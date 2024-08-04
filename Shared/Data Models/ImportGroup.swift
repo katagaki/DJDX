@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class ImportGroup: Sendable {
+final class ImportGroup {
     var id: String = UUID().uuidString
     var importDate: Date = Date.distantPast
     @Relationship(deleteRule: .cascade, inverse: \IIDXSongRecord.importGroup) var iidxData: [IIDXSongRecord]?

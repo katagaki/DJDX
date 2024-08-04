@@ -107,6 +107,7 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
         }
     }
 
+    @MainActor
     func stopProcessing(with reason: ImportFailedReason) {
         autoImportFailedReason = reason
         isAutoImportFailed = true
@@ -308,6 +309,7 @@ document.getElementById('score_data').value
 }
 
 // swiftlint:disable class_delegate_protocol
+@MainActor
 protocol UpdateScoreDataDelegate {
     func importScoreData(using newScoreData: String) async
     func stopProcessing(with reason: ImportFailedReason)

@@ -11,7 +11,7 @@ import SwiftData
 let songLevelCSVHeaders: [String] = ["BEGINNER", "NORMAL", "HYPER", "ANOTHER", "LEGGENDARIA"]
 
 @Model
-final class IIDXSongRecord: Equatable, Hashable, Sendable {
+final class IIDXSongRecord: Equatable, Hashable {
     var version: String = ""
     var title: String = ""
     var genre: String = ""
@@ -73,7 +73,7 @@ final class IIDXSongRecord: Equatable, Hashable, Sendable {
     }
 
     func scores() -> [IIDXLevelScore] {
-        var scores = [beginnerScore, normalScore, hyperScore, anotherScore, leggendariaScore]
+        let scores = [beginnerScore, normalScore, hyperScore, anotherScore, leggendariaScore]
         return scores.filter({ $0.difficulty != 0 })
     }
 

@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 // swiftlint:disable type_body_length file_length
-class PlayDataManager: ObservableObject {
+final class PlayDataManager: ObservableObject, Sendable {
 
     // External Data
     var allSongs: [IIDXSong] = []
@@ -70,9 +70,6 @@ class PlayDataManager: ObservableObject {
         filteredSongRecords.removeAll()
         allSongRecords.removeAll()
         allSongNoteCounts.removeAll()
-
-        debugPrint("Performing required data migration (if any)")
-        await migrateDataToNewerSchema()
 
         debugPrint("Loading new song records")
         let modelContext = ModelContext(sharedModelContainer)
@@ -337,7 +334,7 @@ class PlayDataManager: ObservableObject {
                 .reduce(into: [:], { partialResult, songRecord in
                     let song = allSongNoteCounts[songRecord.titleCompact()]
                     if let song {
-                        var scores: [IIDXLevelScore] = songRecord.scores()
+                        let scores: [IIDXLevelScore] = songRecord.scores()
                         let scoreRates = scores.reduce(into: [:] as [IIDXLevel: Float]) { partialResult, score in
                             if let noteCount = song.noteCount(for: score.level) {
                                 partialResult[score.level] = Float(score.score) / Float(noteCount * 2)
@@ -362,7 +359,7 @@ class PlayDataManager: ObservableObject {
     }
 
     @MainActor
-    func cleanUpOrphanedSongRecords() async {
+    func cleanUpData() async {
         debugPrint("Cleaning up orphaned song records")
         let modelContext = ModelContext(sharedModelContainer)
         let songRecords = (try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>(
@@ -377,25 +374,27 @@ class PlayDataManager: ObservableObject {
         }
     }
 
-    func migrateDataToNewerSchema() async {
+    @MainActor
+    func migrateData() async {
         let defaults = UserDefaults.standard
-        let dataMigrationKeys = ["Internal.DataMigrationForBetaBuild84"]
+        let dataMigrationKeys = ["Internal.DataMigrationForBetaBuild120"]
 
-        for dataMigrationKey in dataMigrationKeys {
+        for dataMigrationKey in dataMigrationKeys where !defaults.bool(forKey: dataMigrationKey) {
             switch dataMigrationKey {
             case "Internal.DataMigrationForBetaBuild84":
-                if !defaults.bool(forKey: dataMigrationKey) {
-                    debugPrint("Performing migration when migrating from 1.0-84 to 1.0-85+")
-                    UserDefaults.standard.set(true, forKey: dataMigrationKey)
-                    let modelContext = ModelContext(sharedModelContainer)
-                    let songRecords = try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>())
-                    for songRecord in songRecords ?? [] {
-                        songRecord.playType = .single
-                    }
-                    try? modelContext.save()
+                debugPrint("Performing migration when migrating from 1.0-84 to 1.0-85+")
+                let modelContext = ModelContext(sharedModelContainer)
+                let songRecords = try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>())
+                for songRecord in songRecords ?? [] {
+                    songRecord.playType = .single
                 }
+                try? modelContext.save()
+            case "Internal.DataMigrationForBetaBuild120":
+                debugPrint("Performing migration when migrating from 1.0-117 to 1.0-120+")
+                UserDefaults.standard.set(Data(), forKey: "Analytics.Trends.DJLevel.Level.Cache")
             default: break
             }
+            UserDefaults.standard.set(true, forKey: dataMigrationKey)
         }
     }
 

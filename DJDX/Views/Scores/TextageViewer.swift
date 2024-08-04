@@ -152,7 +152,6 @@ do_djauto();
                     }
                 default: break
                 }
-            default: break
             }
             return "102"
         }

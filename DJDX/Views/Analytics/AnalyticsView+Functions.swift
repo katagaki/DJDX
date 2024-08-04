@@ -148,17 +148,15 @@ extension AnalyticsView {
     func trendDataForClearTypePerDifficulty(
         _ importGroups: [ImportGroup]
     ) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
-        let (newData, newCache) = await trendDataPerDifficulty(importGroups,
-                                                               using: clearTypePerImportGroupCache) { songRecords in
+        let (newData, newCache) = await trendDataPerDifficulty(
+            importGroups,
+            using: clearTypePerImportGroupCache
+        ) { songRecords in
             await clearTypePerDifficulty(for: songRecords)
         }
-
-        do {
-            debugPrint("Updating Clear Type cache")
-            clearTypePerImportGroupCache = try JSONEncoder().encode(newCache)
-        } catch {
-            debugPrint("Could not update cache: \(error)")
-        }
+        
+        debugPrint("Updating Clear Type cache")
+        clearTypePerImportGroupCache = (try? JSONEncoder().encode(newCache)) ?? Data()
 
         return newData
     }
@@ -166,17 +164,15 @@ extension AnalyticsView {
     func trendDataForDJLevelPerDifficulty(
         _ importGroups: [ImportGroup]
     ) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
-        let (newData, newCache) = await trendDataPerDifficulty(importGroups,
-                                                               using: djLevelPerImportGroupCache) { songRecords in
-            await clearTypePerDifficulty(for: songRecords)
+        let (newData, newCache) = await trendDataPerDifficulty(
+            importGroups,
+            using: djLevelPerImportGroupCache
+        ) { songRecords in
+            await djLevelPerDifficulty(for: songRecords)
         }
-
-        do {
-            debugPrint("Updating DJ Level trend cache")
-            djLevelPerImportGroupCache = try JSONEncoder().encode(newCache)
-        } catch {
-            debugPrint("Could not update cache: \(error)")
-        }
+        
+        debugPrint("Updating DJ Level trend cache")
+        djLevelPerImportGroupCache = (try? JSONEncoder().encode(newCache)) ?? Data()
 
         return newData
     }

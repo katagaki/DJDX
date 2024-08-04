@@ -58,7 +58,8 @@ struct MainTabView: View {
                 if !isTimeTravelling {
                     calendar.playDataDate = .now
                 }
-                await playData.cleanUpOrphanedSongRecords()
+                await playData.cleanUpData()
+                await playData.migrateData()
                 isFirstStartCleanupComplete = true
             }
             try? Tips.configure([

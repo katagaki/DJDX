@@ -134,8 +134,8 @@ struct MoreBemaniWikiCharts: View {
             try? modelContext.save()
         }
         await playData.reloadAllSongs()
-        progressAlertManager.hide()
         await MainActor.run {
+            progressAlertManager.hide()
             withAnimation(.snappy.speed(2.0)) {
                 dataImported = 0
             }
