@@ -194,6 +194,14 @@ struct AnalyticsView: View {
                     .scrollIndicators(.hidden)
                 }
             }
+            .refreshable {
+                switch viewMode {
+                case .overview:
+                    await reloadOverview()
+                case .trends:
+                    await reloadTrends()
+                }
+            }
             .onAppear {
                 if dataState == .initializing {
                     calendar.analyticsDate = .now

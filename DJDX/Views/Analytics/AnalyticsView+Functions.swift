@@ -16,7 +16,7 @@ extension AnalyticsView {
         Task.detached(priority: .userInitiated) {
             let viewMode = await viewMode
             switch viewMode {
-            case .overview: await reloadScores()
+            case .overview: await reloadOverview()
             case .trends: await reloadTrends()
             }
             await MainActor.run {
@@ -27,7 +27,7 @@ extension AnalyticsView {
         }
     }
 
-    func reloadScores() async {
+    func reloadOverview() async {
         dataState = .loading
         debugPrint("Calculating overview")
         let songRecords = calendar.latestAvailableIIDXSongRecords(
