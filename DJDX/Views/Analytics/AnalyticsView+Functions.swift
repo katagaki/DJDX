@@ -13,6 +13,7 @@ import SwiftUI
 extension AnalyticsView {
 
     func reload() {
+        dataState = .loading
         Task.detached(priority: .userInitiated) {
             let viewMode = await viewMode
             switch viewMode {
@@ -28,7 +29,6 @@ extension AnalyticsView {
     }
 
     func reloadOverview() async {
-        dataState = .loading
         debugPrint("Calculating overview")
         let songRecords = calendar.latestAvailableIIDXSongRecords(
             in: modelContext,
@@ -65,7 +65,6 @@ extension AnalyticsView {
     }
 
     func reloadTrends() async {
-        dataState = .loading
         debugPrint("Calculating trends")
         let importGroups: [ImportGroup] = (try? modelContext.fetch(
             FetchDescriptor<ImportGroup>(

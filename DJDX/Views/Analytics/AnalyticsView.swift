@@ -196,11 +196,12 @@ struct AnalyticsView: View {
             }
             .refreshable {
                 switch viewMode {
-                case .overview:
-                    await reloadOverview()
                 case .trends:
-                    await reloadTrends()
+                    clearTypePerImportGroupCache = Data()
+                    djLevelPerImportGroupCache = Data()
+                default: break
                 }
+                reload()
             }
             .onAppear {
                 if dataState == .initializing {
