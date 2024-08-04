@@ -131,9 +131,6 @@ struct ScoresView: View {
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "Scores.Search.Prompt")
             .onAppear {
-                if !Calendar.current.isDate(.now, inSameDayAs: calendar.playDataDate) {
-                    isTimeTravelling = true
-                }
                 if dataState == .initializing {
                     if !isTimeTravelling {
                         isSystemChangingCalendarDate = true
