@@ -28,6 +28,7 @@ extension AnalyticsView {
         }
     }
 
+    @MainActor
     func reloadOverview() async {
         debugPrint("Calculating overview")
         let songRecords = calendar.latestAvailableIIDXSongRecords(
@@ -36,30 +37,18 @@ extension AnalyticsView {
         )
             .filter { $0.playType == playTypeToShow }
         if songRecords.count > 0 {
-            await withDiscardingTaskGroup { group in
-                group.addTask {
-                    let newClearTypePerDifficulty = await clearTypePerDifficulty(for: songRecords)
-                    await MainActor.run {
-                        withAnimation(.snappy.speed(2.0)) {
-                            self.clearTypePerDifficulty = newClearTypePerDifficulty
-                        }
-                    }
-                }
-                group.addTask {
-                    let newScoresPerDifficulty = await scoresPerDifficulty(for: songRecords)
-                    await MainActor.run { [newScoresPerDifficulty] in
-                        withAnimation(.snappy.speed(2.0)) {
-                            self.djLevelPerDifficulty = newScoresPerDifficulty
-                        }
-                    }
-                }
+            let newClearTypePerDifficulty = clearTypePerDifficulty(for: songRecords)
+            withAnimation(.snappy.speed(2.0)) {
+                self.clearTypePerDifficulty = newClearTypePerDifficulty
+            }
+            let newScoresPerDifficulty = scoresPerDifficulty(for: songRecords)
+            withAnimation(.snappy.speed(2.0)) {
+                self.djLevelPerDifficulty = newScoresPerDifficulty
             }
         } else {
-            await MainActor.run {
-                withAnimation(.snappy.speed(2.0)) {
-                    self.clearTypePerDifficulty.removeAll()
-                    self.djLevelPerDifficulty.removeAll()
-                }
+            withAnimation(.snappy.speed(2.0)) {
+                self.clearTypePerDifficulty.removeAll()
+                self.djLevelPerDifficulty.removeAll()
             }
         }
     }
