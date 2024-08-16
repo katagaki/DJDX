@@ -12,23 +12,20 @@ import SwiftUI
 
 extension AnalyticsView {
 
-    func reload() {
+    @MainActor
+    func reload() async {
         dataState = .loading
-        Task.detached(priority: .userInitiated) {
-            let viewMode = await viewMode
-            switch viewMode {
-            case .overview: await reloadOverview()
-            case .trends: await reloadTrends()
-            }
-            await MainActor.run {
-                withAnimation(.snappy.speed(2.0)) {
-                    dataState = .presenting
-                }
+        switch viewMode {
+        case .overview: await reloadOverview()
+        case .trends: await reloadTrends()
+        }
+        await MainActor.run {
+            withAnimation(.snappy.speed(2.0)) {
+                dataState = .presenting
             }
         }
     }
 
-    @MainActor
     func reloadOverview() async {
         debugPrint("Calculating overview")
         let songRecords = calendar.latestAvailableIIDXSongRecords(
@@ -37,13 +34,15 @@ extension AnalyticsView {
         )
             .filter { $0.playType == playTypeToShow }
         if songRecords.count > 0 {
-            let newClearTypePerDifficulty = clearTypePerDifficulty(for: songRecords)
-            withAnimation(.snappy.speed(2.0)) {
-                self.clearTypePerDifficulty = newClearTypePerDifficulty
-            }
-            let newScoresPerDifficulty = scoresPerDifficulty(for: songRecords)
-            withAnimation(.snappy.speed(2.0)) {
-                self.djLevelPerDifficulty = newScoresPerDifficulty
+            await MainActor.run {
+                withAnimation(.snappy.speed(2.0)) {
+                    debugPrint("Calculating clear type per difficulty")
+                    let newClearTypePerDifficulty = clearTypePerDifficulty(for: songRecords)
+                    self.clearTypePerDifficulty = newClearTypePerDifficulty
+                    debugPrint("Calculating scores per difficulty")
+                    let newScoresPerDifficulty = scoresPerDifficulty(for: songRecords)
+                    self.djLevelPerDifficulty = newScoresPerDifficulty
+                }
             }
         } else {
             withAnimation(.snappy.speed(2.0)) {

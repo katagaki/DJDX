@@ -160,7 +160,9 @@ struct AnalyticsView: View {
                             debugPrint("Clearing cache")
                             clearTypePerImportGroupCache = Data()
                             djLevelPerImportGroupCache = Data()
-                            reload()
+                            Task {
+                                await reload()
+                            }
                         }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -201,12 +203,16 @@ struct AnalyticsView: View {
                     djLevelPerImportGroupCache = Data()
                 default: break
                 }
-                reload()
+                Task {
+                    await reload()
+                    debugPrint("Reloaded from swipe to refresh")
+                }
             }
-            .onAppear {
+            .task {
                 if dataState == .initializing {
                     calendar.analyticsDate = .now
-                    reload()
+                    await reload()
+                    debugPrint("Reloaded on view appearance")
                 }
             }
             .onChange(of: calendar.shouldReloadDisplayedData, { oldValue, newValue in
@@ -227,12 +233,18 @@ struct AnalyticsView: View {
                 case .trends: shouldReload = clearTypePerImportGroup.count == 0 || djLevelPerImportGroup.count == 0
                 }
                 if shouldReload {
-                    reload()
+                    Task {
+                        await reload()
+                        debugPrint("Reloaded on change of view mode")
+                    }
                 }
             }
             .onChange(of: playTypeToShow) { _, _ in
                 if navigationManager.selectedTab == .analytics {
-                    reload()
+                    Task {
+                        await reload()
+                        debugPrint("Reloaded on change of play type")
+                    }
                 } else {
                     dataState = .initializing
                 }

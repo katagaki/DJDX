@@ -16,7 +16,23 @@ struct LargeInlineTitle: View {
 
     var body: some View {
         Text(text)
-            .fontWeight(.bold)
             .font(.title)
+            .fontWeight(.bold)
+    }
+}
+
+#Preview {
+    NavigationStack {
+        List {
+            Text("1")
+            Text("2")
+            Text("3")
+        }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    LargeInlineTitle("インポート履歴")
+                }
+            }
     }
 }
