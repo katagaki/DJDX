@@ -6,6 +6,7 @@
 //
 
 import Komponents
+import SwiftData
 import SwiftUI
 import WebKit
 
@@ -113,6 +114,10 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
+                    Button("More.ManageData.ForceReSync") {
+                        try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>())
+                        try? modelContext.fetch(FetchDescriptor<ImportGroup>())
+                    }
                     Button {
                         isConfirmingWebDataDelete = true
                     } label: {

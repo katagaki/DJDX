@@ -36,6 +36,7 @@
 		E46D51BF2C2FF5FF000524B9 /* StartHereTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51BE2C2FF5F6000524B9 /* StartHereTip.swift */; };
 		E46D51C12C2FF737000524B9 /* ImportWikiDataTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51C02C2FF737000524B9 /* ImportWikiDataTip.swift */; };
 		E47269012C3A2A5F00D5335D /* TrendsDJLevelGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47269002C3A2A5C00D5335D /* TrendsDJLevelGraph.swift */; };
+		E48365662C9E4291008666E3 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48365652C9E428F008666E3 /* DataImporter.swift */; };
 		E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */; };
 		E48B628A2C5F47CF007874AE /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48B62892C5F47CE007874AE /* UserDefaults.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
@@ -107,6 +108,7 @@
 		E46D51BE2C2FF5F6000524B9 /* StartHereTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartHereTip.swift; sourceTree = "<group>"; };
 		E46D51C02C2FF737000524B9 /* ImportWikiDataTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportWikiDataTip.swift; sourceTree = "<group>"; };
 		E47269002C3A2A5C00D5335D /* TrendsDJLevelGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsDJLevelGraph.swift; sourceTree = "<group>"; };
+		E48365652C9E428F008666E3 /* DataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImporter.swift; sourceTree = "<group>"; };
 		E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayTypePicker.swift; sourceTree = "<group>"; };
 		E48B62892C5F47CE007874AE /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
@@ -194,6 +196,14 @@
 			path = Tips;
 			sourceTree = "<group>";
 		};
+		E48365642C9E4284008666E3 /* Actors */ = {
+			isa = PBXGroup;
+			children = (
+				E48365652C9E428F008666E3 /* DataImporter.swift */,
+			);
+			path = Actors;
+			sourceTree = "<group>";
+		};
 		E4B123A32BF8E8E400D4A3D1 = {
 			isa = PBXGroup;
 			children = (
@@ -222,6 +232,7 @@
 				E46A65E92C0AE83E00D9544B /* Localizable.xcstrings */,
 				E4B123D02BF902B600D4A3D1 /* Views */,
 				E4BC327E2C036C6F006A0F7A /* View Modifiers */,
+				E48365642C9E4284008666E3 /* Actors */,
 				E4B123CF2BF9028C00D4A3D1 /* Classes */,
 				E46D51BA2C2B094B000524B9 /* Structs */,
 				E4E3D0C82BF98DAA001942FE /* Enums */,
@@ -515,6 +526,7 @@
 				E4B123B42BF8E8E400D4A3D1 /* IIDXSongRecord.swift in Sources */,
 				E4B4CF9F2C10AA6F0069EC8C /* String.swift in Sources */,
 				E46A66012C0C926E00D9544B /* IIDXClearType.swift in Sources */,
+				E48365662C9E4291008666E3 /* DataImporter.swift in Sources */,
 				E46A66092C0CC45500D9544B /* NoteTypeDetailRow.swift in Sources */,
 				E4E3D0CC2BF98DC7001942FE /* ViewPath.swift in Sources */,
 				E46A65F52C0B3C9700D9544B /* ProgressAlertManager.swift in Sources */,

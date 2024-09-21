@@ -9,7 +9,8 @@
             "value" : ""
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "AA" : {
       "localizations" : {
@@ -19,7 +20,8 @@
             "value" : ""
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "AAA" : {
       "localizations" : {
@@ -29,7 +31,8 @@
             "value" : ""
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Alert.DeleteData.Score.Confirm" : {
       "extractionState" : "manual",
@@ -699,7 +702,8 @@
             "value" : "LEVEL"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "LEVEL %lld" : {
       "localizations" : {
@@ -709,7 +713,8 @@
             "value" : "LEVEL %lld"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "More.ExternalData.BemaniWiki2nd" : {
       "extractionState" : "manual",
@@ -843,6 +848,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Webデータを消去"
+          }
+        }
+      }
+    },
+    "More.ManageData.ForceReSync" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync All Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのデータを同期"
           }
         }
       }
