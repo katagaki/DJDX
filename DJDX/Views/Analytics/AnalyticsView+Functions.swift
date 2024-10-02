@@ -15,6 +15,7 @@ extension AnalyticsView {
     @MainActor
     func reload() async {
         dataState = .loading
+        try? await Task.sleep(for: .seconds(0.5))
         switch viewMode {
         case .overview: await reloadOverview()
         case .trends: await reloadTrends()
