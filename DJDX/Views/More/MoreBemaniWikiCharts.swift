@@ -113,20 +113,11 @@ struct MoreBemaniWikiCharts: View {
 
     func reloadData() async {
         try? modelContext.delete(model: IIDXSong.self)
-        let iidxSongs: [IIDXSong] = await withTaskGroup(of: [IIDXSong].self) { group in
-            var iidxSongsFromWiki: [IIDXSong] = []
-            group.addTask {
-                return await reloadBemaniWikiDataForLatestVersion()
-            }
-            group.addTask {
-                return await reloadBemaniWikiDataForExistingVersions()
-            }
-            for await result in group {
-                iidxSongsFromWiki.append(contentsOf: result)
-                dataImported += 1
-            }
-            return iidxSongsFromWiki
-        }
+        var iidxSongs: [IIDXSong] = []
+        iidxSongs.append(contentsOf: await reloadBemaniWikiDataForLatestVersion())
+        dataImported += 1
+        iidxSongs.append(contentsOf: await reloadBemaniWikiDataForExistingVersions())
+        dataImported += 1
         try? modelContext.transaction {
             for iidxSong in iidxSongs {
                 modelContext.insert(iidxSong)
