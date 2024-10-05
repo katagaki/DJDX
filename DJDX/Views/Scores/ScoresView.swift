@@ -38,6 +38,8 @@ struct ScoresView: View {
     var isTimeTravellingKey: String = "ScoresView.IsTimeTravelling"
     @State var isTimeTravelling: Bool
 
+    @Namespace var scoresNamespace
+
     var conditionsForReload: [String] {
         [isShowingOnlyPlayDataWithScores.description,
          String(difficultyToShow.rawValue),
@@ -62,6 +64,7 @@ struct ScoresView: View {
                             levelToShow: $levelToShow,
                             difficultyToShow: $difficultyToShow
                         )
+                        .automaticMatchedTransitionSource(id: songRecord.title, in: scoresNamespace)
                     }
                     .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
                 }
@@ -180,6 +183,7 @@ struct ScoresView: View {
                 case .scoreViewer(let songRecord):
                     ScoreViewer(songRecord: songRecord,
                                 noteCount: noteCount)
+                    .automaticNavigationTransition(id: songRecord.title, in: scoresNamespace)
                 case .scoreHistory(let songTitle, let level, let noteCount):
                     ScoreHistoryViewer(songTitle: songTitle,
                                        level: level,

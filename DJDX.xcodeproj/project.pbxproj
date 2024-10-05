@@ -11,6 +11,8 @@
 		E45B1CE82CB158F8006A7E85 /* FilterOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1CE72CB158E5006A7E85 /* FilterOptions.swift */; };
 		E45B1CEA2CB15942006A7E85 /* SortOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1CE92CB15940006A7E85 /* SortOptions.swift */; };
 		E45B1CEC2CB1790A006A7E85 /* IIDXVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1CEB2CB17908006A7E85 /* IIDXVersion.swift */; };
+		E45B1D082CB19968006A7E85 /* AutomaticMatchedTransitionSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1D072CB19967006A7E85 /* AutomaticMatchedTransitionSource.swift */; };
+		E45B1D0A2CB19973006A7E85 /* AutomaticNavigationTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1D092CB19973006A7E85 /* AutomaticNavigationTransition.swift */; };
 		E46A65E02C0A276800D9544B /* DetailRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65DF2C0A276800D9544B /* DetailRow.swift */; };
 		E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = E46A65E22C0ACAC400D9544B /* SwiftSoup */; };
 		E46A65E52C0ACADB00D9544B /* IIDXSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65E42C0ACADB00D9544B /* IIDXSong.swift */; };
@@ -87,6 +89,8 @@
 		E45B1CE72CB158E5006A7E85 /* FilterOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterOptions.swift; sourceTree = "<group>"; };
 		E45B1CE92CB15940006A7E85 /* SortOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortOptions.swift; sourceTree = "<group>"; };
 		E45B1CEB2CB17908006A7E85 /* IIDXVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXVersion.swift; sourceTree = "<group>"; };
+		E45B1D072CB19967006A7E85 /* AutomaticMatchedTransitionSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomaticMatchedTransitionSource.swift; sourceTree = "<group>"; };
+		E45B1D092CB19973006A7E85 /* AutomaticNavigationTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomaticNavigationTransition.swift; sourceTree = "<group>"; };
 		E46A65DF2C0A276800D9544B /* DetailRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailRow.swift; sourceTree = "<group>"; };
 		E46A65E42C0ACADB00D9544B /* IIDXSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXSong.swift; sourceTree = "<group>"; };
 		E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXPlayType.swift; sourceTree = "<group>"; };
@@ -327,6 +331,8 @@
 		E4BC327E2C036C6F006A0F7A /* View Modifiers */ = {
 			isa = PBXGroup;
 			children = (
+				E45B1D072CB19967006A7E85 /* AutomaticMatchedTransitionSource.swift */,
+				E45B1D092CB19973006A7E85 /* AutomaticNavigationTransition.swift */,
 				E4BC327F2C036C82006A0F7A /* ConditionalShadow.swift */,
 				E4BC32812C036CBD006A0F7A /* LevelLabelGlow.swift */,
 			);
@@ -507,6 +513,7 @@
 				E46D51C12C2FF737000524B9 /* ImportWikiDataTip.swift in Sources */,
 				E45B1CEA2CB15942006A7E85 /* SortOptions.swift in Sources */,
 				E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */,
+				E45B1D082CB19968006A7E85 /* AutomaticMatchedTransitionSource.swift in Sources */,
 				E4E3D0F22BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift in Sources */,
 				E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */,
 				E4EB2CA82BFF7E3700A00796 /* ImportView.swift in Sources */,
@@ -532,6 +539,7 @@
 				E4B123B42BF8E8E400D4A3D1 /* IIDXSongRecord.swift in Sources */,
 				E4B4CF9F2C10AA6F0069EC8C /* String.swift in Sources */,
 				E46A66012C0C926E00D9544B /* IIDXClearType.swift in Sources */,
+				E45B1D0A2CB19973006A7E85 /* AutomaticNavigationTransition.swift in Sources */,
 				E48365662C9E4291008666E3 /* DataImporter.swift in Sources */,
 				E46A66092C0CC45500D9544B /* NoteTypeDetailRow.swift in Sources */,
 				E4E3D0CC2BF98DC7001942FE /* ViewPath.swift in Sources */,
@@ -709,6 +717,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -747,6 +756,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
