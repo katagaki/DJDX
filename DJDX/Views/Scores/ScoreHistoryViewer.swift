@@ -21,8 +21,12 @@ struct ScoreHistoryViewer: View {
     var noteCount: Int?
 
     @State var songRecordsForSong: [IIDXSongRecord] = []
+
     @State var scoreHistory: [Date: Int] = [:]
     @State var scoreRateHistory: [Date: Float] = [:]
+    @State var summarizedScoreHistory: [Date: Int] = [:]
+    @State var summarizedScoreRateHistory: [Date: Float] = [:]
+
     @State var earliestDate: Date = Calendar.current.date(byAdding: .day, value: -1, to: .now)!
     @State var latestDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: .now)!
     @State var dataState: DataState = .initializing
@@ -84,7 +88,7 @@ struct ScoreHistoryViewer: View {
                 }
                 Section {
                     VStack(alignment: .leading, spacing: 8.0) {
-                        ForEach(scoreHistory.sorted(by: {$0.key < $1.key}), id: \.key) { date, score in
+                        ForEach(summarizedScoreHistory.sorted(by: {$0.key < $1.key}), id: \.key) { date, score in
                             DetailRow(
                                 date.formatted(date: .abbreviated, time: .omitted),
                                 value: String(score),
@@ -102,7 +106,7 @@ struct ScoreHistoryViewer: View {
                 }
                 Section {
                     VStack(alignment: .leading, spacing: 8.0) {
-                        ForEach(scoreRateHistory.sorted(by: {$0.key < $1.key}), id: \.key) { date, scoreRate in
+                        ForEach(summarizedScoreRateHistory.sorted(by: {$0.key < $1.key}), id: \.key) { date, scoreRate in
                             DetailRow(date.formatted(date: .abbreviated, time: .omitted),
                                       value: percentageFormatter.string(from: NSNumber(value: scoreRate)) ?? "0%",
                                       style: LinearGradient(
@@ -182,6 +186,8 @@ struct ScoreHistoryViewer: View {
                 partialResult[importGroup.importDate] = score.score
             }
         })
+
+        // Dictionarize list of score rates
         if let noteCount {
             scoreRateHistory = songRecordsForSong.reduce(
                 into: [:] as [Date: Float], { partialResult, songRecord in
@@ -190,6 +196,32 @@ struct ScoreHistoryViewer: View {
                         partialResult[importGroup.importDate] = Float(score.score) / Float(noteCount * 2)
                     }
                 })
+        }
+
+        // Summarize scores
+        var previousScore: Int?
+        for (date, score) in scoreHistory {
+            if let previousScore {
+                if score != previousScore {
+                    summarizedScoreHistory[date] = score
+                }
+            } else {
+                summarizedScoreHistory[date] = score
+            }
+            previousScore = score
+        }
+
+        // Summarize score rates
+        var previousScoreRate: Int?
+        for (date, scoreRate) in scoreRateHistory {
+            if let previousScoreRate {
+                if Int(scoreRate) != previousScoreRate {
+                    summarizedScoreRateHistory[date] = scoreRate
+                }
+            } else {
+                summarizedScoreRateHistory[date] = scoreRate
+            }
+            previousScoreRate = Int(scoreRate)
         }
 
         // Set date range for chart
