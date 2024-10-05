@@ -68,7 +68,7 @@ struct WebImporter: View {
     }
 }
 
-struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
+struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataDelegate {
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
@@ -262,7 +262,7 @@ document.getElementById('score_data').value
         super.init()
     }
 
-    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if let webViewURL = webView.url {
             let urlString = webViewURL.absoluteString
@@ -316,7 +316,6 @@ document.getElementById('score_data').value
             }
         }
     }
-    // swiftlint:enable cyclomatic_complexity
 
     func evaluateIIDXSPScript(_ webView: WKWebView) {
         webView.evaluateJavaScript(self.selectSPButtonJS) { _, error in
@@ -336,7 +335,7 @@ document.getElementById('score_data').value
 }
 
 // swiftlint:disable class_delegate_protocol
-protocol UpdateScoreDataDelegate {
+protocol UpdateScoreDataDelegate: Sendable {
     func importScoreData(using newScoreData: String) async
     func stopProcessing(with reason: ImportFailedReason)
 }

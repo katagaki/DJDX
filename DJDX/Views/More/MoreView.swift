@@ -53,6 +53,7 @@ struct MoreView: View {
                 }
                 Section {
                     // TODO: Implement this feature
+                    // swiftlint:disable:next control_statement
                     if (false) {
                         Toggle(isOn: $isLevelsShownSeparately) {
                             HStack(spacing: 0.0) {
@@ -114,8 +115,18 @@ struct MoreView: View {
                 }
                 Section {
                     Button("More.ManageData.ForceReSync") {
-                        try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>())
-                        try? modelContext.fetch(FetchDescriptor<ImportGroup>())
+                        let importGroups: [ImportGroup] = (try? modelContext.fetch(
+                            FetchDescriptor<ImportGroup>()
+                        )) ?? []
+                        for importGroup in importGroups {
+                            debugPrint("Fetched \(importGroup.id)")
+                        }
+                        let songRecords: [IIDXSongRecord] = (try? modelContext.fetch(
+                            FetchDescriptor<IIDXSongRecord>()
+                        )) ?? []
+                        for songRecord in songRecords {
+                            debugPrint("Fetched \(songRecord.title)")
+                        }
                     }
                     Button {
                         isConfirmingWebDataDelete = true

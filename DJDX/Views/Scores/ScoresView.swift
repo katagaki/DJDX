@@ -192,6 +192,7 @@ struct ScoresView: View {
         }
     }
 
+    // swiftlint:disable:next function_body_length
     func reloadDisplay() {
         withAnimation(.snappy.speed(2.0)) {
             dataState = .loading
@@ -200,17 +201,13 @@ struct ScoresView: View {
                 let actor = DataFetcher(modelContainer: sharedModelContainer)
                 let songRecordIdentifiers = await actor.songRecords(
                     on: playDataDate,
-                    filters: FilterOptions(
-                        playType: playTypeToShow,
-                        onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
-                        level: levelToShow,
-                        difficulty: difficultyToShow,
-                        clearType: clearTypeToShow,
-                        searchTerm: searchTerm
-                    ),
-                    sortOptions: SortOptions(
-                        mode: sortMode
-                    )
+                    filters: FilterOptions(playType: playTypeToShow,
+                                           onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
+                                           level: levelToShow,
+                                           difficulty: difficultyToShow,
+                                           clearType: clearTypeToShow,
+                                           searchTerm: searchTerm),
+                    sortOptions: SortOptions(mode: sortMode)
                 )
                 let songCompactTitles = await actor.songCompactTitles()
                 let songNoteCounts = await actor.songNoteCounts()
@@ -230,7 +227,9 @@ struct ScoresView: View {
                                     let song = songNoteCounts[songRecord.titleCompact()]
                                     if let song {
                                         let scores: [IIDXLevelScore] = songRecord.scores()
-                                        let scoreRates = scores.reduce(into: [:] as [IIDXLevel: Float]) { partialResult, score in
+                                        let scoreRates = scores.reduce(
+                                            into: [:] as [IIDXLevel: Float]
+                                        ) { partialResult, score in
                                             if let noteCount = song.noteCount(for: score.level) {
                                                 partialResult[score.level] = Float(score.score) / Float(noteCount * 2)
                                             }
@@ -242,6 +241,7 @@ struct ScoresView: View {
                             self.songRecordClearRates = songRecordClearRates
                             self.songRecords = songRecords
                         } else {
+                            self.songRecordClearRates = [:]
                             self.songRecords = nil
                         }
 

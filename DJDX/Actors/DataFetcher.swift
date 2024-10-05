@@ -62,14 +62,14 @@ actor DataFetcher {
     // MARK: Song Records
 
     func songRecords(for importGroupID: String) -> [PersistentIdentifier] {
-        let songRecords = try? modelContext.fetch(
+        let songRecords: [IIDXSongRecord]? = try? modelContext.fetch(
             FetchDescriptor<IIDXSongRecord>(
                 predicate: #Predicate<IIDXSongRecord> {
                     $0.importGroup?.id == importGroupID
                 },
                 sortBy: [SortDescriptor(\.title, order: .forward)]
             )
-        ) ?? []
+        )
         return (songRecords ?? []).map { $0.persistentModelID }
     }
 
@@ -87,7 +87,7 @@ actor DataFetcher {
 
         // Get song records in import group
         let importGroupID = importGroup.id
-        guard let allSongRecords = try? modelContext.fetch (
+        guard let allSongRecords = try? modelContext.fetch(
             FetchDescriptor<IIDXSongRecord>(
                 predicate: #Predicate<IIDXSongRecord> {
                     $0.importGroup?.id == importGroupID
@@ -97,7 +97,7 @@ actor DataFetcher {
         ) else {
             return []
         }
-        
+
         let songs = try? modelContext.fetch(
             FetchDescriptor<IIDXSong>(
                 sortBy: [SortDescriptor(\.title, order: .forward)]
@@ -162,14 +162,17 @@ actor DataFetcher {
 
                 // Filter song records by clear type
                 if filters.clearType != .all {
-                    if filters.difficulty != .all && filters.level == .all,
+                    let isDifficultyFilterActive = filters.difficulty != .all
+                    let isLevelFilterActive = filters.level != .all
+                    if isDifficultyFilterActive && !isLevelFilterActive,
                        songRecord.score(for: filters.difficulty)?.clearType != filters.clearType.rawValue {
                         return true
-                    } else if filters.difficulty == .all && filters.level != .all,
+                    } else if isDifficultyFilterActive && isLevelFilterActive,
                               songRecord.score(for: filters.level)?.clearType != filters.clearType.rawValue {
                         return true
-                    } else if filters.difficulty != .all && filters.level != .all,
-                              songRecord.score(for: filters.difficulty)?.level == songRecord.score(for: filters.level)?.level,
+                    } else if isDifficultyFilterActive && isLevelFilterActive,
+                              songRecord.score(for: filters.difficulty)?.level ==
+                                songRecord.score(for: filters.level)?.level,
                               songRecord.score(for: filters.difficulty)?.clearType != filters.clearType.rawValue {
                         return true
                     } else {
