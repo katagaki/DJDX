@@ -12,7 +12,6 @@ import SwiftData
 struct DJDXApp: App {
 
     @StateObject var navigationManager = NavigationManager()
-    @StateObject var calendar = CalendarManager()
     @StateObject var playData = PlayDataManager()
     @State var progressAlertManager = ProgressAlertManager()
 
@@ -22,17 +21,10 @@ struct DJDXApp: App {
         }
         .modelContainer(sharedModelContainer)
         .environmentObject(navigationManager)
-        .environmentObject(calendar)
         .environmentObject(playData)
         .environment(progressAlertManager)
         .onChange(of: navigationManager.selectedTab) { _, _ in
             navigationManager.saveToDefaults()
-        }
-        .onChange(of: calendar.importToDate) { _, _ in
-            calendar.saveToDefaults()
-        }
-        .onChange(of: calendar.playDataDate) { _, _ in
-            calendar.saveToDefaults()
         }
     }
 }

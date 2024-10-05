@@ -13,7 +13,6 @@ struct ScoresView: View {
     @Environment(\.modelContext) var modelContext
 
     @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var calendar: CalendarManager
     @EnvironmentObject var playData: PlayDataManager
 
     @State var dataState: DataState = .initializing
@@ -26,6 +25,7 @@ struct ScoresView: View {
 
     @AppStorage(wrappedValue: .title, "ScoresView.SortOrder") var sortMode: SortMode
 
+    @State var playDataDate: Date = .now
     @State var searchTerm: String = ""
     @State var isSystemChangingFilterAndSort: Bool = false
     @State var isSystemChangingCalendarDate: Bool = false
@@ -80,7 +80,7 @@ struct ScoresView: View {
                     VStack(spacing: 8.0) {
                         if isTimeTravelling {
                             DatePicker("Shared.SelectDate",
-                                       selection: $calendar.playDataDate.animation(.snappy.speed(2.0)),
+                                       selection: $playDataDate.animation(.snappy.speed(2.0)),
                                        in: ...Date.now,
                                        displayedComponents: .date)
                             .datePickerStyle(.compact)
@@ -105,7 +105,7 @@ struct ScoresView: View {
                                         isTimeTravelling.toggle()
                                     }
                                     if !isTimeTravelling {
-                                        calendar.playDataDate = .now
+                                        playDataDate = .now
                                     }
                                 }
                             }
@@ -134,7 +134,7 @@ struct ScoresView: View {
                 if dataState == .initializing {
                     if !isTimeTravelling {
                         isSystemChangingCalendarDate = true
-                        calendar.playDataDate = .now
+                        playDataDate = .now
                         isSystemChangingCalendarDate = false
                     }
                     reloadDisplay(shouldReloadAll: true, shouldFilter: true,
@@ -172,16 +172,10 @@ struct ScoresView: View {
             .onChange(of: isTimeTravelling) { _, newValue in
                 UserDefaults.standard.set(newValue, forKey: isTimeTravellingKey)
                 if !isTimeTravelling {
-                    calendar.playDataDate = .now
+                    playDataDate = .now
                 }
             }
-            .onChange(of: calendar.shouldReloadDisplayedData, { oldValue, newValue in
-                if !oldValue && newValue {
-                    calendar.shouldReloadDisplayedData = false
-                    dataState = .initializing
-                }
-            })
-            .onChange(of: calendar.playDataDate) { oldValue, newValue in
+            .onChange(of: playDataDate) { oldValue, newValue in
                 if !isSystemChangingCalendarDate,
                    !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
                     reloadDisplay(shouldReloadAll: true, shouldFilter: true,
@@ -204,7 +198,6 @@ struct ScoresView: View {
         }
     }
 
-    @MainActor
     func reloadDisplay(shouldReloadAll: Bool = false,
                        shouldFilter: Bool = false,
                        shouldSort: Bool = false,
@@ -216,7 +209,7 @@ struct ScoresView: View {
                 }
             }
             if shouldReloadAll {
-                await playData.reloadAllSongRecords(in: calendar)
+                await playData.reloadAllSongRecords(modelContext, on: playDataDate)
             }
             if shouldFilter {
                 await playData.filterSongRecords(

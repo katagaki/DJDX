@@ -17,12 +17,12 @@ struct ImportView: View {
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var calendar: CalendarManager
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var importPlayType: IIDXPlayType
 
-    @State var importGroups: [ImportGroup] = []
+    @Query(sort: \ImportGroup.importDate, order: .reverse) var importGroups: [ImportGroup]
 
+    @State var importToDate: Date = .now
     @State var isAutoImportFailed: Bool = false
     @State var didImportSucceed: Bool = false
     @State var autoImportFailedReason: ImportFailedReason?
@@ -46,8 +46,6 @@ struct ImportView: View {
                     importGroupsToDelete.forEach { importGroup in
                         modelContext.delete(importGroup)
                     }
-                    refreshImportGroups()
-                    calendar.shouldReloadDisplayedData = true
                 })
             }
             .listStyle(.plain)
@@ -66,11 +64,29 @@ struct ImportView: View {
                         Menu {
                             Section {
                                 Button("Calendar.Import.LoadSamples.Button") {
-                                    Task.detached {
-                                        await calendar.importCSV(reportingTo: progressAlertManager, for: .single)
-                                        await MainActor.run {
-                                            didImportSucceed = true
-                                            refreshImportGroups()
+                                    progressAlertManager.show(
+                                        title: "Alert.Importing.Title",
+                                        message: "Alert.Importing.Text"
+                                    ) {
+                                        Task.detached {
+                                            let actor = DataImporter(modelContainer: sharedModelContainer)
+                                            await actor.importSampleCSV(
+                                                to: importToDate,
+                                                for: .single
+                                            ) { currentProgress, totalProgress in
+                                                Task {
+                                                    let progress = (currentProgress * 100) / totalProgress
+                                                    await MainActor.run {
+                                                        progressAlertManager.updateProgress(
+                                                            progress
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                            await MainActor.run {
+                                                didImportSucceed = true
+                                                progressAlertManager.hide()
+                                            }
                                         }
                                     }
                                 }
@@ -87,7 +103,7 @@ struct ImportView: View {
                 TabBarAccessory(placement: .bottom) {
                     VStack(spacing: 8.0) {
                         DatePicker("Calendar.Import.SelectDate",
-                                   selection: $calendar.importToDate.animation(.snappy.speed(2.0)),
+                                   selection: $importToDate.animation(.snappy.speed(2.0)),
                                    in: ...Date.now,
                                    displayedComponents: .date)
                         .datePickerStyle(.compact)
@@ -145,32 +161,30 @@ struct ImportView: View {
                 }
             )
             .task {
-                calendar.importToDate = .now
-                refreshImportGroups()
+                importToDate = .now
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .importerWebIIDXSingle:
-                    WebImporter(importMode: .single,
+                    WebImporter(importToDate: $importToDate,
+                                importMode: .single,
                                 isAutoImportFailed: $isAutoImportFailed,
                                 didImportSucceed: $didImportSucceed,
                                 autoImportFailedReason: $autoImportFailedReason)
                 case .importerWebIIDXDouble:
-                    WebImporter(importMode: .double,
+                    WebImporter(importToDate: $importToDate,
+                                importMode: .double,
                                 isAutoImportFailed: $isAutoImportFailed,
                                 didImportSucceed: $didImportSucceed,
                                 autoImportFailedReason: $autoImportFailedReason)
                 case .importerManual:
-                    ManualImporter(importPlayType: $importPlayType,
+                    ManualImporter(importToDate: $importToDate,
+                                   importPlayType: $importPlayType,
                                    didImportSucceed: $didImportSucceed)
                 default: Color.clear
                 }
             }
         }
-    }
-
-    func refreshImportGroups() {
-        importGroups = calendar.allImportGroups(in: modelContext)
     }
 
     func countOfIIDXSongRecords(in importGroup: ImportGroup) -> Int {

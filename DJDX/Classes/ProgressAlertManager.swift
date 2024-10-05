@@ -9,23 +9,23 @@ import Foundation
 import SwiftUI
 
 @Observable
-final class ProgressAlertManager: Sendable {
+class ProgressAlertManager {
     var isShowing: Bool = false
     var title: String = ""
     var message: String = ""
     var percentage: Int = 0
 
-    @MainActor
-    func show(title: String, message: String) {
+    func show(title: String, message: String, completion: @escaping () -> Void = {}) {
         withAnimation(.snappy.speed(2.0)) {
             self.title = title
             self.message = message
             percentage = 0
             isShowing = true
+        } completion: {
+            completion()
         }
     }
 
-    @MainActor
     func hide() {
         withAnimation(.snappy.speed(2.0)) {
             isShowing = false

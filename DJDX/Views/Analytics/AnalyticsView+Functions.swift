@@ -12,7 +12,6 @@ import SwiftUI
 
 extension AnalyticsView {
 
-    @MainActor
     func reload() async {
         dataState = .loading
         try? await Task.sleep(for: .seconds(0.5))
@@ -29,26 +28,36 @@ extension AnalyticsView {
 
     func reloadOverview() async {
         debugPrint("Calculating overview")
-        let songRecords = calendar.latestAvailableIIDXSongRecords(
-            in: modelContext,
-            on: calendar.analyticsDate
-        )
-            .filter { $0.playType == playTypeToShow }
-        if songRecords.count > 0 {
-            await MainActor.run {
-                withAnimation(.snappy.speed(2.0)) {
-                    debugPrint("Calculating clear type per difficulty")
-                    let newClearTypePerDifficulty = clearTypePerDifficulty(for: songRecords)
-                    self.clearTypePerDifficulty = newClearTypePerDifficulty
-                    debugPrint("Calculating scores per difficulty")
-                    let newScoresPerDifficulty = scoresPerDifficulty(for: songRecords)
-                    self.djLevelPerDifficulty = newScoresPerDifficulty
+        let actor = DataFetcher(modelContainer: sharedModelContainer)
+        let importGroupIdentifier = await actor.importGroup(for: .now)
+        if let importGroupIdentifier,
+           let importGroup = modelContext.model(for: importGroupIdentifier) as? ImportGroup {
+            let importGroupID = importGroup.id
+            var songRecords: [IIDXSongRecord] = (try? modelContext.fetch(
+                FetchDescriptor<IIDXSongRecord>(
+                    predicate: #Predicate<IIDXSongRecord> {
+                        $0.importGroup?.id == importGroupID
+                    },
+                    sortBy: [SortDescriptor(\.title, order: .forward)]
+                )
+            )) ?? []
+            songRecords.removeAll { $0.playType != playTypeToShow }
+            if songRecords.count > 0 {
+                await MainActor.run {
+                    withAnimation(.snappy.speed(2.0)) {
+                        debugPrint("Calculating clear type per difficulty")
+                        let newClearTypePerDifficulty = clearTypePerDifficulty(for: songRecords)
+                        self.clearTypePerDifficulty = newClearTypePerDifficulty
+                        debugPrint("Calculating scores per difficulty")
+                        let newScoresPerDifficulty = scoresPerDifficulty(for: songRecords)
+                        self.djLevelPerDifficulty = newScoresPerDifficulty
+                    }
                 }
-            }
-        } else {
-            withAnimation(.snappy.speed(2.0)) {
-                self.clearTypePerDifficulty.removeAll()
-                self.djLevelPerDifficulty.removeAll()
+            } else {
+                withAnimation(.snappy.speed(2.0)) {
+                    self.clearTypePerDifficulty.removeAll()
+                    self.djLevelPerDifficulty.removeAll()
+                }
             }
         }
     }

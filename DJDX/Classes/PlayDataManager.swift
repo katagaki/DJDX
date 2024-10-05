@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 // swiftlint:disable type_body_length file_length
-final class PlayDataManager: ObservableObject, Sendable {
+class PlayDataManager: ObservableObject {
 
     // External Data
     var allSongs: [IIDXSong] = []
@@ -58,7 +58,7 @@ final class PlayDataManager: ObservableObject, Sendable {
         }
     }
 
-    func reloadAllSongRecords(in calendar: CalendarManager) async {
+    func reloadAllSongRecords(_ modelContext: ModelContext, on playDataDate: Date) async {
         debugPrint("Removing all song records")
         await MainActor.run {
             withAnimation(.snappy.speed(2.0)) {
@@ -72,20 +72,32 @@ final class PlayDataManager: ObservableObject, Sendable {
         allSongNoteCounts.removeAll()
 
         debugPrint("Loading new song records")
-        let modelContext = ModelContext(sharedModelContainer)
-        let newSongRecords = calendar.latestAvailableIIDXSongRecords(
-            in: modelContext,
-            on: calendar.playDataDate
-        )
-        let newSongMappings = ((try? modelContext.fetch(FetchDescriptor<IIDXSong>(
-            sortBy: [SortDescriptor(\.title, order: .forward)]
-        ))) ?? [])
-            .reduce(into: [:]) { partialResult, song in
-                partialResult[song.titleCompact()] = song.spNoteCount
-            }
+        let actor = DataFetcher(modelContainer: sharedModelContainer)
+        let importGroupIdentifier = await actor.importGroup(for: playDataDate)
+        if let importGroupIdentifier,
+           let importGroup = modelContext.model(for: importGroupIdentifier) as? ImportGroup {
+            let importGroupID = importGroup.id
 
-        allSongRecords = newSongRecords
-        allSongNoteCounts = newSongMappings
+            let newSongRecords: [IIDXSongRecord] = (try? modelContext.fetch(
+                FetchDescriptor<IIDXSongRecord>(
+                    predicate: #Predicate<IIDXSongRecord> {
+                        $0.importGroup?.id == importGroupID
+                    },
+                    sortBy: [SortDescriptor(\.title, order: .forward)]
+                )
+            )) ?? []
+
+            let newSongMappings = ((try? modelContext.fetch(FetchDescriptor<IIDXSong>(
+                sortBy: [SortDescriptor(\.title, order: .forward)]
+            ))) ?? [])
+                .reduce(into: [:]) { partialResult, song in
+                    partialResult[song.titleCompact()] = song.spNoteCount
+                }
+
+            allSongRecords = newSongRecords
+            allSongNoteCounts = newSongMappings
+        }
+
     }
 
     func filterSongRecords(playTypeToShow: IIDXPlayType,
@@ -349,7 +361,6 @@ final class PlayDataManager: ObservableObject, Sendable {
         }
     }
 
-    @MainActor
     func updateDisplayedSongRecords(_ records: [IIDXSongRecord],
                                     with clearRates: [IIDXSongRecord: [IIDXLevel: Float]]) {
         withAnimation(.snappy.speed(2.0)) {
@@ -358,7 +369,6 @@ final class PlayDataManager: ObservableObject, Sendable {
         }
     }
 
-    @MainActor
     func cleanUpData() async {
         debugPrint("Cleaning up orphaned song records")
         let modelContext = ModelContext(sharedModelContainer)
@@ -374,7 +384,6 @@ final class PlayDataManager: ObservableObject, Sendable {
         }
     }
 
-    @MainActor
     func migrateData() async {
         let defaults = UserDefaults.standard
         let dataMigrationKeys = ["Internal.DataMigrationForBetaBuild120"]

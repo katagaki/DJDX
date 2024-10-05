@@ -8,39 +8,61 @@
 import Foundation
 import SwiftData
 
+@ModelActor
 actor DataImporter {
-    
-    static func readDate(from key: String) -> Date {
-        if let date = UserDefaults.standard.object(forKey: key) as? Date {
-            return date
-        } else {
-            return .now
-        }
+
+    // MARK: CSV Import
+
+    func importSampleCSV(
+        to importToDate: Date,
+        for playType: IIDXPlayType,
+        didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
+    ) {
+        importCSV(
+            url: Bundle.main.url(forResource: "SampleData", withExtension: "csv"),
+            to: importToDate,
+            for: playType,
+            didProgressUpdate: didProgressUpdate
+        )
     }
 
-    func importCSV(url: URL? = Bundle.main.url(forResource: "SampleData", withExtension: "csv"),
-                   importToDate: Date, for playType: IIDXPlayType) async {
+    func importCSV(
+        url: URL?,
+        to importToDate: Date,
+        for playType: IIDXPlayType,
+        didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
+    ) {
         if let urlOfData: URL = url, let stringFromData: String = try? String(contentsOf: urlOfData) {
             saveCSVStringToFile(stringFromData)
             let parsedCSV = CSwiftV(with: stringFromData)
             if let keyedRows = parsedCSV.keyedRows {
-                importCSV(keyedRows: keyedRows, importToDate: importToDate, playType: playType)
+                importCSV(keyedRows, to: importToDate, for: playType, didProgressUpdate: didProgressUpdate)
             }
         }
     }
 
-    func importCSV(csvString: String, importToDate: Date, for playType: IIDXPlayType) async {
+    func importCSV(
+        csv csvString: String,
+        to importToDate: Date,
+        for playType: IIDXPlayType,
+        didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
+    ) {
         saveCSVStringToFile(csvString)
         let parsedCSV = CSwiftV(with: csvString)
         if let keyedRows = parsedCSV.keyedRows {
-            importCSV(keyedRows: keyedRows, importToDate: importToDate, playType: playType)
+            importCSV(keyedRows, to: importToDate, for: playType, didProgressUpdate: didProgressUpdate)
         }
     }
 
-    func importCSV(keyedRows: [[String: String]], importToDate: Date, playType: IIDXPlayType) {
-        let modelContext = ModelContext(sharedModelContainer)
-        try? modelContext.transaction { [playType] in
-            let importGroup = prepareImportGroupForPartialImport(modelContext, importToDate: importToDate, playType: playType)
+    func importCSV(
+        _ keyedRows: [[String: String]],
+        to importToDate: Date,
+        for playType: IIDXPlayType,
+        didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
+    ) {
+        try? modelContext.transaction {
+            let importGroup = prepareImportGroupForPartialImport(importToDate: importToDate, playType: playType)
+            let totalNumberOfKeyedRows = keyedRows.count
             var numberOfKeyedRowsProcessed = 0
             for keyedRow in keyedRows {
                 debugPrint("Processing keyed row \(numberOfKeyedRowsProcessed)")
@@ -49,10 +71,13 @@ actor DataImporter {
                 songRecord.importGroup = importGroup
                 songRecord.playType = playType
                 numberOfKeyedRowsProcessed += 1
+                didProgressUpdate(numberOfKeyedRowsProcessed, totalNumberOfKeyedRows)
             }
         }
         try? modelContext.save()
     }
+
+    // MARK: Other Import Stuff
 
     func saveCSVStringToFile(_ csvString: String) {
         if let documentsDirectoryURL: URL = FileManager
@@ -66,8 +91,7 @@ actor DataImporter {
         }
     }
 
-    func prepareImportGroupForPartialImport(_ modelContext: ModelContext, importToDate: Date,
-                                            playType: IIDXPlayType) -> ImportGroup {
+    func prepareImportGroupForPartialImport(importToDate: Date, playType: IIDXPlayType) -> ImportGroup {
         let fetchDescriptor = FetchDescriptor<ImportGroup>(
             predicate: importGroups(from: importToDate)
         )
@@ -86,57 +110,5 @@ actor DataImporter {
         let newImportGroup = ImportGroup(importDate: importToDate, iidxData: [])
         modelContext.insert(newImportGroup)
         return newImportGroup
-    }
-
-    func allImportGroups(in modelContext: ModelContext) -> [ImportGroup] {
-        var fetchDescriptor = FetchDescriptor<ImportGroup>(
-            sortBy: [SortDescriptor<ImportGroup>(\.importDate, order: .reverse)]
-        )
-        fetchDescriptor.relationshipKeyPathsForPrefetching = []
-        return (try? modelContext.fetch(fetchDescriptor)) ?? []
-    }
-
-    func latestAvailableIIDXSongRecords(in modelContext: ModelContext, playDataDate: Date, on date: Date) -> [IIDXSongRecord] {
-        let importGroupsForSelectedDate: [ImportGroup] = (try? modelContext.fetch(
-            FetchDescriptor<ImportGroup>(
-                predicate: importGroups(from: playDataDate),
-                sortBy: [SortDescriptor(\.importDate, order: .forward)]
-            )
-        )) ?? []
-        var importGroupID: String?
-        if let importGroupForSelectedDate = importGroupsForSelectedDate.first {
-            // Use selected date's import group
-            importGroupID = importGroupForSelectedDate.id
-        } else {
-            // Use latest available import group
-            let allImportGroups: [ImportGroup] = (try? modelContext.fetch(
-                FetchDescriptor<ImportGroup>(
-                    sortBy: [SortDescriptor(\.importDate, order: .forward)]
-                )
-            )) ?? []
-            var importGroupClosestToTheSelectedDate: ImportGroup?
-            for importGroup in allImportGroups {
-                if importGroup.importDate <= date {
-                    importGroupClosestToTheSelectedDate = importGroup
-                } else {
-                    break
-                }
-            }
-            if let importGroupClosestToTheSelectedDate {
-                importGroupID = importGroupClosestToTheSelectedDate.id
-            }
-        }
-        if let importGroupID {
-            let songRecordsInImportGroup: [IIDXSongRecord] = (try? modelContext.fetch(
-                FetchDescriptor<IIDXSongRecord>(
-                    predicate: #Predicate<IIDXSongRecord> {
-                        $0.importGroup?.id == importGroupID
-                    },
-                    sortBy: [SortDescriptor(\.title, order: .forward)]
-                )
-            )) ?? []
-            return songRecordsInImportGroup
-        }
-        return []
     }
 }

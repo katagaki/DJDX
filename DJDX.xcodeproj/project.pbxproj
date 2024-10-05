@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E45B1CE22CB0EBDB006A7E85 /* DataFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1CE12CB0EBD9006A7E85 /* DataFetcher.swift */; };
 		E46A65E02C0A276800D9544B /* DetailRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65DF2C0A276800D9544B /* DetailRow.swift */; };
 		E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = E46A65E22C0ACAC400D9544B /* SwiftSoup */; };
 		E46A65E52C0ACADB00D9544B /* IIDXSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65E42C0ACADB00D9544B /* IIDXSong.swift */; };
@@ -75,12 +76,12 @@
 		E4E3D0F22BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F12BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift */; };
 		E4E3D0F42BFC053D001942FE /* DifficultyPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */; };
 		E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */; };
-		E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA42BFF7C9D00A00796 /* CalendarManager.swift */; };
 		E4EB2CA82BFF7E3700A00796 /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA72BFF7E3700A00796 /* ImportView.swift */; };
 		E4EB2CAB2BFF8CC500A00796 /* Predicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CAA2BFF8CC500A00796 /* Predicates.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E45B1CE12CB0EBD9006A7E85 /* DataFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataFetcher.swift; sourceTree = "<group>"; };
 		E46A65DF2C0A276800D9544B /* DetailRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailRow.swift; sourceTree = "<group>"; };
 		E46A65E42C0ACADB00D9544B /* IIDXSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXSong.swift; sourceTree = "<group>"; };
 		E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXPlayType.swift; sourceTree = "<group>"; };
@@ -150,7 +151,6 @@
 		E4E3D0F12BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewDJLevelPerDifficultyGraph.swift; sourceTree = "<group>"; };
 		E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyPicker.swift; sourceTree = "<group>"; };
 		E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportGroup.swift; sourceTree = "<group>"; };
-		E4EB2CA42BFF7C9D00A00796 /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
 		E4EB2CA72BFF7E3700A00796 /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
 		E4EB2CAA2BFF8CC500A00796 /* Predicates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Predicates.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -199,6 +199,7 @@
 		E48365642C9E4284008666E3 /* Actors */ = {
 			isa = PBXGroup;
 			children = (
+				E45B1CE12CB0EBD9006A7E85 /* DataFetcher.swift */,
 				E48365652C9E428F008666E3 /* DataImporter.swift */,
 			);
 			path = Actors;
@@ -245,7 +246,6 @@
 			isa = PBXGroup;
 			children = (
 				E4B123CD2BF8FEC900D4A3D1 /* CSwiftV.swift */,
-				E4EB2CA42BFF7C9D00A00796 /* CalendarManager.swift */,
 				E4E3D0C42BF98D79001942FE /* NavigationManager.swift */,
 				E4AD1ACC2C11FCDC00E45F59 /* PlayDataManager.swift */,
 				E46A65F42C0B3C9700D9544B /* ProgressAlertManager.swift */,
@@ -500,7 +500,6 @@
 				E46A65FD2C0C8E9600D9544B /* AnalyticsView+Functions.swift in Sources */,
 				E46D51C12C2FF737000524B9 /* ImportWikiDataTip.swift in Sources */,
 				E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */,
-				E4EB2CA52BFF7C9D00A00796 /* CalendarManager.swift in Sources */,
 				E4E3D0F22BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift in Sources */,
 				E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */,
 				E4EB2CA82BFF7E3700A00796 /* ImportView.swift in Sources */,
@@ -532,6 +531,7 @@
 				E46A65F52C0B3C9700D9544B /* ProgressAlertManager.swift in Sources */,
 				E46D51BF2C2FF5FF000524B9 /* StartHereTip.swift in Sources */,
 				E4E3D0F42BFC053D001942FE /* DifficultyPicker.swift in Sources */,
+				E45B1CE22CB0EBDB006A7E85 /* DataFetcher.swift in Sources */,
 				E46A66032C0CA6D000D9544B /* IIDXDifficulty.swift in Sources */,
 				E4B123CE2BF8FEC900D4A3D1 /* CSwiftV.swift in Sources */,
 				E4E3D0DE2BF9D662001942FE /* AnalyticsView.swift in Sources */,
@@ -727,6 +727,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
+				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;

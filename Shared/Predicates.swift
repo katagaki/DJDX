@@ -17,8 +17,8 @@ func importGroups(from startDate: Date) -> Predicate<ImportGroup> {
     }
 }
 
-func iidxSongRecords(in calendar: CalendarManager) -> Predicate<IIDXSongRecord> {
-    let startDate: Date = Calendar.current.startOfDay(for: calendar.playDataDate)
+func iidxSongRecords(on playDataDate: Date) -> Predicate<IIDXSongRecord> {
+    let startDate: Date = Calendar.current.startOfDay(for: playDataDate)
     var components = DateComponents()
     components.day = 1
     components.second = -1

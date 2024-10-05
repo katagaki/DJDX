@@ -16,7 +16,6 @@ struct AnalyticsView: View {
     @Environment(\.modelContext) var modelContext
 
     @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var calendar: CalendarManager
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: 1, "Analytics.Overview.ClearType.Level") var levelFilterForOverviewClearType: Int
@@ -203,27 +202,13 @@ struct AnalyticsView: View {
                     djLevelPerImportGroupCache = Data()
                 default: break
                 }
-                Task {
-                    await reload()
-                    debugPrint("Reloaded from swipe to refresh")
-                }
+                await reload()
+                debugPrint("Reloaded from swipe to refresh")
             }
             .task {
                 if dataState == .initializing {
-                    calendar.analyticsDate = .now
                     await reload()
                     debugPrint("Reloaded on view appearance")
-                }
-            }
-            .onChange(of: calendar.shouldReloadDisplayedData, { oldValue, newValue in
-                if !oldValue && newValue {
-                    calendar.shouldReloadDisplayedData = false
-                    dataState = .initializing
-                }
-            })
-            .onChange(of: calendar.analyticsDate) { oldValue, newValue in
-                if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
-                    dataState = .initializing
                 }
             }
             .onChange(of: viewMode) { _, newValue in

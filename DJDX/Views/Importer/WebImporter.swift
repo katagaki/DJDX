@@ -26,6 +26,7 @@ https://p.eagate.573.jp/game/2dx/31/error/error.html
 // swiftlint:enable line_length
 
 struct WebImporter: View {
+    @Binding var importToDate: Date
     @State var importMode: IIDXPlayType
     @Binding var isAutoImportFailed: Bool
     @Binding var didImportSucceed: Bool
@@ -33,6 +34,7 @@ struct WebImporter: View {
 
     var body: some View {
         WebViewForImporter(
+            importToDate: $importToDate,
             importMode: $importMode,
             isAutoImportFailed: $isAutoImportFailed,
             didImportSucceed: $didImportSucceed,
@@ -71,8 +73,8 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
     @Environment(\.modelContext) var modelContext
-    @EnvironmentObject var calendar: CalendarManager
 
+    @Binding var importToDate: Date
     @Binding var importMode: IIDXPlayType
     @Binding var isAutoImportFailed: Bool
     @Binding var didImportSucceed: Bool
@@ -96,18 +98,35 @@ struct WebViewForImporter: UIViewRepresentable, UpdateScoreDataDelegate {
         // Blank function to conform to protocol
     }
 
-    @MainActor
     func importScoreData(using csvString: String) async {
-        progressAlertManager.show(title: "Alert.Importing.Title", message: "Alert.Importing.Text")
-        Task.detached {
-            await calendar.importCSV(csvString: csvString, reportingTo: progressAlertManager, for: importMode)
-            await MainActor.run {
-                didImportSucceed = true
+        progressAlertManager.show(
+            title: "Alert.Importing.Title",
+            message: "Alert.Importing.Text"
+        ) {
+            Task.detached {
+                let actor = DataImporter(modelContainer: sharedModelContainer)
+                await actor.importCSV(
+                    csv: csvString,
+                    to: importToDate,
+                    for: importMode
+                ) { currentProgress, totalProgress in
+                    Task {
+                        let progress = (currentProgress * 100) / totalProgress
+                        await MainActor.run {
+                            progressAlertManager.updateProgress(
+                                progress
+                            )
+                        }
+                    }
+                }
+                await MainActor.run {
+                    didImportSucceed = true
+                    progressAlertManager.hide()
+                }
             }
         }
     }
 
-    @MainActor
     func stopProcessing(with reason: ImportFailedReason) {
         autoImportFailedReason = reason
         isAutoImportFailed = true
@@ -317,7 +336,6 @@ document.getElementById('score_data').value
 }
 
 // swiftlint:disable class_delegate_protocol
-@MainActor
 protocol UpdateScoreDataDelegate {
     func importScoreData(using newScoreData: String) async
     func stopProcessing(with reason: ImportFailedReason)

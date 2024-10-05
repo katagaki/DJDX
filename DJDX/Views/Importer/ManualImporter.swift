@@ -15,8 +15,8 @@ struct ManualImporter: View {
     @Environment(\.modelContext) var modelContext
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
-    @EnvironmentObject var calendar: CalendarManager
 
+    @Binding var importToDate: Date
     @Binding var importPlayType: IIDXPlayType
 
     @State var isSelectingCSVFile: Bool = false
@@ -51,10 +51,30 @@ struct ManualImporter: View {
             DocumentPicker(allowedUTIs: [.commaSeparatedText], onDocumentPicked: { url in
                 let isAccessSuccessful = url.startAccessingSecurityScopedResource()
                 if isAccessSuccessful {
-                    Task.detached {
-                        await calendar.importCSV(url: url, reportingTo: progressAlertManager, for: importPlayType)
-                        await MainActor.run {
-                            didImportSucceed = true
+                    progressAlertManager.show(
+                        title: "Alert.Importing.Title",
+                        message: "Alert.Importing.Text"
+                    ) {
+                        Task.detached {
+                            let actor = DataImporter(modelContainer: sharedModelContainer)
+                            await actor.importCSV(
+                                url: url,
+                                to: importToDate,
+                                for: .single
+                            ) { currentProgress, totalProgress in
+                                Task {
+                                    let progress = (currentProgress * 100) / totalProgress
+                                    await MainActor.run {
+                                        progressAlertManager.updateProgress(
+                                            progress
+                                        )
+                                    }
+                                }
+                            }
+                            await MainActor.run {
+                                didImportSucceed = true
+                                progressAlertManager.hide()
+                            }
                         }
                     }
                 } else {
