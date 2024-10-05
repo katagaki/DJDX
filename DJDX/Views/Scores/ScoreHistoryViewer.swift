@@ -13,7 +13,6 @@ import SwiftUI
 struct ScoreHistoryViewer: View {
 
     @Environment(\.modelContext) var modelContext
-    @EnvironmentObject var playData: PlayDataManager
 
     var percentageFormatter: NumberFormatter
 

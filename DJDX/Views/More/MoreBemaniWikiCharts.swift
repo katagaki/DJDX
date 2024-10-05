@@ -15,9 +15,10 @@ struct MoreBemaniWikiCharts: View {
     @Environment(\.modelContext) var modelContext
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var playData: PlayDataManager
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+
+    @Query(sort: \IIDXSong.title, order: .forward) var allSongs: [IIDXSong]
 
     @State var isReloadCompleted: Bool = false
     @State var dataImported: Int = 0
@@ -36,7 +37,7 @@ struct MoreBemaniWikiCharts: View {
                 }
             }
             Section {
-                ForEach(playData.allSongs) { song in
+                ForEach(allSongs) { song in
                     NavigationLink(song.title) {
                         List {
                             Section {
@@ -107,7 +108,7 @@ struct MoreBemaniWikiCharts: View {
                 }
             },
             message: {
-                Text("Alert.ExternalData.Completed.Text.\(playData.allSongs.count)")
+                Text("Alert.ExternalData.Completed.Text.\(allSongs.count)")
             })
     }
 
@@ -124,7 +125,6 @@ struct MoreBemaniWikiCharts: View {
             }
             try? modelContext.save()
         }
-        await playData.reloadAllSongs()
         await MainActor.run {
             progressAlertManager.hide()
             withAnimation(.snappy.speed(2.0)) {

@@ -13,7 +13,6 @@ struct ScoresView: View {
     @Environment(\.modelContext) var modelContext
 
     @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var playData: PlayDataManager
 
     @State var dataState: DataState = .initializing
 
@@ -22,8 +21,13 @@ struct ScoresView: View {
     @AppStorage(wrappedValue: .all, "ScoresView.DifficultyFilter") var difficultyToShow: IIDXDifficulty
     @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
     @AppStorage(wrappedValue: .all, "ScoresView.ClearTypeFilter") var clearTypeToShow: IIDXClearType
-
     @AppStorage(wrappedValue: .title, "ScoresView.SortOrder") var sortMode: SortMode
+
+    @State var songRecords: [IIDXSongRecord]?
+    @State var songRecordClearRates: [IIDXSongRecord: [IIDXLevel: Float]] = [:]
+
+    @State var songCompactTitles: [String: PersistentIdentifier] = [:]
+    @State var songNoteCounts: [String: IIDXNoteCount] = [:]
 
     @State var playDataDate: Date = .now
     @State var searchTerm: String = ""
@@ -34,8 +38,13 @@ struct ScoresView: View {
     var isTimeTravellingKey: String = "ScoresView.IsTimeTravelling"
     @State var isTimeTravelling: Bool
 
-    var filters: [String] {
-        [String(difficultyToShow.rawValue), levelToShow.rawValue, clearTypeToShow.rawValue]
+    var conditionsForReload: [String] {
+        [isShowingOnlyPlayDataWithScores.description,
+         String(difficultyToShow.rawValue),
+         levelToShow.rawValue,
+         clearTypeToShow.rawValue,
+         searchTerm,
+         sortMode.rawValue]
     }
 
     init() {
@@ -45,11 +54,11 @@ struct ScoresView: View {
     var body: some View {
         NavigationStack(path: $navigationManager[.scores]) {
             List {
-                ForEach(playData.displayedSongRecords, id: \.title) { songRecord in
+                ForEach((songRecords ?? []), id: \.title) { songRecord in
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
                         ScoreRow(
                             songRecord: songRecord,
-                            scoreRate: playData.scoreRate(for: songRecord, of: levelToShow, or: difficultyToShow),
+                            scoreRate: scoreRate(for: songRecord, of: levelToShow, or: difficultyToShow),
                             levelToShow: $levelToShow,
                             difficultyToShow: $difficultyToShow
                         )
@@ -96,8 +105,7 @@ struct ScoresView: View {
                                                    clearTypeToShow: $clearTypeToShow,
                                                    sortMode: $sortMode,
                                                    isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort) {
-                                    reloadDisplay(shouldReloadAll: false, shouldFilter: true,
-                                                  shouldSort: true, shouldSearch: true)
+                                    reloadDisplay()
                                 }
                                 ToolbarButton("Shared.ShowPastData", icon: "arrowshape.turn.up.backward.badge.clock",
                                               isSecondary: !isTimeTravelling) {
@@ -119,7 +127,7 @@ struct ScoresView: View {
             .background {
                 switch dataState {
                 case .presenting:
-                    if playData.allSongRecords.count == 0 {
+                    if songRecords == nil {
                         ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
                     } else {
                         Color.clear
@@ -130,6 +138,9 @@ struct ScoresView: View {
             .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "Scores.Search.Prompt")
+            .refreshable {
+                reloadDisplay()
+            }
             .onAppear {
                 if dataState == .initializing {
                     if !isTimeTravelling {
@@ -137,37 +148,20 @@ struct ScoresView: View {
                         playDataDate = .now
                         isSystemChangingCalendarDate = false
                     }
-                    reloadDisplay(shouldReloadAll: true, shouldFilter: true,
-                                  shouldSort: true, shouldSearch: true)
+                    reloadDisplay()
                 }
             }
             .onChange(of: playTypeToShow) { _, _ in
                 if navigationManager.selectedTab == .scores {
-                    reloadDisplay(shouldReloadAll: false, shouldFilter: true,
-                                  shouldSort: true, shouldSearch: true)
+                    reloadDisplay()
                 } else {
                     dataState = .initializing
                 }
             }
-            .onChange(of: isShowingOnlyPlayDataWithScores) { _, _ in
-                reloadDisplay(shouldReloadAll: false, shouldFilter: true,
-                              shouldSort: true, shouldSearch: true)
-            }
-            .onChange(of: filters) {_, _ in
+            .onChange(of: conditionsForReload) {_, _ in
                 if !isSystemChangingFilterAndSort {
-                    reloadDisplay(shouldReloadAll: false, shouldFilter: true,
-                                  shouldSort: true, shouldSearch: true)
+                    reloadDisplay()
                 }
-            }
-            .onChange(of: sortMode) { _, _ in
-                if !isSystemChangingFilterAndSort {
-                    reloadDisplay(shouldReloadAll: false, shouldFilter: false,
-                                  shouldSort: true, shouldSearch: true)
-                }
-            }
-            .onChange(of: searchTerm) { _, _ in
-                reloadDisplay(shouldReloadAll: false, shouldFilter: false,
-                              shouldSort: false, shouldSearch: true)
             }
             .onChange(of: isTimeTravelling) { _, newValue in
                 UserDefaults.standard.set(newValue, forKey: isTimeTravellingKey)
@@ -178,14 +172,14 @@ struct ScoresView: View {
             .onChange(of: playDataDate) { oldValue, newValue in
                 if !isSystemChangingCalendarDate,
                    !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
-                    reloadDisplay(shouldReloadAll: true, shouldFilter: true,
-                                  shouldSort: true, shouldSearch: true)
+                    reloadDisplay()
                 }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .scoreViewer(let songRecord):
-                    ScoreViewer(songRecord: songRecord)
+                    ScoreViewer(songRecord: songRecord,
+                                noteCount: noteCount)
                 case .scoreHistory(let songTitle, let level, let noteCount):
                     ScoreHistoryViewer(songTitle: songTitle,
                                        level: level,
@@ -198,45 +192,91 @@ struct ScoresView: View {
         }
     }
 
-    func reloadDisplay(shouldReloadAll: Bool = false,
-                       shouldFilter: Bool = false,
-                       shouldSort: Bool = false,
-                       shouldSearch: Bool = false) {
-        Task.detached {
-            await MainActor.run {
-                withAnimation(.snappy.speed(2.0)) {
-                    dataState = .loading
+    func reloadDisplay() {
+        withAnimation(.snappy.speed(2.0)) {
+            dataState = .loading
+        } completion: {
+            Task.detached {
+                let actor = DataFetcher(modelContainer: sharedModelContainer)
+                let songRecordIdentifiers = await actor.songRecords(
+                    on: playDataDate,
+                    filters: FilterOptions(
+                        playType: playTypeToShow,
+                        onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
+                        level: levelToShow,
+                        difficulty: difficultyToShow,
+                        clearType: clearTypeToShow,
+                        searchTerm: searchTerm
+                    ),
+                    sortOptions: SortOptions(
+                        mode: sortMode
+                    )
+                )
+                let songCompactTitles = await actor.songCompactTitles()
+                let songNoteCounts = await actor.songNoteCounts()
+
+                await MainActor.run {
+                    withAnimation(.snappy.speed(2.0)) {
+                        if let songRecordIdentifiers {
+
+                            // Get song records
+                            let songRecords = songRecordIdentifiers.compactMap {
+                                modelContext.model(for: $0) as? IIDXSongRecord
+                            }
+
+                            // Calculate clear rates
+                            let songRecordClearRates: [IIDXSongRecord: [IIDXLevel: Float]] = songRecords
+                                .reduce(into: [:], { partialResult, songRecord in
+                                    let song = songNoteCounts[songRecord.titleCompact()]
+                                    if let song {
+                                        let scores: [IIDXLevelScore] = songRecord.scores()
+                                        let scoreRates = scores.reduce(into: [:] as [IIDXLevel: Float]) { partialResult, score in
+                                            if let noteCount = song.noteCount(for: score.level) {
+                                                partialResult[score.level] = Float(score.score) / Float(noteCount * 2)
+                                            }
+                                        }
+                                        partialResult[songRecord] = scoreRates
+                                    }
+                                })
+
+                            self.songRecordClearRates = songRecordClearRates
+                            self.songRecords = songRecords
+                        } else {
+                            self.songRecords = nil
+                        }
+
+                        self.songCompactTitles = songCompactTitles
+                        self.songNoteCounts = songNoteCounts
+
+                        dataState = .presenting
+                    }
                 }
             }
-            if shouldReloadAll {
-                await playData.reloadAllSongRecords(modelContext, on: playDataDate)
-            }
-            if shouldFilter {
-                await playData.filterSongRecords(
-                    playTypeToShow: playTypeToShow,
-                    isShowingOnlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
-                    levelToShow: levelToShow,
-                    difficultyToShow: difficultyToShow,
-                    clearTypeToShow: clearTypeToShow
-                )
-            }
-            if shouldSort {
-                await playData.sortSongRecords(
-                    sortMode: sortMode,
-                    levelToShow: levelToShow,
-                    difficultyToShow: difficultyToShow
-                )
-            }
-            if shouldSearch {
-                await playData.searchSongRecords(
-                    searchTerm: searchTerm
-                )
-            }
-            await MainActor.run {
-                withAnimation(.snappy.speed(2.0)) {
-                    dataState = .presenting
-                }
-            }
+        }
+    }
+
+    func scoreRate(for songRecord: IIDXSongRecord, of level: IIDXLevel, or difficulty: IIDXDifficulty) -> Float? {
+        return songRecordClearRates[songRecord]?[
+            songRecord.level(for: level, or: difficulty)]
+    }
+
+    func noteCount(for songRecord: IIDXSongRecord, of level: IIDXLevel) -> Int? {
+        let compactTitle = songRecord.titleCompact()
+        let keyPath: KeyPath<IIDXNoteCount, Int?>?
+        switch level {
+        case .beginner: keyPath = \.beginnerNoteCount
+        case .normal: keyPath = \.normalNoteCount
+        case .hyper: keyPath = \.hyperNoteCount
+        case .another: keyPath = \.anotherNoteCount
+        case .leggendaria: keyPath = \.leggendariaNoteCount
+        default: keyPath = nil
+        }
+        if let keyPath,
+           let songIdentifier = songCompactTitles[compactTitle],
+           let song = modelContext.model(for: songIdentifier) as? IIDXSong {
+            return song.spNoteCount?[keyPath: keyPath]
+        } else {
+            return nil
         }
     }
 }

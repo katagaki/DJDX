@@ -10,37 +10,36 @@ import SwiftUI
 
 struct ScoreViewer: View {
 
-    @EnvironmentObject var playData: PlayDataManager
-
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
     var songRecord: IIDXSongRecord
+    var noteCount: (IIDXSongRecord, IIDXLevel) -> Int?
 
     var body: some View {
         List {
             if !isBeginnerLevelHidden, songRecord.beginnerScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
-                             noteCount: playData.noteCount(for: songRecord, of: .beginner),
+                             noteCount: noteCount(songRecord, .beginner),
                              playType: .single) // Only SP has Beginner level
             }
             if songRecord.normalScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.normalScore,
-                             noteCount: playData.noteCount(for: songRecord, of: .normal),
+                             noteCount: noteCount(songRecord, .normal),
                              playType: songRecord.playType)
             }
             if songRecord.hyperScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.hyperScore,
-                             noteCount: playData.noteCount(for: songRecord, of: .hyper),
+                             noteCount: noteCount(songRecord, .hyper),
                              playType: songRecord.playType)
             }
             if songRecord.anotherScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.anotherScore,
-                             noteCount: playData.noteCount(for: songRecord, of: .another),
+                             noteCount: noteCount(songRecord, .another),
                              playType: songRecord.playType)
             }
             if songRecord.leggendariaScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.leggendariaScore,
-                             noteCount: playData.noteCount(for: songRecord, of: .leggendaria),
+                             noteCount: noteCount(songRecord, .leggendaria),
                              playType: songRecord.playType)
             }
         }

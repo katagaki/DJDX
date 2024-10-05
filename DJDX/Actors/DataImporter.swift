@@ -62,6 +62,8 @@ actor DataImporter {
     ) {
         try? modelContext.transaction {
             let importGroup = prepareImportGroupForPartialImport(importToDate: importToDate, playType: playType)
+            modelContext.insert(importGroup)
+
             let totalNumberOfKeyedRows = keyedRows.count
             var numberOfKeyedRowsProcessed = 0
             for keyedRow in keyedRows {

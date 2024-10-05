@@ -29,7 +29,7 @@ extension AnalyticsView {
     func reloadOverview() async {
         debugPrint("Calculating overview")
         let actor = DataFetcher(modelContainer: sharedModelContainer)
-        let importGroupIdentifier = await actor.importGroup(for: .now)
+        let importGroupIdentifier = await actor.importGroupIdentifier(for: .now)
         if let importGroupIdentifier,
            let importGroup = modelContext.model(for: importGroupIdentifier) as? ImportGroup {
             let importGroupID = importGroup.id

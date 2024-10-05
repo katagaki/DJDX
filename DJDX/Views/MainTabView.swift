@@ -5,14 +5,16 @@
 //  Created by シン・ジャスティン on 2024/05/19.
 //
 
+import SwiftData
 import SwiftUI
 import TipKit
 
 struct MainTabView: View {
 
+    @Environment(\.modelContext) var modelContext
+
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var playData: PlayDataManager
 
     @AppStorage(wrappedValue: false, "ScoresView.IsTimeTravelling") var isTimeTravelling: Bool
 
@@ -54,8 +56,8 @@ struct MainTabView: View {
         }
         .task {
             if !isFirstStartCleanupComplete {
-                await playData.cleanUpData()
-                await playData.migrateData()
+                await cleanUpData()
+                await migrateData()
                 isFirstStartCleanupComplete = true
             }
             try? Tips.configure([
@@ -69,5 +71,41 @@ struct MainTabView: View {
             }
             navigationManager.previouslySelectedTab = newValue
         })
+    }
+
+    func cleanUpData() async {
+        debugPrint("Cleaning up orphaned song records")
+        let songRecords = (try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>(
+            predicate: #Predicate<IIDXSongRecord> {
+                $0.importGroup == nil
+            }))) ?? []
+        try? modelContext.transaction {
+            for songRecord in songRecords {
+                modelContext.delete(songRecord)
+            }
+            try? modelContext.save()
+        }
+    }
+
+    func migrateData() async {
+        let defaults = UserDefaults.standard
+        let dataMigrationKeys = ["Internal.DataMigrationForBetaBuild120"]
+
+        for dataMigrationKey in dataMigrationKeys where !defaults.bool(forKey: dataMigrationKey) {
+            switch dataMigrationKey {
+            case "Internal.DataMigrationForBetaBuild84":
+                debugPrint("Performing migration when migrating from 1.0-84 to 1.0-85+")
+                let songRecords = try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>())
+                for songRecord in songRecords ?? [] {
+                    songRecord.playType = .single
+                }
+                try? modelContext.save()
+            case "Internal.DataMigrationForBetaBuild120":
+                debugPrint("Performing migration when migrating from 1.0-117 to 1.0-120+")
+                UserDefaults.standard.set(Data(), forKey: "Analytics.Trends.DJLevel.Level.Cache")
+            default: break
+            }
+            UserDefaults.standard.set(true, forKey: dataMigrationKey)
+        }
     }
 }
