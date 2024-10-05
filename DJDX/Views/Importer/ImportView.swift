@@ -12,6 +12,7 @@ import SwiftUI
 struct ImportView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
@@ -33,9 +34,21 @@ struct ImportView: View {
                 ForEach(importGroups) { importGroup in
                     VStack(alignment: .leading, spacing: 2.0) {
                         Text(importGroup.importDate, style: .date)
-                        Text("Shared.SongCount.\(countOfIIDXSongRecords(in: importGroup))")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        HStack(alignment: .center, spacing: 6.0) {
+                            if let version = importGroup.iidxVersion {
+                                Text(version.marketingName)
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(colorScheme == .dark ?
+                                                     Color(uiColor: version.darkModeColor) :
+                                                        Color(uiColor: version.lightModeColor))
+                            }
+                            Divider()
+                                .frame(maxHeight: 14.0)
+                            Text("Shared.SongCount.\(countOfIIDXSongRecords(in: importGroup))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
                 .onDelete(perform: { indexSet in

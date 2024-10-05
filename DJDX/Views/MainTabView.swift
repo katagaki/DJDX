@@ -89,7 +89,7 @@ struct MainTabView: View {
 
     func migrateData() async {
         let defaults = UserDefaults.standard
-        let dataMigrationKeys = ["Internal.DataMigrationForBetaBuild120"]
+        let dataMigrationKeys = ["Internal.DataMigrationForEpolisToPinkyCrush"]
 
         for dataMigrationKey in dataMigrationKeys where !defaults.bool(forKey: dataMigrationKey) {
             switch dataMigrationKey {
@@ -103,6 +103,12 @@ struct MainTabView: View {
             case "Internal.DataMigrationForBetaBuild120":
                 debugPrint("Performing migration when migrating from 1.0-117 to 1.0-120+")
                 UserDefaults.standard.set(Data(), forKey: "Analytics.Trends.DJLevel.Level.Cache")
+            case "Internal.DataMigrationForEpolisToPinkyCrush":
+                debugPrint("Performing migration when migrating from 1.x to 32.x")
+                let importGroups = try? modelContext.fetch(FetchDescriptor<ImportGroup>())
+                for importGroup in importGroups ?? [] where importGroup.iidxVersion == nil {
+                    importGroup.iidxVersion = .epolis
+                }
             default: break
             }
             UserDefaults.standard.set(true, forKey: dataMigrationKey)

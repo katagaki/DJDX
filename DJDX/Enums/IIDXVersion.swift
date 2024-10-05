@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum IIDXVersion: Int, CaseIterable {
+enum IIDXVersion: Int, Codable, CaseIterable {
     case iidx1stStyle = 1
     case iidx2ndStyle = 2
     case iidx3rdStyle = 3
