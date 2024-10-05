@@ -73,7 +73,7 @@ actor DataFetcher {
         return (songRecords ?? []).map { $0.persistentModelID }
     }
 
-    // swiftlint:disable cyclomatic_complexity function_body_length
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func songRecords(
         on playDataDate: Date,
         filters: FilterOptions?,
@@ -343,7 +343,6 @@ actor DataFetcher {
 
         return songRecords.map { $0.persistentModelID }
     }
-    // swiftlint:enable cyclomatic_complexity
 
     // MARK: Song Metadata
 
