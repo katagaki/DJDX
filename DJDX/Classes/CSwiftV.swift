@@ -86,7 +86,7 @@ public class CSwiftV {
         let initial = string.components(separatedBy: separator)
         var merged = [String]()
         for newString in initial {
-            guard let record = merged.last , oddNumberOfQuotes(record) == true else {
+            guard let record = merged.last, oddNumberOfQuotes(record) else {
                 merged.append(newString)
                 continue
             }
