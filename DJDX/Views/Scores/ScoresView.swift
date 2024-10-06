@@ -59,12 +59,12 @@ struct ScoresView: View {
                 ForEach((songRecords ?? []), id: \.title) { songRecord in
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
                         ScoreRow(
+                            namespace: scoresNamespace,
                             songRecord: songRecord,
                             scoreRate: scoreRate(for: songRecord, of: levelToShow, or: difficultyToShow),
                             levelToShow: $levelToShow,
                             difficultyToShow: $difficultyToShow
                         )
-                        .automaticMatchedTransitionSource(id: songRecord.title, in: scoresNamespace)
                     }
                     .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
                 }
@@ -103,10 +103,10 @@ struct ScoresView: View {
                             HStack(spacing: 8.0) {
                                 PlayTypePicker(playTypeToShow: $playTypeToShow)
                                 ScoreSortAndFilter(isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                                                   difficultyToShow: $difficultyToShow,
-                                                   levelToShow: $levelToShow,
-                                                   clearTypeToShow: $clearTypeToShow,
-                                                   sortMode: $sortMode,
+                                                   difficultyToShow: $difficultyToShow.animation(.snappy.speed(2.0)),
+                                                   levelToShow: $levelToShow.animation(.snappy.speed(2.0)),
+                                                   clearTypeToShow: $clearTypeToShow.animation(.snappy.speed(2.0)),
+                                                   sortMode: $sortMode.animation(.snappy.speed(2.0)),
                                                    isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort) {
                                     reloadDisplay()
                                 }

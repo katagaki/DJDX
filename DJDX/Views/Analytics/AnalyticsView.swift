@@ -46,6 +46,8 @@ struct AnalyticsView: View {
 
     let difficulties: [Int] = Array(1...12)
 
+    @Namespace var analyticsNamespace
+
     var body: some View {
         NavigationStack(path: $navigationManager[.analytics]) {
             List {
@@ -54,6 +56,7 @@ struct AnalyticsView: View {
                     Section {
                         OverviewClearTypeOverallGraph(graphData: $clearTypePerDifficulty)
                         .frame(height: 200.0)
+                        .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                     } header: {
                         HStack(spacing: 8.0) {
@@ -71,6 +74,7 @@ struct AnalyticsView: View {
                         OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
                                                             difficulty: $levelFilterForOverviewClearType)
                         .frame(height: 156.0)
+                        .automaticMatchedTransitionSource(id: "ClearType.ByDifficulty", in: analyticsNamespace)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                         DifficultyPicker(selection: $levelFilterForOverviewClearType,
                                          difficulties: .constant(difficulties))
@@ -90,6 +94,7 @@ struct AnalyticsView: View {
                         OverviewDJLevelPerDifficultyGraph(graphData: $djLevelPerDifficulty,
                                                           difficulty: $levelFilterForOverviewScoreRate)
                         .frame(height: 156.0)
+                        .automaticMatchedTransitionSource(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                         DifficultyPicker(selection: $levelFilterForOverviewScoreRate,
                                          difficulties: .constant(difficulties))
@@ -110,6 +115,7 @@ struct AnalyticsView: View {
                         TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
                                              difficulty: $levelFilterForTrendsClearType)
                         .frame(height: 256.0)
+                        .automaticMatchedTransitionSource(id: "Trends.ClearType", in: analyticsNamespace)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                         DifficultyPicker(selection: $levelFilterForTrendsClearType,
                                          difficulties: .constant(difficulties))
@@ -129,6 +135,7 @@ struct AnalyticsView: View {
                         TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
                                            difficulty: $levelFilterForTrendsDJLevel)
                         .frame(height: 256.0)
+                        .automaticMatchedTransitionSource(id: "Trends.DJLevel", in: analyticsNamespace)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                         DifficultyPicker(selection: $levelFilterForTrendsDJLevel,
                                          difficulties: .constant(difficulties))
@@ -241,23 +248,28 @@ struct AnalyticsView: View {
                         OverviewClearTypeOverallGraph(graphData: $clearTypePerDifficulty,
                                                       isInteractive: true)
                         .navigationTitle("Analytics.ClearType.Overall")
+                        .automaticNavigationTransition(id: "ClearType.Overall", in: analyticsNamespace)
                     case .clearTypePerDifficultyGraph:
                         OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
                                                             difficulty: $levelFilterForOverviewClearType,
                                                             legendPosition: .bottom)
                         .navigationTitle("Analytics.ClearType.ByDifficulty")
+                        .automaticNavigationTransition(id: "ClearType.ByDifficulty", in: analyticsNamespace)
                     case .scoreRatePerDifficultyGraph:
                         OverviewDJLevelPerDifficultyGraph(graphData: $djLevelPerDifficulty,
                                                           difficulty: $levelFilterForOverviewScoreRate)
                         .navigationTitle("Analytics.DJLevel.ByDifficulty")
+                        .automaticNavigationTransition(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
                     case .trendsClearTypeGraph:
                         TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
                                              difficulty: $levelFilterForTrendsClearType)
                         .navigationTitle("Analytics.Trends.ClearType")
+                        .automaticNavigationTransition(id: "Trends.ClearType", in: analyticsNamespace)
                     case .trendsDJLevelGraph:
                         TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
                                            difficulty: $levelFilterForTrendsDJLevel)
                         .navigationTitle("Analytics.Trends.DJLevel")
+                        .automaticNavigationTransition(id: "Trends.DJLevel", in: analyticsNamespace)
                     default: Color.clear
                     }
                 }

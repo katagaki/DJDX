@@ -19,6 +19,8 @@ struct ScoreRow: View {
     @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
+    var namespace: Namespace.ID
+
     var songRecord: IIDXSongRecord
     @State var scoreRate: Float?
 
@@ -125,6 +127,7 @@ struct ScoreRow: View {
                         .font(.caption)
                     }
                 }
+                .automaticMatchedTransitionSource(id: songRecord.title, in: namespace)
                 if isLevelVisible, let score = scores.first(where: { $0 != nil }), let score = score {
                     Spacer(minLength: 0.0)
                     IIDXLevelLabel(levelType: score.level, songRecord: songRecord)
