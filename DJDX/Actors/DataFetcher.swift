@@ -361,17 +361,6 @@ actor DataFetcher {
             songRecords = sortedSongRecords
         }
 
-        // Filter song records by search term
-        if let filters {
-            let searchTermTrimmed = filters.searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
-            if !searchTermTrimmed.isEmpty && searchTermTrimmed.count >= 1 {
-                songRecords.removeAll(where: { songRecord in
-                    !(songRecord.title.lowercased().contains(searchTermTrimmed) ||
-                      songRecord.artist.lowercased().contains(searchTermTrimmed))
-                })
-            }
-        }
-
         previousFilters = filters
         previousSortOptions = sortOptions
         return songRecords.map { $0.persistentModelID }

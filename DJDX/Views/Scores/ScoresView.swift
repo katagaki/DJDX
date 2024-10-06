@@ -23,14 +23,17 @@ struct ScoresView: View {
     @AppStorage(wrappedValue: .all, "ScoresView.ClearTypeFilter") var clearTypeToShow: IIDXClearType
     @AppStorage(wrappedValue: .title, "ScoresView.SortOrder") var sortMode: SortMode
 
+    @State var playDataDate: Date = .now
+
     @State var songRecords: [IIDXSongRecord]?
     @State var songRecordClearRates: [IIDXSongRecord: [IIDXLevel: Float]] = [:]
 
     @State var songCompactTitles: [String: PersistentIdentifier] = [:]
     @State var songNoteCounts: [String: IIDXNoteCount] = [:]
 
-    @State var playDataDate: Date = .now
     @State var searchTerm: String = ""
+    @State var searchResults: [IIDXSongRecord]?
+
     @State var isSystemChangingFilterAndSort: Bool = false
     @State var isSystemChangingCalendarDate: Bool = false
     @State var isSystemChangingAllRecords: Bool = false
@@ -47,7 +50,6 @@ struct ScoresView: View {
          String(difficultyToShow.rawValue),
          levelToShow.rawValue,
          clearTypeToShow.rawValue,
-         searchTerm,
          sortMode.rawValue]
     }
 
@@ -58,7 +60,8 @@ struct ScoresView: View {
     var body: some View {
         NavigationStack(path: $navigationManager[.scores]) {
             List {
-                ForEach((songRecords ?? []), id: \.title) { songRecord in
+                ForEach((searchResults != nil ? searchResults ?? [] : songRecords ?? []),
+                        id: \.title) { songRecord in
                     NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
                         ScoreRow(
                             namespace: scoresNamespace,
@@ -132,7 +135,7 @@ struct ScoresView: View {
             .background {
                 switch dataState {
                 case .presenting:
-                    if songRecords == nil {
+                    if songRecords == nil || (searchResults != nil && (searchResults?.isEmpty ?? false)) {
                         ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
                     } else {
                         Color.clear
@@ -167,6 +170,9 @@ struct ScoresView: View {
                 if !isSystemChangingFilterAndSort {
                     reloadDisplay()
                 }
+            }
+            .onChange(of: searchTerm) {_, _ in
+                filterSongRecords()
             }
             .onChange(of: isTimeTravelling) { _, newValue in
                 UserDefaults.standard.set(newValue, forKey: isTimeTravellingKey)
@@ -209,8 +215,7 @@ struct ScoresView: View {
                                            onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
                                            level: levelToShow,
                                            difficulty: difficultyToShow,
-                                           clearType: clearTypeToShow,
-                                           searchTerm: searchTerm),
+                                           clearType: clearTypeToShow),
                     sortOptions: SortOptions(mode: sortMode)
                 )
                 let songCompactTitles = await actor.songCompactTitles()
@@ -256,6 +261,22 @@ struct ScoresView: View {
                     }
                 }
             }
+        }
+    }
+
+    func filterSongRecords() {
+        guard let songRecords else {
+            searchResults = nil
+            return
+        }
+        let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
+        if !searchTermTrimmed.isEmpty && searchTermTrimmed.count >= 1 {
+            searchResults = songRecords.filter({ songRecord in
+                songRecord.title.lowercased().contains(searchTermTrimmed) ||
+                songRecord.artist.lowercased().contains(searchTermTrimmed)
+            })
+        } else {
+            searchResults = nil
         }
     }
 
