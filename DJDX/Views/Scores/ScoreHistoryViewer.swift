@@ -217,10 +217,10 @@ struct ScoreHistoryViewer: View {
         for date in scoreRateHistory.keys.sorted() {
             if let previousScoreRate {
                 if Int(scoreRateHistory[date] ?? -1.0) != previousScoreRate {
-                    summarizedScoreRateHistory[date] = Int(scoreRateHistory[date] ?? -1.0)
+                    summarizedScoreRateHistory[date] = scoreRateHistory[date]
                 }
             } else {
-                summarizedScoreRateHistory[date] = Int(scoreRateHistory[date] ?? -1.0)
+                summarizedScoreRateHistory[date] = scoreRateHistory[date]
             }
             previousScoreRate = Int(scoreRateHistory[date] ?? -1.0)
         }
