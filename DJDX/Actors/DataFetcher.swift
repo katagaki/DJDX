@@ -125,7 +125,7 @@ actor DataFetcher {
                     }
             }
         }
-        var songRecords: [IIDXSongRecord] = allSongRecords
+        var songRecords: [IIDXSongRecord] = []
 
         if filters != previousFilters, let filters {
             debugPrint("Filters were changed, filtering")
