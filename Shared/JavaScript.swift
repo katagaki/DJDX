@@ -156,6 +156,12 @@ var injectedCSS = `
         padding: 0 !important;
     }
 }
+
+@media screen and (min-width:481px) {
+    #base-inner {
+        padding: 20px 0 20px 0;
+    }
+}
 `
 
 style.appendChild(document.createTextNode(injectedCSS))
