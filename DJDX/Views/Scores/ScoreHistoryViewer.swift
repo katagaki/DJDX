@@ -169,6 +169,7 @@ struct ScoreHistoryViewer: View {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func reloadScoreHistory() {
         // Get list of scores
         songRecordsForSong = (try? modelContext.fetch(

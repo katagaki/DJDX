@@ -38,6 +38,8 @@ struct ScoresView: View {
     var isTimeTravellingKey: String = "ScoresView.IsTimeTravelling"
     @State var isTimeTravelling: Bool
 
+    let actor = DataFetcher(modelContainer: sharedModelContainer)
+
     @Namespace var scoresNamespace
 
     var conditionsForReload: [String] {
@@ -196,13 +198,11 @@ struct ScoresView: View {
         }
     }
 
-    // swiftlint:disable:next function_body_length
     func reloadDisplay() {
         withAnimation(.snappy.speed(2.0)) {
             dataState = .loading
         } completion: {
             Task.detached {
-                let actor = DataFetcher(modelContainer: sharedModelContainer)
                 let songRecordIdentifiers = await actor.songRecords(
                     on: playDataDate,
                     filters: FilterOptions(playType: playTypeToShow,
@@ -214,7 +214,7 @@ struct ScoresView: View {
                     sortOptions: SortOptions(mode: sortMode)
                 )
                 let songCompactTitles = await actor.songCompactTitles()
-                let songNoteCounts = await actor.songNoteCounts()
+                let songNoteCounts = await actor.songNoteCounts
 
                 await MainActor.run {
                     withAnimation(.snappy.speed(2.0)) {

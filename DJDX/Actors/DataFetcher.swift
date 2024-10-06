@@ -9,7 +9,19 @@ import Foundation
 import SwiftData
 
 @ModelActor
+// swiftlint:disable:next type_body_length
 actor DataFetcher {
+
+    var previousFilters: FilterOptions?
+    var previousSortOptions: SortOptions?
+
+    var importGroupID: String?
+    var allSongRecords: [IIDXSongRecord] = []
+    var filteredSongRecords: [IIDXSongRecord] = []
+    var sortedSongRecords: [IIDXSongRecord] = []
+
+    var songs: [IIDXSong] = []
+    var songNoteCounts: [String: IIDXNoteCount] = [:]
 
     // MARK: Import Groups
 
@@ -85,34 +97,41 @@ actor DataFetcher {
             return nil
         }
 
-        // Get song records in import group
-        let importGroupID = importGroup.id
-        guard let allSongRecords = try? modelContext.fetch(
-            FetchDescriptor<IIDXSongRecord>(
-                predicate: #Predicate<IIDXSongRecord> {
-                    $0.importGroup?.id == importGroupID
-                },
-                sortBy: [SortDescriptor(\.title, order: .forward)]
-            )
-        ) else {
-            return []
-        }
+        if importGroupID != importGroup.id {
+            importGroupID = importGroup.id
 
-        let songs = try? modelContext.fetch(
-            FetchDescriptor<IIDXSong>(
-                sortBy: [SortDescriptor(\.title, order: .forward)]
-            )
-        )
-        let songNoteCounts = (songs ?? [])
-            .reduce(into: [:]) { partialResult, song in
-                partialResult[song.titleCompact()] = song.spNoteCount
+            // Get new song records in import group
+            allSongRecords = (try? modelContext.fetch(
+                FetchDescriptor<IIDXSongRecord>(
+                    predicate: #Predicate<IIDXSongRecord> {
+                        $0.importGroup?.id == importGroupID
+                    },
+                    sortBy: [SortDescriptor(\.title, order: .forward)]
+                )
+            )) ?? []
+
+            // TODO: Find a way to trigger a refresh only on wiki data instead of just caching as-is
+            if songs.isEmpty {
+                songs = (try? modelContext.fetch(
+                    FetchDescriptor<IIDXSong>(
+                        sortBy: [SortDescriptor(\.title, order: .forward)]
+                    )
+                )) ?? []
             }
+            if songNoteCounts.isEmpty {
+                songNoteCounts = songs
+                    .reduce(into: [:]) { partialResult, song in
+                        partialResult[song.titleCompact()] = song.spNoteCount
+                    }
+            }
+        }
         var songRecords: [IIDXSongRecord] = allSongRecords
 
-        if let filters {
+        if filters != previousFilters, let filters {
+            debugPrint("Filters were changed, filtering")
 
             // Filter song records
-            var filteredSongRecords = allSongRecords.filter({
+            filteredSongRecords = allSongRecords.filter({
                 $0.playType == filters.playType
             })
 
@@ -185,21 +204,16 @@ actor DataFetcher {
                 return false
             }
 
-            // Filter song records by search term
-            let searchTermTrimmed = filters.searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
-            if !searchTermTrimmed.isEmpty && searchTermTrimmed.count >= 1 {
-                filteredSongRecords.removeAll(where: { songRecord in
-                    !(songRecord.title.lowercased().contains(searchTermTrimmed) ||
-                    songRecord.artist.lowercased().contains(searchTermTrimmed))
-                })
-            }
-
+            songRecords = filteredSongRecords
+        } else if filters == previousFilters {
+            debugPrint("Filters were not changed, using previously filtered song records")
             songRecords = filteredSongRecords
         }
 
-        if let sortOptions {
+        if filters != previousFilters || sortOptions != previousSortOptions, let sortOptions {
+            debugPrint("Filters or sort options were changed, sorting")
 
-            var sortedSongRecords: [IIDXSongRecord] = songRecords
+            sortedSongRecords = songRecords
             var songLevelScores: [IIDXSongRecord: IIDXLevelScore] = [:]
 
             // Get the level score to be used for sorting
@@ -342,25 +356,41 @@ actor DataFetcher {
             }
 
             songRecords = sortedSongRecords
+        } else if filters == previousFilters && sortOptions == previousSortOptions {
+            debugPrint("Filters or sort options were not changed, using previously sorted song records")
+            songRecords = sortedSongRecords
         }
 
+        // Filter song records by search term
+        if let filters {
+            let searchTermTrimmed = filters.searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
+            if !searchTermTrimmed.isEmpty && searchTermTrimmed.count >= 1 {
+                songRecords.removeAll(where: { songRecord in
+                    !(songRecord.title.lowercased().contains(searchTermTrimmed) ||
+                      songRecord.artist.lowercased().contains(searchTermTrimmed))
+                })
+            }
+        }
+
+        previousFilters = filters
+        previousSortOptions = sortOptions
         return songRecords.map { $0.persistentModelID }
     }
 
     // MARK: Song Metadata
 
-    func songNoteCounts() -> [String: IIDXNoteCount] {
-        let songs = try? modelContext.fetch(
-            FetchDescriptor<IIDXSong>(
-                sortBy: [SortDescriptor(\.title, order: .forward)]
-            )
-        )
-        let songMappings = (songs ?? [])
-            .reduce(into: [:]) { partialResult, song in
-                partialResult[song.titleCompact()] = song.spNoteCount
-            }
-        return songMappings
-    }
+//    func songNoteCounts() -> [String: IIDXNoteCount] {
+//        let songs = try? modelContext.fetch(
+//            FetchDescriptor<IIDXSong>(
+//                sortBy: [SortDescriptor(\.title, order: .forward)]
+//            )
+//        )
+//        let songMappings = (songs ?? [])
+//            .reduce(into: [:]) { partialResult, song in
+//                partialResult[song.titleCompact()] = song.spNoteCount
+//            }
+//        return songMappings
+//    }
 
     func songCompactTitles() -> [String: PersistentIdentifier] {
         var songCompactTitles: [String: PersistentIdentifier] = [:]
