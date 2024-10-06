@@ -2131,6 +2131,28 @@
         }
       }
     },
+    "Tower.Unavailable.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたバージョンのIIDXタワーはご利用いただけません。"
+          }
+        }
+      }
+    },
+    "Tower.Unavailable.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDXタワーはご利用いただけません"
+          }
+        }
+      }
+    },
     "ViewTitle.Analytics" : {
       "extractionState" : "manual",
       "localizations" : {

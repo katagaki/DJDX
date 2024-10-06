@@ -11,12 +11,17 @@ import WebKit
 struct TowerView: View {
 
     @State var webView = WKWebView()
+    @State var isTowerAvailable: Bool = true
 
     @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     var body: some View {
         NavigationStack {
-            WebViewForTower(webView: $webView, towerURL: iidxVersion.towerURL())
+            WebViewForTower(
+                webView: $webView,
+                isTowerAvailable: $isTowerAvailable,
+                towerURL: iidxVersion.towerURL()
+            )
                 .navigationTitle("ViewTitle.Tower")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -40,6 +45,17 @@ struct TowerView: View {
                         }
                     }
                 }
+                .background {
+                    if !isTowerAvailable {
+                        ContentUnavailableView(
+                            "Tower.Unavailable.Title",
+                            systemImage: "exclamationmark.circle.fill",
+                            description: Text("Tower.Unavailable.Description")
+                        )
+                    } else {
+                        Color.clear
+                    }
+                }
         }
     }
 }
@@ -47,7 +63,8 @@ struct TowerView: View {
 struct WebViewForTower: UIViewRepresentable {
 
     @Binding var webView: WKWebView
-    var towerURL: URL
+    @Binding var isTowerAvailable: Bool
+    @State var towerURL: URL
 
     @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
@@ -59,11 +76,20 @@ struct WebViewForTower: UIViewRepresentable {
     }
 
     func makeCoordinator() -> CoordinatorForTower {
-        Coordinator(version: iidxVersion)
+        Coordinator(version: iidxVersion, updateTowerState: updateTowerState)
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
         // Blank function to conform to protocol
+    }
+
+    func updateTowerState(_ isTowerAvailable: Bool) {
+        self.isTowerAvailable = isTowerAvailable
+        if isTowerAvailable {
+            webView.layer.opacity = 1.0
+        } else {
+            webView.layer.opacity = 0.0
+        }
     }
 }
 
@@ -85,20 +111,31 @@ class CoordinatorForTower: NSObject, WKNavigationDelegate {
 """
 
     var version: IIDXVersion
+    var updateTowerState: (Bool) -> Void
 
-    init(version: IIDXVersion) {
+    init(version: IIDXVersion, updateTowerState: @escaping (Bool) -> Void) {
         self.version = version
+        self.updateTowerState = updateTowerState
         super.init()
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if let webViewURL = webView.url {
             let urlString = webViewURL.absoluteString
-            webView.evaluateJavaScript(self.cleanupTowerJS)
-            if urlString.starts(with: version.towerURL().absoluteString) {
-                webView.layer.opacity = 1.0
-            } else {
-                webView.evaluateJavaScript(self.cleanupLoginJS)
+            webView.evaluateJavaScript(self.cleanupTowerJS) { _, _ in
+                if urlString.starts(with: self.version.towerURL().absoluteString) {
+                    webView.evaluateJavaScript("document.documentElement.outerHTML.toString()") { html, _ in
+                        if let html = html as? String {
+                            self.updateTowerState(!html.contains("Http 404"))
+                        } else {
+                            self.updateTowerState(false)
+                        }
+                    }
+                } else {
+                    webView.evaluateJavaScript(self.cleanupLoginJS) { _, _ in
+                        webView.layer.opacity = 1.0
+                    }
+                }
             }
         }
     }

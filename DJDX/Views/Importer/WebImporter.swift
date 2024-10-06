@@ -181,54 +181,56 @@ document.getElementById('score_data').value
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if let webViewURL = webView.url {
             let urlString = webViewURL.absoluteString
-            webView.evaluateJavaScript(self.cleanupJS)
-            if urlString.starts(with: version.downloadPageURL().absoluteString) {
-                webView.layer.opacity = 0.0
-                webView.isUserInteractionEnabled = false
-                if !waitingForDownloadPageFormSubmit {
-                    switch importMode {
-                    case .single: evaluateIIDXSPScript(webView)
-                    case .double: evaluateIIDXDPScript(webView)
-                    }
-                    waitingForDownloadPageFormSubmit = true
-                } else {
-                    webView.evaluateJavaScript(getScoreDataJS) { result, _ in
-                        if let result: String = result as? String {
-                            Task {
-                                await self.delegate.importScoreData(using: result)
-                            }
-                        } else {
-                            Task {
-                                await MainActor.run {
-                                    self.delegate.stopProcessing(with: .serverError)
+            webView.evaluateJavaScript(self.cleanupJS) { _, _ in
+                if urlString.starts(with: self.version.downloadPageURL().absoluteString) {
+                    webView.layer.opacity = 0.0
+                    webView.isUserInteractionEnabled = false
+                    if !self.waitingForDownloadPageFormSubmit {
+                        switch self.importMode {
+                        case .single: self.evaluateIIDXSPScript(webView)
+                        case .double: self.evaluateIIDXDPScript(webView)
+                        }
+                        self.waitingForDownloadPageFormSubmit = true
+                    } else {
+                        webView.evaluateJavaScript(self.getScoreDataJS) { result, _ in
+                            if let result: String = result as? String {
+                                Task {
+                                    await self.delegate.importScoreData(using: result)
+                                }
+                            } else {
+                                Task {
+                                    await MainActor.run {
+                                        self.delegate.stopProcessing(with: .serverError)
+                                    }
                                 }
                             }
                         }
+                        self.waitingForDownloadPageFormSubmit = false
                     }
-                    waitingForDownloadPageFormSubmit = false
-                }
-            } else if urlString.starts(with: version.errorPageURL().absoluteString) {
-                webView.layer.opacity = 0.0
-                Task { [urlString] in
-                    await MainActor.run {
-                        if urlString.hasSuffix("?err=1") {
-                            self.delegate.stopProcessing(with: .noPremiumCourse)
-                        } else if urlString.hasSuffix("?err=2") {
-                            self.delegate.stopProcessing(with: .noEAmusementPass)
-                        } else if urlString.hasSuffix("?err=3") {
-                            self.delegate.stopProcessing(with: .noPlayData)
-                        } else if urlString.hasSuffix("?err=4") {
-                            self.delegate.stopProcessing(with: .serverError)
-                        } else if urlString.hasSuffix("?err=5") {
-                            self.delegate.stopProcessing(with: .noPremiumCourse)
-                        } else {
-                            self.delegate.stopProcessing(with: .serverError)
+                } else if urlString.starts(with: self.version.errorPageURL().absoluteString) {
+                    webView.layer.opacity = 0.0
+                    Task { [urlString] in
+                        await MainActor.run {
+                            if urlString.hasSuffix("?err=1") {
+                                self.delegate.stopProcessing(with: .noPremiumCourse)
+                            } else if urlString.hasSuffix("?err=2") {
+                                self.delegate.stopProcessing(with: .noEAmusementPass)
+                            } else if urlString.hasSuffix("?err=3") {
+                                self.delegate.stopProcessing(with: .noPlayData)
+                            } else if urlString.hasSuffix("?err=4") {
+                                self.delegate.stopProcessing(with: .serverError)
+                            } else if urlString.hasSuffix("?err=5") {
+                                self.delegate.stopProcessing(with: .noPremiumCourse)
+                            } else {
+                                self.delegate.stopProcessing(with: .serverError)
+                            }
                         }
                     }
+                } else {
+                    webView.layer.opacity = 1.0
                 }
-            } else {
-                webView.layer.opacity = 1.0
             }
+            
         }
     }
 
