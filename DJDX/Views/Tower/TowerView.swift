@@ -12,9 +12,11 @@ struct TowerView: View {
 
     @State var webView = WKWebView()
 
+    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+
     var body: some View {
         NavigationStack {
-            WebViewForTower(webView: $webView)
+            WebViewForTower(webView: $webView, towerURL: iidxVersion.towerURL())
                 .navigationTitle("ViewTitle.Tower")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -34,7 +36,7 @@ struct TowerView: View {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Shared.Refresh", systemImage: "arrow.clockwise") {
                             webView.layer.opacity = 0.0
-                            webView.reload()
+                            webView.load(URLRequest(url: iidxVersion.towerURL()))
                         }
                     }
                 }
@@ -45,6 +47,9 @@ struct TowerView: View {
 struct WebViewForTower: UIViewRepresentable {
 
     @Binding var webView: WKWebView
+    var towerURL: URL
+
+    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
@@ -55,7 +60,7 @@ struct WebViewForTower: UIViewRepresentable {
     }
 
     func makeCoordinator() -> CoordinatorForTower {
-        Coordinator()
+        Coordinator(version: iidxVersion)
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
@@ -80,11 +85,18 @@ class CoordinatorForTower: NSObject, WKNavigationDelegate {
 \(loginPageCleanup)
 """
 
+    var version: IIDXVersion
+
+    init(version: IIDXVersion) {
+        self.version = version
+        super.init()
+    }
+
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if let webViewURL = webView.url {
             let urlString = webViewURL.absoluteString
             webView.evaluateJavaScript(self.cleanupTowerJS)
-            if urlString.starts(with: towerURL.absoluteString) {
+            if urlString.starts(with: version.towerURL().absoluteString) {
                 webView.layer.opacity = 1.0
             } else {
                 webView.evaluateJavaScript(self.cleanupLoginJS)

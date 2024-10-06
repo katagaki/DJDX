@@ -41,7 +41,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
     case epolis = 31
     case pinkyCrush = 32
 
-    var supportedVersions: [IIDXVersion] {
+    static var supportedVersions: [IIDXVersion] {
         [.epolis, .pinkyCrush]
     }
 
@@ -155,4 +155,36 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .pinkyCrush: return UIColor(red: 255 / 255, green: 97 / 255, blue: 178 / 255, alpha: 1.0)
         }
     }
+
+    // swiftlint:disable line_length
+    func loginPageRedirectURL() -> URL {
+        return URL(string: """
+https://p.eagate.573.jp/gate/p/login.html?path=http%3A%2F%2Fp.eagate.573.jp%2Fgame%2F2dx%2F\(self.rawValue)%2Fdjdata%2Fscore_download.html
+""")!
+    }
+
+    func loginPageURL() -> URL {
+        return URL(string: """
+https://my1.konami.net/ja/signin
+""")!
+    }
+
+    func downloadPageURL() -> URL {
+        return URL(string: """
+https://p.eagate.573.jp/game/2dx/\(self.rawValue)/djdata/score_download.html
+""")!
+    }
+
+    func errorPageURL() -> URL {
+        return URL(string: """
+https://p.eagate.573.jp/game/2dx/\(self.rawValue)/error/error.html
+""")!
+    }
+
+    func towerURL() -> URL {
+        return URL(string: """
+https://p.eagate.573.jp/game/2dx/\(self.rawValue)/djdata/tower.html
+""")!
+    }
+    // swiftlint:enable line_length
 }

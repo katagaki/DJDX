@@ -1389,7 +1389,8 @@
             "value" : "CLEAR COUNT"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Shared.ClearType" : {
       "extractionState" : "manual",
@@ -1457,7 +1458,8 @@
             "value" : "DJ LEVEL"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Shared.Filter" : {
       "extractionState" : "manual",
@@ -1488,6 +1490,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フィルターを初期化"
+          }
+        }
+      }
+    },
+    "Shared.IIDX.Version" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン"
           }
         }
       }
@@ -1524,7 +1542,8 @@
             "value" : "ANOTHER"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Shared.Level.Beginner" : {
       "extractionState" : "manual",
@@ -1541,7 +1560,8 @@
             "value" : "BEGINNER"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Shared.Level.Hyper" : {
       "extractionState" : "manual",
@@ -1558,7 +1578,8 @@
             "value" : "HYPER"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Shared.Level.Leggendaria" : {
       "extractionState" : "manual",
@@ -1575,7 +1596,8 @@
             "value" : "LEGGENDARIA"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Shared.Level.Normal" : {
       "extractionState" : "manual",
@@ -1592,7 +1614,8 @@
             "value" : "NORMAL"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Shared.NoData" : {
       "extractionState" : "manual",
@@ -1676,7 +1699,8 @@
             "value" : "PLAY TYPE"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Shared.Refresh" : {
       "localizations" : {

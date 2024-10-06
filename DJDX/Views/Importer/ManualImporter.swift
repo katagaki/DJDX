@@ -22,6 +22,8 @@ struct ManualImporter: View {
     @State var isSelectingCSVFile: Bool = false
     @Binding var didImportSucceed: Bool
 
+    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+
     var body: some View {
         List {
             Section {
@@ -60,7 +62,8 @@ struct ManualImporter: View {
                             await actor.importCSV(
                                 url: url,
                                 to: importToDate,
-                                for: .single
+                                for: .single,
+                                from: iidxVersion
                             ) { currentProgress, totalProgress in
                                 Task {
                                     let progress = (currentProgress * 100) / totalProgress

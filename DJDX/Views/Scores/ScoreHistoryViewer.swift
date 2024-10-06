@@ -106,7 +106,10 @@ struct ScoreHistoryViewer: View {
                 }
                 Section {
                     VStack(alignment: .leading, spacing: 8.0) {
-                        ForEach(summarizedScoreRateHistory.sorted(by: {$0.key < $1.key}), id: \.key) { date, scoreRate in
+                        ForEach(
+                            summarizedScoreRateHistory.sorted(by: {$0.key < $1.key}),
+                            id: \.key
+                        ) { date, scoreRate in
                             DetailRow(date.formatted(date: .abbreviated, time: .omitted),
                                       value: percentageFormatter.string(from: NSNumber(value: scoreRate)) ?? "0%",
                                       style: LinearGradient(

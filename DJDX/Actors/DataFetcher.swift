@@ -9,6 +9,7 @@ import Foundation
 import SwiftData
 
 @ModelActor
+// swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
 actor DataFetcher {
 
@@ -406,4 +407,17 @@ actor DataFetcher {
         default: return nil
         }
     }
+
+    // MARK: Predicates
+
+    func importGroups(from startDate: Date) -> Predicate<ImportGroup> {
+        var components = DateComponents()
+        components.day = 1
+        components.second = -1
+        let endDate: Date = Calendar.current.date(byAdding: components, to: startDate)!
+        return #Predicate<ImportGroup> {
+            $0.importDate >= startDate && $0.importDate <= endDate
+        }
+    }
 }
+// swiftlint:enable file_length

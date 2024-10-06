@@ -15,7 +15,7 @@
 		E45B1D0A2CB19973006A7E85 /* AutomaticNavigationTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1D092CB19973006A7E85 /* AutomaticNavigationTransition.swift */; };
 		E45B1D0D2CB271D4006A7E85 /* TowerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1D0C2CB271D1006A7E85 /* TowerView.swift */; };
 		E45B1D0F2CB27962006A7E85 /* JavaScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1D0E2CB27960006A7E85 /* JavaScript.swift */; };
-		E45B1D112CB27BBB006A7E85 /* URLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1D102CB27BBA006A7E85 /* URLs.swift */; };
+		E45B1D132CB2ACAE006A7E85 /* ScoresView+Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1D122CB2ACAB006A7E85 /* ScoresView+Functions.swift */; };
 		E46A65E02C0A276800D9544B /* DetailRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65DF2C0A276800D9544B /* DetailRow.swift */; };
 		E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = E46A65E22C0ACAC400D9544B /* SwiftSoup */; };
 		E46A65E52C0ACADB00D9544B /* IIDXSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46A65E42C0ACADB00D9544B /* IIDXSong.swift */; };
@@ -84,7 +84,6 @@
 		E4E3D0F42BFC053D001942FE /* DifficultyPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */; };
 		E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */; };
 		E4EB2CA82BFF7E3700A00796 /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CA72BFF7E3700A00796 /* ImportView.swift */; };
-		E4EB2CAB2BFF8CC500A00796 /* Predicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB2CAA2BFF8CC500A00796 /* Predicates.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,7 +95,7 @@
 		E45B1D092CB19973006A7E85 /* AutomaticNavigationTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomaticNavigationTransition.swift; sourceTree = "<group>"; };
 		E45B1D0C2CB271D1006A7E85 /* TowerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerView.swift; sourceTree = "<group>"; };
 		E45B1D0E2CB27960006A7E85 /* JavaScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavaScript.swift; sourceTree = "<group>"; };
-		E45B1D102CB27BBA006A7E85 /* URLs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLs.swift; sourceTree = "<group>"; };
+		E45B1D122CB2ACAB006A7E85 /* ScoresView+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScoresView+Functions.swift"; sourceTree = "<group>"; };
 		E46A65DF2C0A276800D9544B /* DetailRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailRow.swift; sourceTree = "<group>"; };
 		E46A65E42C0ACADB00D9544B /* IIDXSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXSong.swift; sourceTree = "<group>"; };
 		E46A65E62C0ACBAA00D9544B /* IIDXPlayType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXPlayType.swift; sourceTree = "<group>"; };
@@ -166,7 +165,6 @@
 		E4E3D0F32BFC053D001942FE /* DifficultyPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyPicker.swift; sourceTree = "<group>"; };
 		E4EB2CA22BFF78F300A00796 /* ImportGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportGroup.swift; sourceTree = "<group>"; };
 		E4EB2CA72BFF7E3700A00796 /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
-		E4EB2CAA2BFF8CC500A00796 /* Predicates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Predicates.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -195,8 +193,6 @@
 			isa = PBXGroup;
 			children = (
 				E45B1D0E2CB27960006A7E85 /* JavaScript.swift */,
-				E45B1D102CB27BBA006A7E85 /* URLs.swift */,
-				E4EB2CAA2BFF8CC500A00796 /* Predicates.swift */,
 				E4EB2CA12BFF78E400A00796 /* Data Models */,
 			);
 			path = Shared;
@@ -317,6 +313,7 @@
 			isa = PBXGroup;
 			children = (
 				E4B123B12BF8E8E400D4A3D1 /* ScoresView.swift */,
+				E45B1D122CB2ACAB006A7E85 /* ScoresView+Functions.swift */,
 				E46A66062C0CC12800D9544B /* ScoreSortAndFilter.swift */,
 				E46A66042C0CA71E00D9544B /* ScoreRow.swift */,
 				E4E3D0C22BF98D57001942FE /* ScoreViewer.swift */,
@@ -535,7 +532,6 @@
 				E4E3D0F22BFC0489001942FE /* OverviewDJLevelPerDifficultyGraph.swift in Sources */,
 				E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */,
 				E4EB2CA82BFF7E3700A00796 /* ImportView.swift in Sources */,
-				E45B1D112CB27BBB006A7E85 /* URLs.swift in Sources */,
 				E46D51B12C26501D000524B9 /* LargeInlineTitle.swift in Sources */,
 				E46D51AB2C25BDFA000524B9 /* AnalyticsViewMode.swift in Sources */,
 				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,
@@ -546,7 +542,6 @@
 				E49359E12C016F2F0022E385 /* SortMode.swift in Sources */,
 				E46D51BC2C2B095E000524B9 /* CachedTrendData.swift in Sources */,
 				E4BC32802C036C82006A0F7A /* ConditionalShadow.swift in Sources */,
-				E4EB2CAB2BFF8CC500A00796 /* Predicates.swift in Sources */,
 				E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */,
 				E46A65FB2C0B635200D9544B /* IIDXPlaySide.swift in Sources */,
 				E46A65FF2C0C918300D9544B /* IIDXDJLevel.swift in Sources */,
@@ -581,6 +576,7 @@
 				E46A660B2C0CC59500D9544B /* ClearTypeDetailRow.swift in Sources */,
 				E45B1D0F2CB27962006A7E85 /* JavaScript.swift in Sources */,
 				E4E3D0F02BFC03CB001942FE /* OverviewClearTypePerDifficultyGraph.swift in Sources */,
+				E45B1D132CB2ACAE006A7E85 /* ScoresView+Functions.swift in Sources */,
 				E46A65EF2C0AFF0000D9544B /* ProgressAlert.swift in Sources */,
 				E4E3D0D42BF99A86001942FE /* ScoreSection.swift in Sources */,
 				E46D51AF2C264E73000524B9 /* TabBarAccessory.swift in Sources */,

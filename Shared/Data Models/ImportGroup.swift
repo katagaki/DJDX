@@ -15,9 +15,9 @@ final class ImportGroup {
     @Relationship(deleteRule: .cascade, inverse: \IIDXSongRecord.importGroup) var iidxData: [IIDXSongRecord]?
     var iidxVersion: IIDXVersion?
 
-    init(importDate: Date, iidxData: [IIDXSongRecord]) {
+    init(importDate: Date, iidxData: [IIDXSongRecord], iidxVersion: IIDXVersion) {
         self.importDate = importDate
         self.iidxData = iidxData
-        self.iidxVersion = .epolis
+        self.iidxVersion = iidxVersion
     }
 }

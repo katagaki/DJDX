@@ -22,6 +22,7 @@ actor DataImporter {
             url: Bundle.main.url(forResource: "SampleData", withExtension: "csv"),
             to: importToDate,
             for: playType,
+            from: .epolis,
             didProgressUpdate: didProgressUpdate
         )
     }
@@ -30,13 +31,20 @@ actor DataImporter {
         url: URL?,
         to importToDate: Date,
         for playType: IIDXPlayType,
+        from version: IIDXVersion,
         didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
     ) {
         if let urlOfData: URL = url, let stringFromData: String = try? String(contentsOf: urlOfData) {
             saveCSVStringToFile(stringFromData)
             let parsedCSV = CSwiftV(with: stringFromData)
             if let keyedRows = parsedCSV.keyedRows {
-                importCSV(keyedRows, to: importToDate, for: playType, didProgressUpdate: didProgressUpdate)
+                importCSV(
+                    keyedRows,
+                    to: importToDate,
+                    for: playType,
+                    from: version,
+                    didProgressUpdate: didProgressUpdate
+                )
             }
         }
     }
@@ -45,12 +53,13 @@ actor DataImporter {
         csv csvString: String,
         to importToDate: Date,
         for playType: IIDXPlayType,
+        from version: IIDXVersion,
         didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
     ) {
         saveCSVStringToFile(csvString)
         let parsedCSV = CSwiftV(with: csvString)
         if let keyedRows = parsedCSV.keyedRows {
-            importCSV(keyedRows, to: importToDate, for: playType, didProgressUpdate: didProgressUpdate)
+            importCSV(keyedRows, to: importToDate, for: playType, from: version, didProgressUpdate: didProgressUpdate)
         }
     }
 
@@ -58,10 +67,15 @@ actor DataImporter {
         _ keyedRows: [[String: String]],
         to importToDate: Date,
         for playType: IIDXPlayType,
+        from version: IIDXVersion,
         didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
     ) {
         try? modelContext.transaction {
-            let importGroup = prepareImportGroupForPartialImport(importToDate: importToDate, playType: playType)
+            let importGroup = prepareImportGroupForPartialImport(
+                importToDate: importToDate,
+                playType: playType,
+                version: version
+            )
             modelContext.insert(importGroup)
 
             let totalNumberOfKeyedRows = keyedRows.count
@@ -93,7 +107,11 @@ actor DataImporter {
         }
     }
 
-    func prepareImportGroupForPartialImport(importToDate: Date, playType: IIDXPlayType) -> ImportGroup {
+    func prepareImportGroupForPartialImport(
+        importToDate: Date,
+        playType: IIDXPlayType,
+        version: IIDXVersion
+    ) -> ImportGroup {
         let fetchDescriptor = FetchDescriptor<ImportGroup>(
             predicate: importGroups(from: importToDate)
         )
@@ -109,8 +127,18 @@ actor DataImporter {
             }
         }
         // If all conditions fail, create new import group and return it
-        let newImportGroup = ImportGroup(importDate: importToDate, iidxData: [])
+        let newImportGroup = ImportGroup(importDate: importToDate, iidxData: [], iidxVersion: version)
         modelContext.insert(newImportGroup)
         return newImportGroup
+    }
+
+    func importGroups(from startDate: Date) -> Predicate<ImportGroup> {
+        var components = DateComponents()
+        components.day = 1
+        components.second = -1
+        let endDate: Date = Calendar.current.date(byAdding: components, to: startDate)!
+        return #Predicate<ImportGroup> {
+            $0.importDate >= startDate && $0.importDate <= endDate
+        }
     }
 }

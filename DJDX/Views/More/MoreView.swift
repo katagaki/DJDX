@@ -20,6 +20,7 @@ https://bemaniwiki.com/?beatmania+IIDX+31+EPOLIS/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%
 // swiftlint:disable type_body_length file_length
 struct MoreView: View {
 
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
 
@@ -29,10 +30,12 @@ struct MoreView: View {
     @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScorewView.DJLevelVisible") var isDJLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScorewView.ScoreRateVisible") var isScoreRateVisible: Bool
-    @AppStorage(wrappedValue: true, "ScorewView.ScoreVisible") var isScoreVisible: Bool
-    @AppStorage(wrappedValue: false, "ScorewView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.DJLevelVisible") var isDJLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreRateVisible") var isScoreRateVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
+    @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
+
+    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
@@ -64,6 +67,14 @@ struct MoreView: View {
                             }
                         }
                     }
+                    Picker(selection: $iidxVersion) {
+                        ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
+                            Text(version.marketingName)
+                        }
+                    } label: {
+                        Text("Shared.IIDX.Version")
+                    }
+
                     Toggle(isOn: $isBeginnerLevelHidden) {
                         ListRow(image: "ListIcon.HideBeginner",
                                 title: "More.PlayDataDisplay.HideBeginnerLevel",

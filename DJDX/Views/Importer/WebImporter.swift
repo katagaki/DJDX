@@ -66,17 +66,19 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     @Binding var autoImportFailedReason: ImportFailedReason?
     @State var observers = [NSKeyValueObservation]()
 
+    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+
     let webView = WKWebView()
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
-        webView.load(URLRequest(url: loginPageRedirectURL))
+        webView.load(URLRequest(url: iidxVersion.loginPageRedirectURL()))
         return webView
     }
 
     func makeCoordinator() -> CoordinatorForImporter {
-        Coordinator(updateScoreDataDelegate: self, importMode: importMode)
+        Coordinator(delegate: self, importMode: importMode, version: iidxVersion)
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
@@ -93,7 +95,8 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
                 await actor.importCSV(
                     csv: csvString,
                     to: importToDate,
-                    for: importMode
+                    for: importMode,
+                    from: iidxVersion
                 ) { currentProgress, totalProgress in
                     Task {
                         let progress = (currentProgress * 100) / totalProgress
@@ -157,13 +160,20 @@ if (submitButtons.length > 0) {
 document.getElementById('score_data').value
 """
 
-    var updateScoreDataDelegate: UpdateScoreDataDelegate
+    var delegate: UpdateScoreDataDelegate
     var importMode: IIDXPlayType
+    var version: IIDXVersion
+
     var waitingForDownloadPageFormSubmit: Bool = false
 
-    init(updateScoreDataDelegate: UpdateScoreDataDelegate, importMode: IIDXPlayType = .single) {
-        self.updateScoreDataDelegate = updateScoreDataDelegate
+    init(
+        delegate: UpdateScoreDataDelegate,
+        importMode: IIDXPlayType = .single,
+        version: IIDXVersion
+    ) {
+        self.delegate = delegate
         self.importMode = importMode
+        self.version = version
         super.init()
     }
 
@@ -172,7 +182,7 @@ document.getElementById('score_data').value
         if let webViewURL = webView.url {
             let urlString = webViewURL.absoluteString
             webView.evaluateJavaScript(self.cleanupJS)
-            if urlString.starts(with: downloadPageURL.absoluteString) {
+            if urlString.starts(with: version.downloadPageURL().absoluteString) {
                 webView.layer.opacity = 0.0
                 webView.isUserInteractionEnabled = false
                 if !waitingForDownloadPageFormSubmit {
@@ -185,34 +195,34 @@ document.getElementById('score_data').value
                     webView.evaluateJavaScript(getScoreDataJS) { result, _ in
                         if let result: String = result as? String {
                             Task {
-                                await self.updateScoreDataDelegate.importScoreData(using: result)
+                                await self.delegate.importScoreData(using: result)
                             }
                         } else {
                             Task {
                                 await MainActor.run {
-                                    self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                                    self.delegate.stopProcessing(with: .serverError)
                                 }
                             }
                         }
                     }
                     waitingForDownloadPageFormSubmit = false
                 }
-            } else if urlString.starts(with: errorPageURL.absoluteString) {
+            } else if urlString.starts(with: version.errorPageURL().absoluteString) {
                 webView.layer.opacity = 0.0
                 Task { [urlString] in
                     await MainActor.run {
                         if urlString.hasSuffix("?err=1") {
-                            self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
+                            self.delegate.stopProcessing(with: .noPremiumCourse)
                         } else if urlString.hasSuffix("?err=2") {
-                            self.updateScoreDataDelegate.stopProcessing(with: .noEAmusementPass)
+                            self.delegate.stopProcessing(with: .noEAmusementPass)
                         } else if urlString.hasSuffix("?err=3") {
-                            self.updateScoreDataDelegate.stopProcessing(with: .noPlayData)
+                            self.delegate.stopProcessing(with: .noPlayData)
                         } else if urlString.hasSuffix("?err=4") {
-                            self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                            self.delegate.stopProcessing(with: .serverError)
                         } else if urlString.hasSuffix("?err=5") {
-                            self.updateScoreDataDelegate.stopProcessing(with: .noPremiumCourse)
+                            self.delegate.stopProcessing(with: .noPremiumCourse)
                         } else {
-                            self.updateScoreDataDelegate.stopProcessing(with: .serverError)
+                            self.delegate.stopProcessing(with: .serverError)
                         }
                     }
                 }
@@ -225,7 +235,7 @@ document.getElementById('score_data').value
     func evaluateIIDXSPScript(_ webView: WKWebView) {
         webView.evaluateJavaScript(self.selectSPButtonJS) { _, error in
             if error != nil {
-                self.updateScoreDataDelegate.stopProcessing(with: .maintenance)
+                self.delegate.stopProcessing(with: .maintenance)
             }
         }
     }
@@ -233,7 +243,7 @@ document.getElementById('score_data').value
     func evaluateIIDXDPScript(_ webView: WKWebView) {
         webView.evaluateJavaScript(self.selectDPButtonJS) { _, error in
             if error != nil {
-                self.updateScoreDataDelegate.stopProcessing(with: .maintenance)
+                self.delegate.stopProcessing(with: .maintenance)
             }
         }
     }
