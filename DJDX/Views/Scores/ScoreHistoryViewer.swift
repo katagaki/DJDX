@@ -213,16 +213,16 @@ struct ScoreHistoryViewer: View {
         }
 
         // Summarize score rates
-        var previousScoreRate: Int?
+        var previousScoreRate: Float?
         for date in scoreRateHistory.keys.sorted() {
             if let previousScoreRate {
-                if Int(scoreRateHistory[date] ?? -1.0) != previousScoreRate {
+                if scoreRateHistory[date]?.isEqual(to: previousScoreRate) {
                     summarizedScoreRateHistory[date] = scoreRateHistory[date]
                 }
             } else {
                 summarizedScoreRateHistory[date] = scoreRateHistory[date]
             }
-            previousScoreRate = Int(scoreRateHistory[date] ?? -1.0)
+            previousScoreRate = scoreRateHistory[date]
         }
 
         // Set date range for chart
