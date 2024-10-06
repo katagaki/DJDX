@@ -201,28 +201,28 @@ struct ScoreHistoryViewer: View {
 
         // Summarize scores
         var previousScore: Int?
-        for (date, score) in scoreHistory {
+        for date in scoreHistory.keys.sorted() {
             if let previousScore {
-                if score != previousScore {
-                    summarizedScoreHistory[date] = score
+                if scoreHistory[date] != previousScore {
+                    summarizedScoreHistory[date] = scoreHistory[date]
                 }
             } else {
-                summarizedScoreHistory[date] = score
+                summarizedScoreHistory[date] = scoreHistory[date]
             }
-            previousScore = score
+            previousScore = scoreHistory[date]
         }
 
         // Summarize score rates
-        var previousScoreRate: Int?
-        for (date, scoreRate) in scoreRateHistory {
+        var previousScoreRate: Float?
+        for date in scoreRateHistory.keys.sorted() {
             if let previousScoreRate {
-                if Int(scoreRate) != previousScoreRate {
-                    summarizedScoreRateHistory[date] = scoreRate
+                if !(scoreRateHistory[date] ?? .infinity).isEqual(to: previousScoreRate.rounded(.down)) {
+                    summarizedScoreRateHistory[date] = scoreRateHistory[date]
                 }
             } else {
-                summarizedScoreRateHistory[date] = scoreRate
+                summarizedScoreRateHistory[date] = scoreRateHistory[date]
             }
-            previousScoreRate = Int(scoreRate)
+            previousScoreRate = scoreRateHistory[date]?.rounded(.down)
         }
 
         // Set date range for chart
