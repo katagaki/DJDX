@@ -98,21 +98,17 @@ struct MainTabView: View {
 
         for dataMigrationKey in dataMigrationKeys where !defaults.bool(forKey: dataMigrationKey) {
             switch dataMigrationKey {
-            case "Internal.DataMigrationForBetaBuild84":
-                debugPrint("Performing migration when migrating from 1.0-84 to 1.0-85+")
-                let songRecords = try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>())
-                for songRecord in songRecords ?? [] {
-                    songRecord.playType = .single
-                }
-                try? modelContext.save()
-            case "Internal.DataMigrationForBetaBuild120":
-                debugPrint("Performing migration when migrating from 1.0-117 to 1.0-120+")
-                UserDefaults.standard.set(Data(), forKey: "Analytics.Trends.DJLevel.Level.Cache")
             case "Internal.DataMigrationForEpolisToPinkyCrush":
                 debugPrint("Performing migration when migrating from 1.x to 32.x")
-                let importGroups = try? modelContext.fetch(FetchDescriptor<ImportGroup>())
-                for importGroup in importGroups ?? [] where importGroup.iidxVersion == nil {
-                    importGroup.iidxVersion = .epolis
+                progressAlertManager.show(
+                    title: "Migration.Title",
+                    message: "Migration.Description"
+                ) {
+                    let importGroups = try? modelContext.fetch(FetchDescriptor<ImportGroup>())
+                    for importGroup in importGroups ?? [] where importGroup.iidxVersion == nil {
+                        importGroup.iidxVersion = .epolis
+                    }
+                    progressAlertManager.hide()
                 }
             default: break
             }

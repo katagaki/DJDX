@@ -62,7 +62,9 @@ struct ScoresView: View {
             List {
                 ForEach((searchResults != nil ? searchResults ?? [] : songRecords ?? []),
                         id: \.title) { songRecord in
-                    NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
+                    Button {
+                        navigationManager.push(.scoreViewer(songRecord: songRecord), for: .scores)
+                    } label: {
                         ScoreRow(
                             namespace: scoresNamespace,
                             songRecord: songRecord,
@@ -72,6 +74,18 @@ struct ScoresView: View {
                         )
                     }
                     .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
+                    // TODO: NavigationLink causes double opening of views, temporarily using button instead
+                    // TODO: Do something about the navigation transition having to be inside the label instead of out here
+//                    NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
+//                        ScoreRow(
+//                            namespace: scoresNamespace,
+//                            songRecord: songRecord,
+//                            scoreRate: scoreRate(for: songRecord, of: levelToShow, or: difficultyToShow),
+//                            levelToShow: $levelToShow,
+//                            difficultyToShow: $difficultyToShow
+//                        )
+//                    }
+//                    .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
                 }
             }
             .navigationTitle("ViewTitle.Scores")
@@ -189,13 +203,10 @@ struct ScoresView: View {
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .scoreViewer(let songRecord):
-                    ScoreViewer(songRecord: songRecord,
-                                noteCount: noteCount)
+                    ScoreViewer(songRecord: songRecord, noteCount: noteCount)
                     .automaticNavigationTransition(id: songRecord.title, in: scoresNamespace)
                 case .scoreHistory(let songTitle, let level, let noteCount):
-                    ScoreHistoryViewer(songTitle: songTitle,
-                                       level: level,
-                                       noteCount: noteCount)
+                    ScoreHistoryViewer(songTitle: songTitle, level: level, noteCount: noteCount)
                 case .textageViewer(let songTitle, let level, let playSide, let playType):
                     TextageViewer(songTitle: songTitle, level: level, playSide: playSide, playType: playType)
                 default: Color.clear

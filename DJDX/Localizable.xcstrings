@@ -716,6 +716,40 @@
       },
       "shouldTranslate" : false
     },
+    "Migration.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data is being optimized after an app update."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリがアップデートされたため、データの最適化を行なっています。"
+          }
+        }
+      }
+    },
+    "Migration.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optimizing Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ最適化中"
+          }
+        }
+      }
+    },
     "More.ExternalData.BemaniWiki2nd" : {
       "extractionState" : "manual",
       "localizations" : {
