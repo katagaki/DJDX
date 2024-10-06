@@ -55,7 +55,6 @@ struct WebViewForTower: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
         webView.load(URLRequest(url: towerURL))
-        webView.isInspectable = true
         return webView
     }
 
