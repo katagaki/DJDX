@@ -216,7 +216,7 @@ struct ScoreHistoryViewer: View {
         var previousScoreRate: Float?
         for date in scoreRateHistory.keys.sorted() {
             if let previousScoreRate {
-                if scoreRateHistory[date]?.isEqual(to: previousScoreRate) {
+                if !(scoreRateHistory[date]?.isEqual(to: previousScoreRate) ?? true) {
                     summarizedScoreRateHistory[date] = scoreRateHistory[date]
                 }
             } else {
