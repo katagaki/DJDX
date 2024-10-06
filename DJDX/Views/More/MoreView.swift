@@ -72,7 +72,8 @@ struct MoreView: View {
                             Text(version.marketingName)
                         }
                     } label: {
-                        Text("Shared.IIDX.Version")
+                        ListRow(image: "ListIcon.Version",
+                                title: "Shared.IIDX.Version")
                     }
 
                     Toggle(isOn: $isBeginnerLevelHidden) {
@@ -157,6 +158,7 @@ struct MoreView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
+            .listSectionSpacing(.compact)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Spacer()
