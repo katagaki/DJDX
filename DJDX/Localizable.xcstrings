@@ -1307,6 +1307,22 @@
         }
       }
     },
+    "Shared.Beta" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BETA"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ベータ"
+          }
+        }
+      }
+    },
     "Shared.Cancel" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1624,6 +1640,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PLAY TYPE"
+          }
+        }
+      }
+    },
+    "Shared.Refresh" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リロード"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リロード"
           }
         }
       }
@@ -1959,6 +1991,22 @@
         }
       }
     },
+    "Tab.Tower" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDX Tower"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDXタワー"
+          }
+        }
+      }
+    },
     "Tips.ImportWikiData.Text" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2203,6 +2251,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Textage譜面"
+          }
+        }
+      }
+    },
+    "ViewTitle.Tower" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDX Tower"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDXタワー"
           }
         }
       }

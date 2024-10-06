@@ -12,5 +12,6 @@ enum TabType: Int {
     case scores = 1
     case notImplemented = 2
     case analytics = 3
+    case tower = 5
     case more = 4
 }

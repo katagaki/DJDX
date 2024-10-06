@@ -10,21 +10,6 @@ import SwiftUI
 import UIKit
 import WebKit
 
-// swiftlint:disable line_length
-let loginPageRedirectURL: URL = URL(string: """
-https://p.eagate.573.jp/gate/p/login.html?path=http%3A%2F%2Fp.eagate.573.jp%2Fgame%2F2dx%2F31%2Fdjdata%2Fscore_download.html
-""")!
-let loginPageURL: URL = URL(string: """
-https://my1.konami.net/ja/signin
-""")!
-let downloadPageURL: URL = URL(string: """
-https://p.eagate.573.jp/game/2dx/31/djdata/score_download.html
-""")!
-let errorPageURL: URL = URL(string: """
-https://p.eagate.573.jp/game/2dx/31/error/error.html
-""")!
-// swiftlint:enable line_length
-
 struct WebImporter: View {
     @Binding var importToDate: Date
     @State var importMode: IIDXPlayType
@@ -135,116 +120,36 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
 
 class CoordinatorForImporter: NSObject, WKNavigationDelegate {
     let cleanupJS = """
-function waitForElementToExist(selector) {
-return new Promise(resolve => {
-    if (document.querySelector(selector)) {
-        return resolve(document.querySelector(selector))
-    }
-    const observer = new MutationObserver(mutations => {
-        if (document.querySelector(selector)) {
-            observer.disconnect()
-            resolve(document.querySelector(selector))
-        }
-    })
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    })
-})
-}
+\(globalJSFunctions)
 
-var head = document.head || document.getElementsByTagName('head')[0]
+\(globalCleanup)
 
-// ダークモード
-var darkModeCSS = `
-@media (prefers-color-scheme: dark) {
-body, #id_ea_common_content_whole {
-    background-color: #000000;
-    color: #ffffff;
-}
-header, .Header_logo__konami--default__lYPft {
-    background-color: #000000!important;
-}
-.Form_login__layout--narrow-frame__SnckF,
-.Form_login__layout--default__bEjGz,
-.Form_login__form--default__3G_u1,
-.Form_login__form--narrow-frame__Rvksw,
-#email-form {
-    border: unset;
-    background-color: #1c1c1e!important;
-}
-.form-control, .form-control:focus {
-    background-color: #000000!important;
-    color: #fff!important;
-}
-.card {
-    background-color: #1c1c1e!important;
-}
-}
-
-@media (prefers-color-scheme: light) {
-body {
-    background-color: #ffffff;
-    color: #000000;
-}
-}
-
-`
-var style = document.createElement('style')
-style.type = 'text/css'
-style.appendChild(document.createTextNode(darkModeCSS))
-head.appendChild(style)
-
-// テキスト選択を無効化
-var disableSelectionCSS = '*{-webkit-touch-callout:none;-webkit-user-select:none}'
-var style = document.createElement('style')
-style.type = 'text/css'
-style.appendChild(document.createTextNode(disableSelectionCSS))
-head.appendChild(style)
-
-// フッターを取り除く
-document.body.style.setProperty('margin-bottom', '0', 'important')
-waitForElementToExist('footer').then((element) => {
-document.getElementsByTagName('footer')[0].remove()
-})
-waitForElementToExist('#synalio-iframe').then((element) => {
-document.getElementById('synalio-iframe').remove()
-})
-
-// チャットポップアップを取り除く
-waitForElementToExist('.fs-6').then((element) => {
-document.getElementsByClassName('fs-6')[0].remove()
-})
-
-// Cookieバナーを取り除く
-waitForElementToExist('#onetrust-consent-sdk').then((element) => {
-document.getElementById('onetrust-consent-sdk').remove()
-})
+\(loginPageCleanup)
 """
 
     let selectSPButtonJS = """
 var submitButtons = document.getElementsByClassName('submit_btn')
 if (submitButtons.length > 0) {
-Array.from(submitButtons).forEach(button => {
-    if (button.value === "SP") {
-        button.click()
-    }
-})
+    Array.from(submitButtons).forEach(button => {
+        if (button.value === "SP") {
+            button.click()
+        }
+    })
 } else {
-throw 1
+    throw 1
 }
 """
 
     let selectDPButtonJS = """
 var submitButtons = document.getElementsByClassName('submit_btn')
 if (submitButtons.length > 0) {
-Array.from(submitButtons).forEach(button => {
-    if (button.value === "DP") {
-        button.click()
-    }
-})
+    Array.from(submitButtons).forEach(button => {
+        if (button.value === "DP") {
+            button.click()
+        }
+    })
 } else {
-throw 1
+    throw 1
 }
 """
 

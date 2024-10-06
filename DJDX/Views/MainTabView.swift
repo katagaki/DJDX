@@ -37,6 +37,11 @@ struct MainTabView: View {
                     Label("Tab.Analytics", image: .tabIconAnalytics)
                 }
                 .tag(TabType.analytics)
+            TowerView()
+                .tabItem {
+                    Label("Tab.Tower", systemImage: "chart.bar.xaxis")
+                }
+                .tag(TabType.tower)
             MoreView()
                 .tabItem {
                     Label("Tab.More", systemImage: "ellipsis")
