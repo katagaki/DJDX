@@ -17,6 +17,7 @@ struct MoreBemaniWikiCharts: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @Query(sort: \IIDXSong.title, order: .forward) var allSongs: [IIDXSong]
 
@@ -136,7 +137,7 @@ struct MoreBemaniWikiCharts: View {
     func reloadBemaniWikiDataForLatestVersion() async -> [IIDXSong] {
         do {
             var iidxSongsFromWiki: [IIDXSong] = []
-            let (data, _) = try await URLSession.shared.data(from: bemaniWikiLatestVersionPageURL)
+            let (data, _) = try await URLSession.shared.data(from: iidxVersion.bemaniWikiLatestVersionPageURL())
             if let htmlString = String(bytes: data, encoding: .japaneseEUC),
                let htmlDocument = try? SwiftSoup.parse(htmlString),
                let htmlDocumentBody = htmlDocument.body(),
@@ -179,7 +180,7 @@ struct MoreBemaniWikiCharts: View {
     func reloadBemaniWikiDataForExistingVersions() async -> [IIDXSong] {
         do {
             var iidxSongsFromWiki: [IIDXSong] = []
-            let (data, _) = try await URLSession.shared.data(from: bemaniWikiExistingVersionsPageURL)
+            let (data, _) = try await URLSession.shared.data(from: iidxVersion.bemaniWikiExistingVersionsPageURL())
             if let htmlString = String(bytes: data, encoding: .japaneseEUC),
                let htmlDocument = try? SwiftSoup.parse(htmlString),
                let htmlDocumentBody = htmlDocument.body(),

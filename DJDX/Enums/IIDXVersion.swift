@@ -186,5 +186,33 @@ https://p.eagate.573.jp/game/2dx/\(self.rawValue)/error/error.html
 https://p.eagate.573.jp/game/2dx/\(self.rawValue)/djdata/tower.html
 """)!
     }
+
+    func bemaniWikiLatestVersionPageURL() -> URL {
+        switch self {
+        case .epolis:
+            return URL(string: """
+https://bemaniwiki.com/?beatmania+IIDX+31+EPOLIS/%BF%B7%B6%CA%A5%EA%A5%B9%A5%C8
+""")!
+        case .pinkyCrush:
+            return URL(string: """
+https://bemaniwiki.com/?beatmania+IIDX+32+Pinky+Crush/%BF%B7%B6%CA%A5%EA%A5%B9%A5%C8
+""")!
+        default: return URL(string: "https://bemaniwiki.com")!
+        }
+    }
+
+    func bemaniWikiExistingVersionsPageURL() -> URL {
+        switch self {
+        case .epolis:
+            return URL(string: """
+https://bemaniwiki.com/?beatmania+IIDX+31+EPOLIS/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%A5%C4%BF%F4%A5%EA%A5%B9%A5%C8
+""")!
+        case .pinkyCrush:
+            return URL(string: """
+https://bemaniwiki.com/?beatmania+IIDX+32+Pinky+Crush/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%A5%C4%BF%F4%A5%EA%A5%B9%A5%C8
+""")!
+        default: return URL(string: "https://bemaniwiki.com")!
+        }
+    }
     // swiftlint:enable line_length
 }
