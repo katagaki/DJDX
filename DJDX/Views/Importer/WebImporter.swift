@@ -230,7 +230,6 @@ document.getElementById('score_data').value
                     webView.layer.opacity = 1.0
                 }
             }
-            
         }
     }
 

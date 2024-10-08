@@ -64,12 +64,13 @@ extension AnalyticsView {
 
     func reloadTrends() async {
         debugPrint("Calculating trends")
-        let importGroups: [ImportGroup] = (try? modelContext.fetch(
+        var importGroups: [ImportGroup] = (try? modelContext.fetch(
             FetchDescriptor<ImportGroup>(
                 sortBy: [SortDescriptor(\.importDate, order: .forward)]
             )
         )) ?? []
         if importGroups.count > 0 {
+            importGroups.removeAll(where: {$0.iidxVersion != iidxVersion})
             let newClearTypePerImportGroup = await trendDataForClearTypePerDifficulty(importGroups)
             let newDJLevelPerImportGroup = await trendDataForDJLevelPerDifficulty(importGroups)
 
