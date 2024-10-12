@@ -183,7 +183,7 @@ extension AnalyticsView {
         }
 
         // Add scores to dictionary
-        let scores = scores(in: songRecords).filter({ $0.clearType != "NO PLAY" })
+        let scores = scores(in: songRecords).filter({ $0.clearType != "NO PLAY" && $0.score > 0 })
         for score in scores {
             newClearTypePerDifficulty[score.difficulty]?[score.clearType]? += 1
         }
