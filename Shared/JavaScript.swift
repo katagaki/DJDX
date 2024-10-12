@@ -162,6 +162,42 @@ var injectedCSS = `
         padding: 20px 0 20px 0;
     }
 }
+
+@media (prefers-color-scheme: light) {
+    body {
+        background-color: white;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: black;
+    }
+
+    #iidx-tower {
+        background: black !important;
+        color: white !important;
+    }
+
+    #iidx-tower table td {
+        background: #1C1C1E;
+        color: white;
+    }
+
+    #iidx-tower table th, #iidx-tower table td {
+        border: 1px solid #46464A;
+    }
+
+    #tower-graph {
+        background: #1C1C1E !important;
+        color: white !important;
+    }
+
+    #tower-graph > .inner > .inner {
+        border-bottom: 1px solid white;
+        border-left: 1px solid white;
+    }
+}
 `
 
 style.appendChild(document.createTextNode(injectedCSS))

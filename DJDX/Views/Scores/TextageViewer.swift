@@ -66,7 +66,7 @@ struct WebViewForTextageViewer: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
-        webView.layer.opacity = 0.5
+        webView.layer.opacity = 0.0
         webView.isInspectable = true
         webView.load(URLRequest(url: textageIIDXURL))
         return webView
