@@ -203,3 +203,13 @@ var injectedCSS = `
 style.appendChild(document.createTextNode(injectedCSS))
 head.appendChild(style)
 """
+
+let textageNavigationJS = """
+var levelSelectors = document.getElementsByName("djauto_opt")[0];
+levelSelectors.value = "%@1";
+
+var songNameTextField = document.getElementsByName("djauto")[0];
+songNameTextField.value = "%@2";
+
+do_djauto();
+"""

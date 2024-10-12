@@ -11,6 +11,7 @@ import WebKit
 struct TowerView: View {
 
     @State var webView = WKWebView()
+    @State var isLoading: Bool = true
     @State var isTowerAvailable: Bool = true
 
     @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
@@ -20,6 +21,7 @@ struct TowerView: View {
             WebViewForTower(
                 webView: $webView,
                 isTowerAvailable: $isTowerAvailable,
+                isLoading: $isLoading,
                 towerURL: iidxVersion.towerURL()
             )
                 .navigationTitle("ViewTitle.Tower")
@@ -41,6 +43,7 @@ struct TowerView: View {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Shared.Refresh", systemImage: "arrow.clockwise") {
                             webView.layer.opacity = 0.0
+                            isLoading = true
                             webView.load(URLRequest(url: iidxVersion.towerURL()))
                         }
                     }
@@ -53,7 +56,13 @@ struct TowerView: View {
                             description: Text("Tower.Unavailable.Description")
                         )
                     } else {
-                        Color.clear
+                        if isLoading {
+                            VStack(spacing: 16.0) {
+                                ProgressView("Shared.Loading")
+                            }
+                        } else {
+                            Color.clear
+                        }
                     }
                 }
         }
@@ -64,6 +73,7 @@ struct WebViewForTower: UIViewRepresentable {
 
     @Binding var webView: WKWebView
     @Binding var isTowerAvailable: Bool
+    @Binding var isLoading: Bool
     @State var towerURL: URL
 
     @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
@@ -75,7 +85,7 @@ struct WebViewForTower: UIViewRepresentable {
         return webView
     }
 
-    func makeCoordinator() -> CoordinatorForTower {
+    func makeCoordinator() -> Coordinator {
         Coordinator(version: iidxVersion, updateTowerState: updateTowerState)
     }
 
@@ -87,53 +97,58 @@ struct WebViewForTower: UIViewRepresentable {
         self.isTowerAvailable = isTowerAvailable
         if isTowerAvailable {
             webView.layer.opacity = 1.0
+            isLoading = false
         } else {
             webView.layer.opacity = 0.0
+            isLoading = false
         }
     }
-}
 
-class CoordinatorForTower: NSObject, WKNavigationDelegate {
-    let cleanupTowerJS = """
-\(globalJSFunctions)
+    class Coordinator: NSObject, WKNavigationDelegate {
+        let cleanupTowerJS = """
+    \(globalJSFunctions)
 
-\(globalCleanup)
+    \(globalCleanup)
 
-\(iidxTowerCleanup)
-"""
+    \(iidxTowerCleanup)
+    """
 
-    let cleanupLoginJS = """
-\(globalJSFunctions)
+        let cleanupLoginJS = """
+    \(globalJSFunctions)
 
-\(globalCleanup)
+    \(globalCleanup)
 
-\(loginPageCleanup)
-"""
+    \(loginPageCleanup)
+    """
 
-    var version: IIDXVersion
-    var updateTowerState: (Bool) -> Void
+        var version: IIDXVersion
+        var updateTowerState: (Bool) -> Void
 
-    init(version: IIDXVersion, updateTowerState: @escaping (Bool) -> Void) {
-        self.version = version
-        self.updateTowerState = updateTowerState
-        super.init()
-    }
+        init(
+            version: IIDXVersion,
+            updateTowerState: @escaping (Bool) -> Void
+        ) {
+            self.version = version
+            self.updateTowerState = updateTowerState
+            super.init()
+        }
 
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        if let webViewURL = webView.url {
-            let urlString = webViewURL.absoluteString
-            webView.evaluateJavaScript(self.cleanupTowerJS) { _, _ in
-                if urlString.starts(with: self.version.towerURL().absoluteString) {
-                    webView.evaluateJavaScript("document.documentElement.outerHTML.toString()") { html, _ in
-                        if let html = html as? String {
-                            self.updateTowerState(!html.contains("Http 404"))
-                        } else {
-                            self.updateTowerState(false)
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            if let webViewURL = webView.url {
+                let urlString = webViewURL.absoluteString
+                webView.evaluateJavaScript(self.cleanupTowerJS) { _, _ in
+                    if urlString.starts(with: self.version.towerURL().absoluteString) {
+                        webView.evaluateJavaScript("document.documentElement.outerHTML.toString()") { html, _ in
+                            if let html = html as? String {
+                                self.updateTowerState(!html.contains("Http 404"))
+                            } else {
+                                self.updateTowerState(false)
+                            }
                         }
-                    }
-                } else {
-                    webView.evaluateJavaScript(self.cleanupLoginJS) { _, _ in
-                        webView.layer.opacity = 1.0
+                    } else {
+                        webView.evaluateJavaScript(self.cleanupLoginJS) { _, _ in
+                            webView.layer.opacity = 1.0
+                        }
                     }
                 }
             }

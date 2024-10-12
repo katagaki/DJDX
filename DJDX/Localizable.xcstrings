@@ -677,23 +677,6 @@
         }
       }
     },
-    "Importer.Web.Loading" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Loading..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "読み込み中…"
-          }
-        }
-      }
-    },
     "LEVEL" : {
       "localizations" : {
         "en" : {
@@ -1617,6 +1600,23 @@
       },
       "shouldTranslate" : false
     },
+    "Shared.Loading" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "読み込み中…"
+          }
+        }
+      }
+    },
     "Shared.NoData" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2061,6 +2061,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "IIDXタワー"
+          }
+        }
+      }
+    },
+    "Textage.FallbackMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart not opening?\nTry searching manually on Textage."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面が開きませんか？\nお手数ですが、Textageで手動で検索してみてください。"
           }
         }
       }

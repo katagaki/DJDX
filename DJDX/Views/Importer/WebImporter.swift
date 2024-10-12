@@ -30,7 +30,7 @@ struct WebImporter: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarBackground(.hidden, for: .tabBar)
         .background {
-            ProgressView("Importer.Web.Loading")
+            ProgressView("Shared.Loading")
         }
         .padding(0.0)
         .safeAreaInset(edge: .bottom, spacing: 0.0) {

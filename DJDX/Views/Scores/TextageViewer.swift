@@ -14,10 +14,16 @@ https://textage.cc/score/index.html
 
 struct TextageViewer: View {
 
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
+
     var songTitle: String
     var level: IIDXLevel
     var playSide: IIDXPlaySide
     var playType: IIDXPlayType
+
+    @State var webView = WKWebView()
+    @State var isLoading: Bool = true
+    @State var isShowingFallbackButton: Bool = false
 
     init(songTitle: String, level: IIDXLevel, playSide: IIDXPlaySide, playType: IIDXPlayType) {
         self.songTitle = songTitle
@@ -27,80 +33,130 @@ struct TextageViewer: View {
     }
 
     var body: some View {
-        WebViewForTextageViewer(songTitle: songTitle, level: level,
-                                playSide: playSide, playType: playType)
+        WebViewForTextage(
+            webView: $webView,
+            isLoading: $isLoading,
+            songTitle: songTitle,
+            level: level,
+            playSide: playSide,
+            playType: playType
+        )
             .navigationTitle("ViewTitle.TextageViewer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.visible, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Link(destination: textageIIDXURL) {
-                        Label("Shared.OpenInSafari", systemImage: "safari")
+                    Button("Shared.Refresh", systemImage: "arrow.clockwise") {
+                        webView.layer.opacity = 0.0
+                        withAnimation(.snappy.speed(2.0)) {
+                            isLoading = true
+                            isShowingFallbackButton = false
+                        } completion: {
+                            webView.load(URLRequest(url: textageIIDXURL))
+                            Task {
+                                await showFallbackAfterDelay()
+                            }
+                        }
                     }
                 }
             }
             .background {
                 VStack(spacing: 16.0) {
-                    ProgressView("Importer.Web.Loading")
+                    if isLoading {
+                        ProgressView("Shared.Loading")
+                    }
+                    if isShowingFallbackButton {
+                        VStack(spacing: 8.0) {
+                            Text("Textage.FallbackMessage")
+                            Link(destination: textageIIDXURL) {
+                                Label("Shared.OpenInSafari", systemImage: "safari")
+                            }
+                        }
+                        .padding()
+                        .background(Color(uiColor: colorScheme == .dark ?
+                            .secondarySystemGroupedBackground :
+                                .systemGroupedBackground))
+                        .clipShape(.rect(cornerRadius: 10.0))
+                    }
                 }
+            }
+            .task {
+                await showFallbackAfterDelay()
             }
             .padding(0.0)
     }
+
+    func showFallbackAfterDelay() async {
+        try? await Task.sleep(for: .seconds(4.0))
+        if isLoading {
+            withAnimation(.snappy.speed(2.0)) {
+                isShowingFallbackButton = true
+            }
+        }
+    }
 }
 
-struct WebViewForTextageViewer: UIViewRepresentable {
+struct WebViewForTextage: UIViewRepresentable {
 
-    let webView = WKWebView()
+    @Binding var webView: WKWebView
+    @Binding var isLoading: Bool
+
     var songTitle: String
     var level: IIDXLevel
     var playSide: IIDXPlaySide = .notApplicable
     var playType: IIDXPlayType = .single
 
-    init(songTitle: String, level: IIDXLevel, playSide: IIDXPlaySide, playType: IIDXPlayType) {
-        self.songTitle = songTitle
-        self.level = level
-        self.playSide = playSide
-        self.playType = playType
-    }
-
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
-        webView.isInspectable = true
         webView.load(URLRequest(url: textageIIDXURL))
         return webView
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(songTitle: songTitle, level: level, playSide: playSide, playType: playType)
+        Coordinator(
+            songTitle: songTitle,
+            level: level, playSide: playSide,
+            playType: playType,
+            updateTextageState: updateTextageState
+        )
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
         // Blank function to conform to protocol
     }
 
+    func updateTextageState(_ isTextageReady: Bool) {
+        if isTextageReady {
+            webView.layer.opacity = 1.0
+            isLoading = false
+        } else {
+            webView.layer.opacity = 0.0
+        }
+    }
+
     class Coordinator: NSObject, WKNavigationDelegate {
 
-        let navigationJS = """
-var levelSelectors = document.getElementsByName("djauto_opt")[0];
-levelSelectors.value = "%@1";
-
-var songNameTextField = document.getElementsByName("djauto")[0];
-songNameTextField.value = "%@2";
-
-do_djauto();
-"""
         var songTitle: String
         var level: IIDXLevel
         var playSide: IIDXPlaySide = .notApplicable
         var playType: IIDXPlayType = .single
+        var updateTextageState: (Bool) -> Void
 
-        init(songTitle: String, level: IIDXLevel, playSide: IIDXPlaySide, playType: IIDXPlayType) {
+        init(
+            songTitle: String,
+            level: IIDXLevel,
+            playSide: IIDXPlaySide,
+            playType: IIDXPlayType,
+            updateTextageState: @escaping (Bool) -> Void
+        ) {
             self.songTitle = songTitle
             self.level = level
             self.playSide = playSide
             self.playType = playType
+            self.updateTextageState = updateTextageState
+            super.init()
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -108,12 +164,12 @@ do_djauto();
                 let urlString = webViewURL.absoluteString
                 if urlString.starts(with: textageIIDXURL.absoluteString) {
                     webView.evaluateJavaScript(
-                        self.navigationJS
+                        textageNavigationJS
                             .replacingOccurrences(of: "%@1", with: levelValue())
                             .replacingOccurrences(of: "%@2", with: songTitle)
                     )
                 } else {
-                    webView.layer.opacity = 1.0
+                    self.updateTextageState(true)
                 }
             }
         }
