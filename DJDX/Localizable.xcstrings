@@ -1329,13 +1329,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BETA"
+            "value" : "Web"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ベータ"
+            "value" : "ウェブ"
           }
         }
       }
