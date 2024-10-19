@@ -63,18 +63,35 @@ struct ScoreViewer: View {
         .safeAreaInset(edge: .top, spacing: 0.0) {
             TabBarAccessory(placement: .top) {
                 VStack(alignment: .center, spacing: 8.0) {
-                    VStack(alignment: .center, spacing: 2.0) {
+                    VStack(alignment: .center, spacing: 4.0) {
                         Text(songRecord.genre)
-                            .font(.caption2)
-                            .fontWidth(.condensed)
+                            .font(.subheadline)
+                            .fontWeight(.heavy)
+                            .foregroundStyle(.white)
+                            .strokeText(color: .black.opacity(0.7), width: 0.5)
                         Text(songRecord.title)
-                            .bold()
-                            .fontWidth(.condensed)
+                            .font(.title)
+                            .fontWeight(.heavy)
+                            .fontWidth(.compressed)
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(
+                                LinearGradient(stops: [
+                                    .init(color: Color(red: 234 / 255, green: 254 / 255, blue: 1.0),
+                                          location: 0.0),
+                                    .init(color: Color(red: 116 / 255, green: 243 / 255, blue: 248 / 255),
+                                          location: 1.0)
+                                ], startPoint: .top, endPoint: .bottom)
+                            )
+                            .strokeText(color: Color(red: 35 / 255, green: 59 / 255, blue: 158 / 255), width: 0.5)
                             .textSelection(.enabled)
+                            .padding(.bottom, 2.0)
                         Text(songRecord.artist)
-                            .font(.caption)
-                            .fontWidth(.condensed)
+                            .font(.subheadline)
+                            .fontWeight(.heavy)
+                            .foregroundStyle(.white)
+                            .strokeText(color: .black.opacity(0.7), width: 0.5)
                     }
+                    .frame(maxWidth: .infinity)
                     Divider()
                     IIDXLevelShowcase(songRecord: songRecord)
                     Divider()

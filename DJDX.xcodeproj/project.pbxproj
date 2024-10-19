@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E4260FC22CC3CB6C0078946D /* TextStroke.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4260FC12CC3CB660078946D /* TextStroke.swift */; };
 		E45B1CE22CB0EBDB006A7E85 /* DataFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1CE12CB0EBD9006A7E85 /* DataFetcher.swift */; };
 		E45B1CE82CB158F8006A7E85 /* FilterOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1CE72CB158E5006A7E85 /* FilterOptions.swift */; };
 		E45B1CEA2CB15942006A7E85 /* SortOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1CE92CB15940006A7E85 /* SortOptions.swift */; };
@@ -87,6 +88,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E4260FC12CC3CB660078946D /* TextStroke.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStroke.swift; sourceTree = "<group>"; };
 		E45B1CE12CB0EBD9006A7E85 /* DataFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataFetcher.swift; sourceTree = "<group>"; };
 		E45B1CE72CB158E5006A7E85 /* FilterOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterOptions.swift; sourceTree = "<group>"; };
 		E45B1CE92CB15940006A7E85 /* SortOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortOptions.swift; sourceTree = "<group>"; };
@@ -349,6 +351,7 @@
 				E45B1D092CB19973006A7E85 /* AutomaticNavigationTransition.swift */,
 				E4BC327F2C036C82006A0F7A /* ConditionalShadow.swift */,
 				E4BC32812C036CBD006A0F7A /* LevelLabelGlow.swift */,
+				E4260FC12CC3CB660078946D /* TextStroke.swift */,
 			);
 			path = "View Modifiers";
 			sourceTree = "<group>";
@@ -545,6 +548,7 @@
 				E4EB2CA32BFF78F300A00796 /* ImportGroup.swift in Sources */,
 				E46A65FB2C0B635200D9544B /* IIDXPlaySide.swift in Sources */,
 				E46A65FF2C0C918300D9544B /* IIDXDJLevel.swift in Sources */,
+				E4260FC22CC3CB6C0078946D /* TextStroke.swift in Sources */,
 				E4E3D0C52BF98D79001942FE /* NavigationManager.swift in Sources */,
 				E47269012C3A2A5F00D5335D /* TrendsDJLevelGraph.swift in Sources */,
 				E46A65F92C0B5E7300D9544B /* TextageViewer.swift in Sources */,
