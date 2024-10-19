@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ScoreViewer: View {
 
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
     var songRecord: IIDXSongRecord
@@ -53,47 +54,64 @@ struct ScoreViewer: View {
                 Spacer()
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Text(songRecord.version)
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
-                    .bold()
-                    .italic()
+                Group {
+                    if let iidxVersion = IIDXVersion.marketingNames[songRecord.version] {
+                        switch colorScheme {
+                        case .dark:
+                            Text(songRecord.version)
+                                .foregroundStyle(Color(uiColor: iidxVersion.darkModeColor))
+                        default:
+                            Text(songRecord.version)
+                                .foregroundStyle(Color(uiColor: iidxVersion.lightModeColor))
+                        }
+                    } else {
+                        Text(songRecord.version)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .font(.subheadline)
+                .fontWeight(.heavy)
+                .italic()
             }
         }
         .safeAreaInset(edge: .top, spacing: 0.0) {
             TabBarAccessory(placement: .top) {
                 VStack(alignment: .center, spacing: 8.0) {
                     VStack(alignment: .center, spacing: 4.0) {
-                        Text(songRecord.genre)
-                            .font(.subheadline)
-                            .fontWeight(.heavy)
-                            .foregroundStyle(.white)
-                            .strokeText(color: .black.opacity(0.7), width: 0.5)
-                        Text(songRecord.title)
-                            .font(.title)
-                            .fontWeight(.heavy)
-                            .fontWidth(.compressed)
-                            .multilineTextAlignment(.center)
-                            .foregroundStyle(
-                                LinearGradient(stops: [
-                                    .init(color: Color(red: 234 / 255, green: 254 / 255, blue: 1.0),
-                                          location: 0.0),
-                                    .init(color: Color(red: 116 / 255, green: 243 / 255, blue: 248 / 255),
-                                          location: 1.0)
-                                ], startPoint: .top, endPoint: .bottom)
-                            )
-                            .strokeText(color: Color(red: 35 / 255, green: 59 / 255, blue: 158 / 255), width: 0.5)
-                            .textSelection(.enabled)
-                            .padding(.bottom, 2.0)
-                        Text(songRecord.artist)
-                            .font(.subheadline)
-                            .fontWeight(.heavy)
-                            .foregroundStyle(.white)
-                            .strokeText(color: .black.opacity(0.7), width: 0.5)
+                        Group {
+                            Text(songRecord.genre)
+                                .font(.subheadline)
+                                .fontWeight(.heavy)
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(.white)
+                                .strokeText(color: .black.opacity(0.7), width: 0.5)
+                            Text(songRecord.title)
+                                .font(.title)
+                                .fontWeight(.heavy)
+                                .fontWidth(.compressed)
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(
+                                    LinearGradient(stops: [
+                                        .init(color: Color(red: 234 / 255, green: 254 / 255, blue: 1.0),
+                                              location: 0.0),
+                                        .init(color: Color(red: 116 / 255, green: 243 / 255, blue: 248 / 255),
+                                              location: 1.0)
+                                    ], startPoint: .top, endPoint: .bottom)
+                                )
+                                .strokeText(color: Color(red: 35 / 255, green: 59 / 255, blue: 158 / 255), width: 0.5)
+                                .textSelection(.enabled)
+                                .padding(.bottom, 2.0)
+                            Text(songRecord.artist)
+                                .font(.subheadline)
+                                .fontWeight(.heavy)
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(.white)
+                                .strokeText(color: .black.opacity(0.7), width: 0.5)
+                        }
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                     }
                     .frame(maxWidth: .infinity)
-                    Divider()
-                    IIDXLevelShowcase(songRecord: songRecord)
                     Divider()
                     HStack {
                         Text("""

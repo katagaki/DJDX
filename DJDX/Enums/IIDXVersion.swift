@@ -47,7 +47,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
 
     var marketingName: String {
         switch self {
-        case .iidx1stStyle: return "1st style"
+        case .iidx1stStyle: return "1st style" // May also be known as '1st&substream'
         case .iidx2ndStyle: return "2nd style"
         case .iidx3rdStyle: return "3rd style"
         case .iidx4thStyle: return "4th style"
@@ -79,6 +79,12 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .resident: return "RESIDENT"
         case .epolis: return "EPOLIS"
         case .pinkyCrush: return "Pinky Crush"
+        }
+    }
+
+    static var marketingNames: [String: IIDXVersion] {
+        allCases.reduce(into: [:]) { partialResult, version in
+            partialResult[version.marketingName] = version
         }
     }
 
