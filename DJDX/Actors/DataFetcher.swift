@@ -102,6 +102,7 @@ actor DataFetcher {
             importGroupID = importGroup.id
 
             // Get new song records in import group
+            // TODO: Find a way to trigger a refresh here when import groups update
             allSongRecords = (try? modelContext.fetch(
                 FetchDescriptor<IIDXSongRecord>(
                     predicate: #Predicate<IIDXSongRecord> {
@@ -111,7 +112,7 @@ actor DataFetcher {
                 )
             )) ?? []
 
-            // TODO: Find a way to trigger a refresh only on wiki data instead of just caching as-is
+            // TODO: Find a way to trigger a refresh on wiki data update
             if songs.isEmpty {
                 songs = (try? modelContext.fetch(
                     FetchDescriptor<IIDXSong>(
@@ -206,7 +207,7 @@ actor DataFetcher {
             }
 
             songRecords = filteredSongRecords
-        } else if filters == previousFilters {
+        } else {
             debugPrint("Filters were not changed, using previously filtered song records")
             songRecords = filteredSongRecords
         }
@@ -357,7 +358,7 @@ actor DataFetcher {
             }
 
             songRecords = sortedSongRecords
-        } else if filters == previousFilters && sortOptions == previousSortOptions {
+        } else {
             debugPrint("Filters or sort options were not changed, using previously sorted song records")
             songRecords = sortedSongRecords
         }

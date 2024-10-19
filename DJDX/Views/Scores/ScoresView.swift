@@ -73,19 +73,21 @@ struct ScoresView: View {
                             difficultyToShow: $difficultyToShow
                         )
                     }
-                    .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
-                    // TODO: NavigationLink causes double opening of views, temporarily using button instead
-                    // TODO: Do something about the navigation transition modifierto bring it out here
-//                    NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
-//                        ScoreRow(
-//                            namespace: scoresNamespace,
-//                            songRecord: songRecord,
-//                            scoreRate: scoreRate(for: songRecord, of: levelToShow, or: difficultyToShow),
-//                            levelToShow: $levelToShow,
-//                            difficultyToShow: $difficultyToShow
-//                        )
-//                    }
-//                    .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
+                    .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 0.0))
+                    .alignmentGuide(.listRowSeparatorLeading) { dimensions in
+                        dimensions[.leading]
+                    }
+                    // HACK: NavigationLink causes double opening of views, temporarily using button instead
+                    // NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
+                    //     ScoreRow(
+                    //         namespace: scoresNamespace,
+                    //         songRecord: songRecord,
+                    //         scoreRate: scoreRate(for: songRecord, of: levelToShow, or: difficultyToShow),
+                    //         levelToShow: $levelToShow,
+                    //         difficultyToShow: $difficultyToShow
+                    //     )
+                    // }
+                    // .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
                 }
             }
             .navigationTitle("ViewTitle.Scores")
