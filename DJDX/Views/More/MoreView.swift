@@ -48,6 +48,19 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
+                    Picker(selection: $iidxVersion) {
+                        ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
+                            Text(version.marketingName)
+                        }
+                    } label: {
+                        ListRow(image: "ListIcon.Version",
+                                title: "Shared.IIDX.Version")
+                    }
+
+                    NavigationLink(value: ViewPath.moreAppIcon) {
+                        ListRow(image: "ListIcon.AppIcon",
+                                title: "More.General.AppIcon")
+                    }
                     // TODO: Implement this feature
                     // swiftlint:disable:next control_statement
                     if (false) {
@@ -60,15 +73,6 @@ struct MoreView: View {
                             }
                         }
                     }
-                    Picker(selection: $iidxVersion) {
-                        ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
-                            Text(version.marketingName)
-                        }
-                    } label: {
-                        ListRow(image: "ListIcon.Version",
-                                title: "Shared.IIDX.Version")
-                    }
-
                     Toggle(isOn: $isBeginnerLevelHidden) {
                         ListRow(image: "ListIcon.HideBeginner",
                                 title: "More.PlayDataDisplay.HideBeginnerLevel",
@@ -192,6 +196,8 @@ struct MoreView: View {
                 switch viewPath {
                 case .moreBemaniWikiCharts:
                     MoreBemaniWikiCharts()
+                case .moreAppIcon:
+                    MoreAppIconView()
                 case .moreAttributions:
                     LicensesView(licenses: [
                         License(libraryName: "CSwiftV", text:

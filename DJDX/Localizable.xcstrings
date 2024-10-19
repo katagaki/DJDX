@@ -818,6 +818,23 @@
         }
       }
     },
+    "More.General.AppIcon" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Icon"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリアイコン"
+          }
+        }
+      }
+    },
     "More.General.Header" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2150,6 +2167,12 @@
     "Tower.Unavailable.Description" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDX Tower is currently not available for the selected IIDX version."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2161,6 +2184,12 @@
     "Tower.Unavailable.Title" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDX Tower Unavailable"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2266,6 +2295,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "BEMANIWiki 2nd"
+          }
+        }
+      }
+    },
+    "ViewTitle.More.Customization.AppIcon" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Icon"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリアイコン"
           }
         }
       }

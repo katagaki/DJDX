@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E4260FC22CC3CB6C0078946D /* TextStroke.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4260FC12CC3CB660078946D /* TextStroke.swift */; };
+		E4260FC42CC3DAFA0078946D /* MoreAppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4260FC32CC3DAF60078946D /* MoreAppIconView.swift */; };
 		E45B1CE22CB0EBDB006A7E85 /* DataFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1CE12CB0EBD9006A7E85 /* DataFetcher.swift */; };
 		E45B1CE82CB158F8006A7E85 /* FilterOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1CE72CB158E5006A7E85 /* FilterOptions.swift */; };
 		E45B1CEA2CB15942006A7E85 /* SortOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45B1CE92CB15940006A7E85 /* SortOptions.swift */; };
@@ -89,6 +90,7 @@
 
 /* Begin PBXFileReference section */
 		E4260FC12CC3CB660078946D /* TextStroke.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStroke.swift; sourceTree = "<group>"; };
+		E4260FC32CC3DAF60078946D /* MoreAppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreAppIconView.swift; sourceTree = "<group>"; };
 		E45B1CE12CB0EBD9006A7E85 /* DataFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataFetcher.swift; sourceTree = "<group>"; };
 		E45B1CE72CB158E5006A7E85 /* FilterOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterOptions.swift; sourceTree = "<group>"; };
 		E45B1CE92CB15940006A7E85 /* SortOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortOptions.swift; sourceTree = "<group>"; };
@@ -329,6 +331,7 @@
 		E4B123DC2BF90D2600D4A3D1 /* More */ = {
 			isa = PBXGroup;
 			children = (
+				E4260FC32CC3DAF60078946D /* MoreAppIconView.swift */,
 				E4B123D62BF90A4300D4A3D1 /* MoreView.swift */,
 				E46A65EC2C0AFC7800D9544B /* MoreBemaniWikiCharts.swift */,
 			);
@@ -586,6 +589,7 @@
 				E46D51AF2C264E73000524B9 /* TabBarAccessory.swift in Sources */,
 				E4E3D0E82BFA2B95001942FE /* WebImporter.swift in Sources */,
 				E49359DA2C00AD060022E385 /* DataState.swift in Sources */,
+				E4260FC42CC3DAFA0078946D /* MoreAppIconView.swift in Sources */,
 				E4E3D0CA2BF98DB7001942FE /* TabType.swift in Sources */,
 				E4E3D0EA2BFA47B1001942FE /* ImportFailedReason.swift in Sources */,
 			);
@@ -720,6 +724,7 @@
 		E4B123BD2BF8E8E500D4A3D1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon.31 AppIcon.30 AppIcon.29 AppIcon.28 AppIcon.27";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DJDX/DJDX.entitlements;
@@ -758,6 +763,7 @@
 		E4B123BE2BF8E8E500D4A3D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon.31 AppIcon.30 AppIcon.29 AppIcon.28 AppIcon.27";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DJDX/DJDX.entitlements;
