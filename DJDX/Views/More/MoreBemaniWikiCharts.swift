@@ -125,12 +125,12 @@ struct MoreBemaniWikiCharts: View {
                 modelContext.insert(iidxSong)
             }
         }
-        try? modelContext.save()
         await MainActor.run {
             progressAlertManager.hide()
             withAnimation(.snappy.speed(2.0)) {
                 dataImported = 0
             }
+            try? modelContext.save()
         }
     }
 

@@ -80,6 +80,7 @@ actor DataImporter {
         let parsedCSV = CSwiftV(with: csvString)
         if let keyedRows = parsedCSV.keyedRows {
             importCSV(keyedRows, to: importToDate, for: playType, from: version, didProgressUpdate: didProgressUpdate)
+            try? modelContext.save()
         }
     }
 
@@ -109,7 +110,6 @@ actor DataImporter {
                 didProgressUpdate(numberOfKeyedRowsProcessed, totalNumberOfKeyedRows)
             }
         }
-        try? modelContext.save()
     }
 
     // MARK: Other Import Stuff
