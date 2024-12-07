@@ -12,6 +12,7 @@ struct ScoreViewer: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     var songRecord: IIDXSongRecord
     var noteCount: (IIDXSongRecord, IIDXLevel) -> Int?
@@ -91,14 +92,28 @@ struct ScoreViewer: View {
                                 .fontWidth(.compressed)
                                 .multilineTextAlignment(.center)
                                 .foregroundStyle(
-                                    LinearGradient(stops: [
-                                        .init(color: Color(red: 234 / 255, green: 254 / 255, blue: 1.0),
-                                              location: 0.0),
-                                        .init(color: Color(red: 116 / 255, green: 243 / 255, blue: 248 / 255),
-                                              location: 1.0)
-                                    ], startPoint: .top, endPoint: .bottom)
+                                    songRecord.version != iidxVersion.marketingName ?
+                                        LinearGradient(stops: [
+                                            .init(color: .white,
+                                                  location: 0.0),
+                                            .init(color: .gray,
+                                                  location: 1.0)
+                                        ], startPoint: .top, endPoint: .bottom)
+                                    :
+                                        LinearGradient(stops: [
+                                            .init(color: Color(red: 234 / 255, green: 254 / 255, blue: 1.0),
+                                                  location: 0.0),
+                                            .init(color: Color(red: 116 / 255, green: 243 / 255, blue: 248 / 255),
+                                                  location: 1.0)
+                                        ], startPoint: .top, endPoint: .bottom)
                                 )
-                                .strokeText(color: Color(red: 35 / 255, green: 59 / 255, blue: 158 / 255), width: 0.5)
+                                .strokeText(
+                                    color: songRecord.version != iidxVersion.marketingName ?
+                                        Color(red: 77 / 255, green: 77 / 255, blue: 77 / 255)
+                                    :
+                                        Color(red: 35 / 255, green: 59 / 255, blue: 158 / 255),
+                                    width: 0.5
+                                )
                                 .textSelection(.enabled)
                                 .padding(.bottom, 2.0)
                             Text(songRecord.artist)
