@@ -374,6 +374,22 @@
         }
       }
     },
+    "Alert.Importing.Title.%lld.%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing (%1$lld of %2$lld)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポート中（%1$lld/%2$lld）"
+          }
+        }
+      }
+    },
     "Analytics.ClearType.ByDifficulty" : {
       "extractionState" : "manual",
       "localizations" : {

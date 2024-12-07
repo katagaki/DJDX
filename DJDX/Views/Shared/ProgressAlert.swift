@@ -10,8 +10,8 @@ import SwiftUI
 struct ProgressAlert: View {
 
     @Environment(\.colorScheme) var colorScheme
-    @State var title: String
-    @State var message: String
+    @Binding var title: String
+    @Binding var message: String
     @Binding var percentage: Int
 
     var body: some View {

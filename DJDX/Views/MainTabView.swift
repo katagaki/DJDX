@@ -21,6 +21,7 @@ struct MainTabView: View {
     @State var isFirstStartCleanupComplete: Bool = false
 
     var body: some View {
+        @Bindable var progressAlertManager = progressAlertManager
         TabView(selection: $navigationManager.selectedTab) {
             ImportView()
                 .tabItem {
@@ -50,10 +51,9 @@ struct MainTabView: View {
         }
         .overlay {
             if progressAlertManager.isShowing {
-                @Bindable var progressAlertManager = progressAlertManager
                 ProgressAlert(
-                    title: progressAlertManager.title,
-                    message: progressAlertManager.message,
+                    title: $progressAlertManager.title,
+                    message: $progressAlertManager.message,
                     percentage: $progressAlertManager.percentage
                 )
                 .ignoresSafeArea(.all)

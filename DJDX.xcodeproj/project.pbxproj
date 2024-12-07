@@ -51,7 +51,6 @@
 		E48ABABC2C1F2AEF00C82578 /* PlayTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */; };
 		E48B628A2C5F47CF007874AE /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48B62892C5F47CE007874AE /* UserDefaults.swift */; };
 		E49359DA2C00AD060022E385 /* DataState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359D92C00AD060022E385 /* DataState.swift */; };
-		E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DB2C00C29C0022E385 /* ManualImporter.swift */; };
 		E49359DF2C00E4230022E385 /* LevelLabelOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */; };
 		E49359E12C016F2F0022E385 /* SortMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359E02C016F2F0022E385 /* SortMode.swift */; };
 		E49359E32C0170E80022E385 /* IIDXLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49359E22C0170E80022E385 /* IIDXLevel.swift */; };
@@ -131,7 +130,6 @@
 		E48ABABB2C1F2AEF00C82578 /* PlayTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayTypePicker.swift; sourceTree = "<group>"; };
 		E48B62892C5F47CE007874AE /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		E49359D92C00AD060022E385 /* DataState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataState.swift; sourceTree = "<group>"; };
-		E49359DB2C00C29C0022E385 /* ManualImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualImporter.swift; sourceTree = "<group>"; };
 		E49359DE2C00E4230022E385 /* LevelLabelOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelLabelOrientation.swift; sourceTree = "<group>"; };
 		E49359E02C016F2F0022E385 /* SortMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortMode.swift; sourceTree = "<group>"; };
 		E49359E22C0170E80022E385 /* IIDXLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IIDXLevel.swift; sourceTree = "<group>"; };
@@ -410,7 +408,6 @@
 			children = (
 				E4EB2CA72BFF7E3700A00796 /* ImportView.swift */,
 				E4E3D0E72BFA2B95001942FE /* WebImporter.swift */,
-				E49359DB2C00C29C0022E385 /* ManualImporter.swift */,
 			);
 			path = Importer;
 			sourceTree = "<group>";
@@ -540,7 +537,6 @@
 				E4EB2CA82BFF7E3700A00796 /* ImportView.swift in Sources */,
 				E46D51B12C26501D000524B9 /* LargeInlineTitle.swift in Sources */,
 				E46D51AB2C25BDFA000524B9 /* AnalyticsViewMode.swift in Sources */,
-				E49359DC2C00C29C0022E385 /* ManualImporter.swift in Sources */,
 				E46A65E02C0A276800D9544B /* DetailRow.swift in Sources */,
 				E4C5053C2C0E71D700A0C303 /* ScoreHistoryViewer.swift in Sources */,
 				E4B123D72BF90A4300D4A3D1 /* MoreView.swift in Sources */,
@@ -747,7 +743,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 32.1.3;
+				MARKETING_VERSION = 32.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -787,7 +783,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 32.1.3;
+				MARKETING_VERSION = 32.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";

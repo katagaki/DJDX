@@ -11,6 +11,8 @@ import SwiftData
 @ModelActor
 actor DataImporter {
 
+    let dateFormat = "yyyy-MM-dd-HH-mm-ss"
+
     // MARK: CSV Import
 
     func importSampleCSV(
@@ -35,16 +37,34 @@ actor DataImporter {
         didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
     ) {
         if let urlOfData: URL = url, let stringFromData: String = try? String(contentsOf: urlOfData) {
-            saveCSVStringToFile(stringFromData)
             let parsedCSV = CSwiftV(with: stringFromData)
             if let keyedRows = parsedCSV.keyedRows {
-                importCSV(
-                    keyedRows,
-                    to: importToDate,
-                    for: playType,
-                    from: version,
-                    didProgressUpdate: didProgressUpdate
-                )
+
+                // 1. Determine whether to use date from filename
+                let fileNameWithoutExtension = urlOfData.deletingPathExtension().lastPathComponent
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = dateFormat
+
+                if let date = dateFormatter.date(from: fileNameWithoutExtension) {
+                    // 2. Import to date from filename
+                    importCSV(
+                        keyedRows,
+                        to: date,
+                        for: playType,
+                        from: version,
+                        didProgressUpdate: didProgressUpdate
+                    )
+                } else {
+                    // 2. Import to selected date
+                    saveCSVStringToFile(stringFromData)
+                    importCSV(
+                        keyedRows,
+                        to: importToDate,
+                        for: playType,
+                        from: version,
+                        didProgressUpdate: didProgressUpdate
+                    )
+                }
             }
         }
     }
@@ -81,7 +101,6 @@ actor DataImporter {
             let totalNumberOfKeyedRows = keyedRows.count
             var numberOfKeyedRowsProcessed = 0
             for keyedRow in keyedRows {
-                debugPrint("Processing keyed row \(numberOfKeyedRowsProcessed)")
                 let songRecord: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
                 modelContext.insert(songRecord)
                 songRecord.importGroup = importGroup
@@ -89,8 +108,8 @@ actor DataImporter {
                 numberOfKeyedRowsProcessed += 1
                 didProgressUpdate(numberOfKeyedRowsProcessed, totalNumberOfKeyedRows)
             }
+            try? modelContext.save()
         }
-        try? modelContext.save()
     }
 
     // MARK: Other Import Stuff
@@ -99,7 +118,7 @@ actor DataImporter {
         if let documentsDirectoryURL: URL = FileManager
         .default.urls(for: .documentDirectory, in: .userDomainMask).first {
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd-HH-mm-ss"
+            dateFormatter.dateFormat = dateFormat
             let dateString = dateFormatter.string(from: .now)
             let csvFile = documentsDirectoryURL.appendingPathComponent("\(dateString).csv",
                                                                        conformingTo: .commaSeparatedText)

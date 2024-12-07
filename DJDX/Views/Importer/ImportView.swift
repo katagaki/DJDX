@@ -11,6 +11,7 @@ import SwiftUI
 
 struct ImportView: View {
 
+    @Environment(\.openURL) var openURL
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
@@ -20,6 +21,7 @@ struct ImportView: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var importPlayType: IIDXPlayType
+    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @Query(sort: \ImportGroup.importDate, order: .reverse) var importGroups: [ImportGroup]
 
@@ -27,6 +29,8 @@ struct ImportView: View {
     @State var isAutoImportFailed: Bool = false
     @State var didImportSucceed: Bool = false
     @State var autoImportFailedReason: ImportFailedReason?
+
+    @State var isSelectingCSVFile: Bool = false
 
     var body: some View {
         NavigationStack(path: $navigationManager[.calendar]) {
@@ -52,13 +56,7 @@ struct ImportView: View {
                     }
                 }
                 .onDelete(perform: { indexSet in
-                    var importGroupsToDelete: [ImportGroup] = []
-                    indexSet.forEach { index in
-                        importGroupsToDelete.append(importGroups[index])
-                    }
-                    importGroupsToDelete.forEach { importGroup in
-                        modelContext.delete(importGroup)
-                    }
+                    deleteImport(indexSet)
                 })
             }
             .listStyle(.plain)
@@ -77,31 +75,7 @@ struct ImportView: View {
                         Menu {
                             Section {
                                 Button("Calendar.Import.LoadSamples.Button") {
-                                    progressAlertManager.show(
-                                        title: "Alert.Importing.Title",
-                                        message: "Alert.Importing.Text"
-                                    ) {
-                                        Task.detached {
-                                            let actor = DataImporter(modelContainer: sharedModelContainer)
-                                            await actor.importSampleCSV(
-                                                to: importToDate,
-                                                for: .single
-                                            ) { currentProgress, totalProgress in
-                                                Task {
-                                                    let progress = (currentProgress * 100) / totalProgress
-                                                    await MainActor.run {
-                                                        progressAlertManager.updateProgress(
-                                                            progress
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                            await MainActor.run {
-                                                didImportSucceed = true
-                                                progressAlertManager.hide()
-                                            }
-                                        }
-                                    }
+                                    importSampleCSV()
                                 }
                             } header: {
                                 Text("Calendar.Import.LoadSamples.Description")
@@ -136,8 +110,33 @@ struct ImportView: View {
                                         navigationManager.push(ViewPath.importerWebIIDXDouble, for: .calendar)
                                     }
                                 }
-                                ToolbarButton("Calendar.Import.FromCSV", icon: "doc.badge.plus") {
-                                    navigationManager.push(ViewPath.importerManual, for: .calendar)
+                                Menu {
+                                    Section {
+                                        Button("Importer.CSV.Download.Button", systemImage: "safari") {
+                                            openURL(URL(
+                                                string: "https://p.eagate.573.jp/game/2dx/\(iidxVersion.rawValue)/djdata/score_download.html"
+                                            )!)
+                                        }
+                                    } header: {
+                                        Text("Importer.CSV.Download.Description")
+                                            .foregroundColor(.primary)
+                                            .textCase(nil)
+                                            .font(.body)
+                                    }
+                                    Section {
+                                        Button("Importer.CSV.Load.Button", systemImage: "folder") {
+                                            isSelectingCSVFile = true
+                                        }
+                                    } header: {
+                                        Text("Importer.CSV.Load.Description")
+                                            .foregroundColor(.primary)
+                                            .textCase(nil)
+                                            .font(.body)
+                                    }
+                                } label: {
+                                    ToolbarButton("Calendar.Import.FromCSV", icon: "doc.badge.plus") {
+                                        // Intentionally left blank
+                                    }
                                 }
                             }
                             .padding([.leading, .trailing], 16.0)
@@ -176,6 +175,12 @@ struct ImportView: View {
             .task {
                 importToDate = .now
             }
+            .sheet(isPresented: $isSelectingCSVFile) {
+                DocumentPicker(allowedUTIs: [.commaSeparatedText], onDocumentPicked: { urls in
+                    importCSVs(from: urls)
+                })
+                .ignoresSafeArea(edges: [.bottom])
+            }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .importerWebIIDXSingle:
@@ -190,10 +195,6 @@ struct ImportView: View {
                                 isAutoImportFailed: $isAutoImportFailed,
                                 didImportSucceed: $didImportSucceed,
                                 autoImportFailedReason: $autoImportFailedReason)
-                case .importerManual:
-                    ManualImporter(importToDate: $importToDate,
-                                   importPlayType: $importPlayType,
-                                   didImportSucceed: $didImportSucceed)
                 default: Color.clear
                 }
             }
@@ -222,6 +223,87 @@ struct ImportView: View {
             return NSLocalizedString("Alert.Import.Error.Subtitle.ServerError", comment: "")
         case .maintenance:
             return NSLocalizedString("Alert.Import.Error.Subtitle.Maintenance", comment: "")
+        }
+    }
+
+    func deleteImport(_ indexSet: IndexSet) {
+        var importGroupsToDelete: [ImportGroup] = []
+        indexSet.forEach { index in
+            importGroupsToDelete.append(importGroups[index])
+        }
+        importGroupsToDelete.forEach { importGroup in
+            modelContext.delete(importGroup)
+        }
+    }
+
+    func importSampleCSV() {
+        progressAlertManager.show(
+            title: "Alert.Importing.Title",
+            message: "Alert.Importing.Text"
+        ) {
+            Task.detached {
+                let actor = DataImporter(modelContainer: sharedModelContainer)
+                await actor.importSampleCSV(
+                    to: importToDate,
+                    for: .single
+                ) { currentProgress, totalProgress in
+                    Task {
+                        let progress = (currentProgress * 100) / totalProgress
+                        await MainActor.run {
+                            progressAlertManager.updateProgress(
+                                progress
+                            )
+                        }
+                    }
+                }
+                await MainActor.run {
+                    didImportSucceed = true
+                    progressAlertManager.hide()
+                }
+            }
+        }
+    }
+
+    func importCSVs(from urls: [URL]) {
+        progressAlertManager.show(
+            title: "Alert.Importing.Title",
+            message: "Alert.Importing.Text"
+        ) {
+            Task.detached(priority: .high) {
+                var processedCount = 0
+                let totalCount = urls.count
+                for url in urls {
+                    processedCount += 1
+                    await MainActor.run {
+                        progressAlertManager.updateTitle("Alert.Importing.Title.\(processedCount).\(totalCount)")
+                    }
+                    let isAccessSuccessful = url.startAccessingSecurityScopedResource()
+                    if isAccessSuccessful {
+                        let actor = DataImporter(modelContainer: sharedModelContainer)
+                        await actor.importCSV(
+                            url: url,
+                            to: importToDate,
+                            for: .single,
+                            from: iidxVersion
+                        ) { currentProgress, totalProgress in
+                            Task {
+                                let progress = (currentProgress * 100) / totalProgress
+                                await MainActor.run {
+                                    progressAlertManager.updateProgress(
+                                        progress
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        url.stopAccessingSecurityScopedResource()
+                    }
+                }
+                await MainActor.run {
+                    didImportSucceed = true
+                    progressAlertManager.hide()
+                }
+            }
         }
     }
 }

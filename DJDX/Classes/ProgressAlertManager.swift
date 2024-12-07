@@ -35,7 +35,13 @@ class ProgressAlertManager {
         }
     }
 
+    @MainActor
     func updateProgress(_ percentage: Int) {
         self.percentage = percentage
+    }
+
+    @MainActor
+    func updateTitle(_ title: LocalizedStringResource) {
+        self.title = String(localized: title)
     }
 }
