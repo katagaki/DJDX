@@ -94,11 +94,11 @@ struct MainTabView: View {
 
     func migrateData() async {
         let defaults = UserDefaults.standard
-        let dataMigrationKeys = ["Internal.DataMigrationForEpolisToPinkyCrush"]
+        let dataMigrationKeys = ["Internal.DataMigrationForEpolisToPinkyCrush.2"]
 
         for dataMigrationKey in dataMigrationKeys where !defaults.bool(forKey: dataMigrationKey) {
             switch dataMigrationKey {
-            case "Internal.DataMigrationForEpolisToPinkyCrush":
+            case "Internal.DataMigrationForEpolisToPinkyCrush.2":
                 debugPrint("Performing migration when migrating from 1.x to 32.x")
                 progressAlertManager.show(
                     title: "Migration.Title",
