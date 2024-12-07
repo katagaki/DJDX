@@ -108,8 +108,8 @@ actor DataImporter {
                 numberOfKeyedRowsProcessed += 1
                 didProgressUpdate(numberOfKeyedRowsProcessed, totalNumberOfKeyedRows)
             }
-            try? modelContext.save()
         }
+        try? modelContext.save()
     }
 
     // MARK: Other Import Stuff

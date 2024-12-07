@@ -124,8 +124,8 @@ struct MoreBemaniWikiCharts: View {
             for iidxSong in iidxSongs {
                 modelContext.insert(iidxSong)
             }
-            try? modelContext.save()
         }
+        try? modelContext.save()
         await MainActor.run {
             progressAlertManager.hide()
             withAnimation(.snappy.speed(2.0)) {
