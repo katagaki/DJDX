@@ -130,7 +130,6 @@ struct MoreBemaniWikiCharts: View {
             withAnimation(.snappy.speed(2.0)) {
                 dataImported = 0
             }
-            try? modelContext.save()
         }
     }
 

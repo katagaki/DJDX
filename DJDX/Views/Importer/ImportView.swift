@@ -303,7 +303,6 @@ struct ImportView: View {
                 await MainActor.run {
                     didImportSucceed = true
                     progressAlertManager.hide()
-                    try? modelContext.save()
                 }
             }
         }

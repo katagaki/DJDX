@@ -89,7 +89,6 @@ struct MainTabView: View {
                 modelContext.delete(songRecord)
             }
         }
-        try? modelContext.save()
     }
 
     func migrateData() async {
