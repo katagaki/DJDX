@@ -17,16 +17,54 @@ actor DataImporter {
 
     func importSampleCSV(
         to importToDate: Date,
+        for playType: IIDXPlayType
+    ) -> AsyncStream<ImportProgress> {
+        let (stream, continuation) = AsyncStream.makeStream(of: ImportProgress.self)
+        continuation.yield(.init(0, 1, 1, 1))
+        try? modelContext.transaction {
+            importCSV(
+                url: Bundle.main.url(forResource: "SampleData", withExtension: "csv"),
+                to: importToDate,
+                for: playType,
+                from: .pinkyCrush,
+                continuation: continuation
+            )
+        }
+        continuation.finish()
+        return stream
+    }
+
+    func importCSVs(
+        urls: [URL],
+        to importToDate: Date,
         for playType: IIDXPlayType,
-        didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
-    ) {
-        importCSV(
-            url: Bundle.main.url(forResource: "SampleData", withExtension: "csv"),
-            to: importToDate,
-            for: playType,
-            from: .epolis,
-            didProgressUpdate: didProgressUpdate
-        )
+        from version: IIDXVersion
+    ) -> AsyncStream<ImportProgress> {
+        let (stream, continuation) = AsyncStream.makeStream(of: ImportProgress.self)
+        var processedCount = 0
+        let totalCount = urls.count
+        continuation.yield(.init(0, totalCount))
+
+        try? modelContext.transaction {
+            for url in urls {
+                processedCount += 1
+                continuation.yield(.init(processedCount, totalCount))
+
+                let isAccessSuccessful = url.startAccessingSecurityScopedResource()
+                if isAccessSuccessful {
+                    importCSV(
+                        url: url,
+                        to: importToDate,
+                        for: playType,
+                        from: version,
+                        continuation: continuation
+                    )
+                }
+                url.stopAccessingSecurityScopedResource()
+            }
+            continuation.finish()
+        }
+        return stream
     }
 
     func importCSV(
@@ -34,7 +72,7 @@ actor DataImporter {
         to importToDate: Date,
         for playType: IIDXPlayType,
         from version: IIDXVersion,
-        didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
+        continuation: AsyncStream<ImportProgress>.Continuation
     ) {
         if let urlOfData: URL = url, let stringFromData: String = try? String(contentsOf: urlOfData) {
             let parsedCSV = CSwiftV(with: stringFromData)
@@ -52,7 +90,7 @@ actor DataImporter {
                         to: date,
                         for: playType,
                         from: version,
-                        didProgressUpdate: didProgressUpdate
+                        continuation: continuation
                     )
                 } else {
                     // 2. Import to selected date
@@ -62,7 +100,7 @@ actor DataImporter {
                         to: importToDate,
                         for: playType,
                         from: version,
-                        didProgressUpdate: didProgressUpdate
+                        continuation: continuation
                     )
                 }
             }
@@ -73,14 +111,22 @@ actor DataImporter {
         csv csvString: String,
         to importToDate: Date,
         for playType: IIDXPlayType,
-        from version: IIDXVersion,
-        didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
-    ) {
+        from version: IIDXVersion
+    ) -> AsyncStream<ImportProgress> {
+        let (stream, continuation) = AsyncStream.makeStream(of: ImportProgress.self)
         saveCSVStringToFile(csvString)
         let parsedCSV = CSwiftV(with: csvString)
         if let keyedRows = parsedCSV.keyedRows {
-            importCSV(keyedRows, to: importToDate, for: playType, from: version, didProgressUpdate: didProgressUpdate)
+            importCSV(
+                keyedRows,
+                to: importToDate,
+                for: playType,
+                from: version,
+                continuation: continuation
+            )
         }
+        continuation.finish()
+        return stream
     }
 
     func importCSV(
@@ -88,26 +134,24 @@ actor DataImporter {
         to importToDate: Date,
         for playType: IIDXPlayType,
         from version: IIDXVersion,
-        didProgressUpdate: @escaping @Sendable (Int, Int) -> Void = { _, _ in }
+        continuation: AsyncStream<ImportProgress>.Continuation
     ) {
-        try? modelContext.transaction {
-            let importGroup = prepareImportGroupForPartialImport(
-                importToDate: importToDate,
-                playType: playType,
-                version: version
-            )
-            modelContext.insert(importGroup)
+        let importGroup = prepareImportGroupForPartialImport(
+            importToDate: importToDate,
+            playType: playType,
+            version: version
+        )
+        modelContext.insert(importGroup)
 
-            let totalNumberOfKeyedRows = keyedRows.count
-            var numberOfKeyedRowsProcessed = 0
-            for keyedRow in keyedRows {
-                let songRecord: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
-                modelContext.insert(songRecord)
-                songRecord.importGroup = importGroup
-                songRecord.playType = playType
-                numberOfKeyedRowsProcessed += 1
-                didProgressUpdate(numberOfKeyedRowsProcessed, totalNumberOfKeyedRows)
-            }
+        let totalNumberOfKeyedRows = keyedRows.count
+        var numberOfKeyedRowsProcessed = 0
+        for keyedRow in keyedRows {
+            let songRecord: IIDXSongRecord = IIDXSongRecord(csvRowData: keyedRow)
+            modelContext.insert(songRecord)
+            songRecord.importGroup = importGroup
+            songRecord.playType = playType
+            numberOfKeyedRowsProcessed += 1
+            continuation.yield(.init(nil, nil, numberOfKeyedRowsProcessed, totalNumberOfKeyedRows))
         }
     }
 

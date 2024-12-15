@@ -12,6 +12,7 @@ import TipKit
 struct MainTabView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
@@ -49,16 +50,6 @@ struct MainTabView: View {
                 }
                 .tag(TabType.more)
         }
-        .overlay {
-            if progressAlertManager.isShowing {
-                ProgressAlert(
-                    title: $progressAlertManager.title,
-                    message: $progressAlertManager.message,
-                    percentage: $progressAlertManager.percentage
-                )
-                .ignoresSafeArea(.all)
-            }
-        }
         .task {
             if !isFirstStartCleanupComplete {
                 await migrateData()
@@ -68,6 +59,17 @@ struct MainTabView: View {
                 .displayFrequency(.immediate),
                 .datastoreLocation(.applicationDefault)
             ])
+        }
+        .overlay {
+            if progressAlertManager.isShowing {
+                ProgressAlert(
+                    title: $progressAlertManager.title,
+                    message: $progressAlertManager.message
+                )
+            } else {
+                // HACK: DO NOT REMOVE. Removing this will cause a freeze when isShowing is false.
+                Color.clear
+            }
         }
         .onReceive(navigationManager.$selectedTab, perform: { newValue in
             if newValue == navigationManager.previouslySelectedTab {

@@ -90,20 +90,19 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
         ) {
-            Task.detached {
+            Task {
                 let actor = DataImporter(modelContainer: sharedModelContainer)
-                await actor.importCSV(
+                for await progress in await actor.importCSV(
                     csv: csvString,
                     to: importToDate,
                     for: importMode,
                     from: iidxVersion
-                ) { currentProgress, totalProgress in
-                    Task {
-                        let progress = (currentProgress * 100) / totalProgress
+                ) {
+                    if let currentFileProgress = progress.currentFileProgress,
+                        let currentFileTotal = progress.currentFileTotal {
+                        let progress = (currentFileProgress * 100) / currentFileTotal
                         await MainActor.run {
-                            progressAlertManager.updateProgress(
-                                progress
-                            )
+                            progressAlertManager.updateProgress(progress)
                         }
                     }
                 }

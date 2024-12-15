@@ -32,6 +32,8 @@ struct ImportView: View {
 
     @State var isSelectingCSVFile: Bool = false
 
+    let actor = DataImporter(modelContainer: sharedModelContainer)
+
     var body: some View {
         NavigationStack(path: $navigationManager[.calendar]) {
             List {
@@ -152,7 +154,6 @@ struct ImportView: View {
                 actions: {
                     Button("Shared.OK", role: .cancel) {
                         didImportSucceed = false
-                        navigationManager.popToRoot(for: .calendar)
                     }
                 },
                 message: {
@@ -165,7 +166,6 @@ struct ImportView: View {
                 actions: {
                     Button("Shared.OK", role: .cancel) {
                         isAutoImportFailed = false
-                        navigationManager.popToRoot(for: .calendar)
                     }
                 },
                 message: {
@@ -241,18 +241,16 @@ struct ImportView: View {
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
         ) {
-            Task.detached {
-                let actor = DataImporter(modelContainer: sharedModelContainer)
-                await actor.importSampleCSV(
+            Task {
+                for await progress in await actor.importSampleCSV(
                     to: importToDate,
                     for: .single
-                ) { currentProgress, totalProgress in
-                    Task {
-                        let progress = (currentProgress * 100) / totalProgress
+                ) {
+                    if let currentFileProgress = progress.currentFileProgress,
+                        let currentFileTotal = progress.currentFileTotal {
+                        let progress = (currentFileProgress * 100) / currentFileTotal
                         await MainActor.run {
-                            progressAlertManager.updateProgress(
-                                progress
-                            )
+                            progressAlertManager.updateProgress(progress)
                         }
                     }
                 }
@@ -269,35 +267,26 @@ struct ImportView: View {
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
         ) {
-            Task.detached(priority: .high) {
-                var processedCount = 0
-                let totalCount = urls.count
-                for url in urls {
-                    processedCount += 1
-                    await MainActor.run {
-                        progressAlertManager.updateTitle("Alert.Importing.Title.\(processedCount).\(totalCount)")
-                    }
-                    let isAccessSuccessful = url.startAccessingSecurityScopedResource()
-                    if isAccessSuccessful {
-                        let actor = DataImporter(modelContainer: sharedModelContainer)
-                        await actor.importCSV(
-                            url: url,
-                            to: importToDate,
-                            for: .single,
-                            from: iidxVersion
-                        ) { currentProgress, totalProgress in
-                            Task {
-                                let progress = (currentProgress * 100) / totalProgress
-                                await MainActor.run {
-                                    progressAlertManager.updateProgress(
-                                        progress
-                                    )
-                                }
-                            }
+            Task {
+                for await progress in await actor.importCSVs(
+                    urls: urls,
+                    to: importToDate,
+                    for: .single,
+                    from: iidxVersion
+                ) {
+                    if let filesProcessed = progress.filesProcessed,
+                       let fileCount = progress.fileCount {
+                        await MainActor.run {
+                            progressAlertManager.updateTitle("Alert.Importing.Title.\(filesProcessed).\(fileCount)")
                         }
-                        url.stopAccessingSecurityScopedResource()
-                    } else {
-                        url.stopAccessingSecurityScopedResource()
+                    }
+                    if let currentFileProgress = progress.currentFileProgress,
+                        let currentFileTotal = progress.currentFileTotal,
+                       currentFileTotal > 0 {
+                        let progress = (currentFileProgress * 100) / currentFileTotal
+                        await MainActor.run {
+                            progressAlertManager.updateProgress(progress)
+                        }
                     }
                 }
                 await MainActor.run {
