@@ -100,6 +100,8 @@ actor DataFetcher {
 
         if importGroupID != importGroup.id {
             importGroupID = importGroup.id
+            previousFilters = nil
+            previousSortOptions = nil
 
             // Get new song records in import group
             // TODO: Find a way to trigger a refresh here when import groups update
