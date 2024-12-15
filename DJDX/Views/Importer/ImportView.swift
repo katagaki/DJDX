@@ -92,7 +92,7 @@ struct ImportView: View {
                 TabBarAccessory(placement: .bottom) {
                     VStack(spacing: 8.0) {
                         DatePicker("Calendar.Import.SelectDate",
-                                   selection: $importToDate.animation(.snappy.speed(2.0)),
+                                   selection: $importToDate,
                                    in: ...Date.now,
                                    displayedComponents: .date)
                         .datePickerStyle(.compact)

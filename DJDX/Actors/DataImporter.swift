@@ -117,13 +117,15 @@ actor DataImporter {
         saveCSVStringToFile(csvString)
         let parsedCSV = CSwiftV(with: csvString)
         if let keyedRows = parsedCSV.keyedRows {
-            importCSV(
-                keyedRows,
-                to: importToDate,
-                for: playType,
-                from: version,
-                continuation: continuation
-            )
+            try? modelContext.transaction {
+                importCSV(
+                    keyedRows,
+                    to: importToDate,
+                    for: playType,
+                    from: version,
+                    continuation: continuation
+                )
+            }
         }
         continuation.finish()
         return stream
