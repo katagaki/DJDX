@@ -233,8 +233,10 @@ struct ImportView: View {
         indexSet.forEach { index in
             importGroupsToDelete.append(importGroups[index])
         }
-        importGroupsToDelete.forEach { importGroup in
-            modelContext.delete(importGroup)
+        try? modelContext.transaction {
+            importGroupsToDelete.forEach { importGroup in
+                modelContext.delete(importGroup)
+            }
         }
     }
 
