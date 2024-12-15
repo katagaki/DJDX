@@ -61,7 +61,6 @@ struct MainTabView: View {
         }
         .task {
             if !isFirstStartCleanupComplete {
-                await cleanUpData()
                 await migrateData()
                 isFirstStartCleanupComplete = true
             }
@@ -76,19 +75,6 @@ struct MainTabView: View {
             }
             navigationManager.previouslySelectedTab = newValue
         })
-    }
-
-    func cleanUpData() async {
-        debugPrint("Cleaning up orphaned song records")
-        let songRecords = (try? modelContext.fetch(FetchDescriptor<IIDXSongRecord>(
-            predicate: #Predicate<IIDXSongRecord> {
-                $0.importGroup == nil
-            }))) ?? []
-        try? modelContext.transaction {
-            for songRecord in songRecords {
-                modelContext.delete(songRecord)
-            }
-        }
     }
 
     func migrateData() async {
