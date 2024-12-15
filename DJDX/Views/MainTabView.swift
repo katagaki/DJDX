@@ -71,12 +71,6 @@ struct MainTabView: View {
                 Color.clear
             }
         }
-        .onReceive(navigationManager.$selectedTab, perform: { newValue in
-            if newValue == navigationManager.previouslySelectedTab {
-                navigationManager.popToRoot(for: newValue)
-            }
-            navigationManager.previouslySelectedTab = newValue
-        })
     }
 
     func migrateData() async {

@@ -154,6 +154,7 @@ struct ImportView: View {
                 actions: {
                     Button("Shared.OK", role: .cancel) {
                         didImportSucceed = false
+                        navigationManager.popToRoot(for: .calendar)
                     }
                 },
                 message: {
@@ -166,6 +167,7 @@ struct ImportView: View {
                 actions: {
                     Button("Shared.OK", role: .cancel) {
                         isAutoImportFailed = false
+                        navigationManager.popToRoot(for: .calendar)
                     }
                 },
                 message: {
