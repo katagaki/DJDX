@@ -180,15 +180,13 @@ actor DataImporter {
             predicate: importGroups(from: importToDate)
         )
         // Find existing import group and return it after cleaning it up
-        if let importGroupsOnSelectedDate: [ImportGroup] = try? modelContext.fetch(fetchDescriptor) {
-            for importGroup in importGroupsOnSelectedDate {
-                if let songRecords: [IIDXSongRecord] = importGroup.iidxData {
-                    for songRecord in songRecords where songRecord.playType == playType {
-                        modelContext.delete(songRecord)
-                    }
-                }
-                return importGroup
+        if let importGroupsOnSelectedDate: [ImportGroup] = try? modelContext.fetch(fetchDescriptor),
+           let importGroup = importGroupsOnSelectedDate.first,
+           let songRecords: [IIDXSongRecord] = importGroup.iidxData {
+            for songRecord in songRecords where songRecord.playType == playType {
+                modelContext.delete(songRecord)
             }
+            return importGroup
         }
         // If all conditions fail, create new import group and return it
         let newImportGroup = ImportGroup(importDate: importToDate, iidxData: [], iidxVersion: version)
