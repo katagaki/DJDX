@@ -48,16 +48,7 @@ struct TextageViewer: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Shared.Refresh", systemImage: "arrow.clockwise") {
-                        webView.layer.opacity = 0.0
-                        withAnimation(.snappy.speed(2.0)) {
-                            isLoading = true
-                            isShowingFallbackButton = false
-                        } completion: {
-                            webView.load(URLRequest(url: textageIIDXURL))
-                            Task {
-                                await showFallbackAfterDelay()
-                            }
-                        }
+                        refresh()
                     }
                 }
             }
@@ -85,6 +76,19 @@ struct TextageViewer: View {
                 await showFallbackAfterDelay()
             }
             .padding(0.0)
+    }
+
+    func refresh() {
+        webView.layer.opacity = 0.0
+        withAnimation(.snappy.speed(2.0)) {
+            isLoading = true
+            isShowingFallbackButton = false
+        } completion: {
+            webView.load(URLRequest(url: textageIIDXURL))
+            Task {
+                await showFallbackAfterDelay()
+            }
+        }
     }
 
     func showFallbackAfterDelay() async {

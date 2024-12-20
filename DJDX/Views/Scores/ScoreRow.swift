@@ -27,27 +27,46 @@ struct ScoreRow: View {
     @Binding var levelToShow: IIDXLevel
     @Binding var difficultyToShow: IIDXDifficulty
 
-    var body: some View {
+    var score: IIDXLevelScore?
+
+    init(namespace: Namespace.ID,
+         songRecord: IIDXSongRecord,
+         scoreRate: Float?,
+         levelToShow: Binding<IIDXLevel>,
+         difficultyToShow: Binding<IIDXDifficulty>) {
+        self.namespace = namespace
+        self.songRecord = songRecord
+        self.scoreRate = scoreRate
+        self._levelToShow = levelToShow
+        self._difficultyToShow = difficultyToShow
         let scores: [IIDXLevelScore?] = [
-            songRecord.score(for: levelToShow),
-            songRecord.score(for: difficultyToShow)
+            songRecord.score(for: levelToShow.wrappedValue),
+            songRecord.score(for: difficultyToShow.wrappedValue)
         ]
+        self.score = (scores.first(where: { $0 != nil }) ?? nil) ?? nil
+    }
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 4.0) {
             HStack(alignment: .center, spacing: 8.0) {
                 // Leading Clear Lamp
                 VStack {
-                    if let score = scores.first(where: { $0 != nil }), let score = score {
+                    if let score = score {
                         switch score.clearType {
                         case "FULLCOMBO CLEAR":
-                            LinearGradient(gradient: Gradient(colors: [Color.red,
-                                                                       Color.orange,
-                                                                       Color.yellow,
-                                                                       Color.green,
-                                                                       Color.blue,
-                                                                       Color.indigo,
-                                                                       Color.purple]),
-                                           startPoint: .top,
-                                           endPoint: .bottom)
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color.red,
+                                    Color.orange,
+                                    Color.yellow,
+                                    Color.green,
+                                    Color.blue,
+                                    Color.indigo,
+                                    Color.purple
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
                         case "CLEAR": Color.cyan
                         case "ASSIST CLEAR": Color.purple
                         case "EASY CLEAR": Color.green
@@ -84,7 +103,7 @@ struct ScoreRow: View {
                         // Metadata Row
                         if isDJLevelVisible || isScoreRateVisible || isScoreVisible || isLastPlayDateVisible {
                             HStack(alignment: .center, spacing: 6.0) {
-                                if let score = scores.first(where: { $0 != nil }), let score = score,
+                                if let score = score,
                                    score.score != 0 {
                                     Group {
                                         if isDJLevelVisible {
@@ -165,7 +184,7 @@ struct ScoreRow: View {
                 .automaticMatchedTransitionSource(id: songRecord.title, in: namespace)
 
                 // Level
-                if isLevelVisible, let score = scores.first(where: { $0 != nil }), let score = score {
+                if isLevelVisible, let score = score {
                     IIDXLevelLabel(levelType: score.level, songRecord: songRecord)
                         .padding([.top, .bottom], 6.0)
                         .frame(width: 78.0, alignment: .center)

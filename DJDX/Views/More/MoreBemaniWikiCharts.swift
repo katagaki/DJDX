@@ -110,7 +110,8 @@ struct MoreBemaniWikiCharts: View {
             },
             message: {
                 Text("Alert.ExternalData.Completed.Text.\(allSongs.count)")
-            })
+            }
+        )
     }
 
     func reloadData() async {

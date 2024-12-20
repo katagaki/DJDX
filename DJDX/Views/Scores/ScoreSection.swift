@@ -89,16 +89,7 @@ struct ScoreSection: View {
                 }
                 Menu {
                     Button("Scores.Viewer.OpenYouTube", image: .listIconYouTube) {
-                        switch playType {
-                        case .single:
-                            let searchQuery: String = "IIDX SP\(score.level.code()) \(songTitle)"
-                                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-                            openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
-                        case .double:
-                            let searchQuery: String = "IIDX DP\(score.level.code()) \(songTitle)"
-                                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-                            openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
-                        }
+                        openYouTube()
                     }
                     if score.level != .beginner {
                         Section {
@@ -145,50 +136,53 @@ struct ScoreSection: View {
 
     func clearTypeStyle() -> any ShapeStyle {
         switch score.clearType {
-        case "FULLCOMBO CLEAR":
-            return LinearGradient(gradient: Gradient(colors: [.cyan,
-                                                              (colorScheme == .dark ? .white : .blue),
-                                                              .purple]),
-                                  startPoint: .top,
-                                  endPoint: .bottom)
-        case "FAILED":
-            return LinearGradient(gradient: Gradient(colors: [.orange,
-                                                              .red,
-                                                              .orange]),
-                                  startPoint: .top,
-                                  endPoint: .bottom)
-        case "ASSIST CLEAR":
-            return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .indigo),
-                                                              .purple,
-                                                              (colorScheme == .dark ? .white : .indigo)]),
-                                  startPoint: .top,
-                                  endPoint: .bottom)
-        case "EASY CLEAR":
-            return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .mint),
-                                                              .green,
-                                                              (colorScheme == .dark ? .white : .mint)]),
-                                  startPoint: .top,
-                                  endPoint: .bottom)
-        case "CLEAR":
-            return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .blue),
-                                                              .cyan,
-                                                              (colorScheme == .dark ? .white : .blue)]),
-                                  startPoint: .top,
-                                  endPoint: .bottom)
-        case "HARD CLEAR":
-            return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .red),
-                                                              .pink,
-                                                              (colorScheme == .dark ? .white : .red)]),
-                                  startPoint: .top,
-                                  endPoint: .bottom)
-        case "EX HARD CLEAR":
-            return LinearGradient(gradient: Gradient(colors: [(colorScheme == .dark ? .white : .orange),
-                                                              .yellow,
-                                                              (colorScheme == .dark ? .white : .orange)]),
-                                  startPoint: .top,
-                                  endPoint: .bottom)
+        case "FULLCOMBO CLEAR": return LinearGradient(
+            gradient: Gradient(colors: [.cyan, whiteOr(.blue), .purple]),
+            startPoint: .top, endPoint: .bottom
+        )
+        case "FAILED": return LinearGradient(
+            gradient: Gradient(colors: [.orange, .red, .orange]),
+            startPoint: .top, endPoint: .bottom
+        )
+        case "ASSIST CLEAR": return LinearGradient(
+            gradient: Gradient(colors: [whiteOr(.indigo), .purple, whiteOr(.indigo)]),
+            startPoint: .top, endPoint: .bottom
+        )
+        case "EASY CLEAR": return LinearGradient(
+            gradient: Gradient(colors: [whiteOr(.mint), .green, whiteOr(.mint)]),
+            startPoint: .top, endPoint: .bottom
+        )
+        case "CLEAR": return LinearGradient(
+            gradient: Gradient(colors: [whiteOr(.blue), .cyan, whiteOr(.blue)]),
+            startPoint: .top, endPoint: .bottom
+        )
+        case "HARD CLEAR": return LinearGradient(
+            gradient: Gradient(colors: [whiteOr(.red), .pink, whiteOr(.red)]),
+            startPoint: .top, endPoint: .bottom
+        )
+        case "EX HARD CLEAR": return LinearGradient(
+            gradient: Gradient(colors: [whiteOr(.orange), .yellow, whiteOr(.orange)]),
+            startPoint: .top, endPoint: .bottom
+        )
         default: return Color.primary
         }
+    }
+
+    func openYouTube() {
+        switch playType {
+        case .single:
+            let searchQuery: String = "IIDX SP\(score.level.code()) \(songTitle)"
+                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
+        case .double:
+            let searchQuery: String = "IIDX DP\(score.level.code()) \(songTitle)"
+                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
+        }
+    }
+
+    func whiteOr(_ color: Color) -> Color {
+        return colorScheme == .dark ? .white : color
     }
 
     func scoreStyle() -> any ShapeStyle {

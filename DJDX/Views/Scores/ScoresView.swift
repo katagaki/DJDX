@@ -77,30 +77,11 @@ struct ScoresView: View {
                     .alignmentGuide(.listRowSeparatorLeading) { dimensions in
                         dimensions[.leading]
                     }
-                    // HACK: NavigationLink causes double opening of views, temporarily using button instead
-                    // NavigationLink(value: ViewPath.scoreViewer(songRecord: songRecord)) {
-                    //     ScoreRow(
-                    //         namespace: scoresNamespace,
-                    //         songRecord: songRecord,
-                    //         scoreRate: scoreRate(for: songRecord, of: levelToShow, or: difficultyToShow),
-                    //         levelToShow: $levelToShow,
-                    //         difficultyToShow: $difficultyToShow
-                    //     )
-                    // }
-                    // .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 20.0))
                 }
             }
-            .navigationTitle("ViewTitle.Scores")
-            .navigationBarTitleDisplayMode(.inline)
-            .listStyle(.plain)
+            .navigator("ViewTitle.Scores")
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Spacer()
-                }
-                ToolbarItem(placement: .topBarLeading) {
-                    LargeInlineTitle("ViewTitle.Scores")
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if dataState == .initializing || dataState == .loading {
                         ProgressView()

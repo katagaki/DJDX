@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 
 extension ScoresView {
+
     func reloadDisplay() {
         withAnimation(.snappy.speed(2.0)) {
             dataState = .loading

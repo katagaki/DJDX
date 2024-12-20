@@ -24,47 +24,33 @@ struct TowerView: View {
                 isLoading: $isLoading,
                 towerURL: iidxVersion.towerURL()
             )
-                .navigationTitle("ViewTitle.Tower")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Spacer()
-                    }
-                    ToolbarItem(placement: .topBarLeading) {
-                        HStack(alignment: .bottom, spacing: 4.0) {
-                            LargeInlineTitle("ViewTitle.Tower")
-                            Text("Shared.Beta")
-                                .font(.caption)
-                                .fontWeight(.black)
-                                .foregroundStyle(.secondary)
-                                .offset(y: -5.0)
-                        }
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Shared.Refresh", systemImage: "arrow.clockwise") {
-                            webView.layer.opacity = 0.0
-                            isLoading = true
-                            webView.load(URLRequest(url: iidxVersion.towerURL()))
-                        }
+            .navigator("ViewTitle.Tower")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Shared.Refresh", systemImage: "arrow.clockwise") {
+                        webView.layer.opacity = 0.0
+                        isLoading = true
+                        webView.load(URLRequest(url: iidxVersion.towerURL()))
                     }
                 }
-                .background {
-                    if !isTowerAvailable {
-                        ContentUnavailableView(
-                            "Tower.Unavailable.Title",
-                            systemImage: "exclamationmark.circle.fill",
-                            description: Text("Tower.Unavailable.Description")
-                        )
+            }
+            .background {
+                if !isTowerAvailable {
+                    ContentUnavailableView(
+                        "Tower.Unavailable.Title",
+                        systemImage: "exclamationmark.circle.fill",
+                        description: Text("Tower.Unavailable.Description")
+                    )
+                } else {
+                    if isLoading {
+                        VStack(spacing: 16.0) {
+                            ProgressView("Shared.Loading")
+                        }
                     } else {
-                        if isLoading {
-                            VStack(spacing: 16.0) {
-                                ProgressView("Shared.Loading")
-                            }
-                        } else {
-                            Color.clear
-                        }
+                        Color.clear
                     }
                 }
+            }
         }
     }
 }

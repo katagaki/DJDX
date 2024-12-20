@@ -372,27 +372,14 @@ actor DataFetcher {
 
     // MARK: Song Metadata
 
-//    func songNoteCounts() -> [String: IIDXNoteCount] {
-//        let songs = try? modelContext.fetch(
-//            FetchDescriptor<IIDXSong>(
-//                sortBy: [SortDescriptor(\.title, order: .forward)]
-//            )
-//        )
-//        let songMappings = (songs ?? [])
-//            .reduce(into: [:]) { partialResult, song in
-//                partialResult[song.titleCompact()] = song.spNoteCount
-//            }
-//        return songMappings
-//    }
-
     func songCompactTitles() -> [String: PersistentIdentifier] {
         var songCompactTitles: [String: PersistentIdentifier] = [:]
-        let songs = (try? modelContext.fetch(
+        let fetchedSongs = (try? modelContext.fetch(
             FetchDescriptor<IIDXSong>(
                 sortBy: [SortDescriptor(\.title, order: .forward)]
             )
         )) ?? []
-        songs.forEach { song in
+        fetchedSongs.forEach { song in
             songCompactTitles[song.titleCompact()] = song.persistentModelID
         }
         return songCompactTitles

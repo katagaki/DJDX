@@ -154,24 +154,10 @@ struct AnalyticsView: View {
                     }
                 }
             }
-            .navigationTitle("ViewTitle.Analytics")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigator("ViewTitle.Analytics", group: true)
+            .listSectionSpacing(.compact)
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Spacer()
-                }
-                ToolbarItem(placement: .topBarLeading) {
-                    LargeInlineTitle("ViewTitle.Analytics")
-                        .onTapGesture(count: 5) {
-                            debugPrint("Clearing cache")
-                            clearTypePerImportGroupCache = Data()
-                            djLevelPerImportGroupCache = Data()
-                            Task {
-                                await reload()
-                            }
-                        }
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if dataState == .initializing || dataState == .loading {
                         ProgressView()
