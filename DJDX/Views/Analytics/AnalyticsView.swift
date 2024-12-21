@@ -71,6 +71,7 @@ struct AnalyticsView: View {
                             }
                         }
                     }
+                    // This graph causes a crash when the data is empty
                     Section {
                         OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
                                                             difficulty: $levelFilterForOverviewClearType)
@@ -202,7 +203,6 @@ struct AnalyticsView: View {
             .task {
                 if dataState == .initializing {
                     await reload()
-                    debugPrint("Reloaded on view appearance")
                 }
             }
             .onChange(of: viewMode) { _, newValue in

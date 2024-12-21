@@ -43,13 +43,11 @@ extension AnalyticsView {
             )) ?? []
             songRecords.removeAll { $0.playType != playTypeToShow }
             if songRecords.count > 0 {
+                let newClearTypePerDifficulty = clearTypePerDifficulty(for: songRecords)
+                let newScoresPerDifficulty = scoresPerDifficulty(for: songRecords)
                 await MainActor.run {
                     withAnimation(.snappy.speed(2.0)) {
-                        debugPrint("Calculating clear type per difficulty")
-                        let newClearTypePerDifficulty = clearTypePerDifficulty(for: songRecords)
                         self.clearTypePerDifficulty = newClearTypePerDifficulty
-                        debugPrint("Calculating scores per difficulty")
-                        let newScoresPerDifficulty = scoresPerDifficulty(for: songRecords)
                         self.djLevelPerDifficulty = newScoresPerDifficulty
                     }
                 }
