@@ -5,12 +5,14 @@
 //  Created by シン・ジャスティン on 2024/05/19.
 //
 
+import StoreKit
 import SwiftData
 import SwiftUI
 import TipKit
 
 struct MainTabView: View {
 
+    @Environment(\.requestReview) var requestReview
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
 
@@ -18,6 +20,8 @@ struct MainTabView: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: false, "ScoresView.IsTimeTravelling") var isTimeTravelling: Bool
+    @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
+    @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
 
     @State var isFirstStartCleanupComplete: Bool = false
 
@@ -59,6 +63,11 @@ struct MainTabView: View {
                 .displayFrequency(.immediate),
                 .datastoreLocation(.applicationDefault)
             ])
+            launchCount += 1
+            if launchCount > 2 && !hasReviewBeenPrompted {
+                requestReview()
+                hasReviewBeenPrompted = true
+            }
         }
         .overlay {
             if progressAlertManager.isShowing {
