@@ -28,31 +28,21 @@ struct MainTabView: View {
     var body: some View {
         @Bindable var progressAlertManager = progressAlertManager
         TabView(selection: $navigationManager.selectedTab) {
-            ImportView()
-                .tabItem {
-                    Label("Tab.Import", systemImage: "arrow.down.circle.dotted")
-                }
-                .tag(TabType.calendar)
-            ScoresView()
-                .tabItem {
-                    Label("Tab.Scores", image: .tabIconScores)
-                }
-                .tag(TabType.scores)
-            AnalyticsView()
-                .tabItem {
-                    Label("Tab.Analytics", image: .tabIconAnalytics)
-                }
-                .tag(TabType.analytics)
-            TowerView()
-                .tabItem {
-                    Label("Tab.Tower", systemImage: "chart.bar.xaxis")
-                }
-                .tag(TabType.tower)
-            MoreView()
-                .tabItem {
-                    Label("Tab.More", systemImage: "ellipsis")
-                }
-                .tag(TabType.more)
+            Tab("Tab.Import", systemImage: "arrow.down.circle.dotted", value: .calendar) {
+                ImportView()
+            }
+            Tab("Tab.Scores", image: "TabIcon.Scores", value: .scores, role: .search) {
+                ScoresView()
+            }
+            Tab("Tab.Analytics", image: "TabIcon.Analytics", value: .analytics) {
+                AnalyticsView()
+            }
+            Tab("Tab.Tower", systemImage: "chart.bar.xaxis", value: .tower) {
+                TowerView()
+            }
+            Tab("Tab.More", systemImage: "ellipsis", value: .more) {
+                MoreView()
+            }
         }
         .task {
             if !isFirstStartCleanupComplete {
