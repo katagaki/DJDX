@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AutomaticMatchedTransitionSourceModifier: ViewModifier {
+struct AutomaticMatchedTransitionSource: ViewModifier {
 
     var id: AnyHashable
     var namespace: Namespace.ID
@@ -24,6 +24,6 @@ struct AutomaticMatchedTransitionSourceModifier: ViewModifier {
 
 extension View {
     func automaticMatchedTransitionSource(id: AnyHashable, in namespace: Namespace.ID) -> some View {
-        modifier(AutomaticMatchedTransitionSourceModifier(id: id, namespace: namespace))
+        modifier(AutomaticMatchedTransitionSource(id: id, namespace: namespace))
     }
 }

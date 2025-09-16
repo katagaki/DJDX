@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AutomaticNavigationTransitionModifier: ViewModifier {
+struct AutomaticNavigationTransition: ViewModifier {
 
     var id: AnyHashable
     var namespace: Namespace.ID
@@ -24,6 +24,6 @@ struct AutomaticNavigationTransitionModifier: ViewModifier {
 
 extension View {
     func automaticNavigationTransition(id: AnyHashable, in namespace: Namespace.ID) -> some View {
-        modifier(AutomaticNavigationTransitionModifier(id: id, namespace: namespace))
+        modifier(AutomaticNavigationTransition(id: id, namespace: namespace))
     }
 }

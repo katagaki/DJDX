@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ConditionalSafeAreaIgnoranceModifier: ViewModifier {
+struct ConditionalSafeAreaIgnorance: ViewModifier {
     func body(content: Content) -> some View {
         if #available(iOS 26.0, *) {
             content
@@ -20,6 +20,6 @@ struct ConditionalSafeAreaIgnoranceModifier: ViewModifier {
 
 extension View {
     func ignoreSafeAreaConditionally() -> some View {
-        modifier(ConditionalSafeAreaIgnoranceModifier())
+        modifier(ConditionalSafeAreaIgnorance())
     }
 }

@@ -54,26 +54,7 @@ struct ScoreViewer: View {
             ToolbarItem(placement: .principal) {
                 Spacer()
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                Group {
-                    if let iidxVersion = IIDXVersion.marketingNames[songRecord.version] {
-                        switch colorScheme {
-                        case .dark:
-                            Text(songRecord.version)
-                                .foregroundStyle(Color(uiColor: iidxVersion.darkModeColor))
-                        default:
-                            Text(songRecord.version)
-                                .foregroundStyle(Color(uiColor: iidxVersion.lightModeColor))
-                        }
-                    } else {
-                        Text(songRecord.version)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .font(.subheadline)
-                .fontWeight(.heavy)
-                .italic()
-            }
+            versionNumberToolbarItem()
         }
         .safeAreaInset(edge: .top, spacing: 0.0) {
             TabBarAccessory(placement: .top) {
@@ -140,11 +121,42 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
                 .padding([.leading, .trailing], 20.0)
             }
         }
-        .safeAreaInset(edge: .bottom, spacing: 0.0) {
-            TabBarAccessory(placement: .bottom) {
-                Color.clear
-                    .frame(height: 0.0)
+        .conditionalBottomTabBarAccessory()
+    }
+
+    @ToolbarContentBuilder
+    func versionNumberToolbarItem() -> some ToolbarContent {
+        if #available(iOS 26.0, *) {
+            ToolbarItem(placement: .topBarTrailing) {
+                versionNumberToolbarItemContent()
+            }
+            .sharedBackgroundVisibility(.hidden)
+        } else {
+            ToolbarItem(placement: .topBarTrailing) {
+                versionNumberToolbarItemContent()
             }
         }
+    }
+
+    @ViewBuilder
+    func versionNumberToolbarItemContent() -> some View {
+        Group {
+            if let iidxVersion = IIDXVersion.marketingNames[songRecord.version] {
+                switch colorScheme {
+                case .dark:
+                    Text(songRecord.version)
+                        .foregroundStyle(Color(uiColor: iidxVersion.darkModeColor))
+                default:
+                    Text(songRecord.version)
+                        .foregroundStyle(Color(uiColor: iidxVersion.lightModeColor))
+                }
+            } else {
+                Text(songRecord.version)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .font(.subheadline)
+        .fontWeight(.heavy)
+        .italic()
     }
 }

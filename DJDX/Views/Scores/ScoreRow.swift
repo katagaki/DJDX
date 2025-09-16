@@ -81,7 +81,7 @@ struct ScoreRow: View {
                 }
                 .frame(width: 12.0)
                 .frame(maxHeight: .infinity)
-                .modifier(ConditionalShadow(color: .black.opacity(0.2), radius: 1.0, x: 2.0))
+                .conditionalShadow(.black.opacity(0.2), radius: 1.0, x: 2.0)
 
                 HStack(alignment: .center, spacing: 0.0) {
                     // Song Info

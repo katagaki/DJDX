@@ -8,14 +8,13 @@
 import Foundation
 import SwiftUI
 
+// swiftlint:disable identifier_name
 struct ConditionalShadow: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
     var color: Color
     var radius: CGFloat = 2.0
-    // swiftlint:disable identifier_name
     var x: CGFloat = 0.0
     var y: CGFloat = 0.0
-    // swiftlint:enable identifier_name
 
     func body(content: Content) -> some View {
         switch colorScheme {
@@ -29,3 +28,10 @@ struct ConditionalShadow: ViewModifier {
         }
     }
 }
+
+extension View {
+    func conditionalShadow(_ color: Color, radius: CGFloat = 2.0, x: CGFloat = 0.0, y: CGFloat = 0.0) -> some View {
+        modifier(ConditionalShadow(color: color, radius: radius, x: x, y: y))
+    }
+}
+// swiftlint:enable identifier_name

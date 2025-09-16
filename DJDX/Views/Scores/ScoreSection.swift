@@ -29,7 +29,7 @@ struct ScoreSection: View {
                                 .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
                                                                 startPoint: .top,
                                                                 endPoint: .bottom))
-                                .modifier(ConditionalShadow(color: .blue.opacity(0.2), radius: 3.0))
+                                .conditionalShadow(.blue.opacity(0.2), radius: 3.0)
                         case .dark:
                             Text(score.djLevel)
                                 .foregroundStyle(LinearGradient(colors: [.white, .cyan],
