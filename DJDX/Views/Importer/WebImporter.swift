@@ -66,7 +66,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     @Binding var autoImportFailedReason: ImportFailedReason?
     @State var observers = [NSKeyValueObservation]()
 
-    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     let webView = WKWebView()
 

@@ -26,7 +26,7 @@ actor DataImporter {
                 url: Bundle.main.url(forResource: "SampleData", withExtension: "csv"),
                 to: importToDate,
                 for: playType,
-                from: .pinkyCrush,
+                from: .sparkleShower,
                 continuation: continuation
             )
         }

@@ -28,7 +28,7 @@ struct MoreView: View {
     @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
-    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false

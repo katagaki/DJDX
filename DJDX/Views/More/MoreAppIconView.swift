@@ -11,7 +11,8 @@ import SwiftUI
 struct MoreAppIconView: View {
 
     let icons: [AppIcon] = [
-        AppIcon("Pinky Crush"),
+        AppIcon("Sparkle Shower"),
+        AppIcon("Pinky Crush", imageName: "AppIcon.32"),
         AppIcon("EPOLIS", imageName: "AppIcon.31"),
         AppIcon("RESIDENT", imageName: "AppIcon.30"),
         AppIcon("CastHour", imageName: "AppIcon.29"),

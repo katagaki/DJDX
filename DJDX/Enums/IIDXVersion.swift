@@ -40,9 +40,10 @@ enum IIDXVersion: Int, Codable, CaseIterable {
     case resident = 30
     case epolis = 31
     case pinkyCrush = 32
+    case sparkleShower = 33
 
     static var supportedVersions: [IIDXVersion] {
-        [.epolis, .pinkyCrush]
+        [.epolis, .pinkyCrush, .sparkleShower]
     }
 
     var marketingName: String {
@@ -79,6 +80,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .resident: return "RESIDENT"
         case .epolis: return "EPOLIS"
         case .pinkyCrush: return "Pinky Crush"
+        case .sparkleShower: return "Sparkle Shower"
         }
     }
 
@@ -122,6 +124,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .resident: return UIColor(red: 0 / 255, green: 33 / 255, blue: 41 / 255, alpha: 1.0)
         case .epolis: return UIColor(red: 50 / 255, green: 50 / 255, blue: 50 / 255, alpha: 1.0)
         case .pinkyCrush: return UIColor(red: 249 / 255, green: 87 / 255, blue: 142 / 255, alpha: 1.0)
+        case .sparkleShower: return UIColor(red: 67 / 255, green: 143 / 255, blue: 82 / 255, alpha: 1.0)
         }
     }
 
@@ -159,6 +162,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .resident: return UIColor(red: 127 / 255, green: 158 / 255, blue: 166 / 255, alpha: 1.0)
         case .epolis: return UIColor(red: 240 / 255, green: 254 / 255, blue: 0 / 255, alpha: 1.0)
         case .pinkyCrush: return UIColor(red: 255 / 255, green: 97 / 255, blue: 178 / 255, alpha: 1.0)
+        case .sparkleShower: return UIColor(red: 173 / 255, green: 227 / 255, blue: 77 / 255, alpha: 1.0)
         }
     }
 
@@ -203,6 +207,10 @@ https://bemaniwiki.com/?beatmania+IIDX+31+EPOLIS/%BF%B7%B6%CA%A5%EA%A5%B9%A5%C8
             return URL(string: """
 https://bemaniwiki.com/?beatmania+IIDX+32+Pinky+Crush/%BF%B7%B6%CA%A5%EA%A5%B9%A5%C8
 """)!
+        case .sparkleShower:
+            return URL(string: """
+https://bemaniwiki.com/?beatmania+IIDX+33+Sparkle+Shower/%BF%B7%B6%CA%A5%EA%A5%B9%A5%C8
+""")!
         default: return URL(string: "https://bemaniwiki.com")!
         }
     }
@@ -216,6 +224,10 @@ https://bemaniwiki.com/?beatmania+IIDX+31+EPOLIS/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%
         case .pinkyCrush:
             return URL(string: """
 https://bemaniwiki.com/?beatmania+IIDX+32+Pinky+Crush/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%A5%C4%BF%F4%A5%EA%A5%B9%A5%C8
+""")!
+        case .sparkleShower:
+            return URL(string: """
+https://bemaniwiki.com/?beatmania+IIDX+33+Sparkle+Shower/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%A5%C4%BF%F4%A5%EA%A5%B9%A5%C8
 """)!
         default: return URL(string: "https://bemaniwiki.com")!
         }

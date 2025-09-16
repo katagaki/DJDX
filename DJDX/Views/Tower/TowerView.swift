@@ -14,7 +14,7 @@ struct TowerView: View {
     @State var isLoading: Bool = true
     @State var isTowerAvailable: Bool = true
 
-    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     var body: some View {
         NavigationStack {
@@ -62,7 +62,7 @@ struct WebViewForTower: UIViewRepresentable {
     @Binding var isLoading: Bool
     @State var towerURL: URL
 
-    @AppStorage(wrappedValue: IIDXVersion.pinkyCrush, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
