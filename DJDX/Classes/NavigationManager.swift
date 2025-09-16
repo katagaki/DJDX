@@ -13,7 +13,6 @@ class NavigationManager: ObservableObject {
     let selectedTabKey = "NavigationManager.SelectedTab"
 
     @Published var selectedTab: TabType
-    @Published var previouslySelectedTab: TabType
     @Published var tabPaths: [TabType: [ViewPath]] = [
         .imports: [],
         .scores: [],
@@ -25,10 +24,8 @@ class NavigationManager: ObservableObject {
     init() {
         if let selectedTab = TabType(rawValue: defaults.integer(forKey: selectedTabKey)) {
             self.selectedTab = selectedTab
-            self.previouslySelectedTab = selectedTab
         } else {
             self.selectedTab = .scores
-            self.previouslySelectedTab = .scores
         }
     }
 
