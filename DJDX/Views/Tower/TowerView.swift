@@ -24,7 +24,8 @@ struct TowerView: View {
                 isLoading: $isLoading,
                 towerURL: iidxVersion.towerURL()
             )
-            .navigator("ViewTitle.Tower")
+            .navigationTitle("ViewTitle.Tower")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Shared.Refresh", systemImage: "arrow.clockwise") {
@@ -51,6 +52,7 @@ struct TowerView: View {
                     }
                 }
             }
+            .ignoreSafeAreaConditionally()
         }
     }
 }

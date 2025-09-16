@@ -53,6 +53,7 @@
     {
       "layers" : [
         {
+          "glass" : false,
           "image-name" : "DJDX.023.png",
           "name" : "DJDX.023"
         }
@@ -73,13 +74,17 @@
           "fill-specializations" : [
             {
               "appearance" : "dark",
-              "value" : {
-                "solid" : "gray:1.00000,0.25712"
-              }
+              "value" : "automatic"
             }
           ],
           "image-name" : "DJDX.022.png",
-          "name" : "DJDX.022"
+          "name" : "DJDX.022",
+          "opacity-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : 0.3
+            }
+          ]
         }
       ],
       "name" : "Accessory",
