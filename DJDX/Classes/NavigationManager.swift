@@ -15,7 +15,7 @@ class NavigationManager: ObservableObject {
     @Published var selectedTab: TabType
     @Published var previouslySelectedTab: TabType
     @Published var tabPaths: [TabType: [ViewPath]] = [
-        .calendar: [],
+        .imports: [],
         .scores: [],
         .analytics: [],
         .tower: [],

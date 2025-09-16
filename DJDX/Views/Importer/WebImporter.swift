@@ -33,28 +33,12 @@ struct WebImporter: View {
             ProgressView("Shared.Loading")
         }
         .padding(0.0)
-        .safeAreaInset(edge: .bottom, spacing: 0.0) {
-            HStack {
-                Image(systemName: "hand.raised.fill")
-                Text("Importer.Web.Disclaimer")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .padding([.leading, .trailing], 12.0)
-            .padding([.top, .bottom], 8.0)
-            .background(.bar)
-            .overlay(alignment: .top) {
-                Rectangle()
-                    .frame(height: 1/3)
-                    .foregroundColor(.primary.opacity(0.2))
-            }
-        }
     }
 }
 
 struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataDelegate {
 
+    @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
     @Environment(\.modelContext) var modelContext
@@ -107,14 +91,18 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
                     }
                 }
                 await MainActor.run {
-                    didImportSucceed = true
+                    // HACK: View doesn't dismiss on iOS 26, need to improve the way this is handled
+                    navigationManager.popToRoot(for: .imports)
                     progressAlertManager.hide()
+                    didImportSucceed = true
                 }
             }
         }
     }
 
     func stopProcessing(with reason: ImportFailedReason) {
+        // HACK: View doesn't dismiss on iOS 26, need to improve the way this is handled
+        navigationManager.popToRoot(for: .imports)
         autoImportFailedReason = reason
         isAutoImportFailed = true
     }

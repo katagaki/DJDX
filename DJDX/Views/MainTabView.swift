@@ -32,7 +32,7 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Tab.Import", systemImage: "arrow.down.circle.dotted")
                 }
-                .tag(TabType.calendar)
+                .tag(TabType.imports)
             ScoresView()
                 .tabItem {
                     Label("Tab.Scores", image: .tabIconScores)

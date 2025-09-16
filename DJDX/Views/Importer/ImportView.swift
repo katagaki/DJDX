@@ -35,7 +35,7 @@ struct ImportView: View {
     let actor = DataImporter(modelContainer: sharedModelContainer)
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.calendar]) {
+        NavigationStack(path: $navigationManager[.imports]) {
             List {
                 ForEach(importGroups) { importGroup in
                     VStack(alignment: .leading, spacing: 2.0) {
@@ -96,12 +96,12 @@ struct ImportView: View {
                                 switch importPlayType {
                                 case .single:
                                     ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
-                                        navigationManager.push(ViewPath.importerWebIIDXSingle, for: .calendar)
+                                        navigationManager.push(ViewPath.importerWebIIDXSingle, for: .imports)
                                     }
                                     .popoverTip(StartHereTip(), arrowEdge: .bottom)
                                 case .double:
                                     ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
-                                        navigationManager.push(ViewPath.importerWebIIDXDouble, for: .calendar)
+                                        navigationManager.push(ViewPath.importerWebIIDXDouble, for: .imports)
                                     }
                                 }
                                 Menu {
@@ -144,7 +144,7 @@ struct ImportView: View {
                 actions: {
                     Button("Shared.OK", role: .cancel) {
                         didImportSucceed = false
-                        navigationManager.popToRoot(for: .calendar)
+                        navigationManager.popToRoot(for: .imports)
                     }
                 },
                 message: {
@@ -157,7 +157,7 @@ struct ImportView: View {
                 actions: {
                     Button("Shared.OK", role: .cancel) {
                         isAutoImportFailed = false
-                        navigationManager.popToRoot(for: .calendar)
+                        navigationManager.popToRoot(for: .imports)
                     }
                 },
                 message: {
