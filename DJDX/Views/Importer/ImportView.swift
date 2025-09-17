@@ -38,24 +38,23 @@ struct ImportView: View {
         NavigationStack(path: $navigationManager[.imports]) {
             List {
                 ForEach(importGroups) { importGroup in
-                    VStack(alignment: .leading, spacing: 2.0) {
+                    HStack(alignment: .center, spacing: 6.0) {
                         Text(importGroup.importDate, style: .date)
-                        HStack(alignment: .center, spacing: 6.0) {
-                            if let version = importGroup.iidxVersion {
-                                Text(version.marketingName)
-                                    .font(.caption)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(colorScheme == .dark ?
-                                                     Color(uiColor: version.darkModeColor) :
-                                                        Color(uiColor: version.lightModeColor))
-                            }
+                        Spacer()
+                        if let version = importGroup.iidxVersion {
+                            Text(version.marketingName)
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundStyle(colorScheme == .dark ?
+                                                 Color(uiColor: version.darkModeColor) :
+                                                    Color(uiColor: version.lightModeColor))
+                        }
 //                            Divider()
 //                                .frame(maxHeight: 14.0)
                             // TODO: Refactor or cache this data
 //                            Text("Shared.SongCount.\(countOfIIDXSongRecords(in: importGroup))")
 //                                .font(.caption)
 //                                .foregroundStyle(.secondary)
-                        }
                     }
                 }
                 .onDelete(perform: { indexSet in

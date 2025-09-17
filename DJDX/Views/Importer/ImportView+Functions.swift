@@ -10,15 +10,15 @@ import SwiftData
 
 extension ImportView {
 
-    func countOfIIDXSongRecords(in importGroup: ImportGroup) -> Int {
-        let importGroupID = importGroup.id
-        let fetchDescriptor = FetchDescriptor<IIDXSongRecord>(
-            predicate: #Predicate<IIDXSongRecord> {
-                $0.importGroup?.id == importGroupID
-            }
-        )
-        return (try? modelContext.fetchCount(fetchDescriptor)) ?? 0
-    }
+//    func countOfIIDXSongRecords(in importGroup: ImportGroup) -> Int {
+//        let importGroupID = importGroup.id
+//        let fetchDescriptor = FetchDescriptor<IIDXSongRecord>(
+//            predicate: #Predicate<IIDXSongRecord> {
+//                $0.importGroup?.id == importGroupID
+//            }
+//        )
+//        return (try? modelContext.fetchCount(fetchDescriptor)) ?? 0
+//    }
 
     func errorMessage(for reason: ImportFailedReason) -> String {
         switch reason {
