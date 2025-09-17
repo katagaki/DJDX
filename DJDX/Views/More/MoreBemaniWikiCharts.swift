@@ -145,7 +145,10 @@ struct MoreBemaniWikiCharts: View {
                let documentBody = try? documentContents.select("#body").first() {
                 // Get index of first h3 containing text '総ノーツ数'
                 let indexOfHeader = documentBody.children().firstIndex { element in
-                    element.tag().getName() == "h3" && (try? element.text().contains("総ノーツ数")) ?? false
+                    // 32 and below: h3
+                    // 33 and above: h4
+                    (element.tag().getName() == "h3" || element.tag().getName() == "h4") &&
+                    (try? element.text().contains("総ノーツ数")) ?? false
                 }
                 if let indexOfHeader {
                     // Get every element after the header
@@ -153,17 +156,20 @@ struct MoreBemaniWikiCharts: View {
                         indexOfHeader..<documentBody.children().count
                     ]))
                     // Find the table in the document
-                    if let tablesInDocument = try? documentAfterHeader.select("div.ie5"),
-                       let table = tablesInDocument.first(),
-                       let tableRows = try? table.select("tr") {
-                        // Get all the rows in the document, and only take the rows that have 13 columns
-                        for tableRow in tableRows {
-                            if let tableRowColumns = try? tableRow.select("td"),
-                               tableRowColumns.count == 13 {
-                                let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
-                                if tableColumnData.count == 13 {
-                                    let iidxSong = IIDXSong(tableColumnData)
-                                    iidxSongsFromWiki.append(iidxSong)
+                    if let tables = try? documentAfterHeader.select("div.ie5") {
+                        for table in tables {
+                            debugPrint(table)
+                            if let tableRows = try? table.select("tr") {
+                                // Get all the rows in the document, and only take the rows that have 13 columns
+                                for tableRow in tableRows {
+                                    if let tableRowColumns = try? tableRow.select("td"),
+                                       tableRowColumns.count == 13 {
+                                        let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
+                                        if tableColumnData.count == 13 {
+                                            let iidxSong = IIDXSong(tableColumnData)
+                                            iidxSongsFromWiki.append(iidxSong)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -187,20 +193,24 @@ struct MoreBemaniWikiCharts: View {
                let documentContents = try? htmlDocumentBody.select("#contents").first(),
                let documentBody = try? documentContents.select("#body").first() {
                 // Find the table in the document
-                if let table = try? documentBody.select("div.ie5")[1],
-                   let tableRows = try? table.select("tr") {
-                    // Get all the rows in the document, and only take the rows that have 13 columns
-                    for tableRow in tableRows {
-                        if let tableRowColumns = try? tableRow.select("td"),
-                           tableRowColumns.count == 13 {
-                            let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
-                            if tableColumnData.count == 13 {
-                                let iidxSong = IIDXSong(tableColumnData)
-                                iidxSongsFromWiki.append(iidxSong)
+                if let tables = try? documentBody.select("div.ie5") {
+                    for table in tables {
+                        if let tableRows = try? table.select("tr") {
+                            // Get all the rows in the document, and only take the rows that have 13 columns
+                            for tableRow in tableRows {
+                                if let tableRowColumns = try? tableRow.select("td"),
+                                   tableRowColumns.count == 13 {
+                                    let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
+                                    if tableColumnData.count == 13 {
+                                        let iidxSong = IIDXSong(tableColumnData)
+                                        iidxSongsFromWiki.append(iidxSong)
+                                    }
+                                }
                             }
                         }
                     }
                 }
+
             }
             return iidxSongsFromWiki
         } catch {
