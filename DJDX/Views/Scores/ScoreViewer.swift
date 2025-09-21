@@ -73,26 +73,10 @@ struct ScoreViewer: View {
                                 .fontWidth(.compressed)
                                 .multilineTextAlignment(.center)
                                 .foregroundStyle(
-                                    songRecord.version != iidxVersion.marketingName ?
-                                        LinearGradient(stops: [
-                                            .init(color: .white,
-                                                  location: 0.0),
-                                            .init(color: .gray,
-                                                  location: 1.0)
-                                        ], startPoint: .top, endPoint: .bottom)
-                                    :
-                                        LinearGradient(stops: [
-                                            .init(color: Color(red: 234 / 255, green: 254 / 255, blue: 1.0),
-                                                  location: 0.0),
-                                            .init(color: Color(red: 116 / 255, green: 243 / 255, blue: 248 / 255),
-                                                  location: 1.0)
-                                        ], startPoint: .top, endPoint: .bottom)
+                                    iidxVersion.songTitleTextColor(for: songRecord.version)
                                 )
                                 .strokeText(
-                                    color: songRecord.version != iidxVersion.marketingName ?
-                                        Color(red: 77 / 255, green: 77 / 255, blue: 77 / 255)
-                                    :
-                                        Color(red: 35 / 255, green: 59 / 255, blue: 158 / 255),
+                                    color: iidxVersion.songTitleStrokeColor(for: songRecord.version),
                                     width: 0.5
                                 )
                                 .textSelection(.enabled)

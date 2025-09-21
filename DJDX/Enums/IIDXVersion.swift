@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2024/10/05.
 //
 
+import SwiftUI
 import UIKit
 
 enum IIDXVersion: Int, Codable, CaseIterable {
@@ -163,6 +164,50 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .epolis: return UIColor(red: 240 / 255, green: 254 / 255, blue: 0 / 255, alpha: 1.0)
         case .pinkyCrush: return UIColor(red: 255 / 255, green: 97 / 255, blue: 178 / 255, alpha: 1.0)
         case .sparkleShower: return UIColor(red: 173 / 255, green: 227 / 255, blue: 77 / 255, alpha: 1.0)
+        }
+    }
+
+    func songTitleTextColor(for versionString: String) -> LinearGradient {
+        var topColor: Color = .white
+        var bottomColor: Color = .gray
+        if self.marketingName == versionString {
+            switch self {
+            case .epolis:
+                topColor = Color(red: 252 / 255, green: 252 / 255, blue: 242 / 255)
+                bottomColor = Color(red: 244 / 255, green: 255 / 255, blue: 92 / 255)
+            case .pinkyCrush:
+                topColor = Color(red: 234 / 255, green: 254 / 255, blue: 255 / 255)
+                bottomColor = Color(red: 116 / 255, green: 243 / 255, blue: 248 / 255)
+            case .sparkleShower:
+                topColor = Color(red: 251 / 255, green: 254 / 255, blue: 255 / 255)
+                bottomColor = Color(red: 211 / 255, green: 250 / 255, blue: 149 / 255)
+            default: break
+            }
+        }
+        return LinearGradient(
+            stops: [
+                .init(color: topColor, location: 0.0),
+                .init(color: bottomColor, location: 1.0)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    func songTitleStrokeColor(for versionString: String) -> Color {
+        if self.marketingName == versionString {
+            switch self {
+            case .epolis:
+                return .black
+            case .pinkyCrush:
+                return Color(red: 35 / 255, green: 59 / 255, blue: 158 / 255)
+            case .sparkleShower:
+                return Color(red: 28 / 255, green: 65 / 255, blue: 118 / 255)
+            default:
+                return Color(red: 77 / 255, green: 77 / 255, blue: 77 / 255)
+            }
+        } else {
+            return Color(red: 77 / 255, green: 77 / 255, blue: 77 / 255)
         }
     }
 
