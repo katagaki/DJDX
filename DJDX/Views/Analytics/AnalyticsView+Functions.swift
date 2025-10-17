@@ -33,15 +33,15 @@ extension AnalyticsView {
         if let importGroupIdentifier,
            let importGroup = modelContext.model(for: importGroupIdentifier) as? ImportGroup {
             let importGroupID = importGroup.id
-            var songRecords: [IIDXSongRecord] = (try? modelContext.fetch(
+            let playType = playTypeToShow
+            let songRecords: [IIDXSongRecord] = (try? modelContext.fetch(
                 FetchDescriptor<IIDXSongRecord>(
                     predicate: #Predicate<IIDXSongRecord> {
-                        $0.importGroup?.id == importGroupID
+                        $0.importGroup?.id == importGroupID && $0.playType == playType
                     },
                     sortBy: [SortDescriptor(\.title, order: .forward)]
                 )
             )) ?? []
-            songRecords.removeAll { $0.playType != playTypeToShow }
             if songRecords.count > 0 {
                 let newClearTypePerDifficulty = clearTypePerDifficulty(for: songRecords)
                 let newScoresPerDifficulty = scoresPerDifficulty(for: songRecords)
@@ -90,6 +90,12 @@ extension AnalyticsView {
     ) -> (data: [Date: [Int: OrderedDictionary<String, Int>]], cache: [CachedTrendData]) {
 
         let existingCache = trendData(using: cacheData)
+        // Create dictionary for O(1) cache lookups
+        let existingCacheDict = Dictionary(
+            uniqueKeysWithValues: existingCache.map { 
+                ("\($0.importGroupID)_\($0.playType.rawValue)", $0) 
+            }
+        )
         var newData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
         var newCache: [CachedTrendData] = []
         var calculatedTrendData: [(importGroup: ImportGroup, data: [Int: OrderedDictionary<String, Int>])] = []
@@ -97,9 +103,8 @@ extension AnalyticsView {
         // Determine whether to load new data for import group or just take from cache
         for importGroup in importGroups {
             let date = dateWithTimeSetToMidnight(importGroup.importDate)
-            if let existingCacheData = existingCache.first(where: {
-                $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-            }) {
+            let cacheKey = "\(importGroup.id)_\(playTypeToShow.rawValue)"
+            if let existingCacheData = existingCacheDict[cacheKey] {
                 debugPrint("Returning from cache: \(date)")
                 calculatedTrendData.append((importGroup, existingCacheData.data))
             } else {
@@ -117,9 +122,8 @@ extension AnalyticsView {
                 debugPrint("Adding: \(importGroup.importDate)")
                 newData[importGroup.importDate] = trendData
             }
-            if let existingCacheData = existingCache.first(where: {
-                $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-            }) {
+            let cacheKey = "\(importGroup.id)_\(playTypeToShow.rawValue)"
+            if let existingCacheData = existingCacheDict[cacheKey] {
                 debugPrint("Storing existing data to new cache: \(importGroup.importDate)")
                 newCache.append(existingCacheData)
             } else {
@@ -180,10 +184,14 @@ extension AnalyticsView {
             )
         }
 
-        // Add scores to dictionary
-        let scores = scores(in: songRecords).filter({ $0.clearType != "NO PLAY" && $0.score > 0 })
-        for score in scores {
-            newClearTypePerDifficulty[score.difficulty]?[score.clearType]? += 1
+        // Add scores to dictionary - optimized to avoid intermediate array creation
+        for songRecord in songRecords {
+            for score in [songRecord.beginnerScore, songRecord.normalScore, 
+                          songRecord.hyperScore, songRecord.anotherScore, 
+                          songRecord.leggendariaScore] where score.difficulty != 0 && 
+                          score.clearType != "NO PLAY" && score.score > 0 {
+                newClearTypePerDifficulty[score.difficulty]?[score.clearType]? += 1
+            }
         }
 
         return newClearTypePerDifficulty
@@ -200,10 +208,11 @@ extension AnalyticsView {
             )
         }
 
-        // Add scores to dictionary
+        // Add scores to dictionary - optimized to avoid calling scores() per record
         for songRecord in songRecords {
-            let scores: [IIDXLevelScore] = songRecord.scores()
-            for score in scores {
+            for score in [songRecord.beginnerScore, songRecord.normalScore,
+                          songRecord.hyperScore, songRecord.anotherScore,
+                          songRecord.leggendariaScore] where score.difficulty != 0 {
                 newDJLevelForDifficulty[score.difficulty]?[score.djLevel]? += 1
             }
         }
@@ -219,10 +228,16 @@ extension AnalyticsView {
                 .reduce(into: [IIDXDJLevel: Int]()) { $0[$1] = 0 }
         }
 
-        // Add scores to dictionary
-        let scores = scores(in: songRecords).filter({ $0.djLevelEnum() != .none})
-        for score in scores {
-            newScoresPerDifficulty[score.difficulty]?[score.djLevelEnum()]? += 1
+        // Add scores to dictionary - optimized to avoid intermediate array creation
+        for songRecord in songRecords {
+            for score in [songRecord.beginnerScore, songRecord.normalScore,
+                          songRecord.hyperScore, songRecord.anotherScore,
+                          songRecord.leggendariaScore] where score.difficulty != 0 {
+                let djLevel = score.djLevelEnum()
+                if djLevel != .none {
+                    newScoresPerDifficulty[score.difficulty]?[djLevel]? += 1
+                }
+            }
         }
         return newScoresPerDifficulty
     }
@@ -238,19 +253,15 @@ extension AnalyticsView {
     }
 
     func scores(in songRecords: [IIDXSongRecord]) -> [IIDXLevelScore] {
-        var scores: [IIDXLevelScore] = []
-        for songRecord in songRecords {
-            let scoresAvailable: [IIDXLevelScore] = [
+        songRecords.flatMap { songRecord in
+            [
                 songRecord.beginnerScore,
                 songRecord.normalScore,
                 songRecord.hyperScore,
                 songRecord.anotherScore,
                 songRecord.leggendariaScore
-            ]
-                .filter({$0.difficulty != 0})
-            scores.append(contentsOf: scoresAvailable)
+            ].filter { $0.difficulty != 0 }
         }
-        return scores
     }
 
     func sumOfCounts(_ data: [Int: OrderedDictionary<String, Int>]) -> Int {
