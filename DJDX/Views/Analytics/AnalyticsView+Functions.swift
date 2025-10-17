@@ -33,15 +33,15 @@ extension AnalyticsView {
         if let importGroupIdentifier,
            let importGroup = modelContext.model(for: importGroupIdentifier) as? ImportGroup {
             let importGroupID = importGroup.id
-            var songRecords: [IIDXSongRecord] = (try? modelContext.fetch(
+            let playType = playTypeToShow
+            let songRecords: [IIDXSongRecord] = (try? modelContext.fetch(
                 FetchDescriptor<IIDXSongRecord>(
                     predicate: #Predicate<IIDXSongRecord> {
-                        $0.importGroup?.id == importGroupID
+                        $0.importGroup?.id == importGroupID && $0.playType == playType
                     },
                     sortBy: [SortDescriptor(\.title, order: .forward)]
                 )
             )) ?? []
-            songRecords.removeAll { $0.playType != playTypeToShow }
             if songRecords.count > 0 {
                 let newClearTypePerDifficulty = clearTypePerDifficulty(for: songRecords)
                 let newScoresPerDifficulty = scoresPerDifficulty(for: songRecords)
@@ -90,6 +90,12 @@ extension AnalyticsView {
     ) -> (data: [Date: [Int: OrderedDictionary<String, Int>]], cache: [CachedTrendData]) {
 
         let existingCache = trendData(using: cacheData)
+        // Create dictionary for O(1) cache lookups
+        let existingCacheDict = Dictionary(
+            uniqueKeysWithValues: existingCache.map { 
+                ("\($0.importGroupID)_\($0.playType.rawValue)", $0) 
+            }
+        )
         var newData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
         var newCache: [CachedTrendData] = []
         var calculatedTrendData: [(importGroup: ImportGroup, data: [Int: OrderedDictionary<String, Int>])] = []
@@ -97,9 +103,8 @@ extension AnalyticsView {
         // Determine whether to load new data for import group or just take from cache
         for importGroup in importGroups {
             let date = dateWithTimeSetToMidnight(importGroup.importDate)
-            if let existingCacheData = existingCache.first(where: {
-                $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-            }) {
+            let cacheKey = "\(importGroup.id)_\(playTypeToShow.rawValue)"
+            if let existingCacheData = existingCacheDict[cacheKey] {
                 debugPrint("Returning from cache: \(date)")
                 calculatedTrendData.append((importGroup, existingCacheData.data))
             } else {
@@ -117,9 +122,8 @@ extension AnalyticsView {
                 debugPrint("Adding: \(importGroup.importDate)")
                 newData[importGroup.importDate] = trendData
             }
-            if let existingCacheData = existingCache.first(where: {
-                $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-            }) {
+            let cacheKey = "\(importGroup.id)_\(playTypeToShow.rawValue)"
+            if let existingCacheData = existingCacheDict[cacheKey] {
                 debugPrint("Storing existing data to new cache: \(importGroup.importDate)")
                 newCache.append(existingCacheData)
             } else {
