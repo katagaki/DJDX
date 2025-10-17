@@ -180,10 +180,14 @@ extension AnalyticsView {
             )
         }
 
-        // Add scores to dictionary
-        let scores = scores(in: songRecords).filter({ $0.clearType != "NO PLAY" && $0.score > 0 })
-        for score in scores {
-            newClearTypePerDifficulty[score.difficulty]?[score.clearType]? += 1
+        // Add scores to dictionary - optimized to avoid intermediate array creation
+        for songRecord in songRecords {
+            for score in [songRecord.beginnerScore, songRecord.normalScore, 
+                          songRecord.hyperScore, songRecord.anotherScore, 
+                          songRecord.leggendariaScore] where score.difficulty != 0 && 
+                          score.clearType != "NO PLAY" && score.score > 0 {
+                newClearTypePerDifficulty[score.difficulty]?[score.clearType]? += 1
+            }
         }
 
         return newClearTypePerDifficulty
@@ -200,10 +204,11 @@ extension AnalyticsView {
             )
         }
 
-        // Add scores to dictionary
+        // Add scores to dictionary - optimized to avoid calling scores() per record
         for songRecord in songRecords {
-            let scores: [IIDXLevelScore] = songRecord.scores()
-            for score in scores {
+            for score in [songRecord.beginnerScore, songRecord.normalScore,
+                          songRecord.hyperScore, songRecord.anotherScore,
+                          songRecord.leggendariaScore] where score.difficulty != 0 {
                 newDJLevelForDifficulty[score.difficulty]?[score.djLevel]? += 1
             }
         }
@@ -219,10 +224,16 @@ extension AnalyticsView {
                 .reduce(into: [IIDXDJLevel: Int]()) { $0[$1] = 0 }
         }
 
-        // Add scores to dictionary
-        let scores = scores(in: songRecords).filter({ $0.djLevelEnum() != .none})
-        for score in scores {
-            newScoresPerDifficulty[score.difficulty]?[score.djLevelEnum()]? += 1
+        // Add scores to dictionary - optimized to avoid intermediate array creation
+        for songRecord in songRecords {
+            for score in [songRecord.beginnerScore, songRecord.normalScore,
+                          songRecord.hyperScore, songRecord.anotherScore,
+                          songRecord.leggendariaScore] where score.difficulty != 0 {
+                let djLevel = score.djLevelEnum()
+                if djLevel != .none {
+                    newScoresPerDifficulty[score.difficulty]?[djLevel]? += 1
+                }
+            }
         }
         return newScoresPerDifficulty
     }
@@ -238,19 +249,15 @@ extension AnalyticsView {
     }
 
     func scores(in songRecords: [IIDXSongRecord]) -> [IIDXLevelScore] {
-        var scores: [IIDXLevelScore] = []
-        for songRecord in songRecords {
-            let scoresAvailable: [IIDXLevelScore] = [
+        songRecords.flatMap { songRecord in
+            [
                 songRecord.beginnerScore,
                 songRecord.normalScore,
                 songRecord.hyperScore,
                 songRecord.anotherScore,
                 songRecord.leggendariaScore
-            ]
-                .filter({$0.difficulty != 0})
-            scores.append(contentsOf: scoresAvailable)
+            ].filter { $0.difficulty != 0 }
         }
-        return scores
     }
 
     func sumOfCounts(_ data: [Int: OrderedDictionary<String, Int>]) -> Int {
