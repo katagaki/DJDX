@@ -16,13 +16,10 @@ struct IIDXLevelShowcase: View {
     var body: some View {
         HStack(alignment: .top) {
             ForEach(IIDXLevel.sorted, id: \.self) { level in
-                if let keyPath = level.scoreKeyPath {
-                    let score = songRecord[keyPath: keyPath]
-                    if score.difficulty != 0 {
-                        if level != .beginner || !isBeginnerLevelHidden {
-                            IIDXLevelLabel(levelType: level, score: score)
-                        }
-                    }
+                if let keyPath = level.scoreKeyPath,
+                   songRecord[keyPath: keyPath].difficulty != 0,
+                   level != .beginner || !isBeginnerLevelHidden {
+                    IIDXLevelLabel(levelType: level, score: songRecord[keyPath: keyPath])
                 }
             }
         }

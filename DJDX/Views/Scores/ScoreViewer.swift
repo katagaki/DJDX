@@ -20,18 +20,15 @@ struct ScoreViewer: View {
     var body: some View {
         List {
             ForEach(IIDXLevel.sorted, id: \.self) { level in
-                if let keyPath = level.scoreKeyPath {
-                    let score = songRecord[keyPath: keyPath]
-                    if score.difficulty != 0 {
-                        if level != .beginner || !isBeginnerLevelHidden {
-                            ScoreSection(
-                                songTitle: songRecord.title,
-                                score: score,
-                                noteCount: noteCount(songRecord, level),
-                                playType: level == .beginner ? .single : songRecord.playType
-                            )
-                        }
-                    }
+                if let keyPath = level.scoreKeyPath,
+                   songRecord[keyPath: keyPath].difficulty != 0,
+                   level != .beginner || !isBeginnerLevelHidden {
+                    ScoreSection(
+                        songTitle: songRecord.title,
+                        score: songRecord[keyPath: keyPath],
+                        noteCount: noteCount(songRecord, level),
+                        playType: level == .beginner ? .single : songRecord.playType
+                    )
                 }
             }
         }
