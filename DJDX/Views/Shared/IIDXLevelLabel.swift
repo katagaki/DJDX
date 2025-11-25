@@ -14,24 +14,10 @@ struct IIDXLevelLabel: View {
 
     init(levelType: IIDXLevel, songRecord: IIDXSongRecord) {
         self.orientation = .vertical
-        switch levelType {
-        case .beginner:
-            self.levelType = .beginner
-            self.score = songRecord.beginnerScore
-        case .normal:
-            self.levelType = .normal
-            self.score = songRecord.normalScore
-        case .hyper:
-            self.levelType = .hyper
-            self.score = songRecord.hyperScore
-        case .another:
-            self.levelType = .another
-            self.score = songRecord.anotherScore
-        case .leggendaria:
-            self.levelType = .leggendaria
-            self.score = songRecord.leggendariaScore
-        default:
-            self.levelType = .unknown
+        self.levelType = levelType
+        if let keyPath = levelType.scoreKeyPath {
+            self.score = songRecord[keyPath: keyPath]
+        } else {
             self.score = IIDXLevelScore()
         }
     }
@@ -77,17 +63,6 @@ struct IIDXLevelLabel: View {
         .lineLimit(1)
         .drawingGroup()
         .offset(y: -1.5) // HACK: Fixes weird offset when using black font weight
-        .modifier(LevelLabelGlow(color: foregroundColor()))
-    }
-
-    func foregroundColor() -> Color {
-        switch levelType {
-        case .beginner: return Color.green
-        case .normal: return Color.blue
-        case .hyper: return Color.orange
-        case .another: return Color.red
-        case .leggendaria: return Color.purple
-        default: return Color.primary
-        }
+        .modifier(LevelLabelGlow(color: levelType.color))
     }
 }

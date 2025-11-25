@@ -20,4 +20,14 @@ final class ImportGroup {
         self.iidxData = iidxData
         self.iidxVersion = iidxVersion
     }
+
+    static func predicate(from startDate: Date) -> Predicate<ImportGroup> {
+        var components = DateComponents()
+        components.day = 1
+        components.second = -1
+        let endDate: Date = Calendar.current.date(byAdding: components, to: startDate)!
+        return #Predicate<ImportGroup> {
+            $0.importDate >= startDate && $0.importDate <= endDate
+        }
+    }
 }

@@ -177,7 +177,7 @@ actor DataImporter {
         version: IIDXVersion
     ) -> ImportGroup {
         let fetchDescriptor = FetchDescriptor<ImportGroup>(
-            predicate: importGroups(from: importToDate)
+            predicate: ImportGroup.predicate(from: importToDate)
         )
         // Find existing import group and return it after cleaning it up
         if let importGroupsOnSelectedDate: [ImportGroup] = try? modelContext.fetch(fetchDescriptor),
@@ -192,15 +192,5 @@ actor DataImporter {
         let newImportGroup = ImportGroup(importDate: importToDate, iidxData: [], iidxVersion: version)
         modelContext.insert(newImportGroup)
         return newImportGroup
-    }
-
-    func importGroups(from startDate: Date) -> Predicate<ImportGroup> {
-        var components = DateComponents()
-        components.day = 1
-        components.second = -1
-        let endDate: Date = Calendar.current.date(byAdding: components, to: startDate)!
-        return #Predicate<ImportGroup> {
-            $0.importDate >= startDate && $0.importDate <= endDate
-        }
     }
 }

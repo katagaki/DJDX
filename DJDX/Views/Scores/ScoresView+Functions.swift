@@ -93,16 +93,7 @@ extension ScoresView {
 
     func noteCount(for songRecord: IIDXSongRecord, of level: IIDXLevel) -> Int? {
         let compactTitle = songRecord.titleCompact()
-        let keyPath: KeyPath<IIDXNoteCount, Int?>?
-        switch level {
-        case .beginner: keyPath = \.beginnerNoteCount
-        case .normal: keyPath = \.normalNoteCount
-        case .hyper: keyPath = \.hyperNoteCount
-        case .another: keyPath = \.anotherNoteCount
-        case .leggendaria: keyPath = \.leggendariaNoteCount
-        default: keyPath = nil
-        }
-        if let keyPath,
+        if let keyPath = level.noteCountKeyPath,
            let songIdentifier = songCompactTitles[compactTitle],
            let song = modelContext.model(for: songIdentifier) as? IIDXSong {
             return song.spNoteCount?[keyPath: keyPath]

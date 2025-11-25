@@ -29,7 +29,7 @@ actor DataFetcher {
     func importGroup(for selectedDate: Date) -> ImportGroup? {
         let importGroupsForSelectedDate: [ImportGroup] = (try? modelContext.fetch(
             FetchDescriptor<ImportGroup>(
-                predicate: importGroups(from: selectedDate),
+                predicate: ImportGroup.predicate(from: selectedDate),
                 sortBy: [SortDescriptor(\.importDate, order: .forward)]
             )
         )) ?? []
@@ -142,7 +142,7 @@ actor DataFetcher {
             // Filter song records that have no scores
             if filters.onlyPlayDataWithScores {
                 if filters.level != .all,
-                   let keyPath = scoreKeyPath(for: filters.level) {
+                   let keyPath = filters.level.scoreKeyPath {
                         filteredSongRecords.removeAll { songRecord in
                             songRecord[keyPath: keyPath].score == 0
                         }
@@ -224,7 +224,7 @@ actor DataFetcher {
             if sortOptions.mode != .title && sortOptions.mode != .lastPlayDate {
                 if let level = filters?.level,
                    level != .all,
-                    let keyPath = scoreKeyPath(for: level) {
+                    let keyPath = level.scoreKeyPath {
                     songLevelScores = sortedSongRecords.reduce(into: [:], { partialResult, songRecord in
                         partialResult[songRecord] = songRecord[keyPath: keyPath]
                     })
@@ -297,7 +297,7 @@ actor DataFetcher {
                                     let rhsScoreRate = Float(rhs.value.score) / Float(rhsNoteCount * 2)
                                     if lhsScoreRate.isZero && rhsScoreRate > .zero {
                                         return false
-                                    } else if rhsScoreRate.isZero && rhsScoreRate > .zero {
+                                    } else if lhsScoreRate > .zero && rhsScoreRate.isZero {
                                         return true
                                     } else if lhsScoreRate.isZero && rhsScoreRate.isZero {
                                         return lhs.key.title < rhs.key.title
@@ -383,31 +383,6 @@ actor DataFetcher {
             songCompactTitles[song.titleCompact()] = song.persistentModelID
         }
         return songCompactTitles
-    }
-
-    // MARK: Key Paths
-
-    func scoreKeyPath(for level: IIDXLevel) -> KeyPath<IIDXSongRecord, IIDXLevelScore>? {
-        switch level {
-        case .beginner: return \.beginnerScore
-        case .normal: return \.normalScore
-        case .hyper: return \.hyperScore
-        case .another: return \.anotherScore
-        case .leggendaria: return \.leggendariaScore
-        default: return nil
-        }
-    }
-
-    // MARK: Predicates
-
-    func importGroups(from startDate: Date) -> Predicate<ImportGroup> {
-        var components = DateComponents()
-        components.day = 1
-        components.second = -1
-        let endDate: Date = Calendar.current.date(byAdding: components, to: startDate)!
-        return #Predicate<ImportGroup> {
-            $0.importDate >= startDate && $0.importDate <= endDate
-        }
     }
 }
 // swiftlint:enable file_length

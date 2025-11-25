@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum IIDXLevel: String, CaseIterable, Codable {
     case all = "Shared.All"
@@ -68,6 +69,39 @@ enum IIDXLevel: String, CaseIterable, Codable {
         case .another: return "A"
         case .leggendaria: return "L"
         case .all, .unknown: return ""
+        }
+    }
+
+    var scoreKeyPath: KeyPath<IIDXSongRecord, IIDXLevelScore>? {
+        switch self {
+        case .beginner: return \.beginnerScore
+        case .normal: return \.normalScore
+        case .hyper: return \.hyperScore
+        case .another: return \.anotherScore
+        case .leggendaria: return \.leggendariaScore
+        default: return nil
+        }
+    }
+
+    var noteCountKeyPath: KeyPath<IIDXNoteCount, Int?>? {
+        switch self {
+        case .beginner: return \.beginnerNoteCount
+        case .normal: return \.normalNoteCount
+        case .hyper: return \.hyperNoteCount
+        case .another: return \.anotherNoteCount
+        case .leggendaria: return \.leggendariaNoteCount
+        default: return nil
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .beginner: return .green
+        case .normal: return .blue
+        case .hyper: return .orange
+        case .another: return .red
+        case .leggendaria: return .purple
+        default: return .primary
         }
     }
 }
