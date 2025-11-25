@@ -238,29 +238,11 @@ extension AnalyticsView {
     }
 
     func scores(in songRecords: [IIDXSongRecord]) -> [IIDXLevelScore] {
-        var scores: [IIDXLevelScore] = []
-        for songRecord in songRecords {
-            let scoresAvailable: [IIDXLevelScore] = [
-                songRecord.beginnerScore,
-                songRecord.normalScore,
-                songRecord.hyperScore,
-                songRecord.anotherScore,
-                songRecord.leggendariaScore
-            ]
-                .filter({$0.difficulty != 0})
-            scores.append(contentsOf: scoresAvailable)
-        }
-        return scores
+        songRecords.flatMap { $0.scores() }
     }
 
     func sumOfCounts(_ data: [Int: OrderedDictionary<String, Int>]) -> Int {
-        var sum = 0
-        for (_, clearTypeDictionary) in data {
-            for (_, count) in clearTypeDictionary {
-                sum += count
-            }
-        }
-        return sum
+        data.values.flatMap { $0.values }.reduce(0, +)
     }
 
     func dateWithTimeSetToMidnight(_ date: Date) -> Date {

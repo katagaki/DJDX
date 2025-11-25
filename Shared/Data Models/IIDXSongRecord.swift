@@ -83,14 +83,8 @@ final class IIDXSongRecord: Equatable, Hashable {
     }
 
     func score(for level: IIDXLevel) -> IIDXLevelScore? {
-        switch level {
-        case .beginner: return beginnerScore
-        case .normal: return normalScore
-        case .hyper: return hyperScore
-        case .another: return anotherScore
-        case .leggendaria: return leggendariaScore
-        default: return nil
-        }
+        guard let keyPath = level.scoreKeyPath else { return nil }
+        return self[keyPath: keyPath]
     }
 
     func level(for level: IIDXLevel, or difficulty: IIDXDifficulty) -> IIDXLevel {

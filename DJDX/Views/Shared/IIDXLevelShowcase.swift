@@ -15,26 +15,15 @@ struct IIDXLevelShowcase: View {
 
     var body: some View {
         HStack(alignment: .top) {
-            if !isBeginnerLevelHidden,
-               songRecord.beginnerScore.difficulty != 0 {
-                IIDXLevelLabel(levelType: .beginner,
-                               score: songRecord.beginnerScore)
-            }
-            if songRecord.normalScore.difficulty != 0 {
-                IIDXLevelLabel(levelType: .normal,
-                                 score: songRecord.normalScore)
-            }
-            if songRecord.hyperScore.difficulty != 0 {
-                IIDXLevelLabel(levelType: .hyper,
-                                 score: songRecord.hyperScore)
-            }
-            if songRecord.anotherScore.difficulty != 0 {
-                IIDXLevelLabel(levelType: .another,
-                                 score: songRecord.anotherScore)
-            }
-            if songRecord.leggendariaScore.difficulty != 0 {
-                IIDXLevelLabel(levelType: .leggendaria,
-                                 score: songRecord.leggendariaScore)
+            ForEach(IIDXLevel.sorted, id: \.self) { level in
+                if let keyPath = level.scoreKeyPath {
+                    let score = songRecord[keyPath: keyPath]
+                    if score.difficulty != 0 {
+                        if level != .beginner || !isBeginnerLevelHidden {
+                            IIDXLevelLabel(levelType: level, score: score)
+                        }
+                    }
+                }
             }
         }
     }

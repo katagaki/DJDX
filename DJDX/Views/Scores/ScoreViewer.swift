@@ -19,30 +19,20 @@ struct ScoreViewer: View {
 
     var body: some View {
         List {
-            if !isBeginnerLevelHidden, songRecord.beginnerScore.difficulty != 0 {
-                ScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
-                             noteCount: noteCount(songRecord, .beginner),
-                             playType: .single) // Only SP has Beginner level
-            }
-            if songRecord.normalScore.difficulty != 0 {
-                ScoreSection(songTitle: songRecord.title, score: songRecord.normalScore,
-                             noteCount: noteCount(songRecord, .normal),
-                             playType: songRecord.playType)
-            }
-            if songRecord.hyperScore.difficulty != 0 {
-                ScoreSection(songTitle: songRecord.title, score: songRecord.hyperScore,
-                             noteCount: noteCount(songRecord, .hyper),
-                             playType: songRecord.playType)
-            }
-            if songRecord.anotherScore.difficulty != 0 {
-                ScoreSection(songTitle: songRecord.title, score: songRecord.anotherScore,
-                             noteCount: noteCount(songRecord, .another),
-                             playType: songRecord.playType)
-            }
-            if songRecord.leggendariaScore.difficulty != 0 {
-                ScoreSection(songTitle: songRecord.title, score: songRecord.leggendariaScore,
-                             noteCount: noteCount(songRecord, .leggendaria),
-                             playType: songRecord.playType)
+            ForEach(IIDXLevel.sorted, id: \.self) { level in
+                if let keyPath = level.scoreKeyPath {
+                    let score = songRecord[keyPath: keyPath]
+                    if score.difficulty != 0 {
+                        if level != .beginner || !isBeginnerLevelHidden {
+                            ScoreSection(
+                                songTitle: songRecord.title,
+                                score: score,
+                                noteCount: noteCount(songRecord, level),
+                                playType: level == .beginner ? .single : songRecord.playType
+                            )
+                        }
+                    }
+                }
             }
         }
         .listSectionSpacing(.compact)

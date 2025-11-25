@@ -52,29 +52,7 @@ struct ScoreRow: View {
                 // Leading Clear Lamp
                 VStack {
                     if let score = score {
-                        switch score.clearType {
-                        case "FULLCOMBO CLEAR":
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color.red,
-                                    Color.orange,
-                                    Color.yellow,
-                                    Color.green,
-                                    Color.blue,
-                                    Color.indigo,
-                                    Color.purple
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        case "CLEAR": Color.cyan
-                        case "ASSIST CLEAR": Color.purple
-                        case "EASY CLEAR": Color.green
-                        case "HARD CLEAR": Color.pink
-                        case "EX HARD CLEAR": Color.yellow
-                        case "FAILED": Color.red
-                        default: Color.clear
-                        }
+                        IIDXClearType(from: score.clearType).lampColor
                     } else {
                         Color.clear
                     }

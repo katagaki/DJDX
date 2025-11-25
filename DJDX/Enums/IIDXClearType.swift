@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum IIDXClearType: String, Codable {
     case all = "Shared.All"
@@ -46,5 +47,28 @@ enum IIDXClearType: String, Codable {
 
     static var sortedStringsWithoutNoPlay: [String] {
         sortedWithoutNoPlay.map({ $0.rawValue })
+    }
+
+    /// Color for clear lamp display (used in ScoreRow)
+    var lampColor: AnyShapeStyle {
+        switch self {
+        case .fullComboClear:
+            return AnyShapeStyle(LinearGradient(
+                gradient: Gradient(colors: [.red, .orange, .yellow, .green, .blue, .indigo, .purple]),
+                startPoint: .top,
+                endPoint: .bottom
+            ))
+        case .clear: return AnyShapeStyle(Color.cyan)
+        case .assistClear: return AnyShapeStyle(Color.purple)
+        case .easyClear: return AnyShapeStyle(Color.green)
+        case .hardClear: return AnyShapeStyle(Color.pink)
+        case .exHardClear: return AnyShapeStyle(Color.yellow)
+        case .failed: return AnyShapeStyle(Color.red)
+        default: return AnyShapeStyle(Color.clear)
+        }
+    }
+
+    init(from rawValue: String) {
+        self = IIDXClearType(rawValue: rawValue) ?? .unknown
     }
 }

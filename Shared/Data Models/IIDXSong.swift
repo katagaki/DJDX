@@ -88,13 +88,7 @@ struct IIDXNoteCount: Codable, Equatable {
     }
 
     func noteCount(for level: IIDXLevel) -> Int? {
-        switch level {
-        case .beginner: return beginnerNoteCount
-        case .normal: return normalNoteCount
-        case .hyper: return hyperNoteCount
-        case .another: return anotherNoteCount
-        case .leggendaria: return leggendariaNoteCount
-        default: return nil
-        }
+        guard let keyPath = level.noteCountKeyPath else { return nil }
+        return self[keyPath: keyPath]
     }
 }
