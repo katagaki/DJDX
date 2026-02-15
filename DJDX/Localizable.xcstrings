@@ -396,13 +396,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clear Type (By Difficulty)"
+            "value" : "Clear Type (By Chart Level)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアランプ（難易度別）"
+            "value" : "クリアランプ（レベル別）"
           }
         }
       }
@@ -430,13 +430,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJ Level (By Difficulty)"
+            "value" : "DJ Level (By Chart Level)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJ LEVEL（難易度別）"
+            "value" : "DJ LEVEL（レベル別）"
           }
         }
       }
@@ -941,13 +941,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hide Beginner Level"
+            "value" : "Hide Beginner Difficulty"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BEGINNERレベルを非表示"
+            "value" : "BEGINNERを非表示"
           }
         }
       }
@@ -1043,13 +1043,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Levels Separately"
+            "value" : "Show Difficulties Separately"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "レベル別で表示"
+            "value" : "難易度を分けて表示"
           }
         }
       }
@@ -1060,13 +1060,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(WIP) Separate each level into its own item when displaying."
+            "value" : "(WIP) Separate each difficulty into its own item when displaying."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "（未実装）譜面をレベルで分けて表示されます。"
+            "value" : "（未実装）譜面を難易度で分けて表示されます。"
           }
         }
       }
@@ -1432,13 +1432,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Difficulty"
+            "value" : "Level"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "難易度"
+            "value" : "レベル"
           }
         }
       }
@@ -1516,13 +1516,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Level"
+            "value" : "Difficulty"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "レベル"
+            "value" : "難易度"
           }
         }
       }
@@ -1868,13 +1868,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Difficulty (Ascending)"
+            "value" : "Level (Ascending)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "難易度（昇順）"
+            "value" : "レベル（昇順）"
           }
         }
       }
@@ -1885,13 +1885,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Difficulty (Descending)"
+            "value" : "Level (Descending)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "難易度（降順）"
+            "value" : "レベル（降順）"
           }
         }
       }
