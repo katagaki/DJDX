@@ -88,7 +88,7 @@ extension ImportView {
                 for await progress in await actor.importCSVs(
                     urls: urls,
                     to: importToDate,
-                    for: .single,
+                    for: importPlayType,
                     from: iidxVersion
                 ) {
                     if let filesProcessed = progress.filesProcessed,
