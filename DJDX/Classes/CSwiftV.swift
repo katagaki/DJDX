@@ -31,7 +31,7 @@ public class CSwiftV {
     public let keyedRows: [[String: String]]?
     /// An Array of the rows in an Array of String form, equivalent to keyedRows, but without the keys
     public let rows: [[String]]
-    
+
     /// Creates an instance containing the data extracted from the `with` String
     /// - Parameter with: The String obtained from reading the csv file.
     /// - Parameter separator: The separator used in the csv file, defaults to ","
@@ -54,15 +54,15 @@ public class CSwiftV {
             return row
         }
     }
-    
+
     /// Creates an instance containing the data extracted from the `with` String
     /// - Parameter with: The string obtained from reading the csv file.
     /// - Parameter headers: The array of headers from the file. I f not included, it will be populated with the ones from the first line
     /// - Attention: In this conveniennce initializer, we assume that the separator between fields is ","
     public convenience init(with string: String, headers: [String]?) {
-        self.init(with: string, separator:",", headers:headers)
+        self.init(with: string, separator: ",", headers: headers)
     }
-    
+
     /// Analizes a row and tries to obtain the different cells contained as an Array of String
     /// - Parameter forRow: The string corresponding to a row of the data matrix
     /// - Parameter separator: The string that delimites the cells or fields inside the row. Defaults to ","
