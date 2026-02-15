@@ -58,6 +58,9 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
         webView.load(URLRequest(url: iidxVersion.loginPageRedirectURL()))
+        #if DEBUG
+        webView.isInspectable = true
+        #endif
         return webView
     }
 

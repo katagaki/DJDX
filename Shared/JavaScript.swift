@@ -98,13 +98,23 @@ var darkModeCSS = `
     header, .Header_logo__konami--default__lYPft {
         background-color: #000000!important;
     }
-    .Form_login__layout--narrow-frame__SnckF,
-    .Form_login__layout--default__bEjGz,
-    .Form_login__form--default__3G_u1,
-    .Form_login__form--narrow-frame__Rvksw,
+    [class*="Form_login__layout--narrow-frame"],
+    [class*="Form_login__layout--default"],
+    [class*="Form_login__form--default"],
+    [class*="Form_login__form--narrow-frame"],
     #email-form {
         border: unset;
         background-color: #1c1c1e!important;
+    }
+    .form-floating > label {
+      color: #aaa;
+    }
+    .form-floating > .form-control:focus ~ label {
+      color: #eee;
+    }
+    .m-icon--arrow_back_back {
+        filter: invert();
+        opacity: 40%;
     }
     .form-control, .form-control:focus {
         background-color: #000000!important;
