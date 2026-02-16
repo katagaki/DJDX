@@ -64,8 +64,8 @@ struct ImportView: View {
             .navigator("ViewTitle.Calendar")
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
-                if #available(iOS 26.0, *) {
-                    ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
+                    if #available(iOS 26.0, *) {
                         Menu(importPlayType.displayName()) {
                             Picker("Shared.PlayType", selection: $importPlayType) {
                                 Text(verbatim: "SP")
@@ -75,6 +75,8 @@ struct ImportView: View {
                             }
                             .pickerStyle(.inline)
                         }
+                    } else {
+                        PlayTypePicker(playTypeToShow: $importPlayType)
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -94,62 +96,15 @@ struct ImportView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                TabBarAccessory(placement: .bottom) {
-                    VStack(spacing: 8.0) {
-                        DatePicker("Calendar.Import.SelectDate",
-                                   selection: $importToDate,
-                                   in: ...Date.now,
-                                   displayedComponents: .date)
-                        .datePickerStyle(.compact)
-                        .padding([.leading, .trailing], 16.0)
-                        .padding([.top], 12.0)
-                        ScrollView(.horizontal) {
-                            HStack(spacing: 8.0) {
-                                if #unavailable(iOS 26.0) {
-                                    PlayTypePicker(playTypeToShow: $importPlayType)
-                                }
-                                switch importPlayType {
-                                case .single:
-                                    ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
-                                        navigationManager.push(ViewPath.importerWebIIDXSingle, for: .imports)
-                                    }
-                                    .popoverTip(StartHereTip(), arrowEdge: .bottom)
-                                case .double:
-                                    ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {
-                                        navigationManager.push(ViewPath.importerWebIIDXDouble, for: .imports)
-                                    }
-                                }
-                                Menu {
-                                    Section {
-                                        Button("Importer.CSV.Download.Button", systemImage: "safari") {
-                                            openCSVDownloadPage()
-                                        }
-                                    } header: {
-                                        Text("Importer.CSV.Download.Description")
-                                            .foregroundColor(.primary)
-                                            .textCase(nil)
-                                            .font(.body)
-                                    }
-                                    Section {
-                                        Button("Importer.CSV.Load.Button", systemImage: "folder") {
-                                            isSelectingCSVFile = true
-                                        }
-                                    } header: {
-                                        Text("Importer.CSV.Load.Description")
-                                            .foregroundColor(.primary)
-                                            .textCase(nil)
-                                            .font(.body)
-                                    }
-                                } label: {
-                                    ToolbarButton("Calendar.Import.FromCSV", icon: "doc.badge.plus") {
-                                        // Intentionally left blank
-                                    }
-                                }
-                            }
-                            .padding([.leading, .trailing], 16.0)
-                            .padding([.top, .bottom], 12.0)
-                        }
-                        .scrollIndicators(.hidden)
+                if #available(iOS 26.0, *) {
+                    bottomBar()
+                        .padding(.vertical, 2.0)
+                        .clipShape(.containerRelative)
+                        .glassEffect(.regular, in: .containerRelative)
+                        .padding()
+                } else {
+                    TabBarAccessory(placement: .bottom) {
+                        bottomBar()
                     }
                 }
             }
@@ -206,5 +161,80 @@ struct ImportView: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    func bottomBar() -> some View {
+        VStack(spacing: 16.0) {
+            HStack(spacing: 8.0) {
+                DatePicker("Calendar.Import.SelectDate",
+                           selection: $importToDate,
+                           in: ...Date.now,
+                           displayedComponents: .date)
+                .datePickerStyle(.compact)
+            }
+            HStack(spacing: 8.0) {
+                Button {
+                    switch importPlayType {
+                    case .single: navigationManager.push(ViewPath.importerWebIIDXSingle, for: .imports)
+                    case .double: navigationManager.push(ViewPath.importerWebIIDXDouble, for: .imports)
+                    }
+                } label: {
+                    VStack(spacing: 8.0) {
+                        Image(systemName: "globe")
+                            .font(.system(size: 24))
+                            .frame(maxHeight: 30.0)
+                        Text(.calendarImportFromWeb)
+                            .fontWeight(.medium)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accent)
+                    .foregroundStyle(.white)
+                    .adaptiveClipShape()
+                }
+                .popoverTip(StartHereTip(), arrowEdge: .bottom)
+                Menu {
+                    Section {
+                        Button(.importerCsvDownloadButton, systemImage: "safari") {
+                            openCSVDownloadPage()
+                        }
+                    } header: {
+                        Text("Importer.CSV.Download.Description")
+                            .foregroundColor(.primary)
+                            .textCase(nil)
+                            .font(.body)
+                    }
+                    Section {
+                        Button(.importerCsvLoadButton, systemImage: "folder") {
+                            isSelectingCSVFile = true
+                        }
+                    } header: {
+                        Text("Importer.CSV.Load.Description")
+                            .foregroundColor(.primary)
+                            .textCase(nil)
+                            .font(.body)
+                    }
+                } label: {
+                    VStack(spacing: 8.0) {
+                        Image(systemName: "document.badge.plus")
+                            .font(.system(size: 24))
+                            .frame(maxHeight: 30.0)
+                        Text(.calendarImportFromCSV)
+                            .fontWeight(.medium)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accent)
+                    .foregroundStyle(.white)
+                    .adaptiveClipShape()
+                }
+            }
+        }
+        .padding()
     }
 }

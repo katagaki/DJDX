@@ -82,8 +82,8 @@ struct ScoresView: View {
             .navigator("ViewTitle.Scores")
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
-                if #available(iOS 26.0, *) {
-                    ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
+                    if #available(iOS 26.0, *) {
                         Menu(playTypeToShow.displayName()) {
                             Picker("Shared.PlayType", selection: $playTypeToShow) {
                                 Text(verbatim: "SP")
@@ -93,6 +93,8 @@ struct ScoresView: View {
                             }
                             .pickerStyle(.inline)
                         }
+                    } else {
+                        PlayTypePicker(playTypeToShow: $playTypeToShow)
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -103,44 +105,15 @@ struct ScoresView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                TabBarAccessory(placement: .bottom) {
-                    VStack(spacing: 8.0) {
-                        if isTimeTravelling {
-                            DatePicker("Shared.SelectDate",
-                                       selection: $playDataDate.animation(.snappy.speed(2.0)),
-                                       in: ...Date.now,
-                                       displayedComponents: .date)
-                            .datePickerStyle(.compact)
-                            .padding([.leading, .trailing], 16.0)
-                            .padding([.top], 12.0)
-                        }
-                        ScrollView(.horizontal) {
-                            HStack(spacing: 8.0) {
-                                if #unavailable(iOS 26.0) {
-                                    PlayTypePicker(playTypeToShow: $playTypeToShow)
-                                }
-                                ScoreSortAndFilter(isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                                                   difficultyToShow: $difficultyToShow.animation(.snappy.speed(2.0)),
-                                                   levelToShow: $levelToShow.animation(.snappy.speed(2.0)),
-                                                   clearTypeToShow: $clearTypeToShow.animation(.snappy.speed(2.0)),
-                                                   sortMode: $sortMode.animation(.snappy.speed(2.0)),
-                                                   isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort) {
-                                    reloadDisplay()
-                                }
-                                ToolbarButton("Shared.ShowPastData", icon: "arrowshape.turn.up.backward.badge.clock",
-                                              isSecondary: !isTimeTravelling) {
-                                    withAnimation {
-                                        isTimeTravelling.toggle()
-                                    }
-                                    if !isTimeTravelling {
-                                        playDataDate = .now
-                                    }
-                                }
-                            }
-                            .padding([.leading, .trailing], 16.0)
-                            .padding([.top, .bottom], 12.0)
-                        }
-                        .scrollIndicators(.hidden)
+                if #available(iOS 26.0, *) {
+                    bottomBar()
+                        .padding(.vertical, 2.0)
+                        .clipShape(.containerRelative)
+                        .glassEffect(.regular, in: .containerRelative)
+                        .padding()
+                } else {
+                    TabBarAccessory(placement: .bottom) {
+                        bottomBar()
                     }
                 }
             }
@@ -210,6 +183,45 @@ struct ScoresView: View {
                 default: Color.clear
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    func bottomBar() -> some View {
+        VStack(spacing: 8.0) {
+            if isTimeTravelling {
+                DatePicker("Shared.SelectDate",
+                           selection: $playDataDate.animation(.snappy.speed(2.0)),
+                           in: ...Date.now,
+                           displayedComponents: .date)
+                .datePickerStyle(.compact)
+                .padding([.leading, .trailing], 16.0)
+                .padding([.top], 12.0)
+            }
+            ScrollView(.horizontal) {
+                HStack(spacing: 8.0) {
+                    ScoreSortAndFilter(isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
+                                       difficultyToShow: $difficultyToShow.animation(.snappy.speed(2.0)),
+                                       levelToShow: $levelToShow.animation(.snappy.speed(2.0)),
+                                       clearTypeToShow: $clearTypeToShow.animation(.snappy.speed(2.0)),
+                                       sortMode: $sortMode.animation(.snappy.speed(2.0)),
+                                       isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort) {
+                        reloadDisplay()
+                    }
+                    ToolbarButton("Shared.ShowPastData", icon: "arrowshape.turn.up.backward.badge.clock",
+                                  isSecondary: !isTimeTravelling) {
+                        withAnimation {
+                            isTimeTravelling.toggle()
+                        }
+                        if !isTimeTravelling {
+                            playDataDate = .now
+                        }
+                    }
+                }
+                .padding([.leading, .trailing], 16.0)
+                .padding([.top, .bottom], 12.0)
+            }
+            .scrollIndicators(.hidden)
         }
     }
 }

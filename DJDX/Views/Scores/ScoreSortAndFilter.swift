@@ -73,6 +73,7 @@ struct ScoreSortAndFilter: View {
             .background(.accent)
             .clipShape(.capsule)
         }
+        .menuActionDismissBehavior(.disabled)
         Menu {
             Picker("Shared.Sort", selection: $sortMode) {
                 if levelToShow != .all {
