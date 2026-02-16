@@ -173,7 +173,7 @@ struct ImportView: View {
                            displayedComponents: .date)
                 .datePickerStyle(.compact)
             }
-            HStack(spacing: 8.0) {
+            HStack(spacing: 10.0) {
                 Button {
                     switch importPlayType {
                     case .single: navigationManager.push(ViewPath.importerWebIIDXSingle, for: .imports)

@@ -14,7 +14,7 @@ struct AdaptiveClipShape: ViewModifier {
                 .clipShape(.containerRelative)
         } else {
             content
-                .clipShape(.rect(cornerRadius: 8.0))
+                .clipShape(.rect(cornerRadius: 16.0))
         }
     }
 }
