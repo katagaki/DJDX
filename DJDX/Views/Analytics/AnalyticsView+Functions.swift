@@ -203,62 +203,47 @@ extension AnalyticsView {
         for importGroupID: String,
         playType: IIDXPlayType
     ) -> [Int: OrderedDictionary<String, Int>] {
-        var result: [Int: OrderedDictionary<String, Int>] = [:]
-        
+        // Fetch records filtering by import group and play type
+        // We cannot filter by score properties in the predicate because IIDXLevelScore is a struct (stored as BLOB)
+        let descriptor = FetchDescriptor<IIDXSongRecord>(
+            predicate: #Predicate {
+                $0.importGroup?.id == importGroupID &&
+                $0.playType == playType
+            }
+        )
+        let songRecords = (try? modelContext.fetch(descriptor)) ?? []
+
+        // Generate skeleton for calculation
         let clearTypes = IIDXClearType.sortedStringsWithoutNoPlay
-        
+        var result: [Int: OrderedDictionary<String, Int>] = [:]
         for difficulty in difficulties {
             result[difficulty] = OrderedDictionary(
                 uniqueKeys: clearTypes,
                 values: clearTypes.map({ _ in return 0 })
             )
+        }
+
+        // Add scores to dictionary
+        // Re-using logic from original implementation but cleaner
+        for songRecord in songRecords {
+            let scoresAvailable: [IIDXLevelScore] = [
+                songRecord.beginnerScore,
+                songRecord.normalScore,
+                songRecord.hyperScore,
+                songRecord.anotherScore,
+                songRecord.leggendariaScore
+            ]
             
-            for clearType in clearTypes {
-                var count = 0
+            for score in scoresAvailable {
+                // Filter invalid scores
+                if score.difficulty == 0 { continue }
+                if score.clearType == "NO PLAY" { continue }
+                if score.score == 0 { continue }
                 
-                let beginner = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
-                    $0.importGroup?.id == importGroupID &&
-                    $0.playType == playType &&
-                    $0.beginnerScore.difficulty == difficulty &&
-                    $0.beginnerScore.clearType == clearType
-                })
-                count += (try? modelContext.fetchCount(beginner)) ?? 0
-
-                let normal = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
-                    $0.importGroup?.id == importGroupID &&
-                    $0.playType == playType &&
-                    $0.normalScore.difficulty == difficulty &&
-                    $0.normalScore.clearType == clearType
-                })
-                count += (try? modelContext.fetchCount(normal)) ?? 0
-
-                let hyper = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
-                    $0.importGroup?.id == importGroupID &&
-                    $0.playType == playType &&
-                    $0.hyperScore.difficulty == difficulty &&
-                    $0.hyperScore.clearType == clearType
-                })
-                count += (try? modelContext.fetchCount(hyper)) ?? 0
-
-                let another = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
-                    $0.importGroup?.id == importGroupID &&
-                    $0.playType == playType &&
-                    $0.anotherScore.difficulty == difficulty &&
-                    $0.anotherScore.clearType == clearType
-                })
-                count += (try? modelContext.fetchCount(another)) ?? 0
-
-                let leggendaria = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
-                    $0.importGroup?.id == importGroupID &&
-                    $0.playType == playType &&
-                    $0.leggendariaScore.difficulty == difficulty &&
-                    $0.leggendariaScore.clearType == clearType
-                })
-                count += (try? modelContext.fetchCount(leggendaria)) ?? 0
-                
-                result[difficulty]?[clearType] = count
+                result[score.difficulty]?[score.clearType]? += 1
             }
         }
+
         return result
     }
 
@@ -266,65 +251,48 @@ extension AnalyticsView {
         for importGroupID: String,
         playType: IIDXPlayType
     ) -> [Int: OrderedDictionary<String, Int>] {
-        var result: [Int: OrderedDictionary<String, Int>] = [:]
-        
+        // Fetch records filtering by import group and play type
+        let descriptor = FetchDescriptor<IIDXSongRecord>(
+            predicate: #Predicate {
+                $0.importGroup?.id == importGroupID &&
+                $0.playType == playType
+            }
+        )
+        let songRecords = (try? modelContext.fetch(descriptor)) ?? []
+
+        // Generate skeleton for calculation
         let djLevels = IIDXDJLevel.sortedStrings.reversed()
-        // Reversed because original code in djLevelPerDifficulty used reversed?
-        // Line 194: let djLevels = IIDXDJLevel.sortedStrings.reversed()
-        // Yes, preserving order.
-        
+        var result: [Int: OrderedDictionary<String, Int>] = [:]
         for difficulty in difficulties {
             result[difficulty] = OrderedDictionary(
                 uniqueKeys: djLevels,
                 values: djLevels.map({ _ in return 0 })
             )
+        }
+
+        // Add scores to dictionary
+        for songRecord in songRecords {
+            let scoresAvailable: [IIDXLevelScore] = [
+                songRecord.beginnerScore,
+                songRecord.normalScore,
+                songRecord.hyperScore,
+                songRecord.anotherScore,
+                songRecord.leggendariaScore
+            ]
             
-            for djLevel in djLevels {
-                var count = 0
+            for score in scoresAvailable {
+                if score.difficulty == 0 { continue }
                 
-                let beginner = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
-                    $0.importGroup?.id == importGroupID &&
-                    $0.playType == playType &&
-                    $0.beginnerScore.difficulty == difficulty &&
-                    $0.beginnerScore.djLevel == djLevel
-                })
-                count += (try? modelContext.fetchCount(beginner)) ?? 0
-
-                let normal = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
-                    $0.importGroup?.id == importGroupID &&
-                    $0.playType == playType &&
-                    $0.normalScore.difficulty == difficulty &&
-                    $0.normalScore.djLevel == djLevel
-                })
-                count += (try? modelContext.fetchCount(normal)) ?? 0
-
-                let hyper = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
-                    $0.importGroup?.id == importGroupID &&
-                    $0.playType == playType &&
-                    $0.hyperScore.difficulty == difficulty &&
-                    $0.hyperScore.djLevel == djLevel
-                })
-                count += (try? modelContext.fetchCount(hyper)) ?? 0
-
-                let another = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
-                    $0.importGroup?.id == importGroupID &&
-                    $0.playType == playType &&
-                    $0.anotherScore.difficulty == difficulty &&
-                    $0.anotherScore.djLevel == djLevel
-                })
-                count += (try? modelContext.fetchCount(another)) ?? 0
-
-                let leggendaria = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
-                    $0.importGroup?.id == importGroupID &&
-                    $0.playType == playType &&
-                    $0.leggendariaScore.difficulty == difficulty &&
-                    $0.leggendariaScore.djLevel == djLevel
-                })
-                count += (try? modelContext.fetchCount(leggendaria)) ?? 0
+                // Assuming we want to count even if score is 0? 
+                // Original code: scores(in: songRecords).filter({ $0.djLevelEnum() != .none})
+                // djLevelEnum() returns .none if rawValue is "---".
                 
-                result[difficulty]?[djLevel] = count
+                if let djLevel = IIDXDJLevel(rawValue: score.djLevel), djLevel != .none {
+                   result[score.difficulty]?[score.djLevel]? += 1
+                }
             }
         }
+
         return result
     }
 }
