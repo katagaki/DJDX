@@ -1430,6 +1430,7 @@
       }
     },
     "Shared.Filter.ResetAll" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {

@@ -19,35 +19,39 @@ struct ScoreSortAndFilter: View {
 
     var body: some View {
         Menu {
-            Toggle("Scores.Filter.ShowWithScoreOnly",
-                   systemImage: "trophy.fill",
-                   isOn: $isShowingOnlyPlayDataWithScores)
-            Section("Shared.Filter") {
-                Picker("Shared.Difficulty", selection: $difficultyToShow) {
-                    Text("Shared.All")
+            Toggle(
+                .scoresFilterShowWithScoreOnly, systemImage: "trophy.fill",
+                isOn: $isShowingOnlyPlayDataWithScores
+            )
+            Section(.sharedFilter) {
+                Picker(.sharedDifficulty, selection: $difficultyToShow) {
+                    Text(.sharedAll)
                         .tag(IIDXDifficulty.all)
+                    Divider()
                     ForEach(IIDXDifficulty.sorted, id: \.self) { sortDifficulty in
                         Text("LEVEL \(sortDifficulty.rawValue)")
                             .tag(sortDifficulty)
                     }
                 }
-                Picker("Shared.Level", selection: $levelToShow) {
-                    Text("Shared.All")
+                Picker(.sharedLevel, selection: $levelToShow) {
+                    Text(.sharedAll)
                         .tag(IIDXLevel.all)
+                    Divider()
                     ForEach(IIDXLevel.sorted, id: \.self) { sortLevel in
                         Text(LocalizedStringKey(sortLevel.rawValue))
                             .tag(sortLevel)
                     }
                 }
-                Picker("Shared.ClearType", selection: $clearTypeToShow) {
-                    Text("Shared.All")
+                Picker(.sharedClearType, selection: $clearTypeToShow) {
+                    Text(.sharedAll)
                         .tag(IIDXClearType.all)
+                    Divider()
                     ForEach(IIDXClearType.sorted, id: \.self) { sortClearType in
                         Text(LocalizedStringKey(sortClearType.rawValue))
                             .tag(sortClearType)
                     }
                 }
-                Button("Shared.Filter.ResetAll", systemImage: "arrow.clockwise") {
+                Button(.sharedFilterResetAll, systemImage: "arrow.clockwise") {
                     isSystemChangingFilterAndSort = true
                     difficultyToShow = .all
                     levelToShow = .all
