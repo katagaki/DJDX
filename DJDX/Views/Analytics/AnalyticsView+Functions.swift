@@ -33,28 +33,30 @@ extension AnalyticsView {
         if let importGroupIdentifier,
            let importGroup = modelContext.model(for: importGroupIdentifier) as? ImportGroup {
             let importGroupID = importGroup.id
-            var songRecords: [IIDXSongRecord] = (try? modelContext.fetch(
-                FetchDescriptor<IIDXSongRecord>(
-                    predicate: #Predicate<IIDXSongRecord> {
-                        $0.importGroup?.id == importGroupID
-                    },
-                    sortBy: [SortDescriptor(\.title, order: .forward)]
-                )
-            )) ?? []
-            songRecords.removeAll { $0.playType != playTypeToShow }
-            if songRecords.count > 0 {
-                let newClearTypePerDifficulty = clearTypePerDifficulty(for: songRecords)
-                let newScoresPerDifficulty = scoresPerDifficulty(for: songRecords)
-                await MainActor.run {
-                    withAnimation(.snappy.speed(2.0)) {
-                        self.clearTypePerDifficulty = newClearTypePerDifficulty
-                        self.djLevelPerDifficulty = newScoresPerDifficulty
-                    }
+            
+            let newClearTypePerDifficulty = countClearTypePerDifficulty(for: importGroupID, playType: playTypeToShow)
+            let newDJLevelPerDifficulty = countDJLevelPerDifficulty(for: importGroupID, playType: playTypeToShow)
+            
+            // Convert to [Int: [IIDXDJLevel: Int]] for the view
+            var convertedDJLevelPerDifficulty: [Int: [IIDXDJLevel: Int]] = [:]
+            for (difficulty, data) in newDJLevelPerDifficulty {
+                var inner: [IIDXDJLevel: Int] = [:]
+                // Initialize with 0
+                for level in IIDXDJLevel.sorted {
+                    inner[level] = 0
                 }
-            } else {
+                for (key, count) in data {
+                     if let level = IIDXDJLevel(rawValue: key) {
+                         inner[level] = count
+                     }
+                }
+                convertedDJLevelPerDifficulty[difficulty] = inner
+            }
+
+            await MainActor.run {
                 withAnimation(.snappy.speed(2.0)) {
-                    self.clearTypePerDifficulty.removeAll()
-                    self.djLevelPerDifficulty.removeAll()
+                    self.clearTypePerDifficulty = newClearTypePerDifficulty
+                    self.djLevelPerDifficulty = convertedDJLevelPerDifficulty
                 }
             }
         }
@@ -86,8 +88,8 @@ extension AnalyticsView {
     func trendDataPerDifficulty(
         _ importGroups: [ImportGroup],
         using cacheData: Data,
-        get trendDataFrom: @escaping ([IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>]
-    ) -> (data: [Date: [Int: OrderedDictionary<String, Int>]], cache: [CachedTrendData]) {
+        get trendDataFrom: @escaping (String) async -> [Int: OrderedDictionary<String, Int>]
+    ) async -> (data: [Date: [Int: OrderedDictionary<String, Int>]], cache: [CachedTrendData]) {
 
         let existingCache = trendData(using: cacheData)
         var newData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
@@ -104,10 +106,7 @@ extension AnalyticsView {
                 calculatedTrendData.append((importGroup, existingCacheData.data))
             } else {
                 debugPrint("Processing data: \(date)")
-                let songRecords: [IIDXSongRecord] = importGroup.iidxData?.filter({
-                    $0.playType == playTypeToShow
-                }) ?? []
-                let data = trendDataFrom(songRecords)
+                let data = await trendDataFrom(importGroup.id)
                 calculatedTrendData.append((importGroup, data))
             }
         }
@@ -138,11 +137,11 @@ extension AnalyticsView {
     func trendDataForClearTypePerDifficulty(
         _ importGroups: [ImportGroup]
     ) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
-        let (newData, newCache) = trendDataPerDifficulty(
+        let (newData, newCache) = await trendDataPerDifficulty(
             importGroups,
             using: clearTypePerImportGroupCache
-        ) { songRecords in
-            clearTypePerDifficulty(for: songRecords)
+        ) { importGroupID in
+            countClearTypePerDifficulty(for: importGroupID, playType: playTypeToShow)
         }
 
         debugPrint("Updating Clear Type cache")
@@ -154,11 +153,11 @@ extension AnalyticsView {
     func trendDataForDJLevelPerDifficulty(
         _ importGroups: [ImportGroup]
     ) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
-        let (newData, newCache) = trendDataPerDifficulty(
+        let (newData, newCache) = await trendDataPerDifficulty(
             importGroups,
             using: djLevelPerImportGroupCache
-        ) { songRecords in
-            djLevelPerDifficulty(for: songRecords)
+        ) { importGroupID in
+            countDJLevelPerDifficulty(for: importGroupID, playType: playTypeToShow)
         }
 
         debugPrint("Updating DJ Level trend cache")
@@ -167,67 +166,8 @@ extension AnalyticsView {
         return newData
     }
 
-    // MARK: Overview
-
-    func clearTypePerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>] {
-        // Generate skeleton for calculation
-        let clearTypes = IIDXClearType.sortedStringsWithoutNoPlay
-        var newClearTypePerDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
-        for difficulty in difficulties {
-            newClearTypePerDifficulty[difficulty] = OrderedDictionary(
-                uniqueKeys: clearTypes,
-                values: clearTypes.map({ _ in return 0 })
-            )
-        }
-
-        // Add scores to dictionary
-        let scores = scores(in: songRecords).filter({ $0.clearType != "NO PLAY" && $0.score > 0 })
-        for score in scores {
-            newClearTypePerDifficulty[score.difficulty]?[score.clearType]? += 1
-        }
-
-        return newClearTypePerDifficulty
-    }
-
-    func djLevelPerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>] {
-        // Generate skeleton for calculation
-        let djLevels = IIDXDJLevel.sortedStrings.reversed()
-        var newDJLevelForDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
-        for difficulty in difficulties {
-            newDJLevelForDifficulty[difficulty] = OrderedDictionary(
-                uniqueKeys: djLevels,
-                values: djLevels.map({ _ in return 0 })
-            )
-        }
-
-        // Add scores to dictionary
-        for songRecord in songRecords {
-            let scores: [IIDXLevelScore] = songRecord.scores()
-            for score in scores {
-                newDJLevelForDifficulty[score.difficulty]?[score.djLevel]? += 1
-            }
-        }
-
-        return newDJLevelForDifficulty
-    }
-
-    func scoresPerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: [IIDXDJLevel: Int]] {
-        // Generate skeleton for calculation
-        var newScoresPerDifficulty: [Int: [IIDXDJLevel: Int]] = [:]
-        for difficulty in difficulties {
-            newScoresPerDifficulty[difficulty] = IIDXDJLevel.sorted
-                .reduce(into: [IIDXDJLevel: Int]()) { $0[$1] = 0 }
-        }
-
-        // Add scores to dictionary
-        let scores = scores(in: songRecords).filter({ $0.djLevelEnum() != .none})
-        for score in scores {
-            newScoresPerDifficulty[score.difficulty]?[score.djLevelEnum()]? += 1
-        }
-        return newScoresPerDifficulty
-    }
-
     // MARK: Shared
+
 
     func trendData(using data: Data) -> [CachedTrendData] {
         if let decodedCachedData = try? JSONDecoder().decode([CachedTrendData].self, from: data) {
@@ -237,21 +177,7 @@ extension AnalyticsView {
         }
     }
 
-    func scores(in songRecords: [IIDXSongRecord]) -> [IIDXLevelScore] {
-        var scores: [IIDXLevelScore] = []
-        for songRecord in songRecords {
-            let scoresAvailable: [IIDXLevelScore] = [
-                songRecord.beginnerScore,
-                songRecord.normalScore,
-                songRecord.hyperScore,
-                songRecord.anotherScore,
-                songRecord.leggendariaScore
-            ]
-                .filter({$0.difficulty != 0})
-            scores.append(contentsOf: scoresAvailable)
-        }
-        return scores
-    }
+
 
     func sumOfCounts(_ data: [Int: OrderedDictionary<String, Int>]) -> Int {
         var sum = 0
@@ -269,5 +195,136 @@ extension AnalyticsView {
         return calendar.date(
             from: Calendar.current.dateComponents([.year, .month, .day], from: date)
         ) ?? date
+    }
+
+    // MARK: Optimized Fetching
+
+    func countClearTypePerDifficulty(
+        for importGroupID: String,
+        playType: IIDXPlayType
+    ) -> [Int: OrderedDictionary<String, Int>] {
+        var result: [Int: OrderedDictionary<String, Int>] = [:]
+        
+        let clearTypes = IIDXClearType.sortedStringsWithoutNoPlay
+        
+        for difficulty in difficulties {
+            result[difficulty] = OrderedDictionary(
+                uniqueKeys: clearTypes,
+                values: clearTypes.map({ _ in return 0 })
+            )
+            
+            for clearType in clearTypes {
+                var count = 0
+                
+                let beginner = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
+                    $0.importGroup?.id == importGroupID &&
+                    $0.playType == playType &&
+                    $0.beginnerScore.difficulty == difficulty &&
+                    $0.beginnerScore.clearType == clearType
+                })
+                count += (try? modelContext.fetchCount(beginner)) ?? 0
+
+                let normal = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
+                    $0.importGroup?.id == importGroupID &&
+                    $0.playType == playType &&
+                    $0.normalScore.difficulty == difficulty &&
+                    $0.normalScore.clearType == clearType
+                })
+                count += (try? modelContext.fetchCount(normal)) ?? 0
+
+                let hyper = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
+                    $0.importGroup?.id == importGroupID &&
+                    $0.playType == playType &&
+                    $0.hyperScore.difficulty == difficulty &&
+                    $0.hyperScore.clearType == clearType
+                })
+                count += (try? modelContext.fetchCount(hyper)) ?? 0
+
+                let another = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
+                    $0.importGroup?.id == importGroupID &&
+                    $0.playType == playType &&
+                    $0.anotherScore.difficulty == difficulty &&
+                    $0.anotherScore.clearType == clearType
+                })
+                count += (try? modelContext.fetchCount(another)) ?? 0
+
+                let leggendaria = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
+                    $0.importGroup?.id == importGroupID &&
+                    $0.playType == playType &&
+                    $0.leggendariaScore.difficulty == difficulty &&
+                    $0.leggendariaScore.clearType == clearType
+                })
+                count += (try? modelContext.fetchCount(leggendaria)) ?? 0
+                
+                result[difficulty]?[clearType] = count
+            }
+        }
+        return result
+    }
+
+    func countDJLevelPerDifficulty(
+        for importGroupID: String,
+        playType: IIDXPlayType
+    ) -> [Int: OrderedDictionary<String, Int>] {
+        var result: [Int: OrderedDictionary<String, Int>] = [:]
+        
+        let djLevels = IIDXDJLevel.sortedStrings.reversed()
+        // Reversed because original code in djLevelPerDifficulty used reversed?
+        // Line 194: let djLevels = IIDXDJLevel.sortedStrings.reversed()
+        // Yes, preserving order.
+        
+        for difficulty in difficulties {
+            result[difficulty] = OrderedDictionary(
+                uniqueKeys: djLevels,
+                values: djLevels.map({ _ in return 0 })
+            )
+            
+            for djLevel in djLevels {
+                var count = 0
+                
+                let beginner = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
+                    $0.importGroup?.id == importGroupID &&
+                    $0.playType == playType &&
+                    $0.beginnerScore.difficulty == difficulty &&
+                    $0.beginnerScore.djLevel == djLevel
+                })
+                count += (try? modelContext.fetchCount(beginner)) ?? 0
+
+                let normal = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
+                    $0.importGroup?.id == importGroupID &&
+                    $0.playType == playType &&
+                    $0.normalScore.difficulty == difficulty &&
+                    $0.normalScore.djLevel == djLevel
+                })
+                count += (try? modelContext.fetchCount(normal)) ?? 0
+
+                let hyper = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
+                    $0.importGroup?.id == importGroupID &&
+                    $0.playType == playType &&
+                    $0.hyperScore.difficulty == difficulty &&
+                    $0.hyperScore.djLevel == djLevel
+                })
+                count += (try? modelContext.fetchCount(hyper)) ?? 0
+
+                let another = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
+                    $0.importGroup?.id == importGroupID &&
+                    $0.playType == playType &&
+                    $0.anotherScore.difficulty == difficulty &&
+                    $0.anotherScore.djLevel == djLevel
+                })
+                count += (try? modelContext.fetchCount(another)) ?? 0
+
+                let leggendaria = FetchDescriptor<IIDXSongRecord>(predicate: #Predicate {
+                    $0.importGroup?.id == importGroupID &&
+                    $0.playType == playType &&
+                    $0.leggendariaScore.difficulty == difficulty &&
+                    $0.leggendariaScore.djLevel == djLevel
+                })
+                count += (try? modelContext.fetchCount(leggendaria)) ?? 0
+                
+                result[difficulty]?[djLevel] = count
+            }
+        }
+        return result
     }
 }
