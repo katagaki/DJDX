@@ -82,6 +82,19 @@ struct ScoresView: View {
             .navigator("ViewTitle.Scores")
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
+                if #available(iOS 26.0, *) {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Menu(playTypeToShow.displayName()) {
+                            Picker("Shared.PlayType", selection: $playTypeToShow) {
+                                Text(verbatim: "SP")
+                                    .tag(IIDXPlayType.single)
+                                Text(verbatim: "DP")
+                                    .tag(IIDXPlayType.double)
+                            }
+                            .pickerStyle(.inline)
+                        }
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if dataState == .initializing || dataState == .loading {
                         ProgressView()
@@ -103,7 +116,9 @@ struct ScoresView: View {
                         }
                         ScrollView(.horizontal) {
                             HStack(spacing: 8.0) {
-                                PlayTypePicker(playTypeToShow: $playTypeToShow)
+                                if #unavailable(iOS 26.0) {
+                                    PlayTypePicker(playTypeToShow: $playTypeToShow)
+                                }
                                 ScoreSortAndFilter(isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
                                                    difficultyToShow: $difficultyToShow.animation(.snappy.speed(2.0)),
                                                    levelToShow: $levelToShow.animation(.snappy.speed(2.0)),

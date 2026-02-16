@@ -396,13 +396,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clear Type (By Chart Level)"
+            "value" : "Summary - Clear Type (By Chart Level)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアランプ（レベル別）"
+            "value" : "クリアランプ（レベル別概要）"
           }
         }
       }
@@ -413,13 +413,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clear Type (Overall)"
+            "value" : "Summary - Clear Type"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアランプ（全体）"
+            "value" : "クリアランプ概要"
           }
         }
       }
@@ -430,45 +430,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJ Level (By Chart Level)"
+            "value" : "Summary - DJ Level (By Chart Level)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJ LEVEL（レベル別）"
-          }
-        }
-      }
-    },
-    "Analytics.Overall" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Overview"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "概要"
-          }
-        }
-      }
-    },
-    "Analytics.Trend" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trends"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "トレンド"
+            "value" : "DJ LEVEL（レベル別概要）"
           }
         }
       }
@@ -479,13 +447,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clear Type"
+            "value" : "Trend - Clear Type"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアランプ"
+            "value" : "クリアランプ（時系列）"
           }
         }
       }
@@ -496,13 +464,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJ Level"
+            "value" : "Trend - DJ Level"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJ LEVEL"
+            "value" : "DJ LEVEL（時系列）"
           }
         }
       }
@@ -1336,23 +1304,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべて"
-          }
-        }
-      }
-    },
-    "Shared.Beta" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Web"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ウェブ"
           }
         }
       }

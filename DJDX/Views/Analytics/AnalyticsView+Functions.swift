@@ -15,13 +15,13 @@ extension AnalyticsView {
     func reload() async {
         dataState = .loading
         try? await Task.sleep(for: .seconds(0.5))
-        switch viewMode {
-        case .overview: await reloadOverview()
-        case .trends: await reloadTrends()
-        }
-        await MainActor.run {
-            withAnimation(.snappy.speed(2.0)) {
-                dataState = .presenting
+        Task.detached {
+            await reloadOverview()
+            await reloadTrends()
+            await MainActor.run {
+                withAnimation(.snappy.speed(2.0)) {
+                    dataState = .presenting
+                }
             }
         }
     }

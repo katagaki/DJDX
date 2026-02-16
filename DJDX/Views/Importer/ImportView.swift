@@ -64,6 +64,19 @@ struct ImportView: View {
             .navigator("ViewTitle.Calendar")
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
+                if #available(iOS 26.0, *) {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Menu(importPlayType.displayName()) {
+                            Picker("Shared.PlayType", selection: $importPlayType) {
+                                Text(verbatim: "SP")
+                                    .tag(IIDXPlayType.single)
+                                Text(verbatim: "DP")
+                                    .tag(IIDXPlayType.double)
+                            }
+                            .pickerStyle(.inline)
+                        }
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
                         Menu {
@@ -92,7 +105,9 @@ struct ImportView: View {
                         .padding([.top], 12.0)
                         ScrollView(.horizontal) {
                             HStack(spacing: 8.0) {
-                                PlayTypePicker(playTypeToShow: $importPlayType)
+                                if #unavailable(iOS 26.0) {
+                                    PlayTypePicker(playTypeToShow: $importPlayType)
+                                }
                                 switch importPlayType {
                                 case .single:
                                     ToolbarButton("Calendar.Import.FromWeb", icon: "globe") {

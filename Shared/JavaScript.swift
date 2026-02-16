@@ -95,7 +95,8 @@ var darkModeCSS = `
         background-color: #000000;
         color: #ffffff;
     }
-    header, .Header_logo__konami--default__lYPft {
+    header,
+    [class*="Header_logo__konami--default"] {
         background-color: #000000!important;
     }
     [class*="Form_login__layout--narrow-frame"],
