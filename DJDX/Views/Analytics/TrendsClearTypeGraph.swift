@@ -25,7 +25,6 @@ struct TrendsClearTypeGraph: View {
                 .interpolationMethod(.monotone)
             }
         }
-        .chartLegend(.visible)
         .chartForegroundStyleScale([
             "FULLCOMBO CLEAR": .blue,
             "CLEAR": .cyan,

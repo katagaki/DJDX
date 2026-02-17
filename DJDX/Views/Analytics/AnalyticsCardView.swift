@@ -28,6 +28,7 @@ struct AnalyticsCardView<Content: View>: View {
                     .lineLimit(1)
             }
             content()
+                .frame(height: cardType.cardContentHeight)
         }
         .padding(12.0)
         .frame(maxWidth: .infinity, alignment: .leading)

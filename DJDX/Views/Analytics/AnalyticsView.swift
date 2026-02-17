@@ -147,13 +147,14 @@ struct AnalyticsView: View {
                     case .clearTypeOverviewGraph:
                         OverviewClearTypeOverallGraph(graphData: $clearTypePerDifficulty,
                                                       isInteractive: true)
+                        .chartLegend(.visible)
                         .navigationTitle("Analytics.ClearType.Overall")
                         .automaticNavigationTransition(id: "ClearType.Overall", in: analyticsNamespace)
                     case .clearTypePerDifficultyGraph:
                         VStack {
                             OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
-                                                                difficulty: $levelFilterForOverviewClearType,
-                                                                legendPosition: .bottom)
+                                                                difficulty: $levelFilterForOverviewClearType)
+                                .chartLegend(.visible)
                             DifficultyPicker(selection: $levelFilterForOverviewClearType,
                                              difficulties: .constant(difficulties))
                                 .padding(.top)
@@ -164,6 +165,7 @@ struct AnalyticsView: View {
                         VStack {
                             OverviewDJLevelPerDifficultyGraph(graphData: $djLevelPerDifficulty,
                                                               difficulty: $levelFilterForOverviewScoreRate)
+                                .chartLegend(.visible)
                             DifficultyPicker(selection: $levelFilterForOverviewScoreRate,
                                              difficulties: .constant(difficulties))
                                 .padding(.top)
@@ -174,6 +176,7 @@ struct AnalyticsView: View {
                         VStack {
                             TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
                                                  difficulty: $levelFilterForTrendsClearType)
+                                .chartLegend(.visible)
                             DifficultyPicker(selection: $levelFilterForTrendsClearType,
                                              difficulties: .constant(difficulties))
                                 .padding(.top)
@@ -184,6 +187,7 @@ struct AnalyticsView: View {
                         VStack {
                             TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
                                                difficulty: $levelFilterForTrendsDJLevel)
+                                .chartLegend(.visible)
                             DifficultyPicker(selection: $levelFilterForTrendsDJLevel,
                                              difficulties: .constant(difficulties))
                                 .padding(.top)
@@ -295,7 +299,6 @@ struct AnalyticsView: View {
     var clearTypeOverallCard: some View {
         AnalyticsCardView(cardType: .clearTypeOverall) {
             OverviewClearTypeOverallGraph(graphData: .constant(filteredClearTypeData))
-                .frame(height: 160.0)
                 .chartLegend(.hidden)
                 .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
         }
@@ -331,9 +334,7 @@ struct AnalyticsView: View {
     var clearTypeByDifficultyCard: some View {
         AnalyticsCardView(cardType: .clearTypeByDifficulty) {
             OverviewClearTypePerDifficultyGraph(graphData: .constant(filteredClearTypeData),
-                                                difficulty: $levelFilterForOverviewClearType,
-                                                legendPosition: .trailing)
-                .frame(height: 100.0)
+                                                difficulty: $levelFilterForOverviewClearType)
                 .chartLegend(.hidden)
                 .automaticMatchedTransitionSource(id: "ClearType.ByDifficulty", in: analyticsNamespace)
         }
@@ -348,7 +349,6 @@ struct AnalyticsView: View {
         AnalyticsCardView(cardType: .clearTypeTrends) {
             TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
                                  difficulty: $levelFilterForTrendsClearType)
-                .frame(height: 100.0)
                 .chartLegend(.hidden)
                 .automaticMatchedTransitionSource(id: "Trends.ClearType", in: analyticsNamespace)
         }
@@ -363,7 +363,6 @@ struct AnalyticsView: View {
         AnalyticsCardView(cardType: .djLevelByDifficulty) {
             OverviewDJLevelPerDifficultyGraph(graphData: $djLevelPerDifficulty,
                                               difficulty: $levelFilterForOverviewScoreRate)
-                .frame(height: 100.0)
                 .chartLegend(.hidden)
                 .automaticMatchedTransitionSource(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
         }
@@ -378,7 +377,6 @@ struct AnalyticsView: View {
         AnalyticsCardView(cardType: .djLevelTrends) {
             TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
                                difficulty: $levelFilterForTrendsDJLevel)
-                .frame(height: 100.0)
                 .chartLegend(.hidden)
                 .automaticMatchedTransitionSource(id: "Trends.DJLevel", in: analyticsNamespace)
         }

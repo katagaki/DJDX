@@ -55,6 +55,16 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         }
     }
 
+    /// Fixed content height for the card body (excluding header)
+    var cardContentHeight: CGFloat {
+        switch self {
+        case .clearTypeOverall: return 160.0
+        case .newClears, .newHighScores: return 60.0
+        case .clearTypeByDifficulty, .clearTypeTrends,
+             .djLevelByDifficulty, .djLevelTrends: return 100.0
+        }
+    }
+
     /// Whether this card is pinned (cannot be reordered past)
     var isPinned: Bool {
         self == .clearTypeOverall

@@ -13,18 +13,15 @@ struct OverviewClearTypePerDifficultyGraph: View {
     @Binding var graphData: [Int: OrderedDictionary<String, Int>]
     @Binding var difficulty: Int
 
-    @State var legendPosition: AnnotationPosition
     @State var clearTypeCounts: OrderedDictionary<String, Int> = [:]
 
     init(
         graphData: Binding<[Int: OrderedDictionary<String, Int>]>,
-        difficulty: Binding<Int>,
-        legendPosition: AnnotationPosition = .trailing
+        difficulty: Binding<Int>
     ) {
         self._graphData = graphData
         self._difficulty = difficulty
         self.clearTypeCounts = graphData.wrappedValue[difficulty.wrappedValue] ?? [:]
-        self.legendPosition = legendPosition
     }
 
     var body: some View {
@@ -34,7 +31,6 @@ struct OverviewClearTypePerDifficultyGraph: View {
                     SectorMark(angle: .value(clearType, clearTypeCounts[clearType] ?? 0))
                         .foregroundStyle(by: .value("Shared.ClearType", clearType))
                 }
-                      .chartLegend(position: legendPosition, alignment: .leading, spacing: 2.0)
                       .chartXScale(domain: IIDXClearType.sortedStrings)
                       .chartForegroundStyleScale([
                         "FULLCOMBO CLEAR": .blue,

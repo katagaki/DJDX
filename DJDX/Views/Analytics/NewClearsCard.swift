@@ -16,7 +16,7 @@ struct NewClearsCard: View {
                 Text("Analytics.NoData")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 60.0)
+                    .frame(maxWidth: .infinity)
             } else {
                 Text("\(newClears.count)")
                     .font(.system(.title, design: .rounded, weight: .bold))
