@@ -137,6 +137,9 @@ struct MoreView: View {
                             debugPrint("Fetched \(songRecord.title)")
                         }
                     }
+                    Button("More.ManageData.ClearAnalyticsCache") {
+                        clearAnalyticsCache()
+                    }
                     Button {
                         isConfirmingWebDataDelete = true
                     } label: {
@@ -481,6 +484,11 @@ SOFTWARE.
     func deleteAllScoreData() {
         try? modelContext.delete(model: ImportGroup.self)
         try? modelContext.delete(model: IIDXSongRecord.self)
+    }
+
+    func clearAnalyticsCache() {
+        UserDefaults.standard.removeObject(forKey: "Analytics.Trends.ClearType.Level.Cache")
+        UserDefaults.standard.removeObject(forKey: "Analytics.Trends.DJLevel.Level.Cache")
     }
 }
 // swiftlint:enable type_body_length file_length
