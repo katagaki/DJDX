@@ -33,6 +33,10 @@ struct AnalyticsView: View {
     @AppStorage(wrappedValue: Data(), "Analytics.VisibleLevels") var visibleLevelsData: Data
     @State var visibleLevels: Set<Int> = Set(1...12)
 
+    // Level ordering
+    @AppStorage(wrappedValue: Data(), "Analytics.LevelOrder") var levelOrderData: Data
+    @State var levelOrder: [Int] = Array(1...12)
+
     // Overall
     @State var clearTypePerDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
     @State var djLevelPerDifficulty: [Int: [IIDXDJLevel: Int]] = [:]
@@ -86,7 +90,7 @@ struct AnalyticsView: View {
                     }
 
                     // Per-level clear lamp cards
-                    ForEach(sortedVisibleLevels, id: \.self) { difficulty in
+                    ForEach(orderedVisibleLevels, id: \.self) { difficulty in
                         clearTypeForLevelCard(difficulty: difficulty)
                         clearTypeTrendsForLevelCard(difficulty: difficulty)
                     }
@@ -133,6 +137,7 @@ struct AnalyticsView: View {
             .task {
                 loadCardOrder()
                 loadVisibleLevels()
+                loadLevelOrder()
                 if dataState == .initializing {
                     await reload()
                 }
@@ -151,7 +156,7 @@ struct AnalyticsView: View {
                 Group {
                     switch viewPath {
                     case .clearTypeOverviewGraph:
-                        OverviewClearTypeOverallGraph(graphData: $clearTypePerDifficulty,
+                        OverviewClearTypeOverallGraph(graphData: .constant(filteredClearTypeData),
                                                       isInteractive: true)
                         .chartLegend(.visible)
                         .navigationTitle("Analytics.ClearType.Overall")
@@ -266,22 +271,41 @@ struct AnalyticsView: View {
     var cardOrderEditor: some View {
         NavigationStack {
             List {
-                ForEach(cardOrder, id: \.self) { cardType in
-                    HStack(spacing: 12.0) {
-                        Image(systemName: cardType.systemImage)
-                            .foregroundStyle(cardType.iconColor)
-                            .frame(width: 24.0)
-                        Text(LocalizedStringKey(cardType.titleKey))
-                        Spacer()
-                        if cardType.isPinned {
-                            Image(systemName: "pin.fill")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                Section {
+                    ForEach(cardOrder, id: \.self) { cardType in
+                        HStack(spacing: 12.0) {
+                            Image(systemName: cardType.systemImage)
+                                .foregroundStyle(cardType.iconColor)
+                                .frame(width: 24.0)
+                            Text(LocalizedStringKey(cardType.titleKey))
+                            Spacer()
+                            if cardType.isPinned {
+                                Image(systemName: "pin.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .moveDisabled(cardType.isPinned)
+                    }
+                    .onMove(perform: moveCards)
+                }
+                Section("Analytics.Settings.PerLevel") {
+                    ForEach(levelOrder, id: \.self) { difficulty in
+                        HStack(spacing: 12.0) {
+                            Image(systemName: "chart.pie.fill")
+                                .foregroundStyle(.purple)
+                                .frame(width: 24.0)
+                            Text(verbatim: "LEVEL \(difficulty)")
+                            if !visibleLevels.contains(difficulty) {
+                                Spacer()
+                                Text("Analytics.Settings.Hidden")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
-                    .moveDisabled(cardType.isPinned)
+                    .onMove(perform: moveLevels)
                 }
-                .onMove(perform: moveCards)
             }
             .environment(\.editMode, .constant(.active))
             .navigationTitle("Analytics.Settings.EditCards")
@@ -291,7 +315,9 @@ struct AnalyticsView: View {
                     Button {
                         withAnimation(.snappy) {
                             cardOrder = AnalyticsCardType.defaultOrder
+                            levelOrder = Array(1...12)
                             saveCardOrder()
+                            saveLevelOrder()
                         }
                     } label: {
                         Text("Analytics.Settings.ResetOrder")
@@ -349,7 +375,7 @@ struct AnalyticsView: View {
 
     var clearTypeByDifficultyCard: some View {
         AnalyticsCardView(cardType: .clearTypeByDifficulty) {
-            OverviewClearTypePerDifficultyGraph(graphData: .constant(filteredClearTypeData),
+            OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
                                                 difficulty: $levelFilterForOverviewClearType)
                 .chartLegend(.hidden)
                 .chartYAxis(.hidden)
@@ -368,6 +394,7 @@ struct AnalyticsView: View {
                                  difficulty: $levelFilterForTrendsClearType)
                 .chartLegend(.hidden)
                 .chartYAxis(.hidden)
+                .chartXAxis(.hidden)
                 .automaticMatchedTransitionSource(id: "Trends.ClearType", in: analyticsNamespace)
         }
         .onTapGesture {
@@ -398,6 +425,7 @@ struct AnalyticsView: View {
                                difficulty: $levelFilterForTrendsDJLevel)
                 .chartLegend(.hidden)
                 .chartYAxis(.hidden)
+                .chartXAxis(.hidden)
                 .automaticMatchedTransitionSource(id: "Trends.DJLevel", in: analyticsNamespace)
         }
         .onTapGesture {
@@ -434,6 +462,7 @@ struct AnalyticsView: View {
                                  difficulty: .constant(difficulty))
                 .chartLegend(.hidden)
                 .chartYAxis(.hidden)
+                .chartXAxis(.hidden)
                 .automaticMatchedTransitionSource(id: "Trends.Level.\(difficulty)", in: analyticsNamespace)
         }
         .onTapGesture {
@@ -445,8 +474,8 @@ struct AnalyticsView: View {
 
     // MARK: - Filtered Data
 
-    var sortedVisibleLevels: [Int] {
-        visibleLevels.sorted()
+    var orderedVisibleLevels: [Int] {
+        levelOrder.filter { visibleLevels.contains($0) }
     }
 
     var filteredClearTypeData: [Int: OrderedDictionary<String, Int>] {
@@ -496,5 +525,27 @@ struct AnalyticsView: View {
 
     func saveVisibleLevels() {
         visibleLevelsData = (try? JSONEncoder().encode(visibleLevels)) ?? Data()
+    }
+
+    func loadLevelOrder() {
+        if let decoded = try? JSONDecoder().decode([Int].self, from: levelOrderData),
+           !decoded.isEmpty {
+            var order = decoded
+            // Ensure all levels 1-12 are present
+            for level in difficulties where !order.contains(level) {
+                order.append(level)
+            }
+            order.removeAll { !difficulties.contains($0) }
+            levelOrder = order
+        }
+    }
+
+    func saveLevelOrder() {
+        levelOrderData = (try? JSONEncoder().encode(levelOrder)) ?? Data()
+    }
+
+    func moveLevels(from source: IndexSet, to destination: Int) {
+        levelOrder.move(fromOffsets: source, toOffset: destination)
+        saveLevelOrder()
     }
 }
