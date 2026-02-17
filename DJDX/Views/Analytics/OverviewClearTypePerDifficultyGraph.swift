@@ -13,28 +13,13 @@ struct OverviewClearTypePerDifficultyGraph: View {
     @Binding var graphData: [Int: OrderedDictionary<String, Int>]
     @Binding var difficulty: Int
 
-    @State var legendPosition: AnnotationPosition
-    @State var clearTypeCounts: OrderedDictionary<String, Int> = [:]
-
-    init(
-        graphData: Binding<[Int: OrderedDictionary<String, Int>]>,
-        difficulty: Binding<Int>,
-        legendPosition: AnnotationPosition = .trailing
-    ) {
-        self._graphData = graphData
-        self._difficulty = difficulty
-        self.clearTypeCounts = graphData.wrappedValue[difficulty.wrappedValue] ?? [:]
-        self.legendPosition = legendPosition
-    }
-
     var body: some View {
         VStack {
             if let clearData = graphData[difficulty], clearData.keys.count > 0 {
                 Chart(clearData.keys, id: \.self) { clearType in
-                    SectorMark(angle: .value(clearType, clearTypeCounts[clearType] ?? 0))
+                    SectorMark(angle: .value(clearType, clearData[clearType] ?? 0))
                         .foregroundStyle(by: .value("Shared.ClearType", clearType))
                 }
-                      .chartLegend(position: legendPosition, alignment: .leading, spacing: 2.0)
                       .chartXScale(domain: IIDXClearType.sortedStrings)
                       .chartForegroundStyleScale([
                         "FULLCOMBO CLEAR": .blue,
@@ -47,16 +32,6 @@ struct OverviewClearTypePerDifficultyGraph: View {
                       ])
             } else {
                 Spacer()
-            }
-        }
-        .onChange(of: graphData) { _, newValue in
-            withAnimation(.snappy.speed(2.0)) {
-                self.clearTypeCounts = newValue[difficulty] ?? OrderedDictionary<String, Int>()
-            }
-        }
-        .onChange(of: difficulty) { _, newValue in
-            withAnimation(.snappy.speed(2.0)) {
-                self.clearTypeCounts = graphData[newValue] ?? OrderedDictionary<String, Int>()
             }
         }
     }

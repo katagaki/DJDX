@@ -158,6 +158,7 @@ struct MoreView: View {
                 }
             }
             .navigator("ViewTitle.More")
+            .scrollContentBackground(.hidden)
             .listSectionSpacing(.compact)
             .alert(
                 "Alert.DeleteData.Web.Title",
@@ -487,8 +488,10 @@ SOFTWARE.
     }
 
     func clearAnalyticsCache() {
-        UserDefaults.standard.removeObject(forKey: "Analytics.Trends.ClearType.Level.Cache")
-        UserDefaults.standard.removeObject(forKey: "Analytics.Trends.DJLevel.Level.Cache")
+        let defaults = UserDefaults.standard
+        defaults.removeObject(forKey: "Analytics.Trends.ClearType.Level.Cache")
+        defaults.removeObject(forKey: "Analytics.Trends.DJLevel.Level.Cache")
+        defaults.synchronize()
     }
 }
 // swiftlint:enable type_body_length file_length

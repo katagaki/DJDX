@@ -21,7 +21,6 @@ struct OverviewDJLevelPerDifficultyGraph: View {
                 width: .inset(8.0)
             )
         }
-              .chartLegend(.visible)
               .chartXScale(domain: IIDXDJLevel.sortedStrings)
     }
 }

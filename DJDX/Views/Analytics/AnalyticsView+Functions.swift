@@ -18,6 +18,7 @@ extension AnalyticsView {
         Task.detached {
             await reloadOverview()
             await reloadTrends()
+            await reloadNewClearsAndHighScores()
             await MainActor.run {
                 withAnimation(.snappy.speed(2.0)) {
                     dataState = .presenting
@@ -121,6 +122,123 @@ extension AnalyticsView {
             }
         }
     }
+
+    // MARK: New Clears & High Scores
+
+    // swiftlint:disable function_body_length
+    func reloadNewClearsAndHighScores() async {
+        debugPrint("Calculating new clears and high scores")
+        var importGroups: [ImportGroup] = (try? modelContext.fetch(
+            FetchDescriptor<ImportGroup>(
+                sortBy: [SortDescriptor(\.importDate, order: .forward)]
+            )
+        )) ?? []
+        importGroups.removeAll(where: { $0.iidxVersion != iidxVersion })
+
+        guard importGroups.count >= 2 else {
+            await MainActor.run {
+                withAnimation(.snappy.speed(2.0)) {
+                    self.newClears = []
+                    self.newHighScores = []
+                }
+            }
+            return
+        }
+
+        let latestGroup = importGroups[importGroups.count - 1]
+        let previousGroup = importGroups[importGroups.count - 2]
+
+        let latestRecords = fetchSongRecords(for: latestGroup.id, playType: playTypeToShow).sorted(by: {
+            $0.lastPlayDate < $1.lastPlayDate
+        })
+        let previousRecords = fetchSongRecords(for: previousGroup.id, playType: playTypeToShow)
+
+        // Build lookup by compact title for previous records
+        var previousByTitle: [String: IIDXSongRecord] = [:]
+        for record in previousRecords {
+            previousByTitle[record.titleCompact()] = record
+        }
+
+        var computedNewClears: [NewClearEntry] = []
+        var computedNewHighScores: [NewHighScoreEntry] = []
+
+        let levels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
+            (.beginner, \.beginnerScore),
+            (.normal, \.normalScore),
+            (.hyper, \.hyperScore),
+            (.another, \.anotherScore),
+            (.leggendaria, \.leggendariaScore)
+        ]
+
+        for latestRecord in latestRecords {
+            let compactTitle = latestRecord.titleCompact()
+            let previousRecord = previousByTitle[compactTitle]
+
+            for (level, keyPath) in levels {
+                let latestScore = latestRecord[keyPath: keyPath]
+                guard latestScore.difficulty > 0 else { continue }
+
+                if let previousRecord {
+                    let previousScore = previousRecord[keyPath: keyPath]
+
+                    // Check for new/upgraded clear
+                    if (latestScore.clearType == "CLEAR" &&
+                        latestScore.score > 0) &&
+                        previousScore.clearType != "CLEAR" {
+                        computedNewClears.append(NewClearEntry(
+                            songTitle: latestRecord.title,
+                            level: level,
+                            difficulty: latestScore.difficulty,
+                            clearType: latestScore.clearType,
+                            previousClearType: previousScore.clearType
+                        ))
+                    }
+
+                    // Check for new high score
+                    if latestScore.score > previousScore.score && latestScore.score > 0 {
+                        computedNewHighScores.append(NewHighScoreEntry(
+                            songTitle: latestRecord.title,
+                            level: level,
+                            difficulty: latestScore.difficulty,
+                            newScore: latestScore.score,
+                            previousScore: previousScore.score,
+                            newDJLevel: latestScore.djLevel,
+                            previousDJLevel: previousScore.djLevel
+                        ))
+                    }
+                } else {
+                    // Song didn't exist in previous import - all played scores are new
+                    if latestScore.clearType == "CLEAR" &&
+                        latestScore.score > 0 {
+                        computedNewClears.append(NewClearEntry(
+                            songTitle: latestRecord.title,
+                            level: level,
+                            difficulty: latestScore.difficulty,
+                            clearType: latestScore.clearType,
+                            previousClearType: "NO PLAY"
+                        ))
+                        computedNewHighScores.append(NewHighScoreEntry(
+                            songTitle: latestRecord.title,
+                            level: level,
+                            difficulty: latestScore.difficulty,
+                            newScore: latestScore.score,
+                            previousScore: 0,
+                            newDJLevel: latestScore.djLevel,
+                            previousDJLevel: "---"
+                        ))
+                    }
+                }
+            }
+        }
+
+        await MainActor.run {
+            withAnimation(.snappy.speed(2.0)) {
+                self.newClears = computedNewClears
+                self.newHighScores = computedNewHighScores
+            }
+        }
+    }
+    // swiftlint:enable function_body_length
 
     // MARK: Data Fetching
 

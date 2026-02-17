@@ -1,0 +1,67 @@
+//
+//  AnalyticsCardView.swift
+//  DJDX
+//
+//  Created on 2026/02/17.
+//
+
+import SwiftUI
+
+struct AnalyticsCardView<Content: View>: View {
+    let title: LocalizedStringKey
+    let systemImage: String
+    let iconColor: Color
+    let contentHeight: CGFloat
+    let cornerRadius: CGFloat
+    let content: () -> Content
+
+    init(cardType: AnalyticsCardType, @ViewBuilder content: @escaping () -> Content) {
+        self.title = LocalizedStringKey(cardType.titleKey)
+        self.systemImage = cardType.systemImage
+        self.iconColor = cardType.iconColor
+        self.contentHeight = cardType.cardContentHeight
+        if #available(iOS 26.0, *) {
+            self.cornerRadius = 20.0
+        } else {
+            self.cornerRadius = 12.0
+        }
+        self.content = content
+    }
+
+    init(title: LocalizedStringKey,
+         systemImage: String,
+         iconColor: Color,
+         contentHeight: CGFloat = 100.0,
+         @ViewBuilder content: @escaping () -> Content) {
+        self.title = title
+        self.systemImage = systemImage
+        self.iconColor = iconColor
+        self.contentHeight = contentHeight
+        if #available(iOS 26.0, *) {
+            self.cornerRadius = 20.0
+        } else {
+            self.cornerRadius = 12.0
+        }
+        self.content = content
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8.0) {
+            HStack(spacing: 6.0) {
+                Image(systemName: systemImage)
+                    .font(.subheadline)
+                    .foregroundStyle(iconColor)
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+            content()
+                .frame(height: contentHeight)
+        }
+        .padding(12.0)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.thinMaterial)
+        .clipShape(.rect(cornerRadius: cornerRadius))
+    }
+}

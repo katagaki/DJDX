@@ -45,7 +45,6 @@ struct OverviewClearTypeOverallGraph: View {
                 }
             }
         }
-        .chartLegend(.visible)
         .chartXAxis {
             AxisMarks(values: .automatic(desiredCount: 13))
         }

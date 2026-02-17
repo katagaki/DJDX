@@ -25,7 +25,6 @@ struct TrendsDJLevelGraph: View {
                 .interpolationMethod(.monotone)
             }
         }
-        .chartLegend(.visible)
         .chartForegroundStyleScale([
             "AAA": .orange,
             "AA": .gray,

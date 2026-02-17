@@ -49,12 +49,6 @@ struct ImportView: View {
                                                  Color(uiColor: version.darkModeColor) :
                                                     Color(uiColor: version.lightModeColor))
                         }
-//                            Divider()
-//                                .frame(maxHeight: 14.0)
-                            // TODO: Refactor or cache this data
-//                            Text("Shared.SongCount.\(countOfIIDXSongRecords(in: importGroup))")
-//                                .font(.caption)
-//                                .foregroundStyle(.secondary)
                     }
                 }
                 .onDelete(perform: { indexSet in

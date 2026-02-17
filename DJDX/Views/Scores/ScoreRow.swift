@@ -188,9 +188,7 @@ struct ScoreRow: View {
                     IIDXLevelLabel(levelType: score.level, songRecord: songRecord)
                         .padding([.top, .bottom], 6.0)
                         .frame(width: 78.0, alignment: .center)
-                        .background(colorScheme == .dark ?
-                                    Color(uiColor: UIColor.secondarySystemGroupedBackground) :
-                                        Color(uiColor: UIColor.systemGroupedBackground))
+                        .background(.thinMaterial)
                         .clipShape(.rect(cornerRadius: 6.0))
                         .padding([.top, .bottom], 8.0)
                 }
