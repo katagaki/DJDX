@@ -63,26 +63,23 @@ struct AnalyticsView: View {
             ScrollView {
                 LazyVGrid(columns: cardColumns, spacing: 12.0) {
                     ForEach(cardOrder, id: \.self) { cardType in
-                        let isFullWidth = cardType.isFullWidth
-                        Group {
-                            switch cardType {
-                            case .clearTypeOverall:
-                                clearTypeOverallCard
-                            case .newClears:
-                                newClearsCard
-                            case .newHighScores:
-                                newHighScoresCard
-                            case .clearTypeByDifficulty:
-                                clearTypeByDifficultyCard
-                            case .clearTypeTrends:
-                                clearTypeTrendsCard
-                            case .djLevelByDifficulty:
-                                djLevelByDifficultyCard
-                            case .djLevelTrends:
-                                djLevelTrendsCard
-                            }
+                        switch cardType {
+                        case .clearTypeOverall:
+                            clearTypeOverallCard
+                                .gridCellColumns(2)
+                        case .newClears:
+                            newClearsCard
+                        case .newHighScores:
+                            newHighScoresCard
+                        case .clearTypeByDifficulty:
+                            clearTypeByDifficultyCard
+                        case .clearTypeTrends:
+                            clearTypeTrendsCard
+                        case .djLevelByDifficulty:
+                            djLevelByDifficultyCard
+                        case .djLevelTrends:
+                            djLevelTrendsCard
                         }
-                        .gridCellColumns(isFullWidth ? 2 : 1)
                     }
 
                     // Per-level clear lamp cards
