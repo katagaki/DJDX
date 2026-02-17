@@ -96,7 +96,7 @@ struct AnalyticsView: View {
                 .padding(.top, 4.0)
                 .padding(.bottom, 16.0)
             }
-            .background(Color(.systemGroupedBackground))
+            .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("ViewTitle.Analytics")
             .navigationBarTitleDisplayMode(.automatic)
             .sheet(isPresented: $isEditingCards) {
@@ -257,8 +257,10 @@ struct AnalyticsView: View {
                         .automaticNavigationTransition(id: "Trends.Level.\(difficulty)", in: analyticsNamespace)
                     case .newClearsDetail:
                         NewClearsDetailView(newClears: $newClears)
+                            .automaticNavigationTransition(id: "NewClears", in: analyticsNamespace)
                     case .newHighScoresDetail:
                         NewHighScoresDetailView(newHighScores: $newHighScores)
+                            .automaticNavigationTransition(id: "NewHighScores", in: analyticsNamespace)
                     default: Color.clear
                     }
                 }
@@ -383,8 +385,8 @@ struct AnalyticsView: View {
             OverviewClearTypeOverallGraph(graphData: .constant(filteredClearTypeData))
                 .chartLegend(.hidden)
                 .chartYAxis(.hidden)
-                .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
         }
+        .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
         .onTapGesture {
             if !isEditingCards && clearTypePerDifficulty.count > 0 {
                 navigationManager.push(.clearTypeOverviewGraph, for: .analytics)
@@ -396,6 +398,7 @@ struct AnalyticsView: View {
         AnalyticsCardView(cardType: .newClears) {
             NewClearsCard(newClears: $newClears)
         }
+        .automaticMatchedTransitionSource(id: "NewClears", in: analyticsNamespace)
         .onTapGesture {
             if !isEditingCards {
                 navigationManager.push(.newClearsDetail, for: .analytics)
@@ -407,6 +410,7 @@ struct AnalyticsView: View {
         AnalyticsCardView(cardType: .newHighScores) {
             NewHighScoresCard(newHighScores: $newHighScores)
         }
+        .automaticMatchedTransitionSource(id: "NewHighScores", in: analyticsNamespace)
         .onTapGesture {
             if !isEditingCards {
                 navigationManager.push(.newHighScoresDetail, for: .analytics)
@@ -420,8 +424,8 @@ struct AnalyticsView: View {
                                               difficulty: $levelFilterForOverviewScoreRate)
                 .chartLegend(.hidden)
                 .chartYAxis(.hidden)
-                .automaticMatchedTransitionSource(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
         }
+        .automaticMatchedTransitionSource(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
         .onTapGesture {
             if !isEditingCards && djLevelPerDifficulty.count > 0 {
                 navigationManager.push(.scoreRatePerDifficultyGraph, for: .analytics)
@@ -436,8 +440,8 @@ struct AnalyticsView: View {
                 .chartLegend(.hidden)
                 .chartYAxis(.hidden)
                 .chartXAxis(.hidden)
-                .automaticMatchedTransitionSource(id: "Trends.DJLevel", in: analyticsNamespace)
         }
+        .automaticMatchedTransitionSource(id: "Trends.DJLevel", in: analyticsNamespace)
         .onTapGesture {
             if !isEditingCards && djLevelPerImportGroup.count > 0 {
                 navigationManager.push(.trendsDJLevelGraph, for: .analytics)
@@ -451,12 +455,14 @@ struct AnalyticsView: View {
         AnalyticsCardView(title: "Analytics.ClearType.Level.\(difficulty)",
                           systemImage: "chart.pie.fill",
                           iconColor: .purple) {
-            OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
-                                                difficulty: .constant(difficulty))
-                .chartLegend(.hidden)
-                .chartYAxis(.hidden)
-                .automaticMatchedTransitionSource(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
+            OverviewClearTypePerDifficultyGraph(
+                graphData: $clearTypePerDifficulty,
+                difficulty: .constant(difficulty)
+            )
+            .chartLegend(.hidden)
+            .chartYAxis(.hidden)
         }
+        .automaticMatchedTransitionSource(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
         .onTapGesture {
             if !isEditingCards && clearTypePerDifficulty[difficulty] != nil {
                 navigationManager.push(.clearTypeForLevel(difficulty: difficulty), for: .analytics)
@@ -473,8 +479,8 @@ struct AnalyticsView: View {
                 .chartLegend(.hidden)
                 .chartYAxis(.hidden)
                 .chartXAxis(.hidden)
-                .automaticMatchedTransitionSource(id: "Trends.Level.\(difficulty)", in: analyticsNamespace)
         }
+        .automaticMatchedTransitionSource(id: "Trends.Level.\(difficulty)", in: analyticsNamespace)
         .onTapGesture {
             if !isEditingCards && clearTypePerImportGroup.count > 0 {
                 navigationManager.push(.clearTypeTrendsForLevel(difficulty: difficulty), for: .analytics)
