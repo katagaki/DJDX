@@ -32,29 +32,22 @@ extension AnalyticsView {
         let importGroupIdentifier = await actor.importGroupIdentifier(for: .now)
         if let importGroupIdentifier,
            let importGroup = modelContext.model(for: importGroupIdentifier) as? ImportGroup {
-            let importGroupID = importGroup.id
-            var songRecords: [IIDXSongRecord] = (try? modelContext.fetch(
-                FetchDescriptor<IIDXSongRecord>(
-                    predicate: #Predicate<IIDXSongRecord> {
-                        $0.importGroup?.id == importGroupID
-                    },
-                    sortBy: [SortDescriptor(\.title, order: .forward)]
-                )
-            )) ?? []
-            songRecords.removeAll { $0.playType != playTypeToShow }
+            let songRecords = fetchSongRecords(for: importGroup.id, playType: playTypeToShow)
             if songRecords.count > 0 {
-                let newClearTypePerDifficulty = clearTypePerDifficulty(for: songRecords)
-                let newScoresPerDifficulty = scoresPerDifficulty(for: songRecords)
+                let (newClearType, newDJLevel) = computeAllCounts(from: songRecords)
+                let newDJLevelPerDifficulty = convertToEnumKeyed(newDJLevel)
                 await MainActor.run {
                     withAnimation(.snappy.speed(2.0)) {
-                        self.clearTypePerDifficulty = newClearTypePerDifficulty
-                        self.djLevelPerDifficulty = newScoresPerDifficulty
+                        self.clearTypePerDifficulty = newClearType
+                        self.djLevelPerDifficulty = newDJLevelPerDifficulty
                     }
                 }
             } else {
-                withAnimation(.snappy.speed(2.0)) {
-                    self.clearTypePerDifficulty.removeAll()
-                    self.djLevelPerDifficulty.removeAll()
+                await MainActor.run {
+                    withAnimation(.snappy.speed(2.0)) {
+                        self.clearTypePerDifficulty.removeAll()
+                        self.djLevelPerDifficulty.removeAll()
+                    }
                 }
             }
         }
@@ -67,207 +60,147 @@ extension AnalyticsView {
                 sortBy: [SortDescriptor(\.importDate, order: .forward)]
             )
         )) ?? []
-        if importGroups.count > 0 {
-            importGroups.removeAll(where: {$0.iidxVersion != iidxVersion})
-            let newClearTypePerImportGroup = await trendDataForClearTypePerDifficulty(importGroups)
-            let newDJLevelPerImportGroup = await trendDataForDJLevelPerDifficulty(importGroups)
+        guard importGroups.count > 0 else { return }
+        importGroups.removeAll(where: { $0.iidxVersion != iidxVersion })
 
-            await MainActor.run {
-                withAnimation(.snappy.speed(2.0)) {
-                    self.clearTypePerImportGroup = newClearTypePerImportGroup
-                    self.djLevelPerImportGroup = newDJLevelPerImportGroup
-                }
-            }
-        }
-    }
+        let existingClearTypeCache = trendData(using: clearTypePerImportGroupCache)
+        let existingDJLevelCache = trendData(using: djLevelPerImportGroupCache)
 
-    // MARK: Trends
+        var newClearTypeData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
+        var newDJLevelData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
+        var newClearTypeCache: [CachedTrendData] = []
+        var newDJLevelCache: [CachedTrendData] = []
 
-    func trendDataPerDifficulty(
-        _ importGroups: [ImportGroup],
-        using cacheData: Data,
-        get trendDataFrom: @escaping ([IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>]
-    ) -> (data: [Date: [Int: OrderedDictionary<String, Int>]], cache: [CachedTrendData]) {
-
-        let existingCache = trendData(using: cacheData)
-        var newData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-        var newCache: [CachedTrendData] = []
-        var calculatedTrendData: [(importGroup: ImportGroup, data: [Int: OrderedDictionary<String, Int>])] = []
-
-        // Determine whether to load new data for import group or just take from cache
         for importGroup in importGroups {
-            let date = dateWithTimeSetToMidnight(importGroup.importDate)
-            if let existingCacheData = existingCache.first(where: {
+            let cachedClearType = existingClearTypeCache.first(where: {
                 $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-            }) {
-                debugPrint("Returning from cache: \(date)")
-                calculatedTrendData.append((importGroup, existingCacheData.data))
-            } else {
-                debugPrint("Processing data: \(date)")
-                let songRecords: [IIDXSongRecord] = importGroup.iidxData?.filter({
-                    $0.playType == playTypeToShow
-                }) ?? []
-                let data = trendDataFrom(songRecords)
-                calculatedTrendData.append((importGroup, data))
-            }
-        }
+            })
+            let cachedDJLevel = existingDJLevelCache.first(where: {
+                $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
+            })
 
-        for (importGroup, trendData) in calculatedTrendData {
-            if sumOfCounts(trendData) > 0 {
+            let clearTypeData: [Int: OrderedDictionary<String, Int>]
+            let djLevelData: [Int: OrderedDictionary<String, Int>]
+
+            if let cachedClearType, let cachedDJLevel {
+                debugPrint("Returning from cache: \(importGroup.importDate)")
+                clearTypeData = cachedClearType.data
+                djLevelData = cachedDJLevel.data
+            } else {
+                debugPrint("Processing data: \(importGroup.importDate)")
+                let songRecords = fetchSongRecords(for: importGroup.id, playType: playTypeToShow)
+                let computed = computeAllCounts(from: songRecords)
+                clearTypeData = cachedClearType?.data ?? computed.clearType
+                djLevelData = cachedDJLevel?.data ?? computed.djLevel
+            }
+
+            if sumOfCounts(clearTypeData) > 0 {
                 debugPrint("Adding: \(importGroup.importDate)")
-                newData[importGroup.importDate] = trendData
+                newClearTypeData[importGroup.importDate] = clearTypeData
             }
-            if let existingCacheData = existingCache.first(where: {
-                $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-            }) {
-                debugPrint("Storing existing data to new cache: \(importGroup.importDate)")
-                newCache.append(existingCacheData)
-            } else {
-                debugPrint("Storing new data to new cache: \(importGroup.importDate)")
-                newCache.append(
-                    CachedTrendData(importGroupID: importGroup.id,
-                                    playType: playTypeToShow,
-                                    data: trendData)
-                )
+            if sumOfCounts(djLevelData) > 0 {
+                newDJLevelData[importGroup.importDate] = djLevelData
+            }
+
+            newClearTypeCache.append(cachedClearType ?? CachedTrendData(
+                importGroupID: importGroup.id, playType: playTypeToShow, data: clearTypeData
+            ))
+            newDJLevelCache.append(cachedDJLevel ?? CachedTrendData(
+                importGroupID: importGroup.id, playType: playTypeToShow, data: djLevelData
+            ))
+        }
+
+        debugPrint("Updating trend caches")
+        clearTypePerImportGroupCache = (try? JSONEncoder().encode(newClearTypeCache)) ?? Data()
+        djLevelPerImportGroupCache = (try? JSONEncoder().encode(newDJLevelCache)) ?? Data()
+
+        await MainActor.run {
+            withAnimation(.snappy.speed(2.0)) {
+                self.clearTypePerImportGroup = newClearTypeData
+                self.djLevelPerImportGroup = newDJLevelData
             }
         }
-
-        return (newData, newCache)
     }
 
-    func trendDataForClearTypePerDifficulty(
-        _ importGroups: [ImportGroup]
-    ) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
-        let (newData, newCache) = trendDataPerDifficulty(
-            importGroups,
-            using: clearTypePerImportGroupCache
-        ) { songRecords in
-            clearTypePerDifficulty(for: songRecords)
-        }
+    // MARK: Data Fetching
 
-        debugPrint("Updating Clear Type cache")
-        clearTypePerImportGroupCache = (try? JSONEncoder().encode(newCache)) ?? Data()
-
-        return newData
+    func fetchSongRecords(for importGroupID: String, playType: IIDXPlayType) -> [IIDXSongRecord] {
+        let descriptor = FetchDescriptor<IIDXSongRecord>(
+            predicate: #Predicate<IIDXSongRecord> {
+                $0.importGroup?.id == importGroupID
+            }
+        )
+        return ((try? modelContext.fetch(descriptor)) ?? []).filter { $0.playType == playType }
     }
 
-    func trendDataForDJLevelPerDifficulty(
-        _ importGroups: [ImportGroup]
-    ) async -> [Date: [Int: OrderedDictionary<String, Int>]] {
-        let (newData, newCache) = trendDataPerDifficulty(
-            importGroups,
-            using: djLevelPerImportGroupCache
-        ) { songRecords in
-            djLevelPerDifficulty(for: songRecords)
-        }
+    // MARK: Data Computation
 
-        debugPrint("Updating DJ Level trend cache")
-        djLevelPerImportGroupCache = (try? JSONEncoder().encode(newCache)) ?? Data()
-
-        return newData
-    }
-
-    // MARK: Overview
-
-    func clearTypePerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>] {
-        // Generate skeleton for calculation
+    func computeAllCounts(from songRecords: [IIDXSongRecord]) -> (
+        clearType: [Int: OrderedDictionary<String, Int>],
+        djLevel: [Int: OrderedDictionary<String, Int>]
+    ) {
         let clearTypes = IIDXClearType.sortedStringsWithoutNoPlay
-        var newClearTypePerDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
-        for difficulty in difficulties {
-            newClearTypePerDifficulty[difficulty] = OrderedDictionary(
-                uniqueKeys: clearTypes,
-                values: clearTypes.map({ _ in return 0 })
-            )
-        }
-
-        // Add scores to dictionary
-        let scores = scores(in: songRecords).filter({ $0.clearType != "NO PLAY" && $0.score > 0 })
-        for score in scores {
-            newClearTypePerDifficulty[score.difficulty]?[score.clearType]? += 1
-        }
-
-        return newClearTypePerDifficulty
-    }
-
-    func djLevelPerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: OrderedDictionary<String, Int>] {
-        // Generate skeleton for calculation
         let djLevels = IIDXDJLevel.sortedStrings.reversed()
-        var newDJLevelForDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
+
+        var clearTypeResult: [Int: OrderedDictionary<String, Int>] = [:]
+        var djLevelResult: [Int: OrderedDictionary<String, Int>] = [:]
+
         for difficulty in difficulties {
-            newDJLevelForDifficulty[difficulty] = OrderedDictionary(
+            clearTypeResult[difficulty] = OrderedDictionary(
+                uniqueKeys: clearTypes,
+                values: clearTypes.map { _ in 0 }
+            )
+            djLevelResult[difficulty] = OrderedDictionary(
                 uniqueKeys: djLevels,
-                values: djLevels.map({ _ in return 0 })
+                values: djLevels.map { _ in 0 }
             )
         }
 
-        // Add scores to dictionary
         for songRecord in songRecords {
-            let scores: [IIDXLevelScore] = songRecord.scores()
-            for score in scores {
-                newDJLevelForDifficulty[score.difficulty]?[score.djLevel]? += 1
-            }
-        }
-
-        return newDJLevelForDifficulty
-    }
-
-    func scoresPerDifficulty(for songRecords: [IIDXSongRecord]) -> [Int: [IIDXDJLevel: Int]] {
-        // Generate skeleton for calculation
-        var newScoresPerDifficulty: [Int: [IIDXDJLevel: Int]] = [:]
-        for difficulty in difficulties {
-            newScoresPerDifficulty[difficulty] = IIDXDJLevel.sorted
-                .reduce(into: [IIDXDJLevel: Int]()) { $0[$1] = 0 }
-        }
-
-        // Add scores to dictionary
-        let scores = scores(in: songRecords).filter({ $0.djLevelEnum() != .none})
-        for score in scores {
-            newScoresPerDifficulty[score.difficulty]?[score.djLevelEnum()]? += 1
-        }
-        return newScoresPerDifficulty
-    }
-
-    // MARK: Shared
-
-    func trendData(using data: Data) -> [CachedTrendData] {
-        if let decodedCachedData = try? JSONDecoder().decode([CachedTrendData].self, from: data) {
-            return decodedCachedData
-        } else {
-            return []
-        }
-    }
-
-    func scores(in songRecords: [IIDXSongRecord]) -> [IIDXLevelScore] {
-        var scores: [IIDXLevelScore] = []
-        for songRecord in songRecords {
-            let scoresAvailable: [IIDXLevelScore] = [
+            let scores: [IIDXLevelScore] = [
                 songRecord.beginnerScore,
                 songRecord.normalScore,
                 songRecord.hyperScore,
                 songRecord.anotherScore,
                 songRecord.leggendariaScore
             ]
-                .filter({$0.difficulty != 0})
-            scores.append(contentsOf: scoresAvailable)
+            for score in scores {
+                if score.difficulty == 0 { continue }
+
+                if score.clearType != "NO PLAY" && score.score > 0 {
+                    clearTypeResult[score.difficulty]?[score.clearType]? += 1
+                }
+
+                if let djLevel = IIDXDJLevel(rawValue: score.djLevel), djLevel != .none {
+                    djLevelResult[score.difficulty]?[score.djLevel]? += 1
+                }
+            }
         }
-        return scores
+
+        return (clearTypeResult, djLevelResult)
+    }
+
+    func convertToEnumKeyed(_ data: [Int: OrderedDictionary<String, Int>]) -> [Int: [IIDXDJLevel: Int]] {
+        var result: [Int: [IIDXDJLevel: Int]] = [:]
+        for (difficulty, counts) in data {
+            var inner: [IIDXDJLevel: Int] = [:]
+            for level in IIDXDJLevel.sorted {
+                inner[level] = counts[level.rawValue] ?? 0
+            }
+            result[difficulty] = inner
+        }
+        return result
+    }
+
+    // MARK: Shared
+
+    func trendData(using data: Data) -> [CachedTrendData] {
+        (try? JSONDecoder().decode([CachedTrendData].self, from: data)) ?? []
     }
 
     func sumOfCounts(_ data: [Int: OrderedDictionary<String, Int>]) -> Int {
-        var sum = 0
-        for (_, clearTypeDictionary) in data {
-            for (_, count) in clearTypeDictionary {
-                sum += count
-            }
+        data.values.reduce(0) { sum, dict in
+            sum + dict.values.reduce(0, +)
         }
-        return sum
-    }
-
-    func dateWithTimeSetToMidnight(_ date: Date) -> Date {
-        var calendar = Calendar.current
-        calendar.timeZone = .current
-        return calendar.date(
-            from: Calendar.current.dateComponents([.year, .month, .day], from: date)
-        ) ?? date
     }
 }
