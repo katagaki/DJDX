@@ -21,6 +21,8 @@ enum ViewPath: Hashable {
     case scoreRatePerDifficultyGraph
     case trendsClearTypeGraph
     case trendsDJLevelGraph
+    case newClearsDetail
+    case newHighScoresDetail
     case importerWebIIDXSingle
     case importerWebIIDXDouble
     case importerManual
