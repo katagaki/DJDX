@@ -61,7 +61,7 @@ struct AnalyticsCardView<Content: View>: View {
         }
         .padding(12.0)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.background)
+        .background(.thinMaterial)
         .clipShape(.rect(cornerRadius: cornerRadius))
     }
 }

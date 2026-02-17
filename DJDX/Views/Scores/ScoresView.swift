@@ -78,6 +78,7 @@ struct ScoresView: View {
                         dimensions[.leading]
                     }
                 }
+                .listRowBackground(Color.clear)
             }
             .navigator("ViewTitle.Scores")
             .toolbarBackground(.hidden, for: .tabBar)

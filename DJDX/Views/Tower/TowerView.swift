@@ -24,8 +24,7 @@ struct TowerView: View {
                 isLoading: $isLoading,
                 towerURL: iidxVersion.towerURL()
             )
-            .navigationTitle("ViewTitle.Tower")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigator("ViewTitle.Tower", inline: true)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Shared.Refresh", systemImage: "arrow.clockwise") {

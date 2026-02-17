@@ -11,6 +11,7 @@ struct NavigatorStyle: ViewModifier {
 
     var title: LocalizedStringKey
     var isGrouped: Bool
+    var isInline: Bool
 
     func body(content: Content) -> some View {
         Group {
@@ -24,12 +25,23 @@ struct NavigatorStyle: ViewModifier {
             }
         }
         .navigationTitle(title)
-        .navigationBarTitleDisplayMode(.automatic)
+        .navigationBarTitleDisplayMode(isInline ? .inline : .automatic)
+        .background(
+            .linearGradient(
+                colors: [.backgroundGradientTop, .backgroundGradientBottom],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
     }
 }
 
 extension View {
-    func navigator(_ title: LocalizedStringKey, group isGrouped: Bool = false) -> some View {
-        modifier(NavigatorStyle(title: title, isGrouped: isGrouped))
+    func navigator(
+        _ title: LocalizedStringKey,
+        group isGrouped: Bool = false,
+        inline isInline: Bool = false
+    ) -> some View {
+        modifier(NavigatorStyle(title: title, isGrouped: isGrouped, isInline: isInline))
     }
 }

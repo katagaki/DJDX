@@ -158,6 +158,7 @@ struct MoreView: View {
                 }
             }
             .navigator("ViewTitle.More")
+            .scrollContentBackground(.hidden)
             .listSectionSpacing(.compact)
             .alert(
                 "Alert.DeleteData.Web.Title",

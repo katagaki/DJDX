@@ -96,9 +96,7 @@ struct AnalyticsView: View {
                 .padding(.top, 4.0)
                 .padding(.bottom, 16.0)
             }
-            .background(Color(uiColor: .systemGroupedBackground))
-            .navigationTitle("ViewTitle.Analytics")
-            .navigationBarTitleDisplayMode(.automatic)
+            .navigator("ViewTitle.Analytics")
             .sheet(isPresented: $isEditingCards) {
                 cardOrderEditor
             }
