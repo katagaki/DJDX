@@ -819,6 +819,23 @@
         }
       }
     },
+    "More.ManageData.ClearAnalyticsCache" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Analytics Cache"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アナリティクスキャッシュをクリア"
+          }
+        }
+      }
+    },
     "More.ManageData.DeleteScoreData" : {
       "extractionState" : "manual",
       "localizations" : {
