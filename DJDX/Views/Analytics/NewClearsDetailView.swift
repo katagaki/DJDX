@@ -24,7 +24,7 @@ struct NewClearsDetailView: View {
                             Text(entry.level.code())
                                 .font(.caption.weight(.bold))
                                 .foregroundStyle(.secondary)
-                            Text("LV.\(entry.difficulty)")
+                            Text("Level.\(entry.difficulty)")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }

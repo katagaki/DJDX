@@ -8,32 +8,40 @@
 import SwiftUI
 
 struct AnalyticsCardView<Content: View>: View {
-    let title: String
-    let titleIsLocalized: Bool
+    let title: LocalizedStringKey
     let systemImage: String
     let iconColor: Color
     let contentHeight: CGFloat
+    let cornerRadius: CGFloat
     let content: () -> Content
 
     init(cardType: AnalyticsCardType, @ViewBuilder content: @escaping () -> Content) {
-        self.title = cardType.titleKey
-        self.titleIsLocalized = true
+        self.title = LocalizedStringKey(cardType.titleKey)
         self.systemImage = cardType.systemImage
         self.iconColor = cardType.iconColor
         self.contentHeight = cardType.cardContentHeight
+        if #available(iOS 26.0, *) {
+            self.cornerRadius = 20.0
+        } else {
+            self.cornerRadius = 12.0
+        }
         self.content = content
     }
 
-    init(title: String,
+    init(title: LocalizedStringKey,
          systemImage: String,
          iconColor: Color,
          contentHeight: CGFloat = 100.0,
          @ViewBuilder content: @escaping () -> Content) {
         self.title = title
-        self.titleIsLocalized = false
         self.systemImage = systemImage
         self.iconColor = iconColor
         self.contentHeight = contentHeight
+        if #available(iOS 26.0, *) {
+            self.cornerRadius = 20.0
+        } else {
+            self.cornerRadius = 12.0
+        }
         self.content = content
     }
 
@@ -43,16 +51,10 @@ struct AnalyticsCardView<Content: View>: View {
                 Image(systemName: systemImage)
                     .font(.subheadline)
                     .foregroundStyle(iconColor)
-                Group {
-                    if titleIsLocalized {
-                        Text(LocalizedStringKey(title))
-                    } else {
-                        Text(verbatim: title)
-                    }
-                }
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
             content()
                 .frame(height: contentHeight)
@@ -60,6 +62,6 @@ struct AnalyticsCardView<Content: View>: View {
         .padding(12.0)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12.0, style: .continuous))
+        .clipShape(.rect(cornerRadius: cornerRadius))
     }
 }

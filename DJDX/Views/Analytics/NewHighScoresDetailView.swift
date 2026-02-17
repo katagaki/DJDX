@@ -24,7 +24,7 @@ struct NewHighScoresDetailView: View {
                             Text(entry.level.code())
                                 .font(.caption.weight(.bold))
                                 .foregroundStyle(.secondary)
-                            Text("LV.\(entry.difficulty)")
+                            Text("Level.\(entry.difficulty)")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -39,7 +39,7 @@ struct NewHighScoresDetailView: View {
                             Text("\(entry.newScore)")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(.orange)
-                            Text("(+\(entry.newScore - entry.previousScore))")
+                            Text("Analytics.NewHighScore.\(entry.newScore - entry.previousScore)")
                                 .font(.caption2)
                                 .foregroundStyle(.orange.opacity(0.8))
                         }

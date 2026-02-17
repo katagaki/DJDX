@@ -125,6 +125,7 @@ extension AnalyticsView {
 
     // MARK: New Clears & High Scores
 
+    // swiftlint:disable function_body_length
     func reloadNewClearsAndHighScores() async {
         debugPrint("Calculating new clears and high scores")
         var importGroups: [ImportGroup] = (try? modelContext.fetch(
@@ -251,6 +252,7 @@ extension AnalyticsView {
             }
         }
     }
+    // swiftlint:enable function_body_length
 
     // MARK: Data Fetching
 

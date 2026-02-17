@@ -12,8 +12,6 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case clearTypeOverall
     case newClears
     case newHighScores
-    case clearTypeByDifficulty
-    case clearTypeTrends
     case djLevelByDifficulty
     case djLevelTrends
 
@@ -24,8 +22,6 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .clearTypeOverall: return "Analytics.ClearType.Overall"
         case .newClears: return "Analytics.NewClears"
         case .newHighScores: return "Analytics.NewHighScores"
-        case .clearTypeByDifficulty: return "Analytics.ClearType.ByDifficulty"
-        case .clearTypeTrends: return "Analytics.Trends.ClearType"
         case .djLevelByDifficulty: return "Analytics.DJLevel.ByDifficulty"
         case .djLevelTrends: return "Analytics.Trends.DJLevel"
         }
@@ -36,8 +32,6 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .clearTypeOverall: return "chart.bar.fill"
         case .newClears: return "sparkles"
         case .newHighScores: return "trophy.fill"
-        case .clearTypeByDifficulty: return "chart.pie.fill"
-        case .clearTypeTrends: return "chart.xyaxis.line"
         case .djLevelByDifficulty: return "chart.bar.fill"
         case .djLevelTrends: return "chart.xyaxis.line"
         }
@@ -48,8 +42,6 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .clearTypeOverall: return .blue
         case .newClears: return .green
         case .newHighScores: return .orange
-        case .clearTypeByDifficulty: return .purple
-        case .clearTypeTrends: return .cyan
         case .djLevelByDifficulty: return .pink
         case .djLevelTrends: return .teal
         }
@@ -76,8 +68,6 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
             .clearTypeOverall,
             .newClears,
             .newHighScores,
-            .clearTypeByDifficulty,
-            .clearTypeTrends,
             .djLevelByDifficulty,
             .djLevelTrends
         ]
@@ -87,7 +77,6 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     static var pairedCards: [(AnalyticsCardType, AnalyticsCardType)] {
         [
             (.newClears, .newHighScores),
-            (.clearTypeByDifficulty, .clearTypeTrends),
             (.djLevelByDifficulty, .djLevelTrends)
         ]
     }

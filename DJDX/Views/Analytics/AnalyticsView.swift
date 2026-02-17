@@ -11,6 +11,7 @@ import OrderedCollections
 import SwiftData
 import SwiftUI
 
+// swiftlint:disable type_body_length
 struct AnalyticsView: View {
 
     @Environment(\.modelContext) var modelContext
@@ -78,10 +79,6 @@ struct AnalyticsView: View {
                             newClearsCard
                         case .newHighScores:
                             newHighScoresCard
-                        case .clearTypeByDifficulty:
-                            clearTypeByDifficultyCard
-                        case .clearTypeTrends:
-                            clearTypeTrendsCard
                         case .djLevelByDifficulty:
                             djLevelByDifficultyCard
                         case .djLevelTrends:
@@ -156,67 +153,108 @@ struct AnalyticsView: View {
                 Group {
                     switch viewPath {
                     case .clearTypeOverviewGraph:
-                        OverviewClearTypeOverallGraph(graphData: .constant(filteredClearTypeData),
-                                                      isInteractive: true)
-                        .chartLegend(.visible)
+                        OverviewClearTypeOverallGraph(
+                            graphData: .constant(filteredClearTypeData),
+                            isInteractive: true
+                        )
+                        .chartLegend(
+                            position: .bottom,
+                            alignment: .leading,
+                            spacing: 16.0
+                        )
+                        .padding()
                         .navigationTitle("Analytics.ClearType.Overall")
                         .automaticNavigationTransition(id: "ClearType.Overall", in: analyticsNamespace)
                     case .clearTypePerDifficultyGraph:
                         VStack {
-                            OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
-                                                                difficulty: $levelFilterForOverviewClearType)
-                                .chartLegend(.visible)
-                            DifficultyPicker(selection: $levelFilterForOverviewClearType,
-                                             difficulties: .constant(difficulties))
-                                .padding(.top)
+                            OverviewClearTypePerDifficultyGraph(
+                                graphData: $clearTypePerDifficulty,
+                                difficulty: $levelFilterForOverviewClearType
+                            )
+                            .chartLegend(
+                                position: .bottom,
+                                alignment: .leading,
+                                spacing: 16.0
+                            )
+                            DifficultyPicker(
+                                selection: $levelFilterForOverviewClearType,
+                                difficulties: .constant(difficulties)
+                            )
                         }
+                        .padding(.top)
+                        .padding()
                         .navigationTitle("Analytics.ClearType.ByDifficulty")
                         .automaticNavigationTransition(id: "ClearType.ByDifficulty", in: analyticsNamespace)
                     case .scoreRatePerDifficultyGraph:
                         VStack {
-                            OverviewDJLevelPerDifficultyGraph(graphData: $djLevelPerDifficulty,
-                                                              difficulty: $levelFilterForOverviewScoreRate)
-                                .chartLegend(.visible)
-                            DifficultyPicker(selection: $levelFilterForOverviewScoreRate,
-                                             difficulties: .constant(difficulties))
-                                .padding(.top)
+                            OverviewDJLevelPerDifficultyGraph(
+                                graphData: $djLevelPerDifficulty,
+                                difficulty: $levelFilterForOverviewScoreRate
+                            )
+                            .chartLegend(
+                                position: .bottom,
+                                alignment: .leading,
+                                spacing: 16.0
+                            )
+                            DifficultyPicker(
+                                selection: $levelFilterForOverviewScoreRate,
+                                difficulties: .constant(difficulties)
+                            )
+                            .padding(.top)
                         }
+                        .padding()
                         .navigationTitle("Analytics.DJLevel.ByDifficulty")
                         .automaticNavigationTransition(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
                     case .trendsClearTypeGraph:
                         VStack {
-                            TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
-                                                 difficulty: $levelFilterForTrendsClearType)
-                                .chartLegend(.visible)
-                            DifficultyPicker(selection: $levelFilterForTrendsClearType,
-                                             difficulties: .constant(difficulties))
-                                .padding(.top)
+                            TrendsClearTypeGraph(
+                                graphData: $clearTypePerImportGroup,
+                                difficulty: $levelFilterForTrendsClearType
+                            )
+                            .chartLegend(.visible)
+                            DifficultyPicker(
+                                selection: $levelFilterForTrendsClearType,
+                                difficulties: .constant(difficulties)
+                            )
+                            .padding(.top)
                         }
+                        .padding()
                         .navigationTitle("Analytics.Trends.ClearType")
                         .automaticNavigationTransition(id: "Trends.ClearType", in: analyticsNamespace)
                     case .trendsDJLevelGraph:
                         VStack {
-                            TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
-                                               difficulty: $levelFilterForTrendsDJLevel)
-                                .chartLegend(.visible)
-                            DifficultyPicker(selection: $levelFilterForTrendsDJLevel,
-                                             difficulties: .constant(difficulties))
-                                .padding(.top)
+                            TrendsDJLevelGraph(
+                                graphData: $djLevelPerImportGroup,
+                                difficulty: $levelFilterForTrendsDJLevel
+                            )
+                            .chartLegend(.visible)
+                            DifficultyPicker(
+                                selection: $levelFilterForTrendsDJLevel,
+                                difficulties: .constant(difficulties)
+                            )
+                            .padding(.top)
                         }
+                        .padding()
                         .navigationTitle("Analytics.Trends.DJLevel")
                         .automaticNavigationTransition(id: "Trends.DJLevel", in: analyticsNamespace)
                     case .clearTypeForLevel(let difficulty):
-                        OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
-                                                            difficulty: .constant(difficulty))
-                            .chartLegend(.visible)
-                            .navigationTitle("LEVEL \(difficulty)")
-                            .automaticNavigationTransition(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
+                        OverviewClearTypePerDifficultyGraph(
+                            graphData: $clearTypePerDifficulty,
+                            difficulty: .constant(difficulty)
+                        )
+                        .chartLegend(.visible)
+                        .padding()
+                        .navigationTitle("LEVEL \(difficulty)")
+                        .automaticNavigationTransition(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
                     case .clearTypeTrendsForLevel(let difficulty):
-                        TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
-                                             difficulty: .constant(difficulty))
-                            .chartLegend(.visible)
-                            .navigationTitle("LEVEL \(difficulty)")
-                            .automaticNavigationTransition(id: "Trends.Level.\(difficulty)", in: analyticsNamespace)
+                        TrendsClearTypeGraph(
+                            graphData: $clearTypePerImportGroup,
+                            difficulty: .constant(difficulty)
+                        )
+                        .chartLegend(.visible)
+                        .padding()
+                        .navigationTitle("LEVEL \(difficulty)")
+                        .automaticNavigationTransition(id: "Trends.Level.\(difficulty)", in: analyticsNamespace)
                     case .newClearsDetail:
                         NewClearsDetailView(newClears: $newClears)
                     case .newHighScoresDetail:
@@ -224,7 +262,6 @@ struct AnalyticsView: View {
                     default: Color.clear
                     }
                 }
-                .padding()
                 .navigationBarTitleDisplayMode(.inline)
             }
         }
@@ -264,6 +301,7 @@ struct AnalyticsView: View {
         } label: {
             Image(systemName: "gearshape")
         }
+        .menuActionDismissBehavior(.disabled)
     }
 
     // MARK: - Card Order Editor
@@ -324,11 +362,14 @@ struct AnalyticsView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        isEditingCards = false
-                    } label: {
-                        Text("Analytics.Settings.DoneEditing")
-                            .fontWeight(.semibold)
+                    if #available(iOS 26.0, *) {
+                        Button(role: .confirm) {
+                            isEditingCards = false
+                        }
+                    } else {
+                        Button(.sharedDone) {
+                            isEditingCards = false
+                        }
                     }
                 }
             }
@@ -373,37 +414,6 @@ struct AnalyticsView: View {
         }
     }
 
-    var clearTypeByDifficultyCard: some View {
-        AnalyticsCardView(cardType: .clearTypeByDifficulty) {
-            OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
-                                                difficulty: $levelFilterForOverviewClearType)
-                .chartLegend(.hidden)
-                .chartYAxis(.hidden)
-                .automaticMatchedTransitionSource(id: "ClearType.ByDifficulty", in: analyticsNamespace)
-        }
-        .onTapGesture {
-            if !isEditingCards && clearTypePerDifficulty.count > 0 {
-                navigationManager.push(.clearTypePerDifficultyGraph, for: .analytics)
-            }
-        }
-    }
-
-    var clearTypeTrendsCard: some View {
-        AnalyticsCardView(cardType: .clearTypeTrends) {
-            TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
-                                 difficulty: $levelFilterForTrendsClearType)
-                .chartLegend(.hidden)
-                .chartYAxis(.hidden)
-                .chartXAxis(.hidden)
-                .automaticMatchedTransitionSource(id: "Trends.ClearType", in: analyticsNamespace)
-        }
-        .onTapGesture {
-            if !isEditingCards && clearTypePerImportGroup.count > 0 {
-                navigationManager.push(.trendsClearTypeGraph, for: .analytics)
-            }
-        }
-    }
-
     var djLevelByDifficultyCard: some View {
         AnalyticsCardView(cardType: .djLevelByDifficulty) {
             OverviewDJLevelPerDifficultyGraph(graphData: $djLevelPerDifficulty,
@@ -438,7 +448,7 @@ struct AnalyticsView: View {
     // MARK: - Per-Level Card Views
 
     func clearTypeForLevelCard(difficulty: Int) -> some View {
-        AnalyticsCardView(title: "LEVEL \(difficulty)",
+        AnalyticsCardView(title: "Analytics.ClearType.Level.\(difficulty)",
                           systemImage: "chart.pie.fill",
                           iconColor: .purple) {
             OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
@@ -455,7 +465,7 @@ struct AnalyticsView: View {
     }
 
     func clearTypeTrendsForLevelCard(difficulty: Int) -> some View {
-        AnalyticsCardView(title: "LEVEL \(difficulty)",
+        AnalyticsCardView(title: "Analytics.Trends.Level.\(difficulty)",
                           systemImage: "chart.xyaxis.line",
                           iconColor: .cyan) {
             TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
@@ -549,3 +559,4 @@ struct AnalyticsView: View {
         saveLevelOrder()
     }
 }
+// swiftlint:enable type_body_length

@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "%lld" : {
+      "shouldTranslate" : false
+    },
     "A" : {
       "localizations" : {
         "en" : {
@@ -407,6 +410,23 @@
         }
       }
     },
+    "Analytics.ClearType.Level.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEVEL %lld - Clear Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEVEL %lld - クリア率"
+          }
+        }
+      }
+    },
     "Analytics.ClearType.Overall" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -437,40 +457,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJ LEVEL（レベル別概要）"
-          }
-        }
-      }
-    },
-    "Analytics.Trends.ClearType" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trend - Clear Type"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "クリアランプ（時系列）"
-          }
-        }
-      }
-    },
-    "Analytics.Trends.DJLevel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trend - DJ Level"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ LEVEL（時系列）"
           }
         }
       }
@@ -508,6 +494,17 @@
           }
         }
       }
+    },
+    "Analytics.NewHighScore.%lld" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(+%lld)"
+          }
+        }
+      },
+      "shouldTranslate" : false
     },
     "Analytics.NewHighScores" : {
       "extractionState" : "manual",
@@ -566,47 +563,29 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edit Card Order"
+            "value" : "Change Order"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "カードの並べ替え"
+            "value" : "並べ替え"
           }
         }
       }
     },
-    "Analytics.Settings.DoneEditing" : {
-      "extractionState" : "manual",
+    "Analytics.Settings.Hidden" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Done Editing"
+            "value" : "Hidden"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "編集を完了"
-          }
-        }
-      }
-    },
-    "Analytics.Settings.ResetOrder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset Card Order"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "カードの並び順をリセット"
+            "value" : "非表示"
           }
         }
       }
@@ -624,6 +603,90 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表示するレベル"
+          }
+        }
+      }
+    },
+    "Analytics.Settings.PerLevel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per Level Cards"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レベル別"
+          }
+        }
+      }
+    },
+    "Analytics.Settings.ResetOrder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リセット"
+          }
+        }
+      }
+    },
+    "Analytics.Trends.ClearType" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trend - Clear Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランプ（時系列）"
+          }
+        }
+      }
+    },
+    "Analytics.Trends.DJLevel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trend - DJ Level"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL（時系列）"
+          }
+        }
+      }
+    },
+    "Analytics.Trends.Level.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEVEL %lld - Clear Trend"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEVEL %lld - クリアトレンド"
           }
         }
       }
@@ -811,6 +874,17 @@
     "LEVEL %lld" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEVEL %lld"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "Level.%lld" : {
+      "localizations" : {
+        "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "LEVEL %lld"
@@ -1581,6 +1655,23 @@
         }
       },
       "shouldTranslate" : false
+    },
+    "Shared.Done" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        }
+      }
     },
     "Shared.Filter" : {
       "extractionState" : "manual",

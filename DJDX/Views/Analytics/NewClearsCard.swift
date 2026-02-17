@@ -12,18 +12,15 @@ struct NewClearsCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4.0) {
+            Spacer(minLength: 0)
             if newClears.isEmpty {
                 Text("Analytics.NoData")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
             } else {
                 Text("\(newClears.count)")
-                    .font(.system(.title, design: .rounded, weight: .bold))
+                    .font(.system(.largeTitle, design: .rounded, weight: .bold))
                     .foregroundStyle(.primary)
-                Text("Analytics.NewClears.Subtitle")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
         }
     }
