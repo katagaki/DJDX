@@ -61,12 +61,15 @@ struct AnalyticsView: View {
     var body: some View {
         NavigationStack(path: $navigationManager[.analytics]) {
             ScrollView {
+                clearTypeOverallCard
+                    .padding(.horizontal)
+                    .padding(.top, 8.0)
+
                 LazyVGrid(columns: cardColumns, spacing: 12.0) {
                     ForEach(cardOrder, id: \.self) { cardType in
                         switch cardType {
                         case .clearTypeOverall:
-                            clearTypeOverallCard
-                                .gridCellColumns(2)
+                            EmptyView()
                         case .newClears:
                             newClearsCard
                         case .newHighScores:
@@ -89,7 +92,7 @@ struct AnalyticsView: View {
                     }
                 }
                 .padding(.horizontal)
-                .padding(.top, 8.0)
+                .padding(.top, 4.0)
                 .padding(.bottom, 16.0)
             }
             .background(Color(.systemGroupedBackground))
