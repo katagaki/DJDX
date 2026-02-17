@@ -148,7 +148,9 @@ extension AnalyticsView {
         let latestGroup = importGroups[importGroups.count - 1]
         let previousGroup = importGroups[importGroups.count - 2]
 
-        let latestRecords = fetchSongRecords(for: latestGroup.id, playType: playTypeToShow)
+        let latestRecords = fetchSongRecords(for: latestGroup.id, playType: playTypeToShow).sorted(by: {
+            $0.lastPlayDate < $1.lastPlayDate
+        })
         let previousRecords = fetchSongRecords(for: previousGroup.id, playType: playTypeToShow)
 
         // Build lookup by compact title for previous records
@@ -160,7 +162,6 @@ extension AnalyticsView {
         var computedNewClears: [NewClearEntry] = []
         var computedNewHighScores: [NewHighScoreEntry] = []
 
-        let clearTypeRanking = IIDXClearType.sortedStringsWithoutNoPlay
         let levels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
             (.beginner, \.beginnerScore),
             (.normal, \.normalScore),
@@ -181,32 +182,16 @@ extension AnalyticsView {
                     let previousScore = previousRecord[keyPath: keyPath]
 
                     // Check for new/upgraded clear
-                    if latestScore.clearType != "NO PLAY" && latestScore.score > 0 {
-                        let latestClearRank = clearTypeRanking.firstIndex(of: latestScore.clearType)
-                        let previousClearRank = clearTypeRanking.firstIndex(of: previousScore.clearType)
-
-                        if let latestRank = latestClearRank {
-                            if previousScore.clearType == "NO PLAY" || previousScore.score == 0 {
-                                // Completely new clear
-                                computedNewClears.append(NewClearEntry(
-                                    songTitle: latestRecord.title,
-                                    level: level,
-                                    difficulty: latestScore.difficulty,
-                                    clearType: latestScore.clearType,
-                                    previousClearType: previousScore.clearType
-                                ))
-                            } else if let previousRank = previousClearRank,
-                                      latestRank < previousRank {
-                                // Upgraded clear (lower index = better clear)
-                                computedNewClears.append(NewClearEntry(
-                                    songTitle: latestRecord.title,
-                                    level: level,
-                                    difficulty: latestScore.difficulty,
-                                    clearType: latestScore.clearType,
-                                    previousClearType: previousScore.clearType
-                                ))
-                            }
-                        }
+                    if (latestScore.clearType == "CLEAR" &&
+                        latestScore.score > 0) &&
+                        previousScore.clearType != "CLEAR" {
+                        computedNewClears.append(NewClearEntry(
+                            songTitle: latestRecord.title,
+                            level: level,
+                            difficulty: latestScore.difficulty,
+                            clearType: latestScore.clearType,
+                            previousClearType: previousScore.clearType
+                        ))
                     }
 
                     // Check for new high score
@@ -223,7 +208,8 @@ extension AnalyticsView {
                     }
                 } else {
                     // Song didn't exist in previous import - all played scores are new
-                    if latestScore.clearType != "NO PLAY" && latestScore.score > 0 {
+                    if latestScore.clearType == "CLEAR" &&
+                        latestScore.score > 0 {
                         computedNewClears.append(NewClearEntry(
                             songTitle: latestRecord.title,
                             level: level,
