@@ -402,12 +402,9 @@ actor DataFetcher {
 
     func importGroups(from startDate: Date) -> Predicate<ImportGroup> {
         let startOfDay = Calendar.current.startOfDay(for: startDate)
-        var components = DateComponents()
-        components.day = 1
-        components.second = -1
-        let endDate: Date = Calendar.current.date(byAdding: components, to: startOfDay)!
+        let startOfNextDay: Date = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
         return #Predicate<ImportGroup> {
-            $0.importDate >= startOfDay && $0.importDate <= endDate
+            $0.importDate >= startOfDay && $0.importDate < startOfNextDay
         }
     }
 }
