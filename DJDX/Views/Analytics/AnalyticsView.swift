@@ -84,6 +84,12 @@ struct AnalyticsView: View {
                         }
                         .gridCellColumns(isFullWidth ? 2 : 1)
                     }
+
+                    // Per-level clear lamp cards
+                    ForEach(sortedVisibleLevels, id: \.self) { difficulty in
+                        clearTypeForLevelCard(difficulty: difficulty)
+                        clearTypeTrendsForLevelCard(difficulty: difficulty)
+                    }
                 }
                 .padding(.horizontal)
                 .padding(.top, 8.0)
@@ -194,6 +200,18 @@ struct AnalyticsView: View {
                         }
                         .navigationTitle("Analytics.Trends.DJLevel")
                         .automaticNavigationTransition(id: "Trends.DJLevel", in: analyticsNamespace)
+                    case .clearTypeForLevel(let difficulty):
+                        OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
+                                                            difficulty: .constant(difficulty))
+                            .chartLegend(.visible)
+                            .navigationTitle("LEVEL \(difficulty)")
+                            .automaticNavigationTransition(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
+                    case .clearTypeTrendsForLevel(let difficulty):
+                        TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
+                                             difficulty: .constant(difficulty))
+                            .chartLegend(.visible)
+                            .navigationTitle("LEVEL \(difficulty)")
+                            .automaticNavigationTransition(id: "Trends.Level.\(difficulty)", in: analyticsNamespace)
                     case .newClearsDetail:
                         NewClearsDetailView(newClears: $newClears)
                     case .newHighScoresDetail:
@@ -221,23 +239,20 @@ struct AnalyticsView: View {
             }
             Section("Analytics.Settings.Levels") {
                 ForEach(difficulties, id: \.self) { difficulty in
-                    Button {
-                        withAnimation(.snappy) {
-                            if visibleLevels.contains(difficulty) {
-                                visibleLevels.remove(difficulty)
-                            } else {
-                                visibleLevels.insert(difficulty)
-                            }
-                            saveVisibleLevels()
-                        }
-                    } label: {
-                        HStack {
-                            Text("LEVEL \(difficulty)")
-                            Spacer()
-                            if visibleLevels.contains(difficulty) {
-                                Image(systemName: "checkmark")
+                    Toggle(isOn: Binding<Bool>(
+                        get: { visibleLevels.contains(difficulty) },
+                        set: { newValue in
+                            withAnimation(.snappy) {
+                                if newValue {
+                                    visibleLevels.insert(difficulty)
+                                } else {
+                                    visibleLevels.remove(difficulty)
+                                }
+                                saveVisibleLevels()
                             }
                         }
+                    )) {
+                        Text("LEVEL \(difficulty)")
                     }
                 }
             }
@@ -300,6 +315,7 @@ struct AnalyticsView: View {
         AnalyticsCardView(cardType: .clearTypeOverall) {
             OverviewClearTypeOverallGraph(graphData: .constant(filteredClearTypeData))
                 .chartLegend(.hidden)
+                .chartYAxis(.hidden)
                 .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
         }
         .onTapGesture {
@@ -336,6 +352,7 @@ struct AnalyticsView: View {
             OverviewClearTypePerDifficultyGraph(graphData: .constant(filteredClearTypeData),
                                                 difficulty: $levelFilterForOverviewClearType)
                 .chartLegend(.hidden)
+                .chartYAxis(.hidden)
                 .automaticMatchedTransitionSource(id: "ClearType.ByDifficulty", in: analyticsNamespace)
         }
         .onTapGesture {
@@ -350,6 +367,7 @@ struct AnalyticsView: View {
             TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
                                  difficulty: $levelFilterForTrendsClearType)
                 .chartLegend(.hidden)
+                .chartYAxis(.hidden)
                 .automaticMatchedTransitionSource(id: "Trends.ClearType", in: analyticsNamespace)
         }
         .onTapGesture {
@@ -364,6 +382,7 @@ struct AnalyticsView: View {
             OverviewDJLevelPerDifficultyGraph(graphData: $djLevelPerDifficulty,
                                               difficulty: $levelFilterForOverviewScoreRate)
                 .chartLegend(.hidden)
+                .chartYAxis(.hidden)
                 .automaticMatchedTransitionSource(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
         }
         .onTapGesture {
@@ -378,6 +397,7 @@ struct AnalyticsView: View {
             TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
                                difficulty: $levelFilterForTrendsDJLevel)
                 .chartLegend(.hidden)
+                .chartYAxis(.hidden)
                 .automaticMatchedTransitionSource(id: "Trends.DJLevel", in: analyticsNamespace)
         }
         .onTapGesture {
@@ -387,7 +407,47 @@ struct AnalyticsView: View {
         }
     }
 
+    // MARK: - Per-Level Card Views
+
+    func clearTypeForLevelCard(difficulty: Int) -> some View {
+        AnalyticsCardView(title: "LEVEL \(difficulty)",
+                          systemImage: "chart.pie.fill",
+                          iconColor: .purple) {
+            OverviewClearTypePerDifficultyGraph(graphData: $clearTypePerDifficulty,
+                                                difficulty: .constant(difficulty))
+                .chartLegend(.hidden)
+                .chartYAxis(.hidden)
+                .automaticMatchedTransitionSource(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
+        }
+        .onTapGesture {
+            if !isEditingCards && clearTypePerDifficulty[difficulty] != nil {
+                navigationManager.push(.clearTypeForLevel(difficulty: difficulty), for: .analytics)
+            }
+        }
+    }
+
+    func clearTypeTrendsForLevelCard(difficulty: Int) -> some View {
+        AnalyticsCardView(title: "LEVEL \(difficulty)",
+                          systemImage: "chart.xyaxis.line",
+                          iconColor: .cyan) {
+            TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
+                                 difficulty: .constant(difficulty))
+                .chartLegend(.hidden)
+                .chartYAxis(.hidden)
+                .automaticMatchedTransitionSource(id: "Trends.Level.\(difficulty)", in: analyticsNamespace)
+        }
+        .onTapGesture {
+            if !isEditingCards && clearTypePerImportGroup.count > 0 {
+                navigationManager.push(.clearTypeTrendsForLevel(difficulty: difficulty), for: .analytics)
+            }
+        }
+    }
+
     // MARK: - Filtered Data
+
+    var sortedVisibleLevels: [Int] {
+        visibleLevels.sorted()
+    }
 
     var filteredClearTypeData: [Int: OrderedDictionary<String, Int>] {
         clearTypePerDifficulty.filter { visibleLevels.contains($0.key) }

@@ -59,9 +59,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var cardContentHeight: CGFloat {
         switch self {
         case .clearTypeOverall: return 160.0
-        case .newClears, .newHighScores: return 60.0
-        case .clearTypeByDifficulty, .clearTypeTrends,
-             .djLevelByDifficulty, .djLevelTrends: return 100.0
+        default: return 100.0
         }
     }
 
