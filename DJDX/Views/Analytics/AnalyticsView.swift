@@ -79,10 +79,16 @@ struct AnalyticsView: View {
     var body: some View {
         NavigationStack(path: $navigationManager[.analytics]) {
             ScrollView {
-                clearTypeOverallCard
-                    .jiggle(isActive: isEditingCards, seed: 0)
-                    .padding(.horizontal)
-                    .padding(.top, 8.0)
+                if isEditingCards {
+                    clearTypeOverallCard
+                        .jiggle(isActive: true, seed: 0)
+                        .padding(.horizontal)
+                        .padding(.top, 8.0)
+                } else {
+                    clearTypeOverallCard
+                        .padding(.horizontal)
+                        .padding(.top, 8.0)
+                }
 
                 LazyVGrid(columns: cardColumns, spacing: 12.0) {
                     ForEach(cardOrder, id: \.self) { cardType in
@@ -688,7 +694,6 @@ extension View {
                 ))
         } else {
             self
-                .jiggle(isActive: false, seed: seed)
         }
     }
 
@@ -718,7 +723,6 @@ extension View {
                 ))
         } else {
             self
-                .jiggle(isActive: false, seed: seed)
         }
     }
 }
