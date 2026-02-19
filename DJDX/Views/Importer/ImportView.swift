@@ -165,6 +165,7 @@ struct ImportView: View {
         }
     }
 
+    // swiftlint:disable function_body_length
     @ViewBuilder
     func bottomBar() -> some View {
         VStack(spacing: 16.0) {
@@ -258,4 +259,5 @@ struct ImportView: View {
         }
         .padding()
     }
+    // swiftlint:enable function_body_length
 }
