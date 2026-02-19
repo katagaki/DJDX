@@ -645,6 +645,7 @@ struct AnalyticsView: View {
 // MARK: - Drag-and-Drop View Extensions
 
 extension View {
+    @ViewBuilder
     func cardDraggable(
         _ cardType: AnalyticsCardType,
         editing: Bool,
@@ -653,21 +654,27 @@ extension View {
         onReorder: @escaping () -> Void,
         seed: Int
     ) -> some View {
-        self
-            .jiggle(isActive: editing, seed: seed)
-            .opacity(draggedCard.wrappedValue == cardType ? 0.4 : 1.0)
-            .onDrag {
-                draggedCard.wrappedValue = cardType
-                return NSItemProvider(object: cardType.rawValue as NSString)
-            }
-            .onDrop(of: [.text], delegate: CardReorderDropDelegate(
-                target: cardType,
-                cards: cardOrder,
-                draggedCard: draggedCard,
-                onReorder: onReorder
-            ))
+        if editing {
+            self
+                .jiggle(isActive: true, seed: seed)
+                .opacity(draggedCard.wrappedValue == cardType ? 0.4 : 1.0)
+                .onDrag {
+                    draggedCard.wrappedValue = cardType
+                    return NSItemProvider(object: cardType.rawValue as NSString)
+                }
+                .onDrop(of: [.text], delegate: CardReorderDropDelegate(
+                    target: cardType,
+                    cards: cardOrder,
+                    draggedCard: draggedCard,
+                    onReorder: onReorder
+                ))
+        } else {
+            self
+                .jiggle(isActive: false, seed: seed)
+        }
     }
 
+    @ViewBuilder
     func levelDraggable(
         _ difficulty: Int,
         category: AnalyticsPerLevelCategory,
@@ -677,18 +684,23 @@ extension View {
         onReorder: @escaping () -> Void
     ) -> some View {
         let seed = difficulty * 10 + (AnalyticsPerLevelCategory.allCases.firstIndex(of: category) ?? 0)
-        return self
-            .jiggle(isActive: editing, seed: seed)
-            .opacity(draggedLevel.wrappedValue == difficulty ? 0.4 : 1.0)
-            .onDrag {
-                draggedLevel.wrappedValue = difficulty
-                return NSItemProvider(object: "\(difficulty)" as NSString)
-            }
-            .onDrop(of: [.text], delegate: LevelReorderDropDelegate(
-                target: difficulty,
-                levels: levelOrder,
-                draggedLevel: draggedLevel,
-                onReorder: onReorder
-            ))
+        if editing {
+            self
+                .jiggle(isActive: true, seed: seed)
+                .opacity(draggedLevel.wrappedValue == difficulty ? 0.4 : 1.0)
+                .onDrag {
+                    draggedLevel.wrappedValue = difficulty
+                    return NSItemProvider(object: "\(difficulty)" as NSString)
+                }
+                .onDrop(of: [.text], delegate: LevelReorderDropDelegate(
+                    target: difficulty,
+                    levels: levelOrder,
+                    draggedLevel: draggedLevel,
+                    onReorder: onReorder
+                ))
+        } else {
+            self
+                .jiggle(isActive: false, seed: seed)
+        }
     }
 }
