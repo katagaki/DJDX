@@ -220,9 +220,17 @@ struct ImportView: View {
                     }
                     Section {
                         Button("Importer.CSV.Backup.Button", systemImage: "folder.badge.gearshape") {
-                            if let url = URL(string: "shareddocuments://") {
-                                openURL(url)
+                            let documentsUrl = FileManager.default.urls(for: .documentDirectory,
+                                                                        in: .userDomainMask).first!
+#if targetEnvironment(macCatalyst)
+                            UIApplication.shared.open(documentsUrl)
+#else
+                            if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)") {
+                                if UIApplication.shared.canOpenURL(sharedUrl) {
+                                    UIApplication.shared.open(sharedUrl)
+                                }
                             }
+#endif
                         }
                     } header: {
                         Text("Importer.CSV.Backup.Description")
