@@ -71,9 +71,6 @@ struct NewHighScoresDetailView: View {
                                 level: entry.level,
                                 difficulty: entry.difficulty,
                                 score: entry.newScore,
-                                perfectGreatCount: 0,
-                                greatCount: 0,
-                                missCount: 0,
                                 clearType: "",
                                 djLevel: entry.newDJLevel
                             )

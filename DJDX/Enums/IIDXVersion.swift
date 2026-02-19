@@ -174,12 +174,12 @@ enum IIDXVersion: Int, Codable, CaseIterable {
             switch self {
             case .epolis:
                 topColor = Color(red: 252 / 255, green: 252 / 255, blue: 242 / 255)
-                bottomColor = Color(red: 244 / 255, green: 255 / 255, blue: 92 / 255)
+                bottomColor = Color(red: 244 / 255, green: 1.0, blue: 92 / 255)
             case .pinkyCrush:
-                topColor = Color(red: 234 / 255, green: 254 / 255, blue: 255 / 255)
+                topColor = Color(red: 234 / 255, green: 254 / 255, blue: 1.0)
                 bottomColor = Color(red: 116 / 255, green: 243 / 255, blue: 248 / 255)
             case .sparkleShower:
-                topColor = Color(red: 251 / 255, green: 254 / 255, blue: 255 / 255)
+                topColor = Color(red: 251 / 255, green: 254 / 255, blue: 1.0)
                 bottomColor = Color(red: 211 / 255, green: 250 / 255, blue: 149 / 255)
             default: break
             }

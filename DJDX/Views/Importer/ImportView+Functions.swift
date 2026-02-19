@@ -58,24 +58,26 @@ extension ImportView {
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
         ) {
-            Task {
-                for await progress in await actor.importSampleCSV(
-                    to: importToDate,
-                    for: .single
-                ) {
-                    if let currentFileProgress = progress.currentFileProgress,
-                        let currentFileTotal = progress.currentFileTotal {
-                        let progress = (currentFileProgress * 100) / currentFileTotal
-                        await MainActor.run {
-                            progressAlertManager.updateProgress(progress)
-                        }
-                    }
-                }
+            Task { await performSampleCSVImport() }
+        }
+    }
+
+    private func performSampleCSVImport() async {
+        for await progress in await actor.importSampleCSV(
+            to: importToDate,
+            for: .single
+        ) {
+            if let currentFileProgress = progress.currentFileProgress,
+                let currentFileTotal = progress.currentFileTotal {
+                let progress = (currentFileProgress * 100) / currentFileTotal
                 await MainActor.run {
-                    didImportSucceed = true
-                    progressAlertManager.hide()
+                    progressAlertManager.updateProgress(progress)
                 }
             }
+        }
+        await MainActor.run {
+            didImportSucceed = true
+            progressAlertManager.hide()
         }
     }
 
@@ -84,33 +86,35 @@ extension ImportView {
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
         ) {
-            Task {
-                for await progress in await actor.importCSVs(
-                    urls: urls,
-                    to: importToDate,
-                    for: importPlayType,
-                    from: iidxVersion
-                ) {
-                    if let filesProcessed = progress.filesProcessed,
-                       let fileCount = progress.fileCount {
-                        await MainActor.run {
-                            progressAlertManager.updateTitle("Alert.Importing.Title.\(filesProcessed).\(fileCount)")
-                        }
-                    }
-                    if let currentFileProgress = progress.currentFileProgress,
-                        let currentFileTotal = progress.currentFileTotal,
-                       currentFileTotal > 0 {
-                        let progress = (currentFileProgress * 100) / currentFileTotal
-                        await MainActor.run {
-                            progressAlertManager.updateProgress(progress)
-                        }
-                    }
-                }
+            Task { await performCSVImport(from: urls) }
+        }
+    }
+
+    private func performCSVImport(from urls: [URL]) async {
+        for await progress in await actor.importCSVs(
+            urls: urls,
+            to: importToDate,
+            for: importPlayType,
+            from: iidxVersion
+        ) {
+            if let filesProcessed = progress.filesProcessed,
+               let fileCount = progress.fileCount {
                 await MainActor.run {
-                    didImportSucceed = true
-                    progressAlertManager.hide()
+                    progressAlertManager.updateTitle("Alert.Importing.Title.\(filesProcessed).\(fileCount)")
                 }
             }
+            if let currentFileProgress = progress.currentFileProgress,
+                let currentFileTotal = progress.currentFileTotal,
+               currentFileTotal > 0 {
+                let progress = (currentFileProgress * 100) / currentFileTotal
+                await MainActor.run {
+                    progressAlertManager.updateProgress(progress)
+                }
+            }
+        }
+        await MainActor.run {
+            didImportSucceed = true
+            progressAlertManager.hide()
         }
     }
 }

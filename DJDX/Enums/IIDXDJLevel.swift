@@ -36,7 +36,7 @@ enum IIDXDJLevel: String, Codable {
         sorted.firstIndex(of: lhs) ?? 1 < sorted.firstIndex(of: rhs) ?? 0
     }
 
-    static func style(for djLevel: String, colorScheme: ColorScheme) -> any ShapeStyle {
+    static func style(for _: String, colorScheme: ColorScheme) -> any ShapeStyle {
         switch colorScheme {
         case .light:
             return LinearGradient(colors: [.cyan, .blue],

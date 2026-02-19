@@ -76,7 +76,7 @@ struct WebViewForTower: UIViewRepresentable {
         Coordinator(version: iidxVersion, updateTowerState: updateTowerState)
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {
+    func updateUIView(_: WKWebView, context _: Context) {
         // Blank function to conform to protocol
     }
 
@@ -120,7 +120,7 @@ struct WebViewForTower: UIViewRepresentable {
             super.init()
         }
 
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
             if let webViewURL = webView.url {
                 let urlString = webViewURL.absoluteString
                 webView.evaluateJavaScript(self.cleanupTowerJS) { _, _ in

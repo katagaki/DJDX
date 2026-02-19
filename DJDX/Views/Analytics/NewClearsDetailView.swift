@@ -49,12 +49,7 @@ struct NewClearsDetailView: View {
                             score: IIDXLevelScore(
                                 level: entry.level,
                                 difficulty: entry.difficulty,
-                                score: 0,
-                                perfectGreatCount: 0,
-                                greatCount: 0,
-                                missCount: 0,
-                                clearType: entry.clearType,
-                                djLevel: "---"
+                                clearType: entry.clearType
                             )
                         )
                         .padding([.top, .bottom], 6.0)

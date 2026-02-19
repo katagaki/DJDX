@@ -226,10 +226,9 @@ struct ImportView: View {
 #if targetEnvironment(macCatalyst)
                             UIApplication.shared.open(documentsUrl)
 #else
-                            if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)") {
-                                if UIApplication.shared.canOpenURL(sharedUrl) {
-                                    UIApplication.shared.open(sharedUrl)
-                                }
+                            if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)"),
+                               UIApplication.shared.canOpenURL(sharedUrl) {
+                                UIApplication.shared.open(sharedUrl)
                             }
 #endif
                         }

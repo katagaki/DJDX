@@ -21,7 +21,7 @@ struct DocumentPicker: UIViewControllerRepresentable {
         return picker
     }
 
-    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {
+    func updateUIViewController(_: UIDocumentPickerViewController, context _: Context) {
         // Not implemented
     }
 
@@ -36,7 +36,7 @@ struct DocumentPicker: UIViewControllerRepresentable {
             self.parent = parent
         }
 
-        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        func documentPicker(_: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
             parent.onDocumentPicked(urls)
         }
     }

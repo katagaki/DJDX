@@ -137,12 +137,12 @@ struct IIDXLevelScore: Codable, Equatable {
 
     init(level: IIDXLevel,
          difficulty: Int,
-         score: Int,
-         perfectGreatCount: Int,
-         greatCount: Int,
-         missCount: Int,
-         clearType: String,
-         djLevel: String) {
+         score: Int = 0,
+         perfectGreatCount: Int = 0,
+         greatCount: Int = 0,
+         missCount: Int = 0,
+         clearType: String = "NO PLAY",
+         djLevel: String = "---") {
         self.level = level
         self.difficulty = difficulty
         self.score = score
