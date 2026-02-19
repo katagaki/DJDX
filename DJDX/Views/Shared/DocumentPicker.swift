@@ -10,11 +10,13 @@ import UniformTypeIdentifiers
 
 struct DocumentPicker: UIViewControllerRepresentable {
     let allowedUTIs: [UTType]
+    var directoryURL: URL? = nil
     let onDocumentPicked: ([URL]) -> Void
 
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
         let picker = UIDocumentPickerViewController(forOpeningContentTypes: allowedUTIs)
         picker.allowsMultipleSelection = true
+        picker.directoryURL = directoryURL
         picker.delegate = context.coordinator
         return picker
     }
