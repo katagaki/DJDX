@@ -33,6 +33,7 @@ enum ViewPath: Hashable {
     case importerWebIIDXSingle
     case importerWebIIDXDouble
     case importerManual
+    case importDetail(importGroup: ImportGroup)
     case moreBemaniWikiCharts
     case moreAppIcon
     case moreAttributions

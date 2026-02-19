@@ -38,16 +38,21 @@ struct ImportView: View {
         NavigationStack(path: $navigationManager[.imports]) {
             List {
                 ForEach(importGroups) { importGroup in
-                    HStack(alignment: .center, spacing: 6.0) {
-                        Text(importGroup.importDate, style: .date)
-                        Spacer()
-                        if let version = importGroup.iidxVersion {
-                            Text(version.marketingName)
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundStyle(colorScheme == .dark ?
-                                                 Color(uiColor: version.darkModeColor) :
-                                                    Color(uiColor: version.lightModeColor))
+                    Button {
+                        navigationManager.push(.importDetail(importGroup: importGroup), for: .imports)
+                    } label: {
+                        HStack(alignment: .center, spacing: 6.0) {
+                            Text(importGroup.importDate, style: .date)
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if let version = importGroup.iidxVersion {
+                                Text(version.marketingName)
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(colorScheme == .dark ?
+                                                     Color(uiColor: version.darkModeColor) :
+                                                        Color(uiColor: version.lightModeColor))
+                            }
                         }
                     }
                 }
@@ -151,6 +156,8 @@ struct ImportView: View {
                                 isAutoImportFailed: $isAutoImportFailed,
                                 didImportSucceed: $didImportSucceed,
                                 autoImportFailedReason: $autoImportFailedReason)
+                case .importDetail(let importGroup):
+                    ImportDetailView(importGroup: importGroup)
                 default: Color.clear
                 }
             }
@@ -207,6 +214,26 @@ struct ImportView: View {
                         }
                     } header: {
                         Text("Importer.CSV.Load.Description")
+                            .foregroundColor(.primary)
+                            .textCase(nil)
+                            .font(.body)
+                    }
+                    Section {
+                        Button("Importer.CSV.Backup.Button", systemImage: "folder.badge.gearshape") {
+                            let documentsUrl = FileManager.default.urls(for: .documentDirectory,
+                                                                        in: .userDomainMask).first!
+#if targetEnvironment(macCatalyst)
+                            UIApplication.shared.open(documentsUrl)
+#else
+                            if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)") {
+                                if UIApplication.shared.canOpenURL(sharedUrl) {
+                                    UIApplication.shared.open(sharedUrl)
+                                }
+                            }
+#endif
+                        }
+                    } header: {
+                        Text("Importer.CSV.Backup.Description")
                             .foregroundColor(.primary)
                             .textCase(nil)
                             .font(.body)

@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "%@" : {
+      "shouldTranslate" : false
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -860,6 +863,40 @@
         }
       }
     },
+    "Importer.CSV.Backup.Button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Files App"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「ファイル」アプリで開く"
+          }
+        }
+      }
+    },
+    "Importer.CSV.Backup.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX saves a copy of every imported CSV file. Open the Files app and navigate to On My iPhone > DJDX to find previously imported files."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDXはインポートしたCSVファイルをバックアップとして保存しています。「ファイル」アプリの「このiPhone内」→「DJDX」から以前のファイルを開けます。"
+          }
+        }
+      }
+    },
     "Importer.CSV.Download.Button" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -924,6 +961,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CSVファイルのダウンロードができたら、こちらで読み込んでください。"
+          }
+        }
+      }
+    },
+    "Importer.Detail.PlayCount.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld play"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld plays"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldプレー"
+          }
+        }
+      }
+    },
+    "Importer.Detail.SongCount.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld song"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld songs"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld曲"
           }
         }
       }
