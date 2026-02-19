@@ -22,7 +22,9 @@ struct ImportDetailView: View {
                     .listRowBackground(Color.clear)
             }
         }
-        .navigator("\(importGroup.importDate, style: .date)", group: false, inline: true)
+        .listStyle(.plain)
+        .navigationTitle(Text(importGroup.importDate, style: .date))
+        .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
             if #available(iOS 26.0, *) {
                 Text("Importer.Detail.SongCount.\(sortedSongRecords.count)")
