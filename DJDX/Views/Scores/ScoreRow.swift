@@ -107,28 +107,10 @@ struct ScoreRow: View {
                                    score.score != 0 {
                                     Group {
                                         if isDJLevelVisible {
-                                            Group {
-                                                switch colorScheme {
-                                                case .light:
-                                                    Text(score.djLevel)
-                                                        .foregroundStyle(
-                                                            LinearGradient(colors: [.cyan, .blue],
-                                                                           startPoint: .top,
-                                                                           endPoint: .bottom)
-                                                        )
-                                                case .dark:
-                                                    Text(score.djLevel)
-                                                        .foregroundStyle(
-                                                            LinearGradient(colors: [.white, .cyan],
-                                                                           startPoint: .top,
-                                                                           endPoint: .bottom)
-                                                        )
-                                                @unknown default:
-                                                    Text(score.djLevel)
-                                                }
-                                            }
-                                            .fontWidth(.expanded)
-                                            .fontWeight(.black)
+                                            Text(score.djLevel)
+                                                .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
+                                                .fontWidth(.expanded)
+                                                .fontWeight(.black)
                                         }
                                         if isScoreRateVisible {
                                             if let scoreRate {
@@ -136,7 +118,7 @@ struct ScoreRow: View {
                                                     Divider()
                                                         .frame(maxHeight: 14.0)
                                                 }
-                                                Text(scoreRate, format: .percent.precision(.fractionLength(0)))
+                                                Text(scoreRate, format: .percent.precision(.fractionLength(1)))
                                                     .foregroundStyle(LinearGradient(
                                                         colors: [.primary.opacity(0.55), .primary.opacity(0.3)],
                                                         startPoint: .top,

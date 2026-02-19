@@ -5,7 +5,7 @@
 //  Created by シン・ジャスティン on 2024/06/02.
 //
 
-import Foundation
+import SwiftUI
 
 enum IIDXDJLevel: String, Codable {
     case djAAA = "AAA"
@@ -34,5 +34,18 @@ enum IIDXDJLevel: String, Codable {
 
     static func < (lhs: IIDXDJLevel, rhs: IIDXDJLevel) -> Bool {
         sorted.firstIndex(of: lhs) ?? 1 < sorted.firstIndex(of: rhs) ?? 0
+    }
+
+    static func style(for djLevel: String, colorScheme: ColorScheme) -> any ShapeStyle {
+        switch colorScheme {
+        case .light:
+            return LinearGradient(colors: [.cyan, .blue],
+                                  startPoint: .top, endPoint: .bottom)
+        case .dark:
+            return LinearGradient(colors: [.white, .cyan],
+                                  startPoint: .top, endPoint: .bottom)
+        @unknown default:
+            return Color.primary
+        }
     }
 }

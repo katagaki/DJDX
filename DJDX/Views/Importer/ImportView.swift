@@ -59,6 +59,7 @@ struct ImportView: View {
                 .onDelete(perform: { indexSet in
                     deleteImport(indexSet)
                 })
+                .listRowBackground(Color.clear)
             }
             .navigator("ViewTitle.Calendar")
             .toolbarBackground(.hidden, for: .tabBar)

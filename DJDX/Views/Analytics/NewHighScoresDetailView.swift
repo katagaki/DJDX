@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct NewHighScoresDetailView: View {
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
+
     @Binding var newHighScores: [NewHighScoreEntry]
 
     var body: some View {
@@ -42,16 +44,23 @@ struct NewHighScoresDetailView: View {
                             }
                             if entry.newDJLevel != entry.previousDJLevel {
                                 HStack(spacing: 4.0) {
-                                    Text(entry.previousDJLevel)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                        .strikethrough()
-                                    Image(systemName: "arrow.right")
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                    Text(entry.newDJLevel)
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(.orange)
+                                    Group {
+                                        Text(entry.previousDJLevel)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                            .fontWidth(.expanded)
+                                            .strikethrough()
+                                        Image(systemName: "arrow.right")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                        Text(entry.newDJLevel)
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundStyle(
+                                                IIDXDJLevel.style(for: entry.newDJLevel, colorScheme: colorScheme)
+                                            )
+                                            .fontWidth(.expanded)
+                                    }
+                                    .fontWeight(.black)
                                 }
                             }
                         }

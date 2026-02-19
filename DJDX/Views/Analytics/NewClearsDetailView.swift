@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct NewClearsDetailView: View {
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
+
     @Binding var newClears: [NewClearEntry]
     var title: String
 
@@ -36,7 +38,9 @@ struct NewClearsDetailView: View {
                                     .foregroundStyle(.secondary)
                                 Text(entry.clearType)
                                     .font(.caption.weight(.semibold))
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(
+                                        IIDXClearType.style(for: entry.clearType, colorScheme: colorScheme)
+                                    )
                             }
                         }
                         Spacer(minLength: 0.0)

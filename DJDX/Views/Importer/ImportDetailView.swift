@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ImportDetailView: View {
 
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
+
     var importGroup: ImportGroup
 
     var sortedSongRecords: [IIDXSongRecord] {
@@ -94,7 +96,10 @@ struct ImportDetailView: View {
             // Level code badge
             Text(level.code())
                 .font(.system(size: 9.0, weight: .black))
-                .foregroundStyle(isEmpty ? Color.secondary.opacity(0.4) : levelColor(level))
+                .foregroundStyle(
+                    isEmpty ? Color(uiColor: .secondaryLabel) :
+                        levelColor(level)
+                )
                 .frame(maxWidth: .infinity)
             if let score, !isEmpty {
                 // Difficulty number
@@ -112,12 +117,14 @@ struct ImportDetailView: View {
                 // DJ Level
                 Text(score.djLevel == "---" ? "-" : score.djLevel)
                     .font(.system(size: 9.0, weight: .heavy))
-                    .foregroundStyle(djLevelColor(score.djLevel))
+                    .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
+                    .fontWidth(.expanded)
+                    .fontWeight(.black)
                     .frame(maxWidth: .infinity)
                 // Clear Type (abbreviated)
                 Text(clearTypeAbbreviation(score.clearType))
                     .font(.system(size: 7.5, weight: .medium))
-                    .foregroundStyle(clearTypeColor(score.clearType))
+                    .foregroundStyle(IIDXClearType.style(for: score.clearType, colorScheme: colorScheme))
                     .frame(maxWidth: .infinity)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
@@ -130,8 +137,11 @@ struct ImportDetailView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(4.0)
-        .background(isEmpty ? Color.secondary.opacity(0.05) : levelColor(level).opacity(0.08),
-                    in: RoundedRectangle(cornerRadius: 6.0))
+        .background(
+            isEmpty ? Color(uiColor: .secondarySystemBackground) :
+                levelColor(level).opacity(0.08),
+            in: RoundedRectangle(cornerRadius: 6.0)
+        )
     }
 
     func levelColor(_ level: IIDXLevel) -> Color {
@@ -141,27 +151,6 @@ struct ImportDetailView: View {
         case .hyper: return .yellow
         case .another: return .red
         case .leggendaria: return .purple
-        default: return .secondary
-        }
-    }
-
-    func djLevelColor(_ djLevel: String) -> Color {
-        switch djLevel {
-        case "AAA": return .yellow
-        case "AA": return .orange
-        case "A": return .green
-        default: return .secondary
-        }
-    }
-
-    func clearTypeColor(_ clearType: String) -> Color {
-        switch clearType {
-        case "FULLCOMBO CLEAR": return .yellow
-        case "HARD CLEAR", "EX HARD CLEAR": return .red
-        case "CLEAR": return .green
-        case "EASY CLEAR": return .mint
-        case "ASSIST CLEAR": return .purple
-        case "FAILED": return .secondary
         default: return .secondary
         }
     }

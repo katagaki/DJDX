@@ -26,15 +26,11 @@ struct ScoreSection: View {
                         switch colorScheme {
                         case .light:
                             Text(score.djLevel)
-                                .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
-                                                                startPoint: .top,
-                                                                endPoint: .bottom))
+                                .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
                                 .conditionalShadow(.blue.opacity(0.2), radius: 3.0)
                         case .dark:
                             Text(score.djLevel)
-                                .foregroundStyle(LinearGradient(colors: [.white, .cyan],
-                                                                startPoint: .top,
-                                                                endPoint: .bottom))
+                                .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
                                 .drawingGroup()
                                 .shadow(color: .cyan, radius: 5.0)
                         @unknown default:
@@ -43,7 +39,7 @@ struct ScoreSection: View {
                         Spacer()
                         if let noteCount {
                             Text(Float(score.score) / Float(noteCount * 2),
-                                 format: .percent.precision(.fractionLength(0)))
+                                 format: .percent.precision(.fractionLength(1)))
                             .foregroundStyle(LinearGradient(
                                 colors: [.primary.opacity(0.35), .primary.opacity(0.2)],
                                 startPoint: .top,
@@ -135,37 +131,7 @@ struct ScoreSection: View {
     }
 
     func clearTypeStyle() -> any ShapeStyle {
-        switch score.clearType {
-        case "FULLCOMBO CLEAR": return LinearGradient(
-            gradient: Gradient(colors: [.cyan, whiteOr(.blue), .purple]),
-            startPoint: .top, endPoint: .bottom
-        )
-        case "FAILED": return LinearGradient(
-            gradient: Gradient(colors: [.orange, .red, .orange]),
-            startPoint: .top, endPoint: .bottom
-        )
-        case "ASSIST CLEAR": return LinearGradient(
-            gradient: Gradient(colors: [whiteOr(.indigo), .purple, whiteOr(.indigo)]),
-            startPoint: .top, endPoint: .bottom
-        )
-        case "EASY CLEAR": return LinearGradient(
-            gradient: Gradient(colors: [whiteOr(.mint), .green, whiteOr(.mint)]),
-            startPoint: .top, endPoint: .bottom
-        )
-        case "CLEAR": return LinearGradient(
-            gradient: Gradient(colors: [whiteOr(.blue), .cyan, whiteOr(.blue)]),
-            startPoint: .top, endPoint: .bottom
-        )
-        case "HARD CLEAR": return LinearGradient(
-            gradient: Gradient(colors: [whiteOr(.red), .pink, whiteOr(.red)]),
-            startPoint: .top, endPoint: .bottom
-        )
-        case "EX HARD CLEAR": return LinearGradient(
-            gradient: Gradient(colors: [whiteOr(.orange), .yellow, whiteOr(.orange)]),
-            startPoint: .top, endPoint: .bottom
-        )
-        default: return Color.primary
-        }
+        IIDXClearType.style(for: score.clearType, colorScheme: colorScheme)
     }
 
     func openYouTube() {
@@ -179,10 +145,6 @@ struct ScoreSection: View {
                 .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
             openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
         }
-    }
-
-    func whiteOr(_ color: Color) -> Color {
-        return colorScheme == .dark ? .white : color
     }
 
     func scoreStyle() -> any ShapeStyle {
