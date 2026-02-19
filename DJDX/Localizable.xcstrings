@@ -464,6 +464,38 @@
         }
       }
     },
+    "Analytics.Header.NewScores" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "New Achievements"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規スコア"
+          }
+        }
+      }
+    },
+    "Analytics.Header.PerLevel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per-Level"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レベル別"
+          }
+        }
+      }
+    },
     "Analytics.NewClears.Subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -539,6 +571,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データなし"
+          }
+        }
+      }
+    },
+    "Analytics.PerLevel.Caption.ClearType" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアタイプ"
+          }
+        }
+      }
+    },
+    "Analytics.PerLevel.Caption.DJLevel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
           }
         }
       }
@@ -644,6 +708,22 @@
         }
       }
     },
+    "Analytics.Settings.HideAll" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて非表示"
+          }
+        }
+      }
+    },
     "Analytics.Settings.Levels" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -662,6 +742,7 @@
       }
     },
     "Analytics.Settings.PerLevel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -673,6 +754,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "レベル別"
+          }
+        }
+      }
+    },
+    "Analytics.Settings.ResetAll" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてリセット"
           }
         }
       }

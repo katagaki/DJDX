@@ -125,7 +125,7 @@ extension AnalyticsView {
 
     // MARK: New Clears & High Scores
 
-    // swiftlint:disable function_body_length
+    // swiftlint:disable function_body_length cyclomatic_complexity
     func reloadNewClearsAndHighScores() async {
         debugPrint("Calculating new clears and high scores")
         var importGroups: [ImportGroup] = (try? modelContext.fetch(
@@ -141,6 +141,9 @@ extension AnalyticsView {
                     self.newClears = []
                     self.newAssistClears = []
                     self.newEasyClears = []
+                    self.newFullComboClears = []
+                    self.newHardClears = []
+                    self.newExHardClears = []
                     self.newFailed = []
                     self.newHighScores = []
                 }
@@ -165,6 +168,9 @@ extension AnalyticsView {
         var computedNewClears: [NewClearEntry] = []
         var computedNewAssistClears: [NewClearEntry] = []
         var computedNewEasyClears: [NewClearEntry] = []
+        var computedNewFullComboClears: [NewClearEntry] = []
+        var computedNewHardClears: [NewClearEntry] = []
+        var computedNewExHardClears: [NewClearEntry] = []
         var computedNewFailed: [NewClearEntry] = []
         var computedNewHighScores: [NewHighScoreEntry] = []
 
@@ -220,6 +226,48 @@ extension AnalyticsView {
                         latestScore.score > 0 &&
                         previousScore.clearType != "EASY CLEAR" {
                         computedNewEasyClears.append(NewClearEntry(
+                            songTitle: latestRecord.title,
+                            songArtist: latestRecord.artist,
+                            level: level,
+                            difficulty: latestScore.difficulty,
+                            clearType: latestScore.clearType,
+                            previousClearType: previousScore.clearType
+                        ))
+                    }
+
+                    // Check for new FULLCOMBO CLEAR
+                    if latestScore.clearType == "FULLCOMBO CLEAR" &&
+                        latestScore.score > 0 &&
+                        previousScore.clearType != "FULLCOMBO CLEAR" {
+                        computedNewFullComboClears.append(NewClearEntry(
+                            songTitle: latestRecord.title,
+                            songArtist: latestRecord.artist,
+                            level: level,
+                            difficulty: latestScore.difficulty,
+                            clearType: latestScore.clearType,
+                            previousClearType: previousScore.clearType
+                        ))
+                    }
+
+                    // Check for new HARD CLEAR
+                    if latestScore.clearType == "HARD CLEAR" &&
+                        latestScore.score > 0 &&
+                        previousScore.clearType != "HARD CLEAR" {
+                        computedNewHardClears.append(NewClearEntry(
+                            songTitle: latestRecord.title,
+                            songArtist: latestRecord.artist,
+                            level: level,
+                            difficulty: latestScore.difficulty,
+                            clearType: latestScore.clearType,
+                            previousClearType: previousScore.clearType
+                        ))
+                    }
+
+                    // Check for new EX HARD CLEAR
+                    if latestScore.clearType == "EX HARD CLEAR" &&
+                        latestScore.score > 0 &&
+                        previousScore.clearType != "EX HARD CLEAR" {
+                        computedNewExHardClears.append(NewClearEntry(
                             songTitle: latestRecord.title,
                             songArtist: latestRecord.artist,
                             level: level,
@@ -286,6 +334,33 @@ extension AnalyticsView {
                                 clearType: latestScore.clearType,
                                 previousClearType: "NO PLAY"
                             ))
+                        } else if latestScore.clearType == "FULLCOMBO CLEAR" {
+                            computedNewFullComboClears.append(NewClearEntry(
+                                songTitle: latestRecord.title,
+                                songArtist: latestRecord.artist,
+                                level: level,
+                                difficulty: latestScore.difficulty,
+                                clearType: latestScore.clearType,
+                                previousClearType: "NO PLAY"
+                            ))
+                        } else if latestScore.clearType == "HARD CLEAR" {
+                            computedNewHardClears.append(NewClearEntry(
+                                songTitle: latestRecord.title,
+                                songArtist: latestRecord.artist,
+                                level: level,
+                                difficulty: latestScore.difficulty,
+                                clearType: latestScore.clearType,
+                                previousClearType: "NO PLAY"
+                            ))
+                        } else if latestScore.clearType == "EX HARD CLEAR" {
+                            computedNewExHardClears.append(NewClearEntry(
+                                songTitle: latestRecord.title,
+                                songArtist: latestRecord.artist,
+                                level: level,
+                                difficulty: latestScore.difficulty,
+                                clearType: latestScore.clearType,
+                                previousClearType: "NO PLAY"
+                            ))
                         } else if latestScore.clearType == "FAILED" {
                             computedNewFailed.append(NewClearEntry(
                                 songTitle: latestRecord.title,
@@ -316,12 +391,15 @@ extension AnalyticsView {
                 self.newClears = computedNewClears
                 self.newAssistClears = computedNewAssistClears
                 self.newEasyClears = computedNewEasyClears
+                self.newFullComboClears = computedNewFullComboClears
+                self.newHardClears = computedNewHardClears
+                self.newExHardClears = computedNewExHardClears
                 self.newFailed = computedNewFailed
                 self.newHighScores = computedNewHighScores
             }
         }
     }
-    // swiftlint:enable function_body_length
+    // swiftlint:enable function_body_length cyclomatic_complexity
 
     // MARK: Data Fetching
 

@@ -90,3 +90,15 @@ struct AnalyticsCardButtonStyle: ButtonStyle {
             .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
     }
 }
+
+extension View {
+    func perLevelCaption(_ key: LocalizedStringKey) -> some View {
+        VStack(spacing: 2.0) {
+            self
+            Text(key)
+                .font(.caption2.bold())
+                .foregroundStyle(.tertiary)
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
+    }
+}

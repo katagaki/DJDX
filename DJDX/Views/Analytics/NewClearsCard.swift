@@ -19,7 +19,7 @@ struct NewClearsCard: View {
                     .foregroundStyle(.secondary)
             } else {
                 Text("\(newClears.count)")
-                    .font(.system(size: 48.0, weight: .black))
+                    .font(.system(size: 40.0, weight: .black))
                     .fontWidth(.expanded)
                     .foregroundStyle(.primary)
             }
