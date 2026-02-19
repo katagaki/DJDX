@@ -10,6 +10,7 @@ import Komponents
 import OrderedCollections
 import SwiftData
 import SwiftUI
+import UniformTypeIdentifiers
 
 // swiftlint:disable type_body_length
 struct AnalyticsView: View {
@@ -29,6 +30,10 @@ struct AnalyticsView: View {
     @AppStorage(wrappedValue: Data(), "Analytics.CardOrder") var cardOrderData: Data
     @State var cardOrder: [AnalyticsCardType] = AnalyticsCardType.defaultOrder
     @State var isEditingCards: Bool = false
+
+    // Drag state
+    @State var draggedCard: AnalyticsCardType?
+    @State var draggedLevel: Int?
 
     // Level filter visibility (settings)
     @AppStorage(wrappedValue: Data(), "Analytics.VisibleLevels") var visibleLevelsData: Data
@@ -70,10 +75,12 @@ struct AnalyticsView: View {
 
     @Namespace var analyticsNamespace
 
+    // swiftlint:disable function_body_length
     var body: some View {
         NavigationStack(path: $navigationManager[.analytics]) {
             ScrollView {
                 clearTypeOverallCard
+                    .jiggle(isActive: isEditingCards, seed: 0)
                     .padding(.horizontal)
                     .padding(.top, 8.0)
 
@@ -84,12 +91,24 @@ struct AnalyticsView: View {
                             EmptyView()
                         case .newClears:
                             newClearsCard
+                                .cardDraggable(cardType, editing: isEditingCards,
+                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                               onReorder: saveCardOrder, seed: 1)
                         case .newAssistClears:
                             newAssistClearsCard
+                                .cardDraggable(cardType, editing: isEditingCards,
+                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                               onReorder: saveCardOrder, seed: 2)
                         case .newEasyClears:
                             newEasyClearsCard
+                                .cardDraggable(cardType, editing: isEditingCards,
+                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                               onReorder: saveCardOrder, seed: 3)
                         case .newHighScores:
                             newHighScoresCard
+                                .cardDraggable(cardType, editing: isEditingCards,
+                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                               onReorder: saveCardOrder, seed: 4)
                         }
                     }
 
@@ -97,6 +116,11 @@ struct AnalyticsView: View {
                     ForEach(orderedVisibleLevels, id: \.self) { difficulty in
                         ForEach(orderedVisiblePerLevelCategories, id: \.self) { category in
                             perLevelCard(difficulty: difficulty, category: category)
+                                .levelDraggable(difficulty, category: category,
+                                                editing: isEditingCards,
+                                                draggedLevel: $draggedLevel,
+                                                levelOrder: $levelOrder,
+                                                onReorder: saveLevelOrder)
                         }
                     }
                 }
@@ -105,25 +129,42 @@ struct AnalyticsView: View {
                 .padding(.bottom, 16.0)
             }
             .navigator("ViewTitle.Analytics")
-            .sheet(isPresented: $isEditingCards) {
-                cardOrderEditor
-            }
             .toolbar {
                 if #available(iOS 26.0, *) {
                     ToolbarItem(placement: .topBarLeading) {
-                        Menu(playTypeToShow.displayName()) {
-                            Picker("Shared.PlayType", selection: $playTypeToShow) {
-                                Text(verbatim: "SP")
-                                    .tag(IIDXPlayType.single)
-                                Text(verbatim: "DP")
-                                    .tag(IIDXPlayType.double)
+                        if !isEditingCards {
+                            Menu(playTypeToShow.displayName()) {
+                                Picker("Shared.PlayType", selection: $playTypeToShow) {
+                                    Text(verbatim: "SP")
+                                        .tag(IIDXPlayType.single)
+                                    Text(verbatim: "DP")
+                                        .tag(IIDXPlayType.double)
+                                }
+                                .pickerStyle(.inline)
                             }
-                            .pickerStyle(.inline)
                         }
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    if dataState == .initializing || dataState == .loading {
+                    if isEditingCards {
+                        if #available(iOS 26.0, *) {
+                            Button(role: .confirm) {
+                                withAnimation(.snappy) {
+                                    isEditingCards = false
+                                    draggedCard = nil
+                                    draggedLevel = nil
+                                }
+                            }
+                        } else {
+                            Button(.sharedDone) {
+                                withAnimation(.snappy) {
+                                    isEditingCards = false
+                                    draggedCard = nil
+                                    draggedLevel = nil
+                                }
+                            }
+                        }
+                    } else if dataState == .initializing || dataState == .loading {
                         ProgressView()
                             .progressViewStyle(.circular)
                     } else {
@@ -311,6 +352,7 @@ struct AnalyticsView: View {
             }
         }
     }
+    // swiftlint:enable function_body_length
 
     // MARK: - Settings Menu
 
@@ -318,7 +360,7 @@ struct AnalyticsView: View {
         Menu {
             Section {
                 Button {
-                    isEditingCards = true
+                    withAnimation(.snappy) { isEditingCards = true }
                 } label: {
                     Label("Analytics.Settings.EditCards",
                           systemImage: "arrow.up.arrow.down")
@@ -367,80 +409,6 @@ struct AnalyticsView: View {
             Image(systemName: "gearshape")
         }
         .menuActionDismissBehavior(.disabled)
-    }
-
-    // MARK: - Card Order Editor
-
-    var cardOrderEditor: some View {
-        NavigationStack {
-            List {
-                Section {
-                    ForEach(cardOrder, id: \.self) { cardType in
-                        HStack(spacing: 12.0) {
-                            Image(systemName: cardType.systemImage)
-                                .foregroundStyle(cardType.iconColor)
-                                .frame(width: 24.0)
-                            cardType.titleText
-                            Spacer()
-                            if cardType.isPinned {
-                                Image(systemName: "pin.fill")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .moveDisabled(cardType.isPinned)
-                    }
-                    .onMove(perform: moveCards)
-                }
-                Section("Analytics.Settings.PerLevel") {
-                    ForEach(levelOrder, id: \.self) { difficulty in
-                        HStack(spacing: 12.0) {
-                            Image(systemName: "chart.pie.fill")
-                                .foregroundStyle(.purple)
-                                .frame(width: 24.0)
-                            Text(verbatim: "LEVEL \(difficulty)")
-                            if !visibleLevels.contains(difficulty) {
-                                Spacer()
-                                Text("Analytics.Settings.Hidden")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                    .onMove(perform: moveLevels)
-                }
-            }
-            .environment(\.editMode, .constant(.active))
-            .navigationTitle("Analytics.Settings.EditCards")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        withAnimation(.snappy) {
-                            cardOrder = AnalyticsCardType.defaultOrder
-                            levelOrder = Array(1...12)
-                            visiblePerLevelCategories = AnalyticsPerLevelCategory.defaultVisible
-                            saveCardOrder()
-                            saveLevelOrder()
-                            savePerLevelCategories()
-                        }
-                    } label: {
-                        Text("Analytics.Settings.ResetOrder")
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    if #available(iOS 26.0, *) {
-                        Button(role: .confirm) {
-                            isEditingCards = false
-                        }
-                    } else {
-                        Button(.sharedDone) {
-                            isEditingCards = false
-                        }
-                    }
-                }
-            }
-        }
     }
 
     // MARK: - Card Views
@@ -617,25 +585,9 @@ struct AnalyticsView: View {
 
     // MARK: - Card Ordering
 
-    func moveCards(from source: IndexSet, to destination: Int) {
-        // Prevent moving past the pinned clearTypeOverall card at index 0
-        let pinnedCount = cardOrder.prefix(while: { $0.isPinned }).count
-        let adjustedDestination = max(destination, pinnedCount)
-        var adjustedSource = source
-        for index in source {
-            if index < pinnedCount {
-                adjustedSource.remove(index)
-            }
-        }
-        guard !adjustedSource.isEmpty else { return }
-        cardOrder.move(fromOffsets: adjustedSource, toOffset: adjustedDestination)
-        saveCardOrder()
-    }
-
     func loadCardOrder() {
         if let decoded = try? JSONDecoder().decode([AnalyticsCardType].self, from: cardOrderData),
            !decoded.isEmpty {
-            // Ensure all card types are present (handle new card types added in updates)
             var order = decoded
             for cardType in AnalyticsCardType.defaultOrder where !order.contains(cardType) {
                 order.append(cardType)
@@ -664,7 +616,6 @@ struct AnalyticsView: View {
         if let decoded = try? JSONDecoder().decode([Int].self, from: levelOrderData),
            !decoded.isEmpty {
             var order = decoded
-            // Ensure all levels 1-12 are present
             for level in difficulties where !order.contains(level) {
                 order.append(level)
             }
@@ -675,11 +626,6 @@ struct AnalyticsView: View {
 
     func saveLevelOrder() {
         levelOrderData = (try? JSONEncoder().encode(levelOrder)) ?? Data()
-    }
-
-    func moveLevels(from source: IndexSet, to destination: Int) {
-        levelOrder.move(fromOffsets: source, toOffset: destination)
-        saveLevelOrder()
     }
 
     func loadPerLevelCategories() {
@@ -695,3 +641,54 @@ struct AnalyticsView: View {
     }
 }
 // swiftlint:enable type_body_length
+
+// MARK: - Drag-and-Drop View Extensions
+
+extension View {
+    func cardDraggable(
+        _ cardType: AnalyticsCardType,
+        editing: Bool,
+        draggedCard: Binding<AnalyticsCardType?>,
+        cardOrder: Binding<[AnalyticsCardType]>,
+        onReorder: @escaping () -> Void,
+        seed: Int
+    ) -> some View {
+        self
+            .jiggle(isActive: editing, seed: seed)
+            .opacity(draggedCard.wrappedValue == cardType ? 0.4 : 1.0)
+            .onDrag {
+                draggedCard.wrappedValue = cardType
+                return NSItemProvider(object: cardType.rawValue as NSString)
+            }
+            .onDrop(of: [.text], delegate: CardReorderDropDelegate(
+                target: cardType,
+                cards: cardOrder,
+                draggedCard: draggedCard,
+                onReorder: onReorder
+            ))
+    }
+
+    func levelDraggable(
+        _ difficulty: Int,
+        category: AnalyticsPerLevelCategory,
+        editing: Bool,
+        draggedLevel: Binding<Int?>,
+        levelOrder: Binding<[Int]>,
+        onReorder: @escaping () -> Void
+    ) -> some View {
+        let seed = difficulty * 10 + (AnalyticsPerLevelCategory.allCases.firstIndex(of: category) ?? 0)
+        return self
+            .jiggle(isActive: editing, seed: seed)
+            .opacity(draggedLevel.wrappedValue == difficulty ? 0.4 : 1.0)
+            .onDrag {
+                draggedLevel.wrappedValue = difficulty
+                return NSItemProvider(object: "\(difficulty)" as NSString)
+            }
+            .onDrop(of: [.text], delegate: LevelReorderDropDelegate(
+                target: difficulty,
+                levels: levelOrder,
+                draggedLevel: draggedLevel,
+                onReorder: onReorder
+            ))
+    }
+}
