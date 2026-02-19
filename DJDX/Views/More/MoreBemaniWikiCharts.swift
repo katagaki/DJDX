@@ -191,26 +191,23 @@ struct MoreBemaniWikiCharts: View {
                let htmlDocument = try? SwiftSoup.parse(htmlString),
                let htmlDocumentBody = htmlDocument.body(),
                let documentContents = try? htmlDocumentBody.select("#contents").first(),
-               let documentBody = try? documentContents.select("#body").first() {
-                // Find the table in the document
-                if let tables = try? documentBody.select("div.ie5") {
-                    for table in tables {
-                        if let tableRows = try? table.select("tr") {
-                            // Get all the rows in the document, and only take the rows that have 13 columns
-                            for tableRow in tableRows {
-                                if let tableRowColumns = try? tableRow.select("td"),
-                                   tableRowColumns.count == 13 {
-                                    let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
-                                    if tableColumnData.count == 13 {
-                                        let iidxSong = IIDXSong(tableColumnData)
-                                        iidxSongsFromWiki.append(iidxSong)
-                                    }
+               let documentBody = try? documentContents.select("#body").first(),
+               let tables = try? documentBody.select("div.ie5") {
+                for table in tables {
+                    if let tableRows = try? table.select("tr") {
+                        // Get all the rows in the document, and only take the rows that have 13 columns
+                        for tableRow in tableRows {
+                            if let tableRowColumns = try? tableRow.select("td"),
+                               tableRowColumns.count == 13 {
+                                let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
+                                if tableColumnData.count == 13 {
+                                    let iidxSong = IIDXSong(tableColumnData)
+                                    iidxSongsFromWiki.append(iidxSong)
                                 }
                             }
                         }
                     }
                 }
-
             }
             return iidxSongsFromWiki
         } catch {

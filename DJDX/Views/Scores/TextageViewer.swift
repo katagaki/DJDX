@@ -127,7 +127,7 @@ struct WebViewForTextage: UIViewRepresentable {
         )
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {
+    func updateUIView(_: WKWebView, context _: Context) {
         // Blank function to conform to protocol
     }
 
@@ -163,7 +163,7 @@ struct WebViewForTextage: UIViewRepresentable {
             super.init()
         }
 
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
             if let webViewURL = webView.url {
                 let urlString = webViewURL.absoluteString
                 if urlString.starts(with: textageIIDXURL.absoluteString) {

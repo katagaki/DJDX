@@ -165,6 +165,7 @@ struct ImportView: View {
         }
     }
 
+    // swiftlint:disable function_body_length
     @ViewBuilder
     func bottomBar() -> some View {
         VStack(spacing: 16.0) {
@@ -226,10 +227,9 @@ struct ImportView: View {
 #if targetEnvironment(macCatalyst)
                             UIApplication.shared.open(documentsUrl)
 #else
-                            if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)") {
-                                if UIApplication.shared.canOpenURL(sharedUrl) {
-                                    UIApplication.shared.open(sharedUrl)
-                                }
+                            if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)"),
+                               UIApplication.shared.canOpenURL(sharedUrl) {
+                                UIApplication.shared.open(sharedUrl)
                             }
 #endif
                         }
@@ -259,4 +259,5 @@ struct ImportView: View {
         }
         .padding()
     }
+    // swiftlint:enable function_body_length
 }

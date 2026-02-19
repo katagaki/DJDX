@@ -108,25 +108,25 @@ struct ScoreRow: View {
                                     Group {
                                         if isDJLevelVisible {
                                             Text(score.djLevel)
-                                                .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
+                                                .foregroundStyle(
+                                                    IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme)
+                                                )
                                                 .fontWidth(.expanded)
                                                 .fontWeight(.black)
                                         }
-                                        if isScoreRateVisible {
-                                            if let scoreRate {
-                                                if isDJLevelVisible {
-                                                    Divider()
-                                                        .frame(maxHeight: 14.0)
-                                                }
-                                                Text(scoreRate, format: .percent.precision(.fractionLength(1)))
-                                                    .foregroundStyle(LinearGradient(
-                                                        colors: [.primary.opacity(0.55), .primary.opacity(0.3)],
-                                                        startPoint: .top,
-                                                        endPoint: .bottom
-                                                    ))
-                                                    .fontWidth(.expanded)
-                                                    .fontWeight(.black)
+                                        if isScoreRateVisible, let scoreRate {
+                                            if isDJLevelVisible {
+                                                Divider()
+                                                    .frame(maxHeight: 14.0)
                                             }
+                                            Text(scoreRate, format: .percent.precision(.fractionLength(1)))
+                                                .foregroundStyle(LinearGradient(
+                                                    colors: [.primary.opacity(0.55), .primary.opacity(0.3)],
+                                                    startPoint: .top,
+                                                    endPoint: .bottom
+                                                ))
+                                                .fontWidth(.expanded)
+                                                .fontWeight(.black)
                                         }
                                         if isScoreVisible {
                                             if isDJLevelVisible || isScoreRateVisible {

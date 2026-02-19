@@ -103,11 +103,6 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         self == .clearTypeOverall
     }
 
-    /// Whether this card always spans the full width
-    var isFullWidth: Bool {
-        self == .clearTypeOverall
-    }
-
     /// Default card order
     static var defaultOrder: [AnalyticsCardType] {
         [

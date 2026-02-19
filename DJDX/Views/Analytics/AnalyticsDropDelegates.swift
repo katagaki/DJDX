@@ -14,16 +14,16 @@ struct CardReorderDropDelegate: DropDelegate {
     @Binding var draggedCard: AnalyticsCardType?
     let onReorder: () -> Void
 
-    func dropUpdated(info: DropInfo) -> DropProposal? {
+    func dropUpdated(info _: DropInfo) -> DropProposal? {
         DropProposal(operation: .move)
     }
 
-    func performDrop(info: DropInfo) -> Bool {
+    func performDrop(info _: DropInfo) -> Bool {
         draggedCard = nil
         return true
     }
 
-    func dropEntered(info: DropInfo) {
+    func dropEntered(info _: DropInfo) {
         guard let draggedCard, draggedCard != target else { return }
         guard let fromIndex = cards.firstIndex(of: draggedCard),
               let toIndex = cards.firstIndex(of: target) else { return }
@@ -40,7 +40,7 @@ struct CardReorderDropDelegate: DropDelegate {
         onReorder()
     }
 
-    func dropExited(info: DropInfo) {}
+    func dropExited(info _: DropInfo) {}
 }
 
 struct PerLevelCardID: Codable, Hashable {
@@ -78,16 +78,16 @@ struct PerLevelCardReorderDropDelegate: DropDelegate {
     @Binding var draggedCard: PerLevelCardID?
     let onReorder: () -> Void
 
-    func dropUpdated(info: DropInfo) -> DropProposal? {
+    func dropUpdated(info _: DropInfo) -> DropProposal? {
         DropProposal(operation: .move)
     }
 
-    func performDrop(info: DropInfo) -> Bool {
+    func performDrop(info _: DropInfo) -> Bool {
         draggedCard = nil
         return true
     }
 
-    func dropEntered(info: DropInfo) {
+    func dropEntered(info _: DropInfo) {
         guard let draggedCard, draggedCard != target else { return }
         guard let fromIndex = cards.firstIndex(of: draggedCard),
               let toIndex = cards.firstIndex(of: target) else { return }
@@ -101,5 +101,5 @@ struct PerLevelCardReorderDropDelegate: DropDelegate {
         onReorder()
     }
 
-    func dropExited(info: DropInfo) {}
+    func dropExited(info _: DropInfo) {}
 }

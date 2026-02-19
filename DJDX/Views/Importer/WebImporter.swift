@@ -68,7 +68,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
         Coordinator(delegate: self, importMode: importMode, version: iidxVersion)
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {
+    func updateUIView(_: WKWebView, context _: Context) {
         // Blank function to conform to protocol
     }
 
@@ -168,7 +168,7 @@ document.getElementById('score_data').value
     }
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
         if let webViewURL = webView.url {
             let urlString = webViewURL.absoluteString
             webView.evaluateJavaScript(self.cleanupJS) { _, _ in
