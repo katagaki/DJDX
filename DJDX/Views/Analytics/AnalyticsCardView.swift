@@ -62,8 +62,6 @@ struct AnalyticsCardView<Content: View>: View {
         self.content = content
     }
 
-    @GestureState private var isPressed = false
-
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
             HStack(spacing: 6.0) {
@@ -80,14 +78,15 @@ struct AnalyticsCardView<Content: View>: View {
         }
         .padding(12.0)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(isPressed ? .thickMaterial : .thinMaterial)
+        .background(.thinMaterial)
         .clipShape(.rect(cornerRadius: cornerRadius))
-        .simultaneousGesture(
-            LongPressGesture(minimumDuration: .infinity)
-                .updating($isPressed) { isPressing, state, _ in
-                    state = isPressing
-                }
-        )
-        .animation(.easeInOut(duration: 0.15), value: isPressed)
+    }
+}
+
+struct AnalyticsCardButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .brightness(configuration.isPressed ? 0.1 : 0)
+            .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
     }
 }

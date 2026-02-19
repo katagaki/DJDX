@@ -414,65 +414,75 @@ struct AnalyticsView: View {
     // MARK: - Card Views
 
     var clearTypeOverallCard: some View {
-        AnalyticsCardView(cardType: .clearTypeOverall) {
-            OverviewClearTypeOverallGraph(graphData: .constant(filteredClearTypeData))
-                .chartLegend(.hidden)
-                .chartYAxis(.hidden)
-        }
-        .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
-        .onTapGesture {
+        Button {
             if !isEditingCards && clearTypePerDifficulty.count > 0 {
                 navigationManager.push(.clearTypeOverviewGraph, for: .analytics)
             }
+        } label: {
+            AnalyticsCardView(cardType: .clearTypeOverall) {
+                OverviewClearTypeOverallGraph(graphData: .constant(filteredClearTypeData))
+                    .chartLegend(.hidden)
+                    .chartYAxis(.hidden)
+            }
         }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
     }
 
     var newClearsCard: some View {
-        AnalyticsCardView(cardType: .newClears) {
-            NewClearsCard(newClears: $newClears)
-        }
-        .automaticMatchedTransitionSource(id: "NewClears", in: analyticsNamespace)
-        .onTapGesture {
+        Button {
             if !isEditingCards {
                 navigationManager.push(.newClearsDetail, for: .analytics)
             }
+        } label: {
+            AnalyticsCardView(cardType: .newClears) {
+                NewClearsCard(newClears: $newClears)
+            }
         }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "NewClears", in: analyticsNamespace)
     }
 
     var newAssistClearsCard: some View {
-        AnalyticsCardView(cardType: .newAssistClears) {
-            NewClearsCard(newClears: $newAssistClears)
-        }
-        .automaticMatchedTransitionSource(id: "NewAssistClears", in: analyticsNamespace)
-        .onTapGesture {
+        Button {
             if !isEditingCards {
                 navigationManager.push(.newAssistClearsDetail, for: .analytics)
             }
+        } label: {
+            AnalyticsCardView(cardType: .newAssistClears) {
+                NewClearsCard(newClears: $newAssistClears)
+            }
         }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "NewAssistClears", in: analyticsNamespace)
     }
 
     var newEasyClearsCard: some View {
-        AnalyticsCardView(cardType: .newEasyClears) {
-            NewClearsCard(newClears: $newEasyClears)
-        }
-        .automaticMatchedTransitionSource(id: "NewEasyClears", in: analyticsNamespace)
-        .onTapGesture {
+        Button {
             if !isEditingCards {
                 navigationManager.push(.newEasyClearsDetail, for: .analytics)
             }
+        } label: {
+            AnalyticsCardView(cardType: .newEasyClears) {
+                NewClearsCard(newClears: $newEasyClears)
+            }
         }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "NewEasyClears", in: analyticsNamespace)
     }
 
     var newHighScoresCard: some View {
-        AnalyticsCardView(cardType: .newHighScores) {
-            NewHighScoresCard(newHighScores: $newHighScores)
-        }
-        .automaticMatchedTransitionSource(id: "NewHighScores", in: analyticsNamespace)
-        .onTapGesture {
+        Button {
             if !isEditingCards {
                 navigationManager.push(.newHighScoresDetail, for: .analytics)
             }
+        } label: {
+            AnalyticsCardView(cardType: .newHighScores) {
+                NewHighScoresCard(newHighScores: $newHighScores)
+            }
         }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "NewHighScores", in: analyticsNamespace)
     }
 
     // MARK: - Per-Level Card Views
@@ -496,81 +506,89 @@ struct AnalyticsView: View {
     }
 
     func clearTypeForLevelCard(difficulty: Int) -> some View {
-        AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                          systemImage: "chart.pie.fill",
-                          iconColor: .purple) {
-            OverviewClearTypePerDifficultyGraph(
-                graphData: $clearTypePerDifficulty,
-                difficulty: .constant(difficulty)
-            )
-            .chartLegend(.hidden)
-            .chartYAxis(.hidden)
-        }
-        .automaticMatchedTransitionSource(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
-        .onTapGesture {
+        Button {
             if !isEditingCards && clearTypePerDifficulty[difficulty] != nil {
                 navigationManager.push(.clearTypeForLevel(difficulty: difficulty), for: .analytics)
             }
+        } label: {
+            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
+                              systemImage: "chart.pie.fill",
+                              iconColor: .purple) {
+                OverviewClearTypePerDifficultyGraph(
+                    graphData: $clearTypePerDifficulty,
+                    difficulty: .constant(difficulty)
+                )
+                .chartLegend(.hidden)
+                .chartYAxis(.hidden)
+            }
         }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
     }
 
     func clearTypeTrendsForLevelCard(difficulty: Int) -> some View {
-        AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                          systemImage: "chart.xyaxis.line",
-                          iconColor: .cyan) {
-            TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
-                                 difficulty: .constant(difficulty))
-                .chartLegend(.hidden)
-                .chartYAxis(.hidden)
-                .chartXAxis(.hidden)
-        }
-        .automaticMatchedTransitionSource(
-            id: "ClearTypeTrends.Level.\(difficulty)", in: analyticsNamespace
-        )
-        .onTapGesture {
+        Button {
             if !isEditingCards && clearTypePerImportGroup.count > 0 {
                 navigationManager.push(.clearTypeTrendsForLevel(difficulty: difficulty), for: .analytics)
             }
+        } label: {
+            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
+                              systemImage: "chart.xyaxis.line",
+                              iconColor: .cyan) {
+                TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
+                                     difficulty: .constant(difficulty))
+                    .chartLegend(.hidden)
+                    .chartYAxis(.hidden)
+                    .chartXAxis(.hidden)
+            }
         }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(
+            id: "ClearTypeTrends.Level.\(difficulty)", in: analyticsNamespace
+        )
     }
 
     func djLevelForLevelCard(difficulty: Int) -> some View {
-        AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                          systemImage: "chart.bar.fill",
-                          iconColor: .pink) {
-            OverviewDJLevelPerDifficultyGraph(
-                graphData: $djLevelPerDifficulty,
-                difficulty: .constant(difficulty)
-            )
-            .chartLegend(.hidden)
-            .chartYAxis(.hidden)
-        }
-        .automaticMatchedTransitionSource(id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace)
-        .onTapGesture {
+        Button {
             if !isEditingCards && djLevelPerDifficulty[difficulty] != nil {
                 navigationManager.push(.djLevelForLevel(difficulty: difficulty), for: .analytics)
             }
+        } label: {
+            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
+                              systemImage: "chart.bar.fill",
+                              iconColor: .pink) {
+                OverviewDJLevelPerDifficultyGraph(
+                    graphData: $djLevelPerDifficulty,
+                    difficulty: .constant(difficulty)
+                )
+                .chartLegend(.hidden)
+                .chartYAxis(.hidden)
+            }
         }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace)
     }
 
     func djLevelTrendsForLevelCard(difficulty: Int) -> some View {
-        AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                          systemImage: "chart.xyaxis.line",
-                          iconColor: .teal) {
-            TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
-                               difficulty: .constant(difficulty))
-                .chartLegend(.hidden)
-                .chartYAxis(.hidden)
-                .chartXAxis(.hidden)
-        }
-        .automaticMatchedTransitionSource(
-            id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
-        )
-        .onTapGesture {
+        Button {
             if !isEditingCards && djLevelPerImportGroup.count > 0 {
                 navigationManager.push(.djLevelTrendsForLevel(difficulty: difficulty), for: .analytics)
             }
+        } label: {
+            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
+                              systemImage: "chart.xyaxis.line",
+                              iconColor: .teal) {
+                TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
+                                   difficulty: .constant(difficulty))
+                    .chartLegend(.hidden)
+                    .chartYAxis(.hidden)
+                    .chartXAxis(.hidden)
+            }
         }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(
+            id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
+        )
     }
 
     // MARK: - Filtered Data
