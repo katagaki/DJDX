@@ -557,6 +557,74 @@
         }
       }
     },
+    "Analytics.PerLevel.ClearRate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Rate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアレート"
+          }
+        }
+      }
+    },
+    "Analytics.PerLevel.ClearRateTrend" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Rate Trend"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアレート推移"
+          }
+        }
+      }
+    },
+    "Analytics.PerLevel.DJLevel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJレベル"
+          }
+        }
+      }
+    },
+    "Analytics.PerLevel.DJLevelTrend" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level Trend"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJレベル推移"
+          }
+        }
+      }
+    },
     "Analytics.Settings.EditCards" : {
       "extractionState" : "manual",
       "localizations" : {

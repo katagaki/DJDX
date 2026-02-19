@@ -29,6 +29,7 @@ struct NewClearsCard: View {
 struct NewClearEntry: Identifiable, Hashable {
     let id = UUID()
     let songTitle: String
+    let songArtist: String
     let level: IIDXLevel
     let difficulty: Int
     let clearType: String

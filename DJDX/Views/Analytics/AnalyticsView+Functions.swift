@@ -139,6 +139,8 @@ extension AnalyticsView {
             await MainActor.run {
                 withAnimation(.snappy.speed(2.0)) {
                     self.newClears = []
+                    self.newAssistClears = []
+                    self.newEasyClears = []
                     self.newHighScores = []
                 }
             }
@@ -160,6 +162,8 @@ extension AnalyticsView {
         }
 
         var computedNewClears: [NewClearEntry] = []
+        var computedNewAssistClears: [NewClearEntry] = []
+        var computedNewEasyClears: [NewClearEntry] = []
         var computedNewHighScores: [NewHighScoreEntry] = []
 
         let levels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
@@ -181,12 +185,41 @@ extension AnalyticsView {
                 if let previousRecord {
                     let previousScore = previousRecord[keyPath: keyPath]
 
-                    // Check for new/upgraded clear
-                    if (latestScore.clearType == "CLEAR" &&
-                        latestScore.score > 0) &&
+                    // Check for new CLEAR
+                    if latestScore.clearType == "CLEAR" &&
+                        latestScore.score > 0 &&
                         previousScore.clearType != "CLEAR" {
                         computedNewClears.append(NewClearEntry(
                             songTitle: latestRecord.title,
+                            songArtist: latestRecord.artist,
+                            level: level,
+                            difficulty: latestScore.difficulty,
+                            clearType: latestScore.clearType,
+                            previousClearType: previousScore.clearType
+                        ))
+                    }
+
+                    // Check for new ASSIST CLEAR
+                    if latestScore.clearType == "ASSIST CLEAR" &&
+                        latestScore.score > 0 &&
+                        previousScore.clearType != "ASSIST CLEAR" {
+                        computedNewAssistClears.append(NewClearEntry(
+                            songTitle: latestRecord.title,
+                            songArtist: latestRecord.artist,
+                            level: level,
+                            difficulty: latestScore.difficulty,
+                            clearType: latestScore.clearType,
+                            previousClearType: previousScore.clearType
+                        ))
+                    }
+
+                    // Check for new EASY CLEAR
+                    if latestScore.clearType == "EASY CLEAR" &&
+                        latestScore.score > 0 &&
+                        previousScore.clearType != "EASY CLEAR" {
+                        computedNewEasyClears.append(NewClearEntry(
+                            songTitle: latestRecord.title,
+                            songArtist: latestRecord.artist,
                             level: level,
                             difficulty: latestScore.difficulty,
                             clearType: latestScore.clearType,
@@ -198,6 +231,7 @@ extension AnalyticsView {
                     if latestScore.score > previousScore.score && latestScore.score > 0 {
                         computedNewHighScores.append(NewHighScoreEntry(
                             songTitle: latestRecord.title,
+                            songArtist: latestRecord.artist,
                             level: level,
                             difficulty: latestScore.difficulty,
                             newScore: latestScore.score,
@@ -208,17 +242,38 @@ extension AnalyticsView {
                     }
                 } else {
                     // Song didn't exist in previous import - all played scores are new
-                    if latestScore.clearType == "CLEAR" &&
-                        latestScore.score > 0 {
-                        computedNewClears.append(NewClearEntry(
-                            songTitle: latestRecord.title,
-                            level: level,
-                            difficulty: latestScore.difficulty,
-                            clearType: latestScore.clearType,
-                            previousClearType: "NO PLAY"
-                        ))
+                    if latestScore.score > 0 {
+                        if latestScore.clearType == "CLEAR" {
+                            computedNewClears.append(NewClearEntry(
+                                songTitle: latestRecord.title,
+                                songArtist: latestRecord.artist,
+                                level: level,
+                                difficulty: latestScore.difficulty,
+                                clearType: latestScore.clearType,
+                                previousClearType: "NO PLAY"
+                            ))
+                        } else if latestScore.clearType == "ASSIST CLEAR" {
+                            computedNewAssistClears.append(NewClearEntry(
+                                songTitle: latestRecord.title,
+                                songArtist: latestRecord.artist,
+                                level: level,
+                                difficulty: latestScore.difficulty,
+                                clearType: latestScore.clearType,
+                                previousClearType: "NO PLAY"
+                            ))
+                        } else if latestScore.clearType == "EASY CLEAR" {
+                            computedNewEasyClears.append(NewClearEntry(
+                                songTitle: latestRecord.title,
+                                songArtist: latestRecord.artist,
+                                level: level,
+                                difficulty: latestScore.difficulty,
+                                clearType: latestScore.clearType,
+                                previousClearType: "NO PLAY"
+                            ))
+                        }
                         computedNewHighScores.append(NewHighScoreEntry(
                             songTitle: latestRecord.title,
+                            songArtist: latestRecord.artist,
                             level: level,
                             difficulty: latestScore.difficulty,
                             newScore: latestScore.score,
@@ -234,6 +289,8 @@ extension AnalyticsView {
         await MainActor.run {
             withAnimation(.snappy.speed(2.0)) {
                 self.newClears = computedNewClears
+                self.newAssistClears = computedNewAssistClears
+                self.newEasyClears = computedNewEasyClears
                 self.newHighScores = computedNewHighScores
             }
         }
