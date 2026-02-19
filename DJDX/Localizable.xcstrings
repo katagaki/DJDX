@@ -843,6 +843,40 @@
         }
       }
     },
+    "Importer.CSV.Backup.Button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open DJDX Documents Folder"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDXドキュメントフォルダを開く"
+          }
+        }
+      }
+    },
+    "Importer.CSV.Backup.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX saves a copy of every imported CSV file. Open the DJDX Documents folder in the Files app to find previously imported files."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDXはインポートしたCSVファイルをバックアップとして保存しています。Filesアプリのドキュメントフォルダから以前のファイルを開けます。"
+          }
+        }
+      }
+    },
     "Importer.CSV.Load.Description" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -856,6 +890,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CSVファイルのダウンロードができたら、こちらで読み込んでください。"
+          }
+        }
+      }
+    },
+    "Importer.Detail.PlayCount.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld play"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld plays"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldプレー"
+          }
+        }
+      }
+    },
+    "Importer.Detail.SongCount.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld song"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld songs"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld曲"
           }
         }
       }

@@ -31,6 +31,7 @@ struct ImportView: View {
     @State var autoImportFailedReason: ImportFailedReason?
 
     @State var isSelectingCSVFile: Bool = false
+    @State var isSelectingBackupCSVFile: Bool = false
 
     let actor = DataImporter(modelContainer: sharedModelContainer)
 
@@ -38,16 +39,21 @@ struct ImportView: View {
         NavigationStack(path: $navigationManager[.imports]) {
             List {
                 ForEach(importGroups) { importGroup in
-                    HStack(alignment: .center, spacing: 6.0) {
-                        Text(importGroup.importDate, style: .date)
-                        Spacer()
-                        if let version = importGroup.iidxVersion {
-                            Text(version.marketingName)
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundStyle(colorScheme == .dark ?
-                                                 Color(uiColor: version.darkModeColor) :
-                                                    Color(uiColor: version.lightModeColor))
+                    Button {
+                        navigationManager.push(.importDetail(importGroup: importGroup), for: .imports)
+                    } label: {
+                        HStack(alignment: .center, spacing: 6.0) {
+                            Text(importGroup.importDate, style: .date)
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if let version = importGroup.iidxVersion {
+                                Text(version.marketingName)
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(colorScheme == .dark ?
+                                                     Color(uiColor: version.darkModeColor) :
+                                                        Color(uiColor: version.lightModeColor))
+                            }
                         }
                     }
                 }
@@ -137,6 +143,16 @@ struct ImportView: View {
                 })
                 .ignoresSafeArea(edges: [.bottom])
             }
+            .sheet(isPresented: $isSelectingBackupCSVFile) {
+                DocumentPicker(
+                    allowedUTIs: [.commaSeparatedText],
+                    directoryURL: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first,
+                    onDocumentPicked: { urls in
+                        importCSVs(from: urls)
+                    }
+                )
+                .ignoresSafeArea(edges: [.bottom])
+            }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .importerWebIIDXSingle:
@@ -151,6 +167,8 @@ struct ImportView: View {
                                 isAutoImportFailed: $isAutoImportFailed,
                                 didImportSucceed: $didImportSucceed,
                                 autoImportFailedReason: $autoImportFailedReason)
+                case .importDetail(let importGroup):
+                    ImportDetailView(importGroup: importGroup)
                 default: Color.clear
                 }
             }
@@ -207,6 +225,16 @@ struct ImportView: View {
                         }
                     } header: {
                         Text("Importer.CSV.Load.Description")
+                            .foregroundColor(.primary)
+                            .textCase(nil)
+                            .font(.body)
+                    }
+                    Section {
+                        Button("Importer.CSV.Backup.Button", systemImage: "archivebox") {
+                            isSelectingBackupCSVFile = true
+                        }
+                    } header: {
+                        Text("Importer.CSV.Backup.Description")
                             .foregroundColor(.primary)
                             .textCase(nil)
                             .font(.body)
