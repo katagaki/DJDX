@@ -464,23 +464,6 @@
         }
       }
     },
-    "Analytics.NewClears" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Clears"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新規クリア"
-          }
-        }
-      }
-    },
     "Analytics.NewClears.Subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -560,6 +543,90 @@
         }
       }
     },
+    "Analytics.PerLevel.ClearRate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Rate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアレート"
+          }
+        }
+      }
+    },
+    "Analytics.PerLevel.ClearRateTrend" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Rate Trend"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアレート推移"
+          }
+        }
+      }
+    },
+    "Analytics.PerLevel.DJLevel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
+          }
+        }
+      }
+    },
+    "Analytics.PerLevel.DJLevelTrend" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level Trend"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL推移"
+          }
+        }
+      }
+    },
+    "Analytics.Settings.Cards" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Summary"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "合計"
+          }
+        }
+      }
+    },
     "Analytics.Settings.EditCards" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -573,22 +640,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "並べ替え"
-          }
-        }
-      }
-    },
-    "Analytics.Settings.Hidden" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hidden"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "非表示"
           }
         }
       }
@@ -978,6 +1029,7 @@
       "shouldTranslate" : false
     },
     "Level.%lld" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {

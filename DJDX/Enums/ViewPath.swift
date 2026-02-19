@@ -23,7 +23,12 @@ enum ViewPath: Hashable {
     case trendsDJLevelGraph
     case clearTypeForLevel(difficulty: Int)
     case clearTypeTrendsForLevel(difficulty: Int)
+    case djLevelForLevel(difficulty: Int)
+    case djLevelTrendsForLevel(difficulty: Int)
     case newClearsDetail
+    case newAssistClearsDetail
+    case newEasyClearsDetail
+    case newFailedDetail
     case newHighScoresDetail
     case importerWebIIDXSingle
     case importerWebIIDXDouble

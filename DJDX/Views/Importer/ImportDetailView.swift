@@ -51,20 +51,17 @@ struct ImportDetailView: View {
             // Song title, genre, artist
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(songRecord.title)
-                    .font(.body.weight(.semibold))
-                    .lineLimit(1)
+                    .bold()
+                    .fontWidth(.condensed)
                 HStack(spacing: 6.0) {
-                    Text(songRecord.genre)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                    Text(verbatim: "·")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(songRecord.artist)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                    Group {
+                        Text(songRecord.genre)
+                        Text(verbatim: "·")
+                        Text(songRecord.artist)
+                    }
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+                    .fontWidth(.condensed)
                 }
             }
             // Play count + last play date
@@ -174,9 +171,9 @@ struct ImportDetailView: View {
         case "FULLCOMBO CLEAR": return "FC"
         case "HARD CLEAR": return "HARD"
         case "EX HARD CLEAR": return "EXH"
-        case "CLEAR": return "CLR"
+        case "CLEAR": return "CLEAR"
         case "EASY CLEAR": return "EASY"
-        case "ASSIST CLEAR": return "AST"
+        case "ASSIST CLEAR": return "ASSIST"
         case "FAILED": return "FAIL"
         case "NO PLAY": return "---"
         default: return "-"

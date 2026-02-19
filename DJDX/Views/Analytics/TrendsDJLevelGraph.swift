@@ -26,13 +26,13 @@ struct TrendsDJLevelGraph: View {
             }
         }
         .chartForegroundStyleScale([
-            "AAA": .orange,
-            "AA": .gray,
-            "A": .teal,
-            "B": .accent,
-            "C": .accent.opacity(0.75),
-            "D": .accent.opacity(0.5),
-            "E": .accent.opacity(0.25),
+            "AAA": Color.primary,
+            "AA": .orange,
+            "A": .yellow,
+            "B": .green,
+            "C": .teal,
+            "D": .blue,
+            "E": .indigo,
             "F": .red
         ])
     }

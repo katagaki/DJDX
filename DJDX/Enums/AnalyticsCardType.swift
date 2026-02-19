@@ -11,39 +11,54 @@ import SwiftUI
 enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case clearTypeOverall
     case newClears
+    case newAssistClears
+    case newEasyClears
+    case newFailed
     case newHighScores
-    case djLevelByDifficulty
-    case djLevelTrends
 
     var id: String { rawValue }
+
+    var titleText: Text {
+        switch self {
+        case .clearTypeOverall: return Text("Analytics.ClearType.Overall")
+        case .newClears: return Text(verbatim: "NEW CLEAR")
+        case .newAssistClears: return Text(verbatim: "NEW ASSIST CLEAR")
+        case .newEasyClears: return Text(verbatim: "NEW EASY CLEAR")
+        case .newFailed: return Text(verbatim: "NEW FAILED")
+        case .newHighScores: return Text("Analytics.NewHighScores")
+        }
+    }
 
     var titleKey: String {
         switch self {
         case .clearTypeOverall: return "Analytics.ClearType.Overall"
-        case .newClears: return "Analytics.NewClears"
+        case .newClears: return "NEW CLEAR"
+        case .newAssistClears: return "NEW ASSIST CLEAR"
+        case .newEasyClears: return "NEW EASY CLEAR"
+        case .newFailed: return "NEW FAILED"
         case .newHighScores: return "Analytics.NewHighScores"
-        case .djLevelByDifficulty: return "Analytics.DJLevel.ByDifficulty"
-        case .djLevelTrends: return "Analytics.Trends.DJLevel"
         }
     }
 
     var systemImage: String {
         switch self {
         case .clearTypeOverall: return "chart.bar.fill"
-        case .newClears: return "sparkles"
+        case .newClears: return "checkmark.circle.fill"
+        case .newAssistClears: return "heart.gauge.open"
+        case .newEasyClears: return "leaf.fill"
+        case .newFailed: return "xmark.circle.fill"
         case .newHighScores: return "trophy.fill"
-        case .djLevelByDifficulty: return "chart.bar.fill"
-        case .djLevelTrends: return "chart.xyaxis.line"
         }
     }
 
     var iconColor: Color {
         switch self {
         case .clearTypeOverall: return .blue
-        case .newClears: return .green
+        case .newClears: return .cyan
+        case .newAssistClears: return .purple
+        case .newEasyClears: return .green
+        case .newFailed: return .red
         case .newHighScores: return .orange
-        case .djLevelByDifficulty: return .pink
-        case .djLevelTrends: return .teal
         }
     }
 
@@ -67,17 +82,17 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         [
             .clearTypeOverall,
             .newClears,
-            .newHighScores,
-            .djLevelByDifficulty,
-            .djLevelTrends
+            .newAssistClears,
+            .newEasyClears,
+            .newFailed,
+            .newHighScores
         ]
     }
 
     /// Cards that show side by side by default
     static var pairedCards: [(AnalyticsCardType, AnalyticsCardType)] {
         [
-            (.newClears, .newHighScores),
-            (.djLevelByDifficulty, .djLevelTrends)
+            (.newClears, .newAssistClears)
         ]
     }
 }
