@@ -13,8 +13,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case newHighScores
     case newFullComboClear
     case newClears
-    case newAssistClears
     case newEasyClears
+    case newAssistClears
     case newHardClear
     case newExHardClear
     case newFailed
@@ -29,56 +29,56 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var titleText: Text {
         switch self {
         case .clearTypeOverall: return Text("Analytics.ClearType.Overall")
-        case .newClears: return Text(verbatim: "CLEAR")
-        case .newAssistClears: return Text(verbatim: "ASSIST CLEAR")
-        case .newEasyClears: return Text(verbatim: "EASY CLEAR")
+        case .newHighScores: return Text("Analytics.NewHighScores")
         case .newFullComboClear: return Text(verbatim: "FULLCOMBO CLEAR")
+        case .newClears: return Text(verbatim: "CLEAR")
+        case .newEasyClears: return Text(verbatim: "EASY CLEAR")
+        case .newAssistClears: return Text(verbatim: "ASSIST CLEAR")
         case .newHardClear: return Text(verbatim: "HARD CLEAR")
         case .newExHardClear: return Text(verbatim: "EX HARD CLEAR")
         case .newFailed: return Text(verbatim: "FAILED")
-        case .newHighScores: return Text("Analytics.NewHighScores")
         }
     }
 
     var titleKey: String {
         switch self {
         case .clearTypeOverall: return "Analytics.ClearType.Overall"
-        case .newClears: return "CLEAR"
-        case .newAssistClears: return "ASSIST CLEAR"
-        case .newEasyClears: return "EASY CLEAR"
+        case .newHighScores: return "Analytics.NewHighScores"
         case .newFullComboClear: return "FULLCOMBO CLEAR"
+        case .newClears: return "CLEAR"
+        case .newEasyClears: return "EASY CLEAR"
+        case .newAssistClears: return "ASSIST CLEAR"
         case .newHardClear: return "HARD CLEAR"
         case .newExHardClear: return "EX HARD CLEAR"
         case .newFailed: return "FAILED"
-        case .newHighScores: return "Analytics.NewHighScores"
         }
     }
 
     var systemImage: String {
         switch self {
-        case .clearTypeOverall: return "chart.bar.fill"
-        case .newClears: return "checkmark.circle.fill"
-        case .newAssistClears: return "heart.gauge.open"
-        case .newEasyClears: return "leaf.fill"
-        case .newFullComboClear: return "star.circle.fill"
-        case .newHardClear: return "bolt.circle.fill"
-        case .newExHardClear: return "bolt.trianglebadge.exclamationmark"
-        case .newFailed: return "xmark.circle.fill"
-        case .newHighScores: return "trophy.fill"
+        case .clearTypeOverall: return "chart.bar"
+        case .newHighScores: return "trophy"
+        case .newFullComboClear: return "star.circle"
+        case .newClears: return "checkmark.circle"
+        case .newEasyClears: return "checkmark.shield"
+        case .newAssistClears: return "bolt.shield"
+        case .newHardClear: return "dial.medium"
+        case .newExHardClear: return "dial.high"
+        case .newFailed: return "exclamationmark.octagon"
         }
     }
 
     var iconColor: Color {
         switch self {
         case .clearTypeOverall: return .blue
-        case .newClears: return .cyan
-        case .newAssistClears: return .purple
-        case .newEasyClears: return .green
+        case .newHighScores: return .orange
         case .newFullComboClear: return .blue
+        case .newClears: return .cyan
+        case .newEasyClears: return .green
+        case .newAssistClears: return .purple
         case .newHardClear: return .pink
         case .newExHardClear: return .yellow
         case .newFailed: return .red
-        case .newHighScores: return .orange
         }
     }
 
@@ -86,10 +86,10 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var cardContentHeight: CGFloat {
         switch self {
         case .clearTypeOverall: return 80.0
-        case .newClears,
-             .newAssistClears,
+        case .newFullComboClear,
+             .newClears,
              .newEasyClears,
-             .newFullComboClear,
+             .newAssistClears,
              .newHardClear,
              .newExHardClear,
              .newFailed,
@@ -111,12 +111,12 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     /// Default card order
     static var defaultOrder: [AnalyticsCardType] {
         [
-            .newHighScores,
             .clearTypeOverall,
-            .newClears,
-            .newAssistClears,
-            .newEasyClears,
+            .newHighScores,
             .newFullComboClear,
+            .newClears,
+            .newEasyClears,
+            .newAssistClears,
             .newHardClear,
             .newExHardClear,
             .newFailed
