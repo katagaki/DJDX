@@ -83,9 +83,9 @@ struct AnalyticsCardView<Content: View>: View {
         .background(isPressed ? .thickMaterial : .thinMaterial)
         .clipShape(.rect(cornerRadius: cornerRadius))
         .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .updating($isPressed) { _, state, _ in
-                    state = true
+            LongPressGesture(minimumDuration: .infinity)
+                .updating($isPressed) { isPressing, state, _ in
+                    state = isPressing
                 }
         )
         .animation(.easeInOut(duration: 0.15), value: isPressed)
