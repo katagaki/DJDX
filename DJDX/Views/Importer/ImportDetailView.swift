@@ -19,11 +19,10 @@ struct ImportDetailView: View {
         List {
             ForEach(sortedSongRecords) { songRecord in
                 songRecordRow(songRecord)
+                    .listRowBackground(Color.clear)
             }
         }
-        .listStyle(.plain)
-        .navigationTitle(Text(importGroup.importDate, style: .date))
-        .navigationBarTitleDisplayMode(.inline)
+        .navigator("\(importGroup.importDate, style: .date)", group: false, inline: true)
         .safeAreaInset(edge: .bottom) {
             if #available(iOS 26.0, *) {
                 Text("Importer.Detail.SongCount.\(sortedSongRecords.count)")
@@ -82,7 +81,7 @@ struct ImportDetailView: View {
             HStack(alignment: .top, spacing: 4.0) {
                 ForEach(IIDXLevel.sorted, id: \.self) { level in
                     levelScoreCell(songRecord.score(for: level), level: level)
-                        .frame(maxHeight: .infinity)
+                        .frame(maxHeight: .infinity, alignment: .top)
                 }
             }
         }
@@ -130,7 +129,7 @@ struct ImportDetailView: View {
                     .frame(maxWidth: .infinity)
             }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(4.0)
         .background(isEmpty ? Color.secondary.opacity(0.05) : levelColor(level).opacity(0.08),
                     in: RoundedRectangle(cornerRadius: 6.0))

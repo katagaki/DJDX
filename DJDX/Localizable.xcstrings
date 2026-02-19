@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "%@" : {
+      "shouldTranslate" : false
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -792,6 +795,40 @@
         }
       }
     },
+    "Importer.CSV.Backup.Button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Files App"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「ファイル」アプリで開く"
+          }
+        }
+      }
+    },
+    "Importer.CSV.Backup.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX saves a copy of every imported CSV file. Open the Files app and navigate to On My iPhone > DJDX to find previously imported files."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDXはインポートしたCSVファイルをバックアップとして保存しています。「ファイル」アプリの「iPhone内のストレージ」>「DJDX」から以前のファイルを開けます。"
+          }
+        }
+      }
+    },
     "Importer.CSV.Download.Button" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -839,40 +876,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CSVを読み込む"
-          }
-        }
-      }
-    },
-    "Importer.CSV.Backup.Button" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open in Files App"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "「ファイル」アプリで開く"
-          }
-        }
-      }
-    },
-    "Importer.CSV.Backup.Description" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJDX saves a copy of every imported CSV file. Open the Files app and navigate to On My iPhone > DJDX to find previously imported files."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJDXはインポートしたCSVファイルをバックアップとして保存しています。「ファイル」アプリの「iPhone内のストレージ」>「DJDX」から以前のファイルを開けます。"
           }
         }
       }
