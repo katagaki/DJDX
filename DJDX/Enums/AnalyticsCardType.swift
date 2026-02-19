@@ -10,14 +10,14 @@ import SwiftUI
 
 enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case clearTypeOverall
+    case newHighScores
+    case newFullComboClear
     case newClears
     case newAssistClears
     case newEasyClears
-    case newFullComboClear
     case newHardClear
     case newExHardClear
     case newFailed
-    case newHighScores
 
     var id: String { rawValue }
 
@@ -29,13 +29,13 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var titleText: Text {
         switch self {
         case .clearTypeOverall: return Text("Analytics.ClearType.Overall")
-        case .newClears: return Text(verbatim: "NEW CLEAR")
-        case .newAssistClears: return Text(verbatim: "NEW ASSIST CLEAR")
-        case .newEasyClears: return Text(verbatim: "NEW EASY CLEAR")
-        case .newFullComboClear: return Text(verbatim: "NEW FULL COMBO CLEAR")
-        case .newHardClear: return Text(verbatim: "NEW HARD CLEAR")
-        case .newExHardClear: return Text(verbatim: "NEW EX HARD CLEAR")
-        case .newFailed: return Text(verbatim: "NEW FAILED")
+        case .newClears: return Text(verbatim: "CLEAR")
+        case .newAssistClears: return Text(verbatim: "ASSIST CLEAR")
+        case .newEasyClears: return Text(verbatim: "EASY CLEAR")
+        case .newFullComboClear: return Text(verbatim: "FULLCOMBO CLEAR")
+        case .newHardClear: return Text(verbatim: "HARD CLEAR")
+        case .newExHardClear: return Text(verbatim: "EX HARD CLEAR")
+        case .newFailed: return Text(verbatim: "FAILED")
         case .newHighScores: return Text("Analytics.NewHighScores")
         }
     }
@@ -43,13 +43,13 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var titleKey: String {
         switch self {
         case .clearTypeOverall: return "Analytics.ClearType.Overall"
-        case .newClears: return "NEW CLEAR"
-        case .newAssistClears: return "NEW ASSIST CLEAR"
-        case .newEasyClears: return "NEW EASY CLEAR"
-        case .newFullComboClear: return "NEW FULL COMBO CLEAR"
-        case .newHardClear: return "NEW HARD CLEAR"
-        case .newExHardClear: return "NEW EX HARD CLEAR"
-        case .newFailed: return "NEW FAILED"
+        case .newClears: return "CLEAR"
+        case .newAssistClears: return "ASSIST CLEAR"
+        case .newEasyClears: return "EASY CLEAR"
+        case .newFullComboClear: return "FULLCOMBO CLEAR"
+        case .newHardClear: return "HARD CLEAR"
+        case .newExHardClear: return "EX HARD CLEAR"
+        case .newFailed: return "FAILED"
         case .newHighScores: return "Analytics.NewHighScores"
         }
     }
@@ -94,7 +94,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
              .newExHardClear,
              .newFailed,
              .newHighScores:
-            return 60.0
+            return 50.0
         }
     }
 
@@ -111,6 +111,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     /// Default card order
     static var defaultOrder: [AnalyticsCardType] {
         [
+            .newHighScores,
             .clearTypeOverall,
             .newClears,
             .newAssistClears,
@@ -118,20 +119,12 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
             .newFullComboClear,
             .newHardClear,
             .newExHardClear,
-            .newFailed,
-            .newHighScores
+            .newFailed
         ]
     }
 
     /// Default visible cards
     static var defaultVisible: Set<AnalyticsCardType> {
-        [.clearTypeOverall, .newClears, .newAssistClears]
-    }
-
-    /// Cards that show side by side by default
-    static var pairedCards: [(AnalyticsCardType, AnalyticsCardType)] {
-        [
-            (.newClears, .newAssistClears)
-        ]
+        [.clearTypeOverall, .newHighScores, .newClears, .newAssistClears]
     }
 }

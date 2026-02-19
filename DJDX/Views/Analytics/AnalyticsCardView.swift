@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct AnalyticsCardView<Content: View>: View {
+
+    @Environment(\.colorScheme) var colorScheme
+
     let title: Text
     let systemImage: String
     let iconColor: Color
@@ -78,7 +81,13 @@ struct AnalyticsCardView<Content: View>: View {
         }
         .padding(12.0)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.thinMaterial)
+        .background {
+            switch colorScheme {
+            case .light: Color.white
+            case .dark: Color.clear.background(.regularMaterial)
+            @unknown default: Color.clear
+            }
+        }
         .clipShape(.rect(cornerRadius: cornerRadius))
     }
 }

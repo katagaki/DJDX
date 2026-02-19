@@ -39,18 +39,13 @@ struct AnalyticsView: View {
     @State var draggedCard: AnalyticsCardType?
     @State var draggedPerLevelCard: PerLevelCardID?
 
-    // Level filter visibility (settings)
-    @AppStorage(wrappedValue: Data(), "Analytics.VisibleLevels") var visibleLevelsData: Data
-    @State var visibleLevels: Set<Int> = [1, 12]
-
     // Per-level card ordering
     @AppStorage(wrappedValue: Data(), "Analytics.PerLevelCardOrder") var perLevelCardOrderData: Data
     @State var perLevelCardOrder: [PerLevelCardID] = PerLevelCardID.defaultOrder
 
-    // Per-level category visibility
-    @AppStorage(wrappedValue: Data(), "Analytics.PerLevelCategories") var perLevelCategoriesData: Data
-    @State var visiblePerLevelCategories: Set<AnalyticsPerLevelCategory> =
-        AnalyticsPerLevelCategory.defaultVisible
+    // Per-level card visibility
+    @AppStorage(wrappedValue: Data(), "Analytics.VisiblePerLevelCards") var visiblePerLevelCardsData: Data
+    @State var visiblePerLevelCardSet: Set<PerLevelCardID> = PerLevelCardID.defaultVisible
 
     // Overall
     @State var clearTypePerDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
@@ -196,9 +191,8 @@ struct AnalyticsView: View {
             .task {
                 loadCardOrder()
                 loadVisibleCards()
-                loadVisibleLevels()
                 loadPerLevelCardOrder()
-                loadPerLevelCategories()
+                loadVisiblePerLevelCards()
                 if dataState == .initializing {
                     await reload()
                 }
@@ -425,28 +419,18 @@ struct AnalyticsView: View {
                 Section("LEVEL \(difficulty)") {
                     ForEach(AnalyticsPerLevelCategory.allCases) { category in
                         let cardID = PerLevelCardID(difficulty: difficulty, category: category)
-                        let isLevelVisible = visibleLevels.contains(difficulty)
-                        let isCategoryVisible = visiblePerLevelCategories.contains(category)
                         Toggle(isOn: Binding<Bool>(
                             get: {
-                                isLevelVisible && isCategoryVisible
+                                visiblePerLevelCardSet.contains(cardID)
                             },
                             set: { newValue in
                                 withAnimation(.snappy) {
                                     if newValue {
-                                        visibleLevels.insert(difficulty)
-                                        visiblePerLevelCategories.insert(category)
+                                        visiblePerLevelCardSet.insert(cardID)
                                     } else {
-                                        let otherCategoriesForLevel = AnalyticsPerLevelCategory
-                                            .allCases.filter { $0 != category }
-                                        let hasOtherVisible = otherCategoriesForLevel
-                                            .contains { visiblePerLevelCategories.contains($0) }
-                                        if !hasOtherVisible {
-                                            visibleLevels.remove(difficulty)
-                                        }
+                                        visiblePerLevelCardSet.remove(cardID)
                                     }
-                                    saveVisibleLevels()
-                                    savePerLevelCategories()
+                                    saveVisiblePerLevelCards()
                                 }
                             }
                         )) {
@@ -455,8 +439,12 @@ struct AnalyticsView: View {
                     }
                     Button("Analytics.Settings.HideAll", role: .destructive) {
                         withAnimation(.snappy) {
-                            visibleLevels.remove(difficulty)
-                            saveVisibleLevels()
+                            for category in AnalyticsPerLevelCategory.allCases {
+                                visiblePerLevelCardSet.remove(
+                                    PerLevelCardID(difficulty: difficulty, category: category)
+                                )
+                            }
+                            saveVisiblePerLevelCards()
                         }
                     }
                 }
@@ -467,14 +455,12 @@ struct AnalyticsView: View {
                     withAnimation(.snappy) {
                         cardOrder = AnalyticsCardType.defaultOrder
                         visibleCards = AnalyticsCardType.defaultVisible
-                        visibleLevels = [1, 12]
                         perLevelCardOrder = PerLevelCardID.defaultOrder
-                        visiblePerLevelCategories = AnalyticsPerLevelCategory.defaultVisible
+                        visiblePerLevelCardSet = PerLevelCardID.defaultVisible
                         saveCardOrder()
                         saveVisibleCards()
-                        saveVisibleLevels()
                         savePerLevelCardOrder()
-                        savePerLevelCategories()
+                        saveVisiblePerLevelCards()
                     }
                 }
             }
@@ -640,15 +626,12 @@ struct AnalyticsView: View {
 
     // MARK: - Per-Level Card Views
 
-    var orderedVisiblePerLevelCategories: [AnalyticsPerLevelCategory] {
-        AnalyticsPerLevelCategory.allCases.filter { visiblePerLevelCategories.contains($0) }
+    var visiblePerLevelCards: [PerLevelCardID] {
+        perLevelCardOrder.filter { visiblePerLevelCardSet.contains($0) }
     }
 
-    var visiblePerLevelCards: [PerLevelCardID] {
-        perLevelCardOrder.filter { card in
-            visibleLevels.contains(card.difficulty) &&
-            visiblePerLevelCategories.contains(card.category)
-        }
+    var visibleLevels: Set<Int> {
+        Set(visiblePerLevelCardSet.map(\.difficulty))
     }
 
     @ViewBuilder
@@ -793,17 +776,6 @@ struct AnalyticsView: View {
         visibleCardsData = (try? JSONEncoder().encode(visibleCards)) ?? Data()
     }
 
-    func loadVisibleLevels() {
-        if let decoded = try? JSONDecoder().decode(Set<Int>.self, from: visibleLevelsData),
-           !decoded.isEmpty {
-            visibleLevels = decoded
-        }
-    }
-
-    func saveVisibleLevels() {
-        visibleLevelsData = (try? JSONEncoder().encode(visibleLevels)) ?? Data()
-    }
-
     func loadPerLevelCardOrder() {
         if let decoded = try? JSONDecoder().decode([PerLevelCardID].self, from: perLevelCardOrderData),
            !decoded.isEmpty {
@@ -821,16 +793,16 @@ struct AnalyticsView: View {
         perLevelCardOrderData = (try? JSONEncoder().encode(perLevelCardOrder)) ?? Data()
     }
 
-    func loadPerLevelCategories() {
+    func loadVisiblePerLevelCards() {
         if let decoded = try? JSONDecoder().decode(
-            Set<AnalyticsPerLevelCategory>.self, from: perLevelCategoriesData
+            Set<PerLevelCardID>.self, from: visiblePerLevelCardsData
         ) {
-            visiblePerLevelCategories = decoded
+            visiblePerLevelCardSet = decoded
         }
     }
 
-    func savePerLevelCategories() {
-        perLevelCategoriesData = (try? JSONEncoder().encode(visiblePerLevelCategories)) ?? Data()
+    func saveVisiblePerLevelCards() {
+        visiblePerLevelCardsData = (try? JSONEncoder().encode(visiblePerLevelCardSet)) ?? Data()
     }
 }
 // swiftlint:enable type_body_length

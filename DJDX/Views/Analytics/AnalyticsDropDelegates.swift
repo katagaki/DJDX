@@ -60,6 +60,16 @@ struct PerLevelCardID: Codable, Hashable {
         }
         return order
     }
+
+    static var defaultVisible: Set<PerLevelCardID> {
+        var cards: Set<PerLevelCardID> = []
+        for difficulty in [1, 12] {
+            for category in AnalyticsPerLevelCategory.defaultVisible {
+                cards.insert(PerLevelCardID(difficulty: difficulty, category: category))
+            }
+        }
+        return cards
+    }
 }
 
 struct PerLevelCardReorderDropDelegate: DropDelegate {
