@@ -603,7 +603,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJレベル"
+            "value" : "DJ LEVEL"
           }
         }
       }
@@ -620,7 +620,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJレベル推移"
+            "value" : "DJ LEVEL推移"
           }
         }
       }
