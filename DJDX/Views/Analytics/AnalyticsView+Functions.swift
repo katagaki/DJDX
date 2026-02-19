@@ -141,6 +141,7 @@ extension AnalyticsView {
                     self.newClears = []
                     self.newAssistClears = []
                     self.newEasyClears = []
+                    self.newFailed = []
                     self.newHighScores = []
                 }
             }
@@ -164,6 +165,7 @@ extension AnalyticsView {
         var computedNewClears: [NewClearEntry] = []
         var computedNewAssistClears: [NewClearEntry] = []
         var computedNewEasyClears: [NewClearEntry] = []
+        var computedNewFailed: [NewClearEntry] = []
         var computedNewHighScores: [NewHighScoreEntry] = []
 
         let levels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
@@ -227,6 +229,20 @@ extension AnalyticsView {
                         ))
                     }
 
+                    // Check for new FAILED
+                    if latestScore.clearType == "FAILED" &&
+                        latestScore.score > 0 &&
+                        previousScore.clearType != "FAILED" {
+                        computedNewFailed.append(NewClearEntry(
+                            songTitle: latestRecord.title,
+                            songArtist: latestRecord.artist,
+                            level: level,
+                            difficulty: latestScore.difficulty,
+                            clearType: latestScore.clearType,
+                            previousClearType: previousScore.clearType
+                        ))
+                    }
+
                     // Check for new high score
                     if latestScore.score > previousScore.score && latestScore.score > 0 {
                         computedNewHighScores.append(NewHighScoreEntry(
@@ -270,6 +286,15 @@ extension AnalyticsView {
                                 clearType: latestScore.clearType,
                                 previousClearType: "NO PLAY"
                             ))
+                        } else if latestScore.clearType == "FAILED" {
+                            computedNewFailed.append(NewClearEntry(
+                                songTitle: latestRecord.title,
+                                songArtist: latestRecord.artist,
+                                level: level,
+                                difficulty: latestScore.difficulty,
+                                clearType: latestScore.clearType,
+                                previousClearType: "NO PLAY"
+                            ))
                         }
                         computedNewHighScores.append(NewHighScoreEntry(
                             songTitle: latestRecord.title,
@@ -291,6 +316,7 @@ extension AnalyticsView {
                 self.newClears = computedNewClears
                 self.newAssistClears = computedNewAssistClears
                 self.newEasyClears = computedNewEasyClears
+                self.newFailed = computedNewFailed
                 self.newHighScores = computedNewHighScores
             }
         }

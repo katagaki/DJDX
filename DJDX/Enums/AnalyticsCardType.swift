@@ -13,6 +13,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case newClears
     case newAssistClears
     case newEasyClears
+    case newFailed
     case newHighScores
 
     var id: String { rawValue }
@@ -23,6 +24,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .newClears: return Text(verbatim: "NEW CLEAR")
         case .newAssistClears: return Text(verbatim: "NEW ASSIST CLEAR")
         case .newEasyClears: return Text(verbatim: "NEW EASY CLEAR")
+        case .newFailed: return Text(verbatim: "NEW FAILED")
         case .newHighScores: return Text("Analytics.NewHighScores")
         }
     }
@@ -33,6 +35,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .newClears: return "NEW CLEAR"
         case .newAssistClears: return "NEW ASSIST CLEAR"
         case .newEasyClears: return "NEW EASY CLEAR"
+        case .newFailed: return "NEW FAILED"
         case .newHighScores: return "Analytics.NewHighScores"
         }
     }
@@ -40,9 +43,10 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var systemImage: String {
         switch self {
         case .clearTypeOverall: return "chart.bar.fill"
-        case .newClears: return "sparkles"
-        case .newAssistClears: return "sparkles"
-        case .newEasyClears: return "sparkles"
+        case .newClears: return "checkmark.circle.fill"
+        case .newAssistClears: return "hand.raised.fill"
+        case .newEasyClears: return "leaf.fill"
+        case .newFailed: return "xmark.circle.fill"
         case .newHighScores: return "trophy.fill"
         }
     }
@@ -50,9 +54,10 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var iconColor: Color {
         switch self {
         case .clearTypeOverall: return .blue
-        case .newClears: return .green
+        case .newClears: return .cyan
         case .newAssistClears: return .purple
-        case .newEasyClears: return .mint
+        case .newEasyClears: return .green
+        case .newFailed: return .red
         case .newHighScores: return .orange
         }
     }
@@ -79,6 +84,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
             .newClears,
             .newAssistClears,
             .newEasyClears,
+            .newFailed,
             .newHighScores
         ]
     }

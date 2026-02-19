@@ -20,7 +20,18 @@ struct OverviewDJLevelPerDifficultyGraph: View {
                 y: .value("Shared.ClearCount", count),
                 width: .inset(8.0)
             )
+            .foregroundStyle(by: .value("Shared.DJLevel", djLevel.rawValue))
         }
               .chartXScale(domain: IIDXDJLevel.sortedStrings)
+              .chartForegroundStyleScale([
+                  "AAA": .yellow,
+                  "AA": .orange,
+                  "A": .mint,
+                  "B": .green,
+                  "C": .teal,
+                  "D": .blue,
+                  "E": .indigo,
+                  "F": .red
+              ])
     }
 }

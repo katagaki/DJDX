@@ -31,17 +31,21 @@ struct AnalyticsView: View {
     @State var cardOrder: [AnalyticsCardType] = AnalyticsCardType.defaultOrder
     @State var isEditingCards: Bool = false
 
+    // Card visibility
+    @AppStorage(wrappedValue: Data(), "Analytics.VisibleCards") var visibleCardsData: Data
+    @State var visibleCards: Set<AnalyticsCardType> = Set(AnalyticsCardType.allCases)
+
     // Drag state
     @State var draggedCard: AnalyticsCardType?
-    @State var draggedLevel: Int?
+    @State var draggedPerLevelCard: PerLevelCardID?
 
     // Level filter visibility (settings)
     @AppStorage(wrappedValue: Data(), "Analytics.VisibleLevels") var visibleLevelsData: Data
     @State var visibleLevels: Set<Int> = Set(1...12)
 
-    // Level ordering
-    @AppStorage(wrappedValue: Data(), "Analytics.LevelOrder") var levelOrderData: Data
-    @State var levelOrder: [Int] = Array(1...12)
+    // Per-level card ordering
+    @AppStorage(wrappedValue: Data(), "Analytics.PerLevelCardOrder") var perLevelCardOrderData: Data
+    @State var perLevelCardOrder: [PerLevelCardID] = PerLevelCardID.defaultOrder
 
     // Per-level category visibility
     @AppStorage(wrappedValue: Data(), "Analytics.PerLevelCategories") var perLevelCategoriesData: Data
@@ -62,6 +66,7 @@ struct AnalyticsView: View {
     @State var newClears: [NewClearEntry] = []
     @State var newAssistClears: [NewClearEntry] = []
     @State var newEasyClears: [NewClearEntry] = []
+    @State var newFailed: [NewClearEntry] = []
     @State var newHighScores: [NewHighScoreEntry] = []
 
     @State var dataState: DataState = .initializing
@@ -86,43 +91,23 @@ struct AnalyticsView: View {
 
                 // Customizable stats cards
                 LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                    ForEach(cardOrder, id: \.self) { cardType in
-                        switch cardType {
-                        case .clearTypeOverall:
-                            EmptyView()
-                        case .newClears:
-                            newClearsCard
-                                .cardDraggable(cardType, editing: isEditingCards,
-                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                               onReorder: saveCardOrder, seed: 1)
-                        case .newAssistClears:
-                            newAssistClearsCard
-                                .cardDraggable(cardType, editing: isEditingCards,
-                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                               onReorder: saveCardOrder, seed: 2)
-                        case .newEasyClears:
-                            newEasyClearsCard
-                                .cardDraggable(cardType, editing: isEditingCards,
-                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                               onReorder: saveCardOrder, seed: 3)
-                        case .newHighScores:
-                            newHighScoresCard
-                                .cardDraggable(cardType, editing: isEditingCards,
-                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                               onReorder: saveCardOrder, seed: 4)
-                        }
+                    ForEach(cardOrder.filter {
+                        $0 != .clearTypeOverall && visibleCards.contains($0)
+                    }, id: \.self) { cardType in
+                        cardView(for: cardType)
+                            .cardDraggable(cardType, editing: isEditingCards,
+                                           draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                           onReorder: saveCardOrder,
+                                           seed: cardOrder.firstIndex(of: cardType) ?? 0)
                     }
 
                     // Per-level cards
-                    ForEach(orderedVisibleLevels, id: \.self) { difficulty in
-                        ForEach(orderedVisiblePerLevelCategories, id: \.self) { category in
-                            perLevelCard(difficulty: difficulty, category: category)
-                                .levelDraggable(difficulty, category: category,
-                                                editing: isEditingCards,
-                                                draggedLevel: $draggedLevel,
-                                                levelOrder: $levelOrder,
-                                                onReorder: saveLevelOrder)
-                        }
+                    ForEach(visiblePerLevelCards, id: \.self) { card in
+                        perLevelCard(difficulty: card.difficulty, category: card.category)
+                            .perLevelCardDraggable(card, editing: isEditingCards,
+                                                   draggedCard: $draggedPerLevelCard,
+                                                   cardOrder: $perLevelCardOrder,
+                                                   onReorder: savePerLevelCardOrder)
                     }
                 }
                 .padding(.horizontal)
@@ -153,7 +138,7 @@ struct AnalyticsView: View {
                                 withAnimation(.snappy) {
                                     isEditingCards = false
                                     draggedCard = nil
-                                    draggedLevel = nil
+                                    draggedPerLevelCard = nil
                                 }
                             }
                         } else {
@@ -161,7 +146,7 @@ struct AnalyticsView: View {
                                 withAnimation(.snappy) {
                                     isEditingCards = false
                                     draggedCard = nil
-                                    draggedLevel = nil
+                                    draggedPerLevelCard = nil
                                 }
                             }
                         }
@@ -181,8 +166,9 @@ struct AnalyticsView: View {
             }
             .task {
                 loadCardOrder()
+                loadVisibleCards()
                 loadVisibleLevels()
-                loadLevelOrder()
+                loadPerLevelCardOrder()
                 loadPerLevelCategories()
                 if dataState == .initializing {
                     await reload()
@@ -343,6 +329,11 @@ struct AnalyticsView: View {
                             .automaticNavigationTransition(
                                 id: "NewEasyClears", in: analyticsNamespace
                             )
+                    case .newFailedDetail:
+                        NewClearsDetailView(newClears: $newFailed)
+                            .automaticNavigationTransition(
+                                id: "NewFailed", in: analyticsNamespace
+                            )
                     case .newHighScoresDetail:
                         NewHighScoresDetailView(newHighScores: $newHighScores)
                             .automaticNavigationTransition(id: "NewHighScores", in: analyticsNamespace)
@@ -365,6 +356,29 @@ struct AnalyticsView: View {
                 } label: {
                     Label("Analytics.Settings.EditCards",
                           systemImage: "arrow.up.arrow.down")
+                }
+            }
+            Section("Analytics.Settings.Cards") {
+                ForEach(AnalyticsCardType.allCases.filter { !$0.isPinned }) { cardType in
+                    Toggle(isOn: Binding<Bool>(
+                        get: { visibleCards.contains(cardType) },
+                        set: { newValue in
+                            withAnimation(.snappy) {
+                                if newValue {
+                                    visibleCards.insert(cardType)
+                                } else {
+                                    visibleCards.remove(cardType)
+                                }
+                                saveVisibleCards()
+                            }
+                        }
+                    )) {
+                        Label {
+                            cardType.titleText
+                        } icon: {
+                            Image(systemName: cardType.systemImage)
+                        }
+                    }
                 }
             }
             Section("Analytics.Settings.PerLevel") {
@@ -413,6 +427,24 @@ struct AnalyticsView: View {
     }
 
     // MARK: - Card Views
+
+    @ViewBuilder
+    func cardView(for cardType: AnalyticsCardType) -> some View {
+        switch cardType {
+        case .clearTypeOverall:
+            EmptyView()
+        case .newClears:
+            newClearsCard
+        case .newAssistClears:
+            newAssistClearsCard
+        case .newEasyClears:
+            newEasyClearsCard
+        case .newFailed:
+            newFailedCard
+        case .newHighScores:
+            newHighScoresCard
+        }
+    }
 
     var clearTypeOverallCard: some View {
         Button {
@@ -472,6 +504,20 @@ struct AnalyticsView: View {
         .automaticMatchedTransitionSource(id: "NewEasyClears", in: analyticsNamespace)
     }
 
+    var newFailedCard: some View {
+        Button {
+            if !isEditingCards {
+                navigationManager.push(.newFailedDetail, for: .analytics)
+            }
+        } label: {
+            AnalyticsCardView(cardType: .newFailed) {
+                NewClearsCard(newClears: $newFailed)
+            }
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "NewFailed", in: analyticsNamespace)
+    }
+
     var newHighScoresCard: some View {
         Button {
             if !isEditingCards {
@@ -490,6 +536,13 @@ struct AnalyticsView: View {
 
     var orderedVisiblePerLevelCategories: [AnalyticsPerLevelCategory] {
         AnalyticsPerLevelCategory.allCases.filter { visiblePerLevelCategories.contains($0) }
+    }
+
+    var visiblePerLevelCards: [PerLevelCardID] {
+        perLevelCardOrder.filter { card in
+            visibleLevels.contains(card.difficulty) &&
+            visiblePerLevelCategories.contains(card.category)
+        }
     }
 
     @ViewBuilder
@@ -594,10 +647,6 @@ struct AnalyticsView: View {
 
     // MARK: - Filtered Data
 
-    var orderedVisibleLevels: [Int] {
-        levelOrder.filter { visibleLevels.contains($0) }
-    }
-
     var filteredClearTypeData: [Int: OrderedDictionary<String, Int>] {
         clearTypePerDifficulty.filter { visibleLevels.contains($0.key) }
     }
@@ -620,6 +669,20 @@ struct AnalyticsView: View {
         cardOrderData = (try? JSONEncoder().encode(cardOrder)) ?? Data()
     }
 
+    func loadVisibleCards() {
+        if let decoded = try? JSONDecoder().decode(Set<AnalyticsCardType>.self, from: visibleCardsData) {
+            var cards = decoded
+            for cardType in AnalyticsCardType.allCases where !decoded.contains(cardType) {
+                cards.insert(cardType)
+            }
+            visibleCards = cards
+        }
+    }
+
+    func saveVisibleCards() {
+        visibleCardsData = (try? JSONEncoder().encode(visibleCards)) ?? Data()
+    }
+
     func loadVisibleLevels() {
         if let decoded = try? JSONDecoder().decode(Set<Int>.self, from: visibleLevelsData),
            !decoded.isEmpty {
@@ -631,20 +694,21 @@ struct AnalyticsView: View {
         visibleLevelsData = (try? JSONEncoder().encode(visibleLevels)) ?? Data()
     }
 
-    func loadLevelOrder() {
-        if let decoded = try? JSONDecoder().decode([Int].self, from: levelOrderData),
+    func loadPerLevelCardOrder() {
+        if let decoded = try? JSONDecoder().decode([PerLevelCardID].self, from: perLevelCardOrderData),
            !decoded.isEmpty {
             var order = decoded
-            for level in difficulties where !order.contains(level) {
-                order.append(level)
+            for card in PerLevelCardID.defaultOrder where !order.contains(card) {
+                order.append(card)
             }
-            order.removeAll { !difficulties.contains($0) }
-            levelOrder = order
+            let validCards = Set(PerLevelCardID.defaultOrder)
+            order.removeAll { !validCards.contains($0) }
+            perLevelCardOrder = order
         }
     }
 
-    func saveLevelOrder() {
-        levelOrderData = (try? JSONEncoder().encode(levelOrder)) ?? Data()
+    func savePerLevelCardOrder() {
+        perLevelCardOrderData = (try? JSONEncoder().encode(perLevelCardOrder)) ?? Data()
     }
 
     func loadPerLevelCategories() {
@@ -693,27 +757,27 @@ extension View {
     }
 
     @ViewBuilder
-    func levelDraggable(
-        _ difficulty: Int,
-        category: AnalyticsPerLevelCategory,
+    func perLevelCardDraggable(
+        _ card: PerLevelCardID,
         editing: Bool,
-        draggedLevel: Binding<Int?>,
-        levelOrder: Binding<[Int]>,
+        draggedCard: Binding<PerLevelCardID?>,
+        cardOrder: Binding<[PerLevelCardID]>,
         onReorder: @escaping () -> Void
     ) -> some View {
-        let seed = difficulty * 10 + (AnalyticsPerLevelCategory.allCases.firstIndex(of: category) ?? 0)
+        let seed = card.difficulty * 10 +
+            (AnalyticsPerLevelCategory.allCases.firstIndex(of: card.category) ?? 0)
         if editing {
             self
                 .jiggle(isActive: true, seed: seed)
-                .opacity(draggedLevel.wrappedValue == difficulty ? 0.4 : 1.0)
+                .opacity(draggedCard.wrappedValue == card ? 0.4 : 1.0)
                 .onDrag {
-                    draggedLevel.wrappedValue = difficulty
-                    return NSItemProvider(object: "\(difficulty)" as NSString)
+                    draggedCard.wrappedValue = card
+                    return NSItemProvider(object: card.dragIdentifier as NSString)
                 }
-                .onDrop(of: [.text], delegate: LevelReorderDropDelegate(
-                    target: difficulty,
-                    levels: levelOrder,
-                    draggedLevel: draggedLevel,
+                .onDrop(of: [.text], delegate: PerLevelCardReorderDropDelegate(
+                    target: card,
+                    cards: cardOrder,
+                    draggedCard: draggedCard,
                     onReorder: onReorder
                 ))
         } else {

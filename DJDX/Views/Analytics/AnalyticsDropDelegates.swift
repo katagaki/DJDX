@@ -43,10 +43,29 @@ struct CardReorderDropDelegate: DropDelegate {
     func dropExited(info: DropInfo) {}
 }
 
-struct LevelReorderDropDelegate: DropDelegate {
-    let target: Int
-    @Binding var levels: [Int]
-    @Binding var draggedLevel: Int?
+struct PerLevelCardID: Codable, Hashable {
+    let difficulty: Int
+    let category: AnalyticsPerLevelCategory
+
+    var dragIdentifier: String {
+        "\(difficulty)_\(category.rawValue)"
+    }
+
+    static var defaultOrder: [PerLevelCardID] {
+        var order: [PerLevelCardID] = []
+        for difficulty in 1...12 {
+            for category in AnalyticsPerLevelCategory.allCases {
+                order.append(PerLevelCardID(difficulty: difficulty, category: category))
+            }
+        }
+        return order
+    }
+}
+
+struct PerLevelCardReorderDropDelegate: DropDelegate {
+    let target: PerLevelCardID
+    @Binding var cards: [PerLevelCardID]
+    @Binding var draggedCard: PerLevelCardID?
     let onReorder: () -> Void
 
     func dropUpdated(info: DropInfo) -> DropProposal? {
@@ -54,17 +73,17 @@ struct LevelReorderDropDelegate: DropDelegate {
     }
 
     func performDrop(info: DropInfo) -> Bool {
-        draggedLevel = nil
+        draggedCard = nil
         return true
     }
 
     func dropEntered(info: DropInfo) {
-        guard let draggedLevel, draggedLevel != target else { return }
-        guard let fromIndex = levels.firstIndex(of: draggedLevel),
-              let toIndex = levels.firstIndex(of: target) else { return }
+        guard let draggedCard, draggedCard != target else { return }
+        guard let fromIndex = cards.firstIndex(of: draggedCard),
+              let toIndex = cards.firstIndex(of: target) else { return }
 
         withAnimation(.snappy(duration: 0.3)) {
-            levels.move(
+            cards.move(
                 fromOffsets: IndexSet(integer: fromIndex),
                 toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
             )
