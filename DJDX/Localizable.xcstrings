@@ -849,13 +849,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open DJDX Documents Folder"
+            "value" : "Open in Files App"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDXドキュメントフォルダを開く"
+            "value" : "「ファイル」アプリで開く"
           }
         }
       }
@@ -866,13 +866,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDX saves a copy of every imported CSV file. Open the DJDX Documents folder in the Files app to find previously imported files."
+            "value" : "DJDX saves a copy of every imported CSV file. Open the Files app and navigate to On My iPhone > DJDX to find previously imported files."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDXはインポートしたCSVファイルをバックアップとして保存しています。Filesアプリのドキュメントフォルダから以前のファイルを開けます。"
+            "value" : "DJDXはインポートしたCSVファイルをバックアップとして保存しています。「ファイル」アプリの「iPhone内のストレージ」>「DJDX」から以前のファイルを開けます。"
           }
         }
       }

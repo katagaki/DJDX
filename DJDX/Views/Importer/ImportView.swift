@@ -31,7 +31,6 @@ struct ImportView: View {
     @State var autoImportFailedReason: ImportFailedReason?
 
     @State var isSelectingCSVFile: Bool = false
-    @State var isSelectingBackupCSVFile: Bool = false
 
     let actor = DataImporter(modelContainer: sharedModelContainer)
 
@@ -143,16 +142,6 @@ struct ImportView: View {
                 })
                 .ignoresSafeArea(edges: [.bottom])
             }
-            .sheet(isPresented: $isSelectingBackupCSVFile) {
-                DocumentPicker(
-                    allowedUTIs: [.commaSeparatedText],
-                    directoryURL: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first,
-                    onDocumentPicked: { urls in
-                        importCSVs(from: urls)
-                    }
-                )
-                .ignoresSafeArea(edges: [.bottom])
-            }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .importerWebIIDXSingle:
@@ -230,8 +219,10 @@ struct ImportView: View {
                             .font(.body)
                     }
                     Section {
-                        Button("Importer.CSV.Backup.Button", systemImage: "archivebox") {
-                            isSelectingBackupCSVFile = true
+                        Button("Importer.CSV.Backup.Button", systemImage: "folder.badge.gearshape") {
+                            if let url = URL(string: "shareddocuments://") {
+                                openURL(url)
+                            }
                         }
                     } header: {
                         Text("Importer.CSV.Backup.Description")

@@ -21,15 +21,26 @@ struct ImportDetailView: View {
                 songRecordRow(songRecord)
             }
         }
+        .listStyle(.plain)
         .navigationTitle(Text(importGroup.importDate, style: .date))
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
-            Text("Importer.Detail.SongCount.\(sortedSongRecords.count)")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8.0)
-                .background(.bar)
+            if #available(iOS 26.0, *) {
+                Text("Importer.Detail.SongCount.\(sortedSongRecords.count)")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 16.0)
+                    .padding(.vertical, 8.0)
+                    .glassEffect(.regular, in: Capsule())
+                    .padding(.bottom, 16.0)
+            } else {
+                Text("Importer.Detail.SongCount.\(sortedSongRecords.count)")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8.0)
+                    .background(.bar)
+            }
         }
     }
 
@@ -71,6 +82,7 @@ struct ImportDetailView: View {
             HStack(alignment: .top, spacing: 4.0) {
                 ForEach(IIDXLevel.sorted, id: \.self) { level in
                     levelScoreCell(songRecord.score(for: level), level: level)
+                        .frame(maxHeight: .infinity)
                 }
             }
         }
