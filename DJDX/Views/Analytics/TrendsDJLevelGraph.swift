@@ -26,9 +26,9 @@ struct TrendsDJLevelGraph: View {
             }
         }
         .chartForegroundStyleScale([
-            "AAA": .yellow,
+            "AAA": Color.primary,
             "AA": .orange,
-            "A": .mint,
+            "A": .yellow,
             "B": .green,
             "C": .teal,
             "D": .blue,

@@ -464,23 +464,6 @@
         }
       }
     },
-    "Analytics.NewClears" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Clears"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新規クリア"
-          }
-        }
-      }
-    },
     "Analytics.NewClears.Subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -628,6 +611,22 @@
         }
       }
     },
+    "Analytics.Settings.Cards" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Summary"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "合計"
+          }
+        }
+      }
+    },
     "Analytics.Settings.EditCards" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -641,22 +640,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "並べ替え"
-          }
-        }
-      }
-    },
-    "Analytics.Settings.Hidden" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hidden"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "非表示"
           }
         }
       }
@@ -1046,6 +1029,7 @@
       "shouldTranslate" : false
     },
     "Level.%lld" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {

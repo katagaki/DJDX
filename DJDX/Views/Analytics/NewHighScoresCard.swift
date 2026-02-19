@@ -19,7 +19,8 @@ struct NewHighScoresCard: View {
                     .foregroundStyle(.secondary)
             } else {
                 Text("\(newHighScores.count)")
-                    .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                    .font(.system(size: 48.0, weight: .black))
+                    .fontWidth(.expanded)
                     .foregroundStyle(.primary)
             }
         }

@@ -44,7 +44,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .clearTypeOverall: return "chart.bar.fill"
         case .newClears: return "checkmark.circle.fill"
-        case .newAssistClears: return "hand.raised.fill"
+        case .newAssistClears: return "heart.gauge.open"
         case .newEasyClears: return "leaf.fill"
         case .newFailed: return "xmark.circle.fill"
         case .newHighScores: return "trophy.fill"

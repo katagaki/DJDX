@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 
 struct DocumentPicker: UIViewControllerRepresentable {
     let allowedUTIs: [UTType]
-    var directoryURL: URL? = nil
+    var directoryURL: URL?
     let onDocumentPicked: ([URL]) -> Void
 
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {

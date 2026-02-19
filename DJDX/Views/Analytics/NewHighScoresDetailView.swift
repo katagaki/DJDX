@@ -78,6 +78,7 @@ struct NewHighScoresDetailView: View {
                 }
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Analytics.NewHighScores")
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -80,7 +80,6 @@ struct AnalyticsView: View {
 
     @Namespace var analyticsNamespace
 
-    // swiftlint:disable function_body_length
     var body: some View {
         NavigationStack(path: $navigationManager[.analytics]) {
             ScrollView {
@@ -317,23 +316,35 @@ struct AnalyticsView: View {
                             id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
                         )
                     case .newClearsDetail:
-                        NewClearsDetailView(newClears: $newClears)
-                            .automaticNavigationTransition(id: "NewClears", in: analyticsNamespace)
+                        NewClearsDetailView(
+                            newClears: $newClears,
+                            title: AnalyticsCardType.newClears.titleKey
+                        )
+                        .automaticNavigationTransition(id: "NewClears", in: analyticsNamespace)
                     case .newAssistClearsDetail:
-                        NewClearsDetailView(newClears: $newAssistClears)
-                            .automaticNavigationTransition(
-                                id: "NewAssistClears", in: analyticsNamespace
-                            )
+                        NewClearsDetailView(
+                            newClears: $newAssistClears,
+                            title: AnalyticsCardType.newAssistClears.titleKey
+                        )
+                        .automaticNavigationTransition(
+                            id: "NewAssistClears", in: analyticsNamespace
+                        )
                     case .newEasyClearsDetail:
-                        NewClearsDetailView(newClears: $newEasyClears)
-                            .automaticNavigationTransition(
-                                id: "NewEasyClears", in: analyticsNamespace
-                            )
+                        NewClearsDetailView(
+                            newClears: $newEasyClears,
+                            title: AnalyticsCardType.newEasyClears.titleKey
+                        )
+                        .automaticNavigationTransition(
+                            id: "NewEasyClears", in: analyticsNamespace
+                        )
                     case .newFailedDetail:
-                        NewClearsDetailView(newClears: $newFailed)
-                            .automaticNavigationTransition(
-                                id: "NewFailed", in: analyticsNamespace
-                            )
+                        NewClearsDetailView(
+                            newClears: $newFailed,
+                            title: AnalyticsCardType.newFailed.titleKey
+                        )
+                        .automaticNavigationTransition(
+                            id: "NewFailed", in: analyticsNamespace
+                        )
                     case .newHighScoresDetail:
                         NewHighScoresDetailView(newHighScores: $newHighScores)
                             .automaticNavigationTransition(id: "NewHighScores", in: analyticsNamespace)
@@ -344,7 +355,6 @@ struct AnalyticsView: View {
             }
         }
     }
-    // swiftlint:enable function_body_length
 
     // MARK: - Settings Menu
 
@@ -396,8 +406,7 @@ struct AnalyticsView: View {
                             }
                         }
                     )) {
-                        Label(LocalizedStringKey(category.titleKey),
-                              systemImage: category.systemImage)
+                        Text(LocalizedStringKey(category.titleKey))
                     }
                 }
             }
@@ -566,8 +575,8 @@ struct AnalyticsView: View {
             }
         } label: {
             AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "chart.pie.fill",
-                              iconColor: .purple) {
+                              systemImage: "medal.star",
+                              iconColor: .secondary) {
                 OverviewClearTypePerDifficultyGraph(
                     graphData: $clearTypePerDifficulty,
                     difficulty: .constant(difficulty)
@@ -587,8 +596,8 @@ struct AnalyticsView: View {
             }
         } label: {
             AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "chart.xyaxis.line",
-                              iconColor: .cyan) {
+                              systemImage: "medal.star",
+                              iconColor: .secondary) {
                 TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
                                      difficulty: .constant(difficulty))
                     .chartLegend(.hidden)
@@ -609,8 +618,8 @@ struct AnalyticsView: View {
             }
         } label: {
             AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "chart.bar.fill",
-                              iconColor: .pink) {
+                              systemImage: "medal.star",
+                              iconColor: .secondary) {
                 OverviewDJLevelPerDifficultyGraph(
                     graphData: $djLevelPerDifficulty,
                     difficulty: .constant(difficulty)
@@ -630,8 +639,8 @@ struct AnalyticsView: View {
             }
         } label: {
             AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "chart.xyaxis.line",
-                              iconColor: .teal) {
+                              systemImage: "medal.star",
+                              iconColor: .secondary) {
                 TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
                                    difficulty: .constant(difficulty))
                     .chartLegend(.hidden)

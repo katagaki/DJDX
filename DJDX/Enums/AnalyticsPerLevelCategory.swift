@@ -25,15 +25,6 @@ enum AnalyticsPerLevelCategory: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    var systemImage: String {
-        switch self {
-        case .clearRate: return "chart.pie.fill"
-        case .clearRateTrend: return "chart.xyaxis.line"
-        case .djLevel: return "chart.bar.fill"
-        case .djLevelTrend: return "chart.xyaxis.line"
-        }
-    }
-
     var iconColor: Color {
         switch self {
         case .clearRate: return .purple

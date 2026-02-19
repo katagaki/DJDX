@@ -24,14 +24,14 @@ struct OverviewDJLevelPerDifficultyGraph: View {
         }
               .chartXScale(domain: IIDXDJLevel.sortedStrings)
               .chartForegroundStyleScale([
-                  "AAA": .yellow,
-                  "AA": .orange,
-                  "A": .mint,
-                  "B": .green,
-                  "C": .teal,
-                  "D": .blue,
-                  "E": .indigo,
-                  "F": .red
+                "AAA": Color.primary,
+                "AA": .orange,
+                "A": .yellow,
+                "B": .green,
+                "C": .teal,
+                "D": .blue,
+                "E": .indigo,
+                "F": .red
               ])
     }
 }

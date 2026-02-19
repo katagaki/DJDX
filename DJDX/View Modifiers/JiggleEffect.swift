@@ -11,14 +11,15 @@ struct JiggleEffect: ViewModifier {
     let isActive: Bool
     let seed: Int
 
+    @State var isAnimating: Bool = false
     @State private var degrees: Double = 0
 
     private var amount: Double {
-        1.0 + Double(abs(seed) % 5) * 0.2
+        0.9 + Double(abs(seed) % 5) * 0.12
     }
 
     private var duration: Double {
-        0.10 + Double(abs(seed) % 4) * 0.015
+        0.13 + Double(abs(seed) % 4) * 0.003
     }
 
     func body(content: Content) -> some View {
@@ -40,7 +41,8 @@ struct JiggleEffect: ViewModifier {
                 }
             }
             .onAppear {
-                if isActive {
+                if isActive && !isAnimating {
+                    isAnimating = true
                     degrees = -amount
                     withAnimation(
                         .easeInOut(duration: duration)
@@ -48,6 +50,14 @@ struct JiggleEffect: ViewModifier {
                     ) {
                         degrees = amount
                     }
+                }
+            }
+            .onDisappear {
+                degrees = 0
+            }
+            .onChange(of: isActive) { _, newIsActive in
+                if !newIsActive {
+                    isAnimating = false
                 }
             }
     }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NewClearsDetailView: View {
     @Binding var newClears: [NewClearEntry]
+    var title: String
 
     var body: some View {
         List {
@@ -61,7 +62,8 @@ struct NewClearsDetailView: View {
                 }
             }
         }
-        .navigationTitle("Analytics.NewClears")
+        .listStyle(.plain)
+        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
