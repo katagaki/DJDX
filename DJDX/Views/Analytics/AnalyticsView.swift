@@ -97,6 +97,7 @@ struct AnalyticsView: View {
                         .padding(.top, 8.0)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
+                        .padding(.leading, 12.0)
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12.0) {
                             ForEach(visibleSummaryCards, id: \.self) { cardType in
@@ -119,6 +120,7 @@ struct AnalyticsView: View {
                     .padding(.top, 8.0)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
+                    .padding(.leading, 12.0)
                 LazyVGrid(columns: cardColumns, spacing: 12.0) {
                     ForEach(visiblePerLevelCards, id: \.self) { card in
                         perLevelCard(difficulty: card.difficulty, category: card.category)
@@ -129,7 +131,6 @@ struct AnalyticsView: View {
                     }
                 }
                 .padding(.horizontal)
-                .padding(.top, 4.0)
                 .padding(.bottom, 16.0)
             }
             .navigator("ViewTitle.Analytics")
