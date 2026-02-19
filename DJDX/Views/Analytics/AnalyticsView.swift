@@ -130,7 +130,7 @@ struct AnalyticsView: View {
                         }
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
                     if isEditingCards {
                         if #available(iOS 26.0, *) {
                             Button(role: .confirm) {
@@ -153,6 +153,12 @@ struct AnalyticsView: View {
                         ProgressView()
                             .progressViewStyle(.circular)
                     } else {
+                        Button {
+                            withAnimation(.snappy) { isEditingCards = true }
+                        } label: {
+                            Label("Analytics.Settings.EditCards",
+                                  systemImage: "arrow.up.arrow.down")
+                        }
                         settingsMenu
                     }
                 }
@@ -360,14 +366,6 @@ struct AnalyticsView: View {
 
     var settingsMenu: some View {
         Menu {
-            Section {
-                Button {
-                    withAnimation(.snappy) { isEditingCards = true }
-                } label: {
-                    Label("Analytics.Settings.EditCards",
-                          systemImage: "arrow.up.arrow.down")
-                }
-            }
             Section("Analytics.Settings.Cards") {
                 ForEach(AnalyticsCardType.allCases.filter { !$0.isPinned }) { cardType in
                     Toggle(isOn: Binding<Bool>(
@@ -430,7 +428,7 @@ struct AnalyticsView: View {
                 }
             }
         } label: {
-            Image(systemName: "gearshape")
+            Image(systemName: "pencil")
         }
         .menuActionDismissBehavior(.disabled)
     }
