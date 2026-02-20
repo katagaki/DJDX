@@ -48,7 +48,7 @@ struct MoreNotesRadarView: View {
                     .padding()
                     .animation(.smooth, value: selectedPlayType)
                 VStack(spacing: 4.0) {
-                    ForEach(radarData.points(), id: \.label) { point in
+                    ForEach(radarData.displayPoints(), id: \.label) { point in
                         HStack {
                             Text(verbatim: point.label)
                                 .font(.system(size: 13, weight: .bold))

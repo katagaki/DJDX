@@ -62,6 +62,15 @@ struct RadarData {
         ]
     }
 
+    static let displayOrder = ["NOTES", "CHORD", "PEAK", "CHARGE", "SCRATCH", "SOF-LAN"]
+
+    func displayPoints() -> [RadarPointConfig] {
+        let allPoints = points()
+        return RadarData.displayOrder.compactMap { label in
+            allPoints.first { $0.label == label }
+        }
+    }
+
     func sum() -> Double {
         return [self.notes, self.peak, self.scratch, self.soflan, self.charge, self.chord].reduce(0, +)
     }
