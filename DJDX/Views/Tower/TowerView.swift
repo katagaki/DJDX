@@ -18,9 +18,18 @@ struct TowerView: View {
     @State var isAutoImportFailed: Bool = false
     @State var didImportSucceed: Bool = false
     @State var autoImportFailedReason: ImportFailedReason?
+    @State var chartMode: TowerChartMode = .recent
 
     var chartEntries: [IIDXTowerEntry] {
         Array(towerEntries.prefix(5)).reversed()
+    }
+
+    var totalKeyCount: Int {
+        towerEntries.reduce(0) { $0 + $1.keyCount } / 100
+    }
+
+    var totalScratchCount: Int {
+        towerEntries.reduce(0) { $0 + $1.scratchCount } / 100
     }
 
     var body: some View {
@@ -35,10 +44,31 @@ struct TowerView: View {
                 } else {
                     List {
                         Section {
-                            TowerBarChart(entries: chartEntries)
-                                .frame(height: 240)
-                                .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
-                                .listRowBackground(Color.clear)
+                            Picker("Tower.ChartMode", selection: $chartMode) {
+                                Text("Tower.ChartMode.Recent")
+                                    .tag(TowerChartMode.recent)
+                                Text("Tower.ChartMode.Totals")
+                                    .tag(TowerChartMode.totals)
+                            }
+                            .pickerStyle(.segmented)
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                        }
+                        Section {
+                            Group {
+                                switch chartMode {
+                                case .recent:
+                                    TowerBarChart(entries: chartEntries)
+                                case .totals:
+                                    TowerTotalsChart(
+                                        totalKeyCount: totalKeyCount,
+                                        totalScratchCount: totalScratchCount
+                                    )
+                                }
+                            }
+                            .frame(height: 240)
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
                         }
                         Section {
                             ForEach(towerEntries, id: \.playDate) { entry in
@@ -133,6 +163,11 @@ struct TowerView: View {
     }
 }
 
+enum TowerChartMode {
+    case recent
+    case totals
+}
+
 struct TowerBarChart: View {
     let entries: [IIDXTowerEntry]
 
@@ -153,6 +188,49 @@ struct TowerBarChart: View {
             )
             .foregroundStyle(.red)
             .position(by: .value("Tower.Type", "Scratch"))
+        }
+    }
+}
+
+struct TowerTotalsChart: View {
+    let totalKeyCount: Int
+    let totalScratchCount: Int
+
+    /// 鍵盤タワー: 鍵盤7回分で1cm
+    var keyTowerHeight: Double {
+        Double(totalKeyCount) / 7.0
+    }
+
+    /// スクラッチタワー: スクラッチ1回分で1cm
+    var scratchTowerHeight: Double {
+        Double(totalScratchCount)
+    }
+
+    var body: some View {
+        Chart {
+            BarMark(
+                x: .value("Tower.Type",
+                          NSLocalizedString("Tower.Totals.Keys", comment: "")),
+                y: .value("Tower.Totals.Height", keyTowerHeight)
+            )
+            .foregroundStyle(.blue)
+            .annotation(position: .top) {
+                Text("Tower.Totals.HeightValue.\(Int(keyTowerHeight))")
+                    .font(.caption)
+                    .monospacedDigit()
+            }
+
+            BarMark(
+                x: .value("Tower.Type",
+                          NSLocalizedString("Tower.Totals.Scratch", comment: "")),
+                y: .value("Tower.Totals.Height", scratchTowerHeight)
+            )
+            .foregroundStyle(.red)
+            .annotation(position: .top) {
+                Text("Tower.Totals.HeightValue.\(Int(scratchTowerHeight))")
+                    .font(.caption)
+                    .monospacedDigit()
+            }
         }
     }
 }

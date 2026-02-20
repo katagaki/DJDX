@@ -468,8 +468,8 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "New Achievements"
+            "state" : "translated",
+            "value" : "New Records"
           }
         },
         "ja" : {
@@ -737,23 +737,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表示するレベル"
-          }
-        }
-      }
-    },
-    "Analytics.Settings.PerLevel" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Per Level Cards"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "レベル別"
           }
         }
       }
@@ -1142,7 +1125,7 @@
       "shouldTranslate" : false
     },
     "Level.%lld" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -2653,6 +2636,54 @@
         }
       }
     },
+    "Tower.ChartMode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display Style"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示モード"
+          }
+        }
+      }
+    },
+    "Tower.ChartMode.Recent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activity"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイアクティビティ"
+          }
+        }
+      }
+    },
+    "Tower.ChartMode.Totals" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tower"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タワー"
+          }
+        }
+      }
+    },
     "Tower.Header.Keys" : {
       "localizations" : {
         "en" : {
@@ -2729,6 +2760,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データなし"
+          }
+        }
+      }
+    },
+    "Tower.Totals.Height" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tower Height"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タワーの高さ"
+          }
+        }
+      }
+    },
+    "Tower.Totals.HeightValue.%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldm"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldm"
+          }
+        }
+      }
+    },
+    "Tower.Totals.Keys" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Key Tower"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "鍵盤タワー"
+          }
+        }
+      }
+    },
+    "Tower.Totals.Scratch" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scratch Tower"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクラッチタワー"
           }
         }
       }
