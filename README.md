@@ -10,4 +10,4 @@ Features:
 - Automatic import using WKWebView, including dark mode support for the KONAMI login page
 
 Wording Clarifications:
-- **LEVEL** refers to the top level category (HYPER, ANOTHER, etc), while **DIFFICULTY** refers to the lower level difficulty number (1 to 12).
+- In DJDX, **DIFFICULTY** refers to the top level category (HYPER, ANOTHER, etc), while **LEVEL** refers to the lower level difficulty number (1 to 12).
