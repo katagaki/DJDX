@@ -20,12 +20,12 @@ struct OverviewClearTypePerDifficultyGraph: View {
                     SectorMark(angle: .value(clearType, clearData[clearType] ?? 0))
                         .foregroundStyle(by: .value("Shared.ClearType", clearType))
                 }
-                      .chartXScale(domain: IIDXClearType.sortedStrings)
+                .chartXScale(domain: IIDXClearType.sortedStrings.reversed())
                       .chartForegroundStyleScale([
                         "FULLCOMBO CLEAR": .blue,
                         "CLEAR": .cyan,
-                        "ASSIST CLEAR": .purple,
                         "EASY CLEAR": .green,
+                        "ASSIST CLEAR": .purple,
                         "HARD CLEAR": .pink,
                         "EX HARD CLEAR": .yellow,
                         "FAILED": .red

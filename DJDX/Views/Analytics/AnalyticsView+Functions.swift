@@ -124,7 +124,7 @@ extension AnalyticsView {
     // swiftlint:enable function_body_length
 
     // MARK: New Clears & High Scores
-    // swiftlint:disable function_body_length cyclomatic_complexity
+    // swiftlint:disable function_body_length
     func reloadNewClearsAndHighScores() async {
         debugPrint("Calculating new clears and high scores")
         var importGroups: [ImportGroup] = (try? modelContext.fetch(
@@ -163,14 +163,15 @@ extension AnalyticsView {
         for record in previousRecords {
             previousByTitle[record.titleCompact()] = record
         }
-
-        var computedNewClears: [NewClearEntry] = []
-        var computedNewAssistClears: [NewClearEntry] = []
-        var computedNewEasyClears: [NewClearEntry] = []
-        var computedNewFullComboClears: [NewClearEntry] = []
-        var computedNewHardClears: [NewClearEntry] = []
-        var computedNewExHardClears: [NewClearEntry] = []
-        var computedNewFailed: [NewClearEntry] = []
+        var computedClears: [String: [NewClearEntry]] = [
+            "CLEAR": [],
+            "EASY CLEAR": [],
+            "ASSIST CLEAR": [],
+            "FULLCOMBO CLEAR": [],
+            "HARD CLEAR": [],
+            "EX HARD CLEAR": [],
+            "FAILED": []
+        ]
         var computedNewHighScores: [NewHighScoreEntry] = []
 
         let levels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
@@ -187,216 +188,54 @@ extension AnalyticsView {
 
             for (level, keyPath) in levels {
                 let latestScore = latestRecord[keyPath: keyPath]
-                guard latestScore.difficulty > 0 else { continue }
+                guard latestScore.difficulty > 0, latestScore.score > 0 else { continue }
 
-                if let previousRecord {
-                    let previousScore = previousRecord[keyPath: keyPath]
+                let previousScore = previousRecord?[keyPath: keyPath]
+                let previousClearType = previousScore?.clearType ?? "NO PLAY"
 
-                    // Check for new CLEAR
-                    if latestScore.clearType == "CLEAR" &&
-                        latestScore.score > 0 &&
-                        previousScore.clearType != "CLEAR" {
-                        computedNewClears.append(NewClearEntry(
-                            songTitle: latestRecord.title,
-                            songArtist: latestRecord.artist,
-                            level: level,
-                            difficulty: latestScore.difficulty,
-                            clearType: latestScore.clearType,
-                            previousClearType: previousScore.clearType
-                        ))
-                    }
+                // Check for new clear type
+                if let clearType = latestScore.clearType as String?,
+                   computedClears.keys.contains(clearType),
+                   previousClearType != clearType {
+                    computedClears[clearType]!.append(NewClearEntry(
+                        songTitle: latestRecord.title,
+                        songArtist: latestRecord.artist,
+                        level: level,
+                        difficulty: latestScore.difficulty,
+                        clearType: clearType,
+                        previousClearType: previousClearType
+                    ))
+                }
 
-                    // Check for new ASSIST CLEAR
-                    if latestScore.clearType == "ASSIST CLEAR" &&
-                        latestScore.score > 0 &&
-                        previousScore.clearType != "ASSIST CLEAR" {
-                        computedNewAssistClears.append(NewClearEntry(
-                            songTitle: latestRecord.title,
-                            songArtist: latestRecord.artist,
-                            level: level,
-                            difficulty: latestScore.difficulty,
-                            clearType: latestScore.clearType,
-                            previousClearType: previousScore.clearType
-                        ))
-                    }
-
-                    // Check for new EASY CLEAR
-                    if latestScore.clearType == "EASY CLEAR" &&
-                        latestScore.score > 0 &&
-                        previousScore.clearType != "EASY CLEAR" {
-                        computedNewEasyClears.append(NewClearEntry(
-                            songTitle: latestRecord.title,
-                            songArtist: latestRecord.artist,
-                            level: level,
-                            difficulty: latestScore.difficulty,
-                            clearType: latestScore.clearType,
-                            previousClearType: previousScore.clearType
-                        ))
-                    }
-
-                    // Check for new FULLCOMBO CLEAR
-                    if latestScore.clearType == "FULLCOMBO CLEAR" &&
-                        latestScore.score > 0 &&
-                        previousScore.clearType != "FULLCOMBO CLEAR" {
-                        computedNewFullComboClears.append(NewClearEntry(
-                            songTitle: latestRecord.title,
-                            songArtist: latestRecord.artist,
-                            level: level,
-                            difficulty: latestScore.difficulty,
-                            clearType: latestScore.clearType,
-                            previousClearType: previousScore.clearType
-                        ))
-                    }
-
-                    // Check for new HARD CLEAR
-                    if latestScore.clearType == "HARD CLEAR" &&
-                        latestScore.score > 0 &&
-                        previousScore.clearType != "HARD CLEAR" {
-                        computedNewHardClears.append(NewClearEntry(
-                            songTitle: latestRecord.title,
-                            songArtist: latestRecord.artist,
-                            level: level,
-                            difficulty: latestScore.difficulty,
-                            clearType: latestScore.clearType,
-                            previousClearType: previousScore.clearType
-                        ))
-                    }
-
-                    // Check for new EX HARD CLEAR
-                    if latestScore.clearType == "EX HARD CLEAR" &&
-                        latestScore.score > 0 &&
-                        previousScore.clearType != "EX HARD CLEAR" {
-                        computedNewExHardClears.append(NewClearEntry(
-                            songTitle: latestRecord.title,
-                            songArtist: latestRecord.artist,
-                            level: level,
-                            difficulty: latestScore.difficulty,
-                            clearType: latestScore.clearType,
-                            previousClearType: previousScore.clearType
-                        ))
-                    }
-
-                    // Check for new FAILED
-                    if latestScore.clearType == "FAILED" &&
-                        latestScore.score > 0 &&
-                        previousScore.clearType != "FAILED" {
-                        computedNewFailed.append(NewClearEntry(
-                            songTitle: latestRecord.title,
-                            songArtist: latestRecord.artist,
-                            level: level,
-                            difficulty: latestScore.difficulty,
-                            clearType: latestScore.clearType,
-                            previousClearType: previousScore.clearType
-                        ))
-                    }
-
-                    // Check for new high score
-                    if latestScore.score > previousScore.score && latestScore.score > 0 {
-                        computedNewHighScores.append(NewHighScoreEntry(
-                            songTitle: latestRecord.title,
-                            songArtist: latestRecord.artist,
-                            level: level,
-                            difficulty: latestScore.difficulty,
-                            newScore: latestScore.score,
-                            previousScore: previousScore.score,
-                            newDJLevel: latestScore.djLevel,
-                            previousDJLevel: previousScore.djLevel
-                        ))
-                    }
-                } else {
-                    // Song didn't exist in previous import - all played scores are new
-                    if latestScore.score > 0 {
-                        if latestScore.clearType == "CLEAR" {
-                            computedNewClears.append(NewClearEntry(
-                                songTitle: latestRecord.title,
-                                songArtist: latestRecord.artist,
-                                level: level,
-                                difficulty: latestScore.difficulty,
-                                clearType: latestScore.clearType,
-                                previousClearType: "NO PLAY"
-                            ))
-                        } else if latestScore.clearType == "ASSIST CLEAR" {
-                            computedNewAssistClears.append(NewClearEntry(
-                                songTitle: latestRecord.title,
-                                songArtist: latestRecord.artist,
-                                level: level,
-                                difficulty: latestScore.difficulty,
-                                clearType: latestScore.clearType,
-                                previousClearType: "NO PLAY"
-                            ))
-                        } else if latestScore.clearType == "EASY CLEAR" {
-                            computedNewEasyClears.append(NewClearEntry(
-                                songTitle: latestRecord.title,
-                                songArtist: latestRecord.artist,
-                                level: level,
-                                difficulty: latestScore.difficulty,
-                                clearType: latestScore.clearType,
-                                previousClearType: "NO PLAY"
-                            ))
-                        } else if latestScore.clearType == "FULLCOMBO CLEAR" {
-                            computedNewFullComboClears.append(NewClearEntry(
-                                songTitle: latestRecord.title,
-                                songArtist: latestRecord.artist,
-                                level: level,
-                                difficulty: latestScore.difficulty,
-                                clearType: latestScore.clearType,
-                                previousClearType: "NO PLAY"
-                            ))
-                        } else if latestScore.clearType == "HARD CLEAR" {
-                            computedNewHardClears.append(NewClearEntry(
-                                songTitle: latestRecord.title,
-                                songArtist: latestRecord.artist,
-                                level: level,
-                                difficulty: latestScore.difficulty,
-                                clearType: latestScore.clearType,
-                                previousClearType: "NO PLAY"
-                            ))
-                        } else if latestScore.clearType == "EX HARD CLEAR" {
-                            computedNewExHardClears.append(NewClearEntry(
-                                songTitle: latestRecord.title,
-                                songArtist: latestRecord.artist,
-                                level: level,
-                                difficulty: latestScore.difficulty,
-                                clearType: latestScore.clearType,
-                                previousClearType: "NO PLAY"
-                            ))
-                        } else if latestScore.clearType == "FAILED" {
-                            computedNewFailed.append(NewClearEntry(
-                                songTitle: latestRecord.title,
-                                songArtist: latestRecord.artist,
-                                level: level,
-                                difficulty: latestScore.difficulty,
-                                clearType: latestScore.clearType,
-                                previousClearType: "NO PLAY"
-                            ))
-                        }
-                        computedNewHighScores.append(NewHighScoreEntry(
-                            songTitle: latestRecord.title,
-                            songArtist: latestRecord.artist,
-                            level: level,
-                            difficulty: latestScore.difficulty,
-                            newScore: latestScore.score,
-                            previousScore: 0,
-                            newDJLevel: latestScore.djLevel,
-                            previousDJLevel: "---"
-                        ))
-                    }
+                // Check for new high score
+                let previousScoreValue = previousScore?.score ?? 0
+                if latestScore.score > previousScoreValue {
+                    computedNewHighScores.append(NewHighScoreEntry(
+                        songTitle: latestRecord.title,
+                        songArtist: latestRecord.artist,
+                        level: level,
+                        difficulty: latestScore.difficulty,
+                        newScore: latestScore.score,
+                        previousScore: previousScoreValue,
+                        newDJLevel: latestScore.djLevel,
+                        previousDJLevel: previousScore?.djLevel ?? "---"
+                    ))
                 }
             }
         }
 
         await MainActor.run {
             withAnimation(.snappy.speed(2.0)) {
-                self.newClears = computedNewClears
-                self.newAssistClears = computedNewAssistClears
-                self.newEasyClears = computedNewEasyClears
-                self.newFullComboClears = computedNewFullComboClears
-                self.newHardClears = computedNewHardClears
-                self.newExHardClears = computedNewExHardClears
-                self.newFailed = computedNewFailed
+                self.newClears = computedClears["CLEAR"]!
+                self.newEasyClears = computedClears["EASY CLEAR"]!
+                self.newAssistClears = computedClears["ASSIST CLEAR"]!
+                self.newFullComboClears = computedClears["FULLCOMBO CLEAR"]!
+                self.newHardClears = computedClears["HARD CLEAR"]!
+                self.newExHardClears = computedClears["EX HARD CLEAR"]!
+                self.newFailed = computedClears["FAILED"]!
                 self.newHighScores = computedNewHighScores
             }
         }
     }
-    // swiftlint:enable function_body_length cyclomatic_complexity
+    // swiftlint:enable function_body_length
 }

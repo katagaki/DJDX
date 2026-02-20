@@ -11,8 +11,8 @@ enum IIDXClearType: String, Codable {
     case all = "Shared.All"
     case fullComboClear = "FULLCOMBO CLEAR"
     case clear = "CLEAR"
-    case assistClear = "ASSIST CLEAR"
     case easyClear = "EASY CLEAR"
+    case assistClear = "ASSIST CLEAR"
     case hardClear = "HARD CLEAR"
     case exHardClear = "EX HARD CLEAR"
     case failed = "FAILED"
@@ -22,8 +22,8 @@ enum IIDXClearType: String, Codable {
     static let sorted: [IIDXClearType] = [
         .fullComboClear,
         .clear,
-        .assistClear,
         .easyClear,
+        .assistClear,
         .hardClear,
         .exHardClear,
         .failed,
@@ -33,8 +33,8 @@ enum IIDXClearType: String, Codable {
     static let sortedWithoutNoPlay: [IIDXClearType] = [
         .fullComboClear,
         .clear,
-        .assistClear,
         .easyClear,
+        .assistClear,
         .hardClear,
         .exHardClear,
         .failed
@@ -61,12 +61,12 @@ enum IIDXClearType: String, Codable {
             gradient: Gradient(colors: [.orange, .red, .orange]),
             startPoint: .top, endPoint: .bottom
         )
-        case "ASSIST CLEAR": return LinearGradient(
-            gradient: Gradient(colors: [whiteOr(.indigo), .purple, whiteOr(.indigo)]),
-            startPoint: .top, endPoint: .bottom
-        )
         case "EASY CLEAR": return LinearGradient(
             gradient: Gradient(colors: [whiteOr(.mint), .green, whiteOr(.mint)]),
+            startPoint: .top, endPoint: .bottom
+        )
+        case "ASSIST CLEAR": return LinearGradient(
+            gradient: Gradient(colors: [whiteOr(.indigo), .purple, whiteOr(.indigo)]),
             startPoint: .top, endPoint: .bottom
         )
         case "CLEAR": return LinearGradient(

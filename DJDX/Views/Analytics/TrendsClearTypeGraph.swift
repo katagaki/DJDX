@@ -28,8 +28,8 @@ struct TrendsClearTypeGraph: View {
         .chartForegroundStyleScale([
             "FULLCOMBO CLEAR": .blue,
             "CLEAR": .cyan,
-            "ASSIST CLEAR": .purple,
             "EASY CLEAR": .green,
+            "ASSIST CLEAR": .purple,
             "HARD CLEAR": .pink,
             "EX HARD CLEAR": .yellow,
             "FAILED": .red

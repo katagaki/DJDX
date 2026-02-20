@@ -68,8 +68,8 @@ struct ScoreRow: View {
                                 endPoint: .bottom
                             )
                         case "CLEAR": Color.cyan
-                        case "ASSIST CLEAR": Color.purple
                         case "EASY CLEAR": Color.green
+                        case "ASSIST CLEAR": Color.purple
                         case "HARD CLEAR": Color.pink
                         case "EX HARD CLEAR": Color.yellow
                         case "FAILED": Color.red

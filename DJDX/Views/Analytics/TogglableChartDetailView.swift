@@ -40,7 +40,7 @@ struct TogglableClearTypeDetailView: View {
                     }
                 } label: {
                     Image(systemName: showAsPieChart
-                          ? "chart.bar.fill" : "chart.pie.fill")
+                          ? "chart.bar" : "chart.pie")
                 }
             }
         }
