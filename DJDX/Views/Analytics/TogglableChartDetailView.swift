@@ -77,8 +77,7 @@ struct TogglableDJLevelDetailView: View {
                         showAsPieChart.toggle()
                     }
                 } label: {
-                    Image(systemName: showAsPieChart
-                          ? "chart.bar.fill" : "chart.pie.fill")
+                    Image(systemName: showAsPieChart ? "chart.bar" : "chart.pie")
                 }
             }
         }
