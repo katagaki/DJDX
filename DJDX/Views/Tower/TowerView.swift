@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2024/10/06.
 //
 
-import Charts
 import SwiftData
 import SwiftUI
 
@@ -18,7 +17,8 @@ struct TowerView: View {
     @State var isAutoImportFailed: Bool = false
     @State var didImportSucceed: Bool = false
     @State var autoImportFailedReason: ImportFailedReason?
-    @State var chartMode: TowerChartMode = .recent
+
+    @AppStorage(wrappedValue: .totals, "TowerView.DisplayMode") var chartMode: TowerChartMode
 
     var chartEntries: [IIDXTowerEntry] {
         Array(towerEntries.prefix(5)).reversed()
@@ -159,78 +159,6 @@ struct TowerView: View {
             return NSLocalizedString("Alert.Import.Error.Subtitle.ServerError", comment: "")
         case .maintenance:
             return NSLocalizedString("Alert.Import.Error.Subtitle.Maintenance", comment: "")
-        }
-    }
-}
-
-enum TowerChartMode {
-    case recent
-    case totals
-}
-
-struct TowerBarChart: View {
-    let entries: [IIDXTowerEntry]
-
-    var body: some View {
-        Chart(entries, id: \.playDate) { entry in
-            BarMark(
-                x: .value("Tower.Header.PlayDate",
-                          entry.playDate, unit: .day),
-                y: .value("Tower.Header.Keys", entry.keyCount)
-            )
-            .foregroundStyle(.blue)
-            .position(by: .value("Tower.Type", "Keys"))
-
-            BarMark(
-                x: .value("Tower.Header.PlayDate",
-                          entry.playDate, unit: .day),
-                y: .value("Tower.Header.Scratch", entry.scratchCount)
-            )
-            .foregroundStyle(.red)
-            .position(by: .value("Tower.Type", "Scratch"))
-        }
-    }
-}
-
-struct TowerTotalsChart: View {
-    let totalKeyCount: Int
-    let totalScratchCount: Int
-
-    /// 鍵盤タワー: 鍵盤7回分で1cm
-    var keyTowerHeight: Double {
-        Double(totalKeyCount) / 7.0
-    }
-
-    /// スクラッチタワー: スクラッチ1回分で1cm
-    var scratchTowerHeight: Double {
-        Double(totalScratchCount)
-    }
-
-    var body: some View {
-        Chart {
-            BarMark(
-                x: .value("Tower.Type",
-                          NSLocalizedString("Tower.Totals.Keys", comment: "")),
-                y: .value("Tower.Totals.Height", keyTowerHeight)
-            )
-            .foregroundStyle(.blue)
-            .annotation(position: .top) {
-                Text("Tower.Totals.HeightValue.\(Int(keyTowerHeight))")
-                    .font(.caption)
-                    .monospacedDigit()
-            }
-
-            BarMark(
-                x: .value("Tower.Type",
-                          NSLocalizedString("Tower.Totals.Scratch", comment: "")),
-                y: .value("Tower.Totals.Height", scratchTowerHeight)
-            )
-            .foregroundStyle(.red)
-            .annotation(position: .top) {
-                Text("Tower.Totals.HeightValue.\(Int(scratchTowerHeight))")
-                    .font(.caption)
-                    .monospacedDigit()
-            }
         }
     }
 }
