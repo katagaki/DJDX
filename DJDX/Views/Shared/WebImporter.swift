@@ -251,6 +251,17 @@ document.getElementById('score_data').value
         }
     }
 
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        // Sync WebView cookie store with URLSession cookie store
+        let webViewCookieStore = webView.configuration.websiteDataStore.httpCookieStore
+        let nativeCookieStorage = HTTPCookieStorage.shared
+        webViewCookieStore.getAllCookies { cookies in
+            for cookie in cookies {
+                nativeCookieStorage.setCookie(cookie)
+            }
+        }
+    }
+
     func evaluateIIDXSPScript(_ webView: WKWebView) {
         webView.evaluateJavaScript(self.selectSPButtonJS) { _, error in
             if error != nil {
