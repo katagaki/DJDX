@@ -176,7 +176,13 @@ struct MoreView: View {
                         .font(.body)
                 }
             }
-            .navigator("ViewTitle.More")
+            .navigator("ViewTitle.More", inline: true)
+            .toolbar {
+                ToolbarItem(placement: .title) {
+                    Text("ViewTitle.More")
+                        .fontWeight(.semibold)
+                }
+            }
             .scrollContentBackground(.hidden)
             .listSectionSpacing(.compact)
             .task {
