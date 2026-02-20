@@ -102,7 +102,7 @@ struct TowerView: View {
                     }
                 }
             }
-            .navigator("ViewTitle.Tower", inline: true)
+            .navigator("ViewTitle.Tower")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Shared.Import", systemImage: "square.and.arrow.down") {
