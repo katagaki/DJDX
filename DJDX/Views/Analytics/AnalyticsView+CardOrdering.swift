@@ -31,7 +31,17 @@ extension AnalyticsView {
     func loadVisibleCards() {
         if let decoded = try? JSONDecoder().decode(Set<AnalyticsCardType>.self, from: visibleCardsData) {
             var cards = decoded
-            for cardType in AnalyticsCardType.allCases where !decoded.contains(cardType) {
+            // Use the saved card order to determine which cards were previously known.
+            // Only insert card types that are truly new (absent from the saved order),
+            // so intentionally hidden cards are not silently re-shown on load.
+            let knownCards: Set<AnalyticsCardType>
+            if let decodedOrder = try? JSONDecoder().decode([AnalyticsCardType].self, from: cardOrderData),
+               !decodedOrder.isEmpty {
+                knownCards = Set(decodedOrder)
+            } else {
+                knownCards = Set(AnalyticsCardType.allCases)
+            }
+            for cardType in AnalyticsCardType.allCases where !knownCards.contains(cardType) {
                 cards.insert(cardType)
             }
             visibleCards = cards
