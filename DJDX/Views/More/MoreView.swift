@@ -30,6 +30,8 @@ struct MoreView: View {
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var qproImage: UIImage?
+    @State var spRadarData: RadarData?
+    @State var dpRadarData: RadarData?
 
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
@@ -45,6 +47,12 @@ struct MoreView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 240.0, alignment: .center)
                             .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                        if spRadarData != nil || dpRadarData != nil {
+                            MoreNotesRadarView(spRadarData: spRadarData, dpRadarData: dpRadarData)
+                                .listRowBackground(Color.clear)
+                                .listRowInsets(EdgeInsets())
+                        }
                     }
                 }
                 Section {
@@ -172,12 +180,13 @@ struct MoreView: View {
             .scrollContentBackground(.hidden)
             .listSectionSpacing(.compact)
             .task {
+                loadRadarData()
                 if qproImage == nil {
-                    await refreshQproImage()
+                    await refreshStatusPageData()
                 }
             }
             .refreshable {
-                await refreshQproImage()
+                await refreshStatusPageData()
             }
             .alert(
                 "Alert.DeleteData.Web.Title",
@@ -218,13 +227,15 @@ struct MoreView: View {
         }
     }
 
-    func refreshQproImage() async {
+    func refreshStatusPageData() async {
         qproImage = loadQproImage()
         if qproImage == nil {
-            await downloadQproImage()
+            await downloadStatusPageData()
             withAnimation {
                 qproImage = loadQproImage()
             }
+        } else {
+            await downloadStatusPageData()
         }
     }
 

@@ -30,11 +30,7 @@ extension AnalyticsView {
 
     func loadVisibleCards() {
         if let decoded = try? JSONDecoder().decode(Set<AnalyticsCardType>.self, from: visibleCardsData) {
-            var cards = decoded
-            for cardType in AnalyticsCardType.allCases where !decoded.contains(cardType) {
-                cards.insert(cardType)
-            }
-            visibleCards = cards
+            visibleCards = decoded
         }
     }
 

@@ -50,7 +50,7 @@ struct MainTabView: View {
                 .tag(TabType.tower)
             MoreView()
                 .tabItem {
-                    Label("Tab.More", systemImage: "ellipsis")
+                    Label("Tab.More", systemImage: "person.crop.circle")
                 }
                 .tag(TabType.more)
         }

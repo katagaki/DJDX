@@ -10,7 +10,7 @@ import SwiftUI
 struct RadarChartView: View {
     let color: Color
     let points: [RadarPointConfig]
-    let maxValue: Double = 110.0
+    let maxValue: Double = 130.0
     let benchmarkValue: Double = 100.0
 
     init(_ data: RadarData) {
@@ -53,13 +53,12 @@ struct RadarChartView: View {
                         .frame(width: 0, height: 0)
                         .overlay(
                             Text(config.label)
-                                .font(.system(size: 14, weight: .black))
+                                .font(.system(size: 12, weight: .black))
                                 .fontWidth(.expanded)
                                 .foregroundStyle(config.color)
                                 .brightness(0.88)
                                 .shadow(color: config.color, radius: 1.0)
                                 .shadow(color: config.color, radius: 3.0)
-                                .padding(4)
                                 .fixedSize(),
                             alignment: config.alignment
                         )

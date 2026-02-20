@@ -192,6 +192,12 @@ https://p.eagate.573.jp/game/2dx/\(self.rawValue)/error/error.html
 """)!
     }
 
+    func statusPageURL() -> URL {
+        return URL(string: """
+https://p.eagate.573.jp/game/2dx/\(self.rawValue)/djdata/status.html
+""")!
+    }
+
     func towerURL() -> URL {
         return URL(string: """
 https://p.eagate.573.jp/game/2dx/\(self.rawValue)/djdata/tower.html

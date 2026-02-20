@@ -1373,6 +1373,23 @@
         }
       }
     },
+    "More.NotesRadar.Total" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TOTAL"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "合計レーダースコア"
+          }
+        }
+      }
+    },
     "More.PlayDataDisplay.Header" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1599,13 +1616,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To view historical score data, you will first need to update the BEMANIWiki 2nd data from the More tab."
+            "value" : "To view historical score data, you will first need to update the BEMANIWiki 2nd data from the My IIDX tab."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "スコア履歴を閲覧するには、「その他」画面でBEMANIWiki 2ndのデータを取得する必要があります。"
+            "value" : "スコア履歴を閲覧するには、「マイ弐寺」画面でBEMANIWiki 2ndのデータを取得する必要があります。"
           }
         }
       }
@@ -2510,13 +2527,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "More"
+            "value" : "My IIDX"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "その他"
+            "value" : "マイ弐寺"
           }
         }
       }
@@ -2951,13 +2968,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "More"
+            "value" : "My IIDX"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "その他"
+            "value" : "マイ弐寺"
           }
         }
       }
