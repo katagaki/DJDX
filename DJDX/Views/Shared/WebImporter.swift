@@ -12,10 +12,24 @@ import WebKit
 
 struct WebImporter: View {
     @Binding var importToDate: Date
-    @State var importMode: IIDXPlayType
+    @State var importMode: IIDXImportMode
     @Binding var isAutoImportFailed: Bool
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
+
+    init(
+        importToDate: Binding<Date> = .constant(Date()),
+        importMode: IIDXImportMode,
+        isAutoImportFailed: Binding<Bool>,
+        didImportSucceed: Binding<Bool>,
+        autoImportFailedReason: Binding<ImportFailedReason?>
+    ) {
+        self._importToDate = importToDate
+        self._importMode = State(initialValue: importMode)
+        self._isAutoImportFailed = isAutoImportFailed
+        self._didImportSucceed = didImportSucceed
+        self._autoImportFailedReason = autoImportFailedReason
+    }
 
     var body: some View {
         WebViewForImporter(
@@ -44,7 +58,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     @Environment(\.modelContext) var modelContext
 
     @Binding var importToDate: Date
-    @Binding var importMode: IIDXPlayType
+    @Binding var importMode: IIDXImportMode
     @Binding var isAutoImportFailed: Bool
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
@@ -146,19 +160,32 @@ if (submitButtons.length > 0) {
 }
 """
 
+    let selectTowerButtonJS = """
+var submitButtons = document.getElementsByClassName('submit_btn')
+if (submitButtons.length > 0) {
+    Array.from(submitButtons).forEach(button => {
+        if (button.value === "tower") {
+            button.click()
+        }
+    })
+} else {
+    throw 1
+}
+"""
+
     let getScoreDataJS = """
 document.getElementById('score_data').value
 """
 
     var delegate: UpdateScoreDataDelegate
-    var importMode: IIDXPlayType
+    var importMode: IIDXImportMode
     var version: IIDXVersion
 
     var waitingForDownloadPageFormSubmit: Bool = false
 
     init(
         delegate: UpdateScoreDataDelegate,
-        importMode: IIDXPlayType = .single,
+        importMode: IIDXImportMode = .single,
         version: IIDXVersion
     ) {
         self.delegate = delegate
@@ -179,6 +206,7 @@ document.getElementById('score_data').value
                         switch self.importMode {
                         case .single: self.evaluateIIDXSPScript(webView)
                         case .double: self.evaluateIIDXDPScript(webView)
+                        case .tower: self.evaluateTowerScript(webView)
                         }
                         self.waitingForDownloadPageFormSubmit = true
                     } else {
@@ -233,6 +261,14 @@ document.getElementById('score_data').value
 
     func evaluateIIDXDPScript(_ webView: WKWebView) {
         webView.evaluateJavaScript(self.selectDPButtonJS) { _, error in
+            if error != nil {
+                self.delegate.stopProcessing(with: .maintenance)
+            }
+        }
+    }
+
+    func evaluateTowerScript(_ webView: WKWebView) {
+        webView.evaluateJavaScript(self.selectTowerButtonJS) { _, error in
             if error != nil {
                 self.delegate.stopProcessing(with: .maintenance)
             }

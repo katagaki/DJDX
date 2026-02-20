@@ -110,23 +110,30 @@ actor DataImporter {
     func importCSV(
         csv csvString: String,
         to importToDate: Date,
-        for playType: IIDXPlayType,
+        for importMode: IIDXImportMode,
         from version: IIDXVersion
     ) -> AsyncStream<ImportProgress> {
         let (stream, continuation) = AsyncStream.makeStream(of: ImportProgress.self)
-        saveCSVStringToFile(csvString)
-        let parsedCSV = CSwiftV(with: csvString)
-        if let keyedRows = parsedCSV.keyedRows {
-            try? modelContext.transaction {
-                importCSV(
-                    keyedRows,
-                    to: importToDate,
-                    for: playType,
-                    from: version,
-                    continuation: continuation
-                )
+
+        if let playType = importMode.playType {
+            saveCSVStringToFile(csvString)
+            let parsedCSV = CSwiftV(with: csvString)
+            if let keyedRows = parsedCSV.keyedRows {
+                try? modelContext.transaction {
+                    importCSV(
+                        keyedRows,
+                        to: importToDate,
+                        for: playType,
+                        from: version,
+                        continuation: continuation
+                    )
+                }
             }
+        } else {
+            saveCSVStringToFile(csvString, appending: "-Tower")
+            // TODO: Tower import
         }
+
         continuation.finish()
         return stream
     }
@@ -159,14 +166,16 @@ actor DataImporter {
 
     // MARK: Other Import Stuff
 
-    func saveCSVStringToFile(_ csvString: String) {
+    func saveCSVStringToFile(_ csvString: String, appending suffix: String? = nil) {
         if let documentsDirectoryURL: URL = FileManager
         .default.urls(for: .documentDirectory, in: .userDomainMask).first {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = dateFormat
             let dateString = dateFormatter.string(from: .now)
-            let csvFile = documentsDirectoryURL.appendingPathComponent("\(dateString).csv",
-                                                                       conformingTo: .commaSeparatedText)
+            let csvFileName = "\(dateString)\(suffix ?? "").csv"
+            let csvFile = documentsDirectoryURL.appendingPathComponent(
+                csvFileName, conformingTo: .commaSeparatedText
+            )
             try? csvString.write(to: csvFile, atomically: true, encoding: .utf8)
         }
     }

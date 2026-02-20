@@ -35,6 +35,7 @@ enum ViewPath: Hashable {
     case newHighScoresDetail
     case importerWebIIDXSingle
     case importerWebIIDXDouble
+    case importerWebIIDXTower
     case importerManual
     case importDetail(importGroup: ImportGroup)
     case moreBemaniWikiCharts

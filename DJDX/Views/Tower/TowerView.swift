@@ -10,6 +10,8 @@ import WebKit
 
 struct TowerView: View {
 
+    @EnvironmentObject var navigationManager: NavigationManager
+
     @State var webView = WKWebView()
     @State var isLoading: Bool = true
     @State var isTowerAvailable: Bool = true
@@ -17,7 +19,7 @@ struct TowerView: View {
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationManager[.tower]) {
             WebViewForTower(
                 webView: $webView,
                 isTowerAvailable: $isTowerAvailable,
@@ -26,6 +28,11 @@ struct TowerView: View {
             )
             .navigator("ViewTitle.Tower", inline: true)
             .toolbar {
+//                ToolbarItem(placement: .topBarLeading) {
+//                    Button("Shared.Import") {
+//                        navigationManager.push(ViewPath.importerWebIIDXTower, for: .tower)
+//                    }
+//                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Shared.Refresh", systemImage: "arrow.clockwise") {
                         webView.layer.opacity = 0.0
@@ -52,6 +59,18 @@ struct TowerView: View {
                 }
             }
             .ignoreSafeAreaConditionally()
+            .navigationDestination(for: ViewPath.self) { viewPath in
+                switch viewPath {
+                case .importerWebIIDXTower:
+                    WebImporter(importMode: .tower,
+                                isAutoImportFailed: .constant(false),
+                                didImportSucceed: .constant(false),
+                                autoImportFailedReason: .constant(nil))
+                case .importDetail(let importGroup):
+                    ImportDetailView(importGroup: importGroup)
+                default: Color.clear
+                }
+            }
         }
     }
 }
