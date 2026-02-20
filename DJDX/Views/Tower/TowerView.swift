@@ -5,159 +5,154 @@
 //  Created by シン・ジャスティン on 2024/10/06.
 //
 
+import Charts
+import SwiftData
 import SwiftUI
-import WebKit
 
 struct TowerView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
 
-    @State var webView = WKWebView()
-    @State var isLoading: Bool = true
-    @State var isTowerAvailable: Bool = true
+    @Query(sort: \IIDXTowerEntry.playDate, order: .reverse) var towerEntries: [IIDXTowerEntry]
 
-    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @State var isAutoImportFailed: Bool = false
+    @State var didImportSucceed: Bool = false
+    @State var autoImportFailedReason: ImportFailedReason?
+
+    var chartEntries: [IIDXTowerEntry] {
+        Array(towerEntries.prefix(5)).reversed()
+    }
 
     var body: some View {
         NavigationStack(path: $navigationManager[.tower]) {
-            WebViewForTower(
-                webView: $webView,
-                isTowerAvailable: $isTowerAvailable,
-                isLoading: $isLoading,
-                towerURL: iidxVersion.towerURL()
-            )
-            .navigator("ViewTitle.Tower", inline: true)
-            .toolbar {
-//                ToolbarItem(placement: .topBarLeading) {
-//                    Button("Shared.Import") {
-//                        navigationManager.push(ViewPath.importerWebIIDXTower, for: .tower)
-//                    }
-//                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Shared.Refresh", systemImage: "arrow.clockwise") {
-                        webView.layer.opacity = 0.0
-                        isLoading = true
-                        webView.load(URLRequest(url: iidxVersion.towerURL()))
-                    }
-                }
-            }
-            .background {
-                if !isTowerAvailable {
+            Group {
+                if towerEntries.isEmpty {
                     ContentUnavailableView(
-                        "Tower.Unavailable.Title",
-                        systemImage: "exclamationmark.circle.fill",
-                        description: Text("Tower.Unavailable.Description")
+                        "Tower.NoData.Title",
+                        systemImage: "chart.bar.xaxis",
+                        description: Text("Tower.NoData.Description")
                     )
                 } else {
-                    if isLoading {
-                        VStack(spacing: 16.0) {
-                            ProgressView("Shared.Loading")
+                    List {
+                        Section {
+                            TowerBarChart(entries: chartEntries)
+                                .frame(height: 240)
+                                .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+                                .listRowBackground(Color.clear)
                         }
-                    } else {
-                        Color.clear
+                        Section {
+                            ForEach(towerEntries, id: \.playDate) { entry in
+                                HStack {
+                                    Text(entry.playDate, format: .dateTime.year().month().day())
+                                        .monospacedDigit()
+                                    Spacer()
+                                    Group {
+                                        Text("Count.\(entry.keyCount)")
+                                            .monospacedDigit()
+                                            .foregroundStyle(.blue)
+                                            .frame(width: 80, alignment: .trailing)
+                                        Text("Count.\(entry.scratchCount)")
+                                            .monospacedDigit()
+                                            .foregroundStyle(.red)
+                                            .frame(width: 80, alignment: .trailing)
+                                    }
+                                }
+                            }
+                            .listRowBackground(Color.clear)
+                        } header: {
+                            HStack {
+                                Text("Tower.Header.PlayDate")
+                                Spacer()
+                                Text("Tower.Header.Keys")
+                                    .frame(width: 80, alignment: .trailing)
+                                Text("Tower.Header.Scratch")
+                                    .frame(width: 80, alignment: .trailing)
+                            }
+                        }
                     }
                 }
             }
-            .ignoreSafeAreaConditionally()
+            .navigator("ViewTitle.Tower", inline: true)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Shared.Import", systemImage: "square.and.arrow.down") {
+                        navigationManager.push(ViewPath.importerWebIIDXTower, for: .tower)
+                    }
+                }
+            }
+            .alert(
+                "Alert.Import.Success.Title",
+                isPresented: $didImportSucceed,
+                actions: {
+                    Button("Shared.OK", role: .cancel) {
+                        didImportSucceed = false
+                    }
+                },
+                message: {
+                    Text("Alert.Import.Success.Subtitle")
+                }
+            )
+            .alert(
+                "Alert.Import.Error.Title",
+                isPresented: $isAutoImportFailed,
+                actions: {
+                    Button("Shared.OK", role: .cancel) {
+                        isAutoImportFailed = false
+                    }
+                },
+                message: {
+                    Text(errorMessage(for: autoImportFailedReason ?? .serverError))
+                }
+            )
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .importerWebIIDXTower:
                     WebImporter(importMode: .tower,
-                                isAutoImportFailed: .constant(false),
-                                didImportSucceed: .constant(false),
-                                autoImportFailedReason: .constant(nil))
-                case .importDetail(let importGroup):
-                    ImportDetailView(importGroup: importGroup)
+                                isAutoImportFailed: $isAutoImportFailed,
+                                didImportSucceed: $didImportSucceed,
+                                autoImportFailedReason: $autoImportFailedReason)
                 default: Color.clear
                 }
             }
         }
     }
+
+    func errorMessage(for reason: ImportFailedReason) -> String {
+        switch reason {
+        case .noPremiumCourse:
+            return NSLocalizedString("Alert.Import.Error.Subtitle.NoPremiumCourse", comment: "")
+        case .noEAmusementPass:
+            return NSLocalizedString("Alert.Import.Error.Subtitle.NoEAmusementPass", comment: "")
+        case .noPlayData:
+            return NSLocalizedString("Alert.Import.Error.Subtitle.NoPlayData", comment: "")
+        case .serverError:
+            return NSLocalizedString("Alert.Import.Error.Subtitle.ServerError", comment: "")
+        case .maintenance:
+            return NSLocalizedString("Alert.Import.Error.Subtitle.Maintenance", comment: "")
+        }
+    }
 }
 
-struct WebViewForTower: UIViewRepresentable {
+struct TowerBarChart: View {
+    let entries: [IIDXTowerEntry]
 
-    @Binding var webView: WKWebView
-    @Binding var isTowerAvailable: Bool
-    @Binding var isLoading: Bool
-    @State var towerURL: URL
+    var body: some View {
+        Chart(entries, id: \.playDate) { entry in
+            BarMark(
+                x: .value("Tower.Header.PlayDate",
+                          entry.playDate, unit: .day),
+                y: .value("Tower.Header.Keys", entry.keyCount)
+            )
+            .foregroundStyle(.blue)
+            .position(by: .value("Tower.Type", "Keys"))
 
-    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
-
-    func makeUIView(context: Context) -> WKWebView {
-        webView.navigationDelegate = context.coordinator
-        webView.layer.opacity = 0.0
-        webView.load(URLRequest(url: towerURL))
-        return webView
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(version: iidxVersion, updateTowerState: updateTowerState)
-    }
-
-    func updateUIView(_: WKWebView, context _: Context) {
-        // Blank function to conform to protocol
-    }
-
-    func updateTowerState(_ isTowerAvailable: Bool) {
-        self.isTowerAvailable = isTowerAvailable
-        if isTowerAvailable {
-            webView.layer.opacity = 1.0
-            isLoading = false
-        } else {
-            webView.layer.opacity = 0.0
-            isLoading = false
-        }
-    }
-
-    class Coordinator: NSObject, WKNavigationDelegate {
-        let cleanupTowerJS = """
-    \(globalJSFunctions)
-
-    \(globalCleanup)
-
-    \(iidxTowerCleanup)
-    """
-
-        let cleanupLoginJS = """
-    \(globalJSFunctions)
-
-    \(globalCleanup)
-
-    \(loginPageCleanup)
-    """
-
-        var version: IIDXVersion
-        var updateTowerState: (Bool) -> Void
-
-        init(
-            version: IIDXVersion,
-            updateTowerState: @escaping (Bool) -> Void
-        ) {
-            self.version = version
-            self.updateTowerState = updateTowerState
-            super.init()
-        }
-
-        func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
-            if let webViewURL = webView.url {
-                let urlString = webViewURL.absoluteString
-                webView.evaluateJavaScript(self.cleanupTowerJS) { _, _ in
-                    if urlString.starts(with: self.version.towerURL().absoluteString) {
-                        webView.evaluateJavaScript("document.documentElement.outerHTML.toString()") { html, _ in
-                            if let html = html as? String {
-                                self.updateTowerState(!html.contains("Http 404"))
-                            } else {
-                                self.updateTowerState(false)
-                            }
-                        }
-                    } else {
-                        webView.evaluateJavaScript(self.cleanupLoginJS) { _, _ in
-                            webView.layer.opacity = 1.0
-                        }
-                    }
-                }
-            }
+            BarMark(
+                x: .value("Tower.Header.PlayDate",
+                          entry.playDate, unit: .day),
+                y: .value("Tower.Header.Scratch", entry.scratchCount)
+            )
+            .foregroundStyle(.red)
+            .position(by: .value("Tower.Type", "Scratch"))
         }
     }
 }

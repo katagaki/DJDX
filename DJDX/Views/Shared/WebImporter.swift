@@ -108,8 +108,8 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
                     }
                 }
                 await MainActor.run {
-                    // HACK: View doesn't dismiss on iOS 26, need to improve the way this is handled
-                    navigationManager.popToRoot(for: .imports)
+                    let tab: TabType = importMode == .tower ? .tower : .imports
+                    navigationManager.popToRoot(for: tab)
                     progressAlertManager.hide()
                     didImportSucceed = true
                 }
@@ -118,8 +118,8 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     }
 
     func stopProcessing(with reason: ImportFailedReason) {
-        // HACK: View doesn't dismiss on iOS 26, need to improve the way this is handled
-        navigationManager.popToRoot(for: .imports)
+        let tab: TabType = importMode == .tower ? .tower : .imports
+        navigationManager.popToRoot(for: tab)
         autoImportFailedReason = reason
         isAutoImportFailed = true
     }

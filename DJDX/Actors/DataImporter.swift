@@ -131,7 +131,12 @@ actor DataImporter {
             }
         } else {
             saveCSVStringToFile(csvString, appending: "-Tower")
-            // TODO: Tower import
+            let parsedCSV = CSwiftV(with: csvString)
+            if let keyedRows = parsedCSV.keyedRows {
+                try? modelContext.transaction {
+                    importTowerCSV(keyedRows)
+                }
+            }
         }
 
         continuation.finish()
@@ -208,6 +213,34 @@ actor DataImporter {
         let startOfNextDay: Date = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
         return #Predicate<ImportGroup> {
             $0.importDate >= startOfDay && $0.importDate < startOfNextDay
+        }
+    }
+
+    // MARK: Tower Import
+
+    func importTowerCSV(_ keyedRows: [[String: String]]) {
+        // Delete all existing tower entries
+        let fetchDescriptor = FetchDescriptor<IIDXTowerEntry>()
+        if let existingEntries = try? modelContext.fetch(fetchDescriptor) {
+            for entry in existingEntries {
+                modelContext.delete(entry)
+            }
+        }
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+
+        for keyedRow in keyedRows {
+            guard let playDateString = keyedRow["プレー日"],
+                  let playDate = dateFormatter.date(from: playDateString),
+                  let keyCountString = keyedRow["鍵盤"],
+                  let keyCount = Int(keyCountString),
+                  let scratchCountString = keyedRow["スクラッチ"],
+                  let scratchCount = Int(scratchCountString) else {
+                continue
+            }
+            let entry = IIDXTowerEntry(playDate: playDate, keyCount: keyCount, scratchCount: scratchCount)
+            modelContext.insert(entry)
         }
     }
 }

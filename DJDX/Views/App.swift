@@ -31,7 +31,8 @@ let sharedModelContainer: ModelContainer = {
     let schema = Schema([
         ImportGroup.self,
         IIDXSongRecord.self,
-        IIDXSong.self
+        IIDXSong.self,
+        IIDXTowerEntry.self
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
