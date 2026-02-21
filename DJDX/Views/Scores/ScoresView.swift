@@ -78,7 +78,6 @@ struct ScoresView: View {
                 .listRowBackground(Color.clear)
             }
             .navigator("ViewTitle.Scores")
-            .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     if #available(iOS 26.0, *) {
@@ -95,23 +94,64 @@ struct ScoresView: View {
                         PlayTypePicker(playTypeToShow: $playTypeToShow)
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    if dataState == .initializing || dataState == .loading {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button(
+                        "Shared.ShowPastData",
+                        systemImage: isTimeTravelling ? "arrowshape.turn.up.backward.badge.clock.fill" :
+                            "arrowshape.turn.up.backward.badge.clock"
+                    ) {
+                        withAnimation {
+                            isTimeTravelling.toggle()
+                        }
+                        if !isTimeTravelling {
+                            playDataDate = .now
+                        }
+                    }
+                }
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                }
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    if dataState == .initializing {
                         ProgressView()
                             .progressViewStyle(.circular)
+                    } else {
+                        ScoreSortAndFilter(
+                            isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
+                            difficultyToShow: $difficultyToShow.animation(.snappy.speed(2.0)),
+                            levelToShow: $levelToShow.animation(.snappy.speed(2.0)),
+                            clearTypeToShow: $clearTypeToShow.animation(.snappy.speed(2.0)),
+                            sortMode: $sortMode.animation(.snappy.speed(2.0)),
+                            isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort
+                        ) {
+                            reloadDisplay()
+                        }
                     }
                 }
             }
-            .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                if #available(iOS 26.0, *) {
-                    bottomBar()
-                        .padding(.vertical, 2.0)
-                        .clipShape(.containerRelative)
-                        .glassEffect(.regular, in: .containerRelative)
-                        .padding()
-                } else {
-                    TabBarAccessory(placement: .bottom) {
-                        bottomBar()
+            .toolbarBackground(isTimeTravelling ? .hidden : .automatic, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0.0) {
+                if isTimeTravelling {
+                    if #available(iOS 26.0, *) {
+                        DatePicker("Shared.SelectDate",
+                                   selection: $playDataDate.animation(.snappy.speed(2.0)),
+                                   in: ...Date.now,
+                                   displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .padding(8.0)
+                        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 24.0))
+                        .padding(.horizontal, 16.0)
+                        .padding(.bottom, 12.0)
+                    } else {
+                        TabBarAccessory(placement: .top) {
+                            DatePicker("Shared.SelectDate",
+                                       selection: $playDataDate.animation(.snappy.speed(2.0)),
+                                       in: ...Date.now,
+                                       displayedComponents: .date)
+                            .datePickerStyle(.compact)
+                            .padding(.horizontal, 18.0)
+                            .padding(.bottom, 12.0)
+                        }
                     }
                 }
             }
@@ -185,45 +225,6 @@ struct ScoresView: View {
                 default: Color.clear
                 }
             }
-        }
-    }
-
-    @ViewBuilder
-    func bottomBar() -> some View {
-        VStack(spacing: 8.0) {
-            if isTimeTravelling {
-                DatePicker("Shared.SelectDate",
-                           selection: $playDataDate.animation(.snappy.speed(2.0)),
-                           in: ...Date.now,
-                           displayedComponents: .date)
-                .datePickerStyle(.compact)
-                .padding([.leading, .trailing], 16.0)
-                .padding([.top], 12.0)
-            }
-            ScrollView(.horizontal) {
-                HStack(spacing: 8.0) {
-                    ScoreSortAndFilter(isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                                       difficultyToShow: $difficultyToShow.animation(.snappy.speed(2.0)),
-                                       levelToShow: $levelToShow.animation(.snappy.speed(2.0)),
-                                       clearTypeToShow: $clearTypeToShow.animation(.snappy.speed(2.0)),
-                                       sortMode: $sortMode.animation(.snappy.speed(2.0)),
-                                       isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort) {
-                        reloadDisplay()
-                    }
-                    ToolbarButton("Shared.ShowPastData", icon: "arrowshape.turn.up.backward.badge.clock",
-                                  isSecondary: !isTimeTravelling) {
-                        withAnimation {
-                            isTimeTravelling.toggle()
-                        }
-                        if !isTimeTravelling {
-                            playDataDate = .now
-                        }
-                    }
-                }
-                .padding([.leading, .trailing], 16.0)
-                .padding([.top, .bottom], 12.0)
-            }
-            .scrollIndicators(.hidden)
         }
     }
 }

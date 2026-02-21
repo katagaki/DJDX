@@ -18,7 +18,29 @@ struct ScoreSortAndFilter: View {
     var onReset: () -> Void
 
     var body: some View {
-        Menu {
+        // Sort
+        Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
+            Picker("Shared.Sort", selection: $sortMode) {
+                if levelToShow != .all {
+                    ForEach(SortMode.whenLevelFiltered, id: \.self) { sortMode in
+                        Text(LocalizedStringKey(sortMode.rawValue))
+                            .tag(sortMode)
+                    }
+                } else if difficultyToShow != .all {
+                    ForEach(SortMode.whenDifficultyFiltered, id: \.self) { sortMode in
+                        Text(LocalizedStringKey(sortMode.rawValue))
+                            .tag(sortMode)
+                    }
+                } else {
+                    Text(LocalizedStringKey(SortMode.title.rawValue))
+                        .tag(SortMode.title)
+                }
+            }
+            .pickerStyle(.inline)
+        }
+
+        // Filter
+        Menu("Shared.Filter", systemImage: "line.3.horizontal.decrease.circle") {
             Toggle(
                 .scoresFilterShowWithScoreOnly, systemImage: "trophy.fill",
                 isOn: $isShowingOnlyPlayDataWithScores
@@ -62,54 +84,7 @@ struct ScoreSortAndFilter: View {
                 }
             }
             .pickerStyle(.menu)
-        } label: {
-            HStack(spacing: 8.0) {
-                Image(systemName: "line.3.horizontal.decrease.circle")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 18.0, height: 18.0)
-                Text("Shared.Filter")
-                    .fontWeight(.medium)
-            }
-            .foregroundStyle(.text)
-            .padding([.top, .bottom], 12.0)
-            .padding([.leading, .trailing], 16.0)
-            .background(.accent)
-            .clipShape(.capsule)
         }
         .menuActionDismissBehavior(.disabled)
-        Menu {
-            Picker("Shared.Sort", selection: $sortMode) {
-                if levelToShow != .all {
-                    ForEach(SortMode.whenLevelFiltered, id: \.self) { sortMode in
-                        Text(LocalizedStringKey(sortMode.rawValue))
-                            .tag(sortMode)
-                    }
-                } else if difficultyToShow != .all {
-                    ForEach(SortMode.whenDifficultyFiltered, id: \.self) { sortMode in
-                        Text(LocalizedStringKey(sortMode.rawValue))
-                            .tag(sortMode)
-                    }
-                } else {
-                    Text(LocalizedStringKey(SortMode.title.rawValue))
-                        .tag(SortMode.title)
-                }
-            }
-            .pickerStyle(.inline)
-        } label: {
-            HStack(spacing: 8.0) {
-                Image(systemName: "arrow.up.arrow.down")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 18.0, height: 18.0)
-                Text("Shared.Sort")
-                    .fontWeight(.medium)
-            }
-            .foregroundStyle(.text)
-            .padding([.top, .bottom], 12.0)
-            .padding([.leading, .trailing], 16.0)
-            .background(.accent)
-            .clipShape(.capsule)
-        }
     }
 }
