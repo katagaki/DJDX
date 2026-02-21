@@ -126,6 +126,7 @@ struct MainTabView: View {
         // If no data, skip migration
         guard !importGroups.isEmpty else {
             debugPrint("No SwiftData data to migrate")
+            UserDefaults.standard.set(true, forKey: "Internal.DataMigrationDeleteOldSQLiteData")
             return
         }
 
