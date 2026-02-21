@@ -89,6 +89,7 @@ struct MainTabView: View {
             "Internal.DataMigrationForSwiftDataToSQLite"
         ]
 
+        UIApplication.shared.isIdleTimerDisabled = true
         for dataMigrationKey in dataMigrationKeys where !defaults.bool(forKey: dataMigrationKey) {
             switch dataMigrationKey {
             case "Internal.DataMigrationForEpolisToPinkyCrush.2":
@@ -109,6 +110,7 @@ struct MainTabView: View {
             }
             UserDefaults.standard.set(true, forKey: dataMigrationKey)
         }
+        UIApplication.shared.isIdleTimerDisabled = false
     }
 
     func migrateSwiftDataToSQLite() async {
