@@ -74,4 +74,34 @@ extension AnalyticsView {
             sum + dict.values.reduce(0, +)
         }
     }
+
+    func buildOrderedClearType(
+        from raw: [Int: [String: Int]]
+    ) -> [Int: OrderedDictionary<String, Int>] {
+        let clearTypes = IIDXClearType.sortedStringsWithoutNoPlay
+        var result: [Int: OrderedDictionary<String, Int>] = [:]
+        for difficulty in difficulties {
+            let counts = raw[difficulty] ?? [:]
+            result[difficulty] = OrderedDictionary(
+                uniqueKeys: clearTypes,
+                values: clearTypes.map { counts[$0] ?? 0 }
+            )
+        }
+        return result
+    }
+
+    func buildOrderedDJLevel(
+        from raw: [Int: [String: Int]]
+    ) -> [Int: OrderedDictionary<String, Int>] {
+        let djLevels = Array(IIDXDJLevel.sortedStrings.reversed())
+        var result: [Int: OrderedDictionary<String, Int>] = [:]
+        for difficulty in difficulties {
+            let counts = raw[difficulty] ?? [:]
+            result[difficulty] = OrderedDictionary(
+                uniqueKeys: djLevels,
+                values: djLevels.map { counts[$0] ?? 0 }
+            )
+        }
+        return result
+    }
 }

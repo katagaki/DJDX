@@ -388,6 +388,87 @@ actor DataFetcher {
         return (try? database.prepare(query).map { Self.song(from: $0) }) ?? []
     }
 
+    // MARK: Analytics - Aggregated Counts
+
+    private struct LevelColumns {
+        let difficulty: SQLite.Expression<Int>
+        let clearType: SQLite.Expression<String>
+        let djLevel: SQLite.Expression<String>
+        let score: SQLite.Expression<Int>
+    }
+
+    func aggregatedCounts(
+        for importGroupIDs: [String],
+        playType: IIDXPlayType
+    ) -> (clearType: [String: [Int: [String: Int]]], djLevel: [String: [Int: [String: Int]]]) {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else {
+            return ([:], [:])
+        }
+        let cols = PlayDataDatabase.self
+
+        var clearTypeResult: [String: [Int: [String: Int]]] = [:]
+        var djLevelResult: [String: [Int: [String: Int]]] = [:]
+
+        let levelColumns: [LevelColumns] = [
+            LevelColumns(difficulty: cols.srBeginnerDifficulty, clearType: cols.srBeginnerClearType,
+                         djLevel: cols.srBeginnerDJLevel, score: cols.srBeginnerScore),
+            LevelColumns(difficulty: cols.srNormalDifficulty, clearType: cols.srNormalClearType,
+                         djLevel: cols.srNormalDJLevel, score: cols.srNormalScore),
+            LevelColumns(difficulty: cols.srHyperDifficulty, clearType: cols.srHyperClearType,
+                         djLevel: cols.srHyperDJLevel, score: cols.srHyperScore),
+            LevelColumns(difficulty: cols.srAnotherDifficulty, clearType: cols.srAnotherClearType,
+                         djLevel: cols.srAnotherDJLevel, score: cols.srAnotherScore),
+            LevelColumns(difficulty: cols.srLeggendariaDifficulty, clearType: cols.srLeggendariaClearType,
+                         djLevel: cols.srLeggendariaDJLevel, score: cols.srLeggendariaScore)
+        ]
+
+        let idSet = importGroupIDs
+        let table = PlayDataDatabase.songRecordTable
+            .filter(idSet.contains(cols.srImportGroupID) && cols.srPlayType == playType.rawValue)
+
+        for level in levelColumns {
+            let clearQuery = table
+                .select(cols.srImportGroupID, level.difficulty, level.clearType, level.score.count)
+                .filter(level.difficulty > 0 && level.clearType != "NO PLAY" && level.score > 0)
+                .group(cols.srImportGroupID, level.difficulty, level.clearType)
+
+            if let rows = try? database.prepare(clearQuery) {
+                for row in rows {
+                    let igID = row[cols.srImportGroupID]
+                    let diff = row[level.difficulty]
+                    let clearType = row[level.clearType]
+                    let count = row[level.score.count]
+                    clearTypeResult[igID, default: [:]][diff, default: [:]][clearType, default: 0] += count
+                }
+            }
+
+            let djQuery = table
+                .select(cols.srImportGroupID, level.difficulty, level.djLevel, level.djLevel.count)
+                .filter(level.difficulty > 0 && level.djLevel != "---")
+                .group(cols.srImportGroupID, level.difficulty, level.djLevel)
+
+            if let rows = try? database.prepare(djQuery) {
+                for row in rows {
+                    let igID = row[cols.srImportGroupID]
+                    let diff = row[level.difficulty]
+                    let djLevel = row[level.djLevel]
+                    let count = row[level.djLevel.count]
+                    djLevelResult[igID, default: [:]][diff, default: [:]][djLevel, default: 0] += count
+                }
+            }
+        }
+
+        return (clearTypeResult, djLevelResult)
+    }
+
+    func importGroups(for version: IIDXVersion) -> [ImportGroup] {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = PlayDataDatabase.importGroupTable
+            .filter(PlayDataDatabase.igIIDXVersion == version.rawValue)
+            .order(PlayDataDatabase.igImportDate.asc)
+        return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
+    }
+
     // MARK: Tower Entries
 
     func allTowerEntries() -> [IIDXTowerEntry] {

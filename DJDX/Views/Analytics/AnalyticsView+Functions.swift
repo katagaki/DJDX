@@ -13,9 +13,10 @@ extension AnalyticsView {
         dataState = .loading
         try? await Task.sleep(for: .seconds(0.5))
         Task.detached {
-            await reloadOverview()
-            await reloadTrends()
-            await reloadNewClearsAndHighScores()
+            async let overviewTask: () = reloadOverview()
+            async let trendsTask: () = reloadTrends()
+            async let newClearsTask: () = reloadNewClearsAndHighScores()
+            _ = await (overviewTask, trendsTask, newClearsTask)
             await MainActor.run {
                 withAnimation(.snappy.speed(2.0)) {
                     dataState = .presenting
@@ -28,9 +29,15 @@ extension AnalyticsView {
         debugPrint("Calculating overview")
         let importGroupID = await fetcher.importGroupID(for: .now)
         if let importGroupID {
-            let songRecords = await fetcher.songRecords(for: importGroupID, playType: playTypeToShow)
-            if songRecords.count > 0 {
-                let (newClearType, newDJLevel) = computeAllCounts(from: songRecords)
+            let result = await fetcher.aggregatedCounts(
+                for: [importGroupID], playType: playTypeToShow
+            )
+            let rawClearType = result.clearType[importGroupID]
+            let rawDJLevel = result.djLevel[importGroupID]
+
+            if let rawClearType, !rawClearType.isEmpty {
+                let newClearType = buildOrderedClearType(from: rawClearType)
+                let newDJLevel = buildOrderedDJLevel(from: rawDJLevel ?? [:])
                 let newDJLevelPerDifficulty = convertToEnumKeyed(newDJLevel)
                 await MainActor.run {
                     withAnimation(.snappy.speed(2.0)) {
@@ -51,26 +58,31 @@ extension AnalyticsView {
 
     func reloadTrends() async {
         debugPrint("Calculating trends")
-        var importGroups = await fetcher.allImportGroups()
-        guard importGroups.count > 0 else { return }
-        importGroups.removeAll(where: { $0.iidxVersion != iidxVersion })
+        let importGroups = await fetcher.importGroups(for: iidxVersion)
+        guard !importGroups.isEmpty else { return }
+
+        let importGroupIDs = importGroups.map(\.id)
+        let idToDate = Dictionary(uniqueKeysWithValues: importGroups.map { ($0.id, $0.importDate) })
+
+        let result = await fetcher.aggregatedCounts(for: importGroupIDs, playType: playTypeToShow)
 
         var newClearTypeData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
         var newDJLevelData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
 
-        for importGroup in importGroups {
-            debugPrint("Processing data: \(importGroup.importDate)")
-            let songRecords = await fetcher.songRecords(for: importGroup.id, playType: playTypeToShow)
-            let computed = computeAllCounts(from: songRecords)
-            let clearTypeData = computed.clearType
-            let djLevelData = computed.djLevel
+        for igID in importGroupIDs {
+            guard let date = idToDate[igID] else { continue }
 
-            if sumOfCounts(clearTypeData) > 0 {
-                debugPrint("Adding: \(importGroup.importDate)")
-                newClearTypeData[importGroup.importDate] = clearTypeData
+            if let rawClearType = result.clearType[igID] {
+                let ordered = buildOrderedClearType(from: rawClearType)
+                if sumOfCounts(ordered) > 0 {
+                    newClearTypeData[date] = ordered
+                }
             }
-            if sumOfCounts(djLevelData) > 0 {
-                newDJLevelData[importGroup.importDate] = djLevelData
+            if let rawDJLevel = result.djLevel[igID] {
+                let ordered = buildOrderedDJLevel(from: rawDJLevel)
+                if sumOfCounts(ordered) > 0 {
+                    newDJLevelData[date] = ordered
+                }
             }
         }
 
@@ -86,8 +98,7 @@ extension AnalyticsView {
     // swiftlint:disable function_body_length
     func reloadNewClearsAndHighScores() async {
         debugPrint("Calculating new clears and high scores")
-        var importGroups = await fetcher.allImportGroups()
-        importGroups.removeAll(where: { $0.iidxVersion != iidxVersion })
+        let importGroups = await fetcher.importGroups(for: iidxVersion)
 
         guard importGroups.count >= 2 else {
             await MainActor.run {
@@ -108,15 +119,21 @@ extension AnalyticsView {
         let latestGroup = importGroups[importGroups.count - 1]
         let previousGroup = importGroups[importGroups.count - 2]
 
-        let latestRecords = await fetcher.songRecords(
+        async let latestRecordsTask = fetcher.songRecords(
             for: latestGroup.id, playType: playTypeToShow
-        ).sorted(by: {
+        )
+        async let previousRecordsTask = fetcher.songRecords(
+            for: previousGroup.id, playType: playTypeToShow
+        )
+
+        let latestRecords = await latestRecordsTask.sorted(by: {
             $0.lastPlayDate < $1.lastPlayDate
         })
-        let previousRecords = await fetcher.songRecords(for: previousGroup.id, playType: playTypeToShow)
+        let previousRecords = await previousRecordsTask
 
         // Build lookup by compact title for previous records
         var previousByTitle: [String: IIDXSongRecord] = [:]
+        previousByTitle.reserveCapacity(previousRecords.count)
         for record in previousRecords {
             previousByTitle[record.titleCompact()] = record
         }

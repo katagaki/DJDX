@@ -225,6 +225,15 @@ final class PlayDataDatabase: Sendable {
                 table.column(Self.teKeyCount, defaultValue: 0)
                 table.column(Self.teScratchCount, defaultValue: 0)
             })
+            // MARK: Indexes
+            try database.run(Self.songRecordTable.createIndex(
+                Self.srImportGroupID, Self.srPlayType,
+                ifNotExists: true
+            ))
+            try database.run(Self.importGroupTable.createIndex(
+                Self.igIIDXVersion,
+                ifNotExists: true
+            ))
         } catch {
             debugPrint("Failed to create tables: \(error)")
         }
