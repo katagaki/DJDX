@@ -169,12 +169,14 @@ struct MainTabView: View {
         await importer.migrateTowerEntries(towerEntries)
 
         // Delete all SwiftData entries after successful migration
+        #if DEBUG
         debugPrint("Deleting SwiftData entries after migration")
         try? modelContext.delete(model: IIDXSongRecord.self)
         try? modelContext.delete(model: ImportGroup.self)
         try? modelContext.delete(model: IIDXSong.self)
         try? modelContext.delete(model: IIDXTowerEntry.self)
         try? modelContext.save()
+        #endif
 
         debugPrint("Migration from SwiftData to SQLite completed")
         await MainActor.run {
