@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class IIDXTowerEntry {
+final class IIDXTowerEntry: @unchecked Sendable {
     var playDate: Date = Date.distantPast
     var keyCount: Int = 0
     var scratchCount: Int = 0

@@ -6,13 +6,11 @@
 //
 
 import Komponents
-import SwiftData
 import SwiftUI
 
 struct ImportView: View {
 
     @Environment(\.openURL) var openURL
-    @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
@@ -23,7 +21,7 @@ struct ImportView: View {
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var importPlayType: IIDXPlayType
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
-    @Query(sort: \ImportGroup.importDate, order: .reverse) var importGroups: [ImportGroup]
+    @State var importGroups: [ImportGroup] = []
 
     @State var importToDate: Date = .now
     @State var isAutoImportFailed: Bool = false
@@ -32,7 +30,8 @@ struct ImportView: View {
 
     @State var isSelectingCSVFile: Bool = false
 
-    let actor = DataImporter(modelContainer: sharedModelContainer)
+    let actor = DataImporter()
+    let fetcher = DataFetcher()
 
     var body: some View {
         NavigationStack(path: $navigationManager[.imports]) {
@@ -136,6 +135,12 @@ struct ImportView: View {
             )
             .task {
                 importToDate = .now
+                await reloadImportGroups()
+            }
+            .onChange(of: didImportSucceed) { _, newValue in
+                if newValue {
+                    Task { await reloadImportGroups() }
+                }
             }
             .sheet(isPresented: $isSelectingCSVFile) {
                 DocumentPicker(allowedUTIs: [.commaSeparatedText], onDocumentPicked: { urls in

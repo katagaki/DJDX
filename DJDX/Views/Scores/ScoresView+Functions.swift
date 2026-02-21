@@ -15,7 +15,7 @@ extension ScoresView {
             dataState = .loading
         } completion: {
             Task.detached {
-                let songRecordIdentifiers = await actor.songRecords(
+                let songRecords = await actor.songRecords(
                     on: playDataDate,
                     filters: FilterOptions(playType: playTypeToShow,
                                            onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
@@ -29,17 +29,14 @@ extension ScoresView {
 
                 await MainActor.run {
                     withAnimation(.snappy.speed(2.0)) {
-                        if let songRecordIdentifiers {
-
-                            // Get song records
-                            let songRecords = songRecordIdentifiers.compactMap {
-                                modelContext.model(for: $0) as? IIDXSongRecord
-                            }
-
+                        if let songRecords {
                             // Calculate clear rates
+                            let noteCounts: [String: IIDXNoteCount] = songCompactTitles
+                                .compactMapValues { $0.spNoteCount }
+
                             let songRecordClearRates: [IIDXSongRecord: [IIDXLevel: Float]] = songRecords
                                 .reduce(into: [:], { partialResult, songRecord in
-                                    let song = songNoteCounts[songRecord.titleCompact()]
+                                    let song = noteCounts[songRecord.titleCompact()]
                                     if let song {
                                         let scores: [IIDXLevelScore] = songRecord.scores()
                                         let scoreRates = scores.reduce(
@@ -61,13 +58,17 @@ extension ScoresView {
                         }
 
                         self.songCompactTitles = songCompactTitles
-                        self.songNoteCounts = songNoteCounts
+                        self.songNoteCounts = noteCounts
 
                         dataState = .presenting
                     }
                 }
             }
         }
+    }
+
+    private var noteCounts: [String: IIDXNoteCount] {
+        songCompactTitles.compactMapValues { $0.spNoteCount }
     }
 
     func filterSongRecords() {
@@ -103,8 +104,7 @@ extension ScoresView {
         default: keyPath = nil
         }
         if let keyPath,
-           let songIdentifier = songCompactTitles[compactTitle],
-           let song = modelContext.model(for: songIdentifier) as? IIDXSong {
+           let song = songCompactTitles[compactTitle] {
             return song.spNoteCount?[keyPath: keyPath]
         } else {
             return nil

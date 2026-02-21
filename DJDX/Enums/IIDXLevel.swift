@@ -38,11 +38,11 @@ enum IIDXLevel: String, CaseIterable, Codable {
 
     init(csvValue: String) {
         switch csvValue {
-        case "BEGINNER": self = .beginner
-        case "NORMAL": self = .normal
-        case "HYPER": self = .hyper
-        case "ANOTHER": self = .another
-        case "LEGGENDARIA": self = .leggendaria
+        case "BEGINNER", "B": self = .beginner
+        case "NORMAL", "N": self = .normal
+        case "HYPER", "H": self = .hyper
+        case "ANOTHER", "A": self = .another
+        case "LEGGENDARIA", "L": self = .leggendaria
         default: self = .unknown
         }
     }

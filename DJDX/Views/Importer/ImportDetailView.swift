@@ -13,9 +13,9 @@ struct ImportDetailView: View {
 
     var importGroup: ImportGroup
 
-    var sortedSongRecords: [IIDXSongRecord] {
-        (importGroup.iidxData ?? []).sorted { $0.title < $1.title }
-    }
+    @State var sortedSongRecords: [IIDXSongRecord] = []
+
+    let fetcher = DataFetcher()
 
     var body: some View {
         List {
@@ -27,6 +27,9 @@ struct ImportDetailView: View {
         .listStyle(.plain)
         .navigationTitle(Text(importGroup.importDate, style: .date))
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            sortedSongRecords = await fetcher.songRecords(for: importGroup.id)
+        }
         .safeAreaInset(edge: .bottom) {
             if #available(iOS 26.0, *) {
                 Text("Importer.Detail.SongCount.\(sortedSongRecords.count)")

@@ -6,15 +6,15 @@
 //
 
 import Komponents
-import SwiftData
 import SwiftUI
 import WebKit
 
 struct MoreView: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-    @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
+
+    let importer = DataImporter()
 
     @AppStorage(wrappedValue: false, "ScoresView.LevelsShownSeparately") var isLevelsShownSeparately: Bool
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
@@ -142,24 +142,7 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
-                    Button("More.ManageData.ForceReSync") {
-                        let importGroups: [ImportGroup] = (try? modelContext.fetch(
-                            FetchDescriptor<ImportGroup>()
-                        )) ?? []
-                        for importGroup in importGroups {
-                            debugPrint("Fetched \(importGroup.id)")
-                        }
-                        let songRecords: [IIDXSongRecord] = (try? modelContext.fetch(
-                            FetchDescriptor<IIDXSongRecord>()
-                        )) ?? []
-                        for songRecord in songRecords {
-                            debugPrint("Fetched \(songRecord.title)")
-                        }
-                    }
                     Group {
-                        Button("More.ManageData.ClearAnalyticsCache") {
-                            clearAnalyticsCache()
-                        }
                         Button("More.ManageData.DeleteWebData") {
                             isConfirmingWebDataDelete = true
                         }
@@ -268,14 +251,8 @@ struct MoreView: View {
     }
 
     func deleteAllScoreData() {
-        try? modelContext.delete(model: ImportGroup.self)
-        try? modelContext.delete(model: IIDXSongRecord.self)
-    }
-
-    func clearAnalyticsCache() {
-        let defaults = UserDefaults.standard
-        defaults.removeObject(forKey: "Analytics.Trends.ClearType.Level.Cache")
-        defaults.removeObject(forKey: "Analytics.Trends.DJLevel.Level.Cache")
-        defaults.synchronize()
+        Task {
+            await importer.deleteAllScoreData()
+        }
     }
 }

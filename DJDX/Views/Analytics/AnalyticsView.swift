@@ -8,14 +8,11 @@
 import Charts
 import Komponents
 import OrderedCollections
-import SwiftData
 import SwiftUI
 import UniformTypeIdentifiers
 
 // swiftlint:disable type_body_length
 struct AnalyticsView: View {
-
-    @Environment(\.modelContext) var modelContext
 
     @EnvironmentObject var navigationManager: NavigationManager
 
@@ -53,9 +50,7 @@ struct AnalyticsView: View {
 
     // Trends
     @State var clearTypePerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-    @AppStorage(wrappedValue: Data(), "Analytics.Trends.ClearType.Level.Cache") var clearTypePerImportGroupCache: Data
     @State var djLevelPerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-    @AppStorage(wrappedValue: Data(), "Analytics.Trends.DJLevel.Level.Cache") var djLevelPerImportGroupCache: Data
 
     // New Clears & High Scores
     @State var newClears: [NewClearEntry] = []
@@ -69,6 +64,7 @@ struct AnalyticsView: View {
 
     @State var dataState: DataState = .initializing
 
+    let fetcher = DataFetcher()
     let difficulties: [Int] = Array(1...12)
 
     let cardColumns = [
@@ -183,8 +179,6 @@ struct AnalyticsView: View {
                 }
             }
             .refreshable {
-                clearTypePerImportGroupCache = Data()
-                djLevelPerImportGroupCache = Data()
                 await reload()
                 debugPrint("Reloaded from swipe to refresh")
             }

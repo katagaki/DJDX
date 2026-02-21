@@ -9,13 +9,15 @@ import Foundation
 import SwiftData
 
 @Model
-final class IIDXSong: Equatable {
+final class IIDXSong: Equatable, @unchecked Sendable {
     var title: String = ""
     var spNoteCount: IIDXNoteCount?
     var dpNoteCount: IIDXNoteCount?
     var time: String = ""
     var movie: String = ""
     var layer: String = ""
+
+    init() {}
 
     init(_ tableColumnData: [String]) {
         self.title = tableColumnData[0]

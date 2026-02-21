@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2024/05/19.
 //
 
-import SwiftData
 import SwiftUI
 import UIKit
 import WebKit
@@ -55,8 +54,6 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
-    @Environment(\.modelContext) var modelContext
-
     @Binding var importToDate: Date
     @Binding var importMode: IIDXImportMode
     @Binding var isAutoImportFailed: Bool
@@ -92,7 +89,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
             message: "Alert.Importing.Text"
         ) {
             Task {
-                let actor = DataImporter(modelContainer: sharedModelContainer)
+                let actor = DataImporter()
                 for await progress in await actor.importCSV(
                     csv: csvString,
                     to: importToDate,

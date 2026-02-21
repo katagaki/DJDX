@@ -6,24 +6,25 @@
 //
 
 import Komponents
-import SwiftData
 import SwiftSoup
 import SwiftUI
 
 struct MoreBemaniWikiCharts: View {
 
-    @Environment(\.modelContext) var modelContext
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
-    @Query(sort: \IIDXSong.title, order: .forward) var allSongs: [IIDXSong]
+    @State var allSongs: [IIDXSong] = []
 
     @State var isReloadCompleted: Bool = false
     @State var dataImported: Int = 0
     @State var dataTotal: Int = 2
+
+    let fetcher = DataFetcher()
+    let importer = DataImporter()
 
     var body: some View {
         List {
@@ -100,6 +101,9 @@ struct MoreBemaniWikiCharts: View {
                 }
             }
         })
+        .task {
+            allSongs = await fetcher.fetchAllSongs()
+        }
         .alert(
             "Alert.ExternalData.Completed.Title",
             isPresented: $isReloadCompleted,
@@ -115,17 +119,14 @@ struct MoreBemaniWikiCharts: View {
     }
 
     func reloadData() async {
-        try? modelContext.delete(model: IIDXSong.self)
+        await importer.deleteAllSongs()
         var iidxSongs: [IIDXSong] = []
         iidxSongs.append(contentsOf: await reloadBemaniWikiDataForLatestVersion())
         dataImported += 1
         iidxSongs.append(contentsOf: await reloadBemaniWikiDataForExistingVersions())
         dataImported += 1
-        try? modelContext.transaction {
-            for iidxSong in iidxSongs {
-                modelContext.insert(iidxSong)
-            }
-        }
+        await importer.insertSongs(iidxSongs)
+        allSongs = await fetcher.fetchAllSongs()
         await MainActor.run {
             progressAlertManager.hide()
             withAnimation(.snappy.speed(2.0)) {
