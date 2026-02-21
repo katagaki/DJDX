@@ -169,6 +169,10 @@ struct ScoresView: View {
                     reloadDisplay()
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
+                dataState = .initializing
+                reloadDisplay()
+            }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .scoreViewer(let songRecord):

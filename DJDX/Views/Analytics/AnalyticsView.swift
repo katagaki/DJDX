@@ -201,6 +201,9 @@ struct AnalyticsView: View {
                     dataState = .initializing
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
+                Task { await reload() }
+            }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 Group {
                     switch viewPath {

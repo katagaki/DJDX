@@ -155,6 +155,9 @@ struct TowerView: View {
                     }
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
+                Task { await reloadTowerEntries() }
+            }
         }
     }
 

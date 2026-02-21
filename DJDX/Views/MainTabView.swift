@@ -179,6 +179,7 @@ struct MainTabView: View {
         debugPrint("Migration from SwiftData to SQLite completed")
         await MainActor.run {
             progressAlertManager.hide()
+            NotificationCenter.default.post(name: .dataMigrationCompleted, object: nil)
         }
     }
 }
