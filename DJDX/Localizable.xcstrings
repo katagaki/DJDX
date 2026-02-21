@@ -40,6 +40,54 @@
       },
       "shouldTranslate" : false
     },
+    "Alert.DeleteData.OldData.Confirm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Clean Up"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "従来スコアデータを消去"
+          }
+        }
+      }
+    },
+    "Alert.DeleteData.OldData.Subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Migrated score data will continue to be used throughout the app, and only pre-migration score data will be deleted."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ移行が正常に行われた場合、すでにデータ移行後のデータが使用されます。\nデータ移行前のデータが使用されないため、安全に削除できます。"
+          }
+        }
+      }
+    },
+    "Alert.DeleteData.OldData.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only Pre-Migration Score Data Will Be Deleted"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ移行前のスコアデータのみ削除されます"
+          }
+        }
+      }
+    },
     "Alert.DeleteData.Score.Confirm" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1339,6 +1387,22 @@
         }
       }
     },
+    "More.ManageData.DeleteOldData" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clean Up Migration Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "従来スコアデータを消去"
+          }
+        }
+      }
+    },
     "More.ManageData.DeleteScoreData" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1369,23 +1433,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Webデータを消去"
-          }
-        }
-      }
-    },
-    "More.ManageData.ForceReSync" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sync All Data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてのデータを同期"
           }
         }
       }

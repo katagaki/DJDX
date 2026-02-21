@@ -11,6 +11,7 @@ import WebKit
 
 struct MoreView: View {
 
+    @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @EnvironmentObject var navigationManager: NavigationManager
 
@@ -35,6 +36,7 @@ struct MoreView: View {
 
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
+    @State var isConfirmingOldDataDelete: Bool = false
 
     var body: some View {
         NavigationStack(path: $navigationManager[.more]) {
@@ -149,6 +151,12 @@ struct MoreView: View {
                         Button("More.ManageData.DeleteScoreData") {
                             isConfirmingScoreDataDelete = true
                         }
+                        if UserDefaults.standard.bool(forKey: "Internal.DataMigrationForSwiftDataToSQLite") &&
+                            !UserDefaults.standard.bool(forKey: "Internal.DataMigrationDeleteOldSQLiteData") {
+                            Button("More.ManageData.DeleteOldData") {
+                                isConfirmingOldDataDelete = true
+                            }
+                        }
                     }
                     .tint(.red)
                 } header: {
@@ -214,6 +222,20 @@ struct MoreView: View {
                 message: {
                     Text("Alert.DeleteData.Score.Subtitle")
                 })
+            .alert(
+                "Alert.DeleteData.OldData.Title",
+                isPresented: $isConfirmingOldDataDelete,
+                actions: {
+                    Button("Alert.DeleteData.OldData.Confirm", role: .destructive) {
+                        deleteOldSwiftDataData()
+                    }
+                    Button("Shared.Cancel", role: .cancel) {
+                        isConfirmingOldDataDelete = false
+                    }
+                },
+                message: {
+                    Text("Alert.DeleteData.OldData.Subtitle")
+                })
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
                 switch viewPath {
                 case .moreBemaniWikiCharts: MoreBemaniWikiCharts()
@@ -254,5 +276,14 @@ struct MoreView: View {
         Task {
             await importer.deleteAllScoreData()
         }
+    }
+
+    func deleteOldSwiftDataData() {
+        try? modelContext.delete(model: IIDXSongRecord.self)
+        try? modelContext.delete(model: ImportGroup.self)
+        try? modelContext.delete(model: IIDXSong.self)
+        try? modelContext.delete(model: IIDXTowerEntry.self)
+        try? modelContext.save()
+        UserDefaults.standard.set(true, forKey: "Internal.DataMigrationDeleteOldSQLiteData")
     }
 }
