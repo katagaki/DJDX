@@ -6,11 +6,8 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ScoresView: View {
-
-    @Environment(\.modelContext) var modelContext
 
     @EnvironmentObject var navigationManager: NavigationManager
 
@@ -28,7 +25,7 @@ struct ScoresView: View {
     @State var songRecords: [IIDXSongRecord]?
     @State var songRecordClearRates: [IIDXSongRecord: [IIDXLevel: Float]] = [:]
 
-    @State var songCompactTitles: [String: PersistentIdentifier] = [:]
+    @State var songCompactTitles: [String: IIDXSong] = [:]
     @State var songNoteCounts: [String: IIDXNoteCount] = [:]
 
     @State var searchTerm: String = ""
@@ -41,7 +38,7 @@ struct ScoresView: View {
     var isTimeTravellingKey: String = "ScoresView.IsTimeTravelling"
     @State var isTimeTravelling: Bool
 
-    let actor = DataFetcher(modelContainer: sharedModelContainer)
+    let actor = DataFetcher()
 
     @Namespace var scoresNamespace
 
@@ -171,6 +168,10 @@ struct ScoresView: View {
                    !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
                     reloadDisplay()
                 }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
+                dataState = .initializing
+                reloadDisplay()
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {

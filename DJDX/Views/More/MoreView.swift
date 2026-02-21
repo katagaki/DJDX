@@ -6,15 +6,16 @@
 //
 
 import Komponents
-import SwiftData
 import SwiftUI
 import WebKit
 
 struct MoreView: View {
 
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
     @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
     @EnvironmentObject var navigationManager: NavigationManager
+
+    let importer = DataImporter()
 
     @AppStorage(wrappedValue: false, "ScoresView.LevelsShownSeparately") var isLevelsShownSeparately: Bool
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
@@ -35,6 +36,7 @@ struct MoreView: View {
 
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
+    @State var isConfirmingOldDataDelete: Bool = false
 
     var body: some View {
         NavigationStack(path: $navigationManager[.more]) {
@@ -142,29 +144,18 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
-                    Button("More.ManageData.ForceReSync") {
-                        let importGroups: [ImportGroup] = (try? modelContext.fetch(
-                            FetchDescriptor<ImportGroup>()
-                        )) ?? []
-                        for importGroup in importGroups {
-                            debugPrint("Fetched \(importGroup.id)")
-                        }
-                        let songRecords: [IIDXSongRecord] = (try? modelContext.fetch(
-                            FetchDescriptor<IIDXSongRecord>()
-                        )) ?? []
-                        for songRecord in songRecords {
-                            debugPrint("Fetched \(songRecord.title)")
-                        }
-                    }
                     Group {
-                        Button("More.ManageData.ClearAnalyticsCache") {
-                            clearAnalyticsCache()
-                        }
                         Button("More.ManageData.DeleteWebData") {
                             isConfirmingWebDataDelete = true
                         }
                         Button("More.ManageData.DeleteScoreData") {
                             isConfirmingScoreDataDelete = true
+                        }
+                        if UserDefaults.standard.bool(forKey: "Internal.DataMigrationForSwiftDataToSQLite") &&
+                            !UserDefaults.standard.bool(forKey: "Internal.DataMigrationDeleteOldSQLiteData") {
+                            Button("More.ManageData.DeleteOldData") {
+                                isConfirmingOldDataDelete = true
+                            }
                         }
                     }
                     .tint(.red)
@@ -231,6 +222,20 @@ struct MoreView: View {
                 message: {
                     Text("Alert.DeleteData.Score.Subtitle")
                 })
+            .alert(
+                "Alert.DeleteData.OldData.Title",
+                isPresented: $isConfirmingOldDataDelete,
+                actions: {
+                    Button("Alert.DeleteData.OldData.Confirm", role: .destructive) {
+                        deleteOldSwiftDataData()
+                    }
+                    Button("Shared.Cancel", role: .cancel) {
+                        isConfirmingOldDataDelete = false
+                    }
+                },
+                message: {
+                    Text("Alert.DeleteData.OldData.Subtitle")
+                })
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
                 switch viewPath {
                 case .moreBemaniWikiCharts: MoreBemaniWikiCharts()
@@ -268,14 +273,17 @@ struct MoreView: View {
     }
 
     func deleteAllScoreData() {
-        try? modelContext.delete(model: ImportGroup.self)
-        try? modelContext.delete(model: IIDXSongRecord.self)
+        Task {
+            await importer.deleteAllScoreData()
+        }
     }
 
-    func clearAnalyticsCache() {
-        let defaults = UserDefaults.standard
-        defaults.removeObject(forKey: "Analytics.Trends.ClearType.Level.Cache")
-        defaults.removeObject(forKey: "Analytics.Trends.DJLevel.Level.Cache")
-        defaults.synchronize()
+    func deleteOldSwiftDataData() {
+        try? modelContext.delete(model: IIDXSongRecord.self)
+        try? modelContext.delete(model: ImportGroup.self)
+        try? modelContext.delete(model: IIDXSong.self)
+        try? modelContext.delete(model: IIDXTowerEntry.self)
+        try? modelContext.save()
+        UserDefaults.standard.set(true, forKey: "Internal.DataMigrationDeleteOldSQLiteData")
     }
 }

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = E46A65E22C0ACAC400D9544B /* SwiftSoup */; };
 		E46D51B42C284CFE000524B9 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = E46D51B32C284CFE000524B9 /* Collections */; };
+		E474AEC92F4931A40014149D /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E474AEC82F4931A40014149D /* SQLite */; };
 		E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4E3D0D62BF9A220001942FE /* Komponents */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E474AEC92F4931A40014149D /* SQLite in Frameworks */,
 				E46D51B42C284CFE000524B9 /* Collections in Frameworks */,
 				E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */,
 				E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */,
@@ -88,6 +90,7 @@
 				E4E3D0D62BF9A220001942FE /* Komponents */,
 				E46A65E22C0ACAC400D9544B /* SwiftSoup */,
 				E46D51B32C284CFE000524B9 /* Collections */,
+				E474AEC82F4931A40014149D /* SQLite */,
 			);
 			productName = DJDX;
 			productReference = E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */;
@@ -122,6 +125,7 @@
 				E4E3D0D52BF9A220001942FE /* XCRemoteSwiftPackageReference "Komponents" */,
 				E46A65E12C0ACAC400D9544B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				E46D51B22C284CFE000524B9 /* XCRemoteSwiftPackageReference "swift-collections" */,
+				E474AEC72F4931A40014149D /* XCRemoteSwiftPackageReference "SQLite.swift" */,
 			);
 			productRefGroup = E4B123AD2BF8E8E400D4A3D1 /* Products */;
 			projectDirPath = "";
@@ -327,7 +331,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 33.0.4;
+				MARKETING_VERSION = 33.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -367,7 +371,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 33.0.4;
+				MARKETING_VERSION = 33.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -420,6 +424,14 @@
 				minimumVersion = 1.1.1;
 			};
 		};
+		E474AEC72F4931A40014149D /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.5;
+			};
+		};
 		E4E3D0D52BF9A220001942FE /* XCRemoteSwiftPackageReference "Komponents" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/katagaki/Komponents";
@@ -440,6 +452,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E46D51B22C284CFE000524B9 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = Collections;
+		};
+		E474AEC82F4931A40014149D /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E474AEC72F4931A40014149D /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
 		};
 		E4E3D0D62BF9A220001942FE /* Komponents */ = {
 			isa = XCSwiftPackageProductDependency;

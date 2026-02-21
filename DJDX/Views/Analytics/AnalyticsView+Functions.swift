@@ -6,7 +6,6 @@
 //
 
 import OrderedCollections
-import SwiftData
 import SwiftUI
 
 extension AnalyticsView {
@@ -14,9 +13,10 @@ extension AnalyticsView {
         dataState = .loading
         try? await Task.sleep(for: .seconds(0.5))
         Task.detached {
-            await reloadOverview()
-            await reloadTrends()
-            await reloadNewClearsAndHighScores()
+            async let overviewTask: () = reloadOverview()
+            async let trendsTask: () = reloadTrends()
+            async let newClearsTask: () = reloadNewClearsAndHighScores()
+            _ = await (overviewTask, trendsTask, newClearsTask)
             await MainActor.run {
                 withAnimation(.snappy.speed(2.0)) {
                     dataState = .presenting
@@ -27,13 +27,17 @@ extension AnalyticsView {
 
     func reloadOverview() async {
         debugPrint("Calculating overview")
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
-        let importGroupIdentifier = await actor.importGroupIdentifier(for: .now)
-        if let importGroupIdentifier,
-           let importGroup = modelContext.model(for: importGroupIdentifier) as? ImportGroup {
-            let songRecords = fetchSongRecords(for: importGroup.id, playType: playTypeToShow)
-            if songRecords.count > 0 {
-                let (newClearType, newDJLevel) = computeAllCounts(from: songRecords)
+        let importGroupID = await fetcher.importGroupID(for: .now)
+        if let importGroupID {
+            let result = await fetcher.aggregatedCounts(
+                for: [importGroupID], playType: playTypeToShow
+            )
+            let rawClearType = result.clearType[importGroupID]
+            let rawDJLevel = result.djLevel[importGroupID]
+
+            if let rawClearType, !rawClearType.isEmpty {
+                let newClearType = buildOrderedClearType(from: rawClearType)
+                let newDJLevel = buildOrderedDJLevel(from: rawDJLevel ?? [:])
                 let newDJLevelPerDifficulty = convertToEnumKeyed(newDJLevel)
                 await MainActor.run {
                     withAnimation(.snappy.speed(2.0)) {
@@ -52,67 +56,35 @@ extension AnalyticsView {
         }
     }
 
-    // swiftlint:disable function_body_length
     func reloadTrends() async {
         debugPrint("Calculating trends")
-        var importGroups: [ImportGroup] = (try? modelContext.fetch(
-            FetchDescriptor<ImportGroup>(
-                sortBy: [SortDescriptor(\.importDate, order: .forward)]
-            )
-        )) ?? []
-        guard importGroups.count > 0 else { return }
-        importGroups.removeAll(where: { $0.iidxVersion != iidxVersion })
+        let importGroups = await fetcher.importGroups(for: iidxVersion)
+        guard !importGroups.isEmpty else { return }
 
-        let existingClearTypeCache = trendData(using: clearTypePerImportGroupCache)
-        let existingDJLevelCache = trendData(using: djLevelPerImportGroupCache)
+        let importGroupIDs = importGroups.map(\.id)
+        let idToDate = Dictionary(uniqueKeysWithValues: importGroups.map { ($0.id, $0.importDate) })
+
+        let result = await fetcher.aggregatedCounts(for: importGroupIDs, playType: playTypeToShow)
 
         var newClearTypeData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
         var newDJLevelData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-        var newClearTypeCache: [CachedTrendData] = []
-        var newDJLevelCache: [CachedTrendData] = []
 
-        for importGroup in importGroups {
-            let cachedClearType = existingClearTypeCache.first(where: {
-                $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-            })
-            let cachedDJLevel = existingDJLevelCache.first(where: {
-                $0.importGroupID == importGroup.id && $0.playType == playTypeToShow
-            })
+        for igID in importGroupIDs {
+            guard let date = idToDate[igID] else { continue }
 
-            let clearTypeData: [Int: OrderedDictionary<String, Int>]
-            let djLevelData: [Int: OrderedDictionary<String, Int>]
-
-            if let cachedClearType, let cachedDJLevel {
-                debugPrint("Returning from cache: \(importGroup.importDate)")
-                clearTypeData = cachedClearType.data
-                djLevelData = cachedDJLevel.data
-            } else {
-                debugPrint("Processing data: \(importGroup.importDate)")
-                let songRecords = fetchSongRecords(for: importGroup.id, playType: playTypeToShow)
-                let computed = computeAllCounts(from: songRecords)
-                clearTypeData = cachedClearType?.data ?? computed.clearType
-                djLevelData = cachedDJLevel?.data ?? computed.djLevel
+            if let rawClearType = result.clearType[igID] {
+                let ordered = buildOrderedClearType(from: rawClearType)
+                if sumOfCounts(ordered) > 0 {
+                    newClearTypeData[date] = ordered
+                }
             }
-
-            if sumOfCounts(clearTypeData) > 0 {
-                debugPrint("Adding: \(importGroup.importDate)")
-                newClearTypeData[importGroup.importDate] = clearTypeData
+            if let rawDJLevel = result.djLevel[igID] {
+                let ordered = buildOrderedDJLevel(from: rawDJLevel)
+                if sumOfCounts(ordered) > 0 {
+                    newDJLevelData[date] = ordered
+                }
             }
-            if sumOfCounts(djLevelData) > 0 {
-                newDJLevelData[importGroup.importDate] = djLevelData
-            }
-
-            newClearTypeCache.append(cachedClearType ?? CachedTrendData(
-                importGroupID: importGroup.id, playType: playTypeToShow, data: clearTypeData
-            ))
-            newDJLevelCache.append(cachedDJLevel ?? CachedTrendData(
-                importGroupID: importGroup.id, playType: playTypeToShow, data: djLevelData
-            ))
         }
-
-        debugPrint("Updating trend caches")
-        clearTypePerImportGroupCache = (try? JSONEncoder().encode(newClearTypeCache)) ?? Data()
-        djLevelPerImportGroupCache = (try? JSONEncoder().encode(newDJLevelCache)) ?? Data()
 
         await MainActor.run {
             withAnimation(.snappy.speed(2.0)) {
@@ -121,18 +93,12 @@ extension AnalyticsView {
             }
         }
     }
-    // swiftlint:enable function_body_length
 
     // MARK: New Clears & High Scores
     // swiftlint:disable function_body_length
     func reloadNewClearsAndHighScores() async {
         debugPrint("Calculating new clears and high scores")
-        var importGroups: [ImportGroup] = (try? modelContext.fetch(
-            FetchDescriptor<ImportGroup>(
-                sortBy: [SortDescriptor(\.importDate, order: .forward)]
-            )
-        )) ?? []
-        importGroups.removeAll(where: { $0.iidxVersion != iidxVersion })
+        let importGroups = await fetcher.importGroups(for: iidxVersion)
 
         guard importGroups.count >= 2 else {
             await MainActor.run {
@@ -153,13 +119,21 @@ extension AnalyticsView {
         let latestGroup = importGroups[importGroups.count - 1]
         let previousGroup = importGroups[importGroups.count - 2]
 
-        let latestRecords = fetchSongRecords(for: latestGroup.id, playType: playTypeToShow).sorted(by: {
+        async let latestRecordsTask = fetcher.songRecords(
+            for: latestGroup.id, playType: playTypeToShow
+        )
+        async let previousRecordsTask = fetcher.songRecords(
+            for: previousGroup.id, playType: playTypeToShow
+        )
+
+        let latestRecords = await latestRecordsTask.sorted(by: {
             $0.lastPlayDate < $1.lastPlayDate
         })
-        let previousRecords = fetchSongRecords(for: previousGroup.id, playType: playTypeToShow)
+        let previousRecords = await previousRecordsTask
 
         // Build lookup by compact title for previous records
         var previousByTitle: [String: IIDXSongRecord] = [:]
+        previousByTitle.reserveCapacity(previousRecords.count)
         for record in previousRecords {
             previousByTitle[record.titleCompact()] = record
         }

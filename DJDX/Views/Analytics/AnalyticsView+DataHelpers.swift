@@ -7,20 +7,10 @@
 
 import Foundation
 import OrderedCollections
-import SwiftData
 
 // MARK: - Data Fetching & Computation
 
 extension AnalyticsView {
-
-    func fetchSongRecords(for importGroupID: String, playType: IIDXPlayType) -> [IIDXSongRecord] {
-        let descriptor = FetchDescriptor<IIDXSongRecord>(
-            predicate: #Predicate<IIDXSongRecord> {
-                $0.importGroup?.id == importGroupID
-            }
-        )
-        return ((try? modelContext.fetch(descriptor)) ?? []).filter { $0.playType == playType }
-    }
 
     func computeAllCounts(from songRecords: [IIDXSongRecord]) -> (
         clearType: [Int: OrderedDictionary<String, Int>],
@@ -79,13 +69,39 @@ extension AnalyticsView {
         return result
     }
 
-    func trendData(using data: Data) -> [CachedTrendData] {
-        (try? JSONDecoder().decode([CachedTrendData].self, from: data)) ?? []
-    }
-
     func sumOfCounts(_ data: [Int: OrderedDictionary<String, Int>]) -> Int {
         data.values.reduce(0) { sum, dict in
             sum + dict.values.reduce(0, +)
         }
+    }
+
+    func buildOrderedClearType(
+        from raw: [Int: [String: Int]]
+    ) -> [Int: OrderedDictionary<String, Int>] {
+        let clearTypes = IIDXClearType.sortedStringsWithoutNoPlay
+        var result: [Int: OrderedDictionary<String, Int>] = [:]
+        for difficulty in difficulties {
+            let counts = raw[difficulty] ?? [:]
+            result[difficulty] = OrderedDictionary(
+                uniqueKeys: clearTypes,
+                values: clearTypes.map { counts[$0] ?? 0 }
+            )
+        }
+        return result
+    }
+
+    func buildOrderedDJLevel(
+        from raw: [Int: [String: Int]]
+    ) -> [Int: OrderedDictionary<String, Int>] {
+        let djLevels = Array(IIDXDJLevel.sortedStrings.reversed())
+        var result: [Int: OrderedDictionary<String, Int>] = [:]
+        for difficulty in difficulties {
+            let counts = raw[difficulty] ?? [:]
+            result[difficulty] = OrderedDictionary(
+                uniqueKeys: djLevels,
+                values: djLevels.map { counts[$0] ?? 0 }
+            )
+        }
+        return result
     }
 }

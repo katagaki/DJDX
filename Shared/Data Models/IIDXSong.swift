@@ -9,13 +9,15 @@ import Foundation
 import SwiftData
 
 @Model
-final class IIDXSong: Equatable {
+final class IIDXSong: Equatable, @unchecked Sendable {
     var title: String = ""
     var spNoteCount: IIDXNoteCount?
     var dpNoteCount: IIDXNoteCount?
     var time: String = ""
     var movie: String = ""
     var layer: String = ""
+
+    init() {}
 
     init(_ tableColumnData: [String]) {
         self.title = tableColumnData[0]
@@ -33,23 +35,27 @@ final class IIDXSong: Equatable {
             spHyperNoteCount == "-" &&
             spAnotherNoteCount == "-" &&
             spLeggendariaNoteCount == "-") {
-            self.spNoteCount = IIDXNoteCount(beginnerNoteCount: spBeginnerNoteCount,
-                                             normalNoteCount: spNormalNoteCount,
-                                             hyperNoteCount: spHyperNoteCount,
-                                             anotherNoteCount: spAnotherNoteCount,
-                                             leggendariaNoteCount: spLeggendariaNoteCount,
-                                             playType: .single)
+            self.spNoteCount = IIDXNoteCount(
+                beginnerNoteCount: spBeginnerNoteCount,
+                normalNoteCount: spNormalNoteCount,
+                hyperNoteCount: spHyperNoteCount,
+                anotherNoteCount: spAnotherNoteCount,
+                leggendariaNoteCount: spLeggendariaNoteCount,
+                playType: .single
+            )
         }
         if !(dpNormalNoteCount == "-" &&
              dpHyperNoteCount == "-" &&
              dpAnotherNoteCount == "-" &&
              dpLeggendariaNoteCount == "-" ) {
-            self.dpNoteCount = IIDXNoteCount(beginnerNoteCount: "-",
-                                             normalNoteCount: dpNormalNoteCount,
-                                             hyperNoteCount: dpHyperNoteCount,
-                                             anotherNoteCount: dpAnotherNoteCount,
-                                             leggendariaNoteCount: dpLeggendariaNoteCount,
-                                             playType: .double)
+            self.dpNoteCount = IIDXNoteCount(
+                beginnerNoteCount: "-",
+                normalNoteCount: dpNormalNoteCount,
+                hyperNoteCount: dpHyperNoteCount,
+                anotherNoteCount: dpAnotherNoteCount,
+                leggendariaNoteCount: dpLeggendariaNoteCount,
+                playType: .double
+            )
         }
         self.time = tableColumnData[10]
         self.movie = tableColumnData[11]

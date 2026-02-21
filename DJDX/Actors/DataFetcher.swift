@@ -6,9 +6,8 @@
 //
 
 import Foundation
-import SwiftData
+import SQLite
 
-@ModelActor
 // swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
 actor DataFetcher {
@@ -27,63 +26,87 @@ actor DataFetcher {
     // MARK: Import Groups
 
     func importGroup(for selectedDate: Date) -> ImportGroup? {
-        let importGroupsForSelectedDate: [ImportGroup] = (try? modelContext.fetch(
-            FetchDescriptor<ImportGroup>(
-                predicate: importGroups(from: selectedDate),
-                sortBy: [SortDescriptor(\.importDate, order: .forward)]
-            )
-        )) ?? []
-        if let importGroupForSelectedDate = importGroupsForSelectedDate.first {
-            // Use selected date's import group
-            return importGroupForSelectedDate
-        } else {
-            // Use latest available import group
-            let allImportGroups: [ImportGroup] = (try? modelContext.fetch(
-                FetchDescriptor<ImportGroup>(
-                    sortBy: [SortDescriptor(\.importDate, order: .forward)]
-                )
-            )) ?? []
-            var importGroupClosestToTheSelectedDate: ImportGroup?
-            for importGroup in allImportGroups {
-                if importGroup.importDate <= selectedDate {
-                    importGroupClosestToTheSelectedDate = importGroup
-                } else {
-                    break
-                }
-            }
-            if let importGroupClosestToTheSelectedDate {
-                return importGroupClosestToTheSelectedDate
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return nil }
+        let table = PlayDataDatabase.importGroupTable
+        let col = PlayDataDatabase.self
+
+        let startOfDay = Calendar.current.startOfDay(for: selectedDate)
+        let startOfNextDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
+
+        let query = table
+            .filter(col.igImportDate >= startOfDay.timeIntervalSince1970
+                    && col.igImportDate < startOfNextDay.timeIntervalSince1970)
+            .order(col.igImportDate.asc)
+            .limit(1)
+
+        if let row = try? database.pluck(query) {
+            return Self.importGroup(from: row)
+        }
+
+        // Fallback: closest earlier import group
+        let allQuery = table.order(col.igImportDate.asc)
+        guard let rows = try? database.prepare(allQuery) else { return nil }
+
+        var closestGroup: ImportGroup?
+        for row in rows {
+            let group = Self.importGroup(from: row)
+            if group.importDate <= selectedDate {
+                closestGroup = group
+            } else {
+                break
             }
         }
-        return nil
+        return closestGroup
     }
 
-    func importGroupIdentifier(for selectedDate: Date) -> PersistentIdentifier? {
-        if let importGroup = importGroup(for: selectedDate) {
-            return importGroup.persistentModelID
-        }
-        return nil
+    func importGroupID(for selectedDate: Date) -> String? {
+        importGroup(for: selectedDate)?.id
     }
 
-    func importGroupID(for identifier: PersistentIdentifier) -> String? {
-        if let importGroup = modelContext.model(for: identifier) as? ImportGroup {
-            return importGroup.id
-        }
-        return nil
+    func allImportGroups() -> [ImportGroup] {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = PlayDataDatabase.importGroupTable.order(PlayDataDatabase.igImportDate.asc)
+        return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
+    }
+
+    func allImportGroupsSortedByDateDescending() -> [ImportGroup] {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = PlayDataDatabase.importGroupTable.order(PlayDataDatabase.igImportDate.desc)
+        return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
     }
 
     // MARK: Song Records
 
-    func songRecords(for importGroupID: String) -> [PersistentIdentifier] {
-        let songRecords: [IIDXSongRecord]? = try? modelContext.fetch(
-            FetchDescriptor<IIDXSongRecord>(
-                predicate: #Predicate<IIDXSongRecord> {
-                    $0.importGroup?.id == importGroupID
-                },
-                sortBy: [SortDescriptor(\.title, order: .forward)]
-            )
-        )
-        return (songRecords ?? []).map { $0.persistentModelID }
+    func songRecords(for importGroupID: String) -> [IIDXSongRecord] {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = PlayDataDatabase.songRecordTable
+            .filter(PlayDataDatabase.srImportGroupID == importGroupID)
+            .order(PlayDataDatabase.srTitle.asc)
+        return (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
+    }
+
+    func songRecords(for importGroupID: String, playType: IIDXPlayType) -> [IIDXSongRecord] {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = PlayDataDatabase.songRecordTable
+            .filter(PlayDataDatabase.srImportGroupID == importGroupID
+                    && PlayDataDatabase.srPlayType == playType.rawValue)
+            .order(PlayDataDatabase.srTitle.asc)
+        return (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
+    }
+
+    func songRecordsForSong(title: String) -> [IIDXSongRecord] {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = PlayDataDatabase.songRecordTable
+            .filter(PlayDataDatabase.srTitle == title)
+        return (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
+    }
+
+    func songRecordImportGroupIDs(for title: String) -> [String] {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = PlayDataDatabase.songRecordTable
+            .select(PlayDataDatabase.srImportGroupID)
+            .filter(PlayDataDatabase.srTitle == title)
+        return (try? database.prepare(query).map { $0[PlayDataDatabase.srImportGroupID] }) ?? []
     }
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
@@ -91,9 +114,8 @@ actor DataFetcher {
         on playDataDate: Date,
         filters: FilterOptions?,
         sortOptions: SortOptions?
-    ) -> [PersistentIdentifier]? {
+    ) -> [IIDXSongRecord]? {
 
-        // Get import group for selected date
         guard let importGroup = importGroup(for: playDataDate) else {
             return nil
         }
@@ -103,24 +125,10 @@ actor DataFetcher {
             previousFilters = nil
             previousSortOptions = nil
 
-            // Get new song records in import group
-            // TODO: Find a way to trigger a refresh here when import groups update
-            allSongRecords = (try? modelContext.fetch(
-                FetchDescriptor<IIDXSongRecord>(
-                    predicate: #Predicate<IIDXSongRecord> {
-                        $0.importGroup?.id == importGroupID
-                    },
-                    sortBy: [SortDescriptor(\.title, order: .forward)]
-                )
-            )) ?? []
+            allSongRecords = songRecords(for: importGroup.id)
 
-            // TODO: Find a way to trigger a refresh on wiki data update
             if songs.isEmpty {
-                songs = (try? modelContext.fetch(
-                    FetchDescriptor<IIDXSong>(
-                        sortBy: [SortDescriptor(\.title, order: .forward)]
-                    )
-                )) ?? []
+                songs = fetchAllSongs()
             }
             if songNoteCounts.isEmpty {
                 songNoteCounts = songs
@@ -134,12 +142,10 @@ actor DataFetcher {
         if filters != previousFilters, let filters {
             debugPrint("Filters were changed, filtering")
 
-            // Filter song records
             filteredSongRecords = allSongRecords.filter({
                 $0.playType == filters.playType
             })
 
-            // Filter song records that have no scores
             if filters.onlyPlayDataWithScores {
                 if filters.level != .all,
                    let keyPath = scoreKeyPath(for: filters.level) {
@@ -166,12 +172,10 @@ actor DataFetcher {
 
             filteredSongRecords.removeAll { songRecord in
 
-                // Filter song records by difficulty
                 if filters.difficulty != .all, songRecord.score(for: filters.difficulty) == nil {
                     return true
                 }
 
-                // Filter song records by level
                 if filters.level != .all {
                     if songRecord.score(for: filters.level) == nil {
                         return true
@@ -183,7 +187,6 @@ actor DataFetcher {
                     }
                 }
 
-                // Filter song records by clear type
                 if filters.clearType != .all {
                     let isDifficultyFilterActive = filters.difficulty != .all
                     let isLevelFilterActive = filters.level != .all
@@ -220,7 +223,6 @@ actor DataFetcher {
             sortedSongRecords = songRecords
             var songLevelScores: [IIDXSongRecord: IIDXLevelScore] = [:]
 
-            // Get the level score to be used for sorting
             if sortOptions.mode != .title && sortOptions.mode != .lastPlayDate {
                 if let level = filters?.level,
                    level != .all,
@@ -236,7 +238,6 @@ actor DataFetcher {
                 }
             }
 
-            // Sort dictionary
             switch sortOptions.mode {
             case .title:
                 sortedSongRecords.sort { lhs, rhs in
@@ -367,22 +368,113 @@ actor DataFetcher {
 
         previousFilters = filters
         previousSortOptions = sortOptions
-        return songRecords.map { $0.persistentModelID }
+        return songRecords
     }
 
     // MARK: Song Metadata
 
-    func songCompactTitles() -> [String: PersistentIdentifier] {
-        var songCompactTitles: [String: PersistentIdentifier] = [:]
-        let fetchedSongs = (try? modelContext.fetch(
-            FetchDescriptor<IIDXSong>(
-                sortBy: [SortDescriptor(\.title, order: .forward)]
-            )
-        )) ?? []
+    func songCompactTitles() -> [String: IIDXSong] {
+        var result: [String: IIDXSong] = [:]
+        let fetchedSongs = fetchAllSongs()
         fetchedSongs.forEach { song in
-            songCompactTitles[song.titleCompact()] = song.persistentModelID
+            result[song.titleCompact()] = song
         }
-        return songCompactTitles
+        return result
+    }
+
+    func fetchAllSongs() -> [IIDXSong] {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = PlayDataDatabase.songTable.order(PlayDataDatabase.songTitle.asc)
+        return (try? database.prepare(query).map { Self.song(from: $0) }) ?? []
+    }
+
+    // MARK: Analytics - Aggregated Counts
+
+    private struct LevelColumns {
+        let difficulty: SQLite.Expression<Int>
+        let clearType: SQLite.Expression<String>
+        let djLevel: SQLite.Expression<String>
+        let score: SQLite.Expression<Int>
+    }
+
+    func aggregatedCounts(
+        for importGroupIDs: [String],
+        playType: IIDXPlayType
+    ) -> (clearType: [String: [Int: [String: Int]]], djLevel: [String: [Int: [String: Int]]]) {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else {
+            return ([:], [:])
+        }
+        let cols = PlayDataDatabase.self
+
+        var clearTypeResult: [String: [Int: [String: Int]]] = [:]
+        var djLevelResult: [String: [Int: [String: Int]]] = [:]
+
+        let levelColumns: [LevelColumns] = [
+            LevelColumns(difficulty: cols.srBeginnerDifficulty, clearType: cols.srBeginnerClearType,
+                         djLevel: cols.srBeginnerDJLevel, score: cols.srBeginnerScore),
+            LevelColumns(difficulty: cols.srNormalDifficulty, clearType: cols.srNormalClearType,
+                         djLevel: cols.srNormalDJLevel, score: cols.srNormalScore),
+            LevelColumns(difficulty: cols.srHyperDifficulty, clearType: cols.srHyperClearType,
+                         djLevel: cols.srHyperDJLevel, score: cols.srHyperScore),
+            LevelColumns(difficulty: cols.srAnotherDifficulty, clearType: cols.srAnotherClearType,
+                         djLevel: cols.srAnotherDJLevel, score: cols.srAnotherScore),
+            LevelColumns(difficulty: cols.srLeggendariaDifficulty, clearType: cols.srLeggendariaClearType,
+                         djLevel: cols.srLeggendariaDJLevel, score: cols.srLeggendariaScore)
+        ]
+
+        let idSet = importGroupIDs
+        let table = PlayDataDatabase.songRecordTable
+            .filter(idSet.contains(cols.srImportGroupID) && cols.srPlayType == playType.rawValue)
+
+        for level in levelColumns {
+            let clearQuery = table
+                .select(cols.srImportGroupID, level.difficulty, level.clearType, level.score.count)
+                .filter(level.difficulty > 0 && level.clearType != "NO PLAY" && level.score > 0)
+                .group(cols.srImportGroupID, level.difficulty, level.clearType)
+
+            if let rows = try? database.prepare(clearQuery) {
+                for row in rows {
+                    let igID = row[cols.srImportGroupID]
+                    let diff = row[level.difficulty]
+                    let clearType = row[level.clearType]
+                    let count = row[level.score.count]
+                    clearTypeResult[igID, default: [:]][diff, default: [:]][clearType, default: 0] += count
+                }
+            }
+
+            let djQuery = table
+                .select(cols.srImportGroupID, level.difficulty, level.djLevel, level.djLevel.count)
+                .filter(level.difficulty > 0 && level.djLevel != "---")
+                .group(cols.srImportGroupID, level.difficulty, level.djLevel)
+
+            if let rows = try? database.prepare(djQuery) {
+                for row in rows {
+                    let igID = row[cols.srImportGroupID]
+                    let diff = row[level.difficulty]
+                    let djLevel = row[level.djLevel]
+                    let count = row[level.djLevel.count]
+                    djLevelResult[igID, default: [:]][diff, default: [:]][djLevel, default: 0] += count
+                }
+            }
+        }
+
+        return (clearTypeResult, djLevelResult)
+    }
+
+    func importGroups(for version: IIDXVersion) -> [ImportGroup] {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = PlayDataDatabase.importGroupTable
+            .filter(PlayDataDatabase.igIIDXVersion == version.rawValue)
+            .order(PlayDataDatabase.igImportDate.asc)
+        return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
+    }
+
+    // MARK: Tower Entries
+
+    func allTowerEntries() -> [IIDXTowerEntry] {
+        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = PlayDataDatabase.towerEntryTable.order(PlayDataDatabase.tePlayDate.desc)
+        return (try? database.prepare(query).map { Self.towerEntry(from: $0) }) ?? []
     }
 
     // MARK: Key Paths
@@ -398,14 +490,137 @@ actor DataFetcher {
         }
     }
 
-    // MARK: Predicates
+    // MARK: Row Mapping
 
-    func importGroups(from startDate: Date) -> Predicate<ImportGroup> {
-        let startOfDay = Calendar.current.startOfDay(for: startDate)
-        let startOfNextDay: Date = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
-        return #Predicate<ImportGroup> {
-            $0.importDate >= startOfDay && $0.importDate < startOfNextDay
+    static func importGroup(from row: Row) -> ImportGroup {
+        let group = ImportGroup(
+            importDate: Date(timeIntervalSince1970: row[PlayDataDatabase.igImportDate]),
+            iidxData: [],
+            iidxVersion: row[PlayDataDatabase.igIIDXVersion].flatMap { IIDXVersion(rawValue: $0) } ?? .epolis
+        )
+        group.id = row[PlayDataDatabase.igID]
+        if row[PlayDataDatabase.igIIDXVersion] == nil {
+            group.iidxVersion = nil
         }
+        return group
+    }
+
+    static func songRecord(from row: Row) -> IIDXSongRecord {
+        let record = IIDXSongRecord()
+        record.version = row[PlayDataDatabase.srVersion]
+        record.title = row[PlayDataDatabase.srTitle]
+        record.genre = row[PlayDataDatabase.srGenre]
+        record.artist = row[PlayDataDatabase.srArtist]
+        record.playCount = row[PlayDataDatabase.srPlayCount]
+        record.playType = IIDXPlayType(rawValue: row[PlayDataDatabase.srPlayType]) ?? .single
+        record.lastPlayDate = Date(timeIntervalSince1970: row[PlayDataDatabase.srLastPlayDate])
+
+        record.beginnerScore = levelScore(from: row, prefix: "beginner")
+        record.normalScore = levelScore(from: row, prefix: "normal")
+        record.hyperScore = levelScore(from: row, prefix: "hyper")
+        record.anotherScore = levelScore(from: row, prefix: "another")
+        record.leggendariaScore = levelScore(from: row, prefix: "leggendaria")
+
+        return record
+    }
+
+    private static func levelScore(from row: Row, prefix: String) -> IIDXLevelScore {
+        let database = PlayDataDatabase.self
+        let levelCol: SQLite.Expression<String>
+        let diffCol: SQLite.Expression<Int>
+        let scoreCol: SQLite.Expression<Int>
+        let pgCol: SQLite.Expression<Int>
+        let gCol: SQLite.Expression<Int>
+        let mCol: SQLite.Expression<Int>
+        let ctCol: SQLite.Expression<String>
+        let djCol: SQLite.Expression<String>
+
+        switch prefix {
+        case "beginner":
+            levelCol = database.srBeginnerLevel; diffCol = database.srBeginnerDifficulty
+            scoreCol = database.srBeginnerScore; pgCol = database.srBeginnerPerfectGreatCount
+            gCol = database.srBeginnerGreatCount; mCol = database.srBeginnerMissCount
+            ctCol = database.srBeginnerClearType; djCol = database.srBeginnerDJLevel
+        case "normal":
+            levelCol = database.srNormalLevel; diffCol = database.srNormalDifficulty
+            scoreCol = database.srNormalScore; pgCol = database.srNormalPerfectGreatCount
+            gCol = database.srNormalGreatCount; mCol = database.srNormalMissCount
+            ctCol = database.srNormalClearType; djCol = database.srNormalDJLevel
+        case "hyper":
+            levelCol = database.srHyperLevel; diffCol = database.srHyperDifficulty
+            scoreCol = database.srHyperScore; pgCol = database.srHyperPerfectGreatCount
+            gCol = database.srHyperGreatCount; mCol = database.srHyperMissCount
+            ctCol = database.srHyperClearType; djCol = database.srHyperDJLevel
+        case "another":
+            levelCol = database.srAnotherLevel; diffCol = database.srAnotherDifficulty
+            scoreCol = database.srAnotherScore; pgCol = database.srAnotherPerfectGreatCount
+            gCol = database.srAnotherGreatCount; mCol = database.srAnotherMissCount
+            ctCol = database.srAnotherClearType; djCol = database.srAnotherDJLevel
+        default: // leggendaria
+            levelCol = database.srLeggendariaLevel; diffCol = database.srLeggendariaDifficulty
+            scoreCol = database.srLeggendariaScore; pgCol = database.srLeggendariaPerfectGreatCount
+            gCol = database.srLeggendariaGreatCount; mCol = database.srLeggendariaMissCount
+            ctCol = database.srLeggendariaClearType; djCol = database.srLeggendariaDJLevel
+        }
+
+        return IIDXLevelScore(
+            level: IIDXLevel(csvValue: row[levelCol]),
+            difficulty: row[diffCol],
+            score: row[scoreCol],
+            perfectGreatCount: row[pgCol],
+            greatCount: row[gCol],
+            missCount: row[mCol],
+            clearType: row[ctCol],
+            djLevel: row[djCol]
+        )
+    }
+
+    static func song(from row: Row) -> IIDXSong {
+        let song = IIDXSong()
+        song.title = row[PlayDataDatabase.songTitle]
+        song.time = row[PlayDataDatabase.songTime]
+        song.movie = row[PlayDataDatabase.songMovie]
+        song.layer = row[PlayDataDatabase.songLayer]
+        let database = PlayDataDatabase.self
+        let spB = row[database.songSPBeginnerNoteCount]
+        let spN = row[database.songSPNormalNoteCount]
+        let spH = row[database.songSPHyperNoteCount]
+        let spA = row[database.songSPAnotherNoteCount]
+        let spL = row[database.songSPLeggendariaNoteCount]
+        if spB != nil || spN != nil || spH != nil || spA != nil || spL != nil {
+            song.spNoteCount = IIDXNoteCount(
+                beginnerNoteCount: spB.map(String.init) ?? "-",
+                normalNoteCount: spN.map(String.init) ?? "-",
+                hyperNoteCount: spH.map(String.init) ?? "-",
+                anotherNoteCount: spA.map(String.init) ?? "-",
+                leggendariaNoteCount: spL.map(String.init) ?? "-",
+                playType: .single
+            )
+        }
+        let dpB = row[database.songDPBeginnerNoteCount]
+        let dpN = row[database.songDPNormalNoteCount]
+        let dpH = row[database.songDPHyperNoteCount]
+        let dpA = row[database.songDPAnotherNoteCount]
+        let dpL = row[database.songDPLeggendariaNoteCount]
+        if dpB != nil || dpN != nil || dpH != nil || dpA != nil || dpL != nil {
+            song.dpNoteCount = IIDXNoteCount(
+                beginnerNoteCount: dpB.map(String.init) ?? "-",
+                normalNoteCount: dpN.map(String.init) ?? "-",
+                hyperNoteCount: dpH.map(String.init) ?? "-",
+                anotherNoteCount: dpA.map(String.init) ?? "-",
+                leggendariaNoteCount: dpL.map(String.init) ?? "-",
+                playType: .double
+            )
+        }
+        return song
+    }
+
+    static func towerEntry(from row: Row) -> IIDXTowerEntry {
+        IIDXTowerEntry(
+            playDate: Date(timeIntervalSince1970: row[PlayDataDatabase.tePlayDate]),
+            keyCount: row[PlayDataDatabase.teKeyCount],
+            scratchCount: row[PlayDataDatabase.teScratchCount]
+        )
     }
 }
 // swiftlint:enable file_length

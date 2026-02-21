@@ -5,18 +5,19 @@
 //  Created by シン・ジャスティン on 2024/10/06.
 //
 
-import SwiftData
 import SwiftUI
 
 struct TowerView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
 
-    @Query(sort: \IIDXTowerEntry.playDate, order: .reverse) var towerEntries: [IIDXTowerEntry]
+    @State var towerEntries: [IIDXTowerEntry] = []
 
     @State var isAutoImportFailed: Bool = false
     @State var didImportSucceed: Bool = false
     @State var autoImportFailedReason: ImportFailedReason?
+
+    let fetcher = DataFetcher()
 
     @AppStorage(wrappedValue: .totals, "TowerView.DisplayMode") var chartMode: TowerChartMode
 
@@ -144,7 +145,24 @@ struct TowerView: View {
                 default: Color.clear
                 }
             }
+            .task {
+                await reloadTowerEntries()
+            }
+            .onChange(of: didImportSucceed) { _, newValue in
+                if newValue {
+                    Task {
+                        await reloadTowerEntries()
+                    }
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
+                Task { await reloadTowerEntries() }
+            }
         }
+    }
+
+    func reloadTowerEntries() async {
+        towerEntries = await fetcher.allTowerEntries()
     }
 
     func errorMessage(for reason: ImportFailedReason) -> String {

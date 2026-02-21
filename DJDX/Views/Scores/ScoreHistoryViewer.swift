@@ -7,12 +7,9 @@
 
 import Charts
 import Komponents
-import SwiftData
 import SwiftUI
 
 struct ScoreHistoryViewer: View {
-
-    @Environment(\.modelContext) var modelContext
 
     var percentageFormatter: NumberFormatter
 
@@ -30,6 +27,8 @@ struct ScoreHistoryViewer: View {
     @State var earliestDate: Date = Calendar.current.date(byAdding: .day, value: -1, to: .now)!
     @State var latestDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: .now)!
     @State var dataState: DataState = .initializing
+
+    let fetcher = DataFetcher()
 
     init(songTitle: String, level: IIDXLevel, noteCount: Int? = nil) {
         self.songTitle = songTitle
@@ -150,7 +149,7 @@ struct ScoreHistoryViewer: View {
         .task {
             if dataState == .initializing {
                 dataState = .loading
-                reloadScoreHistory()
+                await reloadScoreHistory()
                 withAnimation(.snappy.speed(2.0)) {
                     dataState = .presenting
                 }
@@ -173,31 +172,44 @@ struct ScoreHistoryViewer: View {
     }
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
-    func reloadScoreHistory() {
-        // Get list of scores
-        songRecordsForSong = (try? modelContext.fetch(
-            FetchDescriptor<IIDXSongRecord>(
-                predicate: #Predicate<IIDXSongRecord> {
-                    $0.title == songTitle && $0.importGroup != nil
-                }
-            )
-        )) ?? []
+    func reloadScoreHistory() async {
+        // Get list of scores for this song
+        songRecordsForSong = await fetcher.songRecordsForSong(title: songTitle)
+
+        // Get import groups for mapping dates
+        let allImportGroups = await fetcher.allImportGroups()
+        var importGroupDates: [String: Date] = [:]
+        for group in allImportGroups {
+            importGroupDates[group.id] = group.importDate
+        }
+
+        // Get import group IDs for this song's records
+        let importGroupIDs = await fetcher.songRecordImportGroupIDs(for: songTitle)
+
+        // Build a lookup of song record to import group ID
+        // Since records are returned in order, match by index
+        var recordImportGroups: [(IIDXSongRecord, String)] = []
+        for (index, record) in songRecordsForSong.enumerated() where index < importGroupIDs.count {
+            recordImportGroups.append((record, importGroupIDs[index]))
+        }
 
         // Dictionarize list of scores
-        scoreHistory = songRecordsForSong.reduce(into: [:] as [Date: Int], { partialResult, songRecord in
-            if let importGroup = songRecord.importGroup,
+        scoreHistory = recordImportGroups.reduce(into: [:] as [Date: Int], { partialResult, pair in
+            let (songRecord, groupID) = pair
+            if let importDate = importGroupDates[groupID],
                let score = songRecord.score(for: level), score.score > 0 {
-                partialResult[importGroup.importDate] = score.score
+                partialResult[importDate] = score.score
             }
         })
 
         // Dictionarize list of score rates
         if let noteCount {
-            scoreRateHistory = songRecordsForSong.reduce(
-                into: [:] as [Date: Float], { partialResult, songRecord in
-                    if let importGroup = songRecord.importGroup,
+            scoreRateHistory = recordImportGroups.reduce(
+                into: [:] as [Date: Float], { partialResult, pair in
+                    let (songRecord, groupID) = pair
+                    if let importDate = importGroupDates[groupID],
                        let score = songRecord.score(for: level), score.score > 0 {
-                        partialResult[importGroup.importDate] = Float(score.score) / Float(noteCount * 2)
+                        partialResult[importDate] = Float(score.score) / Float(noteCount * 2)
                     }
                 })
         }
@@ -231,13 +243,14 @@ struct ScoreHistoryViewer: View {
         // Set date range for chart
         var newEarliestDate: Date = .now
         var newLatestDate: Date = .now
-        for songRecord in songRecordsForSong {
+        for pair in recordImportGroups {
+            let (songRecord, groupID) = pair
             if let score = songRecord.score(for: level), score.score > 0,
-               let importGroup = songRecord.importGroup {
-                if importGroup.importDate < newEarliestDate {
-                    newEarliestDate = importGroup.importDate
-                } else if importGroup.importDate > newLatestDate {
-                    newLatestDate = importGroup.importDate
+               let importDate = importGroupDates[groupID] {
+                if importDate < newEarliestDate {
+                    newEarliestDate = importDate
+                } else if importDate > newLatestDate {
+                    newLatestDate = importDate
                 }
             }
         }

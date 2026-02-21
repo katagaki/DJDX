@@ -6,19 +6,12 @@
 //
 
 import Foundation
-import SwiftData
 
 extension ImportView {
 
-//    func countOfIIDXSongRecords(in importGroup: ImportGroup) -> Int {
-//        let importGroupID = importGroup.id
-//        let fetchDescriptor = FetchDescriptor<IIDXSongRecord>(
-//            predicate: #Predicate<IIDXSongRecord> {
-//                $0.importGroup?.id == importGroupID
-//            }
-//        )
-//        return (try? modelContext.fetchCount(fetchDescriptor)) ?? 0
-//    }
+    func reloadImportGroups() async {
+        importGroups = await fetcher.allImportGroupsSortedByDateDescending()
+    }
 
     func errorMessage(for reason: ImportFailedReason) -> String {
         switch reason {
@@ -40,10 +33,11 @@ extension ImportView {
         indexSet.forEach { index in
             importGroupsToDelete.append(importGroups[index])
         }
-        try? modelContext.transaction {
-            importGroupsToDelete.forEach { importGroup in
-                modelContext.delete(importGroup)
+        Task {
+            for importGroup in importGroupsToDelete {
+                await actor.deleteImportGroup(id: importGroup.id)
             }
+            await reloadImportGroups()
         }
     }
 

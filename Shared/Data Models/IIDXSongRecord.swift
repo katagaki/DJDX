@@ -11,7 +11,7 @@ import SwiftData
 let songLevelCSVHeaders: [String] = ["BEGINNER", "NORMAL", "HYPER", "ANOTHER", "LEGGENDARIA"]
 
 @Model
-final class IIDXSongRecord: Equatable, Hashable {
+final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
     var version: String = ""
     var title: String = ""
     var genre: String = ""
@@ -26,6 +26,8 @@ final class IIDXSongRecord: Equatable, Hashable {
     var lastPlayDate: Date = Date.distantPast
 
     var importGroup: ImportGroup?
+
+    init() {}
 
     // Based on EPOLIS CSV format
     init(csvRowData: [String: Any], playType: IIDXPlayType? = nil) {

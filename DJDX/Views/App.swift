@@ -25,6 +25,10 @@ struct DJDXApp: App {
             navigationManager.saveToDefaults()
         }
     }
+
+    init() {
+        _ = PlayDataDatabase.shared
+    }
 }
 
 let sharedModelContainer: ModelContainer = {

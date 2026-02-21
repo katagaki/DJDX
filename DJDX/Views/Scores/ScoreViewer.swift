@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2024/05/19.
 //
 
-import SwiftData
 import SwiftUI
 
 struct ScoreViewer: View {
