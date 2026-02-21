@@ -104,8 +104,8 @@ struct TowerView: View {
             }
             .navigator("ViewTitle.Tower")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Shared.Import", systemImage: "square.and.arrow.down") {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Shared.Import", systemImage: "arrow.clockwise") {
                         navigationManager.push(ViewPath.importerWebIIDXTower, for: .tower)
                     }
                 }

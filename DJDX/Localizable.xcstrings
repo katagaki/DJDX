@@ -871,7 +871,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Webでインポート"
+            "value" : "Webからインポート"
           }
         }
       }
@@ -1170,6 +1170,23 @@
         }
       }
     },
+    "More.Attributions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attributions"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "著者権表記"
+          }
+        }
+      }
+    },
     "More.ExternalData.BemaniWiki2nd" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1285,6 +1302,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一般"
+          }
+        }
+      }
+    },
+    "More.GitHub" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Source Code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ソースコード"
           }
         }
       }

@@ -52,7 +52,6 @@ struct MoreNotesRadarView: View {
                         HStack {
                             Text(verbatim: point.label)
                                 .font(.system(size: 13, weight: .bold))
-                                .fontWidth(.expanded)
                                 .foregroundStyle(point.color)
                             Spacer()
                             Text(verbatim: String(format: "%.2f", point.value))
@@ -83,6 +82,6 @@ struct MoreNotesRadarView: View {
                 .animation(.smooth, value: selectedPlayType)
             }
         }
-        .padding(.vertical, 12.0)
+//        .padding(.vertical, 12.0)
     }
 }

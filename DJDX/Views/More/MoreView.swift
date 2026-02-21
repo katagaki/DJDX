@@ -38,7 +38,7 @@ struct MoreView: View {
 
     var body: some View {
         NavigationStack(path: $navigationManager[.more]) {
-            MoreList(repoName: "katagaki/DJDX", viewPath: ViewPath.moreAttributions) {
+            List {
                 if let qproImage {
                     Section {
                         Image(uiImage: qproImage)
@@ -156,35 +156,44 @@ struct MoreView: View {
                             debugPrint("Fetched \(songRecord.title)")
                         }
                     }
-                    Button("More.ManageData.ClearAnalyticsCache") {
-                        clearAnalyticsCache()
+                    Group {
+                        Button("More.ManageData.ClearAnalyticsCache") {
+                            clearAnalyticsCache()
+                        }
+                        Button("More.ManageData.DeleteWebData") {
+                            isConfirmingWebDataDelete = true
+                        }
+                        Button("More.ManageData.DeleteScoreData") {
+                            isConfirmingScoreDataDelete = true
+                        }
                     }
-                    Button {
-                        isConfirmingWebDataDelete = true
-                    } label: {
-                        Text("More.ManageData.DeleteWebData")
-                            .foregroundStyle(.red)
-                    }
-                    Button {
-                        isConfirmingScoreDataDelete = true
-                    } label: {
-                        Text("More.ManageData.DeleteScoreData")
-                            .foregroundStyle(.red)
-                    }
+                    .tint(.red)
                 } header: {
                     ListSectionHeader(text: "More.ManageData.Header")
                         .font(.body)
                 }
-            }
-            .navigator("ViewTitle.More", inline: true)
-            .toolbar {
-                ToolbarItem(placement: .title) {
-                    Text("ViewTitle.More")
-                        .fontWeight(.semibold)
+                Section {
+                    Link(destination: URL(string: "https://github.com/katagaki/DJDX")!) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2.0) {
+                                Text("More.GitHub")
+                                Text(verbatim: "katagaki/DJDX")
+                                    .foregroundStyle(.secondary)
+                                    .font(.caption)
+                            }
+                            Spacer()
+                            Image(systemName: "safari")
+                                .opacity(0.5)
+                        }
+                        .tint(.primary)
+                        .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
+                    NavigationLink("More.Attributions", value: ViewPath.moreAttributions)
                 }
             }
+            .navigator("ViewTitle.More", group: true)
             .scrollContentBackground(.hidden)
-            .listSectionSpacing(.compact)
             .task {
                 loadRadarData()
                 if qproImage == nil {
