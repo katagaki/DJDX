@@ -17,5 +17,9 @@
 	<array>
 		<string>iCloud.com.tsubuzaki.DJDX</string>
 	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.tsubuzaki.DJDX</string>
+	</array>
 </dict>
 </plist>

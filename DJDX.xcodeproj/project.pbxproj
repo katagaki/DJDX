@@ -10,14 +10,71 @@
 		E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = E46A65E22C0ACAC400D9544B /* SwiftSoup */; };
 		E46D51B42C284CFE000524B9 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = E46D51B32C284CFE000524B9 /* Collections */; };
 		E474AEC92F4931A40014149D /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E474AEC82F4931A40014149D /* SQLite */; };
+		E47D068D2F53F4E6006081EF /* DJDXWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA000001300100000000000D /* DJDXWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4E3D0D62BF9A220001942FE /* Komponents */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		E47D068E2F53F4E6006081EF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4B123A42BF8E8E400D4A3D1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA000001300100000000000C;
+			remoteInfo = DJDXWidgets;
+		};
+		E47D06912F53F4EC006081EF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4B123A42BF8E8E400D4A3D1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA000001300100000000000C;
+			remoteInfo = DJDXWidgets;
+		};
+		E49816D42F53F04A00EFFB8B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4B123A42BF8E8E400D4A3D1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA000001300100000000000C;
+			remoteInfo = DJDXWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E47D06902F53F4E6006081EF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E47D068D2F53F4E6006081EF /* DJDXWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		AA000001300100000000000D /* DJDXWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DJDXWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DJDX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AA00000130010000000000E0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Data Models/IIDXSong.swift",
+				"Data Models/IIDXSongRecord.swift",
+				"Data Models/IIDXTowerEntry.swift",
+				"Data Models/ImportGroup.swift",
+			);
+			target = AA000001300100000000000C /* DJDXWidgets */;
+		};
+		AA00000130010000000000E1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AA000001300100000000000C /* DJDXWidgets */;
+		};
 		E4B263BC2E7998840031A646 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -29,11 +86,19 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		E4B2630B2E79986D0031A646 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
+		AA000001300100000000000E /* Widgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AA00000130010000000000E1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Widgets; sourceTree = "<group>"; };
+		E4B2630B2E79986D0031A646 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AA00000130010000000000E0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 		E4B2636E2E7998840031A646 /* DJDX */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4B263BC2E7998840031A646 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DJDX; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		AA00000130010000000000F1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E4B123A92BF8E8E400D4A3D1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -48,11 +113,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E49816D22F53F04A00EFFB8B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		E4B123A32BF8E8E400D4A3D1 = {
 			isa = PBXGroup;
 			children = (
 				E4B2630B2E79986D0031A646 /* Shared */,
 				E4B2636E2E7998840031A646 /* DJDX */,
+				AA000001300100000000000E /* Widgets */,
+				E49816D22F53F04A00EFFB8B /* Frameworks */,
 				E4B123AD2BF8E8E400D4A3D1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,6 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */,
+				AA000001300100000000000D /* DJDXWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -68,6 +143,27 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		AA000001300100000000000C /* DJDXWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA00000130010000000000F8 /* Build configuration list for PBXNativeTarget "DJDXWidgets" */;
+			buildPhases = (
+				AA00000130010000000000F2 /* Sources */,
+				AA00000130010000000000F1 /* Frameworks */,
+				AA00000130010000000000F3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AA000001300100000000000E /* Widgets */,
+				E4B2630B2E79986D0031A646 /* Shared */,
+			);
+			name = DJDXWidgets;
+			productName = DJDXWidgets;
+			productReference = AA000001300100000000000D /* DJDXWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		E4B123AB2BF8E8E400D4A3D1 /* DJDX */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E4B123BC2BF8E8E500D4A3D1 /* Build configuration list for PBXNativeTarget "DJDX" */;
@@ -76,10 +172,14 @@
 				E4B123A92BF8E8E400D4A3D1 /* Frameworks */,
 				E4B123AA2BF8E8E400D4A3D1 /* Resources */,
 				E4E3D0DF2BF9D695001942FE /* ShellScript */,
+				E47D06902F53F4E6006081EF /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E49816D52F53F04A00EFFB8B /* PBXTargetDependency */,
+				E47D068F2F53F4E6006081EF /* PBXTargetDependency */,
+				E47D06922F53F4EC006081EF /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				E4B2630B2E79986D0031A646 /* Shared */,
@@ -106,6 +206,9 @@
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					AA000001300100000000000C = {
+						CreatedOnToolsVersion = 16.3;
+					};
 					E4B123AB2BF8E8E400D4A3D1 = {
 						CreatedOnToolsVersion = 15.4;
 					};
@@ -132,11 +235,19 @@
 			projectRoot = "";
 			targets = (
 				E4B123AB2BF8E8E400D4A3D1 /* DJDX */,
+				AA000001300100000000000C /* DJDXWidgets */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		AA00000130010000000000F3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E4B123AA2BF8E8E400D4A3D1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -168,6 +279,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		AA00000130010000000000F2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E4B123A82BF8E8E400D4A3D1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -177,7 +295,87 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		E47D068F2F53F4E6006081EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA000001300100000000000C /* DJDXWidgets */;
+			targetProxy = E47D068E2F53F4E6006081EF /* PBXContainerItemProxy */;
+		};
+		E47D06922F53F4EC006081EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA000001300100000000000C /* DJDXWidgets */;
+			targetProxy = E47D06912F53F4EC006081EF /* PBXContainerItemProxy */;
+		};
+		E49816D52F53F04A00EFFB8B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA000001300100000000000C /* DJDXWidgets */;
+			targetProxy = E49816D42F53F04A00EFFB8B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		AA00000130010000000000F4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widgets/Widgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YYM4Z6MU8F;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Widgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = DJDX;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 33.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.Widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA00000130010000000000F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widgets/Widgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YYM4Z6MU8F;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Widgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = DJDX;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 33.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.Widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		E4B123BA2BF8E8E500D4A3D1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -334,12 +532,12 @@
 				MARKETING_VERSION = 33.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 1.0;
 			};
 			name = Debug;
@@ -374,12 +572,12 @@
 				MARKETING_VERSION = 33.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 1.0;
 			};
 			name = Release;
@@ -387,6 +585,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		AA00000130010000000000F8 /* Build configuration list for PBXNativeTarget "DJDXWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA00000130010000000000F4 /* Debug */,
+				AA00000130010000000000F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E4B123A72BF8E8E400D4A3D1 /* Build configuration list for PBXProject "DJDX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

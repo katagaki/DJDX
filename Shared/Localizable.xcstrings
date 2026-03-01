@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
-    "%@" : {
-      "shouldTranslate" : false
-    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -969,6 +966,12 @@
         }
       }
     },
+    "Clear Type" : {
+
+    },
+    "Count" : {
+
+    },
     "Count.%lld" : {
       "localizations" : {
         "en" : {
@@ -984,6 +987,15 @@
           }
         }
       }
+    },
+    "Date" : {
+
+    },
+    "DJ Level" : {
+
+    },
+    "Height" : {
+
     },
     "Importer.CSV.Backup.Button" : {
       "extractionState" : "manual",
@@ -2044,6 +2056,7 @@
       }
     },
     "Shared.IIDX.Version" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2410,23 +2423,6 @@
         }
       }
     },
-    "Shared.Sort.ClearType" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear Type"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "クリアランプ"
-          }
-        }
-      }
-    },
     "Shared.Sort.Ascending" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2440,6 +2436,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "昇順"
+          }
+        }
+      }
+    },
+    "Shared.Sort.ClearType" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランプ"
           }
         }
       }
@@ -3022,6 +3035,9 @@
         }
       }
     },
+    "Type" : {
+
+    },
     "ViewTitle.Analytics" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3232,6 +3248,374 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "IIDXタワー"
+          }
+        }
+      }
+    },
+    "Widget.ChartDisplay.Bar" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latest Data (Bar)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新データ（棒グラフ）"
+          }
+        }
+      }
+    },
+    "Widget.ChartDisplay.Pie" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latest Data (Pie)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新データ（円グラフ）"
+          }
+        }
+      }
+    },
+    "Widget.ChartDisplay.Trend" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trend"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推移"
+          }
+        }
+      }
+    },
+    "Widget.ChartDisplay.Type" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示"
+          }
+        }
+      }
+    },
+    "Widget.ClearType.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows clear type distribution"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアタイプの分布を表示します"
+          }
+        }
+      }
+    },
+    "Widget.ClearType.Name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアタイプ"
+          }
+        }
+      }
+    },
+    "Widget.ClearType.NoData" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No data available"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データがありません"
+          }
+        }
+      }
+    },
+    "Widget.DJLevel.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows DJ level distribution"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJレベルの分布を表示します"
+          }
+        }
+      }
+    },
+    "Widget.DJLevel.Name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
+          }
+        }
+      }
+    },
+    "Widget.DJLevel.NoData" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No data available"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データがありません"
+          }
+        }
+      }
+    },
+    "Widget.NotesRadar.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows your notes radar chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ノーツレーダーを表示します"
+          }
+        }
+      }
+    },
+    "Widget.NotesRadar.Name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Radar"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ノーツレーダー"
+          }
+        }
+      }
+    },
+    "Widget.NotesRadar.NoData" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No radar data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レーダーデータがありません"
+          }
+        }
+      }
+    },
+    "Widget.NotesRadar.ShowTable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Numbers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "数値を表示"
+          }
+        }
+      }
+    },
+    "Widget.Qpro.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows your Qpro image"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クプロを表示します"
+          }
+        }
+      }
+    },
+    "Widget.Qpro.Name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qpro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クプロ"
+          }
+        }
+      }
+    },
+    "Widget.Qpro.NotLoaded" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the app to load your Qpro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリを開いてクプロを読み込んでください"
+          }
+        }
+      }
+    },
+    "Widget.Tower.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows your IIDX Tower progress"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDXタワーの進捗を表示します"
+          }
+        }
+      }
+    },
+    "Widget.Tower.Keys" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keys"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "鍵盤"
+          }
+        }
+      }
+    },
+    "Widget.Tower.Name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDX Tower"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDXタワー"
+          }
+        }
+      }
+    },
+    "Widget.Tower.NoData" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No tower data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タワーデータがありません"
+          }
+        }
+      }
+    },
+    "Widget.Tower.NoEntries" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No entries"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エントリーがありません"
+          }
+        }
+      }
+    },
+    "Widget.Tower.Scratch" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scratches"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクラッチ"
           }
         }
       }
