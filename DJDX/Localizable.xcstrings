@@ -575,16 +575,10 @@
     "Analytics.NewHighScores" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NEW RECORD"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "新規ハイスコア"
+            "value" : "NEW RECORD"
           }
         }
       },
