@@ -73,9 +73,9 @@ struct NotesRadarWidgetView: View {
 
     private static let displayOrder = ["NOTES", "CHORD", "PEAK", "CHARGE", "SCRATCH", "SOF-LAN"]
     private static let displayColors: [String: Color] = [
-        "NOTES": .init(red: 255 / 255, green: 64 / 255, blue: 235 / 255),
+        "NOTES": .init(red: 1.0, green: 64 / 255, blue: 235 / 255),
         "CHORD": .init(red: 133 / 255, green: 225 / 255, blue: 0 / 255),
-        "PEAK": .init(red: 255 / 255, green: 108 / 255, blue: 0 / 255),
+        "PEAK": .init(red: 1.0, green: 108 / 255, blue: 0 / 255),
         "CHARGE": .init(red: 137 / 255, green: 87 / 255, blue: 221 / 255),
         "SCRATCH": .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255),
         "SOF-LAN": .init(red: 0 / 255, green: 134 / 255, blue: 229 / 255)
