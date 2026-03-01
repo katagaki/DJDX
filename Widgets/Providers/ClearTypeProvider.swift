@@ -16,12 +16,12 @@ struct ClearTypeEntry: TimelineEntry {
 }
 
 struct ClearTypeProvider: AppIntentTimelineProvider {
-    func placeholder(in context: Context) -> ClearTypeEntry {
+    func placeholder(in _: Context) -> ClearTypeEntry {
         ClearTypeEntry(date: .now, configuration: ClearTypeWidgetIntent(),
                        dataPerDifficulty: nil, trendData: nil, playType: "single")
     }
 
-    func snapshot(for configuration: ClearTypeWidgetIntent, in context: Context) async -> ClearTypeEntry {
+    func snapshot(for configuration: ClearTypeWidgetIntent, in _: Context) async -> ClearTypeEntry {
         let snapshot = WidgetDataStore.shared.readClearType()
         return ClearTypeEntry(
             date: .now, configuration: configuration,
@@ -32,7 +32,7 @@ struct ClearTypeProvider: AppIntentTimelineProvider {
     }
 
     func timeline(for configuration: ClearTypeWidgetIntent,
-                  in context: Context) async -> Timeline<ClearTypeEntry> {
+                  in _: Context) async -> Timeline<ClearTypeEntry> {
         let snapshot = WidgetDataStore.shared.readClearType()
         let entry = ClearTypeEntry(
             date: .now, configuration: configuration,

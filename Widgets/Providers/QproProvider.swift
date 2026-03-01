@@ -14,16 +14,16 @@ struct QproEntry: TimelineEntry {
 }
 
 struct QproProvider: TimelineProvider {
-    func placeholder(in context: Context) -> QproEntry {
+    func placeholder(in _: Context) -> QproEntry {
         QproEntry(date: .now, imageData: nil)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (QproEntry) -> Void) {
+    func getSnapshot(in _: Context, completion: @escaping (QproEntry) -> Void) {
         let imageData = WidgetDataStore.shared.readQproImage()
         completion(QproEntry(date: .now, imageData: imageData))
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<QproEntry>) -> Void) {
+    func getTimeline(in _: Context, completion: @escaping (Timeline<QproEntry>) -> Void) {
         let imageData = WidgetDataStore.shared.readQproImage()
         let entry = QproEntry(date: .now, imageData: imageData)
         let nextUpdate = Calendar.current.date(byAdding: .hour, value: 4, to: .now)!

@@ -16,12 +16,12 @@ struct DJLevelEntry: TimelineEntry {
 }
 
 struct DJLevelProvider: AppIntentTimelineProvider {
-    func placeholder(in context: Context) -> DJLevelEntry {
+    func placeholder(in _: Context) -> DJLevelEntry {
         DJLevelEntry(date: .now, configuration: DJLevelWidgetIntent(),
                      dataPerDifficulty: nil, trendData: nil, playType: "single")
     }
 
-    func snapshot(for configuration: DJLevelWidgetIntent, in context: Context) async -> DJLevelEntry {
+    func snapshot(for configuration: DJLevelWidgetIntent, in _: Context) async -> DJLevelEntry {
         let snapshot = WidgetDataStore.shared.readDJLevel()
         return DJLevelEntry(
             date: .now, configuration: configuration,
@@ -32,7 +32,7 @@ struct DJLevelProvider: AppIntentTimelineProvider {
     }
 
     func timeline(for configuration: DJLevelWidgetIntent,
-                  in context: Context) async -> Timeline<DJLevelEntry> {
+                  in _: Context) async -> Timeline<DJLevelEntry> {
         let snapshot = WidgetDataStore.shared.readDJLevel()
         let entry = DJLevelEntry(
             date: .now, configuration: configuration,

@@ -14,11 +14,11 @@ struct NotesRadarEntry: TimelineEntry {
 }
 
 struct NotesRadarProvider: AppIntentTimelineProvider {
-    func placeholder(in context: Context) -> NotesRadarEntry {
+    func placeholder(in _: Context) -> NotesRadarEntry {
         NotesRadarEntry(date: .now, configuration: NotesRadarWidgetIntent(), radarData: nil)
     }
 
-    func snapshot(for configuration: NotesRadarWidgetIntent, in context: Context) async -> NotesRadarEntry {
+    func snapshot(for configuration: NotesRadarWidgetIntent, in _: Context) async -> NotesRadarEntry {
         let snapshot = WidgetDataStore.shared.readRadar()
         return NotesRadarEntry(
             date: .now, configuration: configuration,
@@ -27,7 +27,7 @@ struct NotesRadarProvider: AppIntentTimelineProvider {
     }
 
     func timeline(for configuration: NotesRadarWidgetIntent,
-                  in context: Context) async -> Timeline<NotesRadarEntry> {
+                  in _: Context) async -> Timeline<NotesRadarEntry> {
         let snapshot = WidgetDataStore.shared.readRadar()
         let entry = NotesRadarEntry(
             date: .now, configuration: configuration,

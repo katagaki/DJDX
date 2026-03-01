@@ -13,16 +13,16 @@ struct TowerEntry: TimelineEntry {
 }
 
 struct TowerProvider: TimelineProvider {
-    func placeholder(in context: Context) -> TowerEntry {
+    func placeholder(in _: Context) -> TowerEntry {
         TowerEntry(date: .now, towerData: nil)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (TowerEntry) -> Void) {
+    func getSnapshot(in _: Context, completion: @escaping (TowerEntry) -> Void) {
         let snapshot = WidgetDataStore.shared.readTower()
         completion(TowerEntry(date: .now, towerData: snapshot))
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<TowerEntry>) -> Void) {
+    func getTimeline(in _: Context, completion: @escaping (Timeline<TowerEntry>) -> Void) {
         let snapshot = WidgetDataStore.shared.readTower()
         let entry = TowerEntry(date: .now, towerData: snapshot)
         let nextUpdate = Calendar.current.date(byAdding: .hour, value: 4, to: .now)!
