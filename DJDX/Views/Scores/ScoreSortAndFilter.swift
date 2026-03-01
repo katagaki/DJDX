@@ -52,7 +52,7 @@ struct ScoreSortAndFilter: View {
         .menuActionDismissBehavior(.disabled)
 
         // Filter
-        Menu("Shared.Filter", systemImage: "line.3.horizontal.decrease.circle") {
+        Menu("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             Toggle(
                 .scoresFilterShowWithScoreOnly, systemImage: "trophy.fill",
                 isOn: $isShowingOnlyPlayDataWithScores
