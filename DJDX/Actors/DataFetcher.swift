@@ -146,6 +146,10 @@ actor DataFetcher {
                 $0.playType == filters.playType
             })
 
+            if !filters.version.isEmpty {
+                filteredSongRecords.removeAll { $0.version != filters.version }
+            }
+
             if filters.onlyPlayDataWithScores {
                 if filters.level != .all,
                    let keyPath = scoreKeyPath(for: filters.level) {

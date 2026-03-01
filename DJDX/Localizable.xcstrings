@@ -2563,6 +2563,23 @@
         }
       }
     },
+    "Shared.Version" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン"
+          }
+        }
+      }
+    },
     "Tab.Analytics" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -13,6 +13,7 @@ struct ScoreSortAndFilter: View {
     @Binding var difficultyToShow: IIDXDifficulty
     @Binding var levelToShow: IIDXLevel
     @Binding var clearTypeToShow: IIDXClearType
+    @Binding var versionToShow: String
     @Binding var sortMode: SortMode
     @Binding var isSystemChangingFilterAndSort: Bool
     var onReset: () -> Void
@@ -73,11 +74,21 @@ struct ScoreSortAndFilter: View {
                             .tag(sortClearType)
                     }
                 }
+                Picker(.sharedVersion, selection: $versionToShow) {
+                    Text(.sharedAll)
+                        .tag("")
+                    Divider()
+                    ForEach(IIDXVersion.allCases, id: \.self) { version in
+                        Text(verbatim: version.marketingName)
+                            .tag(version.marketingName)
+                    }
+                }
                 Button(.sharedFilterResetAll, systemImage: "arrow.clockwise") {
                     isSystemChangingFilterAndSort = true
                     difficultyToShow = .all
                     levelToShow = .all
                     clearTypeToShow = .all
+                    versionToShow = ""
                     sortMode = .title
                     isSystemChangingFilterAndSort = false
                     onReset()
