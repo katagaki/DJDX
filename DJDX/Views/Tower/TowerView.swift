@@ -163,6 +163,7 @@ struct TowerView: View {
 
     func reloadTowerEntries() async {
         towerEntries = await fetcher.allTowerEntries()
+        await WidgetDataPublisher.shared.publishTower()
     }
 
     func errorMessage(for reason: ImportFailedReason) -> String {

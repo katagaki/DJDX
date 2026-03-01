@@ -103,7 +103,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .iidx8thStyle: return UIColor(red: 238 / 255, green: 127 / 255, blue: 2 / 255, alpha: 1.0)
         case .iidx9thStyle: return UIColor(red: 35 / 255, green: 24 / 255, blue: 22 / 255, alpha: 1.0)
         case .iidx10thStyle: return UIColor(red: 8 / 255, green: 34 / 255, blue: 88 / 255, alpha: 1.0)
-        case .red: return UIColor(red: 255 / 255, green: 0 / 255, blue: 0 / 255, alpha: 1.0)
+        case .red: return UIColor(red: 1.0, green: 0 / 255, blue: 0 / 255, alpha: 1.0)
         case .happySky: return UIColor(red: 18 / 255, green: 34 / 255, blue: 116 / 255, alpha: 1.0)
         case .distorteD: return UIColor(red: 53 / 255, green: 59 / 255, blue: 27 / 255, alpha: 1.0)
         case .gold: return UIColor(red: 191 / 255, green: 145 / 255, blue: 39 / 255, alpha: 1.0)
@@ -140,8 +140,8 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .iidx7thStyle: return UIColor(red: 146 / 255, green: 164 / 255, blue: 174 / 255, alpha: 1.0)
         case .iidx8thStyle: return UIColor(red: 243 / 255, green: 129 / 255, blue: 15 / 255, alpha: 1.0)
         case .iidx9thStyle: return UIColor(red: 148 / 255, green: 200 / 255, blue: 244 / 255, alpha: 1.0)
-        case .iidx10thStyle: return UIColor(red: 255 / 255, green: 27 / 255, blue: 0 / 255, alpha: 1.0)
-        case .red: return UIColor(red: 255 / 255, green: 0 / 255, blue: 0 / 255, alpha: 1.0)
+        case .iidx10thStyle: return UIColor(red: 1.0, green: 27 / 255, blue: 0 / 255, alpha: 1.0)
+        case .red: return UIColor(red: 1.0, green: 0 / 255, blue: 0 / 255, alpha: 1.0)
         case .happySky: return UIColor(red: 90 / 255, green: 229 / 255, blue: 250 / 255, alpha: 1.0)
         case .distorteD: return UIColor(red: 239 / 255, green: 241 / 255, blue: 54 / 255, alpha: 1.0)
         case .gold: return UIColor(red: 202 / 255, green: 162 / 255, blue: 48 / 255, alpha: 1.0)
@@ -162,7 +162,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .castHour: return UIColor(red: 254 / 255, green: 165 / 255, blue: 89 / 255, alpha: 1.0)
         case .resident: return UIColor(red: 127 / 255, green: 158 / 255, blue: 166 / 255, alpha: 1.0)
         case .epolis: return UIColor(red: 240 / 255, green: 254 / 255, blue: 0 / 255, alpha: 1.0)
-        case .pinkyCrush: return UIColor(red: 255 / 255, green: 97 / 255, blue: 178 / 255, alpha: 1.0)
+        case .pinkyCrush: return UIColor(red: 1.0, green: 97 / 255, blue: 178 / 255, alpha: 1.0)
         case .sparkleShower: return UIColor(red: 173 / 255, green: 227 / 255, blue: 77 / 255, alpha: 1.0)
         }
     }

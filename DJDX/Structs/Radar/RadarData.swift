@@ -20,7 +20,7 @@ struct RadarData {
             RadarPointConfig(
                 label: "NOTES",
                 angle: -.pi / 2,
-                color: .init(red: 255 / 255, green: 64 / 255, blue: 235 / 255),
+                color: .init(red: 1.0, green: 64 / 255, blue: 235 / 255),
                 value: self.notes,
                 alignment: .bottom
             ),
@@ -55,7 +55,7 @@ struct RadarData {
             RadarPointConfig(
                 label: "PEAK",
                 angle: -.pi / 6,
-                color: .init(red: 255 / 255, green: 108 / 255, blue: 0 / 255),
+                color: .init(red: 1.0, green: 108 / 255, blue: 0 / 255),
                 value: self.peak,
                 alignment: .bottomLeading
             )

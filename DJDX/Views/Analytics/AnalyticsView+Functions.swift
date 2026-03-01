@@ -17,6 +17,9 @@ extension AnalyticsView {
             async let trendsTask: () = reloadTrends()
             async let newClearsTask: () = reloadNewClearsAndHighScores()
             _ = await (overviewTask, trendsTask, newClearsTask)
+            await WidgetDataPublisher.shared.publishClearTypeAndDJLevel(
+                playType: playTypeToShow, iidxVersion: iidxVersion
+            )
             await MainActor.run {
                 withAnimation(.snappy.speed(2.0)) {
                     dataState = .presenting

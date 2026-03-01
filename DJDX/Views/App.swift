@@ -5,8 +5,9 @@
 //  Created by シン・ジャスティン on 2024/05/18.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
+import WidgetKit
 
 @main
 struct DJDXApp: App {
@@ -28,6 +29,13 @@ struct DJDXApp: App {
 
     init() {
         _ = PlayDataDatabase.shared
+        Task {
+            let playTypeRaw = UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter") ?? "single"
+            let playType = IIDXPlayType(rawValue: playTypeRaw) ?? .single
+            let versionRaw = UserDefaults.standard.integer(forKey: "Global.IIDX.Version")
+            let version = IIDXVersion(rawValue: versionRaw) ?? .sparkleShower
+            await WidgetDataPublisher.shared.publishAll(playType: playType, iidxVersion: version)
+        }
     }
 }
 

@@ -96,6 +96,8 @@ extension MoreView {
             }
 
             saveRadarData()
+            await WidgetDataPublisher.shared.publishRadar()
+            await WidgetDataPublisher.shared.publishQpro()
         } catch {
             return
         }
