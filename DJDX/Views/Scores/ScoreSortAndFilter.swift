@@ -78,7 +78,7 @@ struct ScoreSortAndFilter: View {
                     Text(.sharedAll)
                         .tag("")
                     Divider()
-                    ForEach(IIDXVersion.allCases, id: \.self) { version in
+                    ForEach(IIDXVersion.allCases.reversed(), id: \.self) { version in
                         Text(verbatim: version.marketingName)
                             .tag(version.marketingName)
                     }
