@@ -19,7 +19,7 @@ struct ClearTypeWidget: Widget {
                 .widgetAccentable(false)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Widget.ClearType.Name")
+        .configurationDisplayName("Shared.IIDX.ClearType")
         .description("Widget.ClearType.Description")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
@@ -29,23 +29,29 @@ struct ClearTypeWidgetView: View {
     @Environment(\.widgetFamily) var family
     let entry: ClearTypeEntry
 
+    var selectedLevel: Int {
+        entry.configuration.level.rawValue
+    }
+
     var body: some View {
         switch entry.configuration.chartDisplay {
         case .trend:
             if let trendData = entry.trendData, !trendData.isEmpty {
-                WidgetClearTypeTrendChart(trendData: trendData)
+                WidgetClearTypeTrendChart(trendData: trendData, level: selectedLevel)
             } else {
                 noDataView
             }
         case .pie:
-            if let data = entry.dataPerDifficulty, !data.isEmpty {
-                WidgetClearTypePieChart(data: aggregateAllDifficulties(data))
+            if let data = entry.dataPerDifficulty,
+               let levelData = dataForSelectedLevel(data) {
+                WidgetClearTypePieChart(data: levelData)
             } else {
                 noDataView
             }
         case .bar:
-            if let data = entry.dataPerDifficulty, !data.isEmpty {
-                WidgetClearTypeBarChart(data: aggregateAllDifficulties(data))
+            if let data = entry.dataPerDifficulty,
+               let levelData = dataForSelectedLevel(data) {
+                WidgetClearTypeBarChart(data: levelData)
             } else {
                 noDataView
             }
@@ -57,19 +63,16 @@ struct ClearTypeWidgetView: View {
             Image(systemName: "chart.bar")
                 .font(.largeTitle)
                 .foregroundStyle(.secondary)
-            Text("Widget.ClearType.NoData")
+            Text("Shared.IIDX.NoData")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
     }
 
-    private func aggregateAllDifficulties(_ data: [Int: [String: Int]]) -> [String: Int] {
-        var result: [String: Int] = [:]
-        for (_, clearTypes) in data {
-            for (clearType, count) in clearTypes {
-                result[clearType, default: 0] += count
-            }
+    private func dataForSelectedLevel(_ data: [Int: [String: Int]]) -> [String: Int]? {
+        guard let levelData = data[selectedLevel], !levelData.isEmpty else {
+            return nil
         }
-        return result
+        return levelData
     }
 }

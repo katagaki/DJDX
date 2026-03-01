@@ -76,7 +76,7 @@ struct ScoreSortAndFilter: View {
                             .tag(sortLevel)
                     }
                 }
-                Picker(.sharedClearType, selection: $clearTypeToShow) {
+                Picker("Shared.IIDX.ClearType", selection: $clearTypeToShow) {
                     Text(.sharedAll)
                         .tag(IIDXClearType.all)
                     Divider()

@@ -21,7 +21,7 @@ struct TrendsClearTypeGraph: View {
                     x: .value("Shared.Date", date),
                     y: .value("Shared.ClearCount", count)
                 )
-                .foregroundStyle(by: .value("Shared.ClearType", clearType))
+                .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
                 .interpolationMethod(.monotone)
             }
         }

@@ -48,6 +48,7 @@ struct WidgetDJLevelBarChart: View {
 
 struct WidgetDJLevelTrendChart: View {
     let trendData: [String: [Int: [String: Int]]]
+    let level: Int
 
     private static let djLevelOrder = ["F", "E", "D", "C", "B", "A", "AA", "AAA"]
 
@@ -55,10 +56,10 @@ struct WidgetDJLevelTrendChart: View {
         let sortedKeys = trendData.keys.sorted()
         if !sortedKeys.isEmpty {
             Chart(sortedKeys, id: \.self) { dateKey in
-                let aggregated = aggregateAllDifficulties(trendData[dateKey] ?? [:])
+                let dataForLevel = trendData[dateKey]?[level] ?? [:]
                 let date = Date(timeIntervalSince1970: Double(dateKey) ?? 0)
                 ForEach(Self.djLevelOrder.reversed(), id: \.self) { djLevel in
-                    let count = aggregated[djLevel] ?? 0
+                    let count = dataForLevel[djLevel] ?? 0
                     AreaMark(
                         x: .value("Date", date),
                         y: .value("Count", count)
@@ -72,16 +73,6 @@ struct WidgetDJLevelTrendChart: View {
             .chartXAxis(.hidden)
             .chartYAxis(.hidden)
         }
-    }
-
-    private func aggregateAllDifficulties(_ data: [Int: [String: Int]]) -> [String: Int] {
-        var result: [String: Int] = [:]
-        for (_, djLevels) in data {
-            for (djLevel, count) in djLevels {
-                result[djLevel, default: 0] += count
-            }
-        }
-        return result
     }
 }
 

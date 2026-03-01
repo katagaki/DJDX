@@ -45,7 +45,7 @@ struct MainTabView: View {
                 .tag(TabType.analytics)
             TowerView()
                 .tabItem {
-                    Label("Tab.Tower", systemImage: "chart.bar.xaxis")
+                    Label("Shared.IIDX.Tower", systemImage: "chart.bar.xaxis")
                 }
                 .tag(TabType.tower)
             MoreView()

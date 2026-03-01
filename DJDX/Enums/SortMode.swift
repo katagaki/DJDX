@@ -9,8 +9,8 @@ import Foundation
 
 enum SortMode: String, CaseIterable, Codable {
     case title = "Shared.Sort.Title"
-    case clearType = "Shared.Sort.ClearType"
-    case djLevel = "Shared.Sort.DJLevel"
+    case clearType = "Shared.IIDX.ClearType"
+    case djLevel = "Shared.IIDX.DJLevel"
     case scoreRate = "Shared.Sort.ScoreRate"
     case score = "Shared.Sort.Score"
     case missCount = "Shared.Sort.MissCount"
@@ -41,8 +41,8 @@ enum SortMode: String, CaseIterable, Codable {
     private var extraRawValues: [String] {
         switch self {
         case .title: return ["タイトル", "Shared.Sort.Title"]
-        case .clearType: return ["クリアタイプ", "Shared.Sort.ClearType"]
-        case .djLevel: return ["DJ LEVEL", "Shared.Sort.DJLevel"]
+        case .clearType: return ["クリアタイプ", "Shared.Sort.ClearType", "Shared.IIDX.ClearType"]
+        case .djLevel: return ["DJ LEVEL", "Shared.Sort.DJLevel", "Shared.IIDX.DJLevel"]
         case .scoreRate: return ["クリアレート", "Shared.Sort.ScoreRate"]
         case .score: return [
             "スコア", "Shared.Sort.Score",

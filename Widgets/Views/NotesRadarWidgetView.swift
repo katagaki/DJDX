@@ -17,7 +17,7 @@ struct NotesRadarWidget: Widget {
             NotesRadarWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Widget.NotesRadar.Name")
+        .configurationDisplayName("Shared.IIDX.NotesRadar")
         .description("Widget.NotesRadar.Description")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
@@ -64,7 +64,7 @@ struct NotesRadarWidgetView: View {
                 Image(systemName: "chart.dots.scatter")
                     .font(.largeTitle)
                     .foregroundStyle(.secondary)
-                Text("Widget.NotesRadar.NoData")
+                Text("Shared.IIDX.NoData")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

@@ -25,11 +25,11 @@ struct OverviewDJLevelPerDifficultyGraph: View {
     var body: some View {
         Chart(filteredData, id: \.key) { djLevel, count in
             BarMark(
-                x: .value("Shared.DJLevel", djLevel.rawValue),
+                x: .value("Shared.IIDX.DJLevel", djLevel.rawValue),
                 y: .value("Shared.ClearCount", count),
                 width: .inset(8.0)
             )
-            .foregroundStyle(by: .value("Shared.DJLevel", djLevel.rawValue))
+            .foregroundStyle(by: .value("Shared.IIDX.DJLevel", djLevel.rawValue))
         }
               .chartXScale(domain: Self.visibleLevelStrings)
               .chartForegroundStyleScale([

@@ -18,7 +18,7 @@ struct OverviewClearTypePerDifficultyGraph: View {
             if let clearData = graphData[difficulty], clearData.keys.count > 0 {
                 Chart(clearData.keys, id: \.self) { clearType in
                     SectorMark(angle: .value(clearType, clearData[clearType] ?? 0))
-                        .foregroundStyle(by: .value("Shared.ClearType", clearType))
+                        .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
                 }
                 .chartXScale(domain: IIDXClearType.sortedStrings.reversed())
                       .chartForegroundStyleScale([

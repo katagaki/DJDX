@@ -287,7 +287,7 @@ extension AnalyticsView {
                 .chartLegend(.hidden)
                 .chartYAxis(.hidden)
             }
-            .perLevelCaption("Analytics.PerLevel.Caption.ClearType")
+            .perLevelCaption("Shared.IIDX.ClearType")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
@@ -308,7 +308,7 @@ extension AnalyticsView {
                     .chartYAxis(.hidden)
                     .chartXAxis(.hidden)
             }
-            .perLevelCaption("Analytics.PerLevel.Caption.ClearType")
+            .perLevelCaption("Shared.IIDX.ClearType")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(
@@ -332,7 +332,7 @@ extension AnalyticsView {
                 .chartLegend(.hidden)
                 .chartYAxis(.hidden)
             }
-            .perLevelCaption("Analytics.PerLevel.Caption.DJLevel")
+            .perLevelCaption("Shared.IIDX.DJLevel")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace)
@@ -353,7 +353,7 @@ extension AnalyticsView {
                     .chartYAxis(.hidden)
                     .chartXAxis(.hidden)
             }
-            .perLevelCaption("Analytics.PerLevel.Caption.DJLevel")
+            .perLevelCaption("Shared.IIDX.DJLevel")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(

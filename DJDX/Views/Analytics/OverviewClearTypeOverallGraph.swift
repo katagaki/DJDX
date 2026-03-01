@@ -25,7 +25,7 @@ struct OverviewClearTypeOverallGraph: View {
                     width: .inset(8.0),
                     stacking: .standard
                 )
-                .foregroundStyle(by: .value("Shared.ClearType", clearType))
+                .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
                 .zIndex(0)
             }
             .annotation(position: .top) {

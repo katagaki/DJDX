@@ -16,7 +16,7 @@ struct TowerWidget: Widget {
             TowerWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Widget.Tower.Name")
+        .configurationDisplayName("Shared.IIDX.Tower")
         .description("Widget.Tower.Description")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
@@ -62,7 +62,7 @@ struct TowerWidgetView: View {
                 Image(systemName: "chart.bar.xaxis")
                     .font(.largeTitle)
                     .foregroundStyle(.secondary)
-                Text("Widget.Tower.NoData")
+                Text("Shared.IIDX.NoData")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -76,7 +76,7 @@ struct TowerWidgetView: View {
         VStack(alignment: .leading, spacing: 8.0) {
             Spacer()
             VStack(alignment: .leading, spacing: 2.0) {
-                Text("Widget.Tower.Keys")
+                Text("Shared.IIDX.Keys")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                 Text(verbatim: "\(keyHeight)m")
@@ -85,7 +85,7 @@ struct TowerWidgetView: View {
                     .foregroundStyle(.blue)
             }
             VStack(alignment: .leading, spacing: 2.0) {
-                Text("Widget.Tower.Scratch")
+                Text("Shared.IIDX.Scratch")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                 Text(verbatim: "\(scratchHeight)m")
@@ -101,7 +101,7 @@ struct TowerWidgetView: View {
     @ViewBuilder
     func recentEntries(_ entries: [WidgetTowerEntry]) -> some View {
         if entries.isEmpty {
-            Text("Widget.Tower.NoEntries")
+            Text("Shared.IIDX.NoEntries")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         } else {
@@ -111,11 +111,11 @@ struct TowerWidgetView: View {
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Text("Tower.Header.Keys")
+                    Text("Shared.IIDX.Keys")
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(.secondary)
                         .frame(width: 60, alignment: .trailing)
-                    Text("Tower.Header.Scratch")
+                    Text("Shared.IIDX.Scratch")
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(.secondary)
                         .frame(width: 60, alignment: .trailing)

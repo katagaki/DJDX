@@ -121,22 +121,22 @@ struct MoreView: View {
                     }
                     Toggle(isOn: $isDJLevelVisible) {
                         ListRow(image: "ListIcon.ShowDJLevel",
-                                title: "More.PlayDataDisplay.ShowDJLevel",
+                                title: "Shared.IIDX.DJLevel",
                                 includeSpacer: true)
                     }
                     Toggle(isOn: $isScoreRateVisible) {
                         ListRow(image: "ListIcon.ShowScoreRate",
-                                title: "More.PlayDataDisplay.ShowScoreRate",
+                                title: "Shared.Sort.ScoreRate",
                                 includeSpacer: true)
                     }
                     Toggle(isOn: $isScoreVisible) {
                         ListRow(image: "ListIcon.ShowScore",
-                                title: "More.PlayDataDisplay.ShowScore",
+                                title: "Shared.Sort.Score",
                                 includeSpacer: true)
                     }
                     Toggle(isOn: $isLastPlayDateVisible) {
                         ListRow(image: "ListIcon.ShowPlayDate",
-                                title: "More.PlayDataDisplay.ShowLastPlayDate",
+                                title: "Shared.Sort.LastPlayDate",
                                 includeSpacer: true)
                     }
                 } header: {

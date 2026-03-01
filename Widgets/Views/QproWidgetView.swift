@@ -16,7 +16,7 @@ struct QproWidget: Widget {
             QproWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Widget.Qpro.Name")
+        .configurationDisplayName("Shared.IIDX.Qpro")
         .description("Widget.Qpro.Description")
         .supportedFamilies([.systemSmall, .systemLarge])
     }

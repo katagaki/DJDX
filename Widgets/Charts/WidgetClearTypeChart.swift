@@ -57,6 +57,7 @@ struct WidgetClearTypeBarChart: View {
 
 struct WidgetClearTypeTrendChart: View {
     let trendData: [String: [Int: [String: Int]]]
+    let level: Int
 
     private static let clearTypeOrder = [
         "FULLCOMBO CLEAR", "CLEAR", "EASY CLEAR", "ASSIST CLEAR",
@@ -67,10 +68,10 @@ struct WidgetClearTypeTrendChart: View {
         let sortedKeys = trendData.keys.sorted()
         if !sortedKeys.isEmpty {
             Chart(sortedKeys, id: \.self) { dateKey in
-                let aggregated = aggregateAllDifficulties(trendData[dateKey] ?? [:])
+                let dataForLevel = trendData[dateKey]?[level] ?? [:]
                 let date = Date(timeIntervalSince1970: Double(dateKey) ?? 0)
                 ForEach(Self.clearTypeOrder.reversed(), id: \.self) { clearType in
-                    let count = aggregated[clearType] ?? 0
+                    let count = dataForLevel[clearType] ?? 0
                     AreaMark(
                         x: .value("Date", date),
                         y: .value("Count", count)
@@ -84,16 +85,6 @@ struct WidgetClearTypeTrendChart: View {
             .chartXAxis(.hidden)
             .chartYAxis(.hidden)
         }
-    }
-
-    private func aggregateAllDifficulties(_ data: [Int: [String: Int]]) -> [String: Int] {
-        var result: [String: Int] = [:]
-        for (_, clearTypes) in data {
-            for (clearType, count) in clearTypes {
-                result[clearType, default: 0] += count
-            }
-        }
-        return result
     }
 }
 

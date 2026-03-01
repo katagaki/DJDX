@@ -16,7 +16,7 @@ struct TowerBarChart: View {
             BarMark(
                 x: .value("Tower.Header.PlayDate",
                           entry.playDate, unit: .day),
-                y: .value("Tower.Header.Keys", entry.keyCount)
+                y: .value("Shared.IIDX.Keys", entry.keyCount)
             )
             .foregroundStyle(.blue)
             .position(by: .value("Tower.Type", "Keys"))
@@ -24,7 +24,7 @@ struct TowerBarChart: View {
             BarMark(
                 x: .value("Tower.Header.PlayDate",
                           entry.playDate, unit: .day),
-                y: .value("Tower.Header.Scratch", entry.scratchCount)
+                y: .value("Shared.IIDX.Scratch", entry.scratchCount)
             )
             .foregroundStyle(.red)
             .position(by: .value("Tower.Type", "Scratch"))

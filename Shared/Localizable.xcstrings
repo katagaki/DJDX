@@ -615,38 +615,6 @@
         }
       }
     },
-    "Analytics.PerLevel.Caption.ClearType" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear Type"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "クリアタイプ"
-          }
-        }
-      }
-    },
-    "Analytics.PerLevel.Caption.DJLevel" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ Level"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ LEVEL"
-          }
-        }
-      }
-    },
     "Analytics.PerLevel.ClearRate" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -677,23 +645,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリアレート推移"
-          }
-        }
-      }
-    },
-    "Analytics.PerLevel.DJLevel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ Level"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ LEVEL"
           }
         }
       }
@@ -967,10 +918,10 @@
       }
     },
     "Clear Type" : {
-
+      "shouldTranslate" : false
     },
     "Count" : {
-
+      "shouldTranslate" : false
     },
     "Count.%lld" : {
       "localizations" : {
@@ -989,13 +940,13 @@
       }
     },
     "Date" : {
-
+      "shouldTranslate" : false
     },
     "DJ Level" : {
-
+      "shouldTranslate" : false
     },
     "Height" : {
-
+      "shouldTranslate" : false
     },
     "Importer.CSV.Backup.Button" : {
       "extractionState" : "manual",
@@ -1177,6 +1128,42 @@
           }
         }
       },
+      "shouldTranslate" : false
+    },
+    "LEVEL 1" : {
+      "shouldTranslate" : false
+    },
+    "LEVEL 2" : {
+      "shouldTranslate" : false
+    },
+    "LEVEL 3" : {
+      "shouldTranslate" : false
+    },
+    "LEVEL 4" : {
+      "shouldTranslate" : false
+    },
+    "LEVEL 5" : {
+      "shouldTranslate" : false
+    },
+    "LEVEL 6" : {
+      "shouldTranslate" : false
+    },
+    "LEVEL 7" : {
+      "shouldTranslate" : false
+    },
+    "LEVEL 8" : {
+      "shouldTranslate" : false
+    },
+    "LEVEL 9" : {
+      "shouldTranslate" : false
+    },
+    "LEVEL 10" : {
+      "shouldTranslate" : false
+    },
+    "LEVEL 11" : {
+      "shouldTranslate" : false
+    },
+    "LEVEL 12" : {
       "shouldTranslate" : false
     },
     "Level.%lld" : {
@@ -1529,23 +1516,6 @@
         }
       }
     },
-    "More.PlayDataDisplay.ShowDJLevel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ Level"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ LEVEL"
-          }
-        }
-      }
-    },
     "More.PlayDataDisplay.ShowGenre" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1559,23 +1529,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンル"
-          }
-        }
-      }
-    },
-    "More.PlayDataDisplay.ShowLastPlayDate" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Last Play Date"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最終プレー日時"
           }
         }
       }
@@ -1627,40 +1580,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "（未実装）譜面を難易度で分けて表示されます。"
-          }
-        }
-      }
-    },
-    "More.PlayDataDisplay.ShowScore" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Score"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スコア"
-          }
-        }
-      }
-    },
-    "More.PlayDataDisplay.ShowScoreRate" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Score Rate"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スコアレート"
           }
         }
       }
@@ -1920,12 +1839,6 @@
     "Shared.ClearCount" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CLEAR COUNT"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1934,23 +1847,6 @@
         }
       },
       "shouldTranslate" : false
-    },
-    "Shared.ClearType" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear Type"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "クリアランプ"
-          }
-        }
-      }
     },
     "Shared.Date" : {
       "extractionState" : "manual",
@@ -1985,24 +1881,6 @@
           }
         }
       }
-    },
-    "Shared.DJLevel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ LEVEL"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ LEVEL"
-          }
-        }
-      },
-      "shouldTranslate" : false
     },
     "Shared.Done" : {
       "extractionState" : "manual",
@@ -2051,6 +1929,145 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フィルターを初期化"
+          }
+        }
+      }
+    },
+    "Shared.IIDX.ClearType" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランプ"
+          }
+        }
+      }
+    },
+    "Shared.IIDX.DJLevel" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "Shared.IIDX.Keys" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keys"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "鍵盤"
+          }
+        }
+      }
+    },
+    "Shared.IIDX.NoData" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No data available"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データがありません"
+          }
+        }
+      }
+    },
+    "Shared.IIDX.NoEntries" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No entries"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エントリーがありません"
+          }
+        }
+      }
+    },
+    "Shared.IIDX.NotesRadar" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Radar"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ノーツレーダー"
+          }
+        }
+      }
+    },
+    "Shared.IIDX.Qpro" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qpro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クプロ"
+          }
+        }
+      }
+    },
+    "Shared.IIDX.Scratch" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scratches"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクラッチ"
+          }
+        }
+      }
+    },
+    "Shared.IIDX.Tower" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDX Tower"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDXタワー"
           }
         }
       }
@@ -2108,12 +2125,6 @@
     "Shared.Level.Another" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ANOTHER"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2126,12 +2137,6 @@
     "Shared.Level.Beginner" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "BEGINNER"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2144,12 +2149,6 @@
     "Shared.Level.Hyper" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "HYPER"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2162,12 +2161,6 @@
     "Shared.Level.Leggendaria" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "LEGGENDARIA"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2180,12 +2173,6 @@
     "Shared.Level.Normal" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NORMAL"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2282,12 +2269,6 @@
     "Shared.PlayType" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PLAY TYPE"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2440,23 +2421,6 @@
         }
       }
     },
-    "Shared.Sort.ClearType" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear Type"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "クリアランプ"
-          }
-        }
-      }
-    },
     "Shared.Sort.Descending" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2487,23 +2451,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "レベル"
-          }
-        }
-      }
-    },
-    "Shared.Sort.DJLevel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ Level"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJ LEVEL"
           }
         }
       }
@@ -2695,22 +2642,6 @@
         }
       }
     },
-    "Tab.Tower" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "IIDX Tower"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "IIDXタワー"
-          }
-        }
-      }
-    },
     "Textage.FallbackMessage" : {
       "localizations" : {
         "en" : {
@@ -2841,22 +2772,6 @@
         }
       }
     },
-    "Tower.Header.Keys" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keys"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "鍵盤"
-          }
-        }
-      }
-    },
     "Tower.Header.PlayDate" : {
       "localizations" : {
         "en" : {
@@ -2869,22 +2784,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレー日"
-          }
-        }
-      }
-    },
-    "Tower.Header.Scratch" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scratches"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スクラッチ"
           }
         }
       }
@@ -3036,7 +2935,7 @@
       }
     },
     "Type" : {
-
+      "shouldTranslate" : false
     },
     "ViewTitle.Analytics" : {
       "extractionState" : "manual",
@@ -3236,22 +3135,6 @@
         }
       }
     },
-    "ViewTitle.Tower" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "IIDX Tower"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "IIDXタワー"
-          }
-        }
-      }
-    },
     "Widget.ChartDisplay.Bar" : {
       "localizations" : {
         "en" : {
@@ -3332,38 +3215,6 @@
         }
       }
     },
-    "Widget.ClearType.Name" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear Type"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "クリアタイプ"
-          }
-        }
-      }
-    },
-    "Widget.ClearType.NoData" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No data available"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データがありません"
-          }
-        }
-      }
-    },
     "Widget.DJLevel.Description" : {
       "localizations" : {
         "en" : {
@@ -3380,34 +3231,34 @@
         }
       }
     },
-    "Widget.DJLevel.Name" : {
+    "Widget.Level.Title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJ LEVEL"
+            "value" : "Level"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJ LEVEL"
+            "value" : "レベル"
           }
         }
       }
     },
-    "Widget.DJLevel.NoData" : {
+    "Widget.Level.Type" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No data available"
+            "value" : "Level"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "データがありません"
+            "value" : "レベル"
           }
         }
       }
@@ -3424,38 +3275,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ノーツレーダーを表示します"
-          }
-        }
-      }
-    },
-    "Widget.NotesRadar.Name" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Notes Radar"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ノーツレーダー"
-          }
-        }
-      }
-    },
-    "Widget.NotesRadar.NoData" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No radar data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "レーダーデータがありません"
           }
         }
       }
@@ -3492,22 +3311,6 @@
         }
       }
     },
-    "Widget.Qpro.Name" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Qpro"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "クプロ"
-          }
-        }
-      }
-    },
     "Widget.Qpro.NotLoaded" : {
       "localizations" : {
         "en" : {
@@ -3536,86 +3339,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "IIDXタワーの進捗を表示します"
-          }
-        }
-      }
-    },
-    "Widget.Tower.Keys" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keys"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "鍵盤"
-          }
-        }
-      }
-    },
-    "Widget.Tower.Name" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "IIDX Tower"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "IIDXタワー"
-          }
-        }
-      }
-    },
-    "Widget.Tower.NoData" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No tower data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "タワーデータがありません"
-          }
-        }
-      }
-    },
-    "Widget.Tower.NoEntries" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No entries"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エントリーがありません"
-          }
-        }
-      }
-    },
-    "Widget.Tower.Scratch" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scratches"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スクラッチ"
           }
         }
       }

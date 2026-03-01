@@ -9,9 +9,12 @@ import AppIntents
 import WidgetKit
 
 struct DJLevelWidgetIntent: WidgetConfigurationIntent {
-    static let title: LocalizedStringResource = "Widget.DJLevel.Name"
+    static let title: LocalizedStringResource = "Shared.IIDX.DJLevel"
     static let description: IntentDescription = "Widget.DJLevel.Description"
 
     @Parameter(title: "Widget.ChartDisplay.Type", default: .bar)
     var chartDisplay: WidgetChartDisplay
+
+    @Parameter(title: "Widget.Level.Title", default: .level12)
+    var level: WidgetLevel
 }

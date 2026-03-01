@@ -20,7 +20,7 @@ enum AnalyticsPerLevelCategory: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .clearRate: return "Analytics.PerLevel.ClearRate"
         case .clearRateTrend: return "Analytics.PerLevel.ClearRateTrend"
-        case .djLevel: return "Analytics.PerLevel.DJLevel"
+        case .djLevel: return "Shared.IIDX.DJLevel"
         case .djLevelTrend: return "Analytics.PerLevel.DJLevelTrend"
         }
     }

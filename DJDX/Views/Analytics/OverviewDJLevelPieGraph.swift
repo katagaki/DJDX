@@ -19,7 +19,7 @@ struct OverviewDJLevelPieGraph: View {
                 if !filteredData.isEmpty {
                     Chart(filteredData, id: \.self) { djLevel in
                         SectorMark(angle: .value(djLevel.rawValue, levelData[djLevel] ?? 0))
-                            .foregroundStyle(by: .value("Shared.DJLevel", djLevel.rawValue))
+                            .foregroundStyle(by: .value("Shared.IIDX.DJLevel", djLevel.rawValue))
                     }
                     .chartForegroundStyleScale([
                         "AAA": Color.primary,

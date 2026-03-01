@@ -94,16 +94,16 @@ struct TowerView: View {
                             HStack {
                                 Text("Tower.Header.PlayDate")
                                 Spacer()
-                                Text("Tower.Header.Keys")
+                                Text("Shared.IIDX.Keys")
                                     .frame(width: 80, alignment: .trailing)
-                                Text("Tower.Header.Scratch")
+                                Text("Shared.IIDX.Scratch")
                                     .frame(width: 80, alignment: .trailing)
                             }
                         }
                     }
                 }
             }
-            .navigator("ViewTitle.Tower")
+            .navigator("Shared.IIDX.Tower")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Shared.Import", systemImage: "arrow.clockwise") {
