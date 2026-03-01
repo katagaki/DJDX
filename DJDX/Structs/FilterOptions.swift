@@ -11,12 +11,14 @@ struct FilterOptions: Equatable {
     var level: IIDXLevel
     var difficulty: IIDXDifficulty
     var clearType: IIDXClearType
+    var version: String
 
     static func == (lhs: FilterOptions, rhs: FilterOptions) -> Bool {
         lhs.playType == rhs.playType &&
         lhs.onlyPlayDataWithScores == rhs.onlyPlayDataWithScores &&
         lhs.level == rhs.level &&
         lhs.difficulty == rhs.difficulty &&
-        lhs.clearType == rhs.clearType
+        lhs.clearType == rhs.clearType &&
+        lhs.version == rhs.version
     }
 }

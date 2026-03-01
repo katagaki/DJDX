@@ -21,7 +21,8 @@ extension ScoresView {
                                            onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
                                            level: levelToShow,
                                            difficulty: difficultyToShow,
-                                           clearType: clearTypeToShow),
+                                           clearType: clearTypeToShow,
+                                           version: versionToShow),
                     sortOptions: SortOptions(mode: sortMode)
                 )
                 let songCompactTitles = await actor.songCompactTitles()
