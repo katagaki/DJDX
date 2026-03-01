@@ -578,7 +578,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "New High Scores"
+            "value" : "NEW RECORD"
           }
         },
         "ja" : {
@@ -587,7 +587,8 @@
             "value" : "新規ハイスコア"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Analytics.NewHighScores.Subtitle" : {
       "extractionState" : "manual",
