@@ -12,10 +12,9 @@ enum SortMode: String, CaseIterable, Codable {
     case clearType = "Shared.Sort.ClearType"
     case djLevel = "Shared.Sort.DJLevel"
     case scoreRate = "Shared.Sort.ScoreRate"
-    case scoreAscending = "Shared.Sort.ScoreAscending"
-    case scoreDescending = "Shared.Sort.ScoreDescending"
-    case difficultyAscending = "Shared.Sort.DifficultyAscending"
-    case difficultyDescending = "Shared.Sort.DifficultyDescending"
+    case score = "Shared.Sort.Score"
+    case missCount = "Shared.Sort.MissCount"
+    case difficulty = "Shared.Sort.Difficulty"
     case lastPlayDate = "Shared.Sort.LastPlayDate"
 
     static let whenLevelFiltered: [SortMode] = [
@@ -23,10 +22,9 @@ enum SortMode: String, CaseIterable, Codable {
         .clearType,
         .djLevel,
         .scoreRate,
-        .scoreAscending,
-        .scoreDescending,
-        .difficultyAscending,
-        .difficultyDescending,
+        .score,
+        .missCount,
+        .difficulty,
         .lastPlayDate
     ]
 
@@ -35,8 +33,8 @@ enum SortMode: String, CaseIterable, Codable {
         .clearType,
         .djLevel,
         .scoreRate,
-        .scoreAscending,
-        .scoreDescending,
+        .score,
+        .missCount,
         .lastPlayDate
     ]
 
@@ -46,10 +44,17 @@ enum SortMode: String, CaseIterable, Codable {
         case .clearType: return ["クリアタイプ", "Shared.Sort.ClearType"]
         case .djLevel: return ["DJ LEVEL", "Shared.Sort.DJLevel"]
         case .scoreRate: return ["クリアレート", "Shared.Sort.ScoreRate"]
-        case .scoreAscending: return ["スコア（昇順）", "Shared.Sort.ScoreAscending"]
-        case .scoreDescending: return ["スコア（降順）", "Shared.Sort.ScoreDescending"]
-        case .difficultyAscending: return ["難易度（昇順）", "Shared.Sort.DifficultyAscending"]
-        case .difficultyDescending: return ["難易度（降順）", "Shared.Sort.DifficultyDescending"]
+        case .score: return [
+            "スコア", "Shared.Sort.Score",
+            "スコア（昇順）", "Shared.Sort.ScoreAscending",
+            "スコア（降順）", "Shared.Sort.ScoreDescending"
+        ]
+        case .missCount: return ["MISS COUNT", "Shared.Sort.MissCount"]
+        case .difficulty: return [
+            "レベル", "Shared.Sort.Difficulty",
+            "難易度（昇順）", "Shared.Sort.DifficultyAscending",
+            "難易度（降順）", "Shared.Sort.DifficultyDescending"
+        ]
         case .lastPlayDate: return ["最終プレー日時", "Shared.Sort.LastPlayDate"]
         }
     }
@@ -66,4 +71,9 @@ enum SortMode: String, CaseIterable, Codable {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid sort mode")
         }
     }
+}
+
+enum SortOrder: String, CaseIterable, Codable {
+    case ascending = "Shared.Sort.Ascending"
+    case descending = "Shared.Sort.Descending"
 }

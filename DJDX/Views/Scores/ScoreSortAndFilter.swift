@@ -15,6 +15,7 @@ struct ScoreSortAndFilter: View {
     @Binding var clearTypeToShow: IIDXClearType
     @Binding var versionToShow: String
     @Binding var sortMode: SortMode
+    @Binding var sortOrder: SortOrder
     @Binding var isSystemChangingFilterAndSort: Bool
     var onReset: () -> Void
 
@@ -38,7 +39,17 @@ struct ScoreSortAndFilter: View {
                 }
             }
             .pickerStyle(.inline)
+            Section {
+                Picker("Shared.Sort.Order", selection: $sortOrder) {
+                    Label("Shared.Sort.Ascending", systemImage: "arrow.up")
+                        .tag(SortOrder.ascending)
+                    Label("Shared.Sort.Descending", systemImage: "arrow.down")
+                        .tag(SortOrder.descending)
+                }
+                .pickerStyle(.inline)
+            }
         }
+        .menuActionDismissBehavior(.disabled)
 
         // Filter
         Menu("Shared.Filter", systemImage: "line.3.horizontal.decrease.circle") {
@@ -90,6 +101,7 @@ struct ScoreSortAndFilter: View {
                     clearTypeToShow = .all
                     versionToShow = ""
                     sortMode = .title
+                    sortOrder = .ascending
                     isSystemChangingFilterAndSort = false
                     onReset()
                 }

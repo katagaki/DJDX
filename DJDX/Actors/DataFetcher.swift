@@ -242,10 +242,12 @@ actor DataFetcher {
                 }
             }
 
+            let isAscending = sortOptions.order == .ascending
+
             switch sortOptions.mode {
             case .title:
                 sortedSongRecords.sort { lhs, rhs in
-                    lhs.title < rhs.title
+                    isAscending ? lhs.title < rhs.title : lhs.title > rhs.title
                 }
             case .clearType:
                 let clearTypes = IIDXClearType.sortedStrings
@@ -257,9 +259,9 @@ actor DataFetcher {
                             return lhs.key.title < rhs.key.title
                         } else {
                             if let lhsIndex, let rhsIndex {
-                                return lhsIndex < rhsIndex
+                                return isAscending ? lhsIndex < rhsIndex : lhsIndex > rhsIndex
                             } else {
-                                return true
+                                return lhsIndex != nil
                             }
                         }
                     })
@@ -274,7 +276,7 @@ actor DataFetcher {
                             return lhs.key.title < rhs.key.title
                         } else {
                             if let lhsIndex, let rhsIndex {
-                                return lhsIndex > rhsIndex
+                                return isAscending ? lhsIndex < rhsIndex : lhsIndex > rhsIndex
                             } else {
                                 if lhsIndex == nil && rhsIndex != nil {
                                     return false
@@ -307,7 +309,8 @@ actor DataFetcher {
                                     } else if lhsScoreRate.isZero && rhsScoreRate.isZero {
                                         return lhs.key.title < rhs.key.title
                                     } else {
-                                        return lhsScoreRate > rhsScoreRate
+                                        return isAscending ? lhsScoreRate < rhsScoreRate
+                                            : lhsScoreRate > rhsScoreRate
                                     }
                                 } else {
                                     return false
@@ -318,49 +321,43 @@ actor DataFetcher {
                         })
                         .map({ $0.key })
                 }
-            case .scoreAscending:
+            case .score:
                 sortedSongRecords = songLevelScores
                     .sorted(by: { lhs, rhs in
                         if lhs.value.score == rhs.value.score {
                             return lhs.key.title < rhs.key.title
                         } else {
-                            return lhs.value.score < rhs.value.score
+                            return isAscending ? lhs.value.score < rhs.value.score
+                                : lhs.value.score > rhs.value.score
                         }
                     })
                     .map({ $0.key })
-            case .scoreDescending:
+            case .missCount:
                 sortedSongRecords = songLevelScores
                     .sorted(by: { lhs, rhs in
-                        if lhs.value.score == rhs.value.score {
+                        if lhs.value.missCount == rhs.value.missCount {
                             return lhs.key.title < rhs.key.title
                         } else {
-                            return lhs.value.score > rhs.value.score
+                            return isAscending ? lhs.value.missCount < rhs.value.missCount
+                                : lhs.value.missCount > rhs.value.missCount
                         }
                     })
                     .map({ $0.key })
-            case .difficultyAscending:
-                sortedSongRecords = songLevelScores
-                    .sorted(by: { lhs, rhs in
-                        if lhs.value.difficulty == rhs.value.difficulty {
-                            return lhs.key.title < rhs.key.title
-                        } else {
-                            return lhs.value.difficulty < rhs.value.difficulty
-                        }
-                    })
-                    .map({ $0.key })
-            case .difficultyDescending:
+            case .difficulty:
                 sortedSongRecords = songLevelScores
                     .sorted(by: { lhs, rhs in
                         if lhs.value.difficulty == rhs.value.difficulty {
                             return lhs.key.title < rhs.key.title
                         } else {
-                            return lhs.value.difficulty > rhs.value.difficulty
+                            return isAscending ? lhs.value.difficulty < rhs.value.difficulty
+                                : lhs.value.difficulty > rhs.value.difficulty
                         }
                     })
                     .map({ $0.key })
             case .lastPlayDate:
                 sortedSongRecords.sort { lhs, rhs in
-                    lhs.lastPlayDate > rhs.lastPlayDate
+                    isAscending ? lhs.lastPlayDate < rhs.lastPlayDate
+                        : lhs.lastPlayDate > rhs.lastPlayDate
                 }
             }
 

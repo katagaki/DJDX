@@ -23,7 +23,7 @@ extension ScoresView {
                                            difficulty: difficultyToShow,
                                            clearType: clearTypeToShow,
                                            version: versionToShow),
-                    sortOptions: SortOptions(mode: sortMode)
+                    sortOptions: SortOptions(mode: sortMode, order: sortOrder)
                 )
                 let songCompactTitles = await actor.songCompactTitles()
                 let songNoteCounts = await actor.songNoteCounts

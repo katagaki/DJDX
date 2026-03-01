@@ -19,7 +19,8 @@ struct ScoresView: View {
     @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
     @AppStorage(wrappedValue: .all, "ScoresView.ClearTypeFilter") var clearTypeToShow: IIDXClearType
     @AppStorage(wrappedValue: "", "ScoresView.VersionFilter") var versionToShow: String
-    @AppStorage(wrappedValue: .title, "ScoresView.SortOrder") var sortMode: SortMode
+    @AppStorage(wrappedValue: .lastPlayDate, "ScoresView.SortOrder") var sortMode: SortMode
+    @AppStorage(wrappedValue: .descending, "ScoresView.SortDirection") var sortOrder: SortOrder
 
     @State var playDataDate: Date = .now
 
@@ -49,7 +50,8 @@ struct ScoresView: View {
          levelToShow.rawValue,
          clearTypeToShow.rawValue,
          versionToShow,
-         sortMode.rawValue]
+         sortMode.rawValue,
+         sortOrder.rawValue]
     }
 
     init() {
@@ -125,6 +127,7 @@ struct ScoresView: View {
                             clearTypeToShow: $clearTypeToShow.animation(.snappy.speed(2.0)),
                             versionToShow: $versionToShow.animation(.snappy.speed(2.0)),
                             sortMode: $sortMode.animation(.snappy.speed(2.0)),
+                            sortOrder: $sortOrder.animation(.snappy.speed(2.0)),
                             isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort
                         ) {
                             reloadDisplay()

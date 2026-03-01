@@ -2427,36 +2427,53 @@
         }
       }
     },
-    "Shared.Sort.DifficultyAscending" : {
+    "Shared.Sort.Ascending" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Level (Ascending)"
+            "value" : "Ascending"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "レベル（昇順）"
+            "value" : "昇順"
           }
         }
       }
     },
-    "Shared.Sort.DifficultyDescending" : {
+    "Shared.Sort.Descending" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Level (Descending)"
+            "value" : "Descending"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "レベル（降順）"
+            "value" : "降順"
+          }
+        }
+      }
+    },
+    "Shared.Sort.Difficulty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Level"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レベル"
           }
         }
       }
@@ -2495,36 +2512,53 @@
         }
       }
     },
-    "Shared.Sort.ScoreAscending" : {
+    "Shared.Sort.MissCount" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Score (Ascending)"
+            "value" : "MISS COUNT"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "スコア（昇順）"
+            "value" : "MISS COUNT"
           }
         }
       }
     },
-    "Shared.Sort.ScoreDescending" : {
+    "Shared.Sort.Order" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Score (Descending)"
+            "value" : "Sort Order"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "スコア（降順）"
+            "value" : "並べ替え順序"
+          }
+        }
+      }
+    },
+    "Shared.Sort.Score" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコア"
           }
         }
       }
