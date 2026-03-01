@@ -575,19 +575,14 @@
     "Analytics.NewHighScores" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New High Scores"
-          }
-        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "新規ハイスコア"
+            "value" : "NEW RECORD"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Analytics.NewHighScores.Subtitle" : {
       "extractionState" : "manual",
