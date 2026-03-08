@@ -6,11 +6,13 @@
 //
 
 import Komponents
+import SafariServices
 import SwiftUI
 
 struct MoreBM2DXNotesRadar: View {
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
+    @Environment(\.openURL) var openURL
 
     @State var entryCount: Int = 0
 
@@ -30,6 +32,9 @@ struct MoreBM2DXNotesRadar: View {
                         isReloadCompleted = true
                     }
                 }
+            } footer: {
+                Text("More.ExternalData.Disclaimer")
+                    .font(.caption2)
             }
             Section {
                 HStack {
@@ -45,6 +50,15 @@ struct MoreBM2DXNotesRadar: View {
         }
         .navigationTitle("ViewTitle.More.BM2DXNotesRadar")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    openURL(URL(string: "https://bm2dx.com/IIDX/notes_radar/")!)
+                } label: {
+                    Image(systemName: "safari")
+                }
+            }
+        }
         .task {
             entryCount = await fetcher.chartRadarDataCount()
         }

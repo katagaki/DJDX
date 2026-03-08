@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// swiftlint:disable:next type_body_length
 struct ScoreViewer: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
@@ -15,42 +16,66 @@ struct ScoreViewer: View {
 
     var songRecord: IIDXSongRecord
     var noteCount: (IIDXSongRecord, IIDXLevel) -> Int?
+    var initialLevel: IIDXLevel
 
+    @State private var selectedLevel: IIDXLevel = .all
     @State private var radarDataByLevel: [String: ChartRadarData] = [:]
 
     private let radarFetcher = DataFetcher()
 
+    var availableLevels: [IIDXLevel] {
+        var levels: [IIDXLevel] = []
+        if !isBeginnerLevelHidden, songRecord.beginnerScore.difficulty != 0 {
+            levels.append(.beginner)
+        }
+        if songRecord.normalScore.difficulty != 0 { levels.append(.normal) }
+        if songRecord.hyperScore.difficulty != 0 { levels.append(.hyper) }
+        if songRecord.anotherScore.difficulty != 0 { levels.append(.another) }
+        if songRecord.leggendariaScore.difficulty != 0 { levels.append(.leggendaria) }
+        return levels
+    }
+
     var body: some View {
         List {
-            if !isBeginnerLevelHidden, songRecord.beginnerScore.difficulty != 0 {
-                ScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
-                             noteCount: noteCount(songRecord, .beginner),
-                             playType: .single,
-                             chartRadarData: radarDataByLevel["SP-0"])
+            if selectedLevel == .all || selectedLevel == .beginner {
+                if !isBeginnerLevelHidden, songRecord.beginnerScore.difficulty != 0 {
+                    ScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
+                                 noteCount: noteCount(songRecord, .beginner),
+                                 playType: .single,
+                                 chartRadarData: radarDataByLevel["SP-0"])
+                }
             }
-            if songRecord.normalScore.difficulty != 0 {
-                ScoreSection(songTitle: songRecord.title, score: songRecord.normalScore,
-                             noteCount: noteCount(songRecord, .normal),
-                             playType: songRecord.playType,
-                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 1)])
+            if selectedLevel == .all || selectedLevel == .normal {
+                if songRecord.normalScore.difficulty != 0 {
+                    ScoreSection(songTitle: songRecord.title, score: songRecord.normalScore,
+                                 noteCount: noteCount(songRecord, .normal),
+                                 playType: songRecord.playType,
+                                 chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 1)])
+                }
             }
-            if songRecord.hyperScore.difficulty != 0 {
-                ScoreSection(songTitle: songRecord.title, score: songRecord.hyperScore,
-                             noteCount: noteCount(songRecord, .hyper),
-                             playType: songRecord.playType,
-                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 2)])
+            if selectedLevel == .all || selectedLevel == .hyper {
+                if songRecord.hyperScore.difficulty != 0 {
+                    ScoreSection(songTitle: songRecord.title, score: songRecord.hyperScore,
+                                 noteCount: noteCount(songRecord, .hyper),
+                                 playType: songRecord.playType,
+                                 chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 2)])
+                }
             }
-            if songRecord.anotherScore.difficulty != 0 {
-                ScoreSection(songTitle: songRecord.title, score: songRecord.anotherScore,
-                             noteCount: noteCount(songRecord, .another),
-                             playType: songRecord.playType,
-                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 3)])
+            if selectedLevel == .all || selectedLevel == .another {
+                if songRecord.anotherScore.difficulty != 0 {
+                    ScoreSection(songTitle: songRecord.title, score: songRecord.anotherScore,
+                                 noteCount: noteCount(songRecord, .another),
+                                 playType: songRecord.playType,
+                                 chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 3)])
+                }
             }
-            if songRecord.leggendariaScore.difficulty != 0 {
-                ScoreSection(songTitle: songRecord.title, score: songRecord.leggendariaScore,
-                             noteCount: noteCount(songRecord, .leggendaria),
-                             playType: songRecord.playType,
-                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 4)])
+            if selectedLevel == .all || selectedLevel == .leggendaria {
+                if songRecord.leggendariaScore.difficulty != 0 {
+                    ScoreSection(songTitle: songRecord.title, score: songRecord.leggendariaScore,
+                                 noteCount: noteCount(songRecord, .leggendaria),
+                                 playType: songRecord.playType,
+                                 chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 4)])
+                }
             }
         }
         .listSectionSpacing(.compact)
@@ -108,6 +133,7 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
                         .foregroundStyle(.tertiary)
                     }
                     .font(.caption2)
+                    difficultySwitcher()
                 }
                 .padding([.bottom], 8.0)
                 .padding([.leading, .trailing], 20.0)
@@ -117,6 +143,50 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
         .task {
             await loadRadarData()
         }
+        .onAppear {
+            if initialLevel != .all, availableLevels.contains(initialLevel) {
+                selectedLevel = initialLevel
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func difficultySwitcher() -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 6.0) {
+                difficultyChip(level: .all, label: "ALL")
+                ForEach(availableLevels, id: \.self) { level in
+                    difficultyChip(level: level, label: level.code())
+                }
+            }
+        }
+        .padding(.top, 4.0)
+    }
+
+    @ViewBuilder
+    private func difficultyChip(level: IIDXLevel, label: String) -> some View {
+        Button {
+            withAnimation(.snappy.speed(2.0)) {
+                selectedLevel = level
+            }
+        } label: {
+            Text(verbatim: label)
+                .font(.caption)
+                .fontWeight(.heavy)
+                .fontWidth(.expanded)
+                .padding(.horizontal, 10.0)
+                .padding(.vertical, 4.0)
+                .background(selectedLevel == level ? .accent : .clear)
+                .foregroundStyle(selectedLevel == level ? .white : .secondary)
+                .clipShape(.capsule(style: .continuous))
+                .overlay {
+                    if selectedLevel != level {
+                        Capsule(style: .continuous)
+                            .stroke(.secondary.opacity(0.3), lineWidth: 1.0)
+                    }
+                }
+        }
+        .buttonStyle(.plain)
     }
 
     private func radarKey(_ playType: IIDXPlayType, _ difficulty: Int) -> String {

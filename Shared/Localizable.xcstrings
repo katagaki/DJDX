@@ -1348,6 +1348,23 @@
         }
       }
     },
+    "More.ExternalData.Disclaimer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX is not affiliated with or endorsed by this external data source."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDXはこの外部データソースとは一切関係ありません。"
+          }
+        }
+      }
+    },
     "More.ExternalData.Header" : {
       "extractionState" : "manual",
       "localizations" : {

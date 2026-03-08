@@ -19,6 +19,8 @@ struct ScoreSection: View {
     var playType: IIDXPlayType
     var chartRadarData: ChartRadarData?
 
+    @State private var isShowingRadarValues: Bool = false
+
     var body: some View {
         Section {
             if score.djLevelEnum() != .none {
@@ -63,8 +65,8 @@ struct ScoreSection: View {
                     DetailRow("SCORE", value: score.score, style: scoreStyle())
                     DetailRow("MISS COUNT", value: score.missCount, style: scoreStyle())
                 }
-                VStack(alignment: .leading, spacing: 8.0) {
-                    NoteTypeDetailRow("PERFECT GREAT", value: score.perfectGreatCount, style: Color.cyan)
+                HStack(spacing: 0.0) {
+                    NoteTypeDetailRow("P-GREAT", value: score.perfectGreatCount, style: Color.cyan)
                     NoteTypeDetailRow("GREAT", value: score.greatCount, style: Color.yellow)
                     NoteTypeDetailRow("MISS", value: score.missCount, style: Color.red)
                 }
@@ -74,25 +76,34 @@ struct ScoreSection: View {
                 }
             }
             if let chartRadarData {
-                VStack(spacing: 8.0) {
-                    RadarChartView(chartRadarData.radarData)
-                        .frame(height: 200.0)
-                    VStack(spacing: 4.0) {
-                        ForEach(chartRadarData.radarData.displayPoints(), id: \.label) { point in
-                            HStack {
-                                Text(verbatim: point.label)
-                                    .font(.system(size: 12, weight: .bold))
-                                    .fontWidth(.expanded)
-                                    .foregroundStyle(point.color)
-                                Spacer()
-                                Text(verbatim: String(format: "%.2f", point.value))
-                                    .font(.system(size: 12, weight: .semibold).monospacedDigit())
-                                    .foregroundStyle(.primary)
+                Button {
+                    withAnimation(.snappy.speed(2.0)) {
+                        isShowingRadarValues.toggle()
+                    }
+                } label: {
+                    if isShowingRadarValues {
+                        VStack(spacing: 4.0) {
+                            ForEach(chartRadarData.radarData.displayPoints(), id: \.label) { point in
+                                HStack {
+                                    Text(verbatim: point.label)
+                                        .font(.system(size: 12, weight: .bold))
+                                        .fontWidth(.expanded)
+                                        .foregroundStyle(point.color)
+                                    Spacer()
+                                    Text(verbatim: String(format: "%.2f", point.value))
+                                        .font(.system(size: 12, weight: .semibold).monospacedDigit())
+                                        .foregroundStyle(.primary)
+                                }
                             }
                         }
+                        .padding(.vertical, 4.0)
+                    } else {
+                        RadarChartView(chartRadarData.radarData)
+                            .frame(height: 200.0)
+                            .padding(.vertical, 4.0)
                     }
                 }
-                .padding(.vertical, 4.0)
+                .buttonStyle(.plain)
             }
         } header: {
             HStack(spacing: 16.0) {

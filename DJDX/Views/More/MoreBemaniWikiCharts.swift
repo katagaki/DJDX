@@ -12,6 +12,7 @@ import SwiftUI
 struct MoreBemaniWikiCharts: View {
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
+    @Environment(\.openURL) var openURL
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
@@ -37,6 +38,9 @@ struct MoreBemaniWikiCharts: View {
                         isReloadCompleted = true
                     }
                 }
+            } footer: {
+                Text("More.ExternalData.Disclaimer")
+                    .font(.caption2)
             }
             Section {
                 ForEach(allSongs) { song in
@@ -94,6 +98,15 @@ struct MoreBemaniWikiCharts: View {
         }
         .navigationTitle("ViewTitle.More.BemaniWiki2nd")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    openURL(URL(string: "https://bemaniwiki.com")!)
+                } label: {
+                    Image(systemName: "safari")
+                }
+            }
+        }
         .onChange(of: dataImported, { _, _ in
             Task {
                 await MainActor.run {
