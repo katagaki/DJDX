@@ -5,14 +5,50 @@
 //  Created by シン・ジャスティン on 2026/02/20.
 //
 
-import Komponents
 import SwiftUI
 
 struct MoreLicensesView: View {
     var body: some View {
-        LicensesView(licenses: [
-            License(libraryName: "CSwiftV", text:
-"""
+        List {
+            ForEach(Dependency.all) { dependency in
+                Section {
+                    Text(dependency.licenseText)
+                        .font(.caption)
+                        .monospaced()
+                        .listRowBackground(Color.clear)
+                } header: {
+                    Text(dependency.name)
+                }
+            }
+        }
+        .listStyle(.grouped)
+        .navigationTitle("More.Attributions")
+        .navigationBarTitleDisplayMode(.inline)
+        .scrollContentBackground(.hidden)
+        .background(
+            .linearGradient(
+                colors: [.backgroundGradientTop, .backgroundGradientBottom],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
+    }
+}
+
+// swiftlint:disable type_body_length
+private struct Dependency: Identifiable {
+    let id: String
+    let name: String
+    let licenseText: String
+
+    init(name: String, licenseText: String) {
+        self.id = name
+        self.name = name
+        self.licenseText = licenseText
+    }
+
+    static let all: [Dependency] = [
+        Dependency(name: "CSwiftV", licenseText: """
 Copyright (c) 2015, Daniel Haight
 
 
@@ -42,7 +78,7 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """),
-            License(libraryName: "SQlite.swift", text: """
+        Dependency(name: "SQLite.swift", licenseText: """
 (The MIT License)
 
 Copyright (c) 2014-2015 Stephen Celis (<stephen@stephencelis.com>)
@@ -65,8 +101,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """),
-            License(libraryName: "swift-collections", text:
-"""
+        Dependency(name: "swift-collections", licenseText: """
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -279,8 +314,7 @@ SOFTWARE.
     you may redistribute such product without providing attribution as would
     otherwise be required by Sections 4(a), 4(b) and 4(d) of the License.
 """),
-            License(libraryName: "SwiftSoup", text:
-"""
+        Dependency(name: "SwiftSoup", licenseText: """
 MIT License
 
 Copyright (c) 2016 Nabil Chatbi
@@ -302,6 +336,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-""")])
-    }
+""")
+    ]
 }
+// swiftlint:enable type_body_length

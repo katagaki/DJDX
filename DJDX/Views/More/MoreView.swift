@@ -120,20 +120,13 @@ struct MoreView: View {
                 Section {
                     Link(destination: URL(string: "https://github.com/katagaki/DJDX")!) {
                         HStack {
-                            VStack(alignment: .leading, spacing: 2.0) {
-                                Text("More.GitHub")
-                                Text(verbatim: "katagaki/DJDX")
-                                    .foregroundStyle(.secondary)
-                                    .font(.caption)
-                            }
+                            Text(String(localized: "More.GitHub"))
                             Spacer()
-                            Image(systemName: "safari")
-                                .opacity(0.5)
+                            Text("katagaki/DJDX")
+                                .foregroundStyle(.secondary)
                         }
-                        .tint(.primary)
-                        .contentShape(.rect)
                     }
-                    .buttonStyle(.plain)
+                    .tint(.primary)
                     NavigationLink("More.Attributions", value: ViewPath.moreAttributions)
                 }
             }

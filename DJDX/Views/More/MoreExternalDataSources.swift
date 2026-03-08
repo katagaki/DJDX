@@ -119,7 +119,6 @@ struct MoreExternalDataSources: View {
             }
         } footer: {
             Text("More.ExternalData.BemaniWiki2nd.Footer")
-                .font(.caption2)
         }
     }
 
@@ -168,7 +167,6 @@ struct MoreExternalDataSources: View {
             }
         } footer: {
             Text("More.ExternalData.BM2DX.Footer")
-                .font(.caption2)
         }
     }
 

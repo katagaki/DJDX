@@ -1108,6 +1108,9 @@
         }
       }
     },
+    "katagaki/DJDX" : {
+
+    },
     "LEVEL" : {
       "localizations" : {
         "en" : {
@@ -1246,40 +1249,6 @@
         }
       }
     },
-    "More.ExternalData.BemaniWiki2nd.Description" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chart Time, Note Counts"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "譜面の時間、ノーツ数"
-          }
-        }
-      }
-    },
-    "More.ExternalData.BemaniWiki2nd.Footer" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Provides chart time and note count data. DJDX is not affiliated with or endorsed by BEMANIWiki 2nd."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "譜面の時間やノーツ数を提供します。DJDXはBEMANIWiki 2ndとは一切関係ありません。"
-          }
-        }
-      }
-    },
     "More.ExternalData.BemaniWiki2nd.Data" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1297,6 +1266,23 @@
         }
       }
     },
+    "More.ExternalData.BemaniWiki2nd.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Time, Note Counts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面の時間、ノーツ数"
+          }
+        }
+      }
+    },
     "More.ExternalData.BemaniWiki2nd.EntryCount" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1310,6 +1296,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "楽曲数"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BemaniWiki2nd.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Provides chart time and note count data. DJDX is not affiliated with or endorsed by BEMANIWiki 2nd."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面の時間やノーツ数を提供します。DJDXはBEMANIWiki 2ndとは一切関係ありません。"
           }
         }
       }
@@ -1365,23 +1368,6 @@
         }
       }
     },
-    "More.ExternalData.BM2DX.Footer" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Provides per-chart notes radar data. DJDX is not affiliated with or endorsed by bm2dx.com."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "譜面別のノーツレーダーデータを提供します。DJDXはbm2dx.comとは一切関係ありません。"
-          }
-        }
-      }
-    },
     "More.ExternalData.BM2DX.EntryCount" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1395,6 +1381,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面数"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BM2DX.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Provides per-chart notes radar data. DJDX is not affiliated with or endorsed by bm2dx.com."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面別のノーツレーダーデータを提供します。DJDXはbm2dx.comとは一切関係ありません。"
           }
         }
       }
@@ -1467,23 +1470,6 @@
         }
       }
     },
-    "More.ExternalData.ViewSource" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Visit Source"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ソースを見る"
-          }
-        }
-      }
-    },
     "More.ExternalData.UpdateData" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1497,6 +1483,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データを更新"
+          }
+        }
+      }
+    },
+    "More.ExternalData.ViewSource" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visit Source"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ソースを見る"
           }
         }
       }
@@ -2665,13 +2668,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MISS COUNT"
+            "value" : "Miss Count"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MISS COUNT"
+            "value" : "ミスカウント"
           }
         }
       }
@@ -3208,23 +3211,6 @@
         }
       }
     },
-    "ViewTitle.More.BM2DXNotesRadar" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bm2dx.com"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bm2dx.com"
-          }
-        }
-      }
-    },
     "ViewTitle.More.BemaniWiki2nd" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3238,6 +3224,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "BEMANIWiki 2nd"
+          }
+        }
+      }
+    },
+    "ViewTitle.More.BM2DXNotesRadar" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bm2dx.com"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bm2dx.com"
           }
         }
       }
