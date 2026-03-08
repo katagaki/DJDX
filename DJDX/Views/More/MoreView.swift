@@ -59,9 +59,12 @@ struct MoreView: View {
                 }
                 Section {
                     NavigationLink(value: ViewPath.moreExternalDataSources) {
-                        ListRow(image: "ListIcon.ExternalData",
-                                title: "More.ExternalData.Header",
-                                subtitle: "More.ExternalData.Description")
+                        VStack(alignment: .leading, spacing: 2.0) {
+                            Text("More.ExternalData.Header")
+                            Text("More.ExternalData.Description")
+                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                        }
                     }
                     .popoverTip(ImportWikiDataTip())
                 } header: {
@@ -74,71 +77,22 @@ struct MoreView: View {
                             Text(version.marketingName)
                         }
                     } label: {
-                        ListRow(image: "ListIcon.Version",
-                                title: "Shared.IIDX.Version")
+                        Text("Shared.IIDX.Version")
                     }
-
-                    NavigationLink(value: ViewPath.moreAppIcon) {
-                        ListRow(image: "ListIcon.AppIcon",
-                                title: "More.General.AppIcon")
-                    }
-                    // TODO: Implement this feature
-                    // swiftlint:disable:next control_statement
-                    if (false) {
-                        Toggle(isOn: $isLevelsShownSeparately) {
-                            HStack(spacing: 0.0) {
-                                ListRow(image: "ListIcon.ShowLevelsAsSeparateRecords",
-                                        title: "More.PlayDataDisplay.ShowLevelsSeparately",
-                                        subtitle: "More.PlayDataDisplay.ShowLevelsSeparately.Description",
-                                        includeSpacer: true)
-                            }
-                        }
-                    }
-                    Toggle(isOn: $isBeginnerLevelHidden) {
-                        ListRow(image: "ListIcon.HideBeginner",
-                                title: "More.PlayDataDisplay.HideBeginnerLevel",
-                                includeSpacer: true)
-                    }
+                    NavigationLink("More.General.AppIcon", value: ViewPath.moreAppIcon)
+                    Toggle("More.PlayDataDisplay.HideBeginnerLevel", isOn: $isBeginnerLevelHidden)
                 } header: {
                     ListSectionHeader(text: "More.General.Header")
                         .font(.body)
                 }
                 Section {
-                    Toggle(isOn: $isGenreVisible) {
-                        ListRow(image: "ListIcon.ShowGenre",
-                                title: "More.PlayDataDisplay.ShowGenre",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isArtistVisible) {
-                        ListRow(image: "ListIcon.ShowArtist",
-                                title: "More.PlayDataDisplay.ShowArtist",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isLevelVisible) {
-                        ListRow(image: "ListIcon.ShowLevel",
-                                title: "More.PlayDataDisplay.ShowLevel",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isDJLevelVisible) {
-                        ListRow(image: "ListIcon.ShowDJLevel",
-                                title: "Shared.IIDX.DJLevel",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isScoreRateVisible) {
-                        ListRow(image: "ListIcon.ShowScoreRate",
-                                title: "Shared.Sort.ScoreRate",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isScoreVisible) {
-                        ListRow(image: "ListIcon.ShowScore",
-                                title: "Shared.Sort.Score",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isLastPlayDateVisible) {
-                        ListRow(image: "ListIcon.ShowPlayDate",
-                                title: "Shared.Sort.LastPlayDate",
-                                includeSpacer: true)
-                    }
+                    Toggle("More.PlayDataDisplay.ShowGenre", isOn: $isGenreVisible)
+                    Toggle("More.PlayDataDisplay.ShowArtist", isOn: $isArtistVisible)
+                    Toggle("More.PlayDataDisplay.ShowLevel", isOn: $isLevelVisible)
+                    Toggle("Shared.IIDX.DJLevel", isOn: $isDJLevelVisible)
+                    Toggle("Shared.Sort.ScoreRate", isOn: $isScoreRateVisible)
+                    Toggle("Shared.Sort.Score", isOn: $isScoreVisible)
+                    Toggle("Shared.Sort.LastPlayDate", isOn: $isLastPlayDateVisible)
                 } header: {
                     ListSectionHeader(text: "More.PlayDataDisplay.Header")
                         .font(.body)
