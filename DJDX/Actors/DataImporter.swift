@@ -8,6 +8,7 @@
 import Foundation
 import SQLite
 
+// swiftlint:disable:next type_body_length
 actor DataImporter {
 
     let dateFormat = "yyyy-MM-dd-HH-mm-ss"
@@ -271,8 +272,8 @@ actor DataImporter {
         ))
     }
 
-    static func insertSong(database: Connection, song: IIDXSong) {
-        let col = PlayDataDatabase.self
+    static func insertSongToBEMANIWiki(database: Connection, song: IIDXSong) {
+        let col = BEMANIWikiDatabase.self
         _ = try? database.run(col.songTable.insert(
             col.songTitle <- song.title,
             col.songSPBeginnerNoteCount <- song.spNoteCount?.beginnerNoteCount,
@@ -348,10 +349,10 @@ actor DataImporter {
     }
 
     func migrateSongs(_ songs: [IIDXSong]) {
-        guard let database = try? PlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? BEMANIWikiDatabase.shared.getWriteConnection() else { return }
         try? database.transaction {
             for song in songs {
-                Self.insertSong(database: database, song: song)
+                Self.insertSongToBEMANIWiki(database: database, song: song)
             }
         }
     }
@@ -386,16 +387,113 @@ actor DataImporter {
     }
 
     func deleteAllSongs() {
-        guard let database = try? PlayDataDatabase.shared.getWriteConnection() else { return }
-        _ = try? database.run(PlayDataDatabase.songTable.delete())
+        guard let database = try? BEMANIWikiDatabase.shared.getWriteConnection() else { return }
+        _ = try? database.run(BEMANIWikiDatabase.songTable.delete())
     }
 
     func insertSongs(_ songs: [IIDXSong]) {
-        guard let database = try? PlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? BEMANIWikiDatabase.shared.getWriteConnection() else { return }
         try? database.transaction {
             for song in songs {
-                Self.insertSong(database: database, song: song)
+                Self.insertSongToBEMANIWiki(database: database, song: song)
             }
         }
+    }
+
+    // MARK: BM2DX Notes Radar
+
+    func deleteAllNotesRadar() {
+        guard let database = try? BM2DXDatabase.shared.getWriteConnection() else { return }
+        _ = try? database.run(BM2DXDatabase.notesRadarTable.delete())
+    }
+
+    func insertNotesRadarEntries(_ entries: [ChartRadarData]) {
+        guard let database = try? BM2DXDatabase.shared.getWriteConnection() else { return }
+        let col = BM2DXDatabase.self
+        try? database.transaction {
+            for entry in entries {
+                _ = try? database.run(col.notesRadarTable.insert(or: .replace,
+                    col.nrTitle <- entry.title,
+                    col.nrPlayType <- entry.playType,
+                    col.nrDifficulty <- entry.difficulty,
+                    col.nrNoteCount <- entry.noteCount,
+                    col.nrNotes <- entry.radarData.notes,
+                    col.nrChord <- entry.radarData.chord,
+                    col.nrPeak <- entry.radarData.peak,
+                    col.nrCharge <- entry.radarData.charge,
+                    col.nrScratch <- entry.radarData.scratch,
+                    col.nrSoflan <- entry.radarData.soflan
+                ))
+            }
+        }
+    }
+
+    // MARK: BEMANIWiki Migration
+
+    func migrateBEMANIWikiDataIfNeeded() {
+        let migrationKey = "Internal.BEMANIWikiMigratedToSeparateDB"
+        guard !UserDefaults.standard.bool(forKey: migrationKey) else { return }
+
+        // Check if old data exists in PlayData.db
+        guard let oldDatabase = try? PlayDataDatabase.shared.getReadConnection() else { return }
+        let oldQuery = PlayDataDatabase.songTable
+        guard let rows = try? oldDatabase.prepare(oldQuery) else { return }
+
+        var songs: [IIDXSong] = []
+        for row in rows {
+            songs.append(Self.songFromPlayDataDB(from: row))
+        }
+
+        if !songs.isEmpty {
+            // Insert into new database
+            guard let newDatabase = try? BEMANIWikiDatabase.shared.getWriteConnection() else { return }
+            try? newDatabase.transaction {
+                for song in songs {
+                    Self.insertSongToBEMANIWiki(database: newDatabase, song: song)
+                }
+            }
+        }
+
+        UserDefaults.standard.set(true, forKey: migrationKey)
+    }
+
+    private static func songFromPlayDataDB(from row: Row) -> IIDXSong {
+        let song = IIDXSong()
+        song.title = row[PlayDataDatabase.songTitle]
+        song.time = row[PlayDataDatabase.songTime]
+        song.movie = row[PlayDataDatabase.songMovie]
+        song.layer = row[PlayDataDatabase.songLayer]
+        let db = PlayDataDatabase.self
+        let spB = row[db.songSPBeginnerNoteCount]
+        let spN = row[db.songSPNormalNoteCount]
+        let spH = row[db.songSPHyperNoteCount]
+        let spA = row[db.songSPAnotherNoteCount]
+        let spL = row[db.songSPLeggendariaNoteCount]
+        if spB != nil || spN != nil || spH != nil || spA != nil || spL != nil {
+            song.spNoteCount = IIDXNoteCount(
+                beginnerNoteCount: spB.map(String.init) ?? "-",
+                normalNoteCount: spN.map(String.init) ?? "-",
+                hyperNoteCount: spH.map(String.init) ?? "-",
+                anotherNoteCount: spA.map(String.init) ?? "-",
+                leggendariaNoteCount: spL.map(String.init) ?? "-",
+                playType: .single
+            )
+        }
+        let dpB = row[db.songDPBeginnerNoteCount]
+        let dpN = row[db.songDPNormalNoteCount]
+        let dpH = row[db.songDPHyperNoteCount]
+        let dpA = row[db.songDPAnotherNoteCount]
+        let dpL = row[db.songDPLeggendariaNoteCount]
+        if dpB != nil || dpN != nil || dpH != nil || dpA != nil || dpL != nil {
+            song.dpNoteCount = IIDXNoteCount(
+                beginnerNoteCount: dpB.map(String.init) ?? "-",
+                normalNoteCount: dpN.map(String.init) ?? "-",
+                hyperNoteCount: dpH.map(String.init) ?? "-",
+                anotherNoteCount: dpA.map(String.init) ?? "-",
+                leggendariaNoteCount: dpL.map(String.init) ?? "-",
+                playType: .double
+            )
+        }
+        return song
     }
 }

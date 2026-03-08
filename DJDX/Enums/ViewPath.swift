@@ -39,6 +39,7 @@ enum ViewPath: Hashable {
     case importerManual
     case importDetail(importGroup: ImportGroup)
     case moreBemaniWikiCharts
+    case moreBM2DXNotesRadar
     case moreAppIcon
     case moreAttributions
 }

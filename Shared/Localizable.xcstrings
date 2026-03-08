@@ -1263,6 +1263,74 @@
         }
       }
     },
+    "More.ExternalData.BM2DX" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bm2dx.com"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bm2dx.com"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BM2DX.Data" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BM2DX.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Radar Per Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面別ノーツレーダー"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BM2DX.EntryCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Charts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面数"
+          }
+        }
+      }
+    },
     "More.ExternalData.Charts" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3017,6 +3085,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "マイ弐寺"
+          }
+        }
+      }
+    },
+    "ViewTitle.More.BM2DXNotesRadar" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bm2dx.com"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bm2dx.com"
           }
         }
       }

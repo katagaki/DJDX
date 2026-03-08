@@ -16,32 +16,41 @@ struct ScoreViewer: View {
     var songRecord: IIDXSongRecord
     var noteCount: (IIDXSongRecord, IIDXLevel) -> Int?
 
+    @State private var radarDataByLevel: [String: ChartRadarData] = [:]
+
+    private let radarFetcher = DataFetcher()
+
     var body: some View {
         List {
             if !isBeginnerLevelHidden, songRecord.beginnerScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
                              noteCount: noteCount(songRecord, .beginner),
-                             playType: .single) // Only SP has Beginner level
+                             playType: .single,
+                             chartRadarData: radarDataByLevel["SP-0"])
             }
             if songRecord.normalScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.normalScore,
                              noteCount: noteCount(songRecord, .normal),
-                             playType: songRecord.playType)
+                             playType: songRecord.playType,
+                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 1)])
             }
             if songRecord.hyperScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.hyperScore,
                              noteCount: noteCount(songRecord, .hyper),
-                             playType: songRecord.playType)
+                             playType: songRecord.playType,
+                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 2)])
             }
             if songRecord.anotherScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.anotherScore,
                              noteCount: noteCount(songRecord, .another),
-                             playType: songRecord.playType)
+                             playType: songRecord.playType,
+                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 3)])
             }
             if songRecord.leggendariaScore.difficulty != 0 {
                 ScoreSection(songTitle: songRecord.title, score: songRecord.leggendariaScore,
                              noteCount: noteCount(songRecord, .leggendaria),
-                             playType: songRecord.playType)
+                             playType: songRecord.playType,
+                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 4)])
             }
         }
         .listSectionSpacing(.compact)
@@ -105,6 +114,40 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
             }
         }
         .conditionalBottomTabBarAccessory()
+        .task {
+            await loadRadarData()
+        }
+    }
+
+    private func radarKey(_ playType: IIDXPlayType, _ difficulty: Int) -> String {
+        let pt = playType == .single ? "SP" : "DP"
+        return "\(pt)-\(difficulty)"
+    }
+
+    private func loadRadarData() async {
+        let difficulties = [
+            (IIDXPlayType.single, 0, songRecord.beginnerScore.difficulty),
+            (songRecord.playType, 1, songRecord.normalScore.difficulty),
+            (songRecord.playType, 2, songRecord.hyperScore.difficulty),
+            (songRecord.playType, 3, songRecord.anotherScore.difficulty),
+            (songRecord.playType, 4, songRecord.leggendariaScore.difficulty)
+        ]
+
+        var results: [String: ChartRadarData] = [:]
+        for (playType, bm2dxDifficulty, chartDifficulty) in difficulties {
+            guard chartDifficulty != 0 else { continue }
+            if let data = await radarFetcher.fetchChartRadarData(
+                title: songRecord.title,
+                playType: playType,
+                difficulty: bm2dxDifficulty
+            ) {
+                results[radarKey(playType, bm2dxDifficulty)] = data
+            }
+        }
+
+        await MainActor.run {
+            radarDataByLevel = results
+        }
     }
 
     @ToolbarContentBuilder

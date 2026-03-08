@@ -384,9 +384,62 @@ actor DataFetcher {
     }
 
     func fetchAllSongs() -> [IIDXSong] {
-        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
-        let query = PlayDataDatabase.songTable.order(PlayDataDatabase.songTitle.asc)
+        guard let database = try? BEMANIWikiDatabase.shared.getReadConnection() else { return [] }
+        let query = BEMANIWikiDatabase.songTable.order(BEMANIWikiDatabase.songTitle.asc)
         return (try? database.prepare(query).map { Self.song(from: $0) }) ?? []
+    }
+
+    // MARK: BM2DX Notes Radar
+
+    func fetchChartRadarData(title: String, playType: IIDXPlayType, difficulty: Int) -> ChartRadarData? {
+        guard let database = try? BM2DXDatabase.shared.getReadConnection() else { return nil }
+        let col = BM2DXDatabase.self
+        let playTypeString = playType == .single ? "SP" : "DP"
+        let query = col.notesRadarTable
+            .filter(col.nrTitle == title && col.nrPlayType == playTypeString && col.nrDifficulty == difficulty)
+            .limit(1)
+        guard let row = try? database.pluck(query) else { return nil }
+        return ChartRadarData(
+            title: row[col.nrTitle],
+            playType: row[col.nrPlayType],
+            difficulty: row[col.nrDifficulty],
+            noteCount: row[col.nrNoteCount],
+            radarData: RadarData(
+                notes: row[col.nrNotes],
+                chord: row[col.nrChord],
+                peak: row[col.nrPeak],
+                charge: row[col.nrCharge],
+                scratch: row[col.nrScratch],
+                soflan: row[col.nrSoflan]
+            )
+        )
+    }
+
+    func fetchAllChartRadarData() -> [ChartRadarData] {
+        guard let database = try? BM2DXDatabase.shared.getReadConnection() else { return [] }
+        let col = BM2DXDatabase.self
+        let query = col.notesRadarTable.order(col.nrTitle.asc)
+        return (try? database.prepare(query).map { row in
+            ChartRadarData(
+                title: row[col.nrTitle],
+                playType: row[col.nrPlayType],
+                difficulty: row[col.nrDifficulty],
+                noteCount: row[col.nrNoteCount],
+                radarData: RadarData(
+                    notes: row[col.nrNotes],
+                    chord: row[col.nrChord],
+                    peak: row[col.nrPeak],
+                    charge: row[col.nrCharge],
+                    scratch: row[col.nrScratch],
+                    soflan: row[col.nrSoflan]
+                )
+            )
+        }) ?? []
+    }
+
+    func chartRadarDataCount() -> Int {
+        guard let database = try? BM2DXDatabase.shared.getReadConnection() else { return 0 }
+        return (try? database.scalar(BM2DXDatabase.notesRadarTable.count)) ?? 0
     }
 
     // MARK: Analytics - Aggregated Counts
@@ -578,11 +631,11 @@ actor DataFetcher {
 
     static func song(from row: Row) -> IIDXSong {
         let song = IIDXSong()
-        song.title = row[PlayDataDatabase.songTitle]
-        song.time = row[PlayDataDatabase.songTime]
-        song.movie = row[PlayDataDatabase.songMovie]
-        song.layer = row[PlayDataDatabase.songLayer]
-        let database = PlayDataDatabase.self
+        song.title = row[BEMANIWikiDatabase.songTitle]
+        song.time = row[BEMANIWikiDatabase.songTime]
+        song.movie = row[BEMANIWikiDatabase.songMovie]
+        song.layer = row[BEMANIWikiDatabase.songLayer]
+        let database = BEMANIWikiDatabase.self
         let spB = row[database.songSPBeginnerNoteCount]
         let spN = row[database.songSPNormalNoteCount]
         let spH = row[database.songSPHyperNoteCount]

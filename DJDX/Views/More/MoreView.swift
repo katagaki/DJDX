@@ -64,6 +64,11 @@ struct MoreView: View {
                                 subtitle: "More.ExternalData.BemaniWiki2nd.Description")
                     }
                     .popoverTip(ImportWikiDataTip())
+                    NavigationLink(value: ViewPath.moreBM2DXNotesRadar) {
+                        ListRow(image: "ListIcon.BM2DX",
+                                title: "More.ExternalData.BM2DX",
+                                subtitle: "More.ExternalData.BM2DX.Description")
+                    }
                 } header: {
                     ListSectionHeader(text: "More.ExternalData.Header")
                         .font(.body)
@@ -239,6 +244,7 @@ struct MoreView: View {
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
                 switch viewPath {
                 case .moreBemaniWikiCharts: MoreBemaniWikiCharts()
+                case .moreBM2DXNotesRadar: MoreBM2DXNotesRadar()
                 case .moreAppIcon: MoreAppIconView()
                 case .moreAttributions: MoreLicensesView()
                 default: Color.clear

@@ -17,6 +17,7 @@ struct ScoreSection: View {
     var score: IIDXLevelScore
     var noteCount: Int?
     var playType: IIDXPlayType
+    var chartRadarData: ChartRadarData?
 
     var body: some View {
         Section {
@@ -71,6 +72,27 @@ struct ScoreSection: View {
                 if score.clearType != "NO PLAY" {
                     ClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
                 }
+            }
+            if let chartRadarData {
+                VStack(spacing: 8.0) {
+                    RadarChartView(chartRadarData.radarData)
+                        .frame(height: 200.0)
+                    VStack(spacing: 4.0) {
+                        ForEach(chartRadarData.radarData.displayPoints(), id: \.label) { point in
+                            HStack {
+                                Text(verbatim: point.label)
+                                    .font(.system(size: 12, weight: .bold))
+                                    .fontWidth(.expanded)
+                                    .foregroundStyle(point.color)
+                                Spacer()
+                                Text(verbatim: String(format: "%.2f", point.value))
+                                    .font(.system(size: 12, weight: .semibold).monospacedDigit())
+                                    .foregroundStyle(.primary)
+                            }
+                        }
+                    }
+                }
+                .padding(.vertical, 4.0)
             }
         } header: {
             HStack(spacing: 16.0) {
