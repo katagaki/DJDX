@@ -78,7 +78,6 @@ struct ScoreViewer: View {
                 }
             }
         }
-        .listSectionSpacing(.compact)
         .navigationTitle("ViewTitle.Scores.Song")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
@@ -153,9 +152,10 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
     @ViewBuilder
     private func difficultySwitcher() -> some View {
         HStack(spacing: 6.0) {
-            difficultyChip(level: .all, label: "ALL", color: .accent)
             ForEach(availableLevels, id: \.self) { level in
-                difficultyChip(level: level, label: level.code(), color: difficultyColor(for: level))
+                difficultyChip(level: level,
+                               label: String(difficultyNumber(for: level)),
+                               color: difficultyColor(for: level))
             }
         }
         .padding(.top, 4.0)
@@ -165,26 +165,42 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
     private func difficultyChip(level: IIDXLevel, label: String, color: Color) -> some View {
         Button {
             withAnimation(.snappy.speed(2.0)) {
-                selectedLevel = level
+                if selectedLevel == level {
+                    selectedLevel = .all
+                } else {
+                    selectedLevel = level
+                }
             }
         } label: {
             Text(verbatim: label)
-                .font(.subheadline)
+                .font(.title3)
                 .fontWeight(.heavy)
                 .fontWidth(.expanded)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 6.0)
-                .background(selectedLevel == level ? color : .clear)
+                .padding(.vertical, 8.0)
+                .background(selectedLevel == level ? color : color.opacity(0.1))
                 .foregroundStyle(selectedLevel == level ? .white : .secondary)
-                .clipShape(.capsule(style: .continuous))
+                .clipShape(.capsule)
                 .overlay {
                     if selectedLevel != level {
                         Capsule(style: .continuous)
                             .stroke(.secondary.opacity(0.3), lineWidth: 1.0)
                     }
                 }
+                .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+
+    private func difficultyNumber(for level: IIDXLevel) -> Int {
+        switch level {
+        case .beginner: return songRecord.beginnerScore.difficulty
+        case .normal: return songRecord.normalScore.difficulty
+        case .hyper: return songRecord.hyperScore.difficulty
+        case .another: return songRecord.anotherScore.difficulty
+        case .leggendaria: return songRecord.leggendariaScore.difficulty
+        default: return 0
+        }
     }
 
     private func difficultyColor(for level: IIDXLevel) -> Color {

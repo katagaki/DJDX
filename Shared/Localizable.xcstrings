@@ -1,6 +1,15 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    " " : {
+
+    },
+    "[%@](https://bemaniwiki.com)" : {
+
+    },
+    "[%@](https://bm2dx.com/IIDX/notes_radar/)" : {
+
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -1661,13 +1670,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show in Scores List"
+            "value" : "Display"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "プレーデータに表示する項目"
+            "value" : "表示設定"
           }
         }
       }
@@ -1915,13 +1924,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open 1P Chart"
+            "value" : "1P Chart"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "1Pの譜面を開く"
+            "value" : "1Pの譜面"
           }
         }
       }
@@ -1932,13 +1941,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open 2P Chart"
+            "value" : "2P Chart"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2Pの譜面を開く"
+            "value" : "2Pの譜面"
           }
         }
       }
@@ -1948,13 +1957,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open DP Chart"
+            "value" : "DP Chart"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DPの譜面を開く"
+            "value" : "DPの譜面"
           }
         }
       }
@@ -3549,6 +3558,9 @@
           }
         }
       }
+    },
+    "YouTube" : {
+
     }
   },
   "version" : "1.0"

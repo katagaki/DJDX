@@ -20,14 +20,6 @@ struct MoreView: View {
     @AppStorage(wrappedValue: false, "ScoresView.LevelsShownSeparately") var isLevelsShownSeparately: Bool
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
-    @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.DJLevelVisible") var isDJLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ScoreRateVisible") var isScoreRateVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
-    @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
-
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var qproImage: UIImage?
@@ -58,20 +50,6 @@ struct MoreView: View {
                     }
                 }
                 Section {
-                    NavigationLink(value: ViewPath.moreExternalDataSources) {
-                        VStack(alignment: .leading, spacing: 2.0) {
-                            Text("More.ExternalData.Header")
-                            Text("More.ExternalData.Description")
-                                .foregroundStyle(.secondary)
-                                .font(.caption)
-                        }
-                    }
-                    .popoverTip(ImportWikiDataTip())
-                } header: {
-                    ListSectionHeader(text: "More.ExternalData.Header")
-                        .font(.body)
-                }
-                Section {
                     Picker(selection: $iidxVersion) {
                         ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
                             Text(version.marketingName)
@@ -80,22 +58,11 @@ struct MoreView: View {
                         Text("Shared.IIDX.Version")
                     }
                     NavigationLink("More.General.AppIcon", value: ViewPath.moreAppIcon)
+                    NavigationLink("More.ExternalData.Header", value: ViewPath.moreExternalDataSources)
+                        .popoverTip(ImportWikiDataTip())
                     Toggle("More.PlayDataDisplay.HideBeginnerLevel", isOn: $isBeginnerLevelHidden)
                 } header: {
-                    ListSectionHeader(text: "More.General.Header")
-                        .font(.body)
-                }
-                Section {
-                    Toggle("More.PlayDataDisplay.ShowGenre", isOn: $isGenreVisible)
-                    Toggle("More.PlayDataDisplay.ShowArtist", isOn: $isArtistVisible)
-                    Toggle("More.PlayDataDisplay.ShowLevel", isOn: $isLevelVisible)
-                    Toggle("Shared.IIDX.DJLevel", isOn: $isDJLevelVisible)
-                    Toggle("Shared.Sort.ScoreRate", isOn: $isScoreRateVisible)
-                    Toggle("Shared.Sort.Score", isOn: $isScoreVisible)
-                    Toggle("Shared.Sort.LastPlayDate", isOn: $isLastPlayDateVisible)
-                } header: {
-                    ListSectionHeader(text: "More.PlayDataDisplay.Header")
-                        .font(.body)
+                    Text("More.General.Header")
                 }
                 Section {
                     Group {
@@ -114,8 +81,7 @@ struct MoreView: View {
                     }
                     .tint(.red)
                 } header: {
-                    ListSectionHeader(text: "More.ManageData.Header")
-                        .font(.body)
+                    Text("More.ManageData.Header")
                 }
                 Section {
                     Link(destination: URL(string: "https://github.com/katagaki/DJDX")!) {
@@ -132,6 +98,7 @@ struct MoreView: View {
             }
             .navigator("ViewTitle.More", group: true)
             .scrollContentBackground(.hidden)
+            .listSectionSpacing(.compact)
             .task {
                 loadRadarData()
                 if qproImage == nil {

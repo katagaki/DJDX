@@ -12,6 +12,7 @@ struct ScoreSection: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @Environment(\.openURL) var openURL
+    @EnvironmentObject var navigationManager: NavigationManager
 
     var songTitle: String
     var score: IIDXLevelScore
@@ -77,9 +78,7 @@ struct ScoreSection: View {
             }
             if let chartRadarData {
                 Button {
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        isShowingRadarValues.toggle()
-                    }
+                    isShowingRadarValues.toggle()
                 } label: {
                     Group {
                         if isShowingRadarValues {
@@ -108,6 +107,7 @@ struct ScoreSection: View {
                 }
                 .buttonStyle(.plain)
             }
+            chartActions()
         } header: {
             HStack(spacing: 16.0) {
                 IIDXLevelLabel(orientation: .horizontal, levelType: score.level, score: score)
@@ -119,51 +119,76 @@ struct ScoreSection: View {
                         Image(systemName: "clock.arrow.circlepath")
                     }.accessibilityLabel("Scores.Viewer.ShowHistory")
                 }
-                Menu {
-                    Button("Scores.Viewer.OpenYouTube", image: .listIconYouTube) {
-                        openYouTube()
-                    }
-                    if score.level != .beginner {
-                        Section {
-                            switch playType {
-                            case .single:
-                                NavigationLink(value: ViewPath.textageViewer(songTitle: songTitle,
-                                                                             level: score.level,
-                                                                             playSide: .side1P,
-                                                                             playType: playType)) {
-                                    Label("Scores.Viewer.OpenTextage.1P", image: .listIconTextage)
-                                }
-                                NavigationLink(value: ViewPath.textageViewer(songTitle: songTitle,
-                                                                             level: score.level,
-                                                                             playSide: .side2P,
-                                                                             playType: playType)) {
-                                    Label("Scores.Viewer.OpenTextage.2P", image: .listIconTextageFlipped)
-                                }
-                            case .double:
-                                NavigationLink(value: ViewPath.textageViewer(songTitle: songTitle,
-                                                                             level: score.level,
-                                                                             playSide: .notApplicable,
-                                                                             playType: playType)) {
-                                    Label("Scores.Viewer.OpenTextage.DP", image: .listIconTextage)
-                                }
-                            }
-                        } header: {
-                            Text("Scores.Viewer.OpenTextage")
-                        }
-                    }
-                } label: {
-                    Text("Scores.Viewer.OpenChart")
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.text)
-                        .padding([.top, .bottom], 4.0)
-                        .padding([.leading, .trailing], 12.0)
-                        .background(.accent)
-                        .clipShape(.capsule(style: .continuous))
-                }
-                .textCase(.none)
             }
         }
+    }
+
+    @ViewBuilder
+    func chartActions() -> some View {
+        HStack(spacing: 0.0) {
+            Button {
+                openYouTube()
+            } label: {
+                chartActionLabel(image: Image(.listIconYouTube), label: "YouTube")
+            }
+            .buttonStyle(.plain)
+            if score.level != .beginner {
+                switch playType {
+                case .single:
+                    Divider()
+                    Button {
+                        navigationManager.push(.textageViewer(songTitle: songTitle,
+                                                              level: score.level,
+                                                              playSide: .side1P,
+                                                              playType: playType), for: .scores)
+                    } label: {
+                        chartActionLabel(image: Image(.listIconTextage),
+                                         label: "Scores.Viewer.OpenTextage.1P")
+                    }
+                    .buttonStyle(.plain)
+                    Divider()
+                    Button {
+                        navigationManager.push(.textageViewer(songTitle: songTitle,
+                                                              level: score.level,
+                                                              playSide: .side2P,
+                                                              playType: playType), for: .scores)
+                    } label: {
+                        chartActionLabel(image: Image(.listIconTextageFlipped),
+                                         label: "Scores.Viewer.OpenTextage.2P")
+                    }
+                    .buttonStyle(.plain)
+                case .double:
+                    Divider()
+                    Button {
+                        navigationManager.push(.textageViewer(songTitle: songTitle,
+                                                              level: score.level,
+                                                              playSide: .notApplicable,
+                                                              playType: playType), for: .scores)
+                    } label: {
+                        chartActionLabel(image: Image(.listIconTextage),
+                                         label: "Scores.Viewer.OpenTextage.DP")
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func chartActionLabel(image: Image, label: LocalizedStringKey) -> some View {
+        VStack(spacing: 8.0) {
+            image
+                .resizable()
+                .scaledToFit()
+                .frame(width: 26.0, height: 26.0)
+            Text(label)
+                .font(.caption)
+                .fontWeight(.semibold)
+                .multilineTextAlignment(.center)
+        }
+        .foregroundStyle(.secondary)
+        .frame(maxWidth: .infinity)
+        .contentShape(.rect)
     }
 
     func clearTypeStyle() -> any ShapeStyle {
