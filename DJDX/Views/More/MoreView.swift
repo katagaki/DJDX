@@ -58,17 +58,12 @@ struct MoreView: View {
                     }
                 }
                 Section {
-                    NavigationLink(value: ViewPath.moreBemaniWikiCharts) {
-                        ListRow(image: "ListIcon.BemaniWiki2nd",
-                                title: "More.ExternalData.BemaniWiki2nd",
-                                subtitle: "More.ExternalData.BemaniWiki2nd.Description")
+                    NavigationLink(value: ViewPath.moreExternalDataSources) {
+                        ListRow(image: "ListIcon.ExternalData",
+                                title: "More.ExternalData.Header",
+                                subtitle: "More.ExternalData.Description")
                     }
                     .popoverTip(ImportWikiDataTip())
-                    NavigationLink(value: ViewPath.moreBM2DXNotesRadar) {
-                        ListRow(image: "ListIcon.BM2DX",
-                                title: "More.ExternalData.BM2DX",
-                                subtitle: "More.ExternalData.BM2DX.Description")
-                    }
                 } header: {
                     ListSectionHeader(text: "More.ExternalData.Header")
                         .font(.body)
@@ -243,8 +238,7 @@ struct MoreView: View {
                 })
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
                 switch viewPath {
-                case .moreBemaniWikiCharts: MoreBemaniWikiCharts()
-                case .moreBM2DXNotesRadar: MoreBM2DXNotesRadar()
+                case .moreExternalDataSources: MoreExternalDataSources()
                 case .moreAppIcon: MoreAppIconView()
                 case .moreAttributions: MoreLicensesView()
                 default: Color.clear

@@ -1263,6 +1263,23 @@
         }
       }
     },
+    "More.ExternalData.BemaniWiki2nd.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Provides chart time and note count data. DJDX is not affiliated with or endorsed by BEMANIWiki 2nd."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面の時間やノーツ数を提供します。DJDXはBEMANIWiki 2ndとは一切関係ありません。"
+          }
+        }
+      }
+    },
     "More.ExternalData.BemaniWiki2nd.Data" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1348,6 +1365,23 @@
         }
       }
     },
+    "More.ExternalData.BM2DX.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Provides per-chart notes radar data. DJDX is not affiliated with or endorsed by bm2dx.com."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面別のノーツレーダーデータを提供します。DJDXはbm2dx.comとは一切関係ありません。"
+          }
+        }
+      }
+    },
     "More.ExternalData.BM2DX.EntryCount" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1378,6 +1412,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面一覧"
+          }
+        }
+      }
+    },
+    "More.ExternalData.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note Counts, Notes Radar"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ノーツ数、ノーツレーダー"
           }
         }
       }
