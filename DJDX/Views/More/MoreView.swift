@@ -20,14 +20,6 @@ struct MoreView: View {
     @AppStorage(wrappedValue: false, "ScoresView.LevelsShownSeparately") var isLevelsShownSeparately: Bool
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
-    @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.DJLevelVisible") var isDJLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ScoreRateVisible") var isScoreRateVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
-    @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
-
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var qproImage: UIImage?
@@ -58,90 +50,19 @@ struct MoreView: View {
                     }
                 }
                 Section {
-                    NavigationLink(value: ViewPath.moreBemaniWikiCharts) {
-                        ListRow(image: "ListIcon.BemaniWiki2nd",
-                                title: "More.ExternalData.BemaniWiki2nd",
-                                subtitle: "More.ExternalData.BemaniWiki2nd.Description")
-                    }
-                    .popoverTip(ImportWikiDataTip())
-                } header: {
-                    ListSectionHeader(text: "More.ExternalData.Header")
-                        .font(.body)
-                }
-                Section {
                     Picker(selection: $iidxVersion) {
                         ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
                             Text(version.marketingName)
                         }
                     } label: {
-                        ListRow(image: "ListIcon.Version",
-                                title: "Shared.IIDX.Version")
+                        Text("Shared.IIDX.Version")
                     }
-
-                    NavigationLink(value: ViewPath.moreAppIcon) {
-                        ListRow(image: "ListIcon.AppIcon",
-                                title: "More.General.AppIcon")
-                    }
-                    // TODO: Implement this feature
-                    // swiftlint:disable:next control_statement
-                    if (false) {
-                        Toggle(isOn: $isLevelsShownSeparately) {
-                            HStack(spacing: 0.0) {
-                                ListRow(image: "ListIcon.ShowLevelsAsSeparateRecords",
-                                        title: "More.PlayDataDisplay.ShowLevelsSeparately",
-                                        subtitle: "More.PlayDataDisplay.ShowLevelsSeparately.Description",
-                                        includeSpacer: true)
-                            }
-                        }
-                    }
-                    Toggle(isOn: $isBeginnerLevelHidden) {
-                        ListRow(image: "ListIcon.HideBeginner",
-                                title: "More.PlayDataDisplay.HideBeginnerLevel",
-                                includeSpacer: true)
-                    }
+                    NavigationLink("More.General.AppIcon", value: ViewPath.moreAppIcon)
+                    NavigationLink("More.ExternalData.Header", value: ViewPath.moreExternalDataSources)
+                        .popoverTip(ImportWikiDataTip())
+                    Toggle("More.PlayDataDisplay.HideBeginnerLevel", isOn: $isBeginnerLevelHidden)
                 } header: {
-                    ListSectionHeader(text: "More.General.Header")
-                        .font(.body)
-                }
-                Section {
-                    Toggle(isOn: $isGenreVisible) {
-                        ListRow(image: "ListIcon.ShowGenre",
-                                title: "More.PlayDataDisplay.ShowGenre",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isArtistVisible) {
-                        ListRow(image: "ListIcon.ShowArtist",
-                                title: "More.PlayDataDisplay.ShowArtist",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isLevelVisible) {
-                        ListRow(image: "ListIcon.ShowLevel",
-                                title: "More.PlayDataDisplay.ShowLevel",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isDJLevelVisible) {
-                        ListRow(image: "ListIcon.ShowDJLevel",
-                                title: "Shared.IIDX.DJLevel",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isScoreRateVisible) {
-                        ListRow(image: "ListIcon.ShowScoreRate",
-                                title: "Shared.Sort.ScoreRate",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isScoreVisible) {
-                        ListRow(image: "ListIcon.ShowScore",
-                                title: "Shared.Sort.Score",
-                                includeSpacer: true)
-                    }
-                    Toggle(isOn: $isLastPlayDateVisible) {
-                        ListRow(image: "ListIcon.ShowPlayDate",
-                                title: "Shared.Sort.LastPlayDate",
-                                includeSpacer: true)
-                    }
-                } header: {
-                    ListSectionHeader(text: "More.PlayDataDisplay.Header")
-                        .font(.body)
+                    Text("More.General.Header")
                 }
                 Section {
                     Group {
@@ -160,31 +81,24 @@ struct MoreView: View {
                     }
                     .tint(.red)
                 } header: {
-                    ListSectionHeader(text: "More.ManageData.Header")
-                        .font(.body)
+                    Text("More.ManageData.Header")
                 }
                 Section {
                     Link(destination: URL(string: "https://github.com/katagaki/DJDX")!) {
                         HStack {
-                            VStack(alignment: .leading, spacing: 2.0) {
-                                Text("More.GitHub")
-                                Text(verbatim: "katagaki/DJDX")
-                                    .foregroundStyle(.secondary)
-                                    .font(.caption)
-                            }
+                            Text(String(localized: "More.GitHub"))
                             Spacer()
-                            Image(systemName: "safari")
-                                .opacity(0.5)
+                            Text("katagaki/DJDX")
+                                .foregroundStyle(.secondary)
                         }
-                        .tint(.primary)
-                        .contentShape(.rect)
                     }
-                    .buttonStyle(.plain)
+                    .tint(.primary)
                     NavigationLink("More.Attributions", value: ViewPath.moreAttributions)
                 }
             }
             .navigator("ViewTitle.More", group: true)
             .scrollContentBackground(.hidden)
+            .listSectionSpacing(.compact)
             .task {
                 loadRadarData()
                 if qproImage == nil {
@@ -238,7 +152,7 @@ struct MoreView: View {
                 })
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
                 switch viewPath {
-                case .moreBemaniWikiCharts: MoreBemaniWikiCharts()
+                case .moreExternalDataSources: MoreExternalDataSources()
                 case .moreAppIcon: MoreAppIconView()
                 case .moreAttributions: MoreLicensesView()
                 default: Color.clear

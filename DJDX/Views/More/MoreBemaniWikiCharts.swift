@@ -12,12 +12,12 @@ import SwiftUI
 struct MoreBemaniWikiCharts: View {
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
+    @Environment(\.openURL) var openURL
     @EnvironmentObject var navigationManager: NavigationManager
 
-    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
-    @State var allSongs: [IIDXSong] = []
+    @State var entryCount: Int = 0
 
     @State var isReloadCompleted: Bool = false
     @State var dataImported: Int = 0
@@ -37,63 +37,33 @@ struct MoreBemaniWikiCharts: View {
                         isReloadCompleted = true
                     }
                 }
+            } footer: {
+                Text("More.ExternalData.Disclaimer")
+                    .font(.caption2)
             }
             Section {
-                ForEach(allSongs) { song in
-                    NavigationLink(song.title) {
-                        List {
-                            Section {
-                                VStack(alignment: .leading, spacing: 8.0) {
-                                    DetailRow("TIME", value: song.time, style: Color.accentColor)
-                                    DetailRow("MOVIE", value: song.movie, style: Color.accentColor)
-                                    DetailRow("LAYER", value: song.layer, style: Color.accentColor)
-                                }
-                            }
-                            if let noteCount = song.spNoteCount {
-                                Section {
-                                    VStack(alignment: .leading, spacing: 8.0) {
-                                        if !isBeginnerLevelHidden {
-                                            LevelDetailRow(level: .beginner, value: noteCount.beginnerNoteCount)
-                                        }
-                                        LevelDetailRow(level: .normal, value: noteCount.normalNoteCount)
-                                        LevelDetailRow(level: .hyper, value: noteCount.hyperNoteCount)
-                                        LevelDetailRow(level: .another, value: noteCount.anotherNoteCount)
-                                        LevelDetailRow(level: .leggendaria, value: noteCount.leggendariaNoteCount)
-                                    }
-                                } header: {
-                                    ListSectionHeader(text: "SP")
-                                        .font(.body)
-                                        .fontWidth(.expanded)
-                                        .fontWeight(.black)
-                                }
-                            }
-                            if let noteCount = song.dpNoteCount {
-                                Section {
-                                    VStack(alignment: .leading, spacing: 8.0) {
-                                        LevelDetailRow(level: .normal, value: noteCount.normalNoteCount)
-                                        LevelDetailRow(level: .hyper, value: noteCount.hyperNoteCount)
-                                        LevelDetailRow(level: .another, value: noteCount.anotherNoteCount)
-                                        LevelDetailRow(level: .leggendaria, value: noteCount.leggendariaNoteCount)
-                                    }
-                                } header: {
-                                    ListSectionHeader(text: "DP")
-                                        .font(.body)
-                                        .fontWidth(.expanded)
-                                        .fontWeight(.black)
-                                }
-                            }
-                        }
-                        .navigationTitle(song.title)
-                        .navigationBarTitleDisplayMode(.inline)
-                    }
+                HStack {
+                    Text("More.ExternalData.BemaniWiki2nd.EntryCount")
+                    Spacer()
+                    Text(verbatim: "\(entryCount)")
+                        .foregroundStyle(.secondary)
                 }
             } header: {
-                ListSectionHeader(text: "More.ExternalData.Charts")
+                ListSectionHeader(text: "More.ExternalData.BemaniWiki2nd.Data")
                     .font(.body)
             }
         }
         .navigationTitle("ViewTitle.More.BemaniWiki2nd")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    openURL(URL(string: "https://bemaniwiki.com")!)
+                } label: {
+                    Image(systemName: "safari")
+                }
+            }
+        }
         .onChange(of: dataImported, { _, _ in
             Task {
                 await MainActor.run {
@@ -102,7 +72,7 @@ struct MoreBemaniWikiCharts: View {
             }
         })
         .task {
-            allSongs = await fetcher.fetchAllSongs()
+            entryCount = await fetcher.bemaniWikiSongCount()
         }
         .alert(
             "Alert.ExternalData.Completed.Title",
@@ -113,7 +83,7 @@ struct MoreBemaniWikiCharts: View {
                 }
             },
             message: {
-                Text("Alert.ExternalData.Completed.Text.\(allSongs.count)")
+                Text("Alert.ExternalData.Completed.Text.\(entryCount)")
             }
         )
     }
@@ -126,7 +96,7 @@ struct MoreBemaniWikiCharts: View {
         iidxSongs.append(contentsOf: await reloadBemaniWikiDataForExistingVersions())
         dataImported += 1
         await importer.insertSongs(iidxSongs)
-        allSongs = await fetcher.fetchAllSongs()
+        entryCount = await fetcher.bemaniWikiSongCount()
         await MainActor.run {
             progressAlertManager.hide()
             withAnimation(.snappy.speed(2.0)) {

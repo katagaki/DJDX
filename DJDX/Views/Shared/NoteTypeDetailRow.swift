@@ -25,12 +25,12 @@ struct NoteTypeDetailRow: View {
     }
 
     var body: some View {
-        HStack {
+        VStack(spacing: 4.0) {
             Text(title)
                 .foregroundStyle(style)
-            Spacer()
             Text(value)
         }
+        .frame(maxWidth: .infinity)
         .fontWidth(.expanded)
         .font(.caption)
         .fontWeight(.heavy)

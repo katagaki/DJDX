@@ -19,6 +19,14 @@ struct ScoreSortAndFilter: View {
     @Binding var isSystemChangingFilterAndSort: Bool
     var onReset: () -> Void
 
+    @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.DJLevelVisible") var isDJLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreRateVisible") var isScoreRateVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
+    @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
+
     var body: some View {
         // Sort
         Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
@@ -107,6 +115,15 @@ struct ScoreSortAndFilter: View {
                 }
             }
             .pickerStyle(.menu)
+            Section("More.PlayDataDisplay.Header") {
+                Toggle("More.PlayDataDisplay.ShowGenre", isOn: $isGenreVisible)
+                Toggle("More.PlayDataDisplay.ShowArtist", isOn: $isArtistVisible)
+                Toggle("More.PlayDataDisplay.ShowLevel", isOn: $isLevelVisible)
+                Toggle("Shared.IIDX.DJLevel", isOn: $isDJLevelVisible)
+                Toggle("Shared.Sort.ScoreRate", isOn: $isScoreRateVisible)
+                Toggle("Shared.Sort.Score", isOn: $isScoreVisible)
+                Toggle("Shared.Sort.LastPlayDate", isOn: $isLastPlayDateVisible)
+            }
         }
         .menuActionDismissBehavior(.disabled)
     }

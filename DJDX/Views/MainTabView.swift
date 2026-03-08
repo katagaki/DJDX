@@ -86,7 +86,8 @@ struct MainTabView: View {
         let defaults = UserDefaults.standard
         let dataMigrationKeys = [
             "Internal.DataMigrationForEpolisToPinkyCrush.2",
-            "Internal.DataMigrationForSwiftDataToSQLite"
+            "Internal.DataMigrationForSwiftDataToSQLite",
+            "Internal.BEMANIWikiMigratedToSeparateDB"
         ]
 
         UIApplication.shared.isIdleTimerDisabled = true
@@ -106,6 +107,9 @@ struct MainTabView: View {
                 }
             case "Internal.DataMigrationForSwiftDataToSQLite":
                 await migrateSwiftDataToSQLite()
+            case "Internal.BEMANIWikiMigratedToSeparateDB":
+                let migrationImporter = DataImporter()
+                await migrationImporter.migrateBEMANIWikiDataIfNeeded()
             default: break
             }
             UserDefaults.standard.set(true, forKey: dataMigrationKey)

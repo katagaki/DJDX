@@ -1,6 +1,15 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    " " : {
+
+    },
+    "[%@](https://bemaniwiki.com)" : {
+
+    },
+    "[%@](https://bm2dx.com/IIDX/notes_radar/)" : {
+
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -1108,6 +1117,9 @@
         }
       }
     },
+    "katagaki/DJDX" : {
+
+    },
     "LEVEL" : {
       "localizations" : {
         "en" : {
@@ -1246,6 +1258,23 @@
         }
       }
     },
+    "More.ExternalData.BemaniWiki2nd.Data" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ"
+          }
+        }
+      }
+    },
     "More.ExternalData.BemaniWiki2nd.Description" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1263,6 +1292,125 @@
         }
       }
     },
+    "More.ExternalData.BemaniWiki2nd.EntryCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Songs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "楽曲数"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BemaniWiki2nd.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Provides chart time and note count data. DJDX is not affiliated with or endorsed by BEMANIWiki 2nd."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面の時間やノーツ数を提供します。DJDXはBEMANIWiki 2ndとは一切関係ありません。"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BM2DX" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "joy to the beat..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "joy to the beat..."
+          }
+        }
+      }
+    },
+    "More.ExternalData.BM2DX.Data" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BM2DX.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Radar Per Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面別ノーツレーダー"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BM2DX.EntryCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Charts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面数"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BM2DX.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Provides per-chart notes radar data. DJDX is not affiliated with or endorsed by bm2dx.com."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面別のノーツレーダーデータを提供します。DJDXはbm2dx.comとは一切関係ありません。"
+          }
+        }
+      }
+    },
     "More.ExternalData.Charts" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1276,6 +1424,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面一覧"
+          }
+        }
+      }
+    },
+    "More.ExternalData.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note Counts, Notes Radar"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ノーツ数、ノーツレーダー"
+          }
+        }
+      }
+    },
+    "More.ExternalData.Disclaimer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX is not affiliated with or endorsed by this external data source."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDXはこの外部データソースとは一切関係ありません。"
           }
         }
       }
@@ -1310,6 +1492,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データを更新"
+          }
+        }
+      }
+    },
+    "More.ExternalData.ViewSource" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visit Source"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ソースを見る"
           }
         }
       }
@@ -1471,13 +1670,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show in Scores List"
+            "value" : "Display"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "プレーデータに表示する項目"
+            "value" : "表示設定"
           }
         }
       }
@@ -1725,13 +1924,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open 1P Chart"
+            "value" : "1P Chart"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "1Pの譜面を開く"
+            "value" : "1Pの譜面"
           }
         }
       }
@@ -1742,13 +1941,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open 2P Chart"
+            "value" : "2P Chart"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2Pの譜面を開く"
+            "value" : "2Pの譜面"
           }
         }
       }
@@ -1758,13 +1957,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open DP Chart"
+            "value" : "DP Chart"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DPの譜面を開く"
+            "value" : "DPの譜面"
           }
         }
       }
@@ -2478,13 +2677,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MISS COUNT"
+            "value" : "Miss Count"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MISS COUNT"
+            "value" : "ミスカウント"
           }
         }
       }
@@ -3038,6 +3237,23 @@
         }
       }
     },
+    "ViewTitle.More.BM2DXNotesRadar" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bm2dx.com"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bm2dx.com"
+          }
+        }
+      }
+    },
     "ViewTitle.More.Customization.AppIcon" : {
       "localizations" : {
         "en" : {
@@ -3342,6 +3558,9 @@
           }
         }
       }
+    },
+    "YouTube" : {
+
     }
   },
   "version" : "1.0"
