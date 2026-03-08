@@ -437,6 +437,11 @@ actor DataFetcher {
         }) ?? []
     }
 
+    func bemaniWikiSongCount() -> Int {
+        guard let database = try? BEMANIWikiDatabase.shared.getReadConnection() else { return 0 }
+        return (try? database.scalar(BEMANIWikiDatabase.songTable.count)) ?? 0
+    }
+
     func chartRadarDataCount() -> Int {
         guard let database = try? BM2DXDatabase.shared.getReadConnection() else { return 0 }
         return (try? database.scalar(BM2DXDatabase.notesRadarTable.count)) ?? 0

@@ -222,7 +222,8 @@ struct ScoresView: View {
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .scoreViewer(let songRecord):
-                    ScoreViewer(songRecord: songRecord, noteCount: noteCount, initialLevel: levelToShow)
+                    ScoreViewer(songRecord: songRecord, noteCount: noteCount,
+                                initialLevel: songRecord.level(for: levelToShow, or: difficultyToShow))
                     .automaticNavigationTransition(id: songRecord.title, in: scoresNamespace)
                 case .scoreHistory(let songTitle, let level, let noteCount):
                     ScoreHistoryViewer(songTitle: songTitle, level: level, noteCount: noteCount)

@@ -77,31 +77,34 @@ struct ScoreSection: View {
             }
             if let chartRadarData {
                 Button {
-                    withAnimation(.snappy.speed(2.0)) {
+                    withAnimation(.easeInOut(duration: 0.25)) {
                         isShowingRadarValues.toggle()
                     }
                 } label: {
-                    if isShowingRadarValues {
-                        VStack(spacing: 4.0) {
-                            ForEach(chartRadarData.radarData.displayPoints(), id: \.label) { point in
-                                HStack {
-                                    Text(verbatim: point.label)
-                                        .font(.system(size: 12, weight: .bold))
-                                        .fontWidth(.expanded)
-                                        .foregroundStyle(point.color)
-                                    Spacer()
-                                    Text(verbatim: String(format: "%.2f", point.value))
-                                        .font(.system(size: 12, weight: .semibold).monospacedDigit())
-                                        .foregroundStyle(.primary)
+                    Group {
+                        if isShowingRadarValues {
+                            VStack(spacing: 4.0) {
+                                ForEach(chartRadarData.radarData.displayPoints(), id: \.label) { point in
+                                    HStack {
+                                        Text(verbatim: point.label)
+                                            .font(.system(size: 12, weight: .bold))
+                                            .fontWidth(.expanded)
+                                            .foregroundStyle(point.color)
+                                        Spacer()
+                                        Text(verbatim: String(format: "%.2f", point.value))
+                                            .font(.system(size: 12, weight: .semibold).monospacedDigit())
+                                            .foregroundStyle(.primary)
+                                    }
                                 }
                             }
-                        }
-                        .padding(.vertical, 4.0)
-                    } else {
-                        RadarChartView(chartRadarData.radarData)
-                            .frame(height: 200.0)
                             .padding(.vertical, 4.0)
+                        } else {
+                            RadarChartView(chartRadarData.radarData)
+                                .frame(height: 200.0)
+                                .padding(.vertical, 4.0)
+                        }
                     }
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }

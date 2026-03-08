@@ -152,31 +152,29 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
 
     @ViewBuilder
     private func difficultySwitcher() -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 6.0) {
-                difficultyChip(level: .all, label: "ALL")
-                ForEach(availableLevels, id: \.self) { level in
-                    difficultyChip(level: level, label: level.code())
-                }
+        HStack(spacing: 6.0) {
+            difficultyChip(level: .all, label: "ALL", color: .accent)
+            ForEach(availableLevels, id: \.self) { level in
+                difficultyChip(level: level, label: level.code(), color: difficultyColor(for: level))
             }
         }
         .padding(.top, 4.0)
     }
 
     @ViewBuilder
-    private func difficultyChip(level: IIDXLevel, label: String) -> some View {
+    private func difficultyChip(level: IIDXLevel, label: String, color: Color) -> some View {
         Button {
             withAnimation(.snappy.speed(2.0)) {
                 selectedLevel = level
             }
         } label: {
             Text(verbatim: label)
-                .font(.caption)
+                .font(.subheadline)
                 .fontWeight(.heavy)
                 .fontWidth(.expanded)
-                .padding(.horizontal, 10.0)
-                .padding(.vertical, 4.0)
-                .background(selectedLevel == level ? .accent : .clear)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6.0)
+                .background(selectedLevel == level ? color : .clear)
                 .foregroundStyle(selectedLevel == level ? .white : .secondary)
                 .clipShape(.capsule(style: .continuous))
                 .overlay {
@@ -187,6 +185,17 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
                 }
         }
         .buttonStyle(.plain)
+    }
+
+    private func difficultyColor(for level: IIDXLevel) -> Color {
+        switch level {
+        case .beginner: return .green
+        case .normal: return .blue
+        case .hyper: return .orange
+        case .another: return .red
+        case .leggendaria: return .purple
+        default: return .accent
+        }
     }
 
     private func radarKey(_ playType: IIDXPlayType, _ difficulty: Int) -> String {

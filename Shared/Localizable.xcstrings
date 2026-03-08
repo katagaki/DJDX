@@ -1263,6 +1263,40 @@
         }
       }
     },
+    "More.ExternalData.BemaniWiki2nd.Data" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ"
+          }
+        }
+      }
+    },
+    "More.ExternalData.BemaniWiki2nd.EntryCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Songs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "楽曲数"
+          }
+        }
+      }
+    },
     "More.ExternalData.BM2DX" : {
       "extractionState" : "manual",
       "localizations" : {
