@@ -71,6 +71,7 @@ struct ScoreSection: View {
                     NoteTypeDetailRow("GREAT", value: score.greatCount, style: Color.yellow)
                     NoteTypeDetailRow("MISS", value: score.missCount, style: Color.red)
                 }
+                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
             } else {
                 if score.clearType != "NO PLAY" {
                     ClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
