@@ -2,13 +2,13 @@
   "sourceLanguage" : "ja",
   "strings" : {
     " " : {
-
+      "shouldTranslate" : false
     },
     "[%@](https://bemaniwiki.com)" : {
-
+      "shouldTranslate" : false
     },
     "[%@](https://bm2dx.com/IIDX/notes_radar/)" : {
-
+      "shouldTranslate" : false
     },
     "%lld" : {
       "shouldTranslate" : false
@@ -1118,7 +1118,7 @@
       }
     },
     "katagaki/DJDX" : {
-
+      "shouldTranslate" : false
     },
     "LEVEL" : {
       "localizations" : {
@@ -3560,7 +3560,7 @@
       }
     },
     "YouTube" : {
-
+      "shouldTranslate" : false
     }
   },
   "version" : "1.0"

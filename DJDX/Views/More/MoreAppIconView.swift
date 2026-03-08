@@ -36,7 +36,7 @@ struct MoreAppIconView: View {
                 .contentShape(Rectangle())
             }
         }
-        .navigationTitle("ViewTitle.More.Customization.AppIcon")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigator("ViewTitle.More.Customization.AppIcon", group: true, inline: true)
+        .scrollContentBackground(.hidden)
     }
 }

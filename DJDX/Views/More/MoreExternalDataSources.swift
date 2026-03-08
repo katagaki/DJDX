@@ -35,8 +35,8 @@ struct MoreExternalDataSources: View {
             bemaniWikiSection()
             bm2dxSection()
         }
-        .navigationTitle("More.ExternalData.Header")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigator("More.ExternalData.Header", group: true, inline: true)
+        .scrollContentBackground(.hidden)
         .onChange(of: dataImported, { _, _ in
             Task {
                 await MainActor.run {

@@ -78,8 +78,8 @@ struct ScoreViewer: View {
                 }
             }
         }
-        .navigationTitle("ViewTitle.Scores.Song")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigator("ViewTitle.Scores.Song", group: true, inline: true)
+        .scrollContentBackground(.hidden)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbarBackground(.visible, for: .tabBar)
         .toolbar {
