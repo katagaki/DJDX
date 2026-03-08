@@ -106,9 +106,16 @@ struct MoreExternalDataSources: View {
                 Button {
                     openURL(URL(string: "https://bemaniwiki.com")!)
                 } label: {
-                    Image(systemName: "safari")
+                    Text("More.ExternalData.ViewSource")
                         .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.text)
+                        .padding([.top, .bottom], 4.0)
+                        .padding([.leading, .trailing], 12.0)
+                        .background(.accent)
+                        .clipShape(.capsule(style: .continuous))
                 }
+                .textCase(.none)
             }
         } footer: {
             Text("More.ExternalData.BemaniWiki2nd.Footer")
@@ -148,9 +155,16 @@ struct MoreExternalDataSources: View {
                 Button {
                     openURL(URL(string: "https://bm2dx.com/IIDX/notes_radar/")!)
                 } label: {
-                    Image(systemName: "safari")
+                    Text("More.ExternalData.ViewSource")
                         .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.text)
+                        .padding([.top, .bottom], 4.0)
+                        .padding([.leading, .trailing], 12.0)
+                        .background(.accent)
+                        .clipShape(.capsule(style: .continuous))
                 }
+                .textCase(.none)
             }
         } footer: {
             Text("More.ExternalData.BM2DX.Footer")

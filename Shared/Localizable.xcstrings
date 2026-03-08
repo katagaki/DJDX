@@ -1320,13 +1320,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "bm2dx.com"
+            "value" : "joy to the beat..."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "bm2dx.com"
+            "value" : "joy to the beat..."
           }
         }
       }
@@ -1463,6 +1463,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "外部データソース"
+          }
+        }
+      }
+    },
+    "More.ExternalData.ViewSource" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visit Source"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ソースを見る"
           }
         }
       }
