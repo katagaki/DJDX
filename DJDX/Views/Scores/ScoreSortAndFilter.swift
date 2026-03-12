@@ -98,7 +98,7 @@ struct ScoreSortAndFilter: View {
                     Text(.sharedAll)
                         .tag(IIDXDJLevel.all)
                     Divider()
-                    ForEach(IIDXDJLevel.sorted, id: \.self) { sortDJLevel in
+                    ForEach(IIDXDJLevel.sorted.reversed(), id: \.self) { sortDJLevel in
                         Text(verbatim: sortDJLevel.rawValue)
                             .tag(sortDJLevel)
                     }
