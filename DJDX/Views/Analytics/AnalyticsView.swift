@@ -61,6 +61,9 @@ struct AnalyticsView: View {
     @State var newExHardClears: [NewClearEntry] = []
     @State var newFailed: [NewClearEntry] = []
     @State var newHighScores: [NewHighScoreEntry] = []
+    @State var newAAA: [NewDJLevelEntry] = []
+    @State var newAA: [NewDJLevelEntry] = []
+    @State var newA: [NewDJLevelEntry] = []
 
     @State var dataState: DataState = .initializing
 
@@ -377,6 +380,24 @@ struct AnalyticsView: View {
                     case .newHighScoresDetail:
                         NewHighScoresDetailView(newHighScores: $newHighScores)
                             .automaticNavigationTransition(id: "NewHighScores", in: analyticsNamespace)
+                    case .newAAADetail:
+                        NewDJLevelsDetailView(
+                            newDJLevels: $newAAA,
+                            title: AnalyticsCardType.newAAA.titleKey
+                        )
+                        .automaticNavigationTransition(id: "NewAAA", in: analyticsNamespace)
+                    case .newAADetail:
+                        NewDJLevelsDetailView(
+                            newDJLevels: $newAA,
+                            title: AnalyticsCardType.newAA.titleKey
+                        )
+                        .automaticNavigationTransition(id: "NewAA", in: analyticsNamespace)
+                    case .newADetail:
+                        NewDJLevelsDetailView(
+                            newDJLevels: $newA,
+                            title: AnalyticsCardType.newA.titleKey
+                        )
+                        .automaticNavigationTransition(id: "NewA", in: analyticsNamespace)
                     default: Color.clear
                     }
                 }

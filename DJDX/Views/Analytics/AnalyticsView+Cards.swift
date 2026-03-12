@@ -116,6 +116,12 @@ extension AnalyticsView {
             newFailedCard
         case .newHighScores:
             newHighScoresCard
+        case .newAAA:
+            newAAACard
+        case .newAA:
+            newAACard
+        case .newA:
+            newACard
         }
     }
 
@@ -245,6 +251,48 @@ extension AnalyticsView {
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(id: "NewHighScores", in: analyticsNamespace)
+    }
+
+    var newAAACard: some View {
+        Button {
+            if !isEditingCards {
+                navigationManager.push(.newAAADetail, for: .analytics)
+            }
+        } label: {
+            AnalyticsCardView(cardType: .newAAA) {
+                NewDJLevelsCard(newDJLevels: $newAAA)
+            }
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "NewAAA", in: analyticsNamespace)
+    }
+
+    var newAACard: some View {
+        Button {
+            if !isEditingCards {
+                navigationManager.push(.newAADetail, for: .analytics)
+            }
+        } label: {
+            AnalyticsCardView(cardType: .newAA) {
+                NewDJLevelsCard(newDJLevels: $newAA)
+            }
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "NewAA", in: analyticsNamespace)
+    }
+
+    var newACard: some View {
+        Button {
+            if !isEditingCards {
+                navigationManager.push(.newADetail, for: .analytics)
+            }
+        } label: {
+            AnalyticsCardView(cardType: .newA) {
+                NewDJLevelsCard(newDJLevels: $newA)
+            }
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "NewA", in: analyticsNamespace)
     }
 
     // MARK: - Per-Level Card Views

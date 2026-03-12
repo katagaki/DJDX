@@ -33,6 +33,9 @@ enum ViewPath: Hashable {
     case newExHardClearDetail
     case newFailedDetail
     case newHighScoresDetail
+    case newAAADetail
+    case newAADetail
+    case newADetail
     case importerWebIIDXSingle
     case importerWebIIDXDouble
     case importerWebIIDXTower
