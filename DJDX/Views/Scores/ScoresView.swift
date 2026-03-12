@@ -18,6 +18,7 @@ struct ScoresView: View {
     @AppStorage(wrappedValue: .all, "ScoresView.DifficultyFilter") var difficultyToShow: IIDXDifficulty
     @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
     @AppStorage(wrappedValue: .all, "ScoresView.ClearTypeFilter") var clearTypeToShow: IIDXClearType
+    @AppStorage(wrappedValue: .all, "ScoresView.DJLevelFilter") var djLevelToShow: IIDXDJLevel
     @AppStorage(wrappedValue: "", "ScoresView.VersionFilter") var versionToShow: String
     @AppStorage(wrappedValue: .lastPlayDate, "ScoresView.SortOrder") var sortMode: SortMode
     @AppStorage(wrappedValue: .descending, "ScoresView.SortDirection") var sortOrder: SortOrder
@@ -49,6 +50,7 @@ struct ScoresView: View {
          String(difficultyToShow.rawValue),
          levelToShow.rawValue,
          clearTypeToShow.rawValue,
+         djLevelToShow.rawValue,
          versionToShow,
          sortMode.rawValue,
          sortOrder.rawValue]
@@ -125,6 +127,7 @@ struct ScoresView: View {
                             difficultyToShow: $difficultyToShow.animation(.snappy.speed(2.0)),
                             levelToShow: $levelToShow.animation(.snappy.speed(2.0)),
                             clearTypeToShow: $clearTypeToShow.animation(.snappy.speed(2.0)),
+                            djLevelToShow: $djLevelToShow.animation(.snappy.speed(2.0)),
                             versionToShow: $versionToShow.animation(.snappy.speed(2.0)),
                             sortMode: $sortMode.animation(.snappy.speed(2.0)),
                             sortOrder: $sortOrder.animation(.snappy.speed(2.0)),

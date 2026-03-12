@@ -114,6 +114,9 @@ extension AnalyticsView {
                     self.newExHardClears = []
                     self.newFailed = []
                     self.newHighScores = []
+                    self.newAAA = []
+                    self.newAA = []
+                    self.newA = []
                 }
             }
             return
@@ -150,6 +153,11 @@ extension AnalyticsView {
             "FAILED": []
         ]
         var computedNewHighScores: [NewHighScoreEntry] = []
+        var computedDJLevels: [String: [NewDJLevelEntry]] = [
+            "AAA": [],
+            "AA": [],
+            "A": []
+        ]
 
         let levels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
             (.beginner, \.beginnerScore),
@@ -184,6 +192,21 @@ extension AnalyticsView {
                     ))
                 }
 
+                // Check for new DJ level
+                let previousDJLevel = previousScore?.djLevel ?? "---"
+                if let djLevel = latestScore.djLevel as String?,
+                   computedDJLevels.keys.contains(djLevel),
+                   previousDJLevel != djLevel {
+                    computedDJLevels[djLevel]!.append(NewDJLevelEntry(
+                        songTitle: latestRecord.title,
+                        songArtist: latestRecord.artist,
+                        level: level,
+                        difficulty: latestScore.difficulty,
+                        djLevel: djLevel,
+                        previousDJLevel: previousDJLevel
+                    ))
+                }
+
                 // Check for new high score
                 let previousScoreValue = previousScore?.score ?? 0
                 if latestScore.score > previousScoreValue {
@@ -211,6 +234,9 @@ extension AnalyticsView {
                 self.newExHardClears = computedClears["EX HARD CLEAR"]!
                 self.newFailed = computedClears["FAILED"]!
                 self.newHighScores = computedNewHighScores
+                self.newAAA = computedDJLevels["AAA"]!
+                self.newAA = computedDJLevels["AA"]!
+                self.newA = computedDJLevels["A"]!
             }
         }
     }

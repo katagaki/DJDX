@@ -11,6 +11,9 @@ import SwiftUI
 enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case clearTypeOverall
     case newHighScores
+    case newAAA
+    case newAA
+    case newA
     case newFullComboClear
     case newClears
     case newEasyClears
@@ -37,6 +40,9 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .newHardClear: return Text(verbatim: "HARD CLEAR")
         case .newExHardClear: return Text(verbatim: "EX HARD CLEAR")
         case .newFailed: return Text(verbatim: "FAILED")
+        case .newAAA: return Text(verbatim: "AAA")
+        case .newAA: return Text(verbatim: "AA")
+        case .newA: return Text(verbatim: "A")
         }
     }
 
@@ -51,6 +57,9 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .newHardClear: return "HARD CLEAR"
         case .newExHardClear: return "EX HARD CLEAR"
         case .newFailed: return "FAILED"
+        case .newAAA: return "AAA"
+        case .newAA: return "AA"
+        case .newA: return "A"
         }
     }
 
@@ -65,6 +74,9 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .newHardClear: return "dial.medium"
         case .newExHardClear: return "dial.high"
         case .newFailed: return "exclamationmark.octagon"
+        case .newAAA: return "crown"
+        case .newAA: return "crown"
+        case .newA: return "crown"
         }
     }
 
@@ -79,6 +91,9 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .newHardClear: return .pink
         case .newExHardClear: return .yellow
         case .newFailed: return .red
+        case .newAAA: return .orange
+        case .newAA: return .orange
+        case .newA: return .orange
         }
     }
 
@@ -93,7 +108,10 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
              .newHardClear,
              .newExHardClear,
              .newFailed,
-             .newHighScores:
+             .newHighScores,
+             .newAAA,
+             .newAA,
+             .newA:
             return 50.0
         }
     }
@@ -108,6 +126,9 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         [
             .clearTypeOverall,
             .newHighScores,
+            .newAAA,
+            .newAA,
+            .newA,
             .newFullComboClear,
             .newClears,
             .newEasyClears,

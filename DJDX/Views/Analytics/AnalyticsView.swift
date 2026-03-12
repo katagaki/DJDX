@@ -61,7 +61,11 @@ struct AnalyticsView: View {
     @State var newExHardClears: [NewClearEntry] = []
     @State var newFailed: [NewClearEntry] = []
     @State var newHighScores: [NewHighScoreEntry] = []
+    @State var newAAA: [NewDJLevelEntry] = []
+    @State var newAA: [NewDJLevelEntry] = []
+    @State var newA: [NewDJLevelEntry] = []
 
+    @State var isShowingSettings: Bool = false
     @State var dataState: DataState = .initializing
 
     let fetcher = DataFetcher()
@@ -174,13 +178,29 @@ struct AnalyticsView: View {
                             Label("Analytics.Settings.EditCards",
                                   systemImage: "arrow.up.arrow.down")
                         }
-                        settingsMenu
+                        Button {
+                            isShowingSettings = true
+                        } label: {
+                            Image(systemName: "pencil")
+                        }
                     }
                 }
             }
             .refreshable {
                 await reload()
                 debugPrint("Reloaded from swipe to refresh")
+            }
+            .sheet(isPresented: $isShowingSettings) {
+                AnalyticsSettingsSheet(
+                    visibleCards: $visibleCards,
+                    cardOrder: $cardOrder,
+                    visiblePerLevelCardSet: $visiblePerLevelCardSet,
+                    perLevelCardOrder: $perLevelCardOrder,
+                    onSaveVisibleCards: saveVisibleCards,
+                    onSaveVisiblePerLevelCards: saveVisiblePerLevelCards,
+                    onSaveCardOrder: saveCardOrder,
+                    onSavePerLevelCardOrder: savePerLevelCardOrder
+                )
             }
             .task {
                 loadCardOrder()
@@ -377,6 +397,24 @@ struct AnalyticsView: View {
                     case .newHighScoresDetail:
                         NewHighScoresDetailView(newHighScores: $newHighScores)
                             .automaticNavigationTransition(id: "NewHighScores", in: analyticsNamespace)
+                    case .newAAADetail:
+                        NewDJLevelsDetailView(
+                            newDJLevels: $newAAA,
+                            title: AnalyticsCardType.newAAA.titleKey
+                        )
+                        .automaticNavigationTransition(id: "NewAAA", in: analyticsNamespace)
+                    case .newAADetail:
+                        NewDJLevelsDetailView(
+                            newDJLevels: $newAA,
+                            title: AnalyticsCardType.newAA.titleKey
+                        )
+                        .automaticNavigationTransition(id: "NewAA", in: analyticsNamespace)
+                    case .newADetail:
+                        NewDJLevelsDetailView(
+                            newDJLevels: $newA,
+                            title: AnalyticsCardType.newA.titleKey
+                        )
+                        .automaticNavigationTransition(id: "NewA", in: analyticsNamespace)
                     default: Color.clear
                     }
                 }

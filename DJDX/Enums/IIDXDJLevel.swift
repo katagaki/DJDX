@@ -8,6 +8,7 @@
 import SwiftUI
 
 enum IIDXDJLevel: String, Codable {
+    case all = "Shared.All"
     case djAAA = "AAA"
     case djAA = "AA"
     case djA = "A"
