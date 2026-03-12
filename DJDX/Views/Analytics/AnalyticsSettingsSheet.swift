@@ -98,12 +98,18 @@ struct AnalyticsSettingsSheet: View {
                     }
                 }
             }
-            .navigationTitle("Analytics.Settings.Cards")
+            .navigationTitle("Analytics.Settings.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(.sharedDone) {
-                        dismiss()
+                    if #available(iOS 26.0, *) {
+                        Button(role: .confirm) {
+                            dismiss()
+                        }
+                    } else {
+                        Button(.sharedDone) {
+                            dismiss()
+                        }
                     }
                 }
             }

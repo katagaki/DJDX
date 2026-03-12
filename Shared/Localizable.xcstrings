@@ -675,6 +675,22 @@
         }
       }
     },
+    "Analytics.Settings.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Analytics View"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレー分析画面を編集"
+          }
+        }
+      }
+    },
     "Analytics.Settings.Cards" : {
       "localizations" : {
         "en" : {
