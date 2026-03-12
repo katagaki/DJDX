@@ -91,9 +91,9 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .newHardClear: return .pink
         case .newExHardClear: return .yellow
         case .newFailed: return .red
-        case .newAAA: return .cyan
-        case .newAA: return .cyan
-        case .newA: return .cyan
+        case .newAAA: return .orange
+        case .newAA: return .orange
+        case .newA: return .orange
         }
     }
 
@@ -126,16 +126,16 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         [
             .clearTypeOverall,
             .newHighScores,
+            .newAAA,
+            .newAA,
+            .newA,
             .newFullComboClear,
             .newClears,
             .newEasyClears,
             .newAssistClears,
             .newHardClear,
             .newExHardClear,
-            .newFailed,
-            .newAAA,
-            .newAA,
-            .newA
+            .newFailed
         ]
     }
 
