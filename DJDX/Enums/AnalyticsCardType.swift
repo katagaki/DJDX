@@ -11,6 +11,9 @@ import SwiftUI
 enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case clearTypeOverall
     case newHighScores
+    case newAAA
+    case newAA
+    case newA
     case newFullComboClear
     case newClears
     case newEasyClears
@@ -18,9 +21,6 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case newHardClear
     case newExHardClear
     case newFailed
-    case newAAA
-    case newAA
-    case newA
 
     var id: String { rawValue }
 
