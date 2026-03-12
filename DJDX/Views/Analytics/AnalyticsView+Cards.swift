@@ -9,91 +9,9 @@ import Charts
 import OrderedCollections
 import SwiftUI
 
-// MARK: - Settings Menu & Card Views
+// MARK: - Card Views
 
 extension AnalyticsView {
-
-    var settingsMenu: some View {
-        Menu {
-            Section("Analytics.Settings.Cards") {
-                ForEach(AnalyticsCardType.allCases.filter { !$0.isPinned }) { cardType in
-                    Toggle(isOn: Binding<Bool>(
-                        get: { visibleCards.contains(cardType) },
-                        set: { newValue in
-                            withAnimation(.snappy) {
-                                if newValue {
-                                    visibleCards.insert(cardType)
-                                } else {
-                                    visibleCards.remove(cardType)
-                                }
-                                saveVisibleCards()
-                            }
-                        }
-                    )) {
-                        Label {
-                            cardType.titleText
-                        } icon: {
-                            Image(systemName: cardType.systemImage)
-                        }
-                    }
-                }
-            }
-            ForEach(difficulties, id: \.self) { difficulty in
-                Section("LEVEL \(difficulty)") {
-                    ForEach(AnalyticsPerLevelCategory.allCases) { category in
-                        let cardID = PerLevelCardID(difficulty: difficulty, category: category)
-                        Toggle(isOn: Binding<Bool>(
-                            get: {
-                                visiblePerLevelCardSet.contains(cardID)
-                            },
-                            set: { newValue in
-                                withAnimation(.snappy) {
-                                    if newValue {
-                                        visiblePerLevelCardSet.insert(cardID)
-                                    } else {
-                                        visiblePerLevelCardSet.remove(cardID)
-                                    }
-                                    saveVisiblePerLevelCards()
-                                }
-                            }
-                        )) {
-                            Text(LocalizedStringKey(category.titleKey))
-                        }
-                    }
-                    Button("Analytics.Settings.HideAll", role: .destructive) {
-                        withAnimation(.snappy) {
-                            for category in AnalyticsPerLevelCategory.allCases {
-                                visiblePerLevelCardSet.remove(
-                                    PerLevelCardID(difficulty: difficulty, category: category)
-                                )
-                            }
-                            saveVisiblePerLevelCards()
-                        }
-                    }
-                }
-                .menuActionDismissBehavior(.disabled)
-            }
-            Section {
-                Button("Analytics.Settings.ResetAll", role: .destructive) {
-                    withAnimation(.snappy) {
-                        cardOrder = AnalyticsCardType.defaultOrder
-                        visibleCards = AnalyticsCardType.defaultVisible
-                        perLevelCardOrder = PerLevelCardID.defaultOrder
-                        visiblePerLevelCardSet = PerLevelCardID.defaultVisible
-                        saveCardOrder()
-                        saveVisibleCards()
-                        savePerLevelCardOrder()
-                        saveVisiblePerLevelCards()
-                    }
-                }
-            }
-        } label: {
-            Image(systemName: "pencil")
-        }
-        .menuActionDismissBehavior(.disabled)
-    }
-
-    // MARK: - Card Views
 
     @ViewBuilder
     func cardView(for cardType: AnalyticsCardType) -> some View {

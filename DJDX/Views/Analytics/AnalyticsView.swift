@@ -65,6 +65,7 @@ struct AnalyticsView: View {
     @State var newAA: [NewDJLevelEntry] = []
     @State var newA: [NewDJLevelEntry] = []
 
+    @State var isShowingSettings: Bool = false
     @State var dataState: DataState = .initializing
 
     let fetcher = DataFetcher()
@@ -177,13 +178,29 @@ struct AnalyticsView: View {
                             Label("Analytics.Settings.EditCards",
                                   systemImage: "arrow.up.arrow.down")
                         }
-                        settingsMenu
+                        Button {
+                            isShowingSettings = true
+                        } label: {
+                            Image(systemName: "pencil")
+                        }
                     }
                 }
             }
             .refreshable {
                 await reload()
                 debugPrint("Reloaded from swipe to refresh")
+            }
+            .sheet(isPresented: $isShowingSettings) {
+                AnalyticsSettingsSheet(
+                    visibleCards: $visibleCards,
+                    cardOrder: $cardOrder,
+                    visiblePerLevelCardSet: $visiblePerLevelCardSet,
+                    perLevelCardOrder: $perLevelCardOrder,
+                    onSaveVisibleCards: saveVisibleCards,
+                    onSaveVisiblePerLevelCards: saveVisiblePerLevelCards,
+                    onSaveCardOrder: saveCardOrder,
+                    onSavePerLevelCardOrder: savePerLevelCardOrder
+                )
             }
             .task {
                 loadCardOrder()
