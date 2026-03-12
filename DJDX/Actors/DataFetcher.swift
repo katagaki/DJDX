@@ -212,6 +212,27 @@ actor DataFetcher {
                     }
                 }
 
+                if filters.djLevel != .all {
+                    let isDifficultyFilterActive = filters.difficulty != .all
+                    let isLevelFilterActive = filters.level != .all
+                    if isDifficultyFilterActive && !isLevelFilterActive,
+                       songRecord.score(for: filters.difficulty)?.djLevel != filters.djLevel.rawValue {
+                        return true
+                    } else if isDifficultyFilterActive && isLevelFilterActive,
+                              songRecord.score(for: filters.level)?.djLevel != filters.djLevel.rawValue {
+                        return true
+                    } else if isDifficultyFilterActive && isLevelFilterActive,
+                              songRecord.score(for: filters.difficulty)?.level ==
+                                songRecord.score(for: filters.level)?.level,
+                              songRecord.score(for: filters.difficulty)?.djLevel != filters.djLevel.rawValue {
+                        return true
+                    } else {
+                        if !songRecord.scores().contains(where: { $0.djLevel == filters.djLevel.rawValue }) {
+                            return true
+                        }
+                    }
+                }
+
                 return false
             }
 

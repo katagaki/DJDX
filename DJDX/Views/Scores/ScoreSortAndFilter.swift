@@ -13,6 +13,7 @@ struct ScoreSortAndFilter: View {
     @Binding var difficultyToShow: IIDXDifficulty
     @Binding var levelToShow: IIDXLevel
     @Binding var clearTypeToShow: IIDXClearType
+    @Binding var djLevelToShow: IIDXDJLevel
     @Binding var versionToShow: String
     @Binding var sortMode: SortMode
     @Binding var sortOrder: SortOrder
@@ -93,6 +94,15 @@ struct ScoreSortAndFilter: View {
                             .tag(sortClearType)
                     }
                 }
+                Picker("Shared.IIDX.DJLevel", selection: $djLevelToShow) {
+                    Text(.sharedAll)
+                        .tag(IIDXDJLevel.all)
+                    Divider()
+                    ForEach(IIDXDJLevel.sorted, id: \.self) { sortDJLevel in
+                        Text(verbatim: sortDJLevel.rawValue)
+                            .tag(sortDJLevel)
+                    }
+                }
                 Picker(.sharedVersion, selection: $versionToShow) {
                     Text(.sharedAll)
                         .tag("")
@@ -107,6 +117,7 @@ struct ScoreSortAndFilter: View {
                     difficultyToShow = .all
                     levelToShow = .all
                     clearTypeToShow = .all
+                    djLevelToShow = .all
                     versionToShow = ""
                     sortMode = .title
                     sortOrder = .ascending

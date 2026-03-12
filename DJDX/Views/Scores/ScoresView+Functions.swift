@@ -22,6 +22,7 @@ extension ScoresView {
                                            level: levelToShow,
                                            difficulty: difficultyToShow,
                                            clearType: clearTypeToShow,
+                                           djLevel: djLevelToShow,
                                            version: versionToShow),
                     sortOptions: SortOptions(mode: sortMode, order: sortOrder)
                 )
