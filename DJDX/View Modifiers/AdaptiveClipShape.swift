@@ -11,10 +11,10 @@ struct AdaptiveClipShape: ViewModifier {
     func body(content: Content) -> some View {
         if #available(iOS 26.0, *) {
             content
-                .clipShape(.containerRelative)
+                .clipShape(.rect(cornerRadius: 12.0))
         } else {
             content
-                .clipShape(.rect(cornerRadius: 16.0))
+                .clipShape(.rect(cornerRadius: 12.0))
         }
     }
 }

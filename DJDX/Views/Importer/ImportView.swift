@@ -97,9 +97,9 @@ struct ImportView: View {
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 if #available(iOS 26.0, *) {
                     bottomBar()
-                        .padding(.vertical, 2.0)
-                        .clipShape(.containerRelative)
-                        .glassEffect(.regular, in: .containerRelative)
+                        .padding(.top, 2.0)
+                        .clipShape(.rect(cornerRadius: 24.0))
+                        .glassEffect(.regular, in: .rect(cornerRadius: 24.0))
                         .padding()
                 } else {
                     TabBarAccessory(placement: .bottom) {
@@ -265,7 +265,7 @@ struct ImportView: View {
                 }
             }
         }
-        .padding()
+        .padding(12.0)
     }
     // swiftlint:enable function_body_length
 }
