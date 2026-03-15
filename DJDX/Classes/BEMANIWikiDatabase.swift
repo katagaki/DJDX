@@ -36,10 +36,14 @@ final class BEMANIWikiDatabase: Sendable {
     // MARK: - Initialization
 
     private init() {
-        let containerURL = FileManager.default.containerURL(
+        if let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: SharedContainer.appGroupID
-        )!
-        databasePath = containerURL.appendingPathComponent("ExD_BEMANIWiki.db").path
+        ) {
+            databasePath = containerURL.appendingPathComponent("ExD_BEMANIWiki.db").path
+        } else {
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            databasePath = documentsURL.appendingPathComponent("ExD_BEMANIWiki.db").path
+        }
         createTablesIfNeeded()
     }
 

@@ -38,7 +38,13 @@ public class CSwiftV {
     /// - Parameter headers: The array of headers from the file. If not included, it will be populated with the ones from the first line
     public init(with string: String, separator: String = ",", headers: [String]? = nil) {
         var parsedLines = CSwiftV.records(from: string.replacingOccurrences(of: "\r\n", with: "\n")).map { CSwiftV.cells(forRow: $0, separator: separator) }
-        self.headers = headers ?? parsedLines.removeFirst()
+        if let headers {
+            self.headers = headers
+        } else if !parsedLines.isEmpty {
+            self.headers = parsedLines.removeFirst()
+        } else {
+            self.headers = []
+        }
         rows = parsedLines
         columnCount = self.headers.count
 

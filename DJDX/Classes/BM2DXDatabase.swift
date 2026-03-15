@@ -32,10 +32,14 @@ final class BM2DXDatabase: Sendable {
     // MARK: - Initialization
 
     private init() {
-        let containerURL = FileManager.default.containerURL(
+        if let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: SharedContainer.appGroupID
-        )!
-        databasePath = containerURL.appendingPathComponent("ExD_BM2DX.db").path
+        ) {
+            databasePath = containerURL.appendingPathComponent("ExD_BM2DX.db").path
+        } else {
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            databasePath = documentsURL.appendingPathComponent("ExD_BM2DX.db").path
+        }
         createTablesIfNeeded()
     }
 
