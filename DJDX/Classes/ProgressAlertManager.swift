@@ -9,13 +9,14 @@ import Foundation
 import SwiftUI
 
 @Observable
+@MainActor
 class ProgressAlertManager {
     var isShowing: Bool = false
     var title: String = ""
     var message: String = ""
     var percentage: Int = 0
 
-    func show(title: String, message: String, completion: @escaping () -> Void = {}) {
+    func show(title: String, message: String, completion: @escaping @MainActor () -> Void = {}) {
         self.title = title
         self.message = message
         percentage = 0
@@ -36,12 +37,10 @@ class ProgressAlertManager {
         }
     }
 
-    @MainActor
     func updateProgress(_ percentage: Int) {
         self.percentage = percentage
     }
 
-    @MainActor
     func updateTitle(_ title: LocalizedStringResource) {
         self.title = String(localized: title)
     }
