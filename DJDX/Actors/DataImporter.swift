@@ -310,6 +310,7 @@ actor DataImporter {
         _ = try? database.run(PlayDataDatabase.towerEntryTable.delete())
 
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "yyyy/MM/dd"
 
         try? database.transaction {
