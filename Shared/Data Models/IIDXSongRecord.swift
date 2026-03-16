@@ -63,6 +63,7 @@ final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
 
         if let lastPlayDate = csvRowData["最終プレー日時"] as? String {
             let dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
             self.lastPlayDate = dateFormatter.date(from: lastPlayDate) ?? .distantPast
         } else {
