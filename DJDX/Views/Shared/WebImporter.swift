@@ -67,7 +67,8 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
-        webView.layer.opacity = 0.0
+        // DEBUG: Always show web view during import (revert this line to opacity = 0.0)
+        webView.layer.opacity = 1.0
         webView.load(URLRequest(url: iidxVersion.loginPageRedirectURL()))
         #if DEBUG
         webView.isInspectable = true
@@ -197,7 +198,8 @@ document.getElementById('score_data').value
             let urlString = webViewURL.absoluteString
             webView.evaluateJavaScript(self.cleanupJS) { _, _ in
                 if urlString.starts(with: self.version.downloadPageURL().absoluteString) {
-                    webView.layer.opacity = 0.0
+                    // DEBUG: Always show web view during import (revert this line to opacity = 0.0)
+                    webView.layer.opacity = 1.0
                     webView.isUserInteractionEnabled = false
                     if !self.waitingForDownloadPageFormSubmit {
                         switch self.importMode {
@@ -223,7 +225,8 @@ document.getElementById('score_data').value
                         self.waitingForDownloadPageFormSubmit = false
                     }
                 } else if urlString.starts(with: self.version.errorPageURL().absoluteString) {
-                    webView.layer.opacity = 0.0
+                    // DEBUG: Always show web view during import (revert this line to opacity = 0.0)
+                    webView.layer.opacity = 1.0
                     Task { [urlString] in
                         await MainActor.run {
                             if urlString.hasSuffix("?err=1") {
