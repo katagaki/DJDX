@@ -16,6 +16,10 @@ struct WebImporter: View {
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
 
+    // DEBUG: Address bar state for debugging (remove this block to revert)
+    @State var webView = WKWebView()
+    @State var addressBarText: String = ""
+
     init(
         importToDate: Binding<Date> = .constant(Date()),
         importMode: IIDXImportMode,
@@ -32,6 +36,8 @@ struct WebImporter: View {
 
     var body: some View {
         WebViewForImporter(
+            webView: $webView,
+            currentURL: $addressBarText,
             importToDate: $importToDate,
             importMode: $importMode,
             isAutoImportFailed: $isAutoImportFailed,
@@ -45,6 +51,26 @@ struct WebImporter: View {
         .background {
             ProgressView("Shared.Loading")
         }
+        // DEBUG: Address bar overlay for debugging (remove this block to revert)
+        .overlay(alignment: .top) {
+            HStack(spacing: 4) {
+                TextField("URL", text: $addressBarText)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(size: 12))
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.URL)
+                Button("Go") {
+                    if let url = URL(string: addressBarText) {
+                        webView.load(URLRequest(url: url))
+                    }
+                }
+                .font(.system(size: 12, weight: .semibold))
+                .buttonStyle(.borderedProminent)
+            }
+            .padding(8)
+            .background(.bar)
+        }
         .padding(0.0)
     }
 }
@@ -54,6 +80,10 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
+    // DEBUG: Accept webView and currentURL from parent (revert to `let webView = WKWebView()` and remove currentURL)
+    @Binding var webView: WKWebView
+    @Binding var currentURL: String
+
     @Binding var importToDate: Date
     @Binding var importMode: IIDXImportMode
     @Binding var isAutoImportFailed: Bool
@@ -62,8 +92,6 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     @State var observers = [NSKeyValueObservation]()
 
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
-
-    let webView = WKWebView()
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
@@ -77,7 +105,12 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     }
 
     func makeCoordinator() -> CoordinatorForImporter {
-        Coordinator(delegate: self, importMode: importMode, version: iidxVersion)
+        Coordinator(delegate: self, importMode: importMode, version: iidxVersion) { url in
+            // DEBUG: Update address bar with current URL (remove this closure to revert)
+            Task { @MainActor in
+                currentURL = url
+            }
+        }
     }
 
     func updateUIView(_: WKWebView, context _: Context) {
@@ -178,17 +211,21 @@ document.getElementById('score_data').value
     var delegate: UpdateScoreDataDelegate
     var importMode: IIDXImportMode
     var version: IIDXVersion
+    // DEBUG: Callback to update address bar URL (remove this property to revert)
+    var onURLChange: ((String) -> Void)?
 
     var waitingForDownloadPageFormSubmit: Bool = false
 
     init(
         delegate: UpdateScoreDataDelegate,
         importMode: IIDXImportMode = .single,
-        version: IIDXVersion
+        version: IIDXVersion,
+        onURLChange: ((String) -> Void)? = nil
     ) {
         self.delegate = delegate
         self.importMode = importMode
         self.version = version
+        self.onURLChange = onURLChange
         super.init()
     }
 
@@ -196,6 +233,8 @@ document.getElementById('score_data').value
     func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
         if let webViewURL = webView.url {
             let urlString = webViewURL.absoluteString
+            // DEBUG: Update address bar (remove this line to revert)
+            self.onURLChange?(urlString)
             webView.evaluateJavaScript(self.cleanupJS) { _, _ in
                 if urlString.starts(with: self.version.downloadPageURL().absoluteString) {
                     // DEBUG: Always show web view during import (revert this line to opacity = 0.0)
@@ -252,6 +291,10 @@ document.getElementById('score_data').value
     }
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        // DEBUG: Update address bar on navigation start (remove this block to revert)
+        if let url = webView.url?.absoluteString {
+            self.onURLChange?(url)
+        }
         // Sync WebView cookie store with URLSession cookie store
         let webViewCookieStore = webView.configuration.websiteDataStore.httpCookieStore
         let nativeCookieStorage = HTTPCookieStorage.shared
