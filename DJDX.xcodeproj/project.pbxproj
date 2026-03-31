@@ -332,7 +332,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 33.2.2;
+				MARKETING_VERSION = 33.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.Widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -363,7 +363,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 33.2.2;
+				MARKETING_VERSION = 33.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.Widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -529,7 +529,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 33.2.2;
+				MARKETING_VERSION = 33.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -569,7 +569,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 33.2.2;
+				MARKETING_VERSION = 33.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
