@@ -11,7 +11,7 @@ import SwiftUI
 extension ScoresView {
 
     func reloadDisplay() {
-        withAnimation(.snappy.speed(2.0)) {
+        withAnimation(.smooth.speed(2.0)) {
             dataState = .loading
         } completion: {
             Task.detached {
@@ -30,7 +30,7 @@ extension ScoresView {
                 let songNoteCounts = await actor.songNoteCounts
 
                 await MainActor.run {
-                    withAnimation(.snappy.speed(2.0)) {
+                    withAnimation(.smooth.speed(2.0)) {
                         if let songRecords {
                             // Calculate clear rates
                             let noteCounts: [String: IIDXNoteCount] = songCompactTitles
