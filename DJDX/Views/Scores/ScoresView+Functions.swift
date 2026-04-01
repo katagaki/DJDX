@@ -89,10 +89,23 @@ extension ScoresView {
         }
     }
 
-    func scoreRate(for songRecord: IIDXSongRecord, of level: IIDXLevel,
-                   or difficulty: IIDXDifficulty) -> Float? {
-        return songRecordClearRates[songRecord]?[
-            songRecord.level(for: level, or: difficulty)]
+    struct SongLevelEntry {
+        let songRecord: IIDXSongRecord
+        let level: IIDXLevel
+        let score: IIDXLevelScore
+        var id: String { "\(songRecord.title)_\(level.rawValue)" }
+    }
+
+    func levelEntries(from records: [IIDXSongRecord]) -> [SongLevelEntry] {
+        records.flatMap { record in
+            Self.allLevels.compactMap { level, keyPath in
+                let score = record[keyPath: keyPath]
+                guard score.difficulty > 0 else { return nil }
+                if level == .beginner && isBeginnerLevelHidden { return nil }
+                guard levelsToShow.isEmpty || levelsToShow.contains(level) else { return nil }
+                return SongLevelEntry(songRecord: record, level: level, score: score)
+            }
+        }
     }
 
     func noteCount(for songRecord: IIDXSongRecord, of level: IIDXLevel) -> Int? {

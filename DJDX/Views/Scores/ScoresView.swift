@@ -43,6 +43,8 @@ struct ScoresView: View {
 
     let actor = DataFetcher()
 
+    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+
     @Namespace var scoresNamespace
 
     var effectiveLevel: IIDXLevel {
@@ -52,6 +54,14 @@ struct ScoresView: View {
     var effectiveDifficulty: IIDXDifficulty {
         difficultiesToShow.count == 1 ? difficultiesToShow.first! : .all
     }
+
+    private static let allLevels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
+        (.beginner, \.beginnerScore),
+        (.normal, \.normalScore),
+        (.hyper, \.hyperScore),
+        (.another, \.anotherScore),
+        (.leggendaria, \.leggendariaScore)
+    ]
 
     var conditionsForReload: [String] {
         [isShowingOnlyPlayDataWithScores.description,
@@ -71,20 +81,17 @@ struct ScoresView: View {
     var body: some View {
         NavigationStack(path: $navigationManager[.scores]) {
             List {
-                ForEach((searchResults != nil ? searchResults ?? [] : songRecords ?? []),
-                        id: \.title) { songRecord in
+                ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
+                        id: \.id) { entry in
                     Button {
-                        navigationManager.push(.scoreViewer(songRecord: songRecord), for: .scores)
+                        navigationManager.push(.scoreViewer(songRecord: entry.songRecord), for: .scores)
                     } label: {
                         ScoreRow(
                             namespace: scoresNamespace,
-                            songRecord: songRecord,
-                            scoreRate: scoreRate(for: songRecord,
-                                                 of: effectiveLevel,
-                                                 or: effectiveDifficulty),
-                            levelToShow: effectiveLevel,
-                            difficultyToShow: effectiveDifficulty,
-                            levelsToShow: levelsToShow
+                            songRecord: entry.songRecord,
+                            level: entry.level,
+                            score: entry.score,
+                            scoreRate: songRecordClearRates[entry.songRecord]?[entry.level]
                         )
                     }
                     .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 0.0))
