@@ -116,83 +116,98 @@ struct ScoreFilterSheet: View {
     var body: some View {
         NavigationStack {
             List {
-                Section(.sharedLevel) {
-
-                    ForEach(IIDXLevel.sorted, id: \.self) { level in
-                        SelectableRow(
-                            isSelected: levelsToShow.contains(level)
-                        ) {
-                            Text(LocalizedStringKey(level.rawValue))
-                        } action: {
-                            if levelsToShow.contains(level) {
-                                levelsToShow.remove(level)
-                            } else {
-                                levelsToShow.insert(level)
+                Section(.sharedFilter) {
+                    DisclosureGroup {
+                        ForEach(IIDXLevel.sorted, id: \.self) { level in
+                            SelectableRow(
+                                isSelected: levelsToShow.contains(level)
+                            ) {
+                                Text(LocalizedStringKey(level.rawValue))
+                            } action: {
+                                if levelsToShow.contains(level) {
+                                    levelsToShow.remove(level)
+                                } else {
+                                    levelsToShow.insert(level)
+                                }
                             }
                         }
+                    } label: {
+                        FilterDisclosureLabel(.sharedLevel, count: levelsToShow.count)
                     }
-                }
-                Section(.sharedDifficulty) {
-                    ForEach(IIDXDifficulty.sorted, id: \.self) { difficulty in
-                        SelectableRow(
-                            isSelected: difficultiesToShow.contains(difficulty)
-                        ) {
-                            Text("LEVEL \(difficulty.rawValue)")
-                        } action: {
-                            if difficultiesToShow.contains(difficulty) {
-                                difficultiesToShow.remove(difficulty)
-                            } else {
-                                difficultiesToShow.insert(difficulty)
+                    DisclosureGroup {
+                        ForEach(IIDXDifficulty.sorted, id: \.self) { difficulty in
+                            SelectableRow(
+                                isSelected: difficultiesToShow.contains(difficulty)
+                            ) {
+                                Text("LEVEL \(difficulty.rawValue)")
+                            } action: {
+                                if difficultiesToShow.contains(difficulty) {
+                                    difficultiesToShow.remove(difficulty)
+                                } else {
+                                    difficultiesToShow.insert(difficulty)
+                                }
                             }
                         }
+                    } label: {
+                        FilterDisclosureLabel(.sharedDifficulty, count: difficultiesToShow.count)
                     }
-                }
-                Section("Shared.IIDX.ClearType") {
-                    ForEach(IIDXClearType.sorted, id: \.self) { clearType in
-                        SelectableRow(
-                            isSelected: clearTypesToShow.contains(clearType)
-                        ) {
-                            Text(LocalizedStringKey(clearType.rawValue))
-                        } action: {
-                            if clearTypesToShow.contains(clearType) {
-                                clearTypesToShow.remove(clearType)
-                            } else {
-                                clearTypesToShow.insert(clearType)
+                    DisclosureGroup {
+                        ForEach(IIDXClearType.sorted, id: \.self) { clearType in
+                            SelectableRow(
+                                isSelected: clearTypesToShow.contains(clearType)
+                            ) {
+                                Text(LocalizedStringKey(clearType.rawValue))
+                            } action: {
+                                if clearTypesToShow.contains(clearType) {
+                                    clearTypesToShow.remove(clearType)
+                                } else {
+                                    clearTypesToShow.insert(clearType)
+                                }
                             }
                         }
+                    } label: {
+                        FilterDisclosureLabel(
+                            LocalizedStringResource("Shared.IIDX.ClearType"),
+                            count: clearTypesToShow.count
+                        )
                     }
-                }
-                Section("Shared.IIDX.DJLevel") {
-                    ForEach(IIDXDJLevel.sorted.reversed(), id: \.self) { djLevel in
-                        SelectableRow(
-                            isSelected: djLevelsToShow.contains(djLevel)
-                        ) {
-                            Text(verbatim: djLevel.rawValue)
-                        } action: {
-                            if djLevelsToShow.contains(djLevel) {
-                                djLevelsToShow.remove(djLevel)
-                            } else {
-                                djLevelsToShow.insert(djLevel)
+                    DisclosureGroup {
+                        ForEach(IIDXDJLevel.sorted.reversed(), id: \.self) { djLevel in
+                            SelectableRow(
+                                isSelected: djLevelsToShow.contains(djLevel)
+                            ) {
+                                Text(verbatim: djLevel.rawValue)
+                            } action: {
+                                if djLevelsToShow.contains(djLevel) {
+                                    djLevelsToShow.remove(djLevel)
+                                } else {
+                                    djLevelsToShow.insert(djLevel)
+                                }
                             }
                         }
+                    } label: {
+                        FilterDisclosureLabel(
+                            LocalizedStringResource("Shared.IIDX.DJLevel"),
+                            count: djLevelsToShow.count
+                        )
                     }
-                }
-                Section(.sharedVersion) {
-                    ForEach(IIDXVersion.allCases.reversed(), id: \.self) { version in
-                        SelectableRow(
-                            isSelected: versionsToShow.contains(version.marketingName)
-                        ) {
-                            Text(verbatim: version.marketingName)
-                        } action: {
-                            if versionsToShow.contains(version.marketingName) {
-                                versionsToShow.remove(version.marketingName)
-                            } else {
-                                versionsToShow.insert(version.marketingName)
+                    DisclosureGroup {
+                        ForEach(IIDXVersion.allCases.reversed(), id: \.self) { version in
+                            SelectableRow(
+                                isSelected: versionsToShow.contains(version.marketingName)
+                            ) {
+                                Text(verbatim: version.marketingName)
+                            } action: {
+                                if versionsToShow.contains(version.marketingName) {
+                                    versionsToShow.remove(version.marketingName)
+                                } else {
+                                    versionsToShow.insert(version.marketingName)
+                                }
                             }
                         }
+                    } label: {
+                        FilterDisclosureLabel(.sharedVersion, count: versionsToShow.count)
                     }
-                }
-                Section {
                     Button(.sharedFilterResetAll, systemImage: "arrow.clockwise") {
                         isSystemChangingFilterAndSort = true
                         difficultiesToShow = []
@@ -233,6 +248,31 @@ struct ScoreFilterSheet: View {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+private struct FilterDisclosureLabel: View {
+
+    let title: LocalizedStringResource
+    let count: Int
+
+    init(_ title: LocalizedStringResource, count: Int) {
+        self.title = title
+        self.count = count
+    }
+
+    var body: some View {
+        HStack {
+            Text(title)
+            Spacer()
+            if count > 0 {
+                Text(verbatim: "\(count)")
+                    .foregroundStyle(.secondary)
+            } else {
+                Text(.sharedAll)
+                    .foregroundStyle(.secondary)
             }
         }
     }
