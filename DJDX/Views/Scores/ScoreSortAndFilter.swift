@@ -130,13 +130,13 @@ struct ScoreFilterSheet: View {
                         label: { Text("LEVEL \($0.rawValue)") }
                     )
                     multiSelectMenu(
-                        "Shared.IIDX.ClearType",
+                        .sharedIIDXClearType,
                         items: IIDXClearType.sorted,
                         selection: $clearTypesToShow,
                         label: { Text(LocalizedStringKey($0.rawValue)) }
                     )
                     multiSelectMenu(
-                        "Shared.IIDX.DJLevel",
+                        .sharedIIDXDJLevel,
                         items: IIDXDJLevel.sorted.reversed(),
                         selection: $djLevelsToShow,
                         label: { Text(verbatim: $0.rawValue) }
@@ -194,7 +194,7 @@ struct ScoreFilterSheet: View {
     // MARK: Multi-Select Menu (Hashable items)
 
     private func multiSelectMenu<Item: Hashable>(
-        _ title: LocalizedStringKey,
+        _ title: LocalizedStringResource,
         items: [Item],
         selection: Binding<Set<Item>>,
         label: @escaping (Item) -> Text
@@ -236,7 +236,7 @@ struct ScoreFilterSheet: View {
     // MARK: Multi-Select Menu (custom ID key path for non-Hashable display)
 
     private func multiSelectMenu<Item: Hashable, ID: Hashable>(
-        _ title: LocalizedStringKey,
+        _ title: LocalizedStringResource,
         items: [Item],
         selection: Binding<Set<ID>>,
         id keyPath: KeyPath<Item, ID>,
