@@ -48,9 +48,9 @@ struct ScoreRow: View {
                 case "CLEAR": Color.cyan
                 case "EASY CLEAR": Color.green
                 case "ASSIST CLEAR": Color.purple
-                case "HARD CLEAR": Color.red
+                case "HARD CLEAR": colorScheme == .dark ? Color.white : Color.gray
                 case "EX HARD CLEAR": Color.yellow
-                case "FAILED": Color.gray
+                case "FAILED": Color.red
                 default: Color.clear
                 }
             }
