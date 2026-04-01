@@ -55,7 +55,7 @@ struct ScoresView: View {
         difficultiesToShow.count == 1 ? difficultiesToShow.first! : .all
     }
 
-    private static let allLevels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
+    static let allLevels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
         (.beginner, \.beginnerScore),
         (.normal, \.normalScore),
         (.hyper, \.hyperScore),
