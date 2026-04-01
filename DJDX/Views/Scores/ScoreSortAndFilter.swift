@@ -111,6 +111,8 @@ struct ScoreFilterSheet: View {
     @Binding var isLastPlayDateVisible: Bool
     var onReset: () -> Void
 
+    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -118,7 +120,8 @@ struct ScoreFilterSheet: View {
             List {
                 Section(.sharedFilter) {
                     DisclosureGroup {
-                        ForEach(IIDXLevel.sorted, id: \.self) { level in
+                        ForEach(IIDXLevel.sorted.filter({ !isBeginnerLevelHidden || $0 != .beginner }),
+                                id: \.self) { level in
                             SelectableRow(
                                 isSelected: levelsToShow.contains(level)
                             ) {
