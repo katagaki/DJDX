@@ -26,6 +26,7 @@ struct ScoreRow: View {
 
     var levelToShow: IIDXLevel
     var difficultyToShow: IIDXDifficulty
+    var levelsToShow: Set<IIDXLevel>
 
     var score: IIDXLevelScore?
 
@@ -33,12 +34,14 @@ struct ScoreRow: View {
          songRecord: IIDXSongRecord,
          scoreRate: Float?,
          levelToShow: IIDXLevel,
-         difficultyToShow: IIDXDifficulty) {
+         difficultyToShow: IIDXDifficulty,
+         levelsToShow: Set<IIDXLevel> = []) {
         self.namespace = namespace
         self.songRecord = songRecord
         self.scoreRate = scoreRate
         self.levelToShow = levelToShow
         self.difficultyToShow = difficultyToShow
+        self.levelsToShow = levelsToShow
         let scores: [IIDXLevelScore?] = [
             songRecord.score(for: levelToShow),
             songRecord.score(for: difficultyToShow)
@@ -181,7 +184,8 @@ struct ScoreRow: View {
             if isLevelVisible && levelToShow == .all && difficultyToShow == .all {
                 HStack(alignment: .center, spacing: 8.0) {
                     Spacer(minLength: 0.0)
-                    IIDXLevelShowcase(songRecord: songRecord)
+                    IIDXLevelShowcase(songRecord: songRecord,
+                                      visibleLevels: levelsToShow)
                 }
                 .padding([.bottom], 8.0)
             }

@@ -83,7 +83,8 @@ struct ScoresView: View {
                                                  of: effectiveLevel,
                                                  or: effectiveDifficulty),
                             levelToShow: effectiveLevel,
-                            difficultyToShow: effectiveDifficulty
+                            difficultyToShow: effectiveDifficulty,
+                            levelsToShow: levelsToShow
                         )
                     }
                     .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 0.0))
