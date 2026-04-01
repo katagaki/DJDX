@@ -130,13 +130,13 @@ struct ScoreFilterSheet: View {
                         label: { Text("LEVEL \($0.rawValue)") }
                     )
                     multiSelectMenu(
-                        .sharedIIDXClearType,
+                        LocalizedStringResource("Shared.IIDX.ClearType"),
                         items: IIDXClearType.sorted,
                         selection: $clearTypesToShow,
                         label: { Text(LocalizedStringKey($0.rawValue)) }
                     )
                     multiSelectMenu(
-                        .sharedIIDXDJLevel,
+                        LocalizedStringResource("Shared.IIDX.DJLevel"),
                         items: IIDXDJLevel.sorted.reversed(),
                         selection: $djLevelsToShow,
                         label: { Text(verbatim: $0.rawValue) }
