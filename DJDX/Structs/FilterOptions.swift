@@ -8,19 +8,9 @@
 struct FilterOptions: Equatable {
     var playType: IIDXPlayType
     var onlyPlayDataWithScores: Bool
-    var level: IIDXLevel
-    var difficulty: IIDXDifficulty
-    var clearType: IIDXClearType
-    var djLevel: IIDXDJLevel
-    var version: String
-
-    static func == (lhs: FilterOptions, rhs: FilterOptions) -> Bool {
-        lhs.playType == rhs.playType &&
-        lhs.onlyPlayDataWithScores == rhs.onlyPlayDataWithScores &&
-        lhs.level == rhs.level &&
-        lhs.difficulty == rhs.difficulty &&
-        lhs.clearType == rhs.clearType &&
-        lhs.djLevel == rhs.djLevel &&
-        lhs.version == rhs.version
-    }
+    var levels: Set<IIDXLevel>
+    var difficulties: Set<IIDXDifficulty>
+    var clearTypes: Set<IIDXClearType>
+    var djLevels: Set<IIDXDJLevel>
+    var versions: Set<String>
 }

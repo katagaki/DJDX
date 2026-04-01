@@ -19,11 +19,11 @@ extension ScoresView {
                     on: playDataDate,
                     filters: FilterOptions(playType: playTypeToShow,
                                            onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
-                                           level: levelToShow,
-                                           difficulty: difficultyToShow,
-                                           clearType: clearTypeToShow,
-                                           djLevel: djLevelToShow,
-                                           version: versionToShow),
+                                           levels: levelsToShow,
+                                           difficulties: difficultiesToShow,
+                                           clearTypes: clearTypesToShow,
+                                           djLevels: djLevelsToShow,
+                                           versions: versionsToShow),
                     sortOptions: SortOptions(mode: sortMode, order: sortOrder)
                 )
                 let songCompactTitles = await actor.songCompactTitles()
@@ -89,7 +89,8 @@ extension ScoresView {
         }
     }
 
-    func scoreRate(for songRecord: IIDXSongRecord, of level: IIDXLevel, or difficulty: IIDXDifficulty) -> Float? {
+    func scoreRate(for songRecord: IIDXSongRecord, of level: IIDXLevel,
+                   or difficulty: IIDXDifficulty) -> Float? {
         return songRecordClearRates[songRecord]?[
             songRecord.level(for: level, or: difficulty)]
     }

@@ -15,11 +15,11 @@ struct ScoresView: View {
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: true, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
-    @AppStorage(wrappedValue: .all, "ScoresView.DifficultyFilter") var difficultyToShow: IIDXDifficulty
-    @AppStorage(wrappedValue: .all, "ScoresView.LevelFilter") var levelToShow: IIDXLevel
-    @AppStorage(wrappedValue: .all, "ScoresView.ClearTypeFilter") var clearTypeToShow: IIDXClearType
-    @AppStorage(wrappedValue: .all, "ScoresView.DJLevelFilter") var djLevelToShow: IIDXDJLevel
-    @AppStorage(wrappedValue: "", "ScoresView.VersionFilter") var versionToShow: String
+    @AppStorage(wrappedValue: [], "ScoresView.DifficultyFilters") var difficultiesToShow: Set<IIDXDifficulty>
+    @AppStorage(wrappedValue: [], "ScoresView.LevelFilters") var levelsToShow: Set<IIDXLevel>
+    @AppStorage(wrappedValue: [], "ScoresView.ClearTypeFilters") var clearTypesToShow: Set<IIDXClearType>
+    @AppStorage(wrappedValue: [], "ScoresView.DJLevelFilters") var djLevelsToShow: Set<IIDXDJLevel>
+    @AppStorage(wrappedValue: [], "ScoresView.VersionFilters") var versionsToShow: Set<String>
     @AppStorage(wrappedValue: .lastPlayDate, "ScoresView.SortOrder") var sortMode: SortMode
     @AppStorage(wrappedValue: .descending, "ScoresView.SortDirection") var sortOrder: SortOrder
 
@@ -45,13 +45,21 @@ struct ScoresView: View {
 
     @Namespace var scoresNamespace
 
+    var effectiveLevel: IIDXLevel {
+        levelsToShow.count == 1 ? levelsToShow.first! : .all
+    }
+
+    var effectiveDifficulty: IIDXDifficulty {
+        difficultiesToShow.count == 1 ? difficultiesToShow.first! : .all
+    }
+
     var conditionsForReload: [String] {
         [isShowingOnlyPlayDataWithScores.description,
-         String(difficultyToShow.rawValue),
-         levelToShow.rawValue,
-         clearTypeToShow.rawValue,
-         djLevelToShow.rawValue,
-         versionToShow,
+         difficultiesToShow.map { String($0.rawValue) }.sorted().joined(separator: ","),
+         levelsToShow.map { $0.rawValue }.sorted().joined(separator: ","),
+         clearTypesToShow.map { $0.rawValue }.sorted().joined(separator: ","),
+         djLevelsToShow.map { $0.rawValue }.sorted().joined(separator: ","),
+         versionsToShow.sorted().joined(separator: ","),
          sortMode.rawValue,
          sortOrder.rawValue]
     }
@@ -71,9 +79,11 @@ struct ScoresView: View {
                         ScoreRow(
                             namespace: scoresNamespace,
                             songRecord: songRecord,
-                            scoreRate: scoreRate(for: songRecord, of: levelToShow, or: difficultyToShow),
-                            levelToShow: $levelToShow,
-                            difficultyToShow: $difficultyToShow
+                            scoreRate: scoreRate(for: songRecord,
+                                                 of: effectiveLevel,
+                                                 or: effectiveDifficulty),
+                            levelToShow: effectiveLevel,
+                            difficultyToShow: effectiveDifficulty
                         )
                     }
                     .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 0.0))
@@ -124,11 +134,11 @@ struct ScoresView: View {
                     } else {
                         ScoreSortAndFilter(
                             isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                            difficultyToShow: $difficultyToShow.animation(.snappy.speed(2.0)),
-                            levelToShow: $levelToShow.animation(.snappy.speed(2.0)),
-                            clearTypeToShow: $clearTypeToShow.animation(.snappy.speed(2.0)),
-                            djLevelToShow: $djLevelToShow.animation(.snappy.speed(2.0)),
-                            versionToShow: $versionToShow.animation(.snappy.speed(2.0)),
+                            difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
+                            levelsToShow: $levelsToShow.animation(.snappy.speed(2.0)),
+                            clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
+                            djLevelsToShow: $djLevelsToShow.animation(.snappy.speed(2.0)),
+                            versionsToShow: $versionsToShow.animation(.snappy.speed(2.0)),
                             sortMode: $sortMode.animation(.snappy.speed(2.0)),
                             sortOrder: $sortOrder.animation(.snappy.speed(2.0)),
                             isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort
@@ -226,7 +236,7 @@ struct ScoresView: View {
                 switch viewPath {
                 case .scoreViewer(let songRecord):
                     ScoreViewer(songRecord: songRecord, noteCount: noteCount,
-                                initialLevel: songRecord.level(for: levelToShow, or: difficultyToShow))
+                                initialLevel: songRecord.level(for: effectiveLevel, or: effectiveDifficulty))
                     .automaticNavigationTransition(id: songRecord.title, in: scoresNamespace)
                 case .scoreHistory(let songTitle, let level, let noteCount):
                     ScoreHistoryViewer(songTitle: songTitle, level: level, noteCount: noteCount)

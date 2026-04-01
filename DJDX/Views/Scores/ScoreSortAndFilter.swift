@@ -10,11 +10,11 @@ import SwiftUI
 struct ScoreSortAndFilter: View {
 
     @Binding var isShowingOnlyPlayDataWithScores: Bool
-    @Binding var difficultyToShow: IIDXDifficulty
-    @Binding var levelToShow: IIDXLevel
-    @Binding var clearTypeToShow: IIDXClearType
-    @Binding var djLevelToShow: IIDXDJLevel
-    @Binding var versionToShow: String
+    @Binding var difficultiesToShow: Set<IIDXDifficulty>
+    @Binding var levelsToShow: Set<IIDXLevel>
+    @Binding var clearTypesToShow: Set<IIDXClearType>
+    @Binding var djLevelsToShow: Set<IIDXDJLevel>
+    @Binding var versionsToShow: Set<String>
     @Binding var sortMode: SortMode
     @Binding var sortOrder: SortOrder
     @Binding var isSystemChangingFilterAndSort: Bool
@@ -34,19 +34,21 @@ struct ScoreSortAndFilter: View {
         // Sort
         Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
             Picker("Shared.Sort", selection: $sortMode) {
-                if levelToShow != .all {
+                if levelsToShow.count == 1 {
                     ForEach(SortMode.whenLevelFiltered, id: \.self) { sortMode in
                         Text(LocalizedStringKey(sortMode.rawValue))
                             .tag(sortMode)
                     }
-                } else if difficultyToShow != .all {
+                } else if difficultiesToShow.count == 1 {
                     ForEach(SortMode.whenDifficultyFiltered, id: \.self) { sortMode in
                         Text(LocalizedStringKey(sortMode.rawValue))
                             .tag(sortMode)
                     }
                 } else {
-                    Text(LocalizedStringKey(SortMode.title.rawValue))
-                        .tag(SortMode.title)
+                    ForEach(SortMode.defaultModes, id: \.self) { sortMode in
+                        Text(LocalizedStringKey(sortMode.rawValue))
+                            .tag(sortMode)
+                    }
                 }
             }
             .pickerStyle(.inline)
@@ -69,11 +71,11 @@ struct ScoreSortAndFilter: View {
         .sheet(isPresented: $isShowingFilterSheet) {
             ScoreFilterSheet(
                 isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                difficultyToShow: $difficultyToShow,
-                levelToShow: $levelToShow,
-                clearTypeToShow: $clearTypeToShow,
-                djLevelToShow: $djLevelToShow,
-                versionToShow: $versionToShow,
+                difficultiesToShow: $difficultiesToShow,
+                levelsToShow: $levelsToShow,
+                clearTypesToShow: $clearTypesToShow,
+                djLevelsToShow: $djLevelsToShow,
+                versionsToShow: $versionsToShow,
                 isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort,
                 isGenreVisible: $isGenreVisible,
                 isArtistVisible: $isArtistVisible,
@@ -94,11 +96,11 @@ struct ScoreSortAndFilter: View {
 struct ScoreFilterSheet: View {
 
     @Binding var isShowingOnlyPlayDataWithScores: Bool
-    @Binding var difficultyToShow: IIDXDifficulty
-    @Binding var levelToShow: IIDXLevel
-    @Binding var clearTypeToShow: IIDXClearType
-    @Binding var djLevelToShow: IIDXDJLevel
-    @Binding var versionToShow: String
+    @Binding var difficultiesToShow: Set<IIDXDifficulty>
+    @Binding var levelsToShow: Set<IIDXLevel>
+    @Binding var clearTypesToShow: Set<IIDXClearType>
+    @Binding var djLevelsToShow: Set<IIDXDJLevel>
+    @Binding var versionsToShow: Set<String>
     @Binding var isSystemChangingFilterAndSort: Bool
     @Binding var isGenreVisible: Bool
     @Binding var isArtistVisible: Bool
@@ -115,63 +117,48 @@ struct ScoreFilterSheet: View {
         NavigationStack {
             List {
                 Section(.sharedFilter) {
-                    Picker(.sharedLevel, selection: $levelToShow) {
-                        Text(.sharedAll)
-                            .tag(IIDXLevel.all)
-                        Divider()
-                        ForEach(IIDXLevel.sorted, id: \.self) { sortLevel in
-                            Text(LocalizedStringKey(sortLevel.rawValue))
-                                .tag(sortLevel)
-                        }
-                    }
-                    Picker(.sharedDifficulty, selection: $difficultyToShow) {
-                        Text(.sharedAll)
-                            .tag(IIDXDifficulty.all)
-                        Divider()
-                        ForEach(IIDXDifficulty.sorted, id: \.self) { sortDifficulty in
-                            Text("LEVEL \(sortDifficulty.rawValue)")
-                                .tag(sortDifficulty)
-                        }
-                    }
-                    Picker("Shared.IIDX.ClearType", selection: $clearTypeToShow) {
-                        Text(.sharedAll)
-                            .tag(IIDXClearType.all)
-                        Divider()
-                        ForEach(IIDXClearType.sorted, id: \.self) { sortClearType in
-                            Text(LocalizedStringKey(sortClearType.rawValue))
-                                .tag(sortClearType)
-                        }
-                    }
-                    Picker("Shared.IIDX.DJLevel", selection: $djLevelToShow) {
-                        Text(.sharedAll)
-                            .tag(IIDXDJLevel.all)
-                        Divider()
-                        ForEach(IIDXDJLevel.sorted.reversed(), id: \.self) { sortDJLevel in
-                            Text(verbatim: sortDJLevel.rawValue)
-                                .tag(sortDJLevel)
-                        }
-                    }
-                    Picker(.sharedVersion, selection: $versionToShow) {
-                        Text(.sharedAll)
-                            .tag("")
-                        Divider()
-                        ForEach(IIDXVersion.allCases.reversed(), id: \.self) { version in
-                            Text(verbatim: version.marketingName)
-                                .tag(version.marketingName)
-                        }
-                    }
+                    multiSelectMenu(
+                        .sharedLevel,
+                        items: IIDXLevel.sorted,
+                        selection: $levelsToShow,
+                        label: { Text(LocalizedStringKey($0.rawValue)) }
+                    )
+                    multiSelectMenu(
+                        .sharedDifficulty,
+                        items: IIDXDifficulty.sorted,
+                        selection: $difficultiesToShow,
+                        label: { Text("LEVEL \($0.rawValue)") }
+                    )
+                    multiSelectMenu(
+                        "Shared.IIDX.ClearType",
+                        items: IIDXClearType.sorted,
+                        selection: $clearTypesToShow,
+                        label: { Text(LocalizedStringKey($0.rawValue)) }
+                    )
+                    multiSelectMenu(
+                        "Shared.IIDX.DJLevel",
+                        items: IIDXDJLevel.sorted.reversed(),
+                        selection: $djLevelsToShow,
+                        label: { Text(verbatim: $0.rawValue) }
+                    )
+                    multiSelectMenu(
+                        .sharedVersion,
+                        items: IIDXVersion.allCases.reversed(),
+                        selection: $versionsToShow,
+                        id: \.marketingName,
+                        label: { Text(verbatim: $0.marketingName) }
+                    )
                     Button(.sharedFilterResetAll, systemImage: "arrow.clockwise") {
                         isSystemChangingFilterAndSort = true
-                        difficultyToShow = .all
-                        levelToShow = .all
-                        clearTypeToShow = .all
-                        djLevelToShow = .all
-                        versionToShow = ""
+                        difficultiesToShow = []
+                        levelsToShow = []
+                        clearTypesToShow = []
+                        djLevelsToShow = []
+                        versionsToShow = []
                         isSystemChangingFilterAndSort = false
                         onReset()
                     }
                 }
-                .pickerStyle(.menu)
                 Section("More.PlayDataDisplay.Header") {
                     Toggle(
                         .scoresFilterShowWithScoreOnly, systemImage: "trophy.fill",
@@ -202,5 +189,91 @@ struct ScoreFilterSheet: View {
                 }
             }
         }
+    }
+
+    // MARK: Multi-Select Menu (Hashable items)
+
+    private func multiSelectMenu<Item: Hashable>(
+        _ title: LocalizedStringKey,
+        items: [Item],
+        selection: Binding<Set<Item>>,
+        label: @escaping (Item) -> Text
+    ) -> some View {
+        Menu {
+            ForEach(items, id: \.self) { item in
+                Button {
+                    if selection.wrappedValue.contains(item) {
+                        selection.wrappedValue.remove(item)
+                    } else {
+                        selection.wrappedValue.insert(item)
+                    }
+                } label: {
+                    if selection.wrappedValue.contains(item) {
+                        Label { label(item) } icon: {
+                            Image(systemName: "checkmark")
+                        }
+                    } else {
+                        label(item)
+                    }
+                }
+            }
+        } label: {
+            LabeledContent {
+                if selection.wrappedValue.isEmpty {
+                    Text(.sharedAll)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(verbatim: "\(selection.wrappedValue.count)")
+                        .foregroundStyle(.secondary)
+                }
+            } label: {
+                Text(title)
+            }
+        }
+        .menuActionDismissBehavior(.disabled)
+    }
+
+    // MARK: Multi-Select Menu (custom ID key path for non-Hashable display)
+
+    private func multiSelectMenu<Item: Hashable, ID: Hashable>(
+        _ title: LocalizedStringKey,
+        items: [Item],
+        selection: Binding<Set<ID>>,
+        id keyPath: KeyPath<Item, ID>,
+        label: @escaping (Item) -> Text
+    ) -> some View {
+        Menu {
+            ForEach(items, id: keyPath) { item in
+                let itemID = item[keyPath: keyPath]
+                Button {
+                    if selection.wrappedValue.contains(itemID) {
+                        selection.wrappedValue.remove(itemID)
+                    } else {
+                        selection.wrappedValue.insert(itemID)
+                    }
+                } label: {
+                    if selection.wrappedValue.contains(itemID) {
+                        Label { label(item) } icon: {
+                            Image(systemName: "checkmark")
+                        }
+                    } else {
+                        label(item)
+                    }
+                }
+            }
+        } label: {
+            LabeledContent {
+                if selection.wrappedValue.isEmpty {
+                    Text(.sharedAll)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(verbatim: "\(selection.wrappedValue.count)")
+                        .foregroundStyle(.secondary)
+                }
+            } label: {
+                Text(title)
+            }
+        }
+        .menuActionDismissBehavior(.disabled)
     }
 }

@@ -38,6 +38,11 @@ enum SortMode: String, CaseIterable, Codable {
         .lastPlayDate
     ]
 
+    static let defaultModes: [SortMode] = [
+        .title,
+        .lastPlayDate
+    ]
+
     private var extraRawValues: [String] {
         switch self {
         case .title: return ["タイトル", "Shared.Sort.Title"]

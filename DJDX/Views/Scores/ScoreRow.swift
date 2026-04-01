@@ -24,24 +24,24 @@ struct ScoreRow: View {
     var songRecord: IIDXSongRecord
     @State var scoreRate: Float?
 
-    @Binding var levelToShow: IIDXLevel
-    @Binding var difficultyToShow: IIDXDifficulty
+    var levelToShow: IIDXLevel
+    var difficultyToShow: IIDXDifficulty
 
     var score: IIDXLevelScore?
 
     init(namespace: Namespace.ID,
          songRecord: IIDXSongRecord,
          scoreRate: Float?,
-         levelToShow: Binding<IIDXLevel>,
-         difficultyToShow: Binding<IIDXDifficulty>) {
+         levelToShow: IIDXLevel,
+         difficultyToShow: IIDXDifficulty) {
         self.namespace = namespace
         self.songRecord = songRecord
         self.scoreRate = scoreRate
-        self._levelToShow = levelToShow
-        self._difficultyToShow = difficultyToShow
+        self.levelToShow = levelToShow
+        self.difficultyToShow = difficultyToShow
         let scores: [IIDXLevelScore?] = [
-            songRecord.score(for: levelToShow.wrappedValue),
-            songRecord.score(for: difficultyToShow.wrappedValue)
+            songRecord.score(for: levelToShow),
+            songRecord.score(for: difficultyToShow)
         ]
         self.score = (scores.first(where: { $0 != nil }) ?? nil) ?? nil
     }
