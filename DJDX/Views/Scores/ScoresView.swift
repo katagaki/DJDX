@@ -84,7 +84,10 @@ struct ScoresView: View {
                 ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
                         id: \.id) { entry in
                     Button {
-                        navigationManager.push(.scoreViewer(songRecord: entry.songRecord), for: .scores)
+                        navigationManager.push(
+                            .scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level),
+                            for: .scores
+                        )
                     } label: {
                         ScoreRow(
                             namespace: scoresNamespace,
@@ -242,9 +245,9 @@ struct ScoresView: View {
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
-                case .scoreViewer(let songRecord):
+                case .scoreViewer(let songRecord, let initialLevel):
                     ScoreViewer(songRecord: songRecord, noteCount: noteCount,
-                                initialLevel: songRecord.level(for: effectiveLevel, or: effectiveDifficulty))
+                                initialLevel: initialLevel)
                     .automaticNavigationTransition(id: songRecord.title, in: scoresNamespace)
                 case .scoreHistory(let songTitle, let level, let noteCount):
                     ScoreHistoryViewer(songTitle: songTitle, level: level, noteCount: noteCount)
