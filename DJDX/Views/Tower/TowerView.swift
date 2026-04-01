@@ -22,7 +22,12 @@ struct TowerView: View {
     @AppStorage(wrappedValue: .totals, "TowerView.DisplayMode") var chartMode: TowerChartMode
 
     var chartEntries: [IIDXTowerEntry] {
-        Array(towerEntries.prefix(5)).reversed()
+        let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: .now)!
+        let recentEntries = towerEntries.prefix(while: { $0.playDate >= thirtyDaysAgo })
+        if recentEntries.count >= 5 {
+            return Array(recentEntries).reversed()
+        }
+        return Array(towerEntries.prefix(5)).reversed()
     }
 
     var totalKeyCount: Int {
