@@ -97,12 +97,18 @@ extension ScoresView {
     }
 
     func levelEntries(from records: [IIDXSongRecord]) -> [SongLevelEntry] {
-        records.flatMap { record in
+        let difficultyRawValues = Set(difficultiesToShow.map(\.rawValue))
+        return records.flatMap { record in
             Self.allLevels.compactMap { level, keyPath in
                 let score = record[keyPath: keyPath]
                 guard score.difficulty > 0 else { return nil }
                 if level == .beginner && isBeginnerLevelHidden { return nil }
-                guard levelsToShow.isEmpty || levelsToShow.contains(level) else { return nil }
+                if !levelsToShow.isEmpty && !levelsToShow.contains(level) { return nil }
+                if !difficultiesToShow.isEmpty && !difficultyRawValues.contains(score.difficulty) { return nil }
+                if !clearTypesToShow.isEmpty &&
+                    !clearTypesToShow.contains(where: { $0.rawValue == score.clearType }) { return nil }
+                if !djLevelsToShow.isEmpty &&
+                    !djLevelsToShow.contains(where: { $0.rawValue == score.djLevel }) { return nil }
                 return SongLevelEntry(songRecord: record, level: level, score: score)
             }
         }
