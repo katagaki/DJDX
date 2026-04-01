@@ -116,38 +116,82 @@ struct ScoreFilterSheet: View {
     var body: some View {
         NavigationStack {
             List {
-                Section(.sharedFilter) {
-                    multiSelectMenu(
-                        .sharedLevel,
-                        items: IIDXLevel.sorted,
-                        selection: $levelsToShow,
-                        label: { Text(LocalizedStringKey($0.rawValue)) }
-                    )
-                    multiSelectMenu(
-                        .sharedDifficulty,
-                        items: IIDXDifficulty.sorted,
-                        selection: $difficultiesToShow,
-                        label: { Text("LEVEL \($0.rawValue)") }
-                    )
-                    multiSelectMenu(
-                        LocalizedStringResource("Shared.IIDX.ClearType"),
-                        items: IIDXClearType.sorted,
-                        selection: $clearTypesToShow,
-                        label: { Text(LocalizedStringKey($0.rawValue)) }
-                    )
-                    multiSelectMenu(
-                        LocalizedStringResource("Shared.IIDX.DJLevel"),
-                        items: IIDXDJLevel.sorted.reversed(),
-                        selection: $djLevelsToShow,
-                        label: { Text(verbatim: $0.rawValue) }
-                    )
-                    multiSelectMenu(
-                        .sharedVersion,
-                        items: IIDXVersion.allCases.reversed(),
-                        selection: $versionsToShow,
-                        id: \.marketingName,
-                        label: { Text(verbatim: $0.marketingName) }
-                    )
+                Section(.sharedLevel) {
+                    ForEach(IIDXLevel.sorted, id: \.self) { level in
+                        SelectableRow(
+                            isSelected: levelsToShow.contains(level)
+                        ) {
+                            Text(LocalizedStringKey(level.rawValue))
+                        } action: {
+                            if levelsToShow.contains(level) {
+                                levelsToShow.remove(level)
+                            } else {
+                                levelsToShow.insert(level)
+                            }
+                        }
+                    }
+                }
+                Section(.sharedDifficulty) {
+                    ForEach(IIDXDifficulty.sorted, id: \.self) { difficulty in
+                        SelectableRow(
+                            isSelected: difficultiesToShow.contains(difficulty)
+                        ) {
+                            Text("LEVEL \(difficulty.rawValue)")
+                        } action: {
+                            if difficultiesToShow.contains(difficulty) {
+                                difficultiesToShow.remove(difficulty)
+                            } else {
+                                difficultiesToShow.insert(difficulty)
+                            }
+                        }
+                    }
+                }
+                Section("Shared.IIDX.ClearType") {
+                    ForEach(IIDXClearType.sorted, id: \.self) { clearType in
+                        SelectableRow(
+                            isSelected: clearTypesToShow.contains(clearType)
+                        ) {
+                            Text(LocalizedStringKey(clearType.rawValue))
+                        } action: {
+                            if clearTypesToShow.contains(clearType) {
+                                clearTypesToShow.remove(clearType)
+                            } else {
+                                clearTypesToShow.insert(clearType)
+                            }
+                        }
+                    }
+                }
+                Section("Shared.IIDX.DJLevel") {
+                    ForEach(IIDXDJLevel.sorted.reversed(), id: \.self) { djLevel in
+                        SelectableRow(
+                            isSelected: djLevelsToShow.contains(djLevel)
+                        ) {
+                            Text(verbatim: djLevel.rawValue)
+                        } action: {
+                            if djLevelsToShow.contains(djLevel) {
+                                djLevelsToShow.remove(djLevel)
+                            } else {
+                                djLevelsToShow.insert(djLevel)
+                            }
+                        }
+                    }
+                }
+                Section(.sharedVersion) {
+                    ForEach(IIDXVersion.allCases.reversed(), id: \.self) { version in
+                        SelectableRow(
+                            isSelected: versionsToShow.contains(version.marketingName)
+                        ) {
+                            Text(verbatim: version.marketingName)
+                        } action: {
+                            if versionsToShow.contains(version.marketingName) {
+                                versionsToShow.remove(version.marketingName)
+                            } else {
+                                versionsToShow.insert(version.marketingName)
+                            }
+                        }
+                    }
+                }
+                Section {
                     Button(.sharedFilterResetAll, systemImage: "arrow.clockwise") {
                         isSystemChangingFilterAndSort = true
                         difficultiesToShow = []
@@ -190,90 +234,29 @@ struct ScoreFilterSheet: View {
             }
         }
     }
+}
 
-    // MARK: Multi-Select Menu (Hashable items)
+private struct SelectableRow<Label: View>: View {
 
-    private func multiSelectMenu<Item: Hashable>(
-        _ title: LocalizedStringResource,
-        items: [Item],
-        selection: Binding<Set<Item>>,
-        label: @escaping (Item) -> Text
-    ) -> some View {
-        Menu {
-            ForEach(items, id: \.self) { item in
-                Button {
-                    if selection.wrappedValue.contains(item) {
-                        selection.wrappedValue.remove(item)
-                    } else {
-                        selection.wrappedValue.insert(item)
-                    }
-                } label: {
-                    if selection.wrappedValue.contains(item) {
-                        Label { label(item) } icon: {
-                            Image(systemName: "checkmark")
-                        }
-                    } else {
-                        label(item)
-                    }
-                }
-            }
+    var isSelected: Bool
+    @ViewBuilder var label: Label
+    var action: () -> Void
+
+    var body: some View {
+        Button {
+            action()
         } label: {
-            LabeledContent {
-                if selection.wrappedValue.isEmpty {
-                    Text(.sharedAll)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text(verbatim: "\(selection.wrappedValue.count)")
-                        .foregroundStyle(.secondary)
+            HStack {
+                label
+                Spacer()
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .foregroundStyle(.tint)
+                        .fontWeight(.semibold)
                 }
-            } label: {
-                Text(title)
             }
+            .contentShape(.rect)
         }
-        .menuActionDismissBehavior(.disabled)
-    }
-
-    // MARK: Multi-Select Menu (custom ID key path for non-Hashable display)
-
-    private func multiSelectMenu<Item: Hashable, ID: Hashable>(
-        _ title: LocalizedStringResource,
-        items: [Item],
-        selection: Binding<Set<ID>>,
-        id keyPath: KeyPath<Item, ID>,
-        label: @escaping (Item) -> Text
-    ) -> some View {
-        Menu {
-            ForEach(items, id: keyPath) { item in
-                let itemID = item[keyPath: keyPath]
-                Button {
-                    if selection.wrappedValue.contains(itemID) {
-                        selection.wrappedValue.remove(itemID)
-                    } else {
-                        selection.wrappedValue.insert(itemID)
-                    }
-                } label: {
-                    if selection.wrappedValue.contains(itemID) {
-                        Label { label(item) } icon: {
-                            Image(systemName: "checkmark")
-                        }
-                    } else {
-                        label(item)
-                    }
-                }
-            }
-        } label: {
-            LabeledContent {
-                if selection.wrappedValue.isEmpty {
-                    Text(.sharedAll)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text(verbatim: "\(selection.wrappedValue.count)")
-                        .foregroundStyle(.secondary)
-                }
-            } label: {
-                Text(title)
-            }
-        }
-        .menuActionDismissBehavior(.disabled)
+        .buttonStyle(.plain)
     }
 }
