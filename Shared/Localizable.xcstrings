@@ -658,6 +658,23 @@
         }
       }
     },
+    "Analytics.PerLevel.ClearTypeTrend" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Lamp Trend"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランプ推移"
+          }
+        }
+      }
+    },
     "Analytics.PerLevel.DJLevelTrend" : {
       "extractionState" : "manual",
       "localizations" : {
