@@ -34,21 +34,9 @@ struct ScoreSortAndFilter: View {
         // Sort
         Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
             Picker("Shared.Sort", selection: $sortMode) {
-                if levelsToShow.count == 1 {
-                    ForEach(SortMode.whenLevelFiltered, id: \.self) { sortMode in
-                        Text(LocalizedStringKey(sortMode.rawValue))
-                            .tag(sortMode)
-                    }
-                } else if difficultiesToShow.count == 1 {
-                    ForEach(SortMode.whenDifficultyFiltered, id: \.self) { sortMode in
-                        Text(LocalizedStringKey(sortMode.rawValue))
-                            .tag(sortMode)
-                    }
-                } else {
-                    ForEach(SortMode.defaultModes, id: \.self) { sortMode in
-                        Text(LocalizedStringKey(sortMode.rawValue))
-                            .tag(sortMode)
-                    }
+                ForEach(SortMode.whenLevelFiltered, id: \.self) { sortMode in
+                    Text(LocalizedStringKey(sortMode.rawValue))
+                        .tag(sortMode)
                 }
             }
             .pickerStyle(.inline)

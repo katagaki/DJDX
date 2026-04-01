@@ -98,7 +98,7 @@ extension ScoresView {
 
     func levelEntries(from records: [IIDXSongRecord]) -> [SongLevelEntry] {
         let difficultyRawValues = Set(difficultiesToShow.map(\.rawValue))
-        return records.flatMap { record in
+        var entries = records.flatMap { record in
             Self.allLevels.compactMap { level, keyPath in
                 let score = record[keyPath: keyPath]
                 guard score.difficulty > 0 else { return nil }
@@ -112,6 +112,61 @@ extension ScoresView {
                 return SongLevelEntry(songRecord: record, level: level, score: score)
             }
         }
+
+        let isAscending = sortOrder == .ascending
+        switch sortMode {
+        case .title:
+            entries.sort { isAscending ? $0.songRecord.title < $1.songRecord.title
+                : $0.songRecord.title > $1.songRecord.title }
+        case .clearType:
+            let order = IIDXClearType.sortedStrings
+            entries.sort { lhs, rhs in
+                let li = order.firstIndex(of: lhs.score.clearType)
+                let ri = order.firstIndex(of: rhs.score.clearType)
+                if li == ri { return lhs.songRecord.title < rhs.songRecord.title }
+                guard let li, let ri else { return li != nil }
+                return isAscending ? li < ri : li > ri
+            }
+        case .djLevel:
+            let order = IIDXDJLevel.sorted
+            entries.sort { lhs, rhs in
+                let li = order.firstIndex(of: IIDXDJLevel(rawValue: lhs.score.djLevel) ?? .none)
+                let ri = order.firstIndex(of: IIDXDJLevel(rawValue: rhs.score.djLevel) ?? .none)
+                if li == ri { return lhs.songRecord.title < rhs.songRecord.title }
+                guard let li, let ri else { return li != nil }
+                return isAscending ? li < ri : li > ri
+            }
+        case .scoreRate:
+            entries.sort { lhs, rhs in
+                let lr = songRecordClearRates[lhs.songRecord]?[lhs.level] ?? 0
+                let rr = songRecordClearRates[rhs.songRecord]?[rhs.level] ?? 0
+                if lr == rr { return lhs.songRecord.title < rhs.songRecord.title }
+                return isAscending ? lr < rr : lr > rr
+            }
+        case .score:
+            entries.sort { lhs, rhs in
+                if lhs.score.score == rhs.score.score { return lhs.songRecord.title < rhs.songRecord.title }
+                return isAscending ? lhs.score.score < rhs.score.score
+                    : lhs.score.score > rhs.score.score
+            }
+        case .missCount:
+            entries.sort { lhs, rhs in
+                if lhs.score.missCount == rhs.score.missCount { return lhs.songRecord.title < rhs.songRecord.title }
+                return isAscending ? lhs.score.missCount < rhs.score.missCount
+                    : lhs.score.missCount > rhs.score.missCount
+            }
+        case .difficulty:
+            entries.sort { lhs, rhs in
+                if lhs.score.difficulty == rhs.score.difficulty { return lhs.songRecord.title < rhs.songRecord.title }
+                return isAscending ? lhs.score.difficulty < rhs.score.difficulty
+                    : lhs.score.difficulty > rhs.score.difficulty
+            }
+        case .lastPlayDate:
+            entries.sort { isAscending ? $0.songRecord.lastPlayDate < $1.songRecord.lastPlayDate
+                : $0.songRecord.lastPlayDate > $1.songRecord.lastPlayDate }
+        }
+
+        return entries
     }
 
     func noteCount(for songRecord: IIDXSongRecord, of level: IIDXLevel) -> Int? {
