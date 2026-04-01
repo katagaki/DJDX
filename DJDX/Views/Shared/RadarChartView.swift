@@ -13,8 +13,8 @@ struct RadarChartView: View {
     let maxValue: Double = 130.0
     let benchmarkValue: Double = 100.0
 
-    init(_ data: RadarData) {
-        self.color = data.color()
+    init(_ data: RadarData, isPlayerRadar: Bool = false) {
+        self.color = data.color(isPlayerRadar: isPlayerRadar)
         self.points = data.points()
     }
 

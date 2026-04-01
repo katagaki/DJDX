@@ -75,9 +75,9 @@ struct RadarData {
         return [self.notes, self.peak, self.scratch, self.soflan, self.charge, self.chord].reduce(0, +)
     }
 
-    func color() -> Color {
+    func color(isPlayerRadar: Bool = false) -> Color {
         let sum = self.sum()
-        if sum > 800.0 {
+        if isPlayerRadar && sum > 800.0 {
             return .green
         } else if sum > 600.0 {
             return .purple
