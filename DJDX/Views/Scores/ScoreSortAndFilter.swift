@@ -117,6 +117,7 @@ struct ScoreFilterSheet: View {
         NavigationStack {
             List {
                 Section(.sharedLevel) {
+
                     ForEach(IIDXLevel.sorted, id: \.self) { level in
                         SelectableRow(
                             isSelected: levelsToShow.contains(level)
@@ -217,6 +218,7 @@ struct ScoreFilterSheet: View {
                     Toggle("Shared.Sort.LastPlayDate", isOn: $isLastPlayDateVisible)
                 }
             }
+            .listSectionSpacing(.compact)
             .navigationTitle("Shared.Filter")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
