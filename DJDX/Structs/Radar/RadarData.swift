@@ -77,7 +77,9 @@ struct RadarData {
 
     func color() -> Color {
         let sum = self.sum()
-        if sum > 600.0 {
+        if sum > 800.0 {
+            return .green
+        } else if sum > 600.0 {
             return .purple
         } else if sum > 400.0 {
             return .red
