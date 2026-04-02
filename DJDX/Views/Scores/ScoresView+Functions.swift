@@ -99,7 +99,7 @@ extension ScoresView {
     func levelEntries(from records: [IIDXSongRecord]) -> [SongLevelEntry] {
         let difficultyRawValues = Set(difficultiesToShow.map(\.rawValue))
         var entries = records.flatMap { record in
-            Self.allLevels.compactMap { level, keyPath in
+            Self.allLevels.compactMap { level, keyPath -> SongLevelEntry? in
                 let score = record[keyPath: keyPath]
                 guard score.difficulty > 0 else { return nil }
                 if level == .beginner && isBeginnerLevelHidden { return nil }
