@@ -106,6 +106,18 @@ struct ScoreFilterSheet: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    Button(.sharedFilterResetAll, systemImage: "arrow.clockwise") {
+                        isSystemChangingFilterAndSort = true
+                        difficultiesToShow = []
+                        levelsToShow = []
+                        clearTypesToShow = []
+                        djLevelsToShow = []
+                        versionsToShow = []
+                        isSystemChangingFilterAndSort = false
+                        onReset()
+                    }
+                }
                 Section(.sharedFilter) {
                     DisclosureGroup {
                         ForEach(IIDXLevel.sorted.filter({ !isBeginnerLevelHidden || $0 != .beginner }),
@@ -199,22 +211,14 @@ struct ScoreFilterSheet: View {
                     } label: {
                         FilterDisclosureLabel(.sharedVersion, count: versionsToShow.count)
                     }
-                    Button(.sharedFilterResetAll, systemImage: "arrow.clockwise") {
-                        isSystemChangingFilterAndSort = true
-                        difficultiesToShow = []
-                        levelsToShow = []
-                        clearTypesToShow = []
-                        djLevelsToShow = []
-                        versionsToShow = []
-                        isSystemChangingFilterAndSort = false
-                        onReset()
-                    }
                 }
-                Section("More.PlayDataDisplay.Header") {
+                Section {
                     Toggle(
                         .scoresFilterShowWithScoreOnly, systemImage: "trophy.fill",
                         isOn: $isShowingOnlyPlayDataWithScores
                     )
+                }
+                Section("More.PlayDataDisplay.Header") {
                     Toggle("More.PlayDataDisplay.ShowGenre", isOn: $isGenreVisible)
                     Toggle("More.PlayDataDisplay.ShowArtist", isOn: $isArtistVisible)
                     Toggle("More.PlayDataDisplay.ShowLevel", isOn: $isLevelVisible)
