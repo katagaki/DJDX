@@ -135,7 +135,8 @@ struct ScoreFilterSheet: View {
                             }
                         }
                     } label: {
-                        FilterDisclosureLabel(.sharedLevel, count: levelsToShow.count)
+                        FilterDisclosureLabel(.sharedLevel, count: levelsToShow.count,
+                                              countLabel: LocalizedStringResource("Shared.Filter.Count.Levels"))
                     }
                     DisclosureGroup {
                         ForEach(IIDXDifficulty.sorted, id: \.self) { difficulty in
@@ -152,7 +153,8 @@ struct ScoreFilterSheet: View {
                             }
                         }
                     } label: {
-                        FilterDisclosureLabel(.sharedDifficulty, count: difficultiesToShow.count)
+                        FilterDisclosureLabel(.sharedDifficulty, count: difficultiesToShow.count,
+                                              countLabel: LocalizedStringResource("Shared.Filter.Count.Difficulties"))
                     }
                     DisclosureGroup {
                         ForEach(IIDXClearType.sorted, id: \.self) { clearType in
@@ -171,7 +173,8 @@ struct ScoreFilterSheet: View {
                     } label: {
                         FilterDisclosureLabel(
                             LocalizedStringResource("Shared.IIDX.ClearType"),
-                            count: clearTypesToShow.count
+                            count: clearTypesToShow.count,
+                            countLabel: LocalizedStringResource("Shared.Filter.Count.ClearTypes")
                         )
                     }
                     DisclosureGroup {
@@ -191,7 +194,8 @@ struct ScoreFilterSheet: View {
                     } label: {
                         FilterDisclosureLabel(
                             LocalizedStringResource("Shared.IIDX.DJLevel"),
-                            count: djLevelsToShow.count
+                            count: djLevelsToShow.count,
+                            countLabel: LocalizedStringResource("Shared.Filter.Count.DJLevels")
                         )
                     }
                     DisclosureGroup {
@@ -209,7 +213,8 @@ struct ScoreFilterSheet: View {
                             }
                         }
                     } label: {
-                        FilterDisclosureLabel(.sharedVersion, count: versionsToShow.count)
+                        FilterDisclosureLabel(.sharedVersion, count: versionsToShow.count,
+                                              countLabel: LocalizedStringResource("Shared.Filter.Count.Versions"))
                     }
                 }
                 Section {
@@ -252,10 +257,12 @@ private struct FilterDisclosureLabel: View {
 
     let title: LocalizedStringResource
     let count: Int
+    let countSuffix: LocalizedStringResource
 
-    init(_ title: LocalizedStringResource, count: Int) {
+    init(_ title: LocalizedStringResource, count: Int, countLabel: LocalizedStringResource) {
         self.title = title
         self.count = count
+        self.countSuffix = countLabel
     }
 
     var body: some View {
@@ -263,7 +270,7 @@ private struct FilterDisclosureLabel: View {
             Text(title)
             Spacer()
             if count > 0 {
-                Text(verbatim: "\(count)")
+                Text("\(count) \(String(localized: countSuffix))")
                     .foregroundStyle(.secondary)
             } else {
                 Text(.sharedAll)
