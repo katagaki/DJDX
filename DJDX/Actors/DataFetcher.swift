@@ -224,6 +224,13 @@ actor DataFetcher {
 
             let isAscending = sortOptions.order == .ascending
 
+            if songLevelScores.isEmpty {
+                // When no single level/difficulty is selected, sort by title as a base order.
+                // Per-level sorting is handled at the view layer.
+                sortedSongRecords.sort { lhs, rhs in
+                    isAscending ? lhs.title < rhs.title : lhs.title > rhs.title
+                }
+            } else {
             switch sortOptions.mode {
             case .title:
                 sortedSongRecords.sort { lhs, rhs in
@@ -340,6 +347,7 @@ actor DataFetcher {
                         : lhs.lastPlayDate > rhs.lastPlayDate
                 }
             }
+            } // else songLevelScores.isEmpty
 
             songRecords = sortedSongRecords
         } else {
