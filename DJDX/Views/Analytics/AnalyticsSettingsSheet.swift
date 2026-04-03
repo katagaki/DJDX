@@ -98,6 +98,7 @@ struct AnalyticsSettingsSheet: View {
                     }
                 }
             }
+            .listSectionSpacing(.compact)
             .navigationTitle("Analytics.Settings.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -43,7 +43,7 @@ struct MoreNotesRadarView: View {
             .padding(.horizontal)
 
             if let radarData = currentRadarData {
-                RadarChartView(radarData)
+                RadarChartView(radarData, isPlayerRadar: true)
                     .frame(height: 200.0)
                     .padding()
                     .animation(.smooth, value: selectedPlayType)

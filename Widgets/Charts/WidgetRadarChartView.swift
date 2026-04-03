@@ -49,7 +49,8 @@ struct WidgetRadarChartView: View {
 
     private var color: Color {
         let sum = data.sum
-        if sum > 600.0 { return .purple
+        if sum > 800.0 { return .green
+        } else if sum > 600.0 { return .purple
         } else if sum > 400.0 { return .red
         } else if sum > 200.0 { return .yellow
         } else { return .cyan }

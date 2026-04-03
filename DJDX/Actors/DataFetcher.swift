@@ -146,25 +146,11 @@ actor DataFetcher {
                 $0.playType == filters.playType
             })
 
-            if !filters.version.isEmpty {
-                filteredSongRecords.removeAll { $0.version != filters.version }
+            if !filters.versions.isEmpty {
+                filteredSongRecords.removeAll { !filters.versions.contains($0.version) }
             }
 
             if filters.onlyPlayDataWithScores {
-                if filters.level != .all,
-                   let keyPath = scoreKeyPath(for: filters.level) {
-                        filteredSongRecords.removeAll { songRecord in
-                            songRecord[keyPath: keyPath].score == 0
-                        }
-                }
-                if filters.difficulty != .all {
-                    filteredSongRecords.removeAll { songRecord in
-                        if let score = songRecord.score(for: filters.difficulty) {
-                            return score.score == 0
-                        }
-                        return false
-                    }
-                }
                 filteredSongRecords.removeAll { songRecord in
                     songRecord.beginnerScore.score == 0 &&
                     songRecord.normalScore.score == 0 &&
@@ -174,66 +160,37 @@ actor DataFetcher {
                 }
             }
 
-            filteredSongRecords.removeAll { songRecord in
+            let hasLevelFilter = !filters.levels.isEmpty
+            let hasDifficultyFilter = !filters.difficulties.isEmpty
+            let hasClearTypeFilter = !filters.clearTypes.isEmpty
+            let hasDJLevelFilter = !filters.djLevels.isEmpty
+            let difficultyRawValues = Set(filters.difficulties.map(\.rawValue))
+            let clearTypeRawValues = Set(filters.clearTypes.map(\.rawValue))
+            let djLevelRawValues = Set(filters.djLevels.map(\.rawValue))
 
-                if filters.difficulty != .all, songRecord.score(for: filters.difficulty) == nil {
-                    return true
-                }
-
-                if filters.level != .all {
-                    if songRecord.score(for: filters.level) == nil {
-                        return true
-                    } else {
-                        if filters.difficulty != .all,
-                           songRecord.score(for: filters.level)?.difficulty != filters.difficulty.rawValue {
-                            return true
+            if hasLevelFilter || hasDifficultyFilter || hasClearTypeFilter || hasDJLevelFilter {
+                filteredSongRecords.removeAll { songRecord in
+                    let scores = songRecord.scores()
+                    let hasMatchingScore = scores.contains { score in
+                        if hasLevelFilter, !filters.levels.contains(score.level) {
+                            return false
                         }
-                    }
-                }
-
-                if filters.clearType != .all {
-                    let isDifficultyFilterActive = filters.difficulty != .all
-                    let isLevelFilterActive = filters.level != .all
-                    if isDifficultyFilterActive && !isLevelFilterActive,
-                       songRecord.score(for: filters.difficulty)?.clearType != filters.clearType.rawValue {
-                        return true
-                    } else if isDifficultyFilterActive && isLevelFilterActive,
-                              songRecord.score(for: filters.level)?.clearType != filters.clearType.rawValue {
-                        return true
-                    } else if isDifficultyFilterActive && isLevelFilterActive,
-                              songRecord.score(for: filters.difficulty)?.level ==
-                                songRecord.score(for: filters.level)?.level,
-                              songRecord.score(for: filters.difficulty)?.clearType != filters.clearType.rawValue {
-                        return true
-                    } else {
-                        if !songRecord.scores().contains(where: { $0.clearType == filters.clearType.rawValue }) {
-                            return true
+                        if hasDifficultyFilter, !difficultyRawValues.contains(score.difficulty) {
+                            return false
                         }
-                    }
-                }
-
-                if filters.djLevel != .all {
-                    let isDifficultyFilterActive = filters.difficulty != .all
-                    let isLevelFilterActive = filters.level != .all
-                    if isDifficultyFilterActive && !isLevelFilterActive,
-                       songRecord.score(for: filters.difficulty)?.djLevel != filters.djLevel.rawValue {
-                        return true
-                    } else if isDifficultyFilterActive && isLevelFilterActive,
-                              songRecord.score(for: filters.level)?.djLevel != filters.djLevel.rawValue {
-                        return true
-                    } else if isDifficultyFilterActive && isLevelFilterActive,
-                              songRecord.score(for: filters.difficulty)?.level ==
-                                songRecord.score(for: filters.level)?.level,
-                              songRecord.score(for: filters.difficulty)?.djLevel != filters.djLevel.rawValue {
-                        return true
-                    } else {
-                        if !songRecord.scores().contains(where: { $0.djLevel == filters.djLevel.rawValue }) {
-                            return true
+                        if hasClearTypeFilter, !clearTypeRawValues.contains(score.clearType) {
+                            return false
                         }
+                        if hasDJLevelFilter, !djLevelRawValues.contains(score.djLevel) {
+                            return false
+                        }
+                        if filters.onlyPlayDataWithScores, score.score == 0 {
+                            return false
+                        }
+                        return true
                     }
+                    return !hasMatchingScore
                 }
-
-                return false
             }
 
             songRecords = filteredSongRecords
@@ -249,14 +206,16 @@ actor DataFetcher {
             var songLevelScores: [IIDXSongRecord: IIDXLevelScore] = [:]
 
             if sortOptions.mode != .title && sortOptions.mode != .lastPlayDate {
-                if let level = filters?.level,
-                   level != .all,
-                    let keyPath = scoreKeyPath(for: level) {
+                if let levels = filters?.levels,
+                   levels.count == 1,
+                   let level = levels.first,
+                   let keyPath = scoreKeyPath(for: level) {
                     songLevelScores = sortedSongRecords.reduce(into: [:], { partialResult, songRecord in
                         partialResult[songRecord] = songRecord[keyPath: keyPath]
                     })
-                } else if let difficulty = filters?.difficulty,
-                          difficulty != .all {
+                } else if let difficulties = filters?.difficulties,
+                          difficulties.count == 1,
+                          let difficulty = difficulties.first {
                     songLevelScores = sortedSongRecords.reduce(into: [:], { partialResult, songRecord in
                         partialResult[songRecord] = songRecord.score(for: difficulty)
                     })
@@ -265,6 +224,13 @@ actor DataFetcher {
 
             let isAscending = sortOptions.order == .ascending
 
+            if songLevelScores.isEmpty {
+                // When no single level/difficulty is selected, sort by title as a base order.
+                // Per-level sorting is handled at the view layer.
+                sortedSongRecords.sort { lhs, rhs in
+                    isAscending ? lhs.title < rhs.title : lhs.title > rhs.title
+                }
+            } else {
             switch sortOptions.mode {
             case .title:
                 sortedSongRecords.sort { lhs, rhs in
@@ -381,6 +347,7 @@ actor DataFetcher {
                         : lhs.lastPlayDate > rhs.lastPlayDate
                 }
             }
+            } // else songLevelScores.isEmpty
 
             songRecords = sortedSongRecords
         } else {

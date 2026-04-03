@@ -18,8 +18,8 @@ enum AnalyticsPerLevelCategory: String, Codable, CaseIterable, Identifiable {
 
     var titleKey: String {
         switch self {
-        case .clearRate: return "Analytics.PerLevel.ClearRate"
-        case .clearRateTrend: return "Analytics.PerLevel.ClearRateTrend"
+        case .clearRate: return "Shared.IIDX.ClearType"
+        case .clearRateTrend: return "Analytics.PerLevel.ClearTypeTrend"
         case .djLevel: return "Shared.IIDX.DJLevel"
         case .djLevelTrend: return "Analytics.PerLevel.DJLevelTrend"
         }
