@@ -28,6 +28,7 @@ struct ScoreSortAndFilter: View {
     @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
+    @Namespace var filterNamespace
     @State private var isShowingFilterSheet: Bool = false
 
     var body: some View {
@@ -56,6 +57,7 @@ struct ScoreSortAndFilter: View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
+        .automaticMatchedTransitionSource(id: "ScoreFilterSheet", in: filterNamespace)
         .sheet(isPresented: $isShowingFilterSheet) {
             ScoreFilterSheet(
                 isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
@@ -234,7 +236,7 @@ struct ScoreFilterSheet: View {
                 }
             }
             .listSectionSpacing(.compact)
-            .navigationTitle("Shared.Filter")
+            .navigationTitle("Scores.CustomizeDisplay")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
