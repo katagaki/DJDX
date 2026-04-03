@@ -96,6 +96,7 @@ extension ScoresView {
         var id: String { "\(songRecord.title)_\(level.rawValue)" }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func levelEntries(from records: [IIDXSongRecord]) -> [SongLevelEntry] {
         let difficultyRawValues = Set(difficultiesToShow.map(\.rawValue))
         var entries = records.flatMap { record in

@@ -13,6 +13,17 @@
     "%lld" : {
       "shouldTranslate" : false
     },
+    "%lld %@" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld %2$@"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
     "A" : {
       "localizations" : {
         "en" : {
@@ -692,22 +703,6 @@
         }
       }
     },
-    "Analytics.Settings.Title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Analytics View"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プレー分析画面を編集"
-          }
-        }
-      }
-    },
     "Analytics.Settings.Cards" : {
       "localizations" : {
         "en" : {
@@ -803,6 +798,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リセット"
+          }
+        }
+      }
+    },
+    "Analytics.Settings.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Analytics View"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレー分析画面を編集"
           }
         }
       }
