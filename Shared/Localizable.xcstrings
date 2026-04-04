@@ -1827,6 +1827,23 @@
         }
       }
     },
+    "Scores.CustomizeDisplay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Customize Display"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示をカスタマイズ"
+          }
+        }
+      }
+    },
     "Scores.Filter.ShowWithScoreOnly" : {
       "extractionState" : "manual",
       "localizations" : {
