@@ -157,6 +157,93 @@ waitForElementToExist('.fs-6').then((element) => {
 })
 """
 
+// Injected at document start. iOS keyboard autofill of a one-time code drops the whole
+// code into the first box of a split OTP input (each box has maxlength="1"), so only the
+// first digit survives truncation. This intercepts the multi-character insertion and
+// distributes the digits across the boxes, dispatching native events so the SPA registers
+// each one. Selectors must be validated against the live 2FA DOM.
+let otpAutofillUserScript = """
+(function() {
+    function isOtpBox(el) {
+        if (!el || el.tagName !== 'INPUT') { return false; }
+        var type = (el.getAttribute('type') || 'text').toLowerCase();
+        if (type !== 'text' && type !== 'tel' && type !== 'number') { return false; }
+        var autocomplete = (el.getAttribute('autocomplete') || '').toLowerCase();
+        if (autocomplete.indexOf('one-time-code') !== -1) { return true; }
+        var maxLength = el.getAttribute('maxlength');
+        var inputmode = (el.getAttribute('inputmode') || '').toLowerCase();
+        var pattern = el.getAttribute('pattern') || '';
+        var numericish = inputmode === 'numeric' || inputmode === 'tel'
+            || pattern.indexOf('0-9') !== -1 || type === 'tel' || type === 'number';
+        return maxLength === '1' && numericish;
+    }
+
+    function otpBoxes(target) {
+        var scope = target.form || target.closest('form') || document;
+        var boxes = Array.prototype.slice.call(scope.querySelectorAll('input')).filter(isOtpBox);
+        if (boxes.indexOf(target) === -1 && isOtpBox(target)) { boxes.push(target); }
+        return boxes;
+    }
+
+    function setValue(el, value) {
+        var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+        setter.call(el, value);
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function distribute(boxes, startIndex, data) {
+        var chars = (data || '').replace(/\\s/g, '').split('');
+        var count = 0;
+        for (var i = 0; i < chars.length && (startIndex + i) < boxes.length; i++) {
+            setValue(boxes[startIndex + i], chars[i]);
+            count++;
+        }
+        var lastIndex = startIndex + count - 1;
+        if (lastIndex >= 0 && boxes[lastIndex]) { boxes[lastIndex].focus(); }
+    }
+
+    function indexOfTarget(boxes, target) {
+        var index = boxes.indexOf(target);
+        return index === -1 ? 0 : index;
+    }
+
+    document.addEventListener('beforeinput', function(event) {
+        var target = event.target;
+        if (!isOtpBox(target)) { return; }
+        var data = event.data;
+        if (data && data.length > 1) {
+            var boxes = otpBoxes(target);
+            event.preventDefault();
+            distribute(boxes, indexOfTarget(boxes, target), data);
+        }
+    }, true);
+
+    document.addEventListener('input', function(event) {
+        var target = event.target;
+        if (!isOtpBox(target)) { return; }
+        if (target.value && target.value.length > 1) {
+            var boxes = otpBoxes(target);
+            var data = target.value;
+            setValue(target, '');
+            distribute(boxes, indexOfTarget(boxes, target), data);
+        }
+    }, true);
+
+    document.addEventListener('paste', function(event) {
+        var target = event.target;
+        if (!isOtpBox(target)) { return; }
+        var clipboard = event.clipboardData || window.clipboardData;
+        var text = clipboard ? clipboard.getData('text') : '';
+        if (text && text.length > 1) {
+            var boxes = otpBoxes(target);
+            event.preventDefault();
+            distribute(boxes, indexOfTarget(boxes, target), text);
+        }
+    }, true);
+})();
+"""
+
 let iidxTowerCleanup = """
 var injectedCSS = `
 #base {

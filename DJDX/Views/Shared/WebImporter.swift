@@ -70,6 +70,11 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
                          injectionTime: .atDocumentStart,
                          forMainFrameOnly: false)
         )
+        contentController.addUserScript(
+            WKUserScript(source: otpAutofillUserScript,
+                         injectionTime: .atDocumentStart,
+                         forMainFrameOnly: false)
+        )
         let configuration = WKWebViewConfiguration()
         configuration.userContentController = contentController
         return WKWebView(frame: .zero, configuration: configuration)
