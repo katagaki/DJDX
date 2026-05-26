@@ -244,6 +244,68 @@ let otpAutofillUserScript = """
 })();
 """
 
+// Body for callAsyncJavaScript. Faithfully reconstructs the score_download form submission
+// (carrying every named field, including any CSRF/hidden tokens, plus the chosen SP/DP/tower
+// button) via a same-origin fetch, then returns the score_data CSV from the response. The
+// browser owns cookies, CSRF and text decoding, so this avoids the previous two-navigation
+// state machine. Returns an "ERR:<code>" sentinel for the e-amusement error page (?err=N),
+// "ERR:maintenance" when the buttons are missing, or "ERR:empty" when no score data is present.
+let scoreDownloadFetchBody = """
+const buttons = Array.from(document.getElementsByClassName('submit_btn'));
+const button = buttons.find(function(candidate) { return candidate.value === buttonValue; });
+if (!button) { return 'ERR:maintenance'; }
+const form = button.form || button.closest('form');
+if (!form) { return 'ERR:maintenance'; }
+
+const params = new URLSearchParams();
+Array.from(form.elements).forEach(function(element) {
+    if (!element.name) { return; }
+    const type = (element.type || '').toLowerCase();
+    if (type === 'submit' || type === 'button' || type === 'reset' || type === 'file') { return; }
+    if ((type === 'checkbox' || type === 'radio') && !element.checked) { return; }
+    params.append(element.name, element.value);
+});
+if (button.name) { params.append(button.name, button.value); }
+
+const action = form.getAttribute('action');
+const targetURL = action ? new URL(action, document.baseURI).href : location.href;
+const method = (form.getAttribute('method') || 'POST').toUpperCase();
+
+let response;
+if (method === 'GET') {
+    const joiner = targetURL.indexOf('?') === -1 ? '?' : '&';
+    response = await fetch(targetURL + joiner + params.toString(), {
+        method: 'GET',
+        credentials: 'same-origin'
+    });
+} else {
+    response = await fetch(targetURL, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+    });
+}
+
+const finalURL = response.url || '';
+if (finalURL.indexOf('/error/error.html') !== -1) {
+    const match = finalURL.match(/[?&]err=([0-9]+)/);
+    return 'ERR:' + (match ? match[1] : 'server');
+}
+
+const html = await response.text();
+const parsed = new DOMParser().parseFromString(html, 'text/html');
+const node = parsed.getElementById('score_data');
+if (node) {
+    const value = (node.value !== undefined && node.value !== null && node.value !== '')
+        ? node.value
+        : (node.getAttribute('value') || node.textContent || '');
+    if (value && value.length > 0) { return value; }
+}
+if (html.indexOf('/error/error.html') !== -1) { return 'ERR:server'; }
+return 'ERR:empty';
+"""
+
 let iidxTowerCleanup = """
 var injectedCSS = `
 #base {
