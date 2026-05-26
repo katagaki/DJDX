@@ -63,7 +63,17 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
 
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
-    let webView = WKWebView()
+    let webView: WKWebView = {
+        let contentController = WKUserContentController()
+        contentController.addUserScript(
+            WKUserScript(source: loginPageDarkModeUserScript,
+                         injectionTime: .atDocumentStart,
+                         forMainFrameOnly: false)
+        )
+        let configuration = WKWebViewConfiguration()
+        configuration.userContentController = contentController
+        return WKWebView(frame: .zero, configuration: configuration)
+    }()
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator

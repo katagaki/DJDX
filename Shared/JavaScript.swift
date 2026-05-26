@@ -87,42 +87,52 @@ waitForElementToExist('#page-top').then((element) => {
 })
 """
 
-let loginPageCleanup = """
-// ダークモード
-var darkModeCSS = `
+// Injected at document start so the theme is present before first paint and persists
+// across the login SPA's re-renders. Selectors are intentionally broad/structural because
+// KONAMI's CSS-module class names carry hashes that drift between deployments.
+let loginPageDarkModeUserScript = """
+(function() {
+    var darkModeCSS = `
 @media (prefers-color-scheme: dark) {
-    body, #id_ea_common_content_whole {
-        background-color: #000000;
-        color: #ffffff;
+    html, body, #id_ea_common_content_whole, #base, #base-inner, main, [class*="Layout"] {
+        background-color: #000000 !important;
+        color: #ffffff !important;
     }
     header,
+    [class*="Header"],
     [class*="Header_logo__konami--default"] {
-        background-color: #000000!important;
+        background-color: #000000 !important;
     }
-    [class*="Form_login__layout--narrow-frame"],
-    [class*="Form_login__layout--default"],
-    [class*="Form_login__form--default"],
-    [class*="Form_login__form--narrow-frame"],
+    [class*="Form_login__layout"],
+    [class*="Form_login__form"],
+    [class*="Card"],
+    .card,
     #email-form {
-        border: unset;
-        background-color: #1c1c1e!important;
+        border: unset !important;
+        background-color: #1c1c1e !important;
     }
+    label,
     .form-floating > label {
-      color: #aaa;
+        color: #aaaaaa !important;
     }
     .form-floating > .form-control:focus ~ label {
-      color: #eee;
+        color: #eeeeee !important;
     }
     .m-icon--arrow_back_back {
         filter: invert();
         opacity: 40%;
     }
-    .form-control, .form-control:focus {
-        background-color: #000000!important;
-        color: #fff!important;
+    input,
+    textarea,
+    select,
+    .form-control,
+    .form-control:focus {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border-color: #46464a !important;
     }
-    .card {
-        background-color: #1c1c1e!important;
+    a {
+        color: #4da3ff !important;
     }
 }
 
@@ -132,15 +142,19 @@ var darkModeCSS = `
         color: #000000;
     }
 }
-`
-style.appendChild(document.createTextNode(darkModeCSS))
-head.appendChild(style)
+`;
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    style.textContent = darkModeCSS;
+    (document.head || document.documentElement).appendChild(style);
+})();
+"""
 
+let loginPageCleanup = """
 // チャットポップアップを取り除く
 waitForElementToExist('.fs-6').then((element) => {
     document.getElementsByClassName('fs-6')[0].remove()
 })
-
 """
 
 let iidxTowerCleanup = """
