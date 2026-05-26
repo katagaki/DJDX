@@ -151,6 +151,8 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
     var version: IIDXVersion
 
     var hasStartedExtraction: Bool = false
+    var hasResolved: Bool = false
+    var watchdog: Task<Void, Never>?
 
     init(
         delegate: UpdateScoreDataDelegate,
@@ -175,16 +177,29 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
                 self.extractScoreData(from: webView)
             } else if urlString.starts(with: self.version.errorPageURL().absoluteString) {
                 webView.layer.opacity = 0.0
-                let reason = Self.failureReason(forErrorPageURL: urlString)
-                Task {
-                    await MainActor.run {
-                        self.delegate.stopProcessing(with: reason)
-                    }
-                }
+                self.resolveFailure(with: Self.failureReason(forErrorPageURL: urlString))
             } else {
                 webView.layer.opacity = 1.0
             }
         }
+    }
+
+    func webView(_ webView: WKWebView, didFail _: WKNavigation!, withError error: Error) {
+        handleNavigationFailure(error)
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
+        handleNavigationFailure(error)
+    }
+
+    // Surfaces a real load failure as an error instead of leaving the user on an endless spinner,
+    // while ignoring the benign cancellations/redirect interruptions that occur during the
+    // multi-step sign-in.
+    func handleNavigationFailure(_ error: Error) {
+        let nsError = error as NSError
+        if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled { return }
+        if nsError.domain == "WebKitErrorDomain" && nsError.code == 102 { return }
+        resolveFailure(with: .serverError)
     }
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
@@ -199,6 +214,7 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
     }
 
     func extractScoreData(from webView: WKWebView) {
+        startExtractionWatchdog()
         let buttonValue: String
         switch importMode {
         case .single: buttonValue = "SP"
@@ -213,21 +229,47 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         ) { result in
             switch result {
             case .success(let value): self.handleExtractionResult(value as? String)
-            case .failure: self.handleExtractionResult(nil)
+            case .failure: self.resolveFailure(with: .serverError)
             }
         }
     }
 
     func handleExtractionResult(_ value: String?) {
         guard let value, !value.isEmpty else {
-            Task { await MainActor.run { self.delegate.stopProcessing(with: .serverError) } }
+            resolveFailure(with: .serverError)
             return
         }
         if value.hasPrefix("ERR:") {
-            let reason = Self.failureReason(forSentinel: String(value.dropFirst(4)))
-            Task { await MainActor.run { self.delegate.stopProcessing(with: reason) } }
+            resolveFailure(with: Self.failureReason(forSentinel: String(value.dropFirst(4))))
         } else {
-            Task { await self.delegate.importScoreData(using: value) }
+            resolveSuccess(with: value)
+        }
+    }
+
+    // A single resolution funnel guards against the watchdog, the fetch result and a navigation
+    // failure racing to finish the import more than once.
+    func resolveSuccess(with csvString: String) {
+        guard !hasResolved else { return }
+        hasResolved = true
+        watchdog?.cancel()
+        Task { await self.delegate.importScoreData(using: csvString) }
+    }
+
+    func resolveFailure(with reason: ImportFailedReason) {
+        guard !hasResolved else { return }
+        hasResolved = true
+        watchdog?.cancel()
+        Task { await MainActor.run { self.delegate.stopProcessing(with: reason) } }
+    }
+
+    func startExtractionWatchdog() {
+        watchdog?.cancel()
+        watchdog = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(25))
+            if Task.isCancelled { return }
+            await MainActor.run {
+                self?.resolveFailure(with: .serverError)
+            }
         }
     }
 
