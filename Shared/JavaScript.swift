@@ -109,7 +109,8 @@ let loginPageDarkModeUserScript = """
     .card,
     .accordion-item,
     .accordion-button,
-    .bg-light,
+    body .bg-light,
+    body .bg-white,
     #email-form {
         border-color: #46464a !important;
         background-color: #1c1c1e !important;
