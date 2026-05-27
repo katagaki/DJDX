@@ -91,24 +91,35 @@ let loginPageDarkModeUserScript = """
 (function() {
     var darkModeCSS = `
 @media (prefers-color-scheme: dark) {
-    html, body, #id_ea_common_content_whole, #base, #base-inner, main, [class*="Layout"] {
+    html, body,
+    main,
+    [class*="Layout"],
+    #id_ea_common_content_whole, #base, #base-inner {
         background-color: #000000 !important;
         color: #ffffff !important;
     }
     header,
+    footer,
     [class*="Header"],
-    [class*="Header_logo__konami--default"] {
+    [class*="Footer"] {
         background-color: #000000 !important;
+        color: #ffffff !important;
     }
-    [class*="Form_login__layout"],
-    [class*="Form_login__form"],
-    [class*="Card"],
+    [class*="login__"],
     .card,
+    .accordion-item,
+    .accordion-button,
+    .bg-light,
     #email-form {
-        border: unset !important;
+        border-color: #46464a !important;
         background-color: #1c1c1e !important;
+        color: #ffffff !important;
     }
-    label,
+    h1, h2, h3, h4, h5, h6,
+    p, span, summary, label,
+    .nav-link {
+        color: #ffffff !important;
+    }
     .form-floating > label {
         color: #aaaaaa !important;
     }
@@ -128,7 +139,7 @@ let loginPageDarkModeUserScript = """
         color: #ffffff !important;
         border-color: #46464a !important;
     }
-    a {
+    a, .link-primary {
         color: #4da3ff !important;
     }
 }
