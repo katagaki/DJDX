@@ -63,7 +63,22 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
 
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
-    let webView = WKWebView()
+    let webView: WKWebView = {
+        let contentController = WKUserContentController()
+        contentController.addUserScript(
+            WKUserScript(source: loginPageDarkModeUserScript,
+                         injectionTime: .atDocumentStart,
+                         forMainFrameOnly: false)
+        )
+        contentController.addUserScript(
+            WKUserScript(source: otpAutofillUserScript,
+                         injectionTime: .atDocumentStart,
+                         forMainFrameOnly: false)
+        )
+        let configuration = WKWebViewConfiguration()
+        configuration.userContentController = contentController
+        return WKWebView(frame: .zero, configuration: configuration)
+    }()
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
@@ -131,54 +146,13 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
 \(loginPageCleanup)
 """
 
-    let selectSPButtonJS = """
-var submitButtons = document.getElementsByClassName('submit_btn')
-if (submitButtons.length > 0) {
-    Array.from(submitButtons).forEach(button => {
-        if (button.value === "SP") {
-            button.click()
-        }
-    })
-} else {
-    throw 1
-}
-"""
-
-    let selectDPButtonJS = """
-var submitButtons = document.getElementsByClassName('submit_btn')
-if (submitButtons.length > 0) {
-    Array.from(submitButtons).forEach(button => {
-        if (button.value === "DP") {
-            button.click()
-        }
-    })
-} else {
-    throw 1
-}
-"""
-
-    let selectTowerButtonJS = """
-var submitButtons = document.getElementsByClassName('submit_btn')
-if (submitButtons.length > 0) {
-    Array.from(submitButtons).forEach(button => {
-        if (button.value === "tower") {
-            button.click()
-        }
-    })
-} else {
-    throw 1
-}
-"""
-
-    let getScoreDataJS = """
-document.getElementById('score_data').value
-"""
-
     var delegate: UpdateScoreDataDelegate
     var importMode: IIDXImportMode
     var version: IIDXVersion
 
-    var waitingForDownloadPageFormSubmit: Bool = false
+    var hasStartedExtraction: Bool = false
+    var hasResolved: Bool = false
+    var watchdog: Task<Void, Never>?
 
     init(
         delegate: UpdateScoreDataDelegate,
@@ -191,61 +165,38 @@ document.getElementById('score_data').value
         super.init()
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
-        if let webViewURL = webView.url {
-            let urlString = webViewURL.absoluteString
-            webView.evaluateJavaScript(self.cleanupJS) { _, _ in
-                if urlString.starts(with: self.version.downloadPageURL().absoluteString) {
-                    webView.layer.opacity = 0.0
-                    webView.isUserInteractionEnabled = false
-                    if !self.waitingForDownloadPageFormSubmit {
-                        switch self.importMode {
-                        case .single: self.evaluateIIDXSPScript(webView)
-                        case .double: self.evaluateIIDXDPScript(webView)
-                        case .tower: self.evaluateTowerScript(webView)
-                        }
-                        self.waitingForDownloadPageFormSubmit = true
-                    } else {
-                        webView.evaluateJavaScript(self.getScoreDataJS) { result, _ in
-                            if let result: String = result as? String {
-                                Task {
-                                    await self.delegate.importScoreData(using: result)
-                                }
-                            } else {
-                                Task {
-                                    await MainActor.run {
-                                        self.delegate.stopProcessing(with: .serverError)
-                                    }
-                                }
-                            }
-                        }
-                        self.waitingForDownloadPageFormSubmit = false
-                    }
-                } else if urlString.starts(with: self.version.errorPageURL().absoluteString) {
-                    webView.layer.opacity = 0.0
-                    Task { [urlString] in
-                        await MainActor.run {
-                            if urlString.hasSuffix("?err=1") {
-                                self.delegate.stopProcessing(with: .noPremiumCourse)
-                            } else if urlString.hasSuffix("?err=2") {
-                                self.delegate.stopProcessing(with: .noEAmusementPass)
-                            } else if urlString.hasSuffix("?err=3") {
-                                self.delegate.stopProcessing(with: .noPlayData)
-                            } else if urlString.hasSuffix("?err=4") {
-                                self.delegate.stopProcessing(with: .serverError)
-                            } else if urlString.hasSuffix("?err=5") {
-                                self.delegate.stopProcessing(with: .noPremiumCourse)
-                            } else {
-                                self.delegate.stopProcessing(with: .serverError)
-                            }
-                        }
-                    }
-                } else {
-                    webView.layer.opacity = 1.0
-                }
+        guard let webViewURL = webView.url else { return }
+        let urlString = webViewURL.absoluteString
+        webView.evaluateJavaScript(self.cleanupJS) { _, _ in
+            if urlString.starts(with: self.version.downloadPageURL().absoluteString) {
+                webView.layer.opacity = 0.0
+                webView.isUserInteractionEnabled = false
+                guard !self.hasStartedExtraction else { return }
+                self.hasStartedExtraction = true
+                self.extractScoreData(from: webView)
+            } else if urlString.starts(with: self.version.errorPageURL().absoluteString) {
+                webView.layer.opacity = 0.0
+                self.resolveFailure(with: Self.failureReason(forErrorPageURL: urlString))
+            } else {
+                webView.layer.opacity = 1.0
             }
         }
+    }
+
+    func webView(_ webView: WKWebView, didFail _: WKNavigation!, withError error: Error) {
+        handleNavigationFailure(error)
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
+        handleNavigationFailure(error)
+    }
+
+    func handleNavigationFailure(_ error: Error) {
+        let nsError = error as NSError
+        if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled { return }
+        if nsError.domain == "WebKitErrorDomain" && nsError.code == 102 { return }
+        resolveFailure(with: .serverError)
     }
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
@@ -259,28 +210,79 @@ document.getElementById('score_data').value
         }
     }
 
-    func evaluateIIDXSPScript(_ webView: WKWebView) {
-        webView.evaluateJavaScript(self.selectSPButtonJS) { _, error in
-            if error != nil {
-                self.delegate.stopProcessing(with: .maintenance)
+    func extractScoreData(from webView: WKWebView) {
+        startExtractionWatchdog()
+        let buttonValue: String
+        switch importMode {
+        case .single: buttonValue = "SP"
+        case .double: buttonValue = "DP"
+        case .tower: buttonValue = "tower"
+        }
+        webView.callAsyncJavaScript(
+            scoreDownloadFetchBody,
+            arguments: ["buttonValue": buttonValue],
+            in: nil,
+            in: .page
+        ) { result in
+            switch result {
+            case .success(let value): self.handleExtractionResult(value as? String)
+            case .failure: self.resolveFailure(with: .serverError)
             }
         }
     }
 
-    func evaluateIIDXDPScript(_ webView: WKWebView) {
-        webView.evaluateJavaScript(self.selectDPButtonJS) { _, error in
-            if error != nil {
-                self.delegate.stopProcessing(with: .maintenance)
+    func handleExtractionResult(_ value: String?) {
+        guard let value, !value.isEmpty else {
+            resolveFailure(with: .serverError)
+            return
+        }
+        if value.hasPrefix("ERR:") {
+            resolveFailure(with: Self.failureReason(forSentinel: String(value.dropFirst(4))))
+        } else {
+            resolveSuccess(with: value)
+        }
+    }
+
+    func resolveSuccess(with csvString: String) {
+        guard !hasResolved else { return }
+        hasResolved = true
+        watchdog?.cancel()
+        Task { await self.delegate.importScoreData(using: csvString) }
+    }
+
+    func resolveFailure(with reason: ImportFailedReason) {
+        guard !hasResolved else { return }
+        hasResolved = true
+        watchdog?.cancel()
+        Task { await MainActor.run { self.delegate.stopProcessing(with: reason) } }
+    }
+
+    func startExtractionWatchdog() {
+        watchdog?.cancel()
+        watchdog = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(25))
+            if Task.isCancelled { return }
+            await MainActor.run {
+                self?.resolveFailure(with: .serverError)
             }
         }
     }
 
-    func evaluateTowerScript(_ webView: WKWebView) {
-        webView.evaluateJavaScript(self.selectTowerButtonJS) { _, error in
-            if error != nil {
-                self.delegate.stopProcessing(with: .maintenance)
-            }
+    static func failureReason(forSentinel sentinel: String) -> ImportFailedReason {
+        switch sentinel {
+        case "1", "5": return .noPremiumCourse
+        case "2": return .noEAmusementPass
+        case "3": return .noPlayData
+        case "maintenance": return .maintenance
+        default: return .serverError
         }
+    }
+
+    static func failureReason(forErrorPageURL urlString: String) -> ImportFailedReason {
+        if let range = urlString.range(of: "err=") {
+            return failureReason(forSentinel: String(urlString[range.upperBound...]))
+        }
+        return .serverError
     }
 }
 

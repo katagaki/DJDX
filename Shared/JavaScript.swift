@@ -87,42 +87,61 @@ waitForElementToExist('#page-top').then((element) => {
 })
 """
 
-let loginPageCleanup = """
-// ダークモード
-var darkModeCSS = `
+let loginPageDarkModeUserScript = """
+(function() {
+    var darkModeCSS = `
 @media (prefers-color-scheme: dark) {
-    body, #id_ea_common_content_whole {
-        background-color: #000000;
-        color: #ffffff;
+    html, body,
+    main,
+    [class*="Layout"],
+    #id_ea_common_content_whole, #base, #base-inner {
+        background-color: #000000 !important;
+        color: #ffffff !important;
     }
     header,
-    [class*="Header_logo__konami--default"] {
-        background-color: #000000!important;
+    footer,
+    [class*="Header"],
+    [class*="Footer"] {
+        background-color: #000000 !important;
+        color: #ffffff !important;
     }
-    [class*="Form_login__layout--narrow-frame"],
-    [class*="Form_login__layout--default"],
-    [class*="Form_login__form--default"],
-    [class*="Form_login__form--narrow-frame"],
+    [class*="login__"],
+    .card,
+    .accordion-item,
+    .accordion-button,
+    body .bg-light,
+    body .bg-white,
     #email-form {
-        border: unset;
-        background-color: #1c1c1e!important;
+        border-color: #46464a !important;
+        background-color: #1c1c1e !important;
+        color: #ffffff !important;
+    }
+    h1, h2, h3, h4, h5, h6,
+    p, span, summary, label,
+    .nav-link {
+        color: #ffffff !important;
     }
     .form-floating > label {
-      color: #aaa;
+        color: #aaaaaa !important;
     }
     .form-floating > .form-control:focus ~ label {
-      color: #eee;
+        color: #eeeeee !important;
     }
     .m-icon--arrow_back_back {
         filter: invert();
         opacity: 40%;
     }
-    .form-control, .form-control:focus {
-        background-color: #000000!important;
-        color: #fff!important;
+    input,
+    textarea,
+    select,
+    .form-control,
+    .form-control:focus {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border-color: #46464a !important;
     }
-    .card {
-        background-color: #1c1c1e!important;
+    a, .link-primary {
+        color: #4da3ff !important;
     }
 }
 
@@ -132,15 +151,169 @@ var darkModeCSS = `
         color: #000000;
     }
 }
-`
-style.appendChild(document.createTextNode(darkModeCSS))
-head.appendChild(style)
+`;
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    style.textContent = darkModeCSS;
+    (document.head || document.documentElement).appendChild(style);
+})();
+"""
 
+let loginPageCleanup = """
 // チャットポップアップを取り除く
 waitForElementToExist('.fs-6').then((element) => {
     document.getElementsByClassName('fs-6')[0].remove()
 })
+"""
 
+let otpAutofillUserScript = """
+(function() {
+    function isOtpBox(el) {
+        if (!el || el.tagName !== 'INPUT') { return false; }
+        var type = (el.getAttribute('type') || 'text').toLowerCase();
+        if (type !== 'text' && type !== 'tel' && type !== 'number') { return false; }
+        var autocomplete = (el.getAttribute('autocomplete') || '').toLowerCase();
+        if (autocomplete.indexOf('one-time-code') !== -1) { return true; }
+        var maxLength = el.getAttribute('maxlength');
+        var inputmode = (el.getAttribute('inputmode') || '').toLowerCase();
+        var pattern = el.getAttribute('pattern') || '';
+        var numericish = inputmode === 'numeric' || inputmode === 'tel'
+            || pattern.indexOf('0-9') !== -1 || type === 'tel' || type === 'number';
+        return maxLength === '1' && numericish;
+    }
+
+    function otpBoxes(target) {
+        var scope = target.form || target.closest('form') || document;
+        var boxes = Array.prototype.slice.call(scope.querySelectorAll('input')).filter(isOtpBox);
+        if (boxes.indexOf(target) === -1 && isOtpBox(target)) { boxes.push(target); }
+        return boxes;
+    }
+
+    function setValue(el, value) {
+        var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+        setter.call(el, value);
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function distribute(boxes, startIndex, data) {
+        var chars = (data || '').replace(/\\s/g, '').split('');
+        var count = 0;
+        for (var i = 0; i < chars.length && (startIndex + i) < boxes.length; i++) {
+            setValue(boxes[startIndex + i], chars[i]);
+            count++;
+        }
+        var lastIndex = startIndex + count - 1;
+        if (lastIndex >= 0 && boxes[lastIndex]) { boxes[lastIndex].focus(); }
+    }
+
+    function indexOfTarget(boxes, target) {
+        var index = boxes.indexOf(target);
+        return index === -1 ? 0 : index;
+    }
+
+    document.addEventListener('beforeinput', function(event) {
+        var target = event.target;
+        if (!isOtpBox(target)) { return; }
+        var data = event.data;
+        if (data && data.length > 1) {
+            var boxes = otpBoxes(target);
+            event.preventDefault();
+            distribute(boxes, indexOfTarget(boxes, target), data);
+        }
+    }, true);
+
+    document.addEventListener('input', function(event) {
+        var target = event.target;
+        if (!isOtpBox(target)) { return; }
+        if (target.value && target.value.length > 1) {
+            var boxes = otpBoxes(target);
+            var data = target.value;
+            setValue(target, '');
+            distribute(boxes, indexOfTarget(boxes, target), data);
+        }
+    }, true);
+
+    document.addEventListener('paste', function(event) {
+        var target = event.target;
+        if (!isOtpBox(target)) { return; }
+        var clipboard = event.clipboardData || window.clipboardData;
+        var text = clipboard ? clipboard.getData('text') : '';
+        if (text && text.length > 1) {
+            var boxes = otpBoxes(target);
+            event.preventDefault();
+            distribute(boxes, indexOfTarget(boxes, target), text);
+        }
+    }, true);
+})();
+"""
+
+let scoreDownloadFetchBody = """
+async function fetchScoreData() {
+    const buttons = Array.from(document.getElementsByClassName('submit_btn'));
+    const button = buttons.find(function(candidate) { return candidate.value === buttonValue; });
+    if (!button) { return 'ERR:maintenance'; }
+    const form = button.form || button.closest('form');
+    if (!form) { return 'ERR:maintenance'; }
+
+    const params = new URLSearchParams();
+    Array.from(form.elements).forEach(function(element) {
+        if (!element.name) { return; }
+        const type = (element.type || '').toLowerCase();
+        if (type === 'submit' || type === 'button' || type === 'reset' || type === 'file') { return; }
+        if ((type === 'checkbox' || type === 'radio') && !element.checked) { return; }
+        params.append(element.name, element.value);
+    });
+    if (button.name) { params.append(button.name, button.value); }
+
+    const action = form.getAttribute('action');
+    const targetURL = action ? new URL(action, document.baseURI).href : location.href;
+    const method = (form.getAttribute('method') || 'POST').toUpperCase();
+
+    let response;
+    if (method === 'GET') {
+        const joiner = targetURL.indexOf('?') === -1 ? '?' : '&';
+        response = await fetch(targetURL + joiner + params.toString(), {
+            method: 'GET',
+            credentials: 'same-origin'
+        });
+    } else {
+        response = await fetch(targetURL, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        });
+    }
+
+    const finalURL = response.url || '';
+    if (finalURL.indexOf('/error/error.html') !== -1) {
+        const match = finalURL.match(/[?&]err=([0-9]+)/);
+        return 'ERR:' + (match ? match[1] : 'server');
+    }
+
+    const html = await response.text();
+    const parsed = new DOMParser().parseFromString(html, 'text/html');
+    const node = parsed.getElementById('score_data');
+    if (node) {
+        const value = (node.value !== undefined && node.value !== null && node.value !== '')
+            ? node.value
+            : (node.getAttribute('value') || node.textContent || '');
+        if (value && value.length > 0) { return value; }
+    }
+    if (html.indexOf('/error/error.html') !== -1) { return 'ERR:server'; }
+    return 'ERR:empty';
+}
+
+for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+        return await fetchScoreData();
+    } catch (error) {
+        if (attempt === 2) { return 'ERR:network'; }
+        await new Promise(function(resolve) { setTimeout(resolve, 600 * (attempt + 1)); });
+    }
+}
+return 'ERR:network';
 """
 
 let iidxTowerCleanup = """
