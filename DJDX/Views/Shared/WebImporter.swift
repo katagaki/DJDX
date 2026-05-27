@@ -192,9 +192,6 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         handleNavigationFailure(error)
     }
 
-    // Surfaces a real load failure as an error instead of leaving the user on an endless spinner,
-    // while ignoring the benign cancellations/redirect interruptions that occur during the
-    // multi-step sign-in.
     func handleNavigationFailure(_ error: Error) {
         let nsError = error as NSError
         if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled { return }
@@ -246,8 +243,6 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         }
     }
 
-    // A single resolution funnel guards against the watchdog, the fetch result and a navigation
-    // failure racing to finish the import more than once.
     func resolveSuccess(with csvString: String) {
         guard !hasResolved else { return }
         hasResolved = true

@@ -87,9 +87,6 @@ waitForElementToExist('#page-top').then((element) => {
 })
 """
 
-// Injected at document start so the theme is present before first paint and persists
-// across the login SPA's re-renders. Selectors are intentionally broad/structural because
-// KONAMI's CSS-module class names carry hashes that drift between deployments.
 let loginPageDarkModeUserScript = """
 (function() {
     var darkModeCSS = `
@@ -157,11 +154,6 @@ waitForElementToExist('.fs-6').then((element) => {
 })
 """
 
-// Injected at document start. iOS keyboard autofill of a one-time code drops the whole
-// code into the first box of a split OTP input (each box has maxlength="1"), so only the
-// first digit survives truncation. This intercepts the multi-character insertion and
-// distributes the digits across the boxes, dispatching native events so the SPA registers
-// each one. Selectors must be validated against the live 2FA DOM.
 let otpAutofillUserScript = """
 (function() {
     function isOtpBox(el) {
@@ -244,12 +236,6 @@ let otpAutofillUserScript = """
 })();
 """
 
-// Body for callAsyncJavaScript. Faithfully reconstructs the score_download form submission
-// (carrying every named field, including any CSRF/hidden tokens, plus the chosen SP/DP/tower
-// button) via a same-origin fetch, then returns the score_data CSV from the response. The
-// browser owns cookies, CSRF and text decoding, so this avoids the previous two-navigation
-// state machine. Returns an "ERR:<code>" sentinel for the e-amusement error page (?err=N),
-// "ERR:maintenance" when the buttons are missing, or "ERR:empty" when no score data is present.
 let scoreDownloadFetchBody = """
 async function fetchScoreData() {
     const buttons = Array.from(document.getElementsByClassName('submit_btn'));
@@ -307,7 +293,6 @@ async function fetchScoreData() {
     return 'ERR:empty';
 }
 
-// Retry only transient network failures (a thrown fetch); definitive sentinels return as-is.
 for (let attempt = 0; attempt < 3; attempt++) {
     try {
         return await fetchScoreData();
