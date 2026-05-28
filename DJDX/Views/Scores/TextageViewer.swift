@@ -170,12 +170,20 @@ struct WebViewForTextage: UIViewRepresentable {
                     webView.evaluateJavaScript(
                         textageNavigationJS
                             .replacingOccurrences(of: "%@1", with: levelValue())
-                            .replacingOccurrences(of: "%@2", with: songTitle)
+                            .replacingOccurrences(of: "%@2", with: escapedForJavaScript(songTitle))
                     )
                 } else {
                     self.updateTextageState(true)
                 }
             }
+        }
+
+        func escapedForJavaScript(_ string: String) -> String {
+            string
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "\"", with: "\\\"")
+                .replacingOccurrences(of: "\n", with: "\\n")
+                .replacingOccurrences(of: "\r", with: "\\r")
         }
 
         // swiftlint: disable cyclomatic_complexity
