@@ -389,11 +389,28 @@ head.appendChild(style)
 """
 
 let textageNavigationJS = """
-var levelSelectors = document.getElementsByName("djauto_opt")[0];
-levelSelectors.value = "%@1";
+(function() {
+    var levelSelector = document.getElementsByName("djauto_opt")[0];
+    var songNameTextField = document.getElementsByName("djauto")[0];
+    if (!levelSelector || !songNameTextField) { return; }
 
-var songNameTextField = document.getElementsByName("djauto")[0];
-songNameTextField.value = "%@2";
+    levelSelector.value = "%@1";
+    songNameTextField.value = "%@2";
 
-do_djauto();
+    // do_djauto() reads its inputs from the form exposed as document.ref.
+    // Textage renders the autocomplete form without that name, so point
+    // document.ref at the form that actually holds these fields.
+    var autoCompleteForm = songNameTextField.form;
+    if (autoCompleteForm) {
+        var namedRef = document.getElementsByName("ref");
+        for (var i = namedRef.length - 1; i >= 0; i--) {
+            if (namedRef[i] !== autoCompleteForm) {
+                namedRef[i].setAttribute("name", "ref_search");
+            }
+        }
+        autoCompleteForm.setAttribute("name", "ref");
+    }
+
+    if (typeof do_djauto === "function") { do_djauto(); }
+})();
 """
