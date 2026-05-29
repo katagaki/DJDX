@@ -55,8 +55,14 @@ struct SettingsMenu: View {
                 } label: {
                     Text("More.General.AppIcon")
                 }
-                Button("More.ExternalData.Header", systemImage: "tray.and.arrow.down") {
+                Button {
                     isPresentingExternalDataSources = true
+                } label: {
+                    Label {
+                        Text("More.ExternalData.Header")
+                    } icon: {
+                        Image(.iconAnalytics)
+                    }
                 }
                 Toggle("More.PlayDataDisplay.HideBeginnerLevel", isOn: $isBeginnerLevelHidden)
             }
