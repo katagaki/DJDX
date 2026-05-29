@@ -37,12 +37,21 @@ struct ScoresView<Header: View>: View {
     @State var searchResults: [IIDXSongRecord]?
 
     @State var isSystemChangingFilterAndSort: Bool = false
+    @State var isShowingFilterSheet: Bool = false
     @State var isSystemChangingCalendarDate: Bool = false
     @State var isSystemChangingAllRecords: Bool = false
 
     var isTimeTravellingKey: String = "ScoresView.IsTimeTravelling"
     @State var isTimeTravelling: Bool
     @State var isShowingDatePopover: Bool = false
+
+    @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.DJLevelVisible") var isDJLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreRateVisible") var isScoreRateVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
+    @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
     let actor = DataFetcher()
 
@@ -145,17 +154,9 @@ struct ScoresView<Header: View>: View {
 
     @ViewBuilder var filterControl: some View {
         ScoreFilterButton(
-            isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-            difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
-            levelsToShow: $levelsToShow.animation(.snappy.speed(2.0)),
-            clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
-            djLevelsToShow: $djLevelsToShow.animation(.snappy.speed(2.0)),
-            versionsToShow: $versionsToShow.animation(.snappy.speed(2.0)),
-            isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort,
+            isShowingFilterSheet: $isShowingFilterSheet,
             filterNamespace: scoresNamespace
-        ) {
-            reloadDisplay()
-        }
+        )
     }
 
     var body: some View {
@@ -236,6 +237,29 @@ struct ScoresView<Header: View>: View {
             .searchable(text: $searchTerm,
                         placement: searchPlacement,
                         prompt: "Scores.Search.Prompt")
+            .sheet(isPresented: $isShowingFilterSheet) {
+                ScoreFilterSheet(
+                    isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
+                    difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
+                    levelsToShow: $levelsToShow.animation(.snappy.speed(2.0)),
+                    clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
+                    djLevelsToShow: $djLevelsToShow.animation(.snappy.speed(2.0)),
+                    versionsToShow: $versionsToShow.animation(.snappy.speed(2.0)),
+                    isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort,
+                    isGenreVisible: $isGenreVisible,
+                    isArtistVisible: $isArtistVisible,
+                    isLevelVisible: $isLevelVisible,
+                    isDJLevelVisible: $isDJLevelVisible,
+                    isScoreRateVisible: $isScoreRateVisible,
+                    isScoreVisible: $isScoreVisible,
+                    isLastPlayDateVisible: $isLastPlayDateVisible,
+                    onReset: { reloadDisplay() }
+                )
+                .automaticNavigationTransition(id: "ScoreFilterSheet", in: scoresNamespace)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.hidden)
+                .interactiveDismissDisabled()
+            }
             .refreshable {
                 reloadDisplay()
             }
