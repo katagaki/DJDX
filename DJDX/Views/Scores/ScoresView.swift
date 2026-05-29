@@ -191,6 +191,7 @@ struct ScoresView<Header: View>: View {
                             score: entry.score,
                             scoreRate: songRecordClearRates[entry.songRecord]?[entry.level]
                         )
+                        .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
                     Divider()
