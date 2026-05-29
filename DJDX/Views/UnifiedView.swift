@@ -98,9 +98,6 @@ struct UnifiedView: View {
     var unifiedHeader: some View {
         VStack(spacing: 16.0) {
             VStack(spacing: 16.0) {
-                if selectedGame.supportsProfile {
-                    ProfileHeaderView()
-                }
                 if selectedGame.supportsPlayType {
                     Picker("Shared.PlayType", selection: $playTypeToShow) {
                         Text(verbatim: "SP")
@@ -109,6 +106,9 @@ struct UnifiedView: View {
                             .tag(IIDXPlayType.double)
                     }
                     .pickerStyle(.segmented)
+                }
+                if selectedGame.supportsProfile {
+                    ProfileHeaderView()
                 }
                 Picker("", selection: $selectedSegment) {
                     ForEach(selectedGame.destinations) { destination in
