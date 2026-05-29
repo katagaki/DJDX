@@ -67,7 +67,7 @@ struct SettingsMenu: View {
                 Toggle("More.PlayDataDisplay.HideBeginnerLevel", isOn: $isBeginnerLevelHidden)
             }
             Section("More.ManageData.Header") {
-                Button("More.ManageData.DeleteWebData", systemImage: "trash") {
+                Button("More.ManageData.DeleteWebData", systemImage: "trash", role: .destructive) {
                     deleteAllWebData()
                 }
                 Button("More.ManageData.DeleteScoreData", systemImage: "trash", role: .destructive) {

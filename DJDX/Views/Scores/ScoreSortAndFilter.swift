@@ -18,6 +18,7 @@ struct ScoreSortAndFilter: View {
     @Binding var sortMode: SortMode
     @Binding var sortOrder: SortOrder
     @Binding var isSystemChangingFilterAndSort: Bool
+    var filterNamespace: Namespace.ID
     var onReset: () -> Void
 
     @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
@@ -28,7 +29,6 @@ struct ScoreSortAndFilter: View {
     @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
-    @Namespace var filterNamespace
     @State private var isShowingFilterSheet: Bool = false
 
     var body: some View {

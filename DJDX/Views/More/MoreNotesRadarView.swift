@@ -16,6 +16,8 @@ struct MoreNotesRadarView: View {
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var selectedPlayType: IIDXPlayType
 
+    @State private var isShowingValues: Bool = false
+
     var cornerRadius: CGFloat {
         if #available(iOS 26.0, *) {
             return 20.0
@@ -34,45 +36,61 @@ struct MoreNotesRadarView: View {
     var body: some View {
         VStack(spacing: 12.0) {
             if let radarData = currentRadarData {
-                RadarChartView(radarData, isPlayerRadar: true)
-                    .frame(height: 200.0)
-                    .padding()
-                    .animation(.smooth, value: selectedPlayType)
-                VStack(spacing: 4.0) {
-                    ForEach(radarData.displayPoints(), id: \.label) { point in
-                        HStack {
-                            Text(verbatim: point.label)
-                                .font(.system(size: 13, weight: .bold))
-                                .foregroundStyle(point.color)
-                            Spacer()
-                            Text(verbatim: String(format: "%.2f", point.value))
-                                .font(.system(size: 13, weight: .semibold).monospacedDigit())
-                                .foregroundStyle(.primary)
-                        }
-                    }
-                    Divider()
-                        .padding(.vertical, 2.0)
-                    HStack {
-                        Text("More.NotesRadar.Total")
-                            .font(.system(size: 13, weight: .bold))
-                        Spacer()
-                        Text(verbatim: String(format: "%.2f", radarData.sum()))
-                            .font(.system(size: 13, weight: .bold).monospacedDigit())
+                Group {
+                    if isShowingValues {
+                        valueList(for: radarData)
+                    } else {
+                        RadarChartView(radarData, isPlayerRadar: true)
+                            .frame(height: 200.0)
+                            .padding()
                     }
                 }
-                .padding()
-                .background {
-                    switch colorScheme {
-                    case .light: Color.white
-                    case .dark: Color.clear.background(.regularMaterial)
-                    @unknown default: Color.clear
+                .frame(maxWidth: .infinity)
+                .contentShape(.rect)
+                .onTapGesture {
+                    withAnimation(.smooth) {
+                        isShowingValues.toggle()
                     }
                 }
-                .clipShape(.rect(cornerRadius: cornerRadius))
-                .padding(.horizontal, 36.0)
                 .animation(.smooth, value: selectedPlayType)
             }
         }
-//        .padding(.vertical, 12.0)
+        .padding(.vertical, 12.0)
+    }
+
+    @ViewBuilder
+    func valueList(for radarData: RadarData) -> some View {
+        VStack(spacing: 4.0) {
+            ForEach(radarData.displayPoints(), id: \.label) { point in
+                HStack {
+                    Text(verbatim: point.label)
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(point.color)
+                    Spacer()
+                    Text(verbatim: String(format: "%.2f", point.value))
+                        .font(.system(size: 13, weight: .semibold).monospacedDigit())
+                        .foregroundStyle(.primary)
+                }
+            }
+            Divider()
+                .padding(.vertical, 2.0)
+            HStack {
+                Text("More.NotesRadar.Total")
+                    .font(.system(size: 13, weight: .bold))
+                Spacer()
+                Text(verbatim: String(format: "%.2f", radarData.sum()))
+                    .font(.system(size: 13, weight: .bold).monospacedDigit())
+            }
+        }
+        .padding()
+        .background {
+            switch colorScheme {
+            case .light: Color.white
+            case .dark: Color.clear.background(.regularMaterial)
+            @unknown default: Color.clear
+            }
+        }
+        .clipShape(.rect(cornerRadius: cornerRadius))
+        .padding(.horizontal, 16.0)
     }
 }

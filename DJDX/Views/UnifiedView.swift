@@ -29,6 +29,8 @@ struct UnifiedView: View {
     @State var isPresentingImport: Bool = false
     @State var isFirstStartCleanupComplete: Bool = false
 
+    @Namespace var importNamespace
+
     var body: some View {
         @Bindable var progressAlertManager = progressAlertManager
         NavigationStack(path: $navigationManager.path) {
@@ -44,6 +46,7 @@ struct UnifiedView: View {
                     Button("Shared.Import", systemImage: "arrow.down.circle.dotted") {
                         isPresentingImport = true
                     }
+                    .automaticMatchedTransitionSource(id: "ImportSheet", in: importNamespace)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     SettingsMenu()
@@ -60,6 +63,7 @@ struct UnifiedView: View {
         .sheet(isPresented: $isPresentingImport) {
             ImportView()
                 .presentationDetents([.medium, .large])
+                .automaticNavigationTransition(id: "ImportSheet", in: importNamespace)
         }
         .overlay {
             if progressAlertManager.isShowing {

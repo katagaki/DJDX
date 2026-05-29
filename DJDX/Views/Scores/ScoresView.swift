@@ -105,7 +105,8 @@ struct ScoresView<Header: View>: View {
                 versionsToShow: $versionsToShow.animation(.snappy.speed(2.0)),
                 sortMode: $sortMode.animation(.snappy.speed(2.0)),
                 sortOrder: $sortOrder.animation(.snappy.speed(2.0)),
-                isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort
+                isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort,
+                filterNamespace: scoresNamespace
             ) {
                 reloadDisplay()
             }
@@ -114,11 +115,14 @@ struct ScoresView<Header: View>: View {
 
     var body: some View {
         List {
-            Section {
-                header
+            if searchTerm.isEmpty {
+                Section {
+                    header
+                }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
             }
-            .listRowBackground(Color.clear)
-            .listRowInsets(EdgeInsets())
                 ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
                         id: \.id) { entry in
                     Button {

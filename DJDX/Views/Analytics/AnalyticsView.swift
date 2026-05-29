@@ -108,8 +108,7 @@ struct AnalyticsView: View {
                 Button {
                     isShowingSettings = true
                 } label: {
-                    Label("Analytics.Settings.EditCards", systemImage: "pencil")
-                        .labelStyle(.iconOnly)
+                    Label("Shared.Edit", systemImage: "pencil")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
@@ -174,13 +173,7 @@ struct AnalyticsView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 16.0)
             }
-            .background(
-                .linearGradient(
-                    colors: [.backgroundGradientTop, .backgroundGradientBottom],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
+            .scrollContentBackground(.hidden)
             .refreshable {
                 await reload()
                 debugPrint("Reloaded from swipe to refresh")
