@@ -121,8 +121,11 @@ struct ScoresView<Header: View>: View {
         }
 
         if #available(iOS 26.0, *) {
-            button
-                .buttonStyle(isTimeTravelling ? .glassProminent : .glass)
+            if isTimeTravelling {
+                button.buttonStyle(.glassProminent)
+            } else {
+                button.buttonStyle(.glass)
+            }
         } else {
             button
                 .background {
