@@ -48,7 +48,9 @@ struct SettingsMenu: View {
                                 Text(verbatim: icon.name)
                             } icon: {
                                 Image(icon.previewImageName)
-                                    .renderingMode(.original)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .clipShape(.rect(cornerRadius: 8.0))
                             }
                         }
                     }
