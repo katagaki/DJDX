@@ -125,29 +125,29 @@ struct UnifiedView: View {
 
     @ViewBuilder
     var unifiedHeader: some View {
-        VStack(spacing: 16.0) {
-            VStack(spacing: 16.0) {
-                if selectedGame.supportsPlayType {
-                    Picker("Shared.PlayType", selection: $playTypeToShow) {
-                        Text(verbatim: "SP")
-                            .tag(IIDXPlayType.single)
-                        Text(verbatim: "DP")
-                            .tag(IIDXPlayType.double)
-                    }
-                    .pickerStyle(.segmented)
+        VStack(spacing: 0.0) {
+            if selectedGame.supportsPlayType {
+                Picker("Shared.PlayType", selection: $playTypeToShow) {
+                    Text(verbatim: "SP")
+                        .tag(IIDXPlayType.single)
+                    Text(verbatim: "DP")
+                        .tag(IIDXPlayType.double)
                 }
-                if selectedGame.supportsProfile {
-                    ProfileHeaderView()
-                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                .padding(.top, 8.0)
             }
-            .padding(.horizontal)
+            if selectedGame.supportsProfile {
+                ProfileHeaderView()
+                    .padding(.horizontal)
+            }
             AnalyticsView(model: analyticsModel,
                           isEditing: $isEditingAnalytics,
                           analyticsNamespace: analyticsNamespace,
                           towerNamespace: towerNamespace)
             .frame(minHeight: 360.0)
         }
-        .padding(.vertical, 8.0)
+        .padding(.bottom, 8.0)
     }
 
     @ViewBuilder

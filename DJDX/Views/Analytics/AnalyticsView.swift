@@ -56,34 +56,55 @@ struct AnalyticsView: View {
     var towerNamespace: Namespace.ID
 
     @ViewBuilder
-    func towerCardButton(for cardType: AnalyticsCardType) -> some View {
-        let transitionID = cardType == .towerRecent ? "Tower.Recent" : "Tower.Totals"
-        Button {
-            if !isEditingCards {
-                navigationManager.push(cardType == .towerRecent ? TowerPath.recent : TowerPath.totals)
+    func overviewCard(for cardType: AnalyticsCardType) -> some View {
+        switch cardType {
+        case .clearTypeOverall:
+            Button {
+                if !isEditingCards && model.clearTypePerDifficulty.count > 0 {
+                    navigationManager.push(AnalyticsPath.clearTypeOverviewGraph)
+                }
+            } label: {
+                AnalyticsCardView(cardType: .clearTypeOverall, showsHeader: false) {
+                    OverviewClearTypeOverallGraph(graphData: .constant(filteredClearTypeData))
+                        .chartLegend(.hidden)
+                        .chartYAxis(.hidden)
+                }
+                .perLevelCaption("Analytics.ClearType.Overall")
             }
-        } label: {
-            AnalyticsCardView(cardType: cardType) {
-                switch cardType {
-                case .towerRecent:
-                    TowerBarChart(entries: model.towerChartEntries, usesDateAxis: false)
+            .buttonStyle(AnalyticsCardButtonStyle())
+            .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
+        case .towerRecent, .towerTotals:
+            let transitionID = cardType == .towerRecent ? "Tower.Recent" : "Tower.Totals"
+            let caption: LocalizedStringKey = cardType == .towerRecent
+                ? "Tower.ChartMode.Recent" : "Tower.ChartMode.Totals"
+            Button {
+                if !isEditingCards {
+                    navigationManager.push(cardType == .towerRecent ? TowerPath.recent : TowerPath.totals)
+                }
+            } label: {
+                AnalyticsCardView(cardType: cardType, showsHeader: false) {
+                    switch cardType {
+                    case .towerRecent:
+                        TowerBarChart(entries: model.towerChartEntries, usesDateAxis: false)
+                            .chartXAxis { AxisMarks { AxisGridLine() } }
+                            .chartYAxis { AxisMarks { AxisGridLine() } }
+                    default:
+                        TowerTotalsChart(
+                            totalKeyCount: model.towerTotalKeyCount,
+                            totalScratchCount: model.towerTotalScratchCount,
+                            showsAnnotations: false
+                        )
                         .chartXAxis { AxisMarks { AxisGridLine() } }
                         .chartYAxis { AxisMarks { AxisGridLine() } }
-                case .towerTotals:
-                    TowerTotalsChart(
-                        totalKeyCount: model.towerTotalKeyCount,
-                        totalScratchCount: model.towerTotalScratchCount,
-                        showsAnnotations: false
-                    )
-                    .chartXAxis { AxisMarks { AxisGridLine() } }
-                    .chartYAxis { AxisMarks { AxisGridLine() } }
-                default:
-                    EmptyView()
+                    }
                 }
+                .perLevelCaption(caption)
             }
+            .buttonStyle(AnalyticsCardButtonStyle())
+            .automaticMatchedTransitionSource(id: transitionID, in: towerNamespace)
+        default:
+            EmptyView()
         }
-        .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: transitionID, in: towerNamespace)
     }
 
     var isEditingCards: Bool { isEditing }
@@ -113,36 +134,26 @@ struct AnalyticsView: View {
     var body: some View {
         VStack(spacing: 0.0) {
                 // MARK: Overview section
-                let towerCards = selectedGame.supportsTower ? cardOrder.filter { $0.isTowerCard } : []
-                let shownTowerCards = isEditing ? towerCards : towerCards.filter { visibleCards.contains($0) }
-                let isClearLampShown = isEditing || visibleCards.contains(.clearTypeOverall)
-                if isEditing || isClearLampShown || !shownTowerCards.isEmpty {
+                let overviewCards = cardOrder.filter {
+                    $0 == .clearTypeOverall || (selectedGame.supportsTower && $0.isTowerCard)
+                }
+                let shownOverviewCards = isEditing ? overviewCards : overviewCards.filter { visibleCards.contains($0) }
+                if !shownOverviewCards.isEmpty {
                     AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
-                    if isClearLampShown {
-                        clearTypeOverallCard
-                            .editableCard(isVisible: visibleCards.contains(.clearTypeOverall),
-                                          isEditing: isEditing,
-                                          seed: 0) {
-                                toggleCard(.clearTypeOverall)
-                            }
-                            .padding(.horizontal)
-                    }
-                    if !shownTowerCards.isEmpty {
-                        LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                            ForEach(shownTowerCards, id: \.self) { cardType in
-                                towerCardButton(for: cardType)
-                                    .editableCard(isVisible: visibleCards.contains(cardType),
-                                                  isEditing: isEditing,
-                                                  seed: cardOrder.firstIndex(of: cardType) ?? 0) {
-                                        toggleCard(cardType)
-                                    }
-                                    .cardDraggable(cardType, editing: isEditing,
-                                                   draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                                   onReorder: saveCardOrder)
-                            }
+                    LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                        ForEach(shownOverviewCards, id: \.self) { cardType in
+                            overviewCard(for: cardType)
+                                .editableCard(isVisible: visibleCards.contains(cardType),
+                                              isEditing: isEditing,
+                                              seed: cardOrder.firstIndex(of: cardType) ?? 0) {
+                                    toggleCard(cardType)
+                                }
+                                .cardDraggable(cardType, editing: isEditing,
+                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                               onReorder: saveCardOrder)
                         }
-                        .padding([.horizontal, .top])
                     }
+                    .padding(.horizontal)
                 }
 
                 // MARK: Last Play section

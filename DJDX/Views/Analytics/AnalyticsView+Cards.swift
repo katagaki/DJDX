@@ -43,22 +43,6 @@ extension AnalyticsView {
         }
     }
 
-    var clearTypeOverallCard: some View {
-        Button {
-            if !isEditingCards && model.clearTypePerDifficulty.count > 0 {
-                navigationManager.push(AnalyticsPath.clearTypeOverviewGraph)
-            }
-        } label: {
-            AnalyticsCardView(cardType: .clearTypeOverall) {
-                OverviewClearTypeOverallGraph(graphData: .constant(filteredClearTypeData))
-                    .chartLegend(.hidden)
-                    .chartYAxis(.hidden)
-            }
-        }
-        .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
-    }
-
     var newClearsCard: some View {
         Button {
             if !isEditingCards {

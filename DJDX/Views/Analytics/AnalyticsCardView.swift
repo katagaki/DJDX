@@ -16,9 +16,10 @@ struct AnalyticsCardView<Content: View>: View {
     let iconColor: Color
     let contentHeight: CGFloat
     let cornerRadius: CGFloat
+    var showsHeader: Bool = true
     let content: () -> Content
 
-    init(cardType: AnalyticsCardType, @ViewBuilder content: @escaping () -> Content) {
+    init(cardType: AnalyticsCardType, showsHeader: Bool = true, @ViewBuilder content: @escaping () -> Content) {
         self.title = cardType.titleText
         self.systemImage = cardType.systemImage
         self.iconColor = cardType.iconColor
@@ -28,6 +29,7 @@ struct AnalyticsCardView<Content: View>: View {
         } else {
             self.cornerRadius = 12.0
         }
+        self.showsHeader = showsHeader
         self.content = content
     }
 
@@ -67,16 +69,18 @@ struct AnalyticsCardView<Content: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
-            HStack(spacing: 6.0) {
-                Image(systemName: systemImage)
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundStyle(iconColor)
-                    .frame(width: 18.0, height: 18.0)
-                title
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+            if showsHeader {
+                HStack(spacing: 6.0) {
+                    Image(systemName: systemImage)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(iconColor)
+                        .frame(width: 18.0, height: 18.0)
+                    title
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
             }
             content()
                 .frame(height: contentHeight)
