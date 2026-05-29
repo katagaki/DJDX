@@ -206,6 +206,7 @@ struct ScoresView<Header: View>: View {
                     ToolbarItemGroup(placement: .bottomBar) {
                         timeTravelButton
                     }
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
                     DefaultToolbarItem(kind: .search, placement: .bottomBar)
                     ToolbarItemGroup(placement: .bottomBar) {
                         sortControl
