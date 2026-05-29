@@ -178,6 +178,6 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
 
     /// Default visible cards
     static var defaultVisible: Set<AnalyticsCardType> {
-        [.clearTypeOverall, .towerTotals, .towerRecent, .newHighScores, .newClears, .newAssistClears]
+        [.clearTypeOverall, .towerTotals, .newHighScores, .newClears, .newAssistClears]
     }
 }
