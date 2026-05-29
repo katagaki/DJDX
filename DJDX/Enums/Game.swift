@@ -24,7 +24,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
 
     var iconResource: ImageResource? {
         switch self {
-        case .iidxArcade: .iconScores
+        case .iidxArcade: .iconIIDX
         case .soundVoltex, .iidxInfinitas: nil
         }
     }
