@@ -13,6 +13,7 @@ struct MoreNotesRadarView: View {
 
     let spRadarData: RadarData?
     let dpRadarData: RadarData?
+    var maxHeight: CGFloat?
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var selectedPlayType: IIDXPlayType
 
@@ -41,11 +42,10 @@ struct MoreNotesRadarView: View {
                         valueList(for: radarData)
                     } else {
                         RadarChartView(radarData, isPlayerRadar: true)
-                            .frame(height: 200.0)
-                            .padding()
+                            .padding(8.0)
                     }
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: maxHeight)
                 .contentShape(.rect)
                 .onTapGesture {
                     withAnimation(.smooth) {
@@ -55,34 +55,34 @@ struct MoreNotesRadarView: View {
                 .animation(.smooth, value: selectedPlayType)
             }
         }
-        .padding(.vertical, 12.0)
+        .frame(maxHeight: maxHeight)
     }
 
     @ViewBuilder
     func valueList(for radarData: RadarData) -> some View {
-        VStack(spacing: 4.0) {
+        VStack(spacing: 1.0) {
             ForEach(radarData.displayPoints(), id: \.label) { point in
                 HStack {
                     Text(verbatim: point.label)
-                        .font(.system(size: 13, weight: .bold))
+                        .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(point.color)
                     Spacer()
                     Text(verbatim: String(format: "%.2f", point.value))
-                        .font(.system(size: 13, weight: .semibold).monospacedDigit())
+                        .font(.system(size: 10, weight: .semibold).monospacedDigit())
                         .foregroundStyle(.primary)
                 }
             }
             Divider()
-                .padding(.vertical, 2.0)
+                .padding(.vertical, 1.0)
             HStack {
                 Text("More.NotesRadar.Total")
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: 10, weight: .bold))
                 Spacer()
                 Text(verbatim: String(format: "%.2f", radarData.sum()))
-                    .font(.system(size: 13, weight: .bold).monospacedDigit())
+                    .font(.system(size: 10, weight: .bold).monospacedDigit())
             }
         }
-        .padding()
+        .padding(8.0)
         .background {
             switch colorScheme {
             case .light: Color.white

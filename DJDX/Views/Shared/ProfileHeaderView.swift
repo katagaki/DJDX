@@ -17,20 +17,24 @@ struct ProfileHeaderView: View {
     @State var spRadarData: RadarData?
     @State var dpRadarData: RadarData?
 
+    let profileHeight: CGFloat = 150.0
+
     var body: some View {
-        HStack(alignment: .top, spacing: 12.0) {
+        HStack(alignment: .center, spacing: 12.0) {
             if let qproImage {
                 Image(uiImage: qproImage)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 120.0)
+                    .frame(height: profileHeight)
             }
             if spRadarData != nil || dpRadarData != nil {
-                MoreNotesRadarView(spRadarData: spRadarData, dpRadarData: dpRadarData)
+                MoreNotesRadarView(spRadarData: spRadarData, dpRadarData: dpRadarData,
+                                   maxHeight: profileHeight)
                     .frame(maxWidth: .infinity)
             }
         }
         .frame(maxWidth: .infinity)
+        .frame(height: profileHeight)
         .task {
             loadRadarData()
             if qproImage == nil {
