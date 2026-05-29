@@ -321,7 +321,8 @@ struct ScoresView<Header: View>: View {
                 case .scoreViewer(let songRecord, let initialLevel):
                     ScoreViewer(songRecord: songRecord, noteCount: noteCount,
                                 initialLevel: initialLevel)
-                    .automaticNavigationTransition(id: songRecord.title, in: scoresNamespace)
+                    .automaticNavigationTransition(id: "\(songRecord.title).\(initialLevel.rawValue)",
+                                                   in: scoresNamespace)
                 case .scoreHistory(let songTitle, let level, let noteCount):
                     ScoreHistoryViewer(songTitle: songTitle, level: level, noteCount: noteCount)
                 case .textageViewer(let songTitle, let level, let playSide, let playType):
