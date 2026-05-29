@@ -41,7 +41,7 @@ struct MoreNotesRadarView: View {
                     if isShowingValues {
                         valueList(for: radarData)
                     } else {
-                        RadarChartView(radarData, isPlayerRadar: true, labelFontSize: 10.0)
+                        RadarChartView(radarData, isPlayerRadar: true, labelFontSize: 10.0, lineWidth: 1.5)
                             .padding(8.0)
                     }
                 }
