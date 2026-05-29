@@ -72,30 +72,15 @@ extension AnalyticsView {
 
 struct AnalyticsSectionHeader: View {
     let title: LocalizedStringKey
-    let isEditing: Bool
-    var showsEditButton: Bool = true
-    let onToggleEdit: () -> Void
 
     var body: some View {
-        HStack {
-            Text(title)
-                .font(.title3.bold())
-                .foregroundStyle(.primary)
-            Spacer()
-            if showsEditButton {
-                Button {
-                    onToggleEdit()
-                } label: {
-                    Image(systemName: isEditing ? "checkmark" : "pencil")
-                        .font(.subheadline.weight(.semibold))
-                }
-                .buttonStyle(.borderless)
-            }
-        }
-        .padding(.top, 20.0)
-        .padding(.bottom, 12.0)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal)
+        Text(title)
+            .font(.title3.bold())
+            .foregroundStyle(.primary)
+            .padding(.top, 20.0)
+            .padding(.bottom, 12.0)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
     }
 }
 

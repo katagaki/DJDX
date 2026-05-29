@@ -27,6 +27,7 @@ struct UnifiedView: View {
 
     @State var isPresentingImport: Bool = false
     @State var isFirstStartCleanupComplete: Bool = false
+    @State var isEditingAnalytics: Bool = false
 
     @State var analyticsModel = AnalyticsModel()
 
@@ -51,6 +52,17 @@ struct UnifiedView: View {
                     }
                     .automaticMatchedTransitionSource(id: "ImportSheet", in: importNamespace)
                     .popoverTip(ImportMovedTip(), arrowEdge: .top)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        withAnimation(.snappy) { isEditingAnalytics.toggle() }
+                    } label: {
+                        if isEditingAnalytics {
+                            Label("Shared.Done", systemImage: "checkmark")
+                        } else {
+                            Label("Shared.Edit", systemImage: "pencil")
+                        }
+                    }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     SettingsMenu()
@@ -131,7 +143,8 @@ struct UnifiedView: View {
             .padding(.horizontal)
             AnalyticsView(model: analyticsModel,
                           analyticsNamespace: analyticsNamespace,
-                          towerNamespace: towerNamespace)
+                          towerNamespace: towerNamespace,
+                          isEditing: $isEditingAnalytics)
             .frame(minHeight: 360.0)
         }
         .padding(.vertical, 8.0)

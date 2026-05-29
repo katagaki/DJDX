@@ -69,8 +69,10 @@ struct AnalyticsCardView<Content: View>: View {
         VStack(alignment: .leading, spacing: 8.0) {
             HStack(spacing: 6.0) {
                 Image(systemName: systemImage)
-                    .font(.subheadline)
+                    .resizable()
+                    .scaledToFit()
                     .foregroundStyle(iconColor)
+                    .frame(width: 18.0, height: 18.0)
                 title
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
