@@ -69,6 +69,9 @@ struct OverviewClearTypeOverallGraph: View {
         .chartXAxis {
             AxisMarks(values: .automatic(desiredCount: 13))
         }
+        .chartPlotStyle { plotArea in
+            plotArea.padding(.horizontal, isInteractive ? 0.0 : 8.0)
+        }
         .chartXScale(domain: xDomain)
         .chartForegroundStyleScale([
             "FULLCOMBO CLEAR": .blue,
