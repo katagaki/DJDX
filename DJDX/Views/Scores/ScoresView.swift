@@ -56,6 +56,7 @@ struct ScoresView<Header: View>: View {
     let actor = DataFetcher()
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @Namespace var scoresNamespace
 
@@ -273,6 +274,9 @@ struct ScoresView<Header: View>: View {
                 }
             }
             .onChange(of: playTypeToShow) { _, _ in
+                reloadDisplay()
+            }
+            .onChange(of: iidxVersion) { _, _ in
                 reloadDisplay()
             }
             .onChange(of: conditionsForReload) {_, _ in

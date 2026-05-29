@@ -229,6 +229,12 @@ struct AnalyticsView: View {
                     debugPrint("Reloaded on change of play type")
                 }
             }
+            .onChange(of: iidxVersion) { _, _ in
+                Task {
+                    await reload()
+                    debugPrint("Reloaded on change of version")
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
                 Task { await reload() }
             }

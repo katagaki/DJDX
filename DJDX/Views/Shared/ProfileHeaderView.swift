@@ -41,6 +41,9 @@ struct ProfileHeaderView: View {
                 await refreshStatusPageData()
             }
         }
+        .onChange(of: iidxVersion) { _, _ in
+            Task { await refreshStatusPageData() }
+        }
     }
 
     func refreshStatusPageData() async {
