@@ -113,9 +113,9 @@ final class PlayDataDatabase: Sendable {
 
     // MARK: - Initialization
 
-    private init() {
+    init(fileName: String = "PlayData.db") {
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        databasePath = documentsURL.appendingPathComponent("PlayData.db").path
+        databasePath = documentsURL.appendingPathComponent(fileName).path
         createTablesIfNeeded()
     }
 
