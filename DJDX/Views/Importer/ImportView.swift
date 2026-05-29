@@ -138,6 +138,7 @@ struct ImportView: View {
             }
             .onChange(of: didImportSucceed) { _, newValue in
                 if newValue {
+                    NotificationCenter.default.post(name: .dataImported, object: nil)
                     Task { await reloadImportGroups() }
                 }
             }

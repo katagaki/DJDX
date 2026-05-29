@@ -232,6 +232,9 @@ struct AnalyticsView: View {
             .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
                 Task { await reload() }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
+                Task { await reload() }
+            }
     }
 
     func reload() async {
