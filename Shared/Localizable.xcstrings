@@ -3325,6 +3325,40 @@
         }
       }
     },
+    "Tips.ImportMoved.Text": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To import new play data, tap this button."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新しいプレーデータをインポートするには、こちらのボタンを押してください。"
+          }
+        }
+      }
+    },
+    "Tips.ImportMoved.Title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imports Has Moved"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インポートはこちら"
+          }
+        }
+      }
+    },
     "Tips.StartHere.Text": {
       "localizations": {
         "en": {

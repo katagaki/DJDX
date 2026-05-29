@@ -50,6 +50,7 @@ struct UnifiedView: View {
                         isPresentingImport = true
                     }
                     .automaticMatchedTransitionSource(id: "ImportSheet", in: importNamespace)
+                    .popoverTip(ImportMovedTip(), arrowEdge: .top)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     SettingsMenu()
