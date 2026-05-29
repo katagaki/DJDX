@@ -143,10 +143,9 @@ struct UnifiedView: View {
             Group {
                 switch selectedSegment {
                 case .analytics:
-                    AnalyticsView(model: analyticsModel, analyticsNamespace: analyticsNamespace)
-                case .tower:
-                    TowerView(towerNamespace: towerNamespace)
-                        .padding(.horizontal)
+                    AnalyticsView(model: analyticsModel,
+                                  analyticsNamespace: analyticsNamespace,
+                                  towerNamespace: towerNamespace)
                 case .activity:
                     ActivityView()
                         .padding(.horizontal)

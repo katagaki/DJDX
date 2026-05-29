@@ -65,15 +65,13 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
 
     var destinations: [GameDestination] {
         switch self {
-        case .iidxArcade: [.analytics, .tower, .activity]
-        case .soundVoltex, .iidxInfinitas: [.analytics, .activity]
+        case .iidxArcade, .soundVoltex, .iidxInfinitas: [.analytics, .activity]
         }
     }
 }
 
 enum GameDestination: Int, Hashable, Identifiable, CaseIterable {
     case analytics
-    case tower
     case activity
 
     var id: Int { rawValue }
@@ -81,7 +79,6 @@ enum GameDestination: Int, Hashable, Identifiable, CaseIterable {
     var titleKey: LocalizedStringKey {
         switch self {
         case .analytics: "ViewTitle.Analytics"
-        case .tower: "Shared.IIDX.Tower"
         case .activity: "ViewTitle.Activity"
         }
     }

@@ -10,6 +10,8 @@ import SwiftUI
 
 enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case clearTypeOverall
+    case towerRecent
+    case towerTotals
     case newHighScores
     case newAAA
     case newAA
@@ -24,14 +26,21 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// Summary cards are the count-based cards (not clearTypeOverall)
+    /// Summary cards are the count-based cards (not clearTypeOverall or tower cards)
     var isSummaryCard: Bool {
-        self != .clearTypeOverall
+        self != .clearTypeOverall && !isTowerCard
+    }
+
+    /// Tower cards are IIDX-AC-only full-width chart cards
+    var isTowerCard: Bool {
+        self == .towerRecent || self == .towerTotals
     }
 
     var titleText: Text {
         switch self {
         case .clearTypeOverall: return Text("Analytics.ClearType.Overall")
+        case .towerRecent: return Text("Tower.ChartMode.Recent")
+        case .towerTotals: return Text("Tower.ChartMode.Totals")
         case .newHighScores: return Text("Analytics.NewHighScores")
         case .newFullComboClear: return Text(verbatim: "FULLCOMBO CLEAR")
         case .newClears: return Text(verbatim: "CLEAR")
@@ -49,6 +58,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var titleKey: String {
         switch self {
         case .clearTypeOverall: return "Analytics.ClearType.Overall"
+        case .towerRecent: return "Tower.ChartMode.Recent"
+        case .towerTotals: return "Tower.ChartMode.Totals"
         case .newHighScores: return "Analytics.NewHighScores"
         case .newFullComboClear: return "FULLCOMBO CLEAR"
         case .newClears: return "CLEAR"
@@ -66,6 +77,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var systemImage: String {
         switch self {
         case .clearTypeOverall: return "chart.bar"
+        case .towerRecent: return "chart.bar.xaxis"
+        case .towerTotals: return "building.2"
         case .newHighScores: return "trophy"
         case .newFullComboClear: return "star.circle"
         case .newClears: return "checkmark.circle"
@@ -83,6 +96,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var iconColor: Color {
         switch self {
         case .clearTypeOverall: return .blue
+        case .towerRecent: return .blue
+        case .towerTotals: return .orange
         case .newHighScores: return .orange
         case .newFullComboClear: return .blue
         case .newClears: return .cyan
@@ -101,6 +116,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var cardContentHeight: CGFloat {
         switch self {
         case .clearTypeOverall: return 80.0
+        case .towerRecent, .towerTotals: return 200.0
         case .newFullComboClear,
              .newClears,
              .newEasyClears,
@@ -121,10 +137,17 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         self == .clearTypeOverall
     }
 
+    /// Tower cards, shown in their own section
+    static var towerCards: [AnalyticsCardType] {
+        [.towerRecent, .towerTotals]
+    }
+
     /// Default card order
     static var defaultOrder: [AnalyticsCardType] {
         [
             .clearTypeOverall,
+            .towerRecent,
+            .towerTotals,
             .newHighScores,
             .newAAA,
             .newAA,

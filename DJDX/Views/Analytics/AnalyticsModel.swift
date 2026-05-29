@@ -33,10 +33,30 @@ final class AnalyticsModel {
     var newAA: [NewDJLevelEntry] = []
     var newA: [NewDJLevelEntry] = []
 
+    // Tower
+    var towerEntries: [IIDXTowerEntry] = []
+
     var dataState: DataState = .initializing
 
     let fetcher = DataFetcher()
     let difficulties: [Int] = Array(1...12)
+
+    var towerChartEntries: [IIDXTowerEntry] {
+        let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: .now)!
+        let recentEntries = towerEntries.prefix(while: { $0.playDate >= thirtyDaysAgo })
+        if recentEntries.count >= 5 {
+            return Array(recentEntries).reversed()
+        }
+        return Array(towerEntries.prefix(5)).reversed()
+    }
+
+    var towerTotalKeyCount: Int {
+        towerEntries.reduce(0) { $0 + $1.keyCount } / 100
+    }
+
+    var towerTotalScratchCount: Int {
+        towerEntries.reduce(0) { $0 + $1.scratchCount } / 100
+    }
 
     func reload(playType: IIDXPlayType, iidxVersion: IIDXVersion) async {
         dataState = .loading
@@ -44,6 +64,7 @@ final class AnalyticsModel {
         await reloadOverview(playType: playType)
         await reloadTrends(playType: playType, iidxVersion: iidxVersion)
         await reloadNewClearsAndHighScores(playType: playType, iidxVersion: iidxVersion)
+        towerEntries = await fetcher.allTowerEntries()
         await WidgetDataPublisher.shared.publishClearTypeAndDJLevel(
             playType: playType, iidxVersion: iidxVersion
         )

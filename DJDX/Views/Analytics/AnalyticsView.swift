@@ -18,6 +18,7 @@ struct AnalyticsView: View {
 
     @Bindable var model: AnalyticsModel
 
+    @AppStorage(wrappedValue: Game.iidxArcade, "Global.SelectedGame") var selectedGame: Game
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: 1, "Analytics.Overview.ClearType.Level") var levelFilterForOverviewClearType: Int
     @AppStorage(wrappedValue: 1, "Analytics.Overview.ScoreRate.Level") var levelFilterForOverviewScoreRate: Int
@@ -54,6 +55,33 @@ struct AnalyticsView: View {
     ]
 
     var analyticsNamespace: Namespace.ID
+    var towerNamespace: Namespace.ID
+
+    @ViewBuilder
+    func towerCardButton(for cardType: AnalyticsCardType) -> some View {
+        let transitionID = cardType == .towerRecent ? "Tower.Recent" : "Tower.Totals"
+        Button {
+            if !isEditingCards {
+                navigationManager.push(cardType == .towerRecent ? TowerPath.recent : TowerPath.totals)
+            }
+        } label: {
+            AnalyticsCardView(cardType: cardType) {
+                switch cardType {
+                case .towerRecent:
+                    TowerBarChart(entries: model.towerChartEntries)
+                case .towerTotals:
+                    TowerTotalsChart(
+                        totalKeyCount: model.towerTotalKeyCount,
+                        totalScratchCount: model.towerTotalScratchCount
+                    )
+                default:
+                    EmptyView()
+                }
+            }
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: transitionID, in: towerNamespace)
+    }
 
     @ViewBuilder
     var editControls: some View {
@@ -100,6 +128,19 @@ struct AnalyticsView: View {
                     .padding(.horizontal)
                     .padding(.top, 8.0)
 
+                // Tower cards (full width, IIDX AC only)
+                let visibleTowerCards = selectedGame.supportsTower ? cardOrder.filter {
+                    $0.isTowerCard && visibleCards.contains($0)
+                } : []
+                ForEach(visibleTowerCards, id: \.self) { cardType in
+                    towerCardButton(for: cardType)
+                        .padding(.horizontal)
+                        .padding(.top, 8.0)
+                        .cardDraggable(cardType, editing: isEditingCards,
+                                       draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                       onReorder: saveCardOrder)
+                }
+
                 // Summary cards - horizontal scroll
                 let visibleSummaryCards = cardOrder.filter {
                     $0.isSummaryCard && visibleCards.contains($0)
@@ -108,7 +149,8 @@ struct AnalyticsView: View {
                     Text("Analytics.Header.NewScores")
                         .font(.subheadline.bold())
                         .foregroundStyle(.secondary)
-                        .padding(.top, 8.0)
+                        .padding(.top, 20.0)
+                        .padding(.bottom, 4.0)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                         .padding(.leading, 12.0)
@@ -130,7 +172,8 @@ struct AnalyticsView: View {
                 Text("Analytics.Header.PerLevel")
                     .font(.subheadline.bold())
                     .foregroundStyle(.secondary)
-                    .padding(.top, 8.0)
+                    .padding(.top, 20.0)
+                    .padding(.bottom, 4.0)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
                     .padding(.leading, 12.0)
@@ -159,7 +202,8 @@ struct AnalyticsView: View {
                     onSaveVisibleCards: saveVisibleCards,
                     onSaveVisiblePerLevelCards: saveVisiblePerLevelCards,
                     onSaveCardOrder: saveCardOrder,
-                    onSavePerLevelCardOrder: savePerLevelCardOrder
+                    onSavePerLevelCardOrder: savePerLevelCardOrder,
+                    showsTowerCards: selectedGame.supportsTower
                 )
             }
             .task {

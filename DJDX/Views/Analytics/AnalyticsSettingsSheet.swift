@@ -17,6 +17,7 @@ struct AnalyticsSettingsSheet: View {
     var onSaveVisiblePerLevelCards: () -> Void
     var onSaveCardOrder: () -> Void
     var onSavePerLevelCardOrder: () -> Void
+    var showsTowerCards: Bool = true
 
     let difficulties: [Int] = Array(1...12)
 
@@ -25,8 +26,34 @@ struct AnalyticsSettingsSheet: View {
     var body: some View {
         NavigationStack {
             List {
+                if showsTowerCards {
+                    Section("Shared.IIDX.Tower") {
+                        ForEach(AnalyticsCardType.towerCards) { cardType in
+                            Toggle(isOn: Binding<Bool>(
+                                get: { visibleCards.contains(cardType) },
+                                set: { newValue in
+                                    withAnimation(.snappy) {
+                                        if newValue {
+                                            visibleCards.insert(cardType)
+                                        } else {
+                                            visibleCards.remove(cardType)
+                                        }
+                                        onSaveVisibleCards()
+                                    }
+                                }
+                            )) {
+                                Label {
+                                    cardType.titleText
+                                } icon: {
+                                    Image(systemName: cardType.systemImage)
+                                        .foregroundStyle(cardType.iconColor)
+                                }
+                            }
+                        }
+                    }
+                }
                 Section("Analytics.Settings.Cards") {
-                    ForEach(AnalyticsCardType.allCases.filter { !$0.isPinned }) { cardType in
+                    ForEach(AnalyticsCardType.allCases.filter { !$0.isPinned && !$0.isTowerCard }) { cardType in
                         Toggle(isOn: Binding<Bool>(
                             get: { visibleCards.contains(cardType) },
                             set: { newValue in
