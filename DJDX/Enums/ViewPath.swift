@@ -54,3 +54,8 @@ enum MorePath: Hashable {
     case moreAppIcon
     case moreAttributions
 }
+
+enum TowerPath: Hashable {
+    case recent
+    case totals
+}

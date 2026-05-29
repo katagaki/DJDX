@@ -160,15 +160,11 @@ struct ScoresView<Header: View>: View {
     }
 
     var body: some View {
-        List {
-            if searchTerm.isEmpty {
-                Section {
+        ScrollView {
+            LazyVStack(spacing: 0.0) {
+                if searchTerm.isEmpty {
                     header
                 }
-                .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
-            }
                 ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
                         id: \.id) { entry in
                     Button {
@@ -184,14 +180,12 @@ struct ScoresView<Header: View>: View {
                             scoreRate: songRecordClearRates[entry.songRecord]?[entry.level]
                         )
                     }
-                    .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 0.0))
-                    .alignmentGuide(.listRowSeparatorLeading) { dimensions in
-                        dimensions[.leading]
-                    }
+                    .buttonStyle(.plain)
+                    Divider()
+                        .padding(.leading, 16.0)
                 }
-                .listRowBackground(Color.clear)
             }
-            .listStyle(.plain)
+        }
             .scrollContentBackground(.hidden)
             .background {
                 LinearGradient(

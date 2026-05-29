@@ -94,7 +94,7 @@ struct AnalyticsView: View {
     }
 
     var body: some View {
-        ScrollView {
+        VStack(spacing: 0.0) {
                 // Overall summary (position fixed)
                 clearTypeOverallCard
                     .padding(.horizontal)
@@ -149,11 +149,6 @@ struct AnalyticsView: View {
                 editControls
                     .padding(.horizontal)
                     .padding(.bottom, 16.0)
-            }
-            .scrollContentBackground(.hidden)
-            .refreshable {
-                await reload()
-                debugPrint("Reloaded from swipe to refresh")
             }
             .sheet(isPresented: $isShowingSettings) {
                 AnalyticsSettingsSheet(

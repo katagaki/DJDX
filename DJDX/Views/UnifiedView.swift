@@ -33,6 +33,7 @@ struct UnifiedView: View {
 
     @Namespace var importNamespace
     @Namespace var analyticsNamespace
+    @Namespace var towerNamespace
 
     var body: some View {
         @Bindable var progressAlertManager = progressAlertManager
@@ -68,6 +69,13 @@ struct UnifiedView: View {
                     path: viewPath,
                     analyticsNamespace: analyticsNamespace
                 )
+            }
+            .navigationDestination(for: TowerPath.self) { path in
+                TowerDetailContainer(path: path)
+                    .automaticNavigationTransition(
+                        id: path == .recent ? "Tower.Recent" : "Tower.Totals",
+                        in: towerNamespace
+                    )
             }
         }
         .sheet(isPresented: $isPresentingImport) {
@@ -137,7 +145,7 @@ struct UnifiedView: View {
                 case .analytics:
                     AnalyticsView(model: analyticsModel, analyticsNamespace: analyticsNamespace)
                 case .tower:
-                    TowerView()
+                    TowerView(towerNamespace: towerNamespace)
                         .padding(.horizontal)
                 case .activity:
                     ActivityView()
