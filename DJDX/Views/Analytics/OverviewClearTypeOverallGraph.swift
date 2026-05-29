@@ -29,7 +29,11 @@ struct OverviewClearTypeOverallGraph: View {
               let last = populatedDifficulties.last else {
             return 1...13
         }
-        return first...max(last, first + 1)
+        if populatedDifficulties.count == 1 {
+            // Pad a single data point with its neighbors when in range
+            return max(1, first - 1)...min(12, first + 1)
+        }
+        return first...last
     }
 
     var body: some View {
