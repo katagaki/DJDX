@@ -7,32 +7,12 @@
 
 import SwiftUI
 
-struct ScoreSortAndFilter: View {
+struct ScoreSortMenu: View {
 
-    @Binding var isShowingOnlyPlayDataWithScores: Bool
-    @Binding var difficultiesToShow: Set<IIDXDifficulty>
-    @Binding var levelsToShow: Set<IIDXLevel>
-    @Binding var clearTypesToShow: Set<IIDXClearType>
-    @Binding var djLevelsToShow: Set<IIDXDJLevel>
-    @Binding var versionsToShow: Set<String>
     @Binding var sortMode: SortMode
     @Binding var sortOrder: SortOrder
-    @Binding var isSystemChangingFilterAndSort: Bool
-    var filterNamespace: Namespace.ID
-    var onReset: () -> Void
-
-    @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.DJLevelVisible") var isDJLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ScoreRateVisible") var isScoreRateVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
-    @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
-
-    @State private var isShowingFilterSheet: Bool = false
 
     var body: some View {
-        // Sort
         Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
             Picker("Shared.Sort", selection: $sortMode) {
                 ForEach(SortMode.whenLevelFiltered, id: \.self) { sortMode in
@@ -53,8 +33,32 @@ struct ScoreSortAndFilter: View {
         }
         .menuOrder(.fixed)
         .menuActionDismissBehavior(.disabled)
+    }
+}
 
-        // Filter
+struct ScoreFilterButton: View {
+
+    @Binding var isShowingOnlyPlayDataWithScores: Bool
+    @Binding var difficultiesToShow: Set<IIDXDifficulty>
+    @Binding var levelsToShow: Set<IIDXLevel>
+    @Binding var clearTypesToShow: Set<IIDXClearType>
+    @Binding var djLevelsToShow: Set<IIDXDJLevel>
+    @Binding var versionsToShow: Set<String>
+    @Binding var isSystemChangingFilterAndSort: Bool
+    var filterNamespace: Namespace.ID
+    var onReset: () -> Void
+
+    @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.DJLevelVisible") var isDJLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreRateVisible") var isScoreRateVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
+    @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
+
+    @State private var isShowingFilterSheet: Bool = false
+
+    var body: some View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }

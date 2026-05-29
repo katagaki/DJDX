@@ -136,25 +136,25 @@ struct ScoresView<Header: View>: View {
         }
     }
 
-    @ViewBuilder var sortFilterControls: some View {
-        if dataState == .initializing {
-            ProgressView()
-                .progressViewStyle(.circular)
-        } else {
-            ScoreSortAndFilter(
-                isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
-                levelsToShow: $levelsToShow.animation(.snappy.speed(2.0)),
-                clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
-                djLevelsToShow: $djLevelsToShow.animation(.snappy.speed(2.0)),
-                versionsToShow: $versionsToShow.animation(.snappy.speed(2.0)),
-                sortMode: $sortMode.animation(.snappy.speed(2.0)),
-                sortOrder: $sortOrder.animation(.snappy.speed(2.0)),
-                isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort,
-                filterNamespace: scoresNamespace
-            ) {
-                reloadDisplay()
-            }
+    @ViewBuilder var sortControl: some View {
+        ScoreSortMenu(
+            sortMode: $sortMode.animation(.snappy.speed(2.0)),
+            sortOrder: $sortOrder.animation(.snappy.speed(2.0))
+        )
+    }
+
+    @ViewBuilder var filterControl: some View {
+        ScoreFilterButton(
+            isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
+            difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
+            levelsToShow: $levelsToShow.animation(.snappy.speed(2.0)),
+            clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
+            djLevelsToShow: $djLevelsToShow.animation(.snappy.speed(2.0)),
+            versionsToShow: $versionsToShow.animation(.snappy.speed(2.0)),
+            isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort,
+            filterNamespace: scoresNamespace
+        ) {
+            reloadDisplay()
         }
     }
 
@@ -207,13 +207,17 @@ struct ScoresView<Header: View>: View {
                     }
                     DefaultToolbarItem(kind: .search, placement: .bottomBar)
                     ToolbarSpacer(.flexible, placement: .bottomBar)
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        sortFilterControls
+                    ToolbarItem(placement: .bottomBar) {
+                        sortControl
+                    }
+                    ToolbarItem(placement: .bottomBar) {
+                        filterControl
                     }
                 } else {
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         timeTravelButton
-                        sortFilterControls
+                        sortControl
+                        filterControl
                     }
                 }
             }
