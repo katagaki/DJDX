@@ -19,22 +19,30 @@ struct ProfileHeaderView: View {
 
     let profileHeight: CGFloat = 150.0
 
+    var hasData: Bool {
+        qproImage != nil || spRadarData != nil || dpRadarData != nil
+    }
+
     var body: some View {
-        HStack(alignment: .center, spacing: 12.0) {
-            if let qproImage {
-                Image(uiImage: qproImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: profileHeight)
-            }
-            if spRadarData != nil || dpRadarData != nil {
-                MoreNotesRadarView(spRadarData: spRadarData, dpRadarData: dpRadarData,
-                                   maxHeight: profileHeight)
-                    .frame(maxWidth: .infinity)
+        Group {
+            if hasData {
+                HStack(alignment: .center, spacing: 12.0) {
+                    if let qproImage {
+                        Image(uiImage: qproImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: profileHeight)
+                    }
+                    if spRadarData != nil || dpRadarData != nil {
+                        MoreNotesRadarView(spRadarData: spRadarData, dpRadarData: dpRadarData,
+                                           maxHeight: profileHeight)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: profileHeight)
             }
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: profileHeight)
         .task {
             loadRadarData()
             if qproImage == nil {
