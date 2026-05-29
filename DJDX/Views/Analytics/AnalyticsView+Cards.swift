@@ -45,7 +45,7 @@ extension AnalyticsView {
 
     var clearTypeOverallCard: some View {
         Button {
-            if !isEditingCards && clearTypePerDifficulty.count > 0 {
+            if !isEditingCards && model.clearTypePerDifficulty.count > 0 {
                 navigationManager.push(AnalyticsPath.clearTypeOverviewGraph)
             }
         } label: {
@@ -66,7 +66,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: .newClears) {
-                NewClearsCard(newClears: $newClears)
+                NewClearsCard(newClears: $model.newClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -80,7 +80,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: .newAssistClears) {
-                NewClearsCard(newClears: $newAssistClears)
+                NewClearsCard(newClears: $model.newAssistClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -94,7 +94,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: .newEasyClears) {
-                NewClearsCard(newClears: $newEasyClears)
+                NewClearsCard(newClears: $model.newEasyClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -108,7 +108,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: .newFullComboClear) {
-                NewClearsCard(newClears: $newFullComboClears)
+                NewClearsCard(newClears: $model.newFullComboClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -122,7 +122,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: .newHardClear) {
-                NewClearsCard(newClears: $newHardClears)
+                NewClearsCard(newClears: $model.newHardClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -136,7 +136,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: .newExHardClear) {
-                NewClearsCard(newClears: $newExHardClears)
+                NewClearsCard(newClears: $model.newExHardClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -150,7 +150,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: .newFailed) {
-                NewClearsCard(newClears: $newFailed)
+                NewClearsCard(newClears: $model.newFailed)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -164,7 +164,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: .newHighScores) {
-                NewHighScoresCard(newHighScores: $newHighScores)
+                NewHighScoresCard(newHighScores: $model.newHighScores)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -178,7 +178,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: .newAAA) {
-                NewDJLevelsCard(newDJLevels: $newAAA)
+                NewDJLevelsCard(newDJLevels: $model.newAAA)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -192,7 +192,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: .newAA) {
-                NewDJLevelsCard(newDJLevels: $newAA)
+                NewDJLevelsCard(newDJLevels: $model.newAA)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -206,7 +206,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: .newA) {
-                NewDJLevelsCard(newDJLevels: $newA)
+                NewDJLevelsCard(newDJLevels: $model.newA)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -239,7 +239,7 @@ extension AnalyticsView {
 
     func clearTypeForLevelCard(difficulty: Int) -> some View {
         Button {
-            if !isEditingCards && clearTypePerDifficulty[difficulty] != nil {
+            if !isEditingCards && model.clearTypePerDifficulty[difficulty] != nil {
                 navigationManager.push(AnalyticsPath.clearTypeForLevel(difficulty: difficulty))
             }
         } label: {
@@ -247,7 +247,7 @@ extension AnalyticsView {
                               systemImage: "medal.star",
                               iconColor: .secondary) {
                 OverviewClearTypePerDifficultyGraph(
-                    graphData: $clearTypePerDifficulty,
+                    graphData: $model.clearTypePerDifficulty,
                     difficulty: .constant(difficulty)
                 )
                 .chartLegend(.hidden)
@@ -261,14 +261,14 @@ extension AnalyticsView {
 
     func clearTypeTrendsForLevelCard(difficulty: Int) -> some View {
         Button {
-            if !isEditingCards && clearTypePerImportGroup.count > 0 {
+            if !isEditingCards && model.clearTypePerImportGroup.count > 0 {
                 navigationManager.push(AnalyticsPath.clearTypeTrendsForLevel(difficulty: difficulty))
             }
         } label: {
             AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
                               systemImage: "medal.star",
                               iconColor: .secondary) {
-                TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
+                TrendsClearTypeGraph(graphData: $model.clearTypePerImportGroup,
                                      difficulty: .constant(difficulty))
                     .chartLegend(.hidden)
                     .chartYAxis(.hidden)
@@ -284,7 +284,7 @@ extension AnalyticsView {
 
     func djLevelForLevelCard(difficulty: Int) -> some View {
         Button {
-            if !isEditingCards && djLevelPerDifficulty[difficulty] != nil {
+            if !isEditingCards && model.djLevelPerDifficulty[difficulty] != nil {
                 navigationManager.push(AnalyticsPath.djLevelForLevel(difficulty: difficulty))
             }
         } label: {
@@ -292,7 +292,7 @@ extension AnalyticsView {
                               systemImage: "medal.star",
                               iconColor: .secondary) {
                 OverviewDJLevelPerDifficultyGraph(
-                    graphData: $djLevelPerDifficulty,
+                    graphData: $model.djLevelPerDifficulty,
                     difficulty: .constant(difficulty)
                 )
                 .chartLegend(.hidden)
@@ -306,14 +306,14 @@ extension AnalyticsView {
 
     func djLevelTrendsForLevelCard(difficulty: Int) -> some View {
         Button {
-            if !isEditingCards && djLevelPerImportGroup.count > 0 {
+            if !isEditingCards && model.djLevelPerImportGroup.count > 0 {
                 navigationManager.push(AnalyticsPath.djLevelTrendsForLevel(difficulty: difficulty))
             }
         } label: {
             AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
                               systemImage: "medal.star",
                               iconColor: .secondary) {
-                TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
+                TrendsDJLevelGraph(graphData: $model.djLevelPerImportGroup,
                                    difficulty: .constant(difficulty))
                     .chartLegend(.hidden)
                     .chartYAxis(.hidden)
@@ -330,7 +330,7 @@ extension AnalyticsView {
     // MARK: - Filtered Data
 
     var filteredClearTypeData: [Int: OrderedDictionary<String, Int>] {
-        clearTypePerDifficulty.filter { visibleLevels.contains($0.key) }
+        model.clearTypePerDifficulty.filter { visibleLevels.contains($0.key) }
     }
 
 }

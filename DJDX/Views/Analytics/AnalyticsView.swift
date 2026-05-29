@@ -16,6 +16,8 @@ struct AnalyticsView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
 
+    @Bindable var model: AnalyticsModel
+
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: 1, "Analytics.Overview.ClearType.Level") var levelFilterForOverviewClearType: Int
     @AppStorage(wrappedValue: 1, "Analytics.Overview.ScoreRate.Level") var levelFilterForOverviewScoreRate: Int
@@ -44,39 +46,14 @@ struct AnalyticsView: View {
     @AppStorage(wrappedValue: Data(), "Analytics.VisiblePerLevelCards") var visiblePerLevelCardsData: Data
     @State var visiblePerLevelCardSet: Set<PerLevelCardID> = PerLevelCardID.defaultVisible
 
-    // Overall
-    @State var clearTypePerDifficulty: [Int: OrderedDictionary<String, Int>] = [:]
-    @State var djLevelPerDifficulty: [Int: [IIDXDJLevel: Int]] = [:]
-
-    // Trends
-    @State var clearTypePerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-    @State var djLevelPerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-
-    // New Clears & High Scores
-    @State var newClears: [NewClearEntry] = []
-    @State var newAssistClears: [NewClearEntry] = []
-    @State var newEasyClears: [NewClearEntry] = []
-    @State var newFullComboClears: [NewClearEntry] = []
-    @State var newHardClears: [NewClearEntry] = []
-    @State var newExHardClears: [NewClearEntry] = []
-    @State var newFailed: [NewClearEntry] = []
-    @State var newHighScores: [NewHighScoreEntry] = []
-    @State var newAAA: [NewDJLevelEntry] = []
-    @State var newAA: [NewDJLevelEntry] = []
-    @State var newA: [NewDJLevelEntry] = []
-
     @State var isShowingSettings: Bool = false
-    @State var dataState: DataState = .initializing
-
-    let fetcher = DataFetcher()
-    let difficulties: [Int] = Array(1...12)
 
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
         GridItem(.flexible(), spacing: 12.0)
     ]
 
-    @Namespace var analyticsNamespace
+    var analyticsNamespace: Namespace.ID
 
     @ViewBuilder
     var editControls: some View {
@@ -92,7 +69,7 @@ struct AnalyticsView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-        } else if dataState == .initializing || dataState == .loading {
+        } else if model.dataState == .initializing || model.dataState == .loading {
             ProgressView()
                 .progressViewStyle(.circular)
                 .frame(maxWidth: .infinity)
@@ -195,7 +172,7 @@ struct AnalyticsView: View {
                 loadVisibleCards()
                 loadPerLevelCardOrder()
                 loadVisiblePerLevelCards()
-                if dataState == .initializing {
+                if model.dataState == .initializing {
                     await reload()
                 }
             }
@@ -208,202 +185,10 @@ struct AnalyticsView: View {
             .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
                 Task { await reload() }
             }
-            .navigationDestination(for: AnalyticsPath.self) { viewPath in
-                Group {
-                    switch viewPath {
-                    case .clearTypeOverviewGraph:
-                        OverviewClearTypeOverallGraph(
-                            graphData: .constant(filteredClearTypeData),
-                            isInteractive: true
-                        )
-                        .chartLegend(
-                            position: .bottom,
-                            alignment: .leading,
-                            spacing: 16.0
-                        )
-                        .padding()
-                        .navigationTitle("Analytics.ClearType.Overall")
-                        .automaticNavigationTransition(id: "ClearType.Overall", in: analyticsNamespace)
-                    case .clearTypePerDifficultyGraph:
-                        VStack {
-                            TogglableClearTypeDetailView(
-                                graphData: $clearTypePerDifficulty,
-                                difficulty: $levelFilterForOverviewClearType
-                            )
-                            DifficultyPicker(
-                                selection: $levelFilterForOverviewClearType,
-                                difficulties: .constant(difficulties)
-                            )
-                        }
-                        .padding(.top)
-                        .navigationTitle("Analytics.ClearType.ByDifficulty")
-                        .automaticNavigationTransition(id: "ClearType.ByDifficulty", in: analyticsNamespace)
-                    case .scoreRatePerDifficultyGraph:
-                        VStack {
-                            TogglableDJLevelDetailView(
-                                graphData: $djLevelPerDifficulty,
-                                difficulty: $levelFilterForOverviewScoreRate
-                            )
-                            DifficultyPicker(
-                                selection: $levelFilterForOverviewScoreRate,
-                                difficulties: .constant(difficulties)
-                            )
-                            .padding(.top)
-                        }
-                        .navigationTitle("Analytics.DJLevel.ByDifficulty")
-                        .automaticNavigationTransition(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
-                    case .trendsClearTypeGraph:
-                        VStack {
-                            TrendsClearTypeGraph(
-                                graphData: $clearTypePerImportGroup,
-                                difficulty: $levelFilterForTrendsClearType
-                            )
-                            .chartLegend(.visible)
-                            DifficultyPicker(
-                                selection: $levelFilterForTrendsClearType,
-                                difficulties: .constant(difficulties)
-                            )
-                            .padding(.top)
-                        }
-                        .padding()
-                        .navigationTitle("Analytics.Trends.ClearType")
-                        .automaticNavigationTransition(id: "Trends.ClearType", in: analyticsNamespace)
-                    case .trendsDJLevelGraph:
-                        VStack {
-                            TrendsDJLevelGraph(
-                                graphData: $djLevelPerImportGroup,
-                                difficulty: $levelFilterForTrendsDJLevel
-                            )
-                            .chartLegend(.visible)
-                            DifficultyPicker(
-                                selection: $levelFilterForTrendsDJLevel,
-                                difficulties: .constant(difficulties)
-                            )
-                            .padding(.top)
-                        }
-                        .padding()
-                        .navigationTitle("Analytics.Trends.DJLevel")
-                        .automaticNavigationTransition(id: "Trends.DJLevel", in: analyticsNamespace)
-                    case .clearTypeForLevel(let difficulty):
-                        TogglableClearTypeDetailView(
-                            graphData: $clearTypePerDifficulty,
-                            difficulty: .constant(difficulty)
-                        )
-                        .navigationTitle("LEVEL \(difficulty)")
-                        .automaticNavigationTransition(
-                            id: "ClearType.Level.\(difficulty)", in: analyticsNamespace
-                        )
-                    case .clearTypeTrendsForLevel(let difficulty):
-                        TrendsClearTypeGraph(
-                            graphData: $clearTypePerImportGroup,
-                            difficulty: .constant(difficulty)
-                        )
-                        .chartLegend(.visible)
-                        .padding()
-                        .navigationTitle("LEVEL \(difficulty)")
-                        .automaticNavigationTransition(
-                            id: "ClearTypeTrends.Level.\(difficulty)", in: analyticsNamespace
-                        )
-                    case .djLevelForLevel(let difficulty):
-                        TogglableDJLevelDetailView(
-                            graphData: $djLevelPerDifficulty,
-                            difficulty: .constant(difficulty)
-                        )
-                        .navigationTitle("LEVEL \(difficulty)")
-                        .automaticNavigationTransition(
-                            id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace
-                        )
-                    case .djLevelTrendsForLevel(let difficulty):
-                        TrendsDJLevelGraph(
-                            graphData: $djLevelPerImportGroup,
-                            difficulty: .constant(difficulty)
-                        )
-                        .chartLegend(.visible)
-                        .padding()
-                        .navigationTitle("LEVEL \(difficulty)")
-                        .automaticNavigationTransition(
-                            id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
-                        )
-                    case .newClearsDetail:
-                        NewClearsDetailView(
-                            newClears: $newClears,
-                            title: AnalyticsCardType.newClears.titleKey
-                        )
-                        .automaticNavigationTransition(id: "NewClears", in: analyticsNamespace)
-                    case .newAssistClearsDetail:
-                        NewClearsDetailView(
-                            newClears: $newAssistClears,
-                            title: AnalyticsCardType.newAssistClears.titleKey
-                        )
-                        .automaticNavigationTransition(
-                            id: "NewAssistClears", in: analyticsNamespace
-                        )
-                    case .newEasyClearsDetail:
-                        NewClearsDetailView(
-                            newClears: $newEasyClears,
-                            title: AnalyticsCardType.newEasyClears.titleKey
-                        )
-                        .automaticNavigationTransition(
-                            id: "NewEasyClears", in: analyticsNamespace
-                        )
-                    case .newFullComboClearDetail:
-                        NewClearsDetailView(
-                            newClears: $newFullComboClears,
-                            title: AnalyticsCardType.newFullComboClear.titleKey
-                        )
-                        .automaticNavigationTransition(
-                            id: "NewFullComboClear", in: analyticsNamespace
-                        )
-                    case .newHardClearDetail:
-                        NewClearsDetailView(
-                            newClears: $newHardClears,
-                            title: AnalyticsCardType.newHardClear.titleKey
-                        )
-                        .automaticNavigationTransition(
-                            id: "NewHardClear", in: analyticsNamespace
-                        )
-                    case .newExHardClearDetail:
-                        NewClearsDetailView(
-                            newClears: $newExHardClears,
-                            title: AnalyticsCardType.newExHardClear.titleKey
-                        )
-                        .automaticNavigationTransition(
-                            id: "NewExHardClear", in: analyticsNamespace
-                        )
-                    case .newFailedDetail:
-                        NewClearsDetailView(
-                            newClears: $newFailed,
-                            title: AnalyticsCardType.newFailed.titleKey
-                        )
-                        .automaticNavigationTransition(
-                            id: "NewFailed", in: analyticsNamespace
-                        )
-                    case .newHighScoresDetail:
-                        NewHighScoresDetailView(newHighScores: $newHighScores)
-                            .automaticNavigationTransition(id: "NewHighScores", in: analyticsNamespace)
-                    case .newAAADetail:
-                        NewDJLevelsDetailView(
-                            newDJLevels: $newAAA,
-                            title: AnalyticsCardType.newAAA.titleKey
-                        )
-                        .automaticNavigationTransition(id: "NewAAA", in: analyticsNamespace)
-                    case .newAADetail:
-                        NewDJLevelsDetailView(
-                            newDJLevels: $newAA,
-                            title: AnalyticsCardType.newAA.titleKey
-                        )
-                        .automaticNavigationTransition(id: "NewAA", in: analyticsNamespace)
-                    case .newADetail:
-                        NewDJLevelsDetailView(
-                            newDJLevels: $newA,
-                            title: AnalyticsCardType.newA.titleKey
-                        )
-                        .automaticNavigationTransition(id: "NewA", in: analyticsNamespace)
-                    default: Color.clear
-                    }
-                }
-                .navigationBarTitleDisplayMode(.inline)
-            }
+    }
+
+    func reload() async {
+        await model.reload(playType: playTypeToShow, iidxVersion: iidxVersion)
     }
 
 }

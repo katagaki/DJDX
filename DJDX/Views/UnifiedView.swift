@@ -29,7 +29,10 @@ struct UnifiedView: View {
     @State var isPresentingImport: Bool = false
     @State var isFirstStartCleanupComplete: Bool = false
 
+    @State var analyticsModel = AnalyticsModel()
+
     @Namespace var importNamespace
+    @Namespace var analyticsNamespace
 
     var body: some View {
         @Bindable var progressAlertManager = progressAlertManager
@@ -58,6 +61,13 @@ struct UnifiedView: View {
                 case .moreAppIcon: MoreAppIconView()
                 case .moreAttributions: MoreLicensesView()
                 }
+            }
+            .navigationDestination(for: AnalyticsPath.self) { viewPath in
+                AnalyticsDestinationView(
+                    model: analyticsModel,
+                    path: viewPath,
+                    analyticsNamespace: analyticsNamespace
+                )
             }
         }
         .sheet(isPresented: $isPresentingImport) {
@@ -124,7 +134,8 @@ struct UnifiedView: View {
             .padding(.horizontal)
             Group {
                 switch selectedSegment {
-                case .analytics: AnalyticsView()
+                case .analytics:
+                    AnalyticsView(model: analyticsModel, analyticsNamespace: analyticsNamespace)
                 case .tower: TowerView()
                 case .activity: ActivityView()
                 }
