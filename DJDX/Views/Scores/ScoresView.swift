@@ -208,6 +208,7 @@ struct ScoresView<Header: View>: View {
                     }
                     ToolbarSpacer(.flexible, placement: .bottomBar)
                     DefaultToolbarItem(kind: .search, placement: .bottomBar)
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
                     ToolbarItemGroup(placement: .bottomBar) {
                         sortControl
                         filterControl
