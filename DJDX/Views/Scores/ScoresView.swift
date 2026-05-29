@@ -203,15 +203,12 @@ struct ScoresView<Header: View>: View {
             }
             .toolbar {
                 if #available(iOS 26.0, *) {
-                    ToolbarItem(placement: .bottomBar) {
+                    ToolbarItemGroup(placement: .bottomBar) {
                         timeTravelButton
                     }
                     DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                    ToolbarSpacer(.flexible, placement: .bottomBar)
-                    ToolbarItem(placement: .bottomBar) {
+                    ToolbarItemGroup(placement: .bottomBar) {
                         sortControl
-                    }
-                    ToolbarItem(placement: .bottomBar) {
                         filterControl
                     }
                 } else {
