@@ -62,24 +62,4 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         case .iidxInfinitas: "PlayDataInfinitas.db"
         }
     }
-
-    var destinations: [GameDestination] {
-        switch self {
-        case .iidxArcade, .soundVoltex, .iidxInfinitas: [.analytics, .activity]
-        }
-    }
-}
-
-enum GameDestination: Int, Hashable, Identifiable, CaseIterable {
-    case analytics
-    case activity
-
-    var id: Int { rawValue }
-
-    var titleKey: LocalizedStringKey {
-        switch self {
-        case .analytics: "ViewTitle.Analytics"
-        case .activity: "ViewTitle.Activity"
-        }
-    }
 }

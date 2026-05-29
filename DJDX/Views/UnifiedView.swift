@@ -25,7 +25,6 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
 
-    @State var selectedSegment: GameDestination = .analytics
     @State var isPresentingImport: Bool = false
     @State var isFirstStartCleanupComplete: Bool = false
 
@@ -94,11 +93,6 @@ struct UnifiedView: View {
                 Color.clear
             }
         }
-        .onChange(of: selectedGame) { _, newValue in
-            if !newValue.destinations.contains(selectedSegment) {
-                selectedSegment = newValue.destinations.first ?? .analytics
-            }
-        }
         .task {
             if !isFirstStartCleanupComplete {
                 await migrateData()
@@ -132,25 +126,11 @@ struct UnifiedView: View {
                 if selectedGame.supportsProfile {
                     ProfileHeaderView()
                 }
-                Picker("", selection: $selectedSegment) {
-                    ForEach(selectedGame.destinations) { destination in
-                        Text(destination.titleKey).tag(destination)
-                    }
-                }
-                .pickerStyle(.segmented)
             }
             .padding(.horizontal)
-            Group {
-                switch selectedSegment {
-                case .analytics:
-                    AnalyticsView(model: analyticsModel,
-                                  analyticsNamespace: analyticsNamespace,
-                                  towerNamespace: towerNamespace)
-                case .activity:
-                    ActivityView()
-                        .padding(.horizontal)
-                }
-            }
+            AnalyticsView(model: analyticsModel,
+                          analyticsNamespace: analyticsNamespace,
+                          towerNamespace: towerNamespace)
             .frame(minHeight: 360.0)
         }
         .padding(.vertical, 8.0)
