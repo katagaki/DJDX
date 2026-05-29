@@ -38,6 +38,9 @@ extension ImportView {
                 await actor.deleteImportGroup(id: importGroup.id)
             }
             await reloadImportGroups()
+            await MainActor.run {
+                NotificationCenter.default.post(name: .dataImported, object: nil)
+            }
         }
     }
 
