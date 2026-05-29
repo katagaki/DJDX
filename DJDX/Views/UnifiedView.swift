@@ -161,6 +161,7 @@ struct UnifiedView: View {
                 }
                 .pickerStyle(.inline)
             }
+            .labelsVisibility(.visible)
         } label: {
             HStack(spacing: 4.0) {
                 Text(selectedGame.displayName)
