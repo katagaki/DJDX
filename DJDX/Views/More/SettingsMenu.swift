@@ -37,7 +37,7 @@ struct SettingsMenu: View {
     var body: some View {
         Menu {
             Section("More.General.Header") {
-                Menu {
+                Menu("More.General.AppIcon", systemImage: "app.gift") {
                     ForEach(appIcons, id: \.name) { icon in
                         Button {
                             UIApplication.shared.setAlternateIconName(icon.imageName) { error in
@@ -56,29 +56,25 @@ struct SettingsMenu: View {
                             }
                         }
                     }
-                } label: {
-                    Text("More.General.AppIcon")
                 }
-                Button {
+                Button("More.ExternalData.Header", image: .iconAnalytics) {
                     isPresentingExternalDataSources = true
-                } label: {
-                    Label {
-                        Text("More.ExternalData.Header")
-                    } icon: {
-                        Image(.iconAnalytics)
-                    }
                 }
-                Toggle("More.PlayDataDisplay.HideBeginnerLevel", isOn: $isBeginnerLevelHidden)
+                Toggle(
+                    "More.PlayDataDisplay.HideBeginnerLevel",
+                    systemImage: "shield.righthalf.filled",
+                    isOn: $isBeginnerLevelHidden
+                )
             }
             Section("More.ManageData.Header") {
-                Button("More.ManageData.DeleteWebData", systemImage: "trash", role: .destructive) {
+                Button("More.ManageData.ResetLayout", systemImage: "arrow.counterclockwise", role: .destructive) {
+                    isConfirmingResetLayout = true
+                }
+                Button("More.ManageData.DeleteWebData", image: .globeSlash, role: .destructive) {
                     isConfirmingWebDataDelete = true
                 }
                 Button("More.ManageData.DeleteScoreData", systemImage: "trash", role: .destructive) {
                     beginScoreDataDelete()
-                }
-                Button("More.ManageData.ResetLayout", systemImage: "arrow.counterclockwise") {
-                    isConfirmingResetLayout = true
                 }
             }
             Section {

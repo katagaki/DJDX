@@ -36,8 +36,8 @@ struct MoreExternalDataSources: View {
             bemaniWikiSection()
             bm2dxSection()
         }
-        .navigator("More.ExternalData.Header", group: true, inline: true)
-        .scrollContentBackground(.hidden)
+        .navigationTitle("More.ExternalData.Header")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if #available(iOS 26.0, *) {

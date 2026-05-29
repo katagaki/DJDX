@@ -142,9 +142,9 @@ struct UnifiedView: View {
             }
             .padding(.horizontal)
             AnalyticsView(model: analyticsModel,
+                          isEditing: $isEditingAnalytics,
                           analyticsNamespace: analyticsNamespace,
-                          towerNamespace: towerNamespace,
-                          isEditing: $isEditingAnalytics)
+                          towerNamespace: towerNamespace)
             .frame(minHeight: 360.0)
         }
         .padding(.vertical, 8.0)
@@ -154,23 +154,20 @@ struct UnifiedView: View {
     var gameMenu: some View {
         Menu {
             Section {
-                ForEach(Game.allCases) { game in
-                    Button {
-                        selectedGame = game
-                    } label: {
-                        if selectedGame == game {
-                            Label(game.displayName, systemImage: "checkmark")
-                        } else if let iconResource = game.iconResource {
+                Picker("Game", selection: $selectedGame) {
+                    ForEach(Game.allCases) { game in
+                        if let iconResource = game.iconResource {
                             Label {
                                 Text(game.displayName)
                             } icon: {
                                 Image(iconResource)
                             }
+                            .tag(game)
                         } else {
                             Text(game.displayName)
+                                .tag(game)
                         }
                     }
-                    .disabled(!game.isAvailable)
                 }
             }
             Section("Shared.IIDX.Version") {
