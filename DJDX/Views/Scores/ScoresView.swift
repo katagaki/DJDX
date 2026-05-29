@@ -173,14 +173,12 @@ struct ScoresView<Header: View>: View {
                 if searchTerm.isEmpty {
                     header
                     if !isEditingAnalytics {
-                        Divider()
                         HStack {
                             Text("Analytics.Section.ScoreData")
                                 .font(.title3.bold())
                                 .foregroundStyle(.primary)
                             Spacer()
                         }
-                        .padding(.top, 20.0)
                         .padding(.bottom, 12.0)
                         .padding(.horizontal)
                         Divider()
@@ -189,23 +187,22 @@ struct ScoresView<Header: View>: View {
                 if !isEditingAnalytics {
                     ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
                             id: \.id) { entry in
-                    Button {
-                        navigationManager.push(
-                            ScoresPath.scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level)
-                        )
-                    } label: {
-                        ScoreRow(
-                            namespace: scoresNamespace,
-                            songRecord: entry.songRecord,
-                            level: entry.level,
-                            score: entry.score,
-                            scoreRate: songRecordClearRates[entry.songRecord]?[entry.level]
-                        )
-                        .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                    Divider()
-                        .padding(.leading, 16.0)
+                        Button {
+                            navigationManager.push(
+                                ScoresPath.scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level)
+                            )
+                        } label: {
+                            ScoreRow(
+                                namespace: scoresNamespace,
+                                songRecord: entry.songRecord,
+                                level: entry.level,
+                                score: entry.score,
+                                scoreRate: songRecordClearRates[entry.songRecord]?[entry.level]
+                            )
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
+                        Divider()
                     }
                 }
             }
