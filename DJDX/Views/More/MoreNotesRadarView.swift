@@ -82,7 +82,8 @@ struct MoreNotesRadarView: View {
                     .font(.system(size: 10, weight: .bold).monospacedDigit())
             }
         }
-        .padding(8.0)
+        .padding(.horizontal, 16.0)
+        .padding(.vertical, 12.0)
         .background {
             switch colorScheme {
             case .light: Color.white
