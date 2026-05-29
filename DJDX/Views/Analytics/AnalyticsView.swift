@@ -128,17 +128,21 @@ struct AnalyticsView: View {
                     .padding(.horizontal)
                     .padding(.top, 8.0)
 
-                // Tower cards (full width, IIDX AC only)
+                // Tower cards (half width, IIDX AC only)
                 let visibleTowerCards = selectedGame.supportsTower ? cardOrder.filter {
                     $0.isTowerCard && visibleCards.contains($0)
                 } : []
-                ForEach(visibleTowerCards, id: \.self) { cardType in
-                    towerCardButton(for: cardType)
-                        .padding(.horizontal)
-                        .padding(.top, 8.0)
-                        .cardDraggable(cardType, editing: isEditingCards,
-                                       draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                       onReorder: saveCardOrder)
+                if !visibleTowerCards.isEmpty {
+                    LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                        ForEach(visibleTowerCards, id: \.self) { cardType in
+                            towerCardButton(for: cardType)
+                                .cardDraggable(cardType, editing: isEditingCards,
+                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                               onReorder: saveCardOrder)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 8.0)
                 }
 
                 // Summary cards - horizontal scroll
