@@ -316,6 +316,52 @@ for (let attempt = 0; attempt < 3; attempt++) {
 return 'ERR:network';
 """
 
+// SDVX: the score data page (playdata/index.html) exposes its CSV by POSTing
+// method=display to itself (the disp_data() function). The response body is an
+// HTML page whose <pre>/<textarea> contains the CSV text; we POST and return
+// the CSV string.
+let sdvxScoreDownloadFetchBody = """
+async function fetchSDVXScoreData() {
+    const params = new URLSearchParams();
+    params.append('method', 'display');
+    const targetURL = location.href.split('#')[0];
+    const response = await fetch(targetURL, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+    });
+    const finalURL = response.url || '';
+    if (finalURL.indexOf('/error/error.html') !== -1) {
+        const match = finalURL.match(/[?&]err=([0-9]+)/);
+        return 'ERR:' + (match ? match[1] : 'server');
+    }
+    const buffer = await response.arrayBuffer();
+    const text = new TextDecoder('utf-8').decode(buffer);
+    const parsed = new DOMParser().parseFromString(text, 'text/html');
+    const candidate = parsed.querySelector('textarea, pre');
+    let csv = candidate ? (candidate.value || candidate.textContent || '') : '';
+    if (!csv && text.indexOf('楽曲名') !== -1) {
+        // The response is the raw CSV itself, not wrapped in HTML
+        csv = text;
+    }
+    csv = csv.trim();
+    if (csv.indexOf('楽曲名') !== -1) { return csv; }
+    if (text.indexOf('/error/error.html') !== -1) { return 'ERR:server'; }
+    return 'ERR:empty';
+}
+
+for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+        return await fetchSDVXScoreData();
+    } catch (error) {
+        if (attempt === 2) { return 'ERR:network'; }
+        await new Promise(function(resolve) { setTimeout(resolve, 600 * (attempt + 1)); });
+    }
+}
+return 'ERR:network';
+"""
+
 let iidxTowerCleanup = """
 var injectedCSS = `
 #base {
