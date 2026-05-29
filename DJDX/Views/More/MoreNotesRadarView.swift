@@ -14,7 +14,7 @@ struct MoreNotesRadarView: View {
     let spRadarData: RadarData?
     let dpRadarData: RadarData?
 
-    @State var selectedPlayType: IIDXPlayType = .single
+    @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var selectedPlayType: IIDXPlayType
 
     var cornerRadius: CGFloat {
         if #available(iOS 26.0, *) {
@@ -33,15 +33,6 @@ struct MoreNotesRadarView: View {
 
     var body: some View {
         VStack(spacing: 12.0) {
-            Picker("Shared.PlayType", selection: $selectedPlayType) {
-                Text(verbatim: "SP")
-                    .tag(IIDXPlayType.single)
-                Text(verbatim: "DP")
-                    .tag(IIDXPlayType.double)
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal)
-
             if let radarData = currentRadarData {
                 RadarChartView(radarData, isPlayerRadar: true)
                     .frame(height: 200.0)

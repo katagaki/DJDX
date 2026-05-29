@@ -20,6 +20,7 @@ struct UnifiedView: View {
 
     @AppStorage(wrappedValue: Game.iidxArcade, "Global.SelectedGame") var selectedGame: Game
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
 
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
@@ -53,6 +54,7 @@ struct UnifiedView: View {
         }
         .sheet(isPresented: $isPresentingImport) {
             ImportView()
+                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $isPresentingSettings) {
             MoreView()
@@ -93,15 +95,27 @@ struct UnifiedView: View {
     @ViewBuilder
     var unifiedHeader: some View {
         VStack(spacing: 16.0) {
-            if selectedGame.supportsProfile {
-                ProfileHeaderView()
-            }
-            Picker("", selection: $selectedSegment) {
-                ForEach(selectedGame.destinations) { destination in
-                    Text(destination.titleKey).tag(destination)
+            VStack(spacing: 16.0) {
+                if selectedGame.supportsProfile {
+                    ProfileHeaderView()
                 }
+                if selectedGame.supportsPlayType {
+                    Picker("Shared.PlayType", selection: $playTypeToShow) {
+                        Text(verbatim: "SP")
+                            .tag(IIDXPlayType.single)
+                        Text(verbatim: "DP")
+                            .tag(IIDXPlayType.double)
+                    }
+                    .pickerStyle(.segmented)
+                }
+                Picker("", selection: $selectedSegment) {
+                    ForEach(selectedGame.destinations) { destination in
+                        Text(destination.titleKey).tag(destination)
+                    }
+                }
+                .pickerStyle(.segmented)
             }
-            .pickerStyle(.segmented)
+            .padding(.horizontal)
             Group {
                 switch selectedSegment {
                 case .analytics: AnalyticsView()

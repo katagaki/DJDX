@@ -83,6 +83,35 @@ struct ScoresView<Header: View>: View {
         self.isTimeTravelling = UserDefaults.standard.bool(forKey: isTimeTravellingKey)
     }
 
+    var searchPlacement: SearchFieldPlacement {
+        if #available(iOS 26.0, *) {
+            .automatic
+        } else {
+            .navigationBarDrawer(displayMode: .always)
+        }
+    }
+
+    @ViewBuilder var sortFilterControls: some View {
+        if dataState == .initializing {
+            ProgressView()
+                .progressViewStyle(.circular)
+        } else {
+            ScoreSortAndFilter(
+                isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
+                difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
+                levelsToShow: $levelsToShow.animation(.snappy.speed(2.0)),
+                clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
+                djLevelsToShow: $djLevelsToShow.animation(.snappy.speed(2.0)),
+                versionsToShow: $versionsToShow.animation(.snappy.speed(2.0)),
+                sortMode: $sortMode.animation(.snappy.speed(2.0)),
+                sortOrder: $sortOrder.animation(.snappy.speed(2.0)),
+                isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort
+            ) {
+                reloadDisplay()
+            }
+        }
+    }
+
     var body: some View {
         List {
             Section {
@@ -113,22 +142,16 @@ struct ScoresView<Header: View>: View {
                 .listRowBackground(Color.clear)
             }
             .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .background {
+                LinearGradient(
+                    colors: [.backgroundGradientTop, .backgroundGradientBottom],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if #available(iOS 26.0, *) {
-                        Menu(playTypeToShow.displayName()) {
-                            Picker("Shared.PlayType", selection: $playTypeToShow) {
-                                Text(verbatim: "SP")
-                                    .tag(IIDXPlayType.single)
-                                Text(verbatim: "DP")
-                                    .tag(IIDXPlayType.double)
-                            }
-                            .pickerStyle(.inline)
-                        }
-                    } else {
-                        PlayTypePicker(playTypeToShow: $playTypeToShow)
-                    }
-                }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button(
                         "Shared.ShowPastData",
@@ -144,26 +167,14 @@ struct ScoresView<Header: View>: View {
                     }
                 }
                 if #available(iOS 26.0, *) {
-                    ToolbarSpacer(.fixed, placement: .topBarTrailing)
-                }
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    if dataState == .initializing {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                    } else {
-                        ScoreSortAndFilter(
-                            isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                            difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
-                            levelsToShow: $levelsToShow.animation(.snappy.speed(2.0)),
-                            clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
-                            djLevelsToShow: $djLevelsToShow.animation(.snappy.speed(2.0)),
-                            versionsToShow: $versionsToShow.animation(.snappy.speed(2.0)),
-                            sortMode: $sortMode.animation(.snappy.speed(2.0)),
-                            sortOrder: $sortOrder.animation(.snappy.speed(2.0)),
-                            isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort
-                        ) {
-                            reloadDisplay()
-                        }
+                    DefaultToolbarItem(kind: .search, placement: .bottomBar)
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        sortFilterControls
+                    }
+                } else {
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        sortFilterControls
                     }
                 }
             }
@@ -205,7 +216,7 @@ struct ScoresView<Header: View>: View {
                 }
             }
             .searchable(text: $searchTerm,
-                        placement: .navigationBarDrawer(displayMode: .always),
+                        placement: searchPlacement,
                         prompt: "Scores.Search.Prompt")
             .refreshable {
                 reloadDisplay()

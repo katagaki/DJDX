@@ -139,21 +139,6 @@ struct AnalyticsView: View {
                 )
             )
             .toolbar {
-                if #available(iOS 26.0, *) {
-                    ToolbarItem(placement: .topBarLeading) {
-                        if !isEditingCards {
-                            Menu(playTypeToShow.displayName()) {
-                                Picker("Shared.PlayType", selection: $playTypeToShow) {
-                                    Text(verbatim: "SP")
-                                        .tag(IIDXPlayType.single)
-                                    Text(verbatim: "DP")
-                                        .tag(IIDXPlayType.double)
-                                }
-                                .pickerStyle(.inline)
-                            }
-                        }
-                    }
-                }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     if isEditingCards {
                         if #available(iOS 26.0, *) {

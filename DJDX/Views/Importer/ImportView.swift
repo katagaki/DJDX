@@ -64,39 +64,30 @@ struct ImportView: View {
             .navigator("ViewTitle.Calendar")
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     if #available(iOS 26.0, *) {
-                        Menu(importPlayType.displayName()) {
-                            Picker("Shared.PlayType", selection: $importPlayType) {
-                                Text(verbatim: "SP")
-                                    .tag(IIDXPlayType.single)
-                                Text(verbatim: "DP")
-                                    .tag(IIDXPlayType.double)
-                            }
-                            .pickerStyle(.inline)
+                        Button(role: .close) {
+                            dismiss()
                         }
                     } else {
-                        PlayTypePicker(playTypeToShow: $importPlayType)
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    HStack {
-                        Menu {
-                            Section {
-                                Button("Calendar.Import.LoadSamples.Button") {
-                                    importSampleCSV()
-                                }
-                            } header: {
-                                Text("Calendar.Import.LoadSamples.Description")
-                            }
+                        Button {
+                            dismiss()
                         } label: {
-                            Image(systemName: "questionmark.circle")
+                            Image(systemName: "xmark.circle")
                         }
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Shared.Done", role: .cancel) {
-                        dismiss()
+                    Menu {
+                        Section {
+                            Button("Calendar.Import.LoadSamples.Button") {
+                                importSampleCSV()
+                            }
+                        } header: {
+                            Text("Calendar.Import.LoadSamples.Description")
+                        }
+                    } label: {
+                        Image(systemName: "questionmark.circle")
                     }
                 }
             }
