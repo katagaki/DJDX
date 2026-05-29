@@ -17,6 +17,7 @@ struct SettingsMenu: View {
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
     @State var isPresentingExternalDataSources: Bool = false
+    @State var isConfirmingWebDataDelete: Bool = false
     @State var isPromptingScoreDeleteCode: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
     @State var scoreDeleteCode: String = ""
@@ -70,7 +71,7 @@ struct SettingsMenu: View {
             }
             Section("More.ManageData.Header") {
                 Button("More.ManageData.DeleteWebData", systemImage: "trash", role: .destructive) {
-                    deleteAllWebData()
+                    isConfirmingWebDataDelete = true
                 }
                 Button("More.ManageData.DeleteScoreData", systemImage: "trash", role: .destructive) {
                     beginScoreDataDelete()
@@ -91,6 +92,14 @@ struct SettingsMenu: View {
             NavigationStack {
                 MoreExternalDataSources()
             }
+        }
+        .alert("Alert.DeleteData.Web.Title", isPresented: $isConfirmingWebDataDelete) {
+            Button("Alert.DeleteData.Web.Confirm", role: .destructive) {
+                deleteAllWebData()
+            }
+            Button("Shared.Cancel", role: .cancel) { }
+        } message: {
+            Text("Alert.DeleteData.Web.Subtitle")
         }
         .alert("Alert.DeleteData.Score.Code.Title", isPresented: $isPromptingScoreDeleteCode) {
             TextField("Alert.DeleteData.Score.Code.Placeholder", text: $scoreDeleteCodeEntry)
