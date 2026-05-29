@@ -95,7 +95,8 @@ struct UnifiedView: View {
         }
         .sheet(isPresented: $isPresentingImport) {
             ImportView()
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.large])
+                .interactiveDismissDisabled()
                 .automaticNavigationTransition(id: "ImportSheet", in: importNamespace)
         }
         .overlay {
