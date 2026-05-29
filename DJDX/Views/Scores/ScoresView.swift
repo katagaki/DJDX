@@ -145,7 +145,7 @@ struct ScoresView<Header: View>: View {
             if isTimeTravelling {
                 button.buttonStyle(.glassProminent)
             } else {
-                button.buttonStyle(.glass)
+                button
             }
         } else {
             button
