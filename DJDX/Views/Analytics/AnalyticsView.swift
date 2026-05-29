@@ -69,11 +69,17 @@ struct AnalyticsView: View {
                 switch cardType {
                 case .towerRecent:
                     TowerBarChart(entries: model.towerChartEntries)
+                        .chartLegend(.hidden)
+                        .chartXAxis(.hidden)
+                        .chartYAxis(.hidden)
                 case .towerTotals:
                     TowerTotalsChart(
                         totalKeyCount: model.towerTotalKeyCount,
                         totalScratchCount: model.towerTotalScratchCount
                     )
+                    .chartLegend(.hidden)
+                    .chartXAxis(.hidden)
+                    .chartYAxis(.hidden)
                 default:
                     EmptyView()
                 }
