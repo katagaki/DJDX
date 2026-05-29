@@ -136,8 +136,12 @@ struct UnifiedView: View {
                 switch selectedSegment {
                 case .analytics:
                     AnalyticsView(model: analyticsModel, analyticsNamespace: analyticsNamespace)
-                case .tower: TowerView()
-                case .activity: ActivityView()
+                case .tower:
+                    TowerView()
+                        .padding(.horizontal)
+                case .activity:
+                    ActivityView()
+                        .padding(.horizontal)
                 }
             }
             .frame(minHeight: 360.0)

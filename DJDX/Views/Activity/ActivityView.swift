@@ -9,10 +9,20 @@ import SwiftUI
 
 struct ActivityView: View {
 
+    @Environment(\.colorScheme) var colorScheme
+
     @State var towerEntries: [IIDXTowerEntry] = []
     @State var isShowingEntries: Bool = false
 
     let fetcher = DataFetcher()
+
+    var cornerRadius: CGFloat {
+        if #available(iOS 26.0, *) {
+            return 20.0
+        } else {
+            return 12.0
+        }
+    }
 
     var chartEntries: [IIDXTowerEntry] {
         let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: .now)!
@@ -64,7 +74,7 @@ struct ActivityView: View {
 
     @ViewBuilder
     var entryList: some View {
-        VStack(spacing: 8.0) {
+        VStack(spacing: 0.0) {
             HStack {
                 Text("Tower.Header.PlayDate")
                 Spacer()
@@ -73,9 +83,13 @@ struct ActivityView: View {
                 Text("Shared.IIDX.Scratch")
                     .frame(width: 80, alignment: .trailing)
             }
-            .font(.caption)
+            .font(.caption.bold())
             .foregroundStyle(.secondary)
-            ForEach(recentEntries, id: \.playDate) { entry in
+            .padding(.vertical, 8.0)
+            ForEach(Array(recentEntries.enumerated()), id: \.element.playDate) { index, entry in
+                if index > 0 {
+                    Divider()
+                }
                 HStack {
                     Text(entry.playDate, format: .dateTime.year().month().day())
                         .monospacedDigit()
@@ -89,8 +103,19 @@ struct ActivityView: View {
                         .foregroundStyle(.red)
                         .frame(width: 80, alignment: .trailing)
                 }
+                .font(.subheadline)
+                .padding(.vertical, 8.0)
             }
         }
+        .padding(.horizontal, 16.0)
+        .background {
+            switch colorScheme {
+            case .light: Color.white
+            case .dark: Color.clear.background(.regularMaterial)
+            @unknown default: Color.clear
+            }
+        }
+        .clipShape(.rect(cornerRadius: cornerRadius))
         .frame(minHeight: 240.0)
     }
 
