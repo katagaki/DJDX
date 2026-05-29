@@ -57,13 +57,15 @@ struct ScoresView<Header: View>: View {
         difficultiesToShow.count == 1 ? difficultiesToShow.first! : .all
     }
 
-    static let allLevels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
-        (.beginner, \.beginnerScore),
-        (.normal, \.normalScore),
-        (.hyper, \.hyperScore),
-        (.another, \.anotherScore),
-        (.leggendaria, \.leggendariaScore)
-    ]
+    static var allLevels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] {
+        [
+            (.beginner, \.beginnerScore),
+            (.normal, \.normalScore),
+            (.hyper, \.hyperScore),
+            (.another, \.anotherScore),
+            (.leggendaria, \.leggendariaScore)
+        ]
+    }
 
     var conditionsForReload: [String] {
         [isShowingOnlyPlayDataWithScores.description,
