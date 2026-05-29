@@ -2808,6 +2808,22 @@
         }
       }
     },
+    "Shared.Reset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset to Today"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日に戻す"
+          }
+        }
+      }
+    },
     "Shared.SelectDate": {
       "localizations": {
         "en": {

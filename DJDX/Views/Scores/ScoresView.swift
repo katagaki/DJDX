@@ -119,11 +119,23 @@ struct ScoresView<Header: View>: View {
             )
         }
         .popover(isPresented: $isShowingDatePopover) {
-            DatePicker("Shared.SelectDate",
-                       selection: $playDataDate.animation(.snappy.speed(2.0)),
-                       in: ...Date.now,
-                       displayedComponents: .date)
-            .datePickerStyle(.graphical)
+            VStack(alignment: .leading, spacing: 12.0) {
+                Text("Shared.SelectDate")
+                    .font(.headline)
+                DatePicker("Shared.SelectDate",
+                           selection: $playDataDate.animation(.snappy.speed(2.0)),
+                           in: ...Date.now,
+                           displayedComponents: .date)
+                .datePickerStyle(.graphical)
+                .labelsHidden()
+                Button("Shared.Reset", systemImage: "arrow.uturn.backward") {
+                    withAnimation(.snappy.speed(2.0)) {
+                        playDataDate = .now
+                    }
+                    isShowingDatePopover = false
+                }
+                .frame(maxWidth: .infinity)
+            }
             .frame(minWidth: 320.0)
             .padding()
             .presentationCompactAdaptation(.popover)
