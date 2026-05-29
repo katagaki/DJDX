@@ -20,6 +20,7 @@ struct UnifiedView: View {
 
     @AppStorage(wrappedValue: Game.iidxArcade, "Global.SelectedGame") var selectedGame: Game
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
 
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
@@ -30,6 +31,7 @@ struct UnifiedView: View {
     @State var isEditingAnalytics: Bool = false
 
     @State var analyticsModel = AnalyticsModel()
+    @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
 
     @Namespace var importNamespace
     @Namespace var analyticsNamespace
@@ -38,8 +40,16 @@ struct UnifiedView: View {
     var body: some View {
         @Bindable var progressAlertManager = progressAlertManager
         NavigationStack(path: $navigationManager.path) {
-            ScoresView(isEditingAnalytics: $isEditingAnalytics) {
-                unifiedHeader
+            Group {
+                if selectedGame == .soundVoltex {
+                    SDVXScoresView(isEditingAnalytics: $isEditingAnalytics) {
+                        sdvxHeader
+                    }
+                } else {
+                    ScoresView(isEditingAnalytics: $isEditingAnalytics) {
+                        unifiedHeader
+                    }
+                }
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -94,10 +104,16 @@ struct UnifiedView: View {
             }
         }
         .sheet(isPresented: $isPresentingImport) {
-            ImportView()
-                .presentationDetents([.large])
-                .interactiveDismissDisabled()
-                .automaticNavigationTransition(id: "ImportSheet", in: importNamespace)
+            Group {
+                if selectedGame == .soundVoltex {
+                    SDVXImportView()
+                } else {
+                    ImportView()
+                }
+            }
+            .presentationDetents([.large])
+            .interactiveDismissDisabled()
+            .automaticNavigationTransition(id: "ImportSheet", in: importNamespace)
         }
         .overlay {
             if progressAlertManager.isShowing {
@@ -155,11 +171,22 @@ struct UnifiedView: View {
     }
 
     @ViewBuilder
+    var sdvxHeader: some View {
+        VStack(spacing: 0.0) {
+            SDVXProfileHeaderView()
+                .padding(.horizontal)
+            SDVXAnalyticsView(model: sdvxAnalyticsModel)
+                .frame(minHeight: 360.0)
+        }
+        .padding(.bottom, 8.0)
+    }
+
+    @ViewBuilder
     var gameMenu: some View {
         Menu {
             Section {
                 Picker("Game", selection: $selectedGame) {
-                    ForEach(Game.allCases) { game in
+                    ForEach(Game.allCases.filter { $0.isAvailable }) { game in
                         if let iconResource = game.iconResource {
                             Label {
                                 Text(game.displayName)
@@ -174,15 +201,27 @@ struct UnifiedView: View {
                     }
                 }
             }
-            Section("Shared.IIDX.Version") {
-                Picker("Shared.IIDX.Version", selection: $iidxVersion) {
-                    ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
-                        Text(version.marketingName).tag(version)
+            if selectedGame == .soundVoltex {
+                Section("Shared.SDVX.Version") {
+                    Picker("Shared.SDVX.Version", selection: $sdvxVersion) {
+                        ForEach(SDVXVersion.supportedVersions, id: \.self) { version in
+                            Text(version.marketingName).tag(version)
+                        }
                     }
+                    .pickerStyle(.inline)
                 }
-                .pickerStyle(.inline)
+                .labelsVisibility(.visible)
+            } else {
+                Section("Shared.IIDX.Version") {
+                    Picker("Shared.IIDX.Version", selection: $iidxVersion) {
+                        ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
+                            Text(version.marketingName).tag(version)
+                        }
+                    }
+                    .pickerStyle(.inline)
+                }
+                .labelsVisibility(.visible)
             }
-            .labelsVisibility(.visible)
         } label: {
             HStack(spacing: 4.0) {
                 Text(selectedGame.displayName)

@@ -4,6 +4,13 @@
     " " : {
       "shouldTranslate" : false
     },
+    "Shared.SDVX.Version" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "SOUND VOLTEX Version" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "SOUND VOLTEX バージョン" } }
+      }
+    },
     "Analytics.SDVX.ClearBreakdown" : {
       "extractionState" : "manual",
       "localizations" : {

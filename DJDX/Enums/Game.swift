@@ -32,8 +32,8 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
     // Only IIDX AC ships in Phase 0; the other games become selectable as their phases land.
     var isAvailable: Bool {
         switch self {
-        case .iidxArcade: true
-        case .soundVoltex, .iidxInfinitas: false
+        case .iidxArcade, .soundVoltex: true
+        case .iidxInfinitas: false
         }
     }
 
