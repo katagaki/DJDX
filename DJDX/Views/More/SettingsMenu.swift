@@ -35,7 +35,7 @@ struct SettingsMenu: View {
     var body: some View {
         Menu {
             Section("More.General.Header") {
-                Menu("More.General.AppIcon", systemImage: "app.badge") {
+                Menu {
                     ForEach(appIcons, id: \.name) { icon in
                         Button {
                             UIApplication.shared.setAlternateIconName(icon.imageName) { error in
@@ -44,9 +44,16 @@ struct SettingsMenu: View {
                                 }
                             }
                         } label: {
-                            Text(verbatim: icon.name)
+                            Label {
+                                Text(verbatim: icon.name)
+                            } icon: {
+                                Image(icon.previewImageName)
+                                    .renderingMode(.original)
+                            }
                         }
                     }
+                } label: {
+                    Text("More.General.AppIcon")
                 }
                 Button("More.ExternalData.Header", systemImage: "tray.and.arrow.down") {
                     isPresentingExternalDataSources = true
@@ -134,5 +141,13 @@ struct AppIconChoice {
     init(_ name: String, imageName: String?) {
         self.name = name
         self.imageName = imageName
+    }
+
+    var previewImageName: String {
+        if let imageName {
+            "\(imageName).Preview"
+        } else {
+            "AppIcon.Preview"
+        }
     }
 }
