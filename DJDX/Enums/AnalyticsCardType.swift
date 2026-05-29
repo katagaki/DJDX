@@ -116,7 +116,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var cardContentHeight: CGFloat {
         switch self {
         case .clearTypeOverall: return 80.0
-        case .towerRecent, .towerTotals: return 200.0
+        case .towerRecent, .towerTotals: return 80.0
         case .newFullComboClear,
              .newClears,
              .newEasyClears,
