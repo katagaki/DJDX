@@ -15,6 +15,23 @@ struct OverviewClearTypeOverallGraph: View {
     @State var isInteractive: Bool = false
     @State var difficultyBelowFinger: Int?
 
+    var populatedDifficulties: [Int] {
+        graphData.filter { _, counts in
+            counts.values.contains(where: { $0 > 0 })
+        }.keys.sorted()
+    }
+
+    var xDomain: ClosedRange<Int> {
+        if isInteractive {
+            return 1...13
+        }
+        guard let first = populatedDifficulties.first,
+              let last = populatedDifficulties.last else {
+            return 1...13
+        }
+        return first...max(last, first + 1)
+    }
+
     var body: some View {
         Chart(Array(graphData.keys), id: \.self) { difficulty in
             ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
@@ -48,7 +65,7 @@ struct OverviewClearTypeOverallGraph: View {
         .chartXAxis {
             AxisMarks(values: .automatic(desiredCount: 13))
         }
-        .chartXScale(domain: 1...13)
+        .chartXScale(domain: xDomain)
         .chartForegroundStyleScale([
             "FULLCOMBO CLEAR": .blue,
             "CLEAR": .cyan,
