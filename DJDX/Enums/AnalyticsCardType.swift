@@ -139,15 +139,15 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
 
     /// Tower cards, shown in their own section
     static var towerCards: [AnalyticsCardType] {
-        [.towerRecent, .towerTotals]
+        [.towerTotals, .towerRecent]
     }
 
     /// Default card order
     static var defaultOrder: [AnalyticsCardType] {
         [
             .clearTypeOverall,
-            .towerRecent,
             .towerTotals,
+            .towerRecent,
             .newHighScores,
             .newAAA,
             .newAA,
