@@ -78,7 +78,7 @@ struct SettingsMenu: View {
                 Link(destination: URL(string: "https://github.com/katagaki/DJDX")!) {
                     Label("More.GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                 }
-                Button("More.Attributions", systemImage: "doc.text") {
+                Button("More.Attributions") {
                     navigationManager.push(MorePath.moreAttributions)
                 }
             }
