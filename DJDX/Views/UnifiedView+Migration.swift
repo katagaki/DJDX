@@ -2,7 +2,7 @@
 //  UnifiedView+Migration.swift
 //  DJDX
 //
-//  Created by シン・ジャスティン on 2026/05/29.
+//  Created by Claude on 2026/05/29.
 //
 
 import SwiftData
