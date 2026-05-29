@@ -64,7 +64,6 @@ struct ImportView: View {
             .listStyle(.plain)
             .navigationTitle("ViewTitle.Calendar")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     if #available(iOS 26.0, *) {

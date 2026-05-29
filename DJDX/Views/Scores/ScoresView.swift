@@ -231,7 +231,6 @@ struct ScoresView<Header: View>: View {
                     }
                 }
             }
-            .toolbarBackground(isTimeTravelling ? .hidden : .automatic, for: .navigationBar)
             .background {
                 switch dataState {
                 case .presenting:

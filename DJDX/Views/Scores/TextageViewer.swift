@@ -44,7 +44,6 @@ struct TextageViewer: View {
             .navigationTitle("ViewTitle.TextageViewer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.visible, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Shared.Refresh", systemImage: "arrow.clockwise") {

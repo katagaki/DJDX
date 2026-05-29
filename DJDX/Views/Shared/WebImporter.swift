@@ -41,7 +41,6 @@ struct WebImporter: View {
         .navigationTitle("ViewTitle.Importer.Web")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarBackground(.hidden, for: .tabBar)
         .background {
             ProgressView("Shared.Loading")
         }
