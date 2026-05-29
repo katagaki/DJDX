@@ -12,10 +12,12 @@ struct RadarChartView: View {
     let points: [RadarPointConfig]
     let maxValue: Double = 130.0
     let benchmarkValue: Double = 100.0
+    var labelFontSize: CGFloat = 12.0
 
-    init(_ data: RadarData, isPlayerRadar: Bool = false) {
+    init(_ data: RadarData, isPlayerRadar: Bool = false, labelFontSize: CGFloat = 12.0) {
         self.color = data.color(isPlayerRadar: isPlayerRadar)
         self.points = data.points()
+        self.labelFontSize = labelFontSize
     }
 
     var body: some View {
@@ -53,7 +55,7 @@ struct RadarChartView: View {
                         .frame(width: 0, height: 0)
                         .overlay(
                             Text(config.label)
-                                .font(.system(size: 12, weight: .black))
+                                .font(.system(size: labelFontSize, weight: .black))
                                 .fontWidth(.expanded)
                                 .foregroundStyle(config.color)
                                 .brightness(0.88)
