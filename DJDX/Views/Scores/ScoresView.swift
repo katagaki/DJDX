@@ -128,13 +128,6 @@ struct ScoresView<Header: View>: View {
                            displayedComponents: .date)
                 .datePickerStyle(.graphical)
                 .labelsHidden()
-                Button("Shared.Reset", systemImage: "arrow.uturn.backward") {
-                    withAnimation(.snappy.speed(2.0)) {
-                        playDataDate = .now
-                    }
-                    isShowingDatePopover = false
-                }
-                .frame(maxWidth: .infinity)
             }
             .frame(minWidth: 320.0)
             .padding()
