@@ -68,7 +68,7 @@ struct AnalyticsView: View {
             AnalyticsCardView(cardType: cardType) {
                 switch cardType {
                 case .towerRecent:
-                    TowerBarChart(entries: model.towerChartEntries)
+                    TowerBarChart(entries: model.towerChartEntries, usesDateAxis: false)
                         .chartLegend(.hidden)
                         .chartXAxis(.hidden)
                         .chartYAxis(.hidden)
