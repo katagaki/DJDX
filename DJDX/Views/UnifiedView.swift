@@ -146,6 +146,12 @@ struct UnifiedView: View {
                     } label: {
                         if selectedGame == game {
                             Label(game.displayName, systemImage: "checkmark")
+                        } else if let iconResource = game.iconResource {
+                            Label {
+                                Text(game.displayName)
+                            } icon: {
+                                Image(iconResource)
+                            }
                         } else {
                             Text(game.displayName)
                         }

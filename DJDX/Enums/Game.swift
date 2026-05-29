@@ -22,6 +22,13 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         }
     }
 
+    var iconResource: ImageResource? {
+        switch self {
+        case .iidxArcade: .iconScores
+        case .soundVoltex, .iidxInfinitas: nil
+        }
+    }
+
     // Only IIDX AC ships in Phase 0; the other games become selectable as their phases land.
     var isAvailable: Bool {
         switch self {
