@@ -4,6 +4,34 @@
     " " : {
       "shouldTranslate" : false
     },
+    "Analytics.SDVX.ClearBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Clear Breakdown" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "クリア内訳" } }
+      }
+    },
+    "Analytics.SDVX.GradeBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Grade Breakdown" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "グレード内訳" } }
+      }
+    },
+    "Analytics.SDVX.TotalCharts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Charts Played" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プレー譜面数" } }
+      }
+    },
+    "Analytics.SDVX.Volforce" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "VOLFORCE" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VOLFORCE" } }
+      }
+    },
     "[%@](https://bemaniwiki.com)" : {
       "shouldTranslate" : false
     },
