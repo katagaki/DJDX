@@ -174,7 +174,6 @@ struct ScoresView<Header: View>: View {
                     header
                     if !isEditingAnalytics {
                         Divider()
-                            .padding(.horizontal)
                         HStack {
                             Text("Analytics.Section.ScoreData")
                                 .font(.title3.bold())
@@ -185,7 +184,6 @@ struct ScoresView<Header: View>: View {
                         .padding(.bottom, 12.0)
                         .padding(.horizontal)
                         Divider()
-                            .padding(.horizontal)
                     }
                 }
                 if !isEditingAnalytics {
