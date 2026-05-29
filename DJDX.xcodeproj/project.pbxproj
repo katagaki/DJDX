@@ -65,6 +65,7 @@
 				"Data Models/IIDXSongRecord.swift",
 				"Data Models/IIDXTowerEntry.swift",
 				"Data Models/ImportGroup.swift",
+				"Data Models/SDVXSongRecord.swift",
 			);
 			target = AA000001300100000000000C /* DJDXWidgets */;
 		};
