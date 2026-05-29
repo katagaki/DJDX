@@ -85,7 +85,7 @@ struct SettingsMenu: View {
                 }
             }
         } label: {
-            Label("Tab.More", systemImage: "ellipsis.circle")
+            Label("Tab.More", systemImage: "ellipsis")
         }
         .sheet(isPresented: $isPresentingExternalDataSources) {
             NavigationStack {
