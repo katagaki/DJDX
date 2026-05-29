@@ -69,17 +69,16 @@ struct AnalyticsView: View {
                 switch cardType {
                 case .towerRecent:
                     TowerBarChart(entries: model.towerChartEntries, usesDateAxis: false)
-                        .chartLegend(.hidden)
-                        .chartXAxis(.hidden)
-                        .chartYAxis(.hidden)
+                        .chartXAxis { AxisMarks { AxisGridLine() } }
+                        .chartYAxis { AxisMarks { AxisGridLine() } }
                 case .towerTotals:
                     TowerTotalsChart(
                         totalKeyCount: model.towerTotalKeyCount,
-                        totalScratchCount: model.towerTotalScratchCount
+                        totalScratchCount: model.towerTotalScratchCount,
+                        showsAnnotations: false
                     )
-                    .chartLegend(.hidden)
-                    .chartXAxis(.hidden)
-                    .chartYAxis(.hidden)
+                    .chartXAxis { AxisMarks { AxisGridLine() } }
+                    .chartYAxis { AxisMarks { AxisGridLine() } }
                 default:
                     EmptyView()
                 }
@@ -147,8 +146,7 @@ struct AnalyticsView: View {
                                                onReorder: saveCardOrder)
                         }
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 8.0)
+                    .padding([.horizontal, .top])
                 }
 
                 // Summary cards - horizontal scroll

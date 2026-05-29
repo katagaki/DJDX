@@ -11,6 +11,7 @@ import SwiftUI
 struct TowerTotalsChart: View {
     let totalKeyCount: Int
     let totalScratchCount: Int
+    var showsAnnotations: Bool = true
 
     /// 鍵盤タワー: 鍵盤7回分で1cm
     var keyTowerHeight: Double {
@@ -31,9 +32,11 @@ struct TowerTotalsChart: View {
             )
             .foregroundStyle(.blue)
             .annotation(position: .top) {
-                Text("Tower.Totals.HeightValue.\(Int(keyTowerHeight))")
-                    .font(.caption)
-                    .monospacedDigit()
+                if showsAnnotations {
+                    Text("Tower.Totals.HeightValue.\(Int(keyTowerHeight))")
+                        .font(.caption)
+                        .monospacedDigit()
+                }
             }
 
             BarMark(
@@ -43,9 +46,11 @@ struct TowerTotalsChart: View {
             )
             .foregroundStyle(.red)
             .annotation(position: .top) {
-                Text("Tower.Totals.HeightValue.\(Int(scratchTowerHeight))")
-                    .font(.caption)
-                    .monospacedDigit()
+                if showsAnnotations {
+                    Text("Tower.Totals.HeightValue.\(Int(scratchTowerHeight))")
+                        .font(.caption)
+                        .monospacedDigit()
+                }
             }
         }
     }
