@@ -18,6 +18,7 @@ struct SettingsMenu: View {
 
     @State var isPresentingExternalDataSources: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
+    @State var isConfirmingResetLayout: Bool = false
     @State var isPromptingScoreDeleteCode: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
     @State var scoreDeleteCode: String = ""
@@ -76,6 +77,9 @@ struct SettingsMenu: View {
                 Button("More.ManageData.DeleteScoreData", systemImage: "trash", role: .destructive) {
                     beginScoreDataDelete()
                 }
+                Button("More.ManageData.ResetLayout", systemImage: "arrow.counterclockwise") {
+                    isConfirmingResetLayout = true
+                }
             }
             Section {
                 Link(destination: URL(string: "https://github.com/katagaki/DJDX")!) {
@@ -100,6 +104,14 @@ struct SettingsMenu: View {
             Button("Shared.Cancel", role: .cancel) { }
         } message: {
             Text("Alert.DeleteData.Web.Subtitle")
+        }
+        .alert("Alert.ResetLayout.Title", isPresented: $isConfirmingResetLayout) {
+            Button("Alert.ResetLayout.Confirm", role: .destructive) {
+                resetLayout()
+            }
+            Button("Shared.Cancel", role: .cancel) { }
+        } message: {
+            Text("Alert.ResetLayout.Subtitle")
         }
         .alert("Alert.DeleteData.Score.Code.Title", isPresented: $isPromptingScoreDeleteCode) {
             TextField("Alert.DeleteData.Score.Code.Placeholder", text: $scoreDeleteCodeEntry)
@@ -148,6 +160,20 @@ struct SettingsMenu: View {
         Task {
             await importer.deleteAllScoreData()
         }
+    }
+
+    func resetLayout() {
+        let defaults = UserDefaults.standard
+        let encoder = JSONEncoder()
+        defaults.set((try? encoder.encode(AnalyticsCardType.defaultOrder)) ?? Data(),
+                     forKey: "Analytics.CardOrder")
+        defaults.set((try? encoder.encode(AnalyticsCardType.defaultVisible)) ?? Data(),
+                     forKey: "Analytics.VisibleCards")
+        defaults.set((try? encoder.encode(PerLevelCardID.defaultOrder)) ?? Data(),
+                     forKey: "Analytics.PerLevelCardOrder")
+        defaults.set((try? encoder.encode(PerLevelCardID.defaultVisible)) ?? Data(),
+                     forKey: "Analytics.VisiblePerLevelCards")
+        NotificationCenter.default.post(name: .analyticsLayoutReset, object: nil)
     }
 }
 

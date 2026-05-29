@@ -170,6 +170,15 @@ struct ScoresView<Header: View>: View {
             LazyVStack(spacing: 0.0) {
                 if searchTerm.isEmpty {
                     header
+                    HStack {
+                        Text("Analytics.Section.ScoreData")
+                            .font(.title3.bold())
+                            .foregroundStyle(.primary)
+                        Spacer()
+                    }
+                    .padding(.top, 20.0)
+                    .padding(.bottom, 4.0)
+                    .padding(.horizontal)
                 }
                 ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
                         id: \.id) { entry in

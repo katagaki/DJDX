@@ -8,6 +8,20 @@
 import Foundation
 import SwiftUI
 
+enum AnalyticsSection: String, Hashable, CaseIterable {
+    case overview
+    case lastPlay
+    case perLevel
+
+    var titleKey: LocalizedStringKey {
+        switch self {
+        case .overview: "Analytics.Section.Overview"
+        case .lastPlay: "Analytics.Section.LastPlay"
+        case .perLevel: "Analytics.Section.PerLevel"
+        }
+    }
+}
+
 enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case clearTypeOverall
     case towerRecent

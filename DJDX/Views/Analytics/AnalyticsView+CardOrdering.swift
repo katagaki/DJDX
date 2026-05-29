@@ -68,7 +68,66 @@ extension AnalyticsView {
     }
 }
 
+// MARK: - Section Header
+
+struct AnalyticsSectionHeader: View {
+    let title: LocalizedStringKey
+    let isEditing: Bool
+    var showsEditButton: Bool = true
+    let onToggleEdit: () -> Void
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.title3.bold())
+                .foregroundStyle(.primary)
+            Spacer()
+            if showsEditButton {
+                Button {
+                    onToggleEdit()
+                } label: {
+                    Image(systemName: isEditing ? "checkmark" : "pencil")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .buttonStyle(.borderless)
+            }
+        }
+        .padding(.top, 20.0)
+        .padding(.bottom, 4.0)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal)
+    }
+}
+
 // MARK: - Drag-and-Drop View Extensions
+
+extension View {
+    @ViewBuilder
+    func editableCard(
+        isVisible: Bool,
+        isEditing: Bool,
+        cornerRadius: CGFloat = 20.0,
+        onToggle: @escaping () -> Void
+    ) -> some View {
+        self
+            .opacity(isEditing && !isVisible ? 0.4 : 1.0)
+            .overlay {
+                if isEditing && !isVisible {
+                    Image(systemName: "eye.slash.fill")
+                        .font(.title2)
+                        .foregroundStyle(.white)
+                        .shadow(radius: 3.0)
+                }
+            }
+            .overlay {
+                if isEditing {
+                    Color.white.opacity(0.001)
+                        .contentShape(.rect(cornerRadius: cornerRadius))
+                        .onTapGesture { onToggle() }
+                }
+            }
+    }
+}
 
 extension View {
     @ViewBuilder
