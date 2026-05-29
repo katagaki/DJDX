@@ -17,14 +17,11 @@ struct DJDXApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            UnifiedView()
         }
         .modelContainer(sharedModelContainer)
         .environmentObject(navigationManager)
         .environment(progressAlertManager)
-        .onChange(of: navigationManager.selectedTab) { _, _ in
-            navigationManager.saveToDefaults()
-        }
     }
 
     init() {

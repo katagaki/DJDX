@@ -51,7 +51,7 @@ struct WebImporter: View {
 
 struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataDelegate {
 
-    @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(\.dismiss) var dismiss
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
     @Binding var importToDate: Date
@@ -120,8 +120,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
                     }
                 }
                 await MainActor.run {
-                    let tab: TabType = importMode == .tower ? .tower : .imports
-                    navigationManager.popToRoot(for: tab)
+                    dismiss()
                     progressAlertManager.hide()
                     didImportSucceed = true
                 }
@@ -130,8 +129,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     }
 
     func stopProcessing(with reason: ImportFailedReason) {
-        let tab: TabType = importMode == .tower ? .tower : .imports
-        navigationManager.popToRoot(for: tab)
+        dismiss()
         autoImportFailedReason = reason
         isAutoImportFailed = true
     }

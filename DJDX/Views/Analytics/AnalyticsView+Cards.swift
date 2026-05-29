@@ -46,7 +46,7 @@ extension AnalyticsView {
     var clearTypeOverallCard: some View {
         Button {
             if !isEditingCards && clearTypePerDifficulty.count > 0 {
-                navigationManager.push(.clearTypeOverviewGraph, for: .analytics)
+                navigationManager.push(AnalyticsPath.clearTypeOverviewGraph)
             }
         } label: {
             AnalyticsCardView(cardType: .clearTypeOverall) {
@@ -62,7 +62,7 @@ extension AnalyticsView {
     var newClearsCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newClearsDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newClearsDetail)
             }
         } label: {
             AnalyticsCardView(cardType: .newClears) {
@@ -76,7 +76,7 @@ extension AnalyticsView {
     var newAssistClearsCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newAssistClearsDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newAssistClearsDetail)
             }
         } label: {
             AnalyticsCardView(cardType: .newAssistClears) {
@@ -90,7 +90,7 @@ extension AnalyticsView {
     var newEasyClearsCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newEasyClearsDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newEasyClearsDetail)
             }
         } label: {
             AnalyticsCardView(cardType: .newEasyClears) {
@@ -104,7 +104,7 @@ extension AnalyticsView {
     var newFullComboClearCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newFullComboClearDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newFullComboClearDetail)
             }
         } label: {
             AnalyticsCardView(cardType: .newFullComboClear) {
@@ -118,7 +118,7 @@ extension AnalyticsView {
     var newHardClearCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newHardClearDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newHardClearDetail)
             }
         } label: {
             AnalyticsCardView(cardType: .newHardClear) {
@@ -132,7 +132,7 @@ extension AnalyticsView {
     var newExHardClearCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newExHardClearDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newExHardClearDetail)
             }
         } label: {
             AnalyticsCardView(cardType: .newExHardClear) {
@@ -146,7 +146,7 @@ extension AnalyticsView {
     var newFailedCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newFailedDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newFailedDetail)
             }
         } label: {
             AnalyticsCardView(cardType: .newFailed) {
@@ -160,7 +160,7 @@ extension AnalyticsView {
     var newHighScoresCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newHighScoresDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newHighScoresDetail)
             }
         } label: {
             AnalyticsCardView(cardType: .newHighScores) {
@@ -174,7 +174,7 @@ extension AnalyticsView {
     var newAAACard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newAAADetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newAAADetail)
             }
         } label: {
             AnalyticsCardView(cardType: .newAAA) {
@@ -188,7 +188,7 @@ extension AnalyticsView {
     var newAACard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newAADetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newAADetail)
             }
         } label: {
             AnalyticsCardView(cardType: .newAA) {
@@ -202,7 +202,7 @@ extension AnalyticsView {
     var newACard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newADetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newADetail)
             }
         } label: {
             AnalyticsCardView(cardType: .newA) {
@@ -240,7 +240,7 @@ extension AnalyticsView {
     func clearTypeForLevelCard(difficulty: Int) -> some View {
         Button {
             if !isEditingCards && clearTypePerDifficulty[difficulty] != nil {
-                navigationManager.push(.clearTypeForLevel(difficulty: difficulty), for: .analytics)
+                navigationManager.push(AnalyticsPath.clearTypeForLevel(difficulty: difficulty))
             }
         } label: {
             AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
@@ -262,7 +262,7 @@ extension AnalyticsView {
     func clearTypeTrendsForLevelCard(difficulty: Int) -> some View {
         Button {
             if !isEditingCards && clearTypePerImportGroup.count > 0 {
-                navigationManager.push(.clearTypeTrendsForLevel(difficulty: difficulty), for: .analytics)
+                navigationManager.push(AnalyticsPath.clearTypeTrendsForLevel(difficulty: difficulty))
             }
         } label: {
             AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
@@ -285,7 +285,7 @@ extension AnalyticsView {
     func djLevelForLevelCard(difficulty: Int) -> some View {
         Button {
             if !isEditingCards && djLevelPerDifficulty[difficulty] != nil {
-                navigationManager.push(.djLevelForLevel(difficulty: difficulty), for: .analytics)
+                navigationManager.push(AnalyticsPath.djLevelForLevel(difficulty: difficulty))
             }
         } label: {
             AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
@@ -307,7 +307,7 @@ extension AnalyticsView {
     func djLevelTrendsForLevelCard(difficulty: Int) -> some View {
         Button {
             if !isEditingCards && djLevelPerImportGroup.count > 0 {
-                navigationManager.push(.djLevelTrendsForLevel(difficulty: difficulty), for: .analytics)
+                navigationManager.push(AnalyticsPath.djLevelTrendsForLevel(difficulty: difficulty))
             }
         } label: {
             AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",

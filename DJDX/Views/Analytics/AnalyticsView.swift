@@ -79,8 +79,7 @@ struct AnalyticsView: View {
     @Namespace var analyticsNamespace
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.analytics]) {
-            ScrollView {
+        ScrollView {
                 // Overall summary (position fixed)
                 clearTypeOverallCard
                     .padding(.horizontal)
@@ -132,7 +131,13 @@ struct AnalyticsView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 16.0)
             }
-            .navigator("ViewTitle.Analytics")
+            .background(
+                .linearGradient(
+                    colors: [.backgroundGradientTop, .backgroundGradientBottom],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
             .toolbar {
                 if #available(iOS 26.0, *) {
                     ToolbarItem(placement: .topBarLeading) {
@@ -212,19 +217,15 @@ struct AnalyticsView: View {
                 }
             }
             .onChange(of: playTypeToShow) { _, _ in
-                if navigationManager.selectedTab == .analytics {
-                    Task {
-                        await reload()
-                        debugPrint("Reloaded on change of play type")
-                    }
-                } else {
-                    dataState = .initializing
+                Task {
+                    await reload()
+                    debugPrint("Reloaded on change of play type")
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
                 Task { await reload() }
             }
-            .navigationDestination(for: ViewPath.self) { viewPath in
+            .navigationDestination(for: AnalyticsPath.self) { viewPath in
                 Group {
                     switch viewPath {
                     case .clearTypeOverviewGraph:
@@ -420,7 +421,6 @@ struct AnalyticsView: View {
                 }
                 .navigationBarTitleDisplayMode(.inline)
             }
-        }
     }
 
 }

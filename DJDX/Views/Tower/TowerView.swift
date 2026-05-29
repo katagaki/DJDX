@@ -9,13 +9,12 @@ import SwiftUI
 
 struct TowerView: View {
 
-    @EnvironmentObject var navigationManager: NavigationManager
-
     @State var towerEntries: [IIDXTowerEntry] = []
 
     @State var isAutoImportFailed: Bool = false
     @State var didImportSucceed: Bool = false
     @State var autoImportFailedReason: ImportFailedReason?
+    @State var isPresentingImporter: Bool = false
 
     let fetcher = DataFetcher()
 
@@ -39,8 +38,7 @@ struct TowerView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.tower]) {
-            Group {
+        Group {
                 if towerEntries.isEmpty {
                     ContentUnavailableView(
                         "Tower.NoData.Title",
@@ -108,11 +106,10 @@ struct TowerView: View {
                     }
                 }
             }
-            .navigator("Shared.IIDX.Tower")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Shared.Import", systemImage: "arrow.clockwise") {
-                        navigationManager.push(ViewPath.importerWebIIDXTower, for: .tower)
+                        isPresentingImporter = true
                     }
                 }
             }
@@ -140,14 +137,12 @@ struct TowerView: View {
                     Text(errorMessage(for: autoImportFailedReason ?? .serverError))
                 }
             )
-            .navigationDestination(for: ViewPath.self) { viewPath in
-                switch viewPath {
-                case .importerWebIIDXTower:
+            .sheet(isPresented: $isPresentingImporter) {
+                NavigationStack {
                     WebImporter(importMode: .tower,
                                 isAutoImportFailed: $isAutoImportFailed,
                                 didImportSucceed: $didImportSucceed,
                                 autoImportFailedReason: $autoImportFailedReason)
-                default: Color.clear
                 }
             }
             .task {
@@ -163,7 +158,6 @@ struct TowerView: View {
             .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
                 Task { await reloadTowerEntries() }
             }
-        }
     }
 
     func reloadTowerEntries() async {

@@ -13,7 +13,7 @@ struct MoreView: View {
 
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-    @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(\.dismiss) var dismiss
 
     let importer = DataImporter()
 
@@ -22,33 +22,15 @@ struct MoreView: View {
 
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
-    @State var qproImage: UIImage?
-    @State var spRadarData: RadarData?
-    @State var dpRadarData: RadarData?
+    @State var morePath = NavigationPath()
 
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
     @State var isConfirmingOldDataDelete: Bool = false
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.more]) {
+        NavigationStack(path: $morePath) {
             List {
-                if let qproImage {
-                    Section {
-                        Image(uiImage: qproImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 240.0, alignment: .center)
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-                        if spRadarData != nil || dpRadarData != nil {
-                            MoreNotesRadarView(spRadarData: spRadarData, dpRadarData: dpRadarData)
-                                .listRowBackground(Color.clear)
-                                .listRowInsets(EdgeInsets())
-                        }
-                    }
-                }
                 Section {
                     Picker(selection: $iidxVersion) {
                         ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
@@ -57,8 +39,8 @@ struct MoreView: View {
                     } label: {
                         Text("Shared.IIDX.Version")
                     }
-                    NavigationLink("More.General.AppIcon", value: ViewPath.moreAppIcon)
-                    NavigationLink("More.ExternalData.Header", value: ViewPath.moreExternalDataSources)
+                    NavigationLink("More.General.AppIcon", value: MorePath.moreAppIcon)
+                    NavigationLink("More.ExternalData.Header", value: MorePath.moreExternalDataSources)
                         .popoverTip(ImportWikiDataTip())
                     Toggle("More.PlayDataDisplay.HideBeginnerLevel", isOn: $isBeginnerLevelHidden)
                 } header: {
@@ -93,20 +75,18 @@ struct MoreView: View {
                         }
                     }
                     .tint(.primary)
-                    NavigationLink("More.Attributions", value: ViewPath.moreAttributions)
+                    NavigationLink("More.Attributions", value: MorePath.moreAttributions)
                 }
             }
             .navigator("ViewTitle.More", group: true)
             .scrollContentBackground(.hidden)
             .listSectionSpacing(.compact)
-            .task {
-                loadRadarData()
-                if qproImage == nil {
-                    await refreshStatusPageData()
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Shared.Done", role: .cancel) {
+                        dismiss()
+                    }
                 }
-            }
-            .refreshable {
-                await refreshStatusPageData()
             }
             .alert(
                 "Alert.DeleteData.Web.Title",
@@ -150,26 +130,13 @@ struct MoreView: View {
                 message: {
                     Text("Alert.DeleteData.OldData.Subtitle")
                 })
-            .navigationDestination(for: ViewPath.self, destination: { viewPath in
+            .navigationDestination(for: MorePath.self, destination: { viewPath in
                 switch viewPath {
                 case .moreExternalDataSources: MoreExternalDataSources()
                 case .moreAppIcon: MoreAppIconView()
                 case .moreAttributions: MoreLicensesView()
-                default: Color.clear
                 }
             })
-        }
-    }
-
-    func refreshStatusPageData() async {
-        qproImage = loadQproImage()
-        if qproImage == nil {
-            await downloadStatusPageData()
-            withAnimation {
-                qproImage = loadQproImage()
-            }
-        } else {
-            await downloadStatusPageData()
         }
     }
 

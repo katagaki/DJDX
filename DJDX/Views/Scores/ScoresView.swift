@@ -7,9 +7,11 @@
 
 import SwiftUI
 
-struct ScoresView: View {
+struct ScoresView<Header: View>: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
+
+    @ViewBuilder var header: Header
 
     @State var dataState: DataState = .initializing
 
@@ -74,19 +76,23 @@ struct ScoresView: View {
          sortOrder.rawValue]
     }
 
-    init() {
+    init(@ViewBuilder header: () -> Header) {
+        self.header = header()
         self.isTimeTravelling = UserDefaults.standard.bool(forKey: isTimeTravellingKey)
     }
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.scores]) {
-            List {
+        List {
+            Section {
+                header
+            }
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets())
                 ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
                         id: \.id) { entry in
                     Button {
                         navigationManager.push(
-                            .scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level),
-                            for: .scores
+                            ScoresPath.scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level)
                         )
                     } label: {
                         ScoreRow(
@@ -104,7 +110,7 @@ struct ScoresView: View {
                 }
                 .listRowBackground(Color.clear)
             }
-            .navigator("ViewTitle.Scores")
+            .listStyle(.plain)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     if #available(iOS 26.0, *) {
@@ -213,11 +219,7 @@ struct ScoresView: View {
                 }
             }
             .onChange(of: playTypeToShow) { _, _ in
-                if navigationManager.selectedTab == .scores {
-                    reloadDisplay()
-                } else {
-                    dataState = .initializing
-                }
+                reloadDisplay()
             }
             .onChange(of: conditionsForReload) {_, _ in
                 if !isSystemChangingFilterAndSort {
@@ -243,7 +245,7 @@ struct ScoresView: View {
                 dataState = .initializing
                 reloadDisplay()
             }
-            .navigationDestination(for: ViewPath.self) { viewPath in
+            .navigationDestination(for: ScoresPath.self) { viewPath in
                 switch viewPath {
                 case .scoreViewer(let songRecord, let initialLevel):
                     ScoreViewer(songRecord: songRecord, noteCount: noteCount,
@@ -253,9 +255,7 @@ struct ScoresView: View {
                     ScoreHistoryViewer(songTitle: songTitle, level: level, noteCount: noteCount)
                 case .textageViewer(let songTitle, let level, let playSide, let playType):
                     TextageViewer(songTitle: songTitle, level: level, playSide: playSide, playType: playType)
-                default: Color.clear
                 }
             }
-        }
     }
 }

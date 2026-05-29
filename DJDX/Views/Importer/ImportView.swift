@@ -16,11 +16,12 @@ struct ImportView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
-    @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(\.dismiss) var dismiss
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var importPlayType: IIDXPlayType
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
+    @State var importPath = NavigationPath()
     @State var importGroups: [ImportGroup] = []
 
     @State var importToDate: Date = .now
@@ -34,11 +35,11 @@ struct ImportView: View {
     let fetcher = DataFetcher()
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.imports]) {
+        NavigationStack(path: $importPath) {
             List {
                 ForEach(importGroups) { importGroup in
                     Button {
-                        navigationManager.push(.importDetail(importGroup: importGroup), for: .imports)
+                        importPath.append(ImportPath.importDetail(importGroup: importGroup))
                     } label: {
                         HStack(alignment: .center, spacing: 6.0) {
                             Text(importGroup.importDate, style: .date)
@@ -93,6 +94,11 @@ struct ImportView: View {
                         }
                     }
                 }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Shared.Done", role: .cancel) {
+                        dismiss()
+                    }
+                }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 if #available(iOS 26.0, *) {
@@ -113,7 +119,7 @@ struct ImportView: View {
                 actions: {
                     Button("Shared.OK", role: .cancel) {
                         didImportSucceed = false
-                        navigationManager.popToRoot(for: .imports)
+                        importPath = NavigationPath()
                     }
                 },
                 message: {
@@ -126,7 +132,7 @@ struct ImportView: View {
                 actions: {
                     Button("Shared.OK", role: .cancel) {
                         isAutoImportFailed = false
-                        navigationManager.popToRoot(for: .imports)
+                        importPath = NavigationPath()
                     }
                 },
                 message: {
@@ -151,7 +157,7 @@ struct ImportView: View {
                 })
                 .ignoresSafeArea(edges: [.bottom])
             }
-            .navigationDestination(for: ViewPath.self) { viewPath in
+            .navigationDestination(for: ImportPath.self) { viewPath in
                 switch viewPath {
                 case .importerWebIIDXSingle:
                     WebImporter(importToDate: $importToDate,
@@ -187,8 +193,8 @@ struct ImportView: View {
             HStack(spacing: 10.0) {
                 Button {
                     switch importPlayType {
-                    case .single: navigationManager.push(ViewPath.importerWebIIDXSingle, for: .imports)
-                    case .double: navigationManager.push(ViewPath.importerWebIIDXDouble, for: .imports)
+                    case .single: importPath.append(ImportPath.importerWebIIDXSingle)
+                    case .double: importPath.append(ImportPath.importerWebIIDXDouble)
                     }
                 } label: {
                     VStack(spacing: 8.0) {

@@ -114,9 +114,9 @@ struct ScoreSection: View {
                 IIDXLevelLabel(orientation: .horizontal, levelType: score.level, score: score)
                 Spacer()
                 if score.djLevelEnum() != .none {
-                    NavigationLink(value: ViewPath.scoreHistory(songTitle: songTitle,
-                                                                level: score.level,
-                                                                noteCount: noteCount)) {
+                    NavigationLink(value: ScoresPath.scoreHistory(songTitle: songTitle,
+                                                                  level: score.level,
+                                                                  noteCount: noteCount)) {
                         Image(systemName: "clock.arrow.circlepath")
                     }.accessibilityLabel("Scores.Viewer.ShowHistory")
                 }
@@ -138,10 +138,10 @@ struct ScoreSection: View {
                 case .single:
                     Divider()
                     Button {
-                        navigationManager.push(.textageViewer(songTitle: songTitle,
+                        navigationManager.push(ScoresPath.textageViewer(songTitle: songTitle,
                                                               level: score.level,
                                                               playSide: .side1P,
-                                                              playType: playType), for: .scores)
+                                                              playType: playType))
                     } label: {
                         chartActionLabel(image: Image(.listIconTextage),
                                          label: "Scores.Viewer.OpenTextage.1P")
@@ -149,10 +149,10 @@ struct ScoreSection: View {
                     .buttonStyle(.plain)
                     Divider()
                     Button {
-                        navigationManager.push(.textageViewer(songTitle: songTitle,
+                        navigationManager.push(ScoresPath.textageViewer(songTitle: songTitle,
                                                               level: score.level,
                                                               playSide: .side2P,
-                                                              playType: playType), for: .scores)
+                                                              playType: playType))
                     } label: {
                         chartActionLabel(image: Image(.listIconTextageFlipped),
                                          label: "Scores.Viewer.OpenTextage.2P")
@@ -161,10 +161,10 @@ struct ScoreSection: View {
                 case .double:
                     Divider()
                     Button {
-                        navigationManager.push(.textageViewer(songTitle: songTitle,
+                        navigationManager.push(ScoresPath.textageViewer(songTitle: songTitle,
                                                               level: score.level,
                                                               playSide: .notApplicable,
-                                                              playType: playType), for: .scores)
+                                                              playType: playType))
                     } label: {
                         chartActionLabel(image: Image(.listIconTextage),
                                          label: "Scores.Viewer.OpenTextage.DP")

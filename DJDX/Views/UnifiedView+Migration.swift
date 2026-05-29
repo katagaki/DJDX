@@ -1,87 +1,15 @@
 //
-//  MainTabView.swift
+//  UnifiedView+Migration.swift
 //  DJDX
 //
-//  Created by シン・ジャスティン on 2024/05/19.
+//  Created by シン・ジャスティン on 2026/05/29.
 //
 
-import StoreKit
 import SwiftData
 import SwiftUI
-import TipKit
+import UIKit
 
-struct MainTabView: View {
-
-    @Environment(\.requestReview) var requestReview
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.colorScheme) var colorScheme
-
-    @Environment(ProgressAlertManager.self) var progressAlertManager
-    @EnvironmentObject var navigationManager: NavigationManager
-
-    @AppStorage(wrappedValue: false, "ScoresView.IsTimeTravelling") var isTimeTravelling: Bool
-    @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
-    @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
-
-    @State var isFirstStartCleanupComplete: Bool = false
-
-    var body: some View {
-        @Bindable var progressAlertManager = progressAlertManager
-        TabView(selection: $navigationManager.selectedTab) {
-            ImportView()
-                .tabItem {
-                    Label("Tab.Import", systemImage: "arrow.down.circle.dotted")
-                }
-                .tag(TabType.imports)
-            ScoresView()
-                .tabItem {
-                    Label("Tab.Scores", image: .tabIconScores)
-                }
-                .tag(TabType.scores)
-            AnalyticsView()
-                .tabItem {
-                    Label("Tab.Analytics", image: .tabIconAnalytics)
-                }
-                .tag(TabType.analytics)
-            TowerView()
-                .tabItem {
-                    Label("Shared.IIDX.Tower", systemImage: "chart.bar.xaxis")
-                }
-                .tag(TabType.tower)
-            MoreView()
-                .tabItem {
-                    Label("Tab.More", systemImage: "person.crop.circle")
-                }
-                .tag(TabType.more)
-        }
-        .task {
-            if !isFirstStartCleanupComplete {
-                await migrateData()
-                isFirstStartCleanupComplete = true
-            }
-            try? Tips.configure([
-                .displayFrequency(.immediate),
-                .datastoreLocation(.applicationDefault)
-            ])
-            launchCount += 1
-            if launchCount > 2 && !hasReviewBeenPrompted {
-                requestReview()
-                hasReviewBeenPrompted = true
-            }
-        }
-        .overlay {
-            if progressAlertManager.isShowing {
-                ProgressAlert(
-                    title: $progressAlertManager.title,
-                    message: $progressAlertManager.message
-                )
-            } else {
-                // HACK: DO NOT REMOVE. Removing this will cause a freeze when isShowing is false.
-                Color.clear
-            }
-        }
-    }
-
+extension UnifiedView {
     func migrateData() async {
         let defaults = UserDefaults.standard
         let dataMigrationKeys = [
@@ -94,7 +22,6 @@ struct MainTabView: View {
         for dataMigrationKey in dataMigrationKeys where !defaults.bool(forKey: dataMigrationKey) {
             switch dataMigrationKey {
             case "Internal.DataMigrationForEpolisToPinkyCrush.2":
-                debugPrint("Performing migration when migrating from 1.x to 32.x")
                 progressAlertManager.show(
                     title: "Migration.Title",
                     message: "Migration.Description"
@@ -118,23 +45,17 @@ struct MainTabView: View {
     }
 
     func migrateSwiftDataToSQLite() async {
-        debugPrint("Performing migration from SwiftData to SQLite")
-
-        // Fetch all SwiftData ImportGroups
         let importGroups: [ImportGroup] = (try? modelContext.fetch(
             FetchDescriptor<ImportGroup>(
                 sortBy: [SortDescriptor(\.importDate, order: .forward)]
             )
         )) ?? []
 
-        // If no data, skip migration
         guard !importGroups.isEmpty else {
-            debugPrint("No SwiftData data to migrate")
             UserDefaults.standard.set(true, forKey: "Internal.DataMigrationDeleteOldSQLiteData")
             return
         }
 
-        // Fetch songs and tower entries
         let songs: [IIDXSong] = (try? modelContext.fetch(
             FetchDescriptor<IIDXSong>()
         )) ?? []
@@ -151,12 +72,10 @@ struct MainTabView: View {
             )
         }
 
-        // Small delay to allow the alert to appear
         try? await Task.sleep(for: .milliseconds(500))
 
         let importer = DataImporter()
 
-        // Migrate ImportGroups and their song records
         for (index, importGroup) in importGroups.enumerated() {
             await importer.migrateImportGroup(
                 importGroup,
@@ -169,15 +88,10 @@ struct MainTabView: View {
             }
         }
 
-        // Migrate IIDXSong data
         await importer.migrateSongs(songs)
-
-        // Migrate IIDXTowerEntry data
         await importer.migrateTowerEntries(towerEntries)
 
-        // Delete all SwiftData entries after successful migration
         #if DEBUG
-        debugPrint("Deleting SwiftData entries after migration")
         try? modelContext.delete(model: IIDXSongRecord.self)
         try? modelContext.delete(model: ImportGroup.self)
         try? modelContext.delete(model: IIDXSong.self)
@@ -185,7 +99,6 @@ struct MainTabView: View {
         try? modelContext.save()
         #endif
 
-        debugPrint("Migration from SwiftData to SQLite completed")
         await MainActor.run {
             progressAlertManager.hide()
             NotificationCenter.default.post(name: .dataMigrationCompleted, object: nil)

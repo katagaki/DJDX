@@ -1,16 +1,56 @@
 //
-//  MoreView+Functions.swift
+//  ProfileHeaderView.swift
 //  DJDX
 //
-//  Created by シン・ジャスティン on 2026/02/20.
+//  Created by シン・ジャスティン on 2026/05/29.
 //
 
-import Foundation
 import SwiftSoup
+import SwiftUI
 import UIKit
-import WebKit
 
-extension MoreView {
+struct ProfileHeaderView: View {
+
+    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+
+    @State var qproImage: UIImage?
+    @State var spRadarData: RadarData?
+    @State var dpRadarData: RadarData?
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12.0) {
+            if let qproImage {
+                Image(uiImage: qproImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120.0)
+            }
+            if spRadarData != nil || dpRadarData != nil {
+                MoreNotesRadarView(spRadarData: spRadarData, dpRadarData: dpRadarData)
+                    .frame(maxWidth: .infinity)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .task {
+            loadRadarData()
+            if qproImage == nil {
+                await refreshStatusPageData()
+            }
+        }
+    }
+
+    func refreshStatusPageData() async {
+        qproImage = loadQproImage()
+        if qproImage == nil {
+            await downloadStatusPageData()
+            withAnimation {
+                qproImage = loadQproImage()
+            }
+        } else {
+            await downloadStatusPageData()
+        }
+    }
+
     func loadQproImage() -> UIImage? {
         guard let documentsDirectory = FileManager.default.urls(
             for: .documentDirectory, in: .userDomainMask
@@ -20,9 +60,6 @@ extension MoreView {
         if FileManager.default.fileExists(atPath: fileURL.path) {
             return UIImage(contentsOfFile: fileURL.path)
         } else {
-            #if DEBUG
-            debugPrint("Qpro image not found")
-            #endif
             return nil
         }
     }
@@ -37,7 +74,6 @@ extension MoreView {
 
             let document = try SwiftSoup.parse(htmlString)
 
-            // Download Qpro image
             if let imgElement = try document.select("div.qpro-img img").first() {
                 let extractedPath = try imgElement.attr("src")
                 if let imageURL = URL(string: baseURLString + extractedPath) {
@@ -46,10 +82,6 @@ extension MoreView {
 
                     if let httpResponse = response as? HTTPURLResponse,
                        (200...299).contains(httpResponse.statusCode) {
-                        #if DEBUG
-                        debugPrint("Qpro image downloaded")
-                        #endif
-
                         if let documentsDirectory = FileManager.default.urls(
                             for: .documentDirectory, in: .userDomainMask
                         ).first {
@@ -60,7 +92,6 @@ extension MoreView {
                 }
             }
 
-            // Parse notes radar data
             let radarCategories = try document.select("div#notes div.rank-cat")
             for category in radarCategories {
                 guard let spanElement = try category.select("span").first() else { continue }
