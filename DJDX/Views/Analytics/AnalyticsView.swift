@@ -127,13 +127,19 @@ struct AnalyticsView: View {
                 // MARK: Overview section
                 AnalyticsSectionHeader(
                     title: AnalyticsSection.overview.titleKey,
-                    isEditing: editingSection == .overview,
-                    showsEditButton: selectedGame.supportsTower
+                    isEditing: editingSection == .overview
                 ) {
                     toggleEdit(.overview)
                 }
-                clearTypeOverallCard
-                    .padding(.horizontal)
+                if editingSection == .overview || visibleCards.contains(.clearTypeOverall) {
+                    clearTypeOverallCard
+                        .editableCard(isVisible: visibleCards.contains(.clearTypeOverall),
+                                      isEditing: editingSection == .overview,
+                                      seed: 0) {
+                            toggleCard(.clearTypeOverall)
+                        }
+                        .padding(.horizontal)
+                }
 
                 // Tower cards (half width, IIDX AC only)
                 let towerCards = selectedGame.supportsTower ? cardOrder.filter { $0.isTowerCard } : []
