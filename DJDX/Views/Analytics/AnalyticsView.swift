@@ -78,6 +78,45 @@ struct AnalyticsView: View {
 
     @Namespace var analyticsNamespace
 
+    @ViewBuilder
+    var editControls: some View {
+        if isEditingCards {
+            Button {
+                withAnimation(.snappy) {
+                    isEditingCards = false
+                    draggedCard = nil
+                    draggedPerLevelCard = nil
+                }
+            } label: {
+                Label(.sharedDone, systemImage: "checkmark")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+        } else if dataState == .initializing || dataState == .loading {
+            ProgressView()
+                .progressViewStyle(.circular)
+                .frame(maxWidth: .infinity)
+        } else {
+            HStack(spacing: 12.0) {
+                Button {
+                    withAnimation(.snappy) { isEditingCards = true }
+                } label: {
+                    Label("Analytics.Settings.EditCards", systemImage: "arrow.up.arrow.down")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                Button {
+                    isShowingSettings = true
+                } label: {
+                    Label("Analytics.Settings.EditCards", systemImage: "pencil")
+                        .labelStyle(.iconOnly)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+            }
+        }
+    }
+
     var body: some View {
         ScrollView {
                 // Overall summary (position fixed)
@@ -130,6 +169,10 @@ struct AnalyticsView: View {
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 16.0)
+
+                editControls
+                    .padding(.horizontal)
+                    .padding(.bottom, 16.0)
             }
             .background(
                 .linearGradient(
@@ -138,44 +181,6 @@ struct AnalyticsView: View {
                     endPoint: .bottom
                 )
             )
-            .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    if isEditingCards {
-                        if #available(iOS 26.0, *) {
-                            Button(role: .confirm) {
-                                withAnimation(.snappy) {
-                                    isEditingCards = false
-                                    draggedCard = nil
-                                    draggedPerLevelCard = nil
-                                }
-                            }
-                        } else {
-                            Button(.sharedDone) {
-                                withAnimation(.snappy) {
-                                    isEditingCards = false
-                                    draggedCard = nil
-                                    draggedPerLevelCard = nil
-                                }
-                            }
-                        }
-                    } else if dataState == .initializing || dataState == .loading {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                    } else {
-                        Button {
-                            withAnimation(.snappy) { isEditingCards = true }
-                        } label: {
-                            Label("Analytics.Settings.EditCards",
-                                  systemImage: "arrow.up.arrow.down")
-                        }
-                        Button {
-                            isShowingSettings = true
-                        } label: {
-                            Image(systemName: "pencil")
-                        }
-                    }
-                }
-            }
             .refreshable {
                 await reload()
                 debugPrint("Reloaded from swipe to refresh")

@@ -61,7 +61,9 @@ struct ImportView: View {
                 })
                 .listRowBackground(Color.clear)
             }
-            .navigator("ViewTitle.Calendar")
+            .listStyle(.plain)
+            .navigationTitle("ViewTitle.Calendar")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

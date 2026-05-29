@@ -51,6 +51,7 @@ struct ScoreSortAndFilter: View {
                 .pickerStyle(.inline)
             }
         }
+        .menuOrder(.fixed)
         .menuActionDismissBehavior(.disabled)
 
         // Filter
@@ -76,6 +77,7 @@ struct ScoreSortAndFilter: View {
                 isLastPlayDateVisible: $isLastPlayDateVisible,
                 onReset: onReset
             )
+            .automaticNavigationTransition(id: "ScoreFilterSheet", in: filterNamespace)
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
             .interactiveDismissDisabled()

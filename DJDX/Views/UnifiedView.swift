@@ -27,7 +27,6 @@ struct UnifiedView: View {
 
     @State var selectedSegment: GameDestination = .analytics
     @State var isPresentingImport: Bool = false
-    @State var isPresentingSettings: Bool = false
     @State var isFirstStartCleanupComplete: Bool = false
 
     var body: some View {
@@ -36,6 +35,7 @@ struct UnifiedView: View {
             ScoresView {
                 unifiedHeader
             }
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     gameMenu
@@ -46,18 +46,20 @@ struct UnifiedView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Tab.More", systemImage: "person.crop.circle") {
-                        isPresentingSettings = true
-                    }
+                    SettingsMenu()
+                }
+            }
+            .navigationDestination(for: MorePath.self) { viewPath in
+                switch viewPath {
+                case .moreExternalDataSources: MoreExternalDataSources()
+                case .moreAppIcon: MoreAppIconView()
+                case .moreAttributions: MoreLicensesView()
                 }
             }
         }
         .sheet(isPresented: $isPresentingImport) {
             ImportView()
                 .presentationDetents([.medium, .large])
-        }
-        .sheet(isPresented: $isPresentingSettings) {
-            MoreView()
         }
         .overlay {
             if progressAlertManager.isShowing {
