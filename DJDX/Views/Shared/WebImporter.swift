@@ -128,6 +128,16 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
         }
     }
 
+    func importTowerData(using towerData: String) async {
+        let actor = DataImporter()
+        for await _ in await actor.importCSV(
+            csv: towerData,
+            to: importToDate,
+            for: .tower,
+            from: iidxVersion
+        ) { }
+    }
+
     func stopProcessing(with reason: ImportFailedReason) {
         dismiss()
         autoImportFailedReason = reason
@@ -151,6 +161,8 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
     var hasStartedExtraction: Bool = false
     var hasResolved: Bool = false
     var watchdog: Task<Void, Never>?
+    weak var activeWebView: WKWebView?
+    var pendingScoreCSV: String?
 
     init(
         delegate: UpdateScoreDataDelegate,
@@ -210,6 +222,7 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
 
     func extractScoreData(from webView: WKWebView) {
         startExtractionWatchdog()
+        self.activeWebView = webView
         let buttonValue: String
         switch importMode {
         case .single: buttonValue = "SP"
@@ -229,6 +242,34 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         }
     }
 
+    // After a successful SP/DP extraction, fetch the tower data in the same
+    // authenticated page so a single refresh imports both scores and tower.
+    func extractTowerData() {
+        guard let webView = activeWebView else {
+            resolveSuccess(with: pendingScoreCSV ?? "")
+            return
+        }
+        startExtractionWatchdog()
+        webView.callAsyncJavaScript(
+            scoreDownloadFetchBody,
+            arguments: ["buttonValue": "tower"],
+            in: nil,
+            in: .page
+        ) { result in
+            if case .success(let value) = result,
+               let towerCSV = value as? String,
+               !towerCSV.isEmpty,
+               !towerCSV.hasPrefix("ERR:") {
+                Task {
+                    await self.delegate.importTowerData(using: towerCSV)
+                    self.resolveSuccess(with: self.pendingScoreCSV ?? "")
+                }
+            } else {
+                self.resolveSuccess(with: self.pendingScoreCSV ?? "")
+            }
+        }
+    }
+
     func handleExtractionResult(_ value: String?) {
         guard let value, !value.isEmpty else {
             resolveFailure(with: .serverError)
@@ -236,6 +277,10 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         }
         if value.hasPrefix("ERR:") {
             resolveFailure(with: Self.failureReason(forSentinel: String(value.dropFirst(4))))
+        } else if importMode != .tower {
+            // Score extraction succeeded; chain a tower fetch before resolving.
+            pendingScoreCSV = value
+            extractTowerData()
         } else {
             resolveSuccess(with: value)
         }
@@ -287,6 +332,7 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
 // swiftlint:disable class_delegate_protocol
 protocol UpdateScoreDataDelegate: Sendable {
     func importScoreData(using newScoreData: String) async
+    func importTowerData(using towerData: String) async
     func stopProcessing(with reason: ImportFailedReason)
 }
 // swiftlint:enable class_delegate_protocol
