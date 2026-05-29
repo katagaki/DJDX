@@ -43,17 +43,17 @@ struct UnifiedView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .principal) {
+                ToolbarItemGroup(placement: .principal) {
                     gameMenu
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItemGroup(placement: .topBarLeading) {
                     Button("Shared.Import", systemImage: "arrow.down.circle.dotted") {
                         isPresentingImport = true
                     }
                     .automaticMatchedTransitionSource(id: "ImportSheet", in: importNamespace)
                     .popoverTip(ImportMovedTip(), arrowEdge: .top)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
                         withAnimation(.snappy) { isEditingAnalytics.toggle() }
                     } label: {
@@ -64,7 +64,10 @@ struct UnifiedView: View {
                         }
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                }
+                ToolbarItemGroup(placement: .topBarTrailing) {
                     SettingsMenu()
                 }
             }
