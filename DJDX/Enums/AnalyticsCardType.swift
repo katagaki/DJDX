@@ -77,7 +77,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var systemImage: String {
         switch self {
         case .clearTypeOverall: return "chart.bar"
-        case .towerRecent: return "chart.bar.xaxis"
+        case .towerRecent: return "calendar"
         case .towerTotals: return "building.2"
         case .newHighScores: return "trophy"
         case .newFullComboClear: return "star.circle"
@@ -96,8 +96,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var iconColor: Color {
         switch self {
         case .clearTypeOverall: return .blue
-        case .towerRecent: return .blue
-        case .towerTotals: return .orange
+        case .towerRecent: return .red
+        case .towerTotals: return .red
         case .newHighScores: return .orange
         case .newFullComboClear: return .blue
         case .newClears: return .cyan
