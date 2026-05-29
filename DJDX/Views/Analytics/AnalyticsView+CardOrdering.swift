@@ -93,7 +93,7 @@ struct AnalyticsSectionHeader: View {
             }
         }
         .padding(.top, 20.0)
-        .padding(.bottom, 4.0)
+        .padding(.bottom, 12.0)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
     }
@@ -106,6 +106,7 @@ extension View {
     func editableCard(
         isVisible: Bool,
         isEditing: Bool,
+        seed: Int,
         cornerRadius: CGFloat = 20.0,
         onToggle: @escaping () -> Void
     ) -> some View {
@@ -126,6 +127,7 @@ extension View {
                         .onTapGesture { onToggle() }
                 }
             }
+            .jiggle(isActive: isEditing, seed: seed)
     }
 }
 
@@ -138,10 +140,8 @@ extension View {
         cardOrder: Binding<[AnalyticsCardType]>,
         onReorder: @escaping () -> Void
     ) -> some View {
-        let seed = cardOrder.wrappedValue.firstIndex(of: cardType) ?? 0
         if editing {
             self
-                .jiggle(isActive: true, seed: seed)
                 .opacity(draggedCard.wrappedValue == cardType ? 0.4 : 1.0)
                 .onDrag {
                     draggedCard.wrappedValue = cardType
@@ -166,11 +166,8 @@ extension View {
         cardOrder: Binding<[PerLevelCardID]>,
         onReorder: @escaping () -> Void
     ) -> some View {
-        let seed = card.difficulty * 10 +
-            (AnalyticsPerLevelCategory.allCases.firstIndex(of: card.category) ?? 0)
         if editing {
             self
-                .jiggle(isActive: true, seed: seed)
                 .opacity(draggedCard.wrappedValue == card ? 0.4 : 1.0)
                 .onDrag {
                     draggedCard.wrappedValue = card

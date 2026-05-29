@@ -145,7 +145,8 @@ struct AnalyticsView: View {
                         ForEach(shownTowerCards, id: \.self) { cardType in
                             towerCardButton(for: cardType)
                                 .editableCard(isVisible: visibleCards.contains(cardType),
-                                              isEditing: editingSection == .overview) {
+                                              isEditing: editingSection == .overview,
+                                              seed: cardOrder.firstIndex(of: cardType) ?? 0) {
                                     toggleCard(cardType)
                                 }
                                 .cardDraggable(cardType, editing: editingSection == .overview,
@@ -173,7 +174,8 @@ struct AnalyticsView: View {
                             cardView(for: cardType)
                                 .frame(width: 130.0)
                                 .editableCard(isVisible: visibleCards.contains(cardType),
-                                              isEditing: editingSection == .lastPlay) {
+                                              isEditing: editingSection == .lastPlay,
+                                              seed: cardOrder.firstIndex(of: cardType) ?? 0) {
                                     toggleCard(cardType)
                                 }
                                 .cardDraggable(cardType, editing: editingSection == .lastPlay,
@@ -195,8 +197,12 @@ struct AnalyticsView: View {
                 LazyVGrid(columns: cardColumns, spacing: 12.0) {
                     ForEach(shownPerLevelCards, id: \.self) { card in
                         perLevelCard(difficulty: card.difficulty, category: card.category)
-                            .editableCard(isVisible: visiblePerLevelCardSet.contains(card),
-                                          isEditing: editingSection == .perLevel) {
+                            .editableCard(
+                                isVisible: visiblePerLevelCardSet.contains(card),
+                                isEditing: editingSection == .perLevel,
+                                seed: card.difficulty * 10 +
+                                    (AnalyticsPerLevelCategory.allCases.firstIndex(of: card.category) ?? 0)
+                            ) {
                                 togglePerLevelCard(card)
                             }
                             .perLevelCardDraggable(card, editing: editingSection == .perLevel,

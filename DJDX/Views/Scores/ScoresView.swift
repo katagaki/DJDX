@@ -177,7 +177,7 @@ struct ScoresView<Header: View>: View {
                         Spacer()
                     }
                     .padding(.top, 20.0)
-                    .padding(.bottom, 4.0)
+                    .padding(.bottom, 12.0)
                     .padding(.horizontal)
                 }
                 ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
