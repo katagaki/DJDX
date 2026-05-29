@@ -38,7 +38,7 @@ struct UnifiedView: View {
     var body: some View {
         @Bindable var progressAlertManager = progressAlertManager
         NavigationStack(path: $navigationManager.path) {
-            ScoresView {
+            ScoresView(isEditingAnalytics: $isEditingAnalytics) {
                 unifiedHeader
             }
             .navigationBarTitleDisplayMode(.inline)

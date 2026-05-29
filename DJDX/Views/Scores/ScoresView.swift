@@ -12,6 +12,7 @@ struct ScoresView<Header: View>: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @ViewBuilder var header: Header
+    @Binding var isEditingAnalytics: Bool
 
     @State var dataState: DataState = .initializing
 
@@ -89,8 +90,9 @@ struct ScoresView<Header: View>: View {
          sortOrder.rawValue]
     }
 
-    init(@ViewBuilder header: () -> Header) {
+    init(isEditingAnalytics: Binding<Bool> = .constant(false), @ViewBuilder header: () -> Header) {
         self.header = header()
+        self._isEditingAnalytics = isEditingAnalytics
         self.isTimeTravelling = UserDefaults.standard.bool(forKey: isTimeTravellingKey)
     }
 
@@ -170,18 +172,25 @@ struct ScoresView<Header: View>: View {
             LazyVStack(spacing: 0.0) {
                 if searchTerm.isEmpty {
                     header
-                    HStack {
-                        Text("Analytics.Section.ScoreData")
-                            .font(.title3.bold())
-                            .foregroundStyle(.primary)
-                        Spacer()
+                    if !isEditingAnalytics {
+                        Divider()
+                            .padding(.horizontal)
+                        HStack {
+                            Text("Analytics.Section.ScoreData")
+                                .font(.title3.bold())
+                                .foregroundStyle(.primary)
+                            Spacer()
+                        }
+                        .padding(.top, 20.0)
+                        .padding(.bottom, 12.0)
+                        .padding(.horizontal)
+                        Divider()
+                            .padding(.horizontal)
                     }
-                    .padding(.top, 20.0)
-                    .padding(.bottom, 12.0)
-                    .padding(.horizontal)
                 }
-                ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
-                        id: \.id) { entry in
+                if !isEditingAnalytics {
+                    ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
+                            id: \.id) { entry in
                     Button {
                         navigationManager.push(
                             ScoresPath.scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level)
@@ -199,6 +208,7 @@ struct ScoresView<Header: View>: View {
                     .buttonStyle(.plain)
                     Divider()
                         .padding(.leading, 16.0)
+                    }
                 }
             }
         }
