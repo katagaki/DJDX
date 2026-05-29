@@ -14,6 +14,7 @@ struct MoreExternalDataSources: View {
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @Environment(\.openURL) var openURL
+    @Environment(\.dismiss) var dismiss
 
     @AppStorage(wrappedValue: true, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
     @AppStorage(wrappedValue: true, "ExternalData.BM2DX.Enabled") var isBM2DXEnabled: Bool
@@ -37,6 +38,21 @@ struct MoreExternalDataSources: View {
         }
         .navigator("More.ExternalData.Header", group: true, inline: true)
         .scrollContentBackground(.hidden)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if #available(iOS 26.0, *) {
+                    Button(role: .close) {
+                        dismiss()
+                    }
+                } else {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle")
+                    }
+                }
+            }
+        }
         .onChange(of: dataImported, { _, _ in
             Task {
                 await MainActor.run {
