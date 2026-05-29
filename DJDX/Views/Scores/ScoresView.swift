@@ -42,6 +42,7 @@ struct ScoresView<Header: View>: View {
 
     var isTimeTravellingKey: String = "ScoresView.IsTimeTravelling"
     @State var isTimeTravelling: Bool
+    @State var isShowingDatePopover: Bool = false
 
     let actor = DataFetcher()
 
@@ -88,6 +89,47 @@ struct ScoresView<Header: View>: View {
             .automatic
         } else {
             .navigationBarDrawer(displayMode: .always)
+        }
+    }
+
+    @ViewBuilder var timeTravelButton: some View {
+        let button = Button {
+            withAnimation {
+                isTimeTravelling.toggle()
+            }
+            if !isTimeTravelling {
+                playDataDate = .now
+            } else {
+                isShowingDatePopover = true
+            }
+        } label: {
+            Label(
+                "Shared.ShowPastData",
+                systemImage: isTimeTravelling ? "arrowshape.turn.up.backward.badge.clock.fill" :
+                    "arrowshape.turn.up.backward.badge.clock"
+            )
+        }
+        .popover(isPresented: $isShowingDatePopover) {
+            DatePicker("Shared.SelectDate",
+                       selection: $playDataDate.animation(.snappy.speed(2.0)),
+                       in: ...Date.now,
+                       displayedComponents: .date)
+            .datePickerStyle(.graphical)
+            .frame(minWidth: 320.0)
+            .padding()
+            .presentationCompactAdaptation(.popover)
+        }
+
+        if #available(iOS 26.0, *) {
+            button
+                .buttonStyle(isTimeTravelling ? .glassProminent : .glass)
+        } else {
+            button
+                .background {
+                    if isTimeTravelling {
+                        Capsule().fill(Color.accentColor.opacity(0.25))
+                    }
+                }
         }
     }
 
@@ -156,21 +198,10 @@ struct ScoresView<Header: View>: View {
                 .ignoresSafeArea()
             }
             .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button(
-                        "Shared.ShowPastData",
-                        systemImage: isTimeTravelling ? "arrowshape.turn.up.backward.badge.clock.fill" :
-                            "arrowshape.turn.up.backward.badge.clock"
-                    ) {
-                        withAnimation {
-                            isTimeTravelling.toggle()
-                        }
-                        if !isTimeTravelling {
-                            playDataDate = .now
-                        }
-                    }
-                }
                 if #available(iOS 26.0, *) {
+                    ToolbarItem(placement: .bottomBar) {
+                        timeTravelButton
+                    }
                     DefaultToolbarItem(kind: .search, placement: .bottomBar)
                     ToolbarSpacer(.flexible, placement: .bottomBar)
                     ToolbarItemGroup(placement: .bottomBar) {
@@ -178,36 +209,12 @@ struct ScoresView<Header: View>: View {
                     }
                 } else {
                     ToolbarItemGroup(placement: .topBarTrailing) {
+                        timeTravelButton
                         sortFilterControls
                     }
                 }
             }
             .toolbarBackground(isTimeTravelling ? .hidden : .automatic, for: .navigationBar)
-            .safeAreaInset(edge: .top, spacing: 0.0) {
-                if isTimeTravelling {
-                    if #available(iOS 26.0, *) {
-                        DatePicker("Shared.SelectDate",
-                                   selection: $playDataDate.animation(.snappy.speed(2.0)),
-                                   in: ...Date.now,
-                                   displayedComponents: .date)
-                        .datePickerStyle(.compact)
-                        .padding(8.0)
-                        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 24.0))
-                        .padding(.horizontal, 16.0)
-                        .padding(.bottom, 12.0)
-                    } else {
-                        TabBarAccessory(placement: .top) {
-                            DatePicker("Shared.SelectDate",
-                                       selection: $playDataDate.animation(.snappy.speed(2.0)),
-                                       in: ...Date.now,
-                                       displayedComponents: .date)
-                            .datePickerStyle(.compact)
-                            .padding(.horizontal, 18.0)
-                            .padding(.bottom, 12.0)
-                        }
-                    }
-                }
-            }
             .background {
                 switch dataState {
                 case .presenting:
