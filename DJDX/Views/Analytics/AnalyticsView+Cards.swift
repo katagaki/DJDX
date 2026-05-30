@@ -203,10 +203,6 @@ extension AnalyticsView {
         perLevelCardOrder.filter { visiblePerLevelCardSet.contains($0) }
     }
 
-    var visibleLevels: Set<Int> {
-        Set(visiblePerLevelCardSet.map(\.difficulty))
-    }
-
     @ViewBuilder
     func perLevelCard(difficulty: Int, category: AnalyticsPerLevelCategory) -> some View {
         switch category {
@@ -309,12 +305,6 @@ extension AnalyticsView {
         .automaticMatchedTransitionSource(
             id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
         )
-    }
-
-    // MARK: - Filtered Data
-
-    var filteredClearTypeData: [Int: OrderedDictionary<String, Int>] {
-        model.clearTypePerDifficulty.filter { visibleLevels.contains($0.key) }
     }
 
 }

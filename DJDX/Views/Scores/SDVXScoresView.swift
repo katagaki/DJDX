@@ -192,6 +192,9 @@ struct SDVXScoresView<Header: View>: View {
                 onReset: {}
             )
             .automaticNavigationTransition(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.hidden)
+            .interactiveDismissDisabled()
         }
         .background {
             if dataState == .presenting && records.isEmpty {

@@ -61,7 +61,7 @@ struct AnalyticsView: View {
                 }
             } label: {
                 AnalyticsCardView(cardType: .clearTypeOverall, showsHeader: false) {
-                    OverviewClearTypeOverallGraph(graphData: .constant(filteredClearTypeData))
+                    OverviewClearTypeOverallGraph(graphData: .constant(model.clearTypePerDifficulty))
                         .chartLegend(.hidden)
                         .chartYAxis(.hidden)
                 }
