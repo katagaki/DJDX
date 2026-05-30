@@ -49,32 +49,6 @@ struct ClearTypeOverviewListView: View {
     }
 }
 
-struct ClearTypeLegend: View {
-
-    let columns = [
-        GridItem(.flexible(), alignment: .leading),
-        GridItem(.flexible(), alignment: .leading)
-    ]
-
-    var body: some View {
-        LazyVGrid(columns: columns, alignment: .leading, spacing: 4.0) {
-            ForEach(IIDXClearType.sortedWithoutNoPlay, id: \.self) { clearType in
-                HStack(spacing: 6.0) {
-                    Circle()
-                        .fill(IIDXClearType.color(for: clearType.rawValue))
-                        .frame(width: 8.0, height: 8.0)
-                    Text(verbatim: clearType.rawValue)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                    Spacer(minLength: 0.0)
-                }
-            }
-        }
-        .padding(.vertical, 2.0)
-    }
-}
-
 struct ClearTypeLevelRow: View {
 
     let counts: OrderedDictionary<String, Int>

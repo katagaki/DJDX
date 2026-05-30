@@ -95,40 +95,56 @@ struct AnalyticsDestinationView: View {
                 .navigationTitle("Analytics.Trends.DJLevel")
                 .automaticNavigationTransition(id: "Trends.DJLevel", in: analyticsNamespace)
             case .clearTypeForLevel(let difficulty):
-                TogglableClearTypeDetailView(
-                    graphData: $model.clearTypePerDifficulty,
-                    difficulty: .constant(difficulty)
-                )
+                VStack {
+                    TogglableClearTypeDetailView(
+                        graphData: $model.clearTypePerDifficulty,
+                        difficulty: .constant(difficulty)
+                    )
+                    .chartLegend(.hidden)
+                    ClearTypeLegend()
+                }
+                .padding()
                 .navigationTitle(perLevelTitle(difficulty, .clearRate))
                 .automaticNavigationTransition(
                     id: "ClearType.Level.\(difficulty)", in: analyticsNamespace
                 )
             case .clearTypeTrendsForLevel(let difficulty):
-                TrendsClearTypeGraph(
-                    graphData: $model.clearTypePerImportGroup,
-                    difficulty: .constant(difficulty)
-                )
-                .chartLegend(.visible)
+                VStack {
+                    TrendsClearTypeGraph(
+                        graphData: $model.clearTypePerImportGroup,
+                        difficulty: .constant(difficulty)
+                    )
+                    .chartLegend(.hidden)
+                    ClearTypeLegend()
+                }
                 .padding()
                 .navigationTitle(perLevelTitle(difficulty, .clearRateTrend))
                 .automaticNavigationTransition(
                     id: "ClearTypeTrends.Level.\(difficulty)", in: analyticsNamespace
                 )
             case .djLevelForLevel(let difficulty):
-                TogglableDJLevelDetailView(
-                    graphData: $model.djLevelPerDifficulty,
-                    difficulty: .constant(difficulty)
-                )
+                VStack {
+                    TogglableDJLevelDetailView(
+                        graphData: $model.djLevelPerDifficulty,
+                        difficulty: .constant(difficulty)
+                    )
+                    .chartLegend(.hidden)
+                    DJLevelLegend()
+                }
+                .padding()
                 .navigationTitle(perLevelTitle(difficulty, .djLevel))
                 .automaticNavigationTransition(
                     id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace
                 )
             case .djLevelTrendsForLevel(let difficulty):
-                TrendsDJLevelGraph(
-                    graphData: $model.djLevelPerImportGroup,
-                    difficulty: .constant(difficulty)
-                )
-                .chartLegend(.visible)
+                VStack {
+                    TrendsDJLevelGraph(
+                        graphData: $model.djLevelPerImportGroup,
+                        difficulty: .constant(difficulty)
+                    )
+                    .chartLegend(.hidden)
+                    DJLevelLegend()
+                }
                 .padding()
                 .navigationTitle(perLevelTitle(difficulty, .djLevelTrend))
                 .automaticNavigationTransition(
