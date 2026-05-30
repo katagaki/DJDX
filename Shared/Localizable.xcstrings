@@ -1143,10 +1143,36 @@
       "shouldTranslate" : false
     },
     "Game" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲーム"
+          }
+        }
+      }
     },
     "Grade" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grade"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グレード"
+          }
+        }
+      }
     },
     "Height" : {
       "shouldTranslate" : false
@@ -2009,23 +2035,6 @@
         }
       }
     },
-    "Scores.History.NoData" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No historical score data for this song."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この曲のスコア履歴はありません。"
-          }
-        }
-      }
-    },
     "Scores.History.NoData.Description" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2822,23 +2831,6 @@
         }
       }
     },
-    "Shared.Reset" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset to Today"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "今日に戻す"
-          }
-        }
-      }
-    },
     "Shared.Score" : {
       "localizations" : {
         "en" : {
@@ -3352,23 +3344,6 @@
         }
       }
     },
-    "Tower.ChartMode" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Display Style"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "表示モード"
-          }
-        }
-      }
-    },
     "Tower.ChartMode.Recent" : {
       "localizations" : {
         "en" : {
@@ -3413,40 +3388,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレー日"
-          }
-        }
-      }
-    },
-    "Tower.NoData.Description" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Please import your IIDX Tower data."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データをインポートしてください。"
-          }
-        }
-      }
-    },
-    "Tower.NoData.Title" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データなし"
           }
         }
       }
@@ -3653,23 +3594,6 @@
         }
       }
     },
-    "ViewTitle.More" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "My IIDX"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "マイ弐寺"
-          }
-        }
-      }
-    },
     "ViewTitle.More.BemaniWiki2nd" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3733,40 +3657,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレーデータ"
-          }
-        }
-      }
-    },
-    "ViewTitle.Scores.History" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Score History"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スコア履歴"
-          }
-        }
-      }
-    },
-    "ViewTitle.Scores.History.%@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Score History for \"%@\""
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "「%@」のスコア履歴"
           }
         }
       }
