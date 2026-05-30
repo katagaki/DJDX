@@ -48,6 +48,7 @@ struct TowerDetailContainer: View {
                 }
             }
         }
+        .appBackgroundGradient()
         .task {
             towerEntries = await fetcher.allTowerEntries()
         }

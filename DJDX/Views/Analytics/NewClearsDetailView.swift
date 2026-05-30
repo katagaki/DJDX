@@ -62,6 +62,7 @@ struct NewClearsDetailView: View {
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }

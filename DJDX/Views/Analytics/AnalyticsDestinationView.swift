@@ -151,6 +151,7 @@ struct AnalyticsDestinationView: View {
                 newEntryDestination
             }
         }
+        .appBackgroundGradient()
         .navigationBarTitleDisplayMode(.inline)
     }
 

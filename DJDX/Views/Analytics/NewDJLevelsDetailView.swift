@@ -66,6 +66,7 @@ struct NewDJLevelsDetailView: View {
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }
