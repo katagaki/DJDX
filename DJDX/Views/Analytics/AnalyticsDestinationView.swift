@@ -102,8 +102,8 @@ struct AnalyticsDestinationView: View {
                     )
                     .chartLegend(.hidden)
                     ClearTypeLegend()
+                        .padding(.horizontal)
                 }
-                .padding()
                 .navigationTitle(perLevelTitle(difficulty, .clearRate))
                 .automaticNavigationTransition(
                     id: "ClearType.Level.\(difficulty)", in: analyticsNamespace
@@ -130,8 +130,8 @@ struct AnalyticsDestinationView: View {
                     )
                     .chartLegend(.hidden)
                     DJLevelLegend()
+                        .padding(.horizontal)
                 }
-                .padding()
                 .navigationTitle(perLevelTitle(difficulty, .djLevel))
                 .automaticNavigationTransition(
                     id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace

@@ -22,13 +22,13 @@ struct TogglableClearTypeDetailView: View {
                     graphData: $graphData,
                     difficulty: $difficulty
                 )
-                .chartLegend(.visible)
+                .chartLegend(.hidden)
             } else {
                 OverviewClearTypeBarGraph(
                     graphData: $graphData,
                     difficulty: $difficulty
                 )
-                .chartLegend(.visible)
+                .chartLegend(.hidden)
             }
         }
         .padding()
@@ -60,13 +60,13 @@ struct TogglableDJLevelDetailView: View {
                     graphData: $graphData,
                     difficulty: $difficulty
                 )
-                .chartLegend(.visible)
+                .chartLegend(.hidden)
             } else {
                 OverviewDJLevelPerDifficultyGraph(
                     graphData: $graphData,
                     difficulty: $difficulty
                 )
-                .chartLegend(.visible)
+                .chartLegend(.hidden)
             }
         }
         .padding()
