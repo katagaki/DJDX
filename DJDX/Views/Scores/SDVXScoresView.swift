@@ -17,10 +17,15 @@ struct SDVXScoresView<Header: View>: View {
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
     @AppStorage(wrappedValue: SDVXSortMode.title, "SDVXScoresView.SortMode") var sortMode: SDVXSortMode
     @AppStorage(wrappedValue: SortOrder.ascending, "SDVXScoresView.SortOrder") var sortOrder: SortOrder
+    @AppStorage(wrappedValue: [], "SDVXScoresView.DifficultyFilters") var difficultiesToShow: Set<SDVXDifficulty>
+    @AppStorage(wrappedValue: [], "SDVXScoresView.LevelFilters") var levelBucketsToShow: Set<Double>
+    @AppStorage(wrappedValue: [], "SDVXScoresView.ClearTypeFilters") var clearTypesToShow: Set<SDVXClearType>
+    @AppStorage(wrappedValue: [], "SDVXScoresView.GradeFilters") var gradesToShow: Set<SDVXGrade>
 
     @State var dataState: DataState = .initializing
     @State var records: [SDVXSongRecord] = []
     @State var searchTerm: String = ""
+    @State var isShowingFilterSheet: Bool = false
 
     let fetcher = SDVXDataFetcher()
 
@@ -32,9 +37,34 @@ struct SDVXScoresView<Header: View>: View {
     }
 
     var filteredRecords: [SDVXSongRecord] {
-        guard !searchTerm.isEmpty else { return records }
-        let term = searchTerm.lowercased()
-        return records.filter { $0.title.lowercased().contains(term) }
+        var result = records
+        if !searchTerm.isEmpty {
+            let term = searchTerm.lowercased()
+            result = result.filter { $0.title.lowercased().contains(term) }
+        }
+        if !difficultiesToShow.isEmpty {
+            result = result.filter { difficultiesToShow.contains($0.difficultyEnum) }
+        }
+        if !levelBucketsToShow.isEmpty {
+            result = result.filter { levelBucketsToShow.contains(levelBucket($0.level)) }
+        }
+        if !clearTypesToShow.isEmpty {
+            result = result.filter { clearTypesToShow.contains($0.clearTypeEnum) }
+        }
+        if !gradesToShow.isEmpty {
+            result = result.filter { gradesToShow.contains($0.gradeEnum) }
+        }
+        return result
+    }
+
+    // Group decimal levels into 0.5-wide buckets (e.g. 17.0–17.4 -> 17.0).
+    func levelBucket(_ level: String) -> Double {
+        let value = Double(level) ?? 0.0
+        return (value * 2.0).rounded(.down) / 2.0
+    }
+
+    var availableLevelBuckets: [Double] {
+        Set(records.map { levelBucket($0.level) }).sorted()
     }
 
     var sortedRecords: [SDVXSongRecord] {
@@ -47,7 +77,7 @@ struct SDVXScoresView<Header: View>: View {
             sorted = base.sorted { lhs, rhs in
                 let lhsRank = clearRank(lhs), rhsRank = clearRank(rhs)
                 if lhsRank != rhsRank { return lhsRank < rhsRank }
-                return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
+                return lhs.highScore > rhs.highScore
             }
         case .score:
             sorted = base.sorted { lhs, rhs in
@@ -93,6 +123,13 @@ struct SDVXScoresView<Header: View>: View {
         .menuActionDismissBehavior(.disabled)
     }
 
+    @ViewBuilder var filterControl: some View {
+        Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
+            isShowingFilterSheet = true
+        }
+        .automaticMatchedTransitionSource(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
+    }
+
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 0.0) {
@@ -136,12 +173,25 @@ struct SDVXScoresView<Header: View>: View {
                 ToolbarSpacer(.fixed, placement: .bottomBar)
                 ToolbarItemGroup(placement: .bottomBar) {
                     sortControl
+                    filterControl
                 }
             } else {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     sortControl
+                    filterControl
                 }
             }
+        }
+        .sheet(isPresented: $isShowingFilterSheet) {
+            SDVXScoreFilterSheet(
+                difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
+                levelBucketsToShow: $levelBucketsToShow.animation(.snappy.speed(2.0)),
+                clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
+                gradesToShow: $gradesToShow.animation(.snappy.speed(2.0)),
+                availableLevelBuckets: availableLevelBuckets,
+                onReset: {}
+            )
+            .automaticNavigationTransition(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
         }
         .background {
             if dataState == .presenting && records.isEmpty {

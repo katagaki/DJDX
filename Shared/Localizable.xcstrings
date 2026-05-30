@@ -4160,6 +4160,22 @@
           }
         }
       }
+    },
+    "Shared.SDVX.Grade" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score Grade"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコアグレード"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
