@@ -46,6 +46,9 @@ struct ProfileHeaderView: View {
         .task {
             loadRadarData()
             if qproImage == nil {
+                qproImage = loadQproImage()
+            }
+            if qproImage == nil {
                 await refreshStatusPageData()
             }
         }
