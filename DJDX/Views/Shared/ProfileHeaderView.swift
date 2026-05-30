@@ -44,13 +44,13 @@ struct ProfileHeaderView: View {
             }
         }
         .task {
+            // Load cached values first so the profile shows immediately on launch,
+            // then refresh from the network in the background.
             loadRadarData()
             if qproImage == nil {
                 qproImage = loadQproImage()
             }
-            if qproImage == nil {
-                await refreshStatusPageData()
-            }
+            await refreshStatusPageData()
         }
         .onChange(of: iidxVersion) { _, _ in
             Task { await refreshStatusPageData() }
