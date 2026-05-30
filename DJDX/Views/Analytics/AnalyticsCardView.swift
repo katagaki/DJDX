@@ -17,6 +17,7 @@ struct AnalyticsCardView<Content: View>: View {
     let contentHeight: CGFloat
     let cornerRadius: CGFloat
     var showsHeader: Bool = true
+    var caption: LocalizedStringKey?
     let content: () -> Content
 
     init(cardType: AnalyticsCardType, showsHeader: Bool = true, @ViewBuilder content: @escaping () -> Content) {
@@ -86,6 +87,12 @@ struct AnalyticsCardView<Content: View>: View {
             }
             content()
                 .frame(height: contentHeight)
+            if let caption {
+                Text(caption)
+                    .font(.caption2.bold())
+                    .foregroundStyle(.tertiary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
         }
         .padding(12.0)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -108,14 +115,10 @@ struct AnalyticsCardButtonStyle: ButtonStyle {
     }
 }
 
-extension View {
-    func perLevelCaption(_ key: LocalizedStringKey) -> some View {
-        overlay(alignment: .bottom) {
-            Text(key)
-                .font(.caption2.bold())
-                .foregroundStyle(.tertiary)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.bottom, 12.0)
-        }
+extension AnalyticsCardView {
+    func perLevelCaption(_ key: LocalizedStringKey) -> AnalyticsCardView {
+        var copy = self
+        copy.caption = key
+        return copy
     }
 }
