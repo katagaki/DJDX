@@ -150,6 +150,6 @@ struct ScoreRow: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding([.trailing], 20.0)
+        .padding(.trailing)
     }
 }
