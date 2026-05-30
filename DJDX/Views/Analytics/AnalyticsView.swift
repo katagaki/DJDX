@@ -43,6 +43,9 @@ struct AnalyticsView: View {
     @AppStorage(wrappedValue: Data(), "Analytics.VisiblePerLevelCards") var visiblePerLevelCardsData: Data
     @State var visiblePerLevelCardSet: Set<PerLevelCardID> = PerLevelCardID.defaultVisible
 
+    // Width of the layout container, measured rather than read from UIScreen.
+    @State var containerWidth: CGFloat = 0.0
+
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
         GridItem(.flexible(), spacing: 12.0)
@@ -51,8 +54,9 @@ struct AnalyticsView: View {
     // Size summary cards so three fit across the screen, then widen by 20pt so
     // the fourth peeks in to hint that the row scrolls horizontally.
     var summaryCardWidth: CGFloat {
+        guard containerWidth > 0.0 else { return 130.0 }
         let gridGap = 12.0
-        let availableWidth = UIScreen.main.bounds.width - 40.0 - (2.0 * gridGap)
+        let availableWidth = containerWidth - 40.0 - (2.0 * gridGap)
         return (availableWidth / 3.0) + 20.0
     }
 
@@ -218,6 +222,11 @@ struct AnalyticsView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 16.0)
                 }
+            }
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.size.width
+            } action: { newWidth in
+                containerWidth = newWidth
             }
             .task {
                 loadCardOrder()
