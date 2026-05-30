@@ -49,7 +49,7 @@ struct OverviewClearTypeOverallGraph: View {
     }
 
     var body: some View {
-        Chart(Array(graphData.keys), id: \.self) { difficulty in
+        Chart(graphData.keys.sorted(), id: \.self) { difficulty in
             ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
                 let count = graphData[difficulty]![clearType]!
                 BarMark(
