@@ -52,6 +52,9 @@ struct ProfileHeaderView: View {
         .onChange(of: iidxVersion) { _, _ in
             Task { await refreshStatusPageData() }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
+            Task { await refreshStatusPageData() }
+        }
     }
 
     func refreshStatusPageData() async {
