@@ -57,14 +57,14 @@ struct SDVXAnalyticsView: View {
         }
         .task {
             if model.dataState == .initializing {
-                await model.reload()
+                await model.reload(version: sdvxVersion)
             }
         }
         .onChange(of: sdvxVersion) { _, _ in
-            Task { await model.reload() }
+            Task { await model.reload(version: sdvxVersion) }
         }
         .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
-            Task { await model.reload() }
+            Task { await model.reload(version: sdvxVersion) }
         }
     }
 

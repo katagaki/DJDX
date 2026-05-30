@@ -213,7 +213,7 @@ struct SDVXScoresView<Header: View>: View {
 
     func reload() async {
         dataState = .loading
-        let latest = await fetcher.latestSongRecords()
+        let latest = await fetcher.latestSongRecords(for: sdvxVersion)
         await MainActor.run {
             withAnimation(.smooth.speed(2.0)) {
                 records = latest

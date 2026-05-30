@@ -20,6 +20,15 @@ actor SDVXDataFetcher {
         return (try? database.pluck(query))?[DB.igID]
     }
 
+    func latestImportGroupID(for version: SDVXVersion) -> String? {
+        guard let database = try? DB.shared.getReadConnection() else { return nil }
+        let query = DB.importGroupTable
+            .filter(DB.igVersion == version.rawValue)
+            .order(DB.igImportDate.desc)
+            .limit(1)
+        return (try? database.pluck(query))?[DB.igID]
+    }
+
     func importGroupID(for selectedDate: Date) -> String? {
         guard let database = try? DB.shared.getReadConnection() else { return nil }
         let startOfDay = Calendar.current.startOfDay(for: selectedDate)
@@ -78,6 +87,11 @@ actor SDVXDataFetcher {
 
     func latestSongRecords() -> [SDVXSongRecord] {
         guard let importGroupID = latestImportGroupID() else { return [] }
+        return songRecords(for: importGroupID)
+    }
+
+    func latestSongRecords(for version: SDVXVersion) -> [SDVXSongRecord] {
+        guard let importGroupID = latestImportGroupID(for: version) else { return [] }
         return songRecords(for: importGroupID)
     }
 

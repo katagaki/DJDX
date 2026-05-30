@@ -61,7 +61,7 @@ final class AnalyticsModel {
     func reload(playType: IIDXPlayType, iidxVersion: IIDXVersion) async {
         dataState = .loading
         try? await Task.sleep(for: .seconds(0.5))
-        await reloadOverview(playType: playType)
+        await reloadOverview(playType: playType, iidxVersion: iidxVersion)
         await reloadTrends(playType: playType, iidxVersion: iidxVersion)
         await reloadNewClearsAndHighScores(playType: playType, iidxVersion: iidxVersion)
         towerEntries = await fetcher.allTowerEntries()
@@ -73,9 +73,9 @@ final class AnalyticsModel {
         }
     }
 
-    func reloadOverview(playType: IIDXPlayType) async {
+    func reloadOverview(playType: IIDXPlayType, iidxVersion: IIDXVersion) async {
         debugPrint("Calculating overview")
-        let importGroupID = await fetcher.importGroupID(for: .now)
+        let importGroupID = await fetcher.importGroups(for: iidxVersion).last?.id
         if let importGroupID {
             let result = await fetcher.aggregatedCounts(
                 for: [importGroupID], playType: playType
@@ -96,6 +96,11 @@ final class AnalyticsModel {
                     self.clearTypePerDifficulty.removeAll()
                     self.djLevelPerDifficulty.removeAll()
                 }
+            }
+        } else {
+            withAnimation(.snappy.speed(2.0)) {
+                self.clearTypePerDifficulty.removeAll()
+                self.djLevelPerDifficulty.removeAll()
             }
         }
     }

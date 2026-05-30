@@ -35,9 +35,9 @@ final class SDVXAnalyticsModel {
         return levelValue * 2.0 * (Double(record.highScore) / 10_000_000.0)
     }
 
-    func reload() async {
+    func reload(version: SDVXVersion) async {
         dataState = .loading
-        let records = await fetcher.latestSongRecords()
+        let records = await fetcher.latestSongRecords(for: version)
 
         var clearByDiff: [SDVXDifficulty: OrderedDictionary<String, Int>] = [:]
         var gradeByDiff: [SDVXDifficulty: OrderedDictionary<String, Int>] = [:]
