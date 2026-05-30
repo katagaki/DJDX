@@ -35,7 +35,6 @@ struct OverviewClearTypeBarGraph: View {
                     "FAILED": .red
                 ])
                 .chartLegend(.hidden)
-                .chartLegend(.hidden)
             } else {
                 Spacer()
             }
