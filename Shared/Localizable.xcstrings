@@ -91,57 +91,6 @@
         }
       }
     },
-    "Alert.DeleteData.OldData.Confirm" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start Clean Up"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "従来スコアデータを消去"
-          }
-        }
-      }
-    },
-    "Alert.DeleteData.OldData.Subtitle" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Migrated score data will continue to be used throughout the app, and only pre-migration score data will be deleted."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データ移行が正常に行われた場合、すでにデータ移行後のデータが使用されます。\nデータ移行前のデータが使用されないため、安全に削除できます。"
-          }
-        }
-      }
-    },
-    "Alert.DeleteData.OldData.Title" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Only Pre-Migration Score Data Will Be Deleted"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データ移行前のスコアデータのみ削除されます"
-          }
-        }
-      }
-    },
     "Alert.DeleteData.Score.Code.Placeholder" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -668,40 +617,6 @@
         }
       }
     },
-    "Analytics.Header.NewScores" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Records"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新規スコア"
-          }
-        }
-      }
-    },
-    "Analytics.Header.PerLevel" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Per-Level"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "レベル別"
-          }
-        }
-      }
-    },
     "Analytics.NewClears.Subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -844,6 +759,22 @@
         }
       }
     },
+    "Analytics.PerLevel.TitleSeparator" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " - "
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "・"
+          }
+        }
+      }
+    },
     "Analytics.SDVX.ClearBreakdown" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -980,23 +911,6 @@
         }
       }
     },
-    "Analytics.Settings.Cards" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Summary"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "合計"
-          }
-        }
-      }
-    },
     "Analytics.Settings.EditCards" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1010,23 +924,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "並べ替え"
-          }
-        }
-      }
-    },
-    "Analytics.Settings.HideAll" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hide All"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべて非表示"
           }
         }
       }
@@ -1048,23 +945,6 @@
         }
       }
     },
-    "Analytics.Settings.ResetAll" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset All"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてリセット"
-          }
-        }
-      }
-    },
     "Analytics.Settings.ResetOrder" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1078,23 +958,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リセット"
-          }
-        }
-      }
-    },
-    "Analytics.Settings.Title" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Analytics View"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プレー分析画面を編集"
           }
         }
       }
@@ -1279,8 +1142,12 @@
     "DJ Level" : {
       "shouldTranslate" : false
     },
-    "Game" : {},
-    "Grade" : {},
+    "Game" : {
+
+    },
+    "Grade" : {
+
+    },
     "Height" : {
       "shouldTranslate" : false
     },
@@ -1904,23 +1771,6 @@
         }
       }
     },
-    "More.ManageData.DeleteOldData" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clean Up Migration Data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "従来スコアデータを消去"
-          }
-        }
-      }
-    },
     "More.ManageData.DeleteScoreData" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2160,6 +2010,7 @@
       }
     },
     "Scores.History.NoData" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3021,6 +2872,38 @@
         }
       }
     },
+    "Shared.SDVX.ClearType" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランク"
+          }
+        }
+      }
+    },
+    "Shared.SDVX.Grade" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score Grade"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコアグレード"
+          }
+        }
+      }
+    },
     "Shared.SDVX.Version" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3855,6 +3738,7 @@
       }
     },
     "ViewTitle.Scores.History" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3871,6 +3755,7 @@
       }
     },
     "ViewTitle.Scores.History.%@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4128,54 +4013,6 @@
     },
     "YouTube" : {
       "shouldTranslate" : false
-    },
-    "Analytics.PerLevel.TitleSeparator" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " - "
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "・"
-          }
-        }
-      }
-    },
-    "Shared.SDVX.ClearType" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear Type"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "クリアランク"
-          }
-        }
-      }
-    },
-    "Shared.SDVX.Grade" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Score Grade"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スコアグレード"
-          }
-        }
-      }
     }
   },
   "version" : "1.0"
