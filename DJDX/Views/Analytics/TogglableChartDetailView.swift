@@ -31,7 +31,7 @@ struct TogglableClearTypeDetailView: View {
                 .chartLegend(.hidden)
             }
         }
-        .padding(.horizontal)
+        .padding()
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -69,7 +69,7 @@ struct TogglableDJLevelDetailView: View {
                 .chartLegend(.hidden)
             }
         }
-        .padding(.horizontal)
+        .padding()
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
