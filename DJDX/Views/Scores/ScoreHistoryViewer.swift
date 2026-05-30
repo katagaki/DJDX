@@ -139,12 +139,6 @@ struct ScoreHistoryViewer: View {
                 }
             }
         }
-        .safeAreaInset(edge: .bottom, spacing: 0.0) {
-            TabBarAccessory(placement: .bottom) {
-                Color.clear
-                    .frame(height: 0.0)
-            }
-        }
         .task {
             if dataState == .initializing {
                 dataState = .loading
