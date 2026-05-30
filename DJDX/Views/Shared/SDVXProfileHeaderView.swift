@@ -68,9 +68,14 @@ struct SDVXProfileHeaderView: View {
         }
         .task {
             loadCachedProfile()
-            await refreshProfile()
         }
         .onChange(of: sdvxVersion) { _, _ in
+            loadCachedProfile()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
+            Task { await refreshProfile() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .profileRefreshRequested)) { _ in
             Task { await refreshProfile() }
         }
     }

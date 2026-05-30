@@ -46,12 +46,15 @@ struct ProfileHeaderView: View {
         .task {
             loadRadarData()
             qproImage = loadQproImage()
-            await refreshStatusPageData()
         }
         .onChange(of: iidxVersion) { _, _ in
-            Task { await refreshStatusPageData() }
+            loadRadarData()
+            qproImage = loadQproImage()
         }
         .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
+            Task { await refreshStatusPageData() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .profileRefreshRequested)) { _ in
             Task { await refreshStatusPageData() }
         }
     }

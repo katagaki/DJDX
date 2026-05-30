@@ -167,6 +167,10 @@ struct SDVXScoresView<Header: View>: View {
             .ignoresSafeArea()
         }
         .searchable(text: $searchTerm, prompt: "Scores.Search.Prompt")
+        .refreshable {
+            NotificationCenter.default.post(name: .profileRefreshRequested, object: nil)
+            await reload()
+        }
         .toolbar {
             if #available(iOS 26.0, *) {
                 DefaultToolbarItem(kind: .search, placement: .bottomBar)

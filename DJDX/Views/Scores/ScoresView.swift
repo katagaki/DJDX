@@ -275,6 +275,7 @@ struct ScoresView<Header: View>: View {
                 .interactiveDismissDisabled()
             }
             .refreshable {
+                NotificationCenter.default.post(name: .profileRefreshRequested, object: nil)
                 reloadDisplay()
             }
             .onAppear {
