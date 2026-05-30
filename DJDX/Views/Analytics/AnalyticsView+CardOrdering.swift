@@ -83,7 +83,7 @@ extension AnalyticsView {
     }
 
     func toggleSection(_ section: AnalyticsSection) {
-        withAnimation(.snappy) {
+        withAnimation(.smooth.speed(2.0)) {
             if collapsedSections.contains(section) {
                 collapsedSections.remove(section)
             } else {
@@ -125,7 +125,7 @@ struct AnalyticsSectionHeader: View {
                     .font(.subheadline.bold())
                     .foregroundStyle(.secondary)
                     .rotationEffect(.degrees(isExpanded ? 0.0 : -90.0))
-                    .animation(.snappy, value: isExpanded)
+                    .animation(.smooth.speed(2.0), value: isExpanded)
             }
             Spacer()
         }

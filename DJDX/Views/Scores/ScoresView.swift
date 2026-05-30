@@ -54,7 +54,10 @@ struct ScoresView<Header: View>: View {
     @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
-    @AppStorage(wrappedValue: true, "ScoresView.ScoreDataExpanded") var isScoreDataExpanded: Bool
+    // Persisted store; `isScoreDataExpanded` mirrors it so a global `withAnimation`
+    // can drive the collapse (animating @AppStorage directly does not work).
+    var isScoreDataExpandedKey: String = "ScoresView.ScoreDataExpanded"
+    @State var isScoreDataExpanded: Bool
 
     let actor = DataFetcher()
 
@@ -96,6 +99,9 @@ struct ScoresView<Header: View>: View {
         self.header = header()
         self._isEditingAnalytics = isEditingAnalytics
         self.isTimeTravelling = UserDefaults.standard.bool(forKey: isTimeTravellingKey)
+        self.isScoreDataExpanded = (UserDefaults.standard.object(
+            forKey: isScoreDataExpandedKey
+        ) as? Bool) ?? true
     }
 
     var searchPlacement: SearchFieldPlacement {
@@ -180,7 +186,8 @@ struct ScoresView<Header: View>: View {
                             isCollapsible: true,
                             isExpanded: isScoreDataExpanded
                         ) {
-                            isScoreDataExpanded.toggle()
+                            withAnimation(.smooth.speed(2.0)) { isScoreDataExpanded.toggle() }
+                            UserDefaults.standard.set(isScoreDataExpanded, forKey: isScoreDataExpandedKey)
                         }
                         .padding(.top, 16.0)
                         .padding(.bottom, 12.0)

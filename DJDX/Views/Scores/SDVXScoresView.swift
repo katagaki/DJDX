@@ -22,7 +22,10 @@ struct SDVXScoresView<Header: View>: View {
     @AppStorage(wrappedValue: [], "SDVXScoresView.ClearTypeFilters") var clearTypesToShow: Set<SDVXClearType>
     @AppStorage(wrappedValue: [], "SDVXScoresView.GradeFilters") var gradesToShow: Set<SDVXGrade>
 
-    @AppStorage(wrappedValue: true, "SDVXScoresView.ScoreDataExpanded") var isScoreDataExpanded: Bool
+    // Persisted store; `isScoreDataExpanded` mirrors it so a global `withAnimation`
+    // can drive the collapse (animating @AppStorage directly does not work).
+    var isScoreDataExpandedKey: String = "SDVXScoresView.ScoreDataExpanded"
+    @State var isScoreDataExpanded: Bool
 
     @State var dataState: DataState = .initializing
     @State var records: [SDVXSongRecord] = []
@@ -36,6 +39,9 @@ struct SDVXScoresView<Header: View>: View {
     init(isEditingAnalytics: Binding<Bool> = .constant(false), @ViewBuilder header: () -> Header) {
         self.header = header()
         self._isEditingAnalytics = isEditingAnalytics
+        self.isScoreDataExpanded = (UserDefaults.standard.object(
+            forKey: isScoreDataExpandedKey
+        ) as? Bool) ?? true
     }
 
     var filteredRecords: [SDVXSongRecord] {
@@ -143,7 +149,8 @@ struct SDVXScoresView<Header: View>: View {
                             isCollapsible: true,
                             isExpanded: isScoreDataExpanded
                         ) {
-                            isScoreDataExpanded.toggle()
+                            withAnimation(.smooth.speed(2.0)) { isScoreDataExpanded.toggle() }
+                            UserDefaults.standard.set(isScoreDataExpanded, forKey: isScoreDataExpandedKey)
                         }
                         .padding(.top, 16.0)
                         .padding(.bottom, 12.0)

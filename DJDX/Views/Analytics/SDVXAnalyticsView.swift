@@ -25,7 +25,10 @@ struct SDVXAnalyticsView: View {
     @AppStorage(wrappedValue: Data(), "Analytics.SDVX.VisibleCards") var visibleCardsData: Data
     @State var visibleCards: Set<SDVXAnalyticsCard> = Set(SDVXAnalyticsCard.allCases)
 
-    @AppStorage(wrappedValue: false, "Analytics.SDVX.OverviewCollapsed") var isOverviewCollapsed: Bool
+    // Persisted store; `isOverviewCollapsed` mirrors it so a global `withAnimation`
+    // can drive the collapse (animating @AppStorage directly does not work).
+    @AppStorage(wrappedValue: false, "Analytics.SDVX.OverviewCollapsed") var isOverviewCollapsedStored: Bool
+    @State var isOverviewCollapsed: Bool = false
 
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
@@ -43,7 +46,8 @@ struct SDVXAnalyticsView: View {
                         isCollapsible: !isEditing,
                         isExpanded: isExpanded
                     ) {
-                        isOverviewCollapsed.toggle()
+                        withAnimation(.smooth.speed(2.0)) { isOverviewCollapsed.toggle() }
+                        isOverviewCollapsedStored = isOverviewCollapsed
                     }
                     if isExpanded {
                         LazyVGrid(columns: cardColumns, spacing: 12.0) {
@@ -62,13 +66,13 @@ struct SDVXAnalyticsView: View {
                         .padding(.horizontal)
                     }
                 }
-                .animation(.snappy, value: isExpanded)
             }
         }
         .padding(.top, 20.0)
         .onAppear {
             loadCardOrder()
             loadVisibleCards()
+            isOverviewCollapsed = isOverviewCollapsedStored
         }
         .task {
             if model.dataState == .initializing {
