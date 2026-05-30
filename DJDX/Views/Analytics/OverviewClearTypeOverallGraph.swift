@@ -72,7 +72,7 @@ struct OverviewClearTypeOverallGraph: View {
         .chartPlotStyle { plotArea in
             plotArea.padding(.horizontal, isInteractive ? 0.0 : 8.0)
         }
-        .chartXScale(domain: xDomain)
+        .chartXScale(domain: xDomain, range: .plotDimension(startPadding: 8.0, endPadding: 8.0))
         .chartForegroundStyleScale([
             "FULLCOMBO CLEAR": .blue,
             "CLEAR": .cyan,

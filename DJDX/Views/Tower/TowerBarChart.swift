@@ -46,5 +46,6 @@ struct TowerBarChart: View {
                 .position(by: .value("Tower.Type", "Scratch"))
             }
         }
+        .chartXScale(range: .plotDimension(startPadding: 8.0, endPadding: 8.0))
     }
 }

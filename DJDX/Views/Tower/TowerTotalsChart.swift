@@ -53,5 +53,6 @@ struct TowerTotalsChart: View {
                 }
             }
         }
+        .chartXScale(range: .plotDimension(startPadding: 16.0, endPadding: 16.0))
     }
 }
