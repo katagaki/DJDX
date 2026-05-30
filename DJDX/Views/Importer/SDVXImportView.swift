@@ -31,15 +31,7 @@ struct SDVXImportView: View {
 
     var body: some View {
         NavigationStack(path: $importPath) {
-            List {
-                Section("Shared.SDVX.Version") {
-                    Picker("Shared.SDVX.Version", selection: $sdvxVersion) {
-                        ForEach(SDVXVersion.supportedVersions, id: \.self) { version in
-                            Text(version.marketingName).tag(version)
-                        }
-                    }
-                }
-            }
+            Color.clear
             .navigationTitle("ViewTitle.Calendar")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
