@@ -12,7 +12,6 @@ struct NewClearsCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4.0) {
-            Spacer(minLength: 0)
             if newClears.isEmpty {
                 Text("Analytics.NoData")
                     .font(.caption)
@@ -23,7 +22,9 @@ struct NewClearsCard: View {
                     .fontWidth(.expanded)
                     .foregroundStyle(.primary)
             }
+            Spacer(minLength: 0)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

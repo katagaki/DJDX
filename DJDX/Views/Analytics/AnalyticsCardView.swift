@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+enum AnalyticsCardHeaderPlacement {
+    case top
+    case bottom
+}
+
 struct AnalyticsCardView<Content: View>: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -17,10 +22,14 @@ struct AnalyticsCardView<Content: View>: View {
     let contentHeight: CGFloat
     let cornerRadius: CGFloat
     var showsHeader: Bool = true
+    var headerPlacement: AnalyticsCardHeaderPlacement = .top
     var caption: LocalizedStringKey?
     let content: () -> Content
 
-    init(cardType: AnalyticsCardType, showsHeader: Bool = true, @ViewBuilder content: @escaping () -> Content) {
+    init(cardType: AnalyticsCardType,
+         showsHeader: Bool = true,
+         headerPlacement: AnalyticsCardHeaderPlacement = .top,
+         @ViewBuilder content: @escaping () -> Content) {
         self.title = cardType.titleText
         self.systemImage = cardType.systemImage
         self.iconColor = cardType.iconColor
@@ -31,6 +40,7 @@ struct AnalyticsCardView<Content: View>: View {
             self.cornerRadius = 12.0
         }
         self.showsHeader = showsHeader
+        self.headerPlacement = headerPlacement
         self.content = content
     }
 
@@ -70,23 +80,30 @@ struct AnalyticsCardView<Content: View>: View {
         self.content = content
     }
 
+    var header: some View {
+        HStack(spacing: 6.0) {
+            Image(systemName: systemImage)
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(iconColor)
+                .frame(width: 18.0, height: 18.0)
+            title
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
-            if showsHeader {
-                HStack(spacing: 6.0) {
-                    Image(systemName: systemImage)
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundStyle(iconColor)
-                        .frame(width: 18.0, height: 18.0)
-                    title
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
+            if showsHeader && headerPlacement == .top {
+                header
             }
             content()
                 .frame(height: contentHeight)
+            if showsHeader && headerPlacement == .bottom {
+                header
+            }
             if let caption {
                 Text(caption)
                     .font(.caption2.bold())

@@ -49,7 +49,7 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.newClearsDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newClears) {
+            AnalyticsCardView(cardType: .newClears, headerPlacement: .bottom) {
                 NewClearsCard(newClears: $model.newClears)
             }
         }
@@ -63,7 +63,7 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.newAssistClearsDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newAssistClears) {
+            AnalyticsCardView(cardType: .newAssistClears, headerPlacement: .bottom) {
                 NewClearsCard(newClears: $model.newAssistClears)
             }
         }
@@ -77,7 +77,7 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.newEasyClearsDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newEasyClears) {
+            AnalyticsCardView(cardType: .newEasyClears, headerPlacement: .bottom) {
                 NewClearsCard(newClears: $model.newEasyClears)
             }
         }
@@ -91,7 +91,7 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.newFullComboClearDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newFullComboClear) {
+            AnalyticsCardView(cardType: .newFullComboClear, headerPlacement: .bottom) {
                 NewClearsCard(newClears: $model.newFullComboClears)
             }
         }
@@ -105,7 +105,7 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.newHardClearDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newHardClear) {
+            AnalyticsCardView(cardType: .newHardClear, headerPlacement: .bottom) {
                 NewClearsCard(newClears: $model.newHardClears)
             }
         }
@@ -119,7 +119,7 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.newExHardClearDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newExHardClear) {
+            AnalyticsCardView(cardType: .newExHardClear, headerPlacement: .bottom) {
                 NewClearsCard(newClears: $model.newExHardClears)
             }
         }
@@ -133,7 +133,7 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.newFailedDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newFailed) {
+            AnalyticsCardView(cardType: .newFailed, headerPlacement: .bottom) {
                 NewClearsCard(newClears: $model.newFailed)
             }
         }
@@ -147,7 +147,7 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.newHighScoresDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newHighScores) {
+            AnalyticsCardView(cardType: .newHighScores, headerPlacement: .bottom) {
                 NewHighScoresCard(newHighScores: $model.newHighScores)
             }
         }
@@ -161,7 +161,7 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.newAAADetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newAAA) {
+            AnalyticsCardView(cardType: .newAAA, headerPlacement: .bottom) {
                 NewDJLevelsCard(newDJLevels: $model.newAAA)
             }
         }
@@ -175,7 +175,7 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.newAADetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newAA) {
+            AnalyticsCardView(cardType: .newAA, headerPlacement: .bottom) {
                 NewDJLevelsCard(newDJLevels: $model.newAA)
             }
         }
@@ -189,7 +189,7 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.newADetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newA) {
+            AnalyticsCardView(cardType: .newA, headerPlacement: .bottom) {
                 NewDJLevelsCard(newDJLevels: $model.newA)
             }
         }
