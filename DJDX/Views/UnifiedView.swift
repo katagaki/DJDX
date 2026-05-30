@@ -165,7 +165,6 @@ struct UnifiedView: View {
                           isEditing: $isEditingAnalytics,
                           analyticsNamespace: analyticsNamespace,
                           towerNamespace: towerNamespace)
-            .frame(minHeight: 360.0)
         }
         .padding(.bottom, 8.0)
     }
