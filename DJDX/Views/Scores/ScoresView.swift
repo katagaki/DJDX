@@ -161,10 +161,7 @@ struct ScoresView<Header: View>: View {
     }
 
     @ViewBuilder var filterControl: some View {
-        ScoreFilterButton(
-            isShowingFilterSheet: $isShowingFilterSheet,
-            filterNamespace: scoresNamespace
-        )
+        ScoreFilterButton(isShowingFilterSheet: $isShowingFilterSheet)
     }
 
     var body: some View {
@@ -269,7 +266,6 @@ struct ScoresView<Header: View>: View {
                     isLastPlayDateVisible: $isLastPlayDateVisible,
                     onReset: { reloadDisplay() }
                 )
-                .automaticNavigationTransition(id: "ScoreFilterSheet", in: scoresNamespace)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.hidden)
                 .interactiveDismissDisabled()

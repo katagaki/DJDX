@@ -33,7 +33,6 @@ struct UnifiedView: View {
     @State var analyticsModel = AnalyticsModel()
     @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
 
-    @Namespace var importNamespace
     @Namespace var analyticsNamespace
     @Namespace var towerNamespace
 
@@ -61,7 +60,6 @@ struct UnifiedView: View {
                     Button("Shared.Import", systemImage: "arrow.down.circle.dotted") {
                         isPresentingImport = true
                     }
-                    .automaticMatchedTransitionSource(id: "ImportSheet", in: importNamespace)
                     .popoverTip(ImportMovedTip(), arrowEdge: .top)
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
@@ -113,8 +111,8 @@ struct UnifiedView: View {
                 }
             }
             .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
             .interactiveDismissDisabled()
-            .automaticNavigationTransition(id: "ImportSheet", in: importNamespace)
         }
         .overlay {
             if progressAlertManager.isShowing {
