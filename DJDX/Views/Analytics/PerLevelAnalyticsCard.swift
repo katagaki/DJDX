@@ -44,28 +44,29 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             trendChart()
+                .padding(.top, cornerRadius)
                 .opacity(showsBar ? 0.2 : 1.0)
                 .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 0.0) {
-                VStack(alignment: .leading, spacing: 2.0) {
+                VStack(alignment: .leading, spacing: 1.0) {
                     Text(verbatim: "LEVEL \(difficulty)")
-                        .font(.title2.bold())
+                        .font(.headline)
                     Text(subtitle)
-                        .font(.subheadline.weight(.semibold))
+                        .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 0.0)
                 if showsBar {
                     segmentedBar
-                        .padding(.top, 12.0)
-                    statsRow
                         .padding(.top, 8.0)
+                    statsRow
+                        .padding(.top, 6.0)
                 }
             }
-            .padding(16.0)
+            .padding(12.0)
         }
-        .frame(height: showsBar ? 150.0 : 110.0)
+        .frame(height: showsBar ? 104.0 : 76.0)
         .background {
             switch colorScheme {
             case .light: Color.white
@@ -84,15 +85,15 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
                         .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
                 }
             }
-            .clipShape(.rect(cornerRadius: 4.0))
+            .clipShape(.rect(cornerRadius: 3.0))
         }
-        .frame(height: 16.0)
+        .frame(height: 10.0)
     }
 
     var statsRow: some View {
-        HStack(spacing: 12.0) {
+        HStack(spacing: 10.0) {
             ForEach(topSegments) { segment in
-                HStack(spacing: 4.0) {
+                HStack(spacing: 3.0) {
                     Text(verbatim: segment.label)
                         .foregroundStyle(segment.color)
                         .fontWeight(.heavy)
@@ -101,7 +102,7 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
                         .fontWeight(.semibold)
                         .monospacedDigit()
                 }
-                .font(.subheadline)
+                .font(.caption2)
             }
             Spacer(minLength: 0.0)
         }
