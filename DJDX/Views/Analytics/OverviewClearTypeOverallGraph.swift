@@ -88,7 +88,7 @@ struct OverviewClearTypeOverallGraph: View {
             }
         }
         .chartPlotStyle { plotArea in
-            plotArea.padding(.horizontal, isInteractive ? 0.0 : 8.0)
+            plotArea.padding(.horizontal, 0.0)
         }
         .chartXScale(domain: xDomain)
         .chartForegroundStyleScale([
