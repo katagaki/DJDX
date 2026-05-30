@@ -424,26 +424,37 @@ style.appendChild(document.createTextNode(injectedCSS))
 head.appendChild(style)
 """
 
+// Polls for the form elements and do_djauto until ready. On iOS 18 the page
+// commits/renders but never fires didFinish, so this script is injected at
+// didCommit and may run before the page's own scripts finish initializing.
 let textageNavigationJS = """
 (function() {
-    var levelSelector = document.getElementsByName("djauto_opt")[0];
-    var songNameTextField = document.getElementsByName("djauto")[0];
-    if (!levelSelector || !songNameTextField) { return; }
-
-    levelSelector.value = "%@1";
-    songNameTextField.value = "%@2";
-
-    var autoCompleteForm = songNameTextField.form;
-    if (autoCompleteForm) {
-        var namedRef = document.getElementsByName("ref");
-        for (var i = namedRef.length - 1; i >= 0; i--) {
-            if (namedRef[i] !== autoCompleteForm) {
-                namedRef[i].setAttribute("name", "ref_search");
-            }
+    var attempts = 0;
+    function tryNavigate() {
+        attempts += 1;
+        var levelSelector = document.getElementsByName("djauto_opt")[0];
+        var songNameTextField = document.getElementsByName("djauto")[0];
+        if (!levelSelector || !songNameTextField || typeof do_djauto !== "function") {
+            if (attempts < 100) { setTimeout(tryNavigate, 100); }
+            return;
         }
-        autoCompleteForm.setAttribute("name", "ref");
-    }
 
-    if (typeof do_djauto === "function") { do_djauto(); }
+        levelSelector.value = "%@1";
+        songNameTextField.value = "%@2";
+
+        var autoCompleteForm = songNameTextField.form;
+        if (autoCompleteForm) {
+            var namedRef = document.getElementsByName("ref");
+            for (var i = namedRef.length - 1; i >= 0; i--) {
+                if (namedRef[i] !== autoCompleteForm) {
+                    namedRef[i].setAttribute("name", "ref_search");
+                }
+            }
+            autoCompleteForm.setAttribute("name", "ref");
+        }
+
+        do_djauto();
+    }
+    tryNavigate();
 })();
 """
