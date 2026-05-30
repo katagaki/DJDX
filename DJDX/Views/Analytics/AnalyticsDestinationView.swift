@@ -24,6 +24,12 @@ struct AnalyticsDestinationView: View {
         model.clearTypePerDifficulty
     }
 
+    func perLevelTitle(_ difficulty: Int, _ category: AnalyticsPerLevelCategory) -> String {
+        let separator = NSLocalizedString("Analytics.PerLevel.TitleSeparator", comment: "")
+        let categoryTitle = NSLocalizedString(category.titleKey, comment: "")
+        return "LEVEL \(difficulty)\(separator)\(categoryTitle)"
+    }
+
     // swiftlint:disable:next function_body_length
     var body: some View {
         Group {
@@ -106,7 +112,7 @@ struct AnalyticsDestinationView: View {
                     graphData: $model.clearTypePerDifficulty,
                     difficulty: .constant(difficulty)
                 )
-                .navigationTitle("LEVEL \(difficulty)")
+                .navigationTitle(perLevelTitle(difficulty, .clearRate))
                 .automaticNavigationTransition(
                     id: "ClearType.Level.\(difficulty)", in: analyticsNamespace
                 )
@@ -117,7 +123,7 @@ struct AnalyticsDestinationView: View {
                 )
                 .chartLegend(.visible)
                 .padding()
-                .navigationTitle("LEVEL \(difficulty)")
+                .navigationTitle(perLevelTitle(difficulty, .clearRateTrend))
                 .automaticNavigationTransition(
                     id: "ClearTypeTrends.Level.\(difficulty)", in: analyticsNamespace
                 )
@@ -126,7 +132,7 @@ struct AnalyticsDestinationView: View {
                     graphData: $model.djLevelPerDifficulty,
                     difficulty: .constant(difficulty)
                 )
-                .navigationTitle("LEVEL \(difficulty)")
+                .navigationTitle(perLevelTitle(difficulty, .djLevel))
                 .automaticNavigationTransition(
                     id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace
                 )
@@ -137,7 +143,7 @@ struct AnalyticsDestinationView: View {
                 )
                 .chartLegend(.visible)
                 .padding()
-                .navigationTitle("LEVEL \(difficulty)")
+                .navigationTitle(perLevelTitle(difficulty, .djLevelTrend))
                 .automaticNavigationTransition(
                     id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
                 )
