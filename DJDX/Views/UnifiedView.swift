@@ -205,7 +205,7 @@ struct UnifiedView: View {
             if selectedGame == .soundVoltex {
                 Section("Shared.SDVX.Version") {
                     Picker("Shared.SDVX.Version", selection: $sdvxVersion) {
-                        ForEach(SDVXVersion.supportedVersions, id: \.self) { version in
+                        ForEach(SDVXVersion.supportedVersions.reversed(), id: \.self) { version in
                             Text(version.marketingName).tag(version)
                         }
                     }
