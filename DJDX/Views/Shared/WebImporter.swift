@@ -79,10 +79,18 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
         return WKWebView(frame: .zero, configuration: configuration)
     }()
 
+    var initialStyle: String {
+        switch importMode {
+        case .single: return "SP"
+        case .double: return "DP"
+        case .tower: return "tower"
+        }
+    }
+
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
-        webView.load(URLRequest(url: iidxVersion.loginPageRedirectURL()))
+        webView.load(URLRequest(url: iidxVersion.loginPageRedirectURL(style: initialStyle)))
         #if DEBUG
         webView.isInspectable = true
         #endif
@@ -194,15 +202,17 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
                 webView.layer.opacity = 0.0
                 webView.isUserInteractionEnabled = false
                 self.activeWebView = webView
-                // Once authenticated and on the download page, navigate to the
-                // styled URL (?style=SP|DP|tower) which renders the CSV into
-                // <textarea id="score_data">, then read it directly.
+                if !self.hasStartedExtraction {
+                    self.hasStartedExtraction = true
+                    self.startExtractionWatchdog()
+                }
+                // Login redirects straight to the styled URL (?style=SP|DP|tower),
+                // which renders the CSV into <textarea id="score_data">; read it
+                // directly. Fall back to a styled navigation if we ever land on
+                // the base page without a style.
                 if urlString.contains("style=") {
                     self.handleStyledPageLoaded(webView, urlString: urlString)
                 } else {
-                    guard !self.hasStartedExtraction else { return }
-                    self.hasStartedExtraction = true
-                    self.startExtractionWatchdog()
                     self.loadStyledPage(webView, style: self.currentStyle)
                 }
             } else if urlString.starts(with: self.version.errorPageURL().absoluteString) {
