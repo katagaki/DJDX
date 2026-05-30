@@ -18,6 +18,7 @@ struct NewDJLevelsDetailView: View {
             if newDJLevels.isEmpty {
                 Text("Analytics.NoData")
                     .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
             } else {
                 ForEach(newDJLevels) { entry in
                     HStack(alignment: .center, spacing: 8.0) {
@@ -62,6 +63,7 @@ struct NewDJLevelsDetailView: View {
                         .clipShape(.rect(cornerRadius: 6.0))
                     }
                     .padding(.vertical, 2.0)
+                    .listRowBackground(Color.clear)
                 }
             }
         }
