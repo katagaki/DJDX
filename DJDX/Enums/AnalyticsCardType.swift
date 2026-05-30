@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-enum AnalyticsSection: String, Hashable, CaseIterable {
+enum AnalyticsSection: String, Codable, Hashable, CaseIterable {
     case overview
     case lastPlay
     case perLevel

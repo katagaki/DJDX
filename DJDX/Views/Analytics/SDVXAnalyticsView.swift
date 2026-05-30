@@ -25,6 +25,11 @@ struct SDVXAnalyticsView: View {
     @AppStorage(wrappedValue: Data(), "Analytics.SDVX.VisibleCards") var visibleCardsData: Data
     @State var visibleCards: Set<SDVXAnalyticsCard> = Set(SDVXAnalyticsCard.allCases)
 
+    // Persisted store; `isOverviewCollapsed` mirrors it so a global `withAnimation`
+    // can drive the collapse (animating @AppStorage directly does not work).
+    @AppStorage(wrappedValue: false, "Analytics.SDVX.OverviewCollapsed") var isOverviewCollapsedStored: Bool
+    @State var isOverviewCollapsed: Bool = false
+
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
         GridItem(.flexible(), spacing: 12.0)
@@ -34,22 +39,32 @@ struct SDVXAnalyticsView: View {
         VStack(spacing: 20.0) {
             let shownCards = isEditing ? cardOrder : cardOrder.filter { visibleCards.contains($0) }
             if !shownCards.isEmpty {
+                let isExpanded = isEditing || !isOverviewCollapsed
                 VStack(spacing: 12.0) {
-                    AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
-                    LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                        ForEach(shownCards, id: \.self) { cardType in
-                            cardView(for: cardType)
-                                .editableCard(isVisible: visibleCards.contains(cardType),
-                                              isEditing: isEditing,
-                                              seed: cardOrder.firstIndex(of: cardType) ?? 0) {
-                                    toggleCard(cardType)
-                                }
-                                .sdvxCardDraggable(cardType, editing: isEditing,
-                                                   draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                                   onReorder: saveCardOrder)
-                        }
+                    AnalyticsSectionHeader(
+                        title: AnalyticsSection.overview.titleKey,
+                        isCollapsible: !isEditing,
+                        isExpanded: isExpanded
+                    ) {
+                        withAnimation(.smooth.speed(2.0)) { isOverviewCollapsed.toggle() }
+                        isOverviewCollapsedStored = isOverviewCollapsed
                     }
-                    .padding(.horizontal)
+                    if isExpanded {
+                        LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                            ForEach(shownCards, id: \.self) { cardType in
+                                cardView(for: cardType)
+                                    .editableCard(isVisible: visibleCards.contains(cardType),
+                                                  isEditing: isEditing,
+                                                  seed: cardOrder.firstIndex(of: cardType) ?? 0) {
+                                        toggleCard(cardType)
+                                    }
+                                    .sdvxCardDraggable(cardType, editing: isEditing,
+                                                       draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                                       onReorder: saveCardOrder)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
                 }
             }
         }
@@ -57,6 +72,7 @@ struct SDVXAnalyticsView: View {
         .onAppear {
             loadCardOrder()
             loadVisibleCards()
+            isOverviewCollapsed = isOverviewCollapsedStored
         }
         .task {
             if model.dataState == .initializing {

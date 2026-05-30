@@ -54,6 +54,11 @@ struct ScoresView<Header: View>: View {
     @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
+    // Persisted store; `isScoreDataExpanded` mirrors it so a global `withAnimation`
+    // can drive the collapse (animating @AppStorage directly does not work).
+    var isScoreDataExpandedKey: String = "ScoresView.ScoreDataExpanded"
+    @State var isScoreDataExpanded: Bool
+
     let actor = DataFetcher()
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
@@ -94,6 +99,9 @@ struct ScoresView<Header: View>: View {
         self.header = header()
         self._isEditingAnalytics = isEditingAnalytics
         self.isTimeTravelling = UserDefaults.standard.bool(forKey: isTimeTravellingKey)
+        self.isScoreDataExpanded = (UserDefaults.standard.object(
+            forKey: isScoreDataExpandedKey
+        ) as? Bool) ?? true
     }
 
     var searchPlacement: SearchFieldPlacement {
@@ -173,19 +181,22 @@ struct ScoresView<Header: View>: View {
                 if searchTerm.isEmpty {
                     header
                     if !isEditingAnalytics {
-                        HStack {
-                            Text("Analytics.Section.ScoreData")
-                                .font(.title3.bold())
-                                .foregroundStyle(.primary)
-                            Spacer()
+                        AnalyticsSectionHeader(
+                            title: "Analytics.Section.ScoreData",
+                            isCollapsible: true,
+                            isExpanded: isScoreDataExpanded
+                        ) {
+                            withAnimation(.smooth.speed(2.0)) { isScoreDataExpanded.toggle() }
+                            UserDefaults.standard.set(isScoreDataExpanded, forKey: isScoreDataExpandedKey)
                         }
                         .padding(.top, 16.0)
                         .padding(.bottom, 12.0)
-                        .padding(.horizontal)
-                        Divider()
+                        if isScoreDataExpanded {
+                            Divider()
+                        }
                     }
                 }
-                if !isEditingAnalytics {
+                if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
                     ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
                             id: \.id) { entry in
                         Button {
@@ -330,8 +341,6 @@ struct ScoresView<Header: View>: View {
                                 initialLevel: initialLevel)
                     .automaticNavigationTransition(id: "\(songRecord.title).\(initialLevel.rawValue)",
                                                    in: scoresNamespace)
-                case .scoreHistory(let songTitle, let level, let noteCount):
-                    ScoreHistoryViewer(songTitle: songTitle, level: level, noteCount: noteCount)
                 case .textageViewer(let songTitle, let level, let playSide, let playType):
                     TextageViewer(songTitle: songTitle, level: level, playSide: playSide, playType: playType)
                 }
