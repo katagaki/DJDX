@@ -23,6 +23,11 @@ struct TowerTotalsChart: View {
         Double(totalScratchCount)
     }
 
+    // Leave headroom above the tallest bar so the meter annotation isn't clipped.
+    var yUpperBound: Double {
+        max(keyTowerHeight, scratchTowerHeight, 1.0) * 1.2
+    }
+
     var body: some View {
         Chart {
             BarMark(
@@ -54,5 +59,6 @@ struct TowerTotalsChart: View {
             }
         }
         .chartXScale(range: .plotDimension(startPadding: 16.0, endPadding: 16.0))
+        .chartYScale(domain: 0.0...yUpperBound)
     }
 }

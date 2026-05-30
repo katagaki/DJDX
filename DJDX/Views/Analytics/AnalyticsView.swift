@@ -89,7 +89,7 @@ struct AnalyticsView: View {
                             TowerTotalsChart(
                                 totalKeyCount: model.towerTotalKeyCount,
                                 totalScratchCount: model.towerTotalScratchCount,
-                                showsAnnotations: false
+                                showsAnnotations: true
                             )
                             .chartXAxis { AxisMarks { AxisGridLine() } }
                             .chartYAxis { AxisMarks { AxisGridLine() } }
