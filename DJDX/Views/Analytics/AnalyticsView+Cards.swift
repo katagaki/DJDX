@@ -16,7 +16,7 @@ extension AnalyticsView {
     @ViewBuilder
     func cardView(for cardType: AnalyticsCardType) -> some View {
         switch cardType {
-        case .clearTypeOverall:
+        case .clearTypeOverall, .towerRecent, .towerTotals:
             EmptyView()
         case .newClears:
             newClearsCard
@@ -43,30 +43,14 @@ extension AnalyticsView {
         }
     }
 
-    var clearTypeOverallCard: some View {
-        Button {
-            if !isEditingCards && clearTypePerDifficulty.count > 0 {
-                navigationManager.push(.clearTypeOverviewGraph, for: .analytics)
-            }
-        } label: {
-            AnalyticsCardView(cardType: .clearTypeOverall) {
-                OverviewClearTypeOverallGraph(graphData: .constant(filteredClearTypeData))
-                    .chartLegend(.hidden)
-                    .chartYAxis(.hidden)
-            }
-        }
-        .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
-    }
-
     var newClearsCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newClearsDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newClearsDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newClears) {
-                NewClearsCard(newClears: $newClears)
+            AnalyticsCardView(cardType: .newClears, headerPlacement: .bottom) {
+                NewClearsCard(newClears: $model.newClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -76,11 +60,11 @@ extension AnalyticsView {
     var newAssistClearsCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newAssistClearsDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newAssistClearsDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newAssistClears) {
-                NewClearsCard(newClears: $newAssistClears)
+            AnalyticsCardView(cardType: .newAssistClears, headerPlacement: .bottom) {
+                NewClearsCard(newClears: $model.newAssistClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -90,11 +74,11 @@ extension AnalyticsView {
     var newEasyClearsCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newEasyClearsDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newEasyClearsDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newEasyClears) {
-                NewClearsCard(newClears: $newEasyClears)
+            AnalyticsCardView(cardType: .newEasyClears, headerPlacement: .bottom) {
+                NewClearsCard(newClears: $model.newEasyClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -104,11 +88,11 @@ extension AnalyticsView {
     var newFullComboClearCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newFullComboClearDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newFullComboClearDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newFullComboClear) {
-                NewClearsCard(newClears: $newFullComboClears)
+            AnalyticsCardView(cardType: .newFullComboClear, headerPlacement: .bottom) {
+                NewClearsCard(newClears: $model.newFullComboClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -118,11 +102,11 @@ extension AnalyticsView {
     var newHardClearCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newHardClearDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newHardClearDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newHardClear) {
-                NewClearsCard(newClears: $newHardClears)
+            AnalyticsCardView(cardType: .newHardClear, headerPlacement: .bottom) {
+                NewClearsCard(newClears: $model.newHardClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -132,11 +116,11 @@ extension AnalyticsView {
     var newExHardClearCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newExHardClearDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newExHardClearDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newExHardClear) {
-                NewClearsCard(newClears: $newExHardClears)
+            AnalyticsCardView(cardType: .newExHardClear, headerPlacement: .bottom) {
+                NewClearsCard(newClears: $model.newExHardClears)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -146,11 +130,11 @@ extension AnalyticsView {
     var newFailedCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newFailedDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newFailedDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newFailed) {
-                NewClearsCard(newClears: $newFailed)
+            AnalyticsCardView(cardType: .newFailed, headerPlacement: .bottom) {
+                NewClearsCard(newClears: $model.newFailed)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -160,11 +144,11 @@ extension AnalyticsView {
     var newHighScoresCard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newHighScoresDetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newHighScoresDetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newHighScores) {
-                NewHighScoresCard(newHighScores: $newHighScores)
+            AnalyticsCardView(cardType: .newHighScores, headerPlacement: .bottom) {
+                NewHighScoresCard(newHighScores: $model.newHighScores)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -174,11 +158,11 @@ extension AnalyticsView {
     var newAAACard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newAAADetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newAAADetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newAAA) {
-                NewDJLevelsCard(newDJLevels: $newAAA)
+            AnalyticsCardView(cardType: .newAAA, headerPlacement: .bottom) {
+                NewDJLevelsCard(newDJLevels: $model.newAAA)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -188,11 +172,11 @@ extension AnalyticsView {
     var newAACard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newAADetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newAADetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newAA) {
-                NewDJLevelsCard(newDJLevels: $newAA)
+            AnalyticsCardView(cardType: .newAA, headerPlacement: .bottom) {
+                NewDJLevelsCard(newDJLevels: $model.newAA)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -202,11 +186,11 @@ extension AnalyticsView {
     var newACard: some View {
         Button {
             if !isEditingCards {
-                navigationManager.push(.newADetail, for: .analytics)
+                navigationManager.push(AnalyticsPath.newADetail)
             }
         } label: {
-            AnalyticsCardView(cardType: .newA) {
-                NewDJLevelsCard(newDJLevels: $newA)
+            AnalyticsCardView(cardType: .newA, headerPlacement: .bottom) {
+                NewDJLevelsCard(newDJLevels: $model.newA)
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -217,10 +201,6 @@ extension AnalyticsView {
 
     var visiblePerLevelCards: [PerLevelCardID] {
         perLevelCardOrder.filter { visiblePerLevelCardSet.contains($0) }
-    }
-
-    var visibleLevels: Set<Int> {
-        Set(visiblePerLevelCardSet.map(\.difficulty))
     }
 
     @ViewBuilder
@@ -237,23 +217,46 @@ extension AnalyticsView {
         }
     }
 
+    func clearTypeSegments(difficulty: Int) -> [PerLevelSegment] {
+        let counts = model.clearTypePerDifficulty[difficulty] ?? [:]
+        return IIDXClearType.sortedStringsWithoutNoPlay.map { clearType in
+            PerLevelSegment(
+                label: IIDXClearType.abbreviation(for: clearType),
+                color: IIDXClearType.color(for: clearType),
+                count: counts[clearType] ?? 0
+            )
+        }
+    }
+
+    func djLevelSegments(difficulty: Int) -> [PerLevelSegment] {
+        let counts = model.djLevelPerDifficulty[difficulty] ?? [:]
+        return IIDXDJLevel.sorted.reversed().map { djLevel in
+            PerLevelSegment(
+                label: djLevel.rawValue,
+                color: IIDXDJLevel.color(for: djLevel.rawValue),
+                count: counts[djLevel] ?? 0
+            )
+        }
+    }
+
     func clearTypeForLevelCard(difficulty: Int) -> some View {
         Button {
-            if !isEditingCards && clearTypePerDifficulty[difficulty] != nil {
-                navigationManager.push(.clearTypeForLevel(difficulty: difficulty), for: .analytics)
+            if !isEditingCards && model.clearTypePerDifficulty[difficulty] != nil {
+                navigationManager.push(AnalyticsPath.clearTypeForLevel(difficulty: difficulty))
             }
         } label: {
-            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "medal.star",
-                              iconColor: .secondary) {
-                OverviewClearTypePerDifficultyGraph(
-                    graphData: $clearTypePerDifficulty,
-                    difficulty: .constant(difficulty)
-                )
-                .chartLegend(.hidden)
-                .chartYAxis(.hidden)
+            PerLevelAnalyticsCard(
+                difficulty: difficulty,
+                subtitle: "Shared.IIDX.ClearType",
+                showsBar: true,
+                segments: clearTypeSegments(difficulty: difficulty)
+            ) {
+                TrendsClearTypeGraph(graphData: $model.clearTypePerImportGroup,
+                                     difficulty: .constant(difficulty))
+                    .chartLegend(.hidden)
+                    .chartYAxis(.hidden)
+                    .chartXAxis(.hidden)
             }
-            .perLevelCaption("Shared.IIDX.ClearType")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
@@ -261,20 +264,22 @@ extension AnalyticsView {
 
     func clearTypeTrendsForLevelCard(difficulty: Int) -> some View {
         Button {
-            if !isEditingCards && clearTypePerImportGroup.count > 0 {
-                navigationManager.push(.clearTypeTrendsForLevel(difficulty: difficulty), for: .analytics)
+            if !isEditingCards && model.clearTypePerImportGroup.count > 0 {
+                navigationManager.push(AnalyticsPath.clearTypeTrendsForLevel(difficulty: difficulty))
             }
         } label: {
-            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "medal.star",
-                              iconColor: .secondary) {
-                TrendsClearTypeGraph(graphData: $clearTypePerImportGroup,
+            PerLevelAnalyticsCard(
+                difficulty: difficulty,
+                subtitle: "Shared.IIDX.ClearType",
+                showsBar: false,
+                segments: []
+            ) {
+                TrendsClearTypeGraph(graphData: $model.clearTypePerImportGroup,
                                      difficulty: .constant(difficulty))
                     .chartLegend(.hidden)
                     .chartYAxis(.hidden)
                     .chartXAxis(.hidden)
             }
-            .perLevelCaption("Shared.IIDX.ClearType")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(
@@ -284,21 +289,22 @@ extension AnalyticsView {
 
     func djLevelForLevelCard(difficulty: Int) -> some View {
         Button {
-            if !isEditingCards && djLevelPerDifficulty[difficulty] != nil {
-                navigationManager.push(.djLevelForLevel(difficulty: difficulty), for: .analytics)
+            if !isEditingCards && model.djLevelPerDifficulty[difficulty] != nil {
+                navigationManager.push(AnalyticsPath.djLevelForLevel(difficulty: difficulty))
             }
         } label: {
-            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "medal.star",
-                              iconColor: .secondary) {
-                OverviewDJLevelPerDifficultyGraph(
-                    graphData: $djLevelPerDifficulty,
-                    difficulty: .constant(difficulty)
-                )
-                .chartLegend(.hidden)
-                .chartYAxis(.hidden)
+            PerLevelAnalyticsCard(
+                difficulty: difficulty,
+                subtitle: "Shared.IIDX.DJLevel",
+                showsBar: true,
+                segments: djLevelSegments(difficulty: difficulty)
+            ) {
+                TrendsDJLevelGraph(graphData: $model.djLevelPerImportGroup,
+                                   difficulty: .constant(difficulty))
+                    .chartLegend(.hidden)
+                    .chartYAxis(.hidden)
+                    .chartXAxis(.hidden)
             }
-            .perLevelCaption("Shared.IIDX.DJLevel")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace)
@@ -306,31 +312,27 @@ extension AnalyticsView {
 
     func djLevelTrendsForLevelCard(difficulty: Int) -> some View {
         Button {
-            if !isEditingCards && djLevelPerImportGroup.count > 0 {
-                navigationManager.push(.djLevelTrendsForLevel(difficulty: difficulty), for: .analytics)
+            if !isEditingCards && model.djLevelPerImportGroup.count > 0 {
+                navigationManager.push(AnalyticsPath.djLevelTrendsForLevel(difficulty: difficulty))
             }
         } label: {
-            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "medal.star",
-                              iconColor: .secondary) {
-                TrendsDJLevelGraph(graphData: $djLevelPerImportGroup,
+            PerLevelAnalyticsCard(
+                difficulty: difficulty,
+                subtitle: "Shared.IIDX.DJLevel",
+                showsBar: false,
+                segments: []
+            ) {
+                TrendsDJLevelGraph(graphData: $model.djLevelPerImportGroup,
                                    difficulty: .constant(difficulty))
                     .chartLegend(.hidden)
                     .chartYAxis(.hidden)
                     .chartXAxis(.hidden)
             }
-            .perLevelCaption("Shared.IIDX.DJLevel")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(
             id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
         )
-    }
-
-    // MARK: - Filtered Data
-
-    var filteredClearTypeData: [Int: OrderedDictionary<String, Int>] {
-        clearTypePerDifficulty.filter { visibleLevels.contains($0.key) }
     }
 
 }

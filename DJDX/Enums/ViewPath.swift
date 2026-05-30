@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ViewPath: Hashable {
+enum ScoresPath: Hashable {
     case scoreViewer(songRecord: IIDXSongRecord, initialLevel: IIDXLevel = .all)
     case scoreHistory(songTitle: String,
                       level: IIDXLevel,
@@ -16,6 +16,9 @@ enum ViewPath: Hashable {
                        level: IIDXLevel,
                        playSide: IIDXPlaySide,
                        playType: IIDXPlayType)
+}
+
+enum AnalyticsPath: Hashable {
     case clearTypeOverviewGraph
     case clearTypePerDifficultyGraph
     case scoreRatePerDifficultyGraph
@@ -36,12 +39,23 @@ enum ViewPath: Hashable {
     case newAAADetail
     case newAADetail
     case newADetail
+}
+
+enum ImportPath: Hashable {
     case importerWebIIDXSingle
     case importerWebIIDXDouble
     case importerWebIIDXTower
     case importerManual
     case importDetail(importGroup: ImportGroup)
+}
+
+enum MorePath: Hashable {
     case moreExternalDataSources
     case moreAppIcon
     case moreAttributions
+}
+
+enum TowerPath: Hashable {
+    case recent
+    case totals
 }

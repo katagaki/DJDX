@@ -12,10 +12,14 @@ struct RadarChartView: View {
     let points: [RadarPointConfig]
     let maxValue: Double = 130.0
     let benchmarkValue: Double = 100.0
+    var labelFontSize: CGFloat = 12.0
+    var lineWidth: CGFloat = 2.0
 
-    init(_ data: RadarData, isPlayerRadar: Bool = false) {
+    init(_ data: RadarData, isPlayerRadar: Bool = false, labelFontSize: CGFloat = 12.0, lineWidth: CGFloat = 2.0) {
         self.color = data.color(isPlayerRadar: isPlayerRadar)
         self.points = data.points()
+        self.labelFontSize = labelFontSize
+        self.lineWidth = lineWidth
     }
 
     var body: some View {
@@ -40,7 +44,7 @@ struct RadarChartView: View {
                     RadarPolygonShape(configs: points, maxValue: maxValue)
                         .fill(color.opacity(0.5))
                     RadarPolygonShape(configs: points, maxValue: maxValue)
-                        .stroke(color, lineWidth: 2)
+                        .stroke(color, lineWidth: lineWidth)
                 }
                 .frame(width: size, height: size)
 
@@ -53,7 +57,7 @@ struct RadarChartView: View {
                         .frame(width: 0, height: 0)
                         .overlay(
                             Text(config.label)
-                                .font(.system(size: 12, weight: .black))
+                                .font(.system(size: labelFontSize, weight: .black))
                                 .fontWidth(.expanded)
                                 .foregroundStyle(config.color)
                                 .brightness(0.88)

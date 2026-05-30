@@ -57,7 +57,42 @@
       },
       "shouldTranslate" : false
     },
+    "Activity.NoData.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your recent play activity will appear here."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近のプレー履歴がここに表示されます。"
+          }
+        }
+      }
+    },
+    "Activity.NoData.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Activity Yet"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクティビティがありません"
+          }
+        }
+      }
+    },
     "Alert.DeleteData.OldData.Confirm" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -74,6 +109,7 @@
       }
     },
     "Alert.DeleteData.OldData.Subtitle" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -90,6 +126,7 @@
       }
     },
     "Alert.DeleteData.OldData.Title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -101,6 +138,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データ移行前のスコアデータのみ削除されます"
+          }
+        }
+      }
+    },
+    "Alert.DeleteData.Score.Code.Placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6-digit code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6桁のコード"
+          }
+        }
+      }
+    },
+    "Alert.DeleteData.Score.Code.Subtitle%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To confirm deletion of all score data, enter the code %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのスコアデータを削除するには、コード %@ を入力してください。"
+          }
+        }
+      }
+    },
+    "Alert.DeleteData.Score.Code.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm Deletion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除の確認"
           }
         }
       }
@@ -461,6 +549,57 @@
         }
       }
     },
+    "Alert.ResetLayout.Confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Layout"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レイアウトをリセット"
+          }
+        }
+      }
+    },
+    "Alert.ResetLayout.Subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Card visibility and order will be restored to their defaults."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カードの表示と並び順が初期状態に戻ります。"
+          }
+        }
+      }
+    },
+    "Alert.ResetLayout.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Layout?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レイアウトをリセットしますか？"
+          }
+        }
+      }
+    },
     "Analytics.ClearType.ByDifficulty" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -530,6 +669,7 @@
       }
     },
     "Analytics.Header.NewScores" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -546,6 +686,7 @@
       }
     },
     "Analytics.Header.PerLevel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -703,7 +844,144 @@
         }
       }
     },
+    "Analytics.SDVX.ClearBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリア内訳"
+          }
+        }
+      }
+    },
+    "Analytics.SDVX.GradeBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grade Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グレード内訳"
+          }
+        }
+      }
+    },
+    "Analytics.SDVX.TotalCharts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Charts Played"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレー譜面数"
+          }
+        }
+      }
+    },
+    "Analytics.SDVX.Volforce" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VOLFORCE"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VOLFORCE"
+          }
+        }
+      }
+    },
+    "Analytics.Section.LastPlay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last Play"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前回のプレー"
+          }
+        }
+      }
+    },
+    "Analytics.Section.Overview" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overview"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "概要"
+          }
+        }
+      }
+    },
+    "Analytics.Section.PerLevel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per Level"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レベル別"
+          }
+        }
+      }
+    },
+    "Analytics.Section.ScoreData" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレー記録"
+          }
+        }
+      }
+    },
     "Analytics.Settings.Cards" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -737,6 +1015,7 @@
       }
     },
     "Analytics.Settings.HideAll" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -770,6 +1049,7 @@
       }
     },
     "Analytics.Settings.ResetAll" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -803,6 +1083,7 @@
       }
     },
     "Analytics.Settings.Title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -998,6 +1279,8 @@
     "DJ Level" : {
       "shouldTranslate" : false
     },
+    "Game" : {},
+    "Grade" : {},
     "Height" : {
       "shouldTranslate" : false
     },
@@ -1160,9 +1443,6 @@
           }
         }
       }
-    },
-    "katagaki/DJDX" : {
-      "shouldTranslate" : false
     },
     "LEVEL" : {
       "localizations" : {
@@ -1625,6 +1905,7 @@
       }
     },
     "More.ManageData.DeleteOldData" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1687,6 +1968,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データ管理"
+          }
+        }
+      }
+    },
+    "More.ManageData.ResetLayout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Layout"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レイアウトをリセット"
           }
         }
       }
@@ -2108,6 +2406,23 @@
       },
       "shouldTranslate" : false
     },
+    "Shared.Continue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "続ける"
+          }
+        }
+      }
+    },
     "Shared.Date" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2155,6 +2470,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完了"
+          }
+        }
+      }
+    },
+    "Shared.Edit" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集"
           }
         }
       }
@@ -2639,6 +2971,23 @@
         }
       }
     },
+    "Shared.Reset" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset to Today"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日に戻す"
+          }
+        }
+      }
+    },
     "Shared.Score" : {
       "localizations" : {
         "en" : {
@@ -2668,6 +3017,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコアレート"
+          }
+        }
+      }
+    },
+    "Shared.SDVX.Version" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SOUND VOLTEX Version"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SOUND VOLTEX バージョン"
           }
         }
       }
@@ -3003,6 +3369,40 @@
         }
       }
     },
+    "Tips.ImportMoved.Text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To import new play data, tap this button."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいプレーデータをインポートするには、こちらのボタンを押してください。"
+          }
+        }
+      }
+    },
+    "Tips.ImportMoved.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imports Have Moved"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポートはこちら"
+          }
+        }
+      }
+    },
     "Tips.ImportWikiData.Text" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3070,6 +3470,7 @@
       }
     },
     "Tower.ChartMode" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3134,6 +3535,7 @@
       }
     },
     "Tower.NoData.Description" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3150,6 +3552,7 @@
       }
     },
     "Tower.NoData.Title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3282,6 +3685,23 @@
     "Type" : {
       "shouldTranslate" : false
     },
+    "ViewTitle.Activity" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My Activity"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイアクティビティ"
+          }
+        }
+      }
+    },
     "ViewTitle.Analytics" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3351,6 +3771,7 @@
       }
     },
     "ViewTitle.More" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3707,6 +4128,54 @@
     },
     "YouTube" : {
       "shouldTranslate" : false
+    },
+    "Analytics.PerLevel.TitleSeparator" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " - "
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "・"
+          }
+        }
+      }
+    },
+    "Shared.SDVX.ClearType" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランク"
+          }
+        }
+      }
+    },
+    "Shared.SDVX.Grade" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score Grade"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコアグレード"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

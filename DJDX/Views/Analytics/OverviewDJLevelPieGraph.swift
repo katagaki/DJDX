@@ -31,6 +31,7 @@ struct OverviewDJLevelPieGraph: View {
                         "E": .indigo,
                         "F": .red
                     ])
+                    .chartLegend(.hidden)
                 } else {
                     Spacer()
                 }

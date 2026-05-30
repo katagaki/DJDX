@@ -18,6 +18,7 @@ struct NewClearsDetailView: View {
             if newClears.isEmpty {
                 Text("Analytics.NoData")
                     .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
             } else {
                 ForEach(newClears) { entry in
                     HStack(alignment: .center, spacing: 8.0) {
@@ -58,10 +59,12 @@ struct NewClearsDetailView: View {
                         .clipShape(.rect(cornerRadius: 6.0))
                     }
                     .padding(.vertical, 2.0)
+                    .listRowBackground(Color.clear)
                 }
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }

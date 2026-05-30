@@ -81,7 +81,6 @@ struct ScoreViewer: View {
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
         .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarBackground(.visible, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Spacer()

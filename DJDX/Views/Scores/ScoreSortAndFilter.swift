@@ -7,32 +7,12 @@
 
 import SwiftUI
 
-struct ScoreSortAndFilter: View {
+struct ScoreSortMenu: View {
 
-    @Binding var isShowingOnlyPlayDataWithScores: Bool
-    @Binding var difficultiesToShow: Set<IIDXDifficulty>
-    @Binding var levelsToShow: Set<IIDXLevel>
-    @Binding var clearTypesToShow: Set<IIDXClearType>
-    @Binding var djLevelsToShow: Set<IIDXDJLevel>
-    @Binding var versionsToShow: Set<String>
     @Binding var sortMode: SortMode
     @Binding var sortOrder: SortOrder
-    @Binding var isSystemChangingFilterAndSort: Bool
-    var onReset: () -> Void
-
-    @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.DJLevelVisible") var isDJLevelVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ScoreRateVisible") var isScoreRateVisible: Bool
-    @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
-    @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
-
-    @Namespace var filterNamespace
-    @State private var isShowingFilterSheet: Bool = false
 
     var body: some View {
-        // Sort
         Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
             Picker("Shared.Sort", selection: $sortMode) {
                 ForEach(SortMode.whenLevelFiltered, id: \.self) { sortMode in
@@ -51,35 +31,21 @@ struct ScoreSortAndFilter: View {
                 .pickerStyle(.inline)
             }
         }
+        .menuOrder(.fixed)
         .menuActionDismissBehavior(.disabled)
+    }
+}
 
-        // Filter
+struct ScoreFilterButton: View {
+
+    @Binding var isShowingFilterSheet: Bool
+    var filterNamespace: Namespace.ID
+
+    var body: some View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
-        .automaticMatchedTransitionSource(id: "ScoreFilterSheet", in: filterNamespace)
-        .sheet(isPresented: $isShowingFilterSheet) {
-            ScoreFilterSheet(
-                isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                difficultiesToShow: $difficultiesToShow,
-                levelsToShow: $levelsToShow,
-                clearTypesToShow: $clearTypesToShow,
-                djLevelsToShow: $djLevelsToShow,
-                versionsToShow: $versionsToShow,
-                isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort,
-                isGenreVisible: $isGenreVisible,
-                isArtistVisible: $isArtistVisible,
-                isLevelVisible: $isLevelVisible,
-                isDJLevelVisible: $isDJLevelVisible,
-                isScoreRateVisible: $isScoreRateVisible,
-                isScoreVisible: $isScoreVisible,
-                isLastPlayDateVisible: $isLastPlayDateVisible,
-                onReset: onReset
-            )
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.hidden)
-            .interactiveDismissDisabled()
-        }
+        .automaticSheetMatchedTransitionSource(id: "ScoreFilterSheet", in: filterNamespace)
     }
 }
 
@@ -223,6 +189,11 @@ struct ScoreFilterSheet: View {
                     Toggle(
                         .scoresFilterShowWithScoreOnly, systemImage: "trophy.fill",
                         isOn: $isShowingOnlyPlayDataWithScores
+                    )
+                    Toggle(
+                        "More.PlayDataDisplay.HideBeginnerLevel",
+                        systemImage: "shield.righthalf.filled",
+                        isOn: $isBeginnerLevelHidden
                     )
                 }
                 Section("More.PlayDataDisplay.Header") {

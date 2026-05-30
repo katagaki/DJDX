@@ -5,49 +5,17 @@
 //  Created by シン・ジャスティン on 2024/05/19.
 //
 
-import Foundation
+import SwiftUI
 
 class NavigationManager: ObservableObject {
 
-    let defaults = UserDefaults.standard
-    let selectedTabKey = "NavigationManager.SelectedTab"
+    @Published var path = NavigationPath()
 
-    @Published var selectedTab: TabType
-    @Published var tabPaths: [TabType: [ViewPath]] = [
-        .imports: [],
-        .scores: [],
-        .analytics: [],
-        .tower: [],
-        .more: []
-    ]
-
-    init() {
-        if let selectedTab = TabType(rawValue: defaults.integer(forKey: selectedTabKey)) {
-            self.selectedTab = selectedTab
-        } else {
-            self.selectedTab = .scores
-        }
+    func popToRoot() {
+        path = NavigationPath()
     }
 
-    subscript(tabType: TabType) -> [ViewPath] {
-        get {
-            return tabPaths[tabType] ?? []
-        }
-        set(newViewPath) {
-            tabPaths[tabType] = newViewPath
-        }
-    }
-
-    func popToRoot(for tab: TabType) {
-        tabPaths[tab]?.removeAll()
-    }
-
-    func push(_ viewPath: ViewPath, for tab: TabType) {
-        tabPaths[tab]?.append(viewPath)
-    }
-
-    func saveToDefaults() {
-        defaults.setValue(selectedTab.rawValue, forKey: selectedTabKey)
-        defaults.synchronize()
+    func push<V: Hashable>(_ value: V) {
+        path.append(value)
     }
 }

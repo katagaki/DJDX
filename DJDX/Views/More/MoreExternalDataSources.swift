@@ -14,6 +14,7 @@ struct MoreExternalDataSources: View {
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @Environment(\.openURL) var openURL
+    @Environment(\.dismiss) var dismiss
 
     @AppStorage(wrappedValue: true, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
     @AppStorage(wrappedValue: true, "ExternalData.BM2DX.Enabled") var isBM2DXEnabled: Bool
@@ -35,8 +36,26 @@ struct MoreExternalDataSources: View {
             bemaniWikiSection()
             bm2dxSection()
         }
-        .navigator("More.ExternalData.Header", group: true, inline: true)
-        .scrollContentBackground(.hidden)
+        .navigationTitle("More.ExternalData.Header")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if #available(iOS 26.0, *) {
+                    Button(role: .close) {
+                        dismiss()
+                    }
+                } else {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .tint(.primary)
+                            .font(.title2)
+                            .symbolRenderingMode(.hierarchical)
+                    }
+                }
+            }
+        }
         .onChange(of: dataImported, { _, _ in
             Task {
                 await MainActor.run {
@@ -165,7 +184,7 @@ struct MoreExternalDataSources: View {
         do {
             var iidxSongsFromWiki: [IIDXSong] = []
             let (data, _) = try await URLSession.shared.data(from: iidxVersion.bemaniWikiLatestVersionPageURL())
-            if let htmlString = String(bytes: data, encoding: .japaneseEUC),
+            if let htmlString = String(bytes: data, encoding: .utf8),
                let htmlDocument = try? SwiftSoup.parse(htmlString),
                let htmlDocumentBody = htmlDocument.body(),
                let documentContents = try? htmlDocumentBody.select("#contents").first(),
@@ -208,7 +227,7 @@ struct MoreExternalDataSources: View {
         do {
             var iidxSongsFromWiki: [IIDXSong] = []
             let (data, _) = try await URLSession.shared.data(from: iidxVersion.bemaniWikiExistingVersionsPageURL())
-            if let htmlString = String(bytes: data, encoding: .japaneseEUC),
+            if let htmlString = String(bytes: data, encoding: .utf8),
                let htmlDocument = try? SwiftSoup.parse(htmlString),
                let htmlDocumentBody = htmlDocument.body(),
                let documentContents = try? htmlDocumentBody.select("#contents").first(),

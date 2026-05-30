@@ -316,6 +316,42 @@ for (let attempt = 0; attempt < 3; attempt++) {
 return 'ERR:network';
 """
 
+// SDVX: the score data page (playdata/index.html) exposes its CSV by POSTing
+// method=display to itself (the disp_data() function). The response body is an
+// HTML page whose <pre>/<textarea> contains the CSV text; we POST and return
+// the CSV string.
+let sdvxScoreDownloadFetchBody = """
+async function fetchSDVXScoreData() {
+    let csv = document.getElementById('score_data').value;
+    if (csv.indexOf('楽曲名') !== -1) { return csv; }
+    return 'ERR:empty';
+}
+    
+return await fetchSDVXScoreData();
+"""
+
+// IIDX: navigating directly to score_download.html?style=SP|DP|tower renders the
+// CSV into <textarea id="score_data"> on the current page. Read it directly,
+// rather than re-submitting the form.
+let scoreDataReadBody = """
+function readScoreData() {
+    const node = document.getElementById('score_data');
+    if (node) {
+        const value = (node.value !== undefined && node.value !== null && node.value !== '')
+            ? node.value
+            : (node.getAttribute('value') || node.textContent || '');
+        const csv = (value || '').trim();
+        if (csv.length > 0) { return csv; }
+    }
+    if (location.href.indexOf('/error/error.html') !== -1) {
+        const match = location.href.match(/[?&]err=([0-9]+)/);
+        return 'ERR:' + (match ? match[1] : 'server');
+    }
+    return 'ERR:empty';
+}
+return readScoreData();
+"""
+
 let iidxTowerCleanup = """
 var injectedCSS = `
 #base {
@@ -388,26 +424,37 @@ style.appendChild(document.createTextNode(injectedCSS))
 head.appendChild(style)
 """
 
+// Polls for the form elements and do_djauto until ready. On iOS 18 the page
+// commits/renders but never fires didFinish, so this script is injected at
+// didCommit and may run before the page's own scripts finish initializing.
 let textageNavigationJS = """
 (function() {
-    var levelSelector = document.getElementsByName("djauto_opt")[0];
-    var songNameTextField = document.getElementsByName("djauto")[0];
-    if (!levelSelector || !songNameTextField) { return; }
-
-    levelSelector.value = "%@1";
-    songNameTextField.value = "%@2";
-
-    var autoCompleteForm = songNameTextField.form;
-    if (autoCompleteForm) {
-        var namedRef = document.getElementsByName("ref");
-        for (var i = namedRef.length - 1; i >= 0; i--) {
-            if (namedRef[i] !== autoCompleteForm) {
-                namedRef[i].setAttribute("name", "ref_search");
-            }
+    var attempts = 0;
+    function tryNavigate() {
+        attempts += 1;
+        var levelSelector = document.getElementsByName("djauto_opt")[0];
+        var songNameTextField = document.getElementsByName("djauto")[0];
+        if (!levelSelector || !songNameTextField || typeof do_djauto !== "function") {
+            if (attempts < 100) { setTimeout(tryNavigate, 100); }
+            return;
         }
-        autoCompleteForm.setAttribute("name", "ref");
-    }
 
-    if (typeof do_djauto === "function") { do_djauto(); }
+        levelSelector.value = "%@1";
+        songNameTextField.value = "%@2";
+
+        var autoCompleteForm = songNameTextField.form;
+        if (autoCompleteForm) {
+            var namedRef = document.getElementsByName("ref");
+            for (var i = namedRef.length - 1; i >= 0; i--) {
+                if (namedRef[i] !== autoCompleteForm) {
+                    namedRef[i].setAttribute("name", "ref_search");
+                }
+            }
+            autoCompleteForm.setAttribute("name", "ref");
+        }
+
+        do_djauto();
+    }
+    tryNavigate();
 })();
 """

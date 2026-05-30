@@ -17,6 +17,7 @@ extension ScoresView {
             Task.detached {
                 let songRecords = await actor.songRecords(
                     on: playDataDate,
+                    version: iidxVersion,
                     filters: FilterOptions(playType: playTypeToShow,
                                            onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
                                            levels: levelsToShow,

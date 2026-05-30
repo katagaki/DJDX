@@ -12,18 +12,19 @@ struct NewHighScoresCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4.0) {
-            Spacer(minLength: 0)
             if newHighScores.isEmpty {
                 Text("Analytics.NoData")
-                    .font(.caption)
+                    .font(.system(size: 14.0))
                     .foregroundStyle(.secondary)
             } else {
                 Text("\(newHighScores.count)")
-                    .font(.system(size: 36.0, weight: .black))
+                    .font(.system(size: 20.0, weight: .black))
                     .fontWidth(.expanded)
                     .foregroundStyle(.primary)
             }
+            Spacer(minLength: 0)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

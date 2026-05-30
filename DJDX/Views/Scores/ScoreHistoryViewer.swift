@@ -126,7 +126,6 @@ struct ScoreHistoryViewer: View {
         }
         .navigationTitle("ViewTitle.Scores.History.\(songTitle)")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.visible, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(alignment: .center, spacing: 2.0) {

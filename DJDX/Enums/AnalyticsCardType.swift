@@ -8,8 +8,24 @@
 import Foundation
 import SwiftUI
 
+enum AnalyticsSection: String, Hashable, CaseIterable {
+    case overview
+    case lastPlay
+    case perLevel
+
+    var titleKey: LocalizedStringKey {
+        switch self {
+        case .overview: "Analytics.Section.Overview"
+        case .lastPlay: "Analytics.Section.LastPlay"
+        case .perLevel: "Analytics.Section.PerLevel"
+        }
+    }
+}
+
 enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case clearTypeOverall
+    case towerRecent
+    case towerTotals
     case newHighScores
     case newAAA
     case newAA
@@ -24,14 +40,21 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// Summary cards are the count-based cards (not clearTypeOverall)
+    /// Summary cards are the count-based cards (not clearTypeOverall or tower cards)
     var isSummaryCard: Bool {
-        self != .clearTypeOverall
+        self != .clearTypeOverall && !isTowerCard
+    }
+
+    /// Tower cards are IIDX-AC-only full-width chart cards
+    var isTowerCard: Bool {
+        self == .towerRecent || self == .towerTotals
     }
 
     var titleText: Text {
         switch self {
         case .clearTypeOverall: return Text("Analytics.ClearType.Overall")
+        case .towerRecent: return Text("Tower.ChartMode.Recent")
+        case .towerTotals: return Text("Tower.ChartMode.Totals")
         case .newHighScores: return Text("Analytics.NewHighScores")
         case .newFullComboClear: return Text(verbatim: "FULLCOMBO CLEAR")
         case .newClears: return Text(verbatim: "CLEAR")
@@ -49,6 +72,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var titleKey: String {
         switch self {
         case .clearTypeOverall: return "Analytics.ClearType.Overall"
+        case .towerRecent: return "Tower.ChartMode.Recent"
+        case .towerTotals: return "Tower.ChartMode.Totals"
         case .newHighScores: return "Analytics.NewHighScores"
         case .newFullComboClear: return "FULLCOMBO CLEAR"
         case .newClears: return "CLEAR"
@@ -66,6 +91,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var systemImage: String {
         switch self {
         case .clearTypeOverall: return "chart.bar"
+        case .towerRecent: return "calendar"
+        case .towerTotals: return "building.2"
         case .newHighScores: return "trophy"
         case .newFullComboClear: return "star.circle"
         case .newClears: return "checkmark.circle"
@@ -83,6 +110,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var iconColor: Color {
         switch self {
         case .clearTypeOverall: return .blue
+        case .towerRecent: return .red
+        case .towerTotals: return .red
         case .newHighScores: return .orange
         case .newFullComboClear: return .blue
         case .newClears: return .cyan
@@ -101,6 +130,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     var cardContentHeight: CGFloat {
         switch self {
         case .clearTypeOverall: return 80.0
+        case .towerRecent, .towerTotals: return 80.0
         case .newFullComboClear,
              .newClears,
              .newEasyClears,
@@ -112,7 +142,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
              .newAAA,
              .newAA,
              .newA:
-            return 50.0
+            return 36.0
         }
     }
 
@@ -121,10 +151,17 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         self == .clearTypeOverall
     }
 
+    /// Tower cards, shown in their own section
+    static var towerCards: [AnalyticsCardType] {
+        [.towerTotals, .towerRecent]
+    }
+
     /// Default card order
     static var defaultOrder: [AnalyticsCardType] {
         [
             .clearTypeOverall,
+            .towerTotals,
+            .towerRecent,
             .newHighScores,
             .newAAA,
             .newAA,
@@ -141,6 +178,6 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
 
     /// Default visible cards
     static var defaultVisible: Set<AnalyticsCardType> {
-        [.clearTypeOverall, .newHighScores, .newClears, .newAssistClears]
+        [.clearTypeOverall, .towerTotals, .newHighScores, .newClears, .newAssistClears]
     }
 }

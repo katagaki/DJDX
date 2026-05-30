@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+enum AnalyticsCardHeaderPlacement {
+    case top
+    case bottom
+}
+
 struct AnalyticsCardView<Content: View>: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -16,9 +21,15 @@ struct AnalyticsCardView<Content: View>: View {
     let iconColor: Color
     let contentHeight: CGFloat
     let cornerRadius: CGFloat
+    var showsHeader: Bool = true
+    var headerPlacement: AnalyticsCardHeaderPlacement = .top
+    var caption: LocalizedStringKey?
     let content: () -> Content
 
-    init(cardType: AnalyticsCardType, @ViewBuilder content: @escaping () -> Content) {
+    init(cardType: AnalyticsCardType,
+         showsHeader: Bool = true,
+         headerPlacement: AnalyticsCardHeaderPlacement = .top,
+         @ViewBuilder content: @escaping () -> Content) {
         self.title = cardType.titleText
         self.systemImage = cardType.systemImage
         self.iconColor = cardType.iconColor
@@ -28,13 +39,16 @@ struct AnalyticsCardView<Content: View>: View {
         } else {
             self.cornerRadius = 12.0
         }
+        self.showsHeader = showsHeader
+        self.headerPlacement = headerPlacement
         self.content = content
     }
 
     init(title: LocalizedStringKey,
          systemImage: String,
          iconColor: Color,
-         contentHeight: CGFloat = 100.0,
+         contentHeight: CGFloat = 80.0,
+         showsHeader: Bool = true,
          @ViewBuilder content: @escaping () -> Content) {
         self.title = Text(title)
         self.systemImage = systemImage
@@ -45,13 +59,14 @@ struct AnalyticsCardView<Content: View>: View {
         } else {
             self.cornerRadius = 12.0
         }
+        self.showsHeader = showsHeader
         self.content = content
     }
 
     init(verbatimTitle: String,
          systemImage: String,
          iconColor: Color,
-         contentHeight: CGFloat = 100.0,
+         contentHeight: CGFloat = 80.0,
          @ViewBuilder content: @escaping () -> Content) {
         self.title = Text(verbatim: verbatimTitle)
         self.systemImage = systemImage
@@ -65,19 +80,36 @@ struct AnalyticsCardView<Content: View>: View {
         self.content = content
     }
 
+    var header: some View {
+        HStack(spacing: 5.0) {
+            Image(systemName: systemImage)
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(iconColor)
+                .frame(width: 13.0, height: 13.0)
+            title
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        }
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8.0) {
-            HStack(spacing: 6.0) {
-                Image(systemName: systemImage)
-                    .font(.subheadline)
-                    .foregroundStyle(iconColor)
-                title
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+        VStack(alignment: .leading, spacing: headerPlacement == .bottom ? 2.0 : 8.0) {
+            if showsHeader && headerPlacement == .top {
+                header
             }
             content()
                 .frame(height: contentHeight)
+            if showsHeader && headerPlacement == .bottom {
+                header
+            }
+            if let caption {
+                Text(caption)
+                    .font(.caption2.bold())
+                    .foregroundStyle(.tertiary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
         }
         .padding(12.0)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -100,14 +132,10 @@ struct AnalyticsCardButtonStyle: ButtonStyle {
     }
 }
 
-extension View {
-    func perLevelCaption(_ key: LocalizedStringKey) -> some View {
-        VStack(spacing: 2.0) {
-            self
-            Text(key)
-                .font(.caption2.bold())
-                .foregroundStyle(.tertiary)
-                .frame(maxWidth: .infinity, alignment: .center)
-        }
+extension AnalyticsCardView {
+    func perLevelCaption(_ key: LocalizedStringKey) -> AnalyticsCardView {
+        var copy = self
+        copy.caption = key
+        return copy
     }
 }

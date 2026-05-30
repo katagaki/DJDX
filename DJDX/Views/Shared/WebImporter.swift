@@ -41,7 +41,6 @@ struct WebImporter: View {
         .navigationTitle("ViewTitle.Importer.Web")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarBackground(.hidden, for: .tabBar)
         .background {
             ProgressView("Shared.Loading")
         }
@@ -51,7 +50,7 @@ struct WebImporter: View {
 
 struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataDelegate {
 
-    @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(\.dismiss) var dismiss
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
     @Binding var importToDate: Date
@@ -80,10 +79,18 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
         return WKWebView(frame: .zero, configuration: configuration)
     }()
 
+    var initialStyle: String {
+        switch importMode {
+        case .single: return "SP"
+        case .double: return "DP"
+        case .tower: return "tower"
+        }
+    }
+
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
-        webView.load(URLRequest(url: iidxVersion.loginPageRedirectURL()))
+        webView.load(URLRequest(url: iidxVersion.loginPageRedirectURL(style: initialStyle)))
         #if DEBUG
         webView.isInspectable = true
         #endif
@@ -120,8 +127,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
                     }
                 }
                 await MainActor.run {
-                    let tab: TabType = importMode == .tower ? .tower : .imports
-                    navigationManager.popToRoot(for: tab)
+                    dismiss()
                     progressAlertManager.hide()
                     didImportSucceed = true
                 }
@@ -129,9 +135,18 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
         }
     }
 
+    func importTowerData(using towerData: String) async {
+        let actor = DataImporter()
+        for await _ in await actor.importCSV(
+            csv: towerData,
+            to: importToDate,
+            for: .tower,
+            from: iidxVersion
+        ) { }
+    }
+
     func stopProcessing(with reason: ImportFailedReason) {
-        let tab: TabType = importMode == .tower ? .tower : .imports
-        navigationManager.popToRoot(for: tab)
+        dismiss()
         autoImportFailedReason = reason
         isAutoImportFailed = true
     }
@@ -153,6 +168,8 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
     var hasStartedExtraction: Bool = false
     var hasResolved: Bool = false
     var watchdog: Task<Void, Never>?
+    weak var activeWebView: WKWebView?
+    var pendingScoreCSV: String?
 
     init(
         delegate: UpdateScoreDataDelegate,
@@ -165,22 +182,99 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         super.init()
     }
 
+    func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationAction: WKNavigationAction,
+                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        #if DEBUG
+        debugPrint("[WebImporter] navigate ->", navigationAction.request.url?.absoluteString ?? "nil")
+        #endif
+        decisionHandler(.allow)
+    }
+
     func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
         guard let webViewURL = webView.url else { return }
         let urlString = webViewURL.absoluteString
+        #if DEBUG
+        debugPrint("[WebImporter] didFinish ->", urlString)
+        #endif
         webView.evaluateJavaScript(self.cleanupJS) { _, _ in
             if urlString.starts(with: self.version.downloadPageURL().absoluteString) {
                 webView.layer.opacity = 0.0
                 webView.isUserInteractionEnabled = false
-                guard !self.hasStartedExtraction else { return }
-                self.hasStartedExtraction = true
-                self.extractScoreData(from: webView)
+                self.activeWebView = webView
+                if !self.hasStartedExtraction {
+                    self.hasStartedExtraction = true
+                    self.startExtractionWatchdog()
+                }
+                // Login redirects straight to the styled URL (?style=SP|DP|tower),
+                // which renders the CSV into <textarea id="score_data">; read it
+                // directly. Fall back to a styled navigation if we ever land on
+                // the base page without a style.
+                if urlString.contains("style=") {
+                    self.handleStyledPageLoaded(webView, urlString: urlString)
+                } else {
+                    self.loadStyledPage(webView, style: self.currentStyle)
+                }
             } else if urlString.starts(with: self.version.errorPageURL().absoluteString) {
                 webView.layer.opacity = 0.0
                 self.resolveFailure(with: Self.failureReason(forErrorPageURL: urlString))
             } else {
                 webView.layer.opacity = 1.0
             }
+        }
+    }
+
+    // The style we want to load next for this page navigation.
+    var currentStyle: String {
+        switch importMode {
+        case .single: return "SP"
+        case .double: return "DP"
+        case .tower: return "tower"
+        }
+    }
+
+    func loadStyledPage(_ webView: WKWebView, style: String) {
+        webView.load(URLRequest(url: version.downloadPageURL(style: style)))
+    }
+
+    func handleStyledPageLoaded(_ webView: WKWebView, urlString: String) {
+        let isTowerStyle = urlString.contains("style=tower")
+        webView.callAsyncJavaScript(
+            scoreDataReadBody,
+            arguments: [:],
+            in: nil,
+            in: .page
+        ) { result in
+            let value = (try? result.get()) as? String
+            if isTowerStyle {
+                // Tower phase (either a tower-only import or the chained tower
+                // fetch after SP/DP). Import tower data if present, then resolve.
+                if let towerCSV = value, !towerCSV.isEmpty, !towerCSV.hasPrefix("ERR:") {
+                    Task {
+                        await self.delegate.importTowerData(using: towerCSV)
+                        self.resolveSuccess(with: self.pendingScoreCSV ?? towerCSV)
+                    }
+                } else if self.importMode == .tower {
+                    self.resolveFailure(with: Self.failureReason(forSentinel:
+                        (value?.hasPrefix("ERR:") ?? false) ? String(value!.dropFirst(4)) : "empty"))
+                } else {
+                    self.resolveSuccess(with: self.pendingScoreCSV ?? "")
+                }
+                return
+            }
+            // SP/DP score phase.
+            guard let value, !value.isEmpty else {
+                self.resolveFailure(with: .serverError)
+                return
+            }
+            if value.hasPrefix("ERR:") {
+                self.resolveFailure(with: Self.failureReason(forSentinel: String(value.dropFirst(4))))
+                return
+            }
+            // Score read succeeded; chain a tower fetch in the same session.
+            self.pendingScoreCSV = value
+            self.startExtractionWatchdog()
+            self.loadStyledPage(webView, style: "tower")
         }
     }
 
@@ -194,6 +288,9 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
 
     func handleNavigationFailure(_ error: Error) {
         let nsError = error as NSError
+        #if DEBUG
+        debugPrint("[WebImporter] navFail ->", nsError.domain, nsError.code, nsError.localizedDescription)
+        #endif
         if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled { return }
         if nsError.domain == "WebKitErrorDomain" && nsError.code == 102 { return }
         resolveFailure(with: .serverError)
@@ -207,39 +304,6 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
             for cookie in cookies {
                 nativeCookieStorage.setCookie(cookie)
             }
-        }
-    }
-
-    func extractScoreData(from webView: WKWebView) {
-        startExtractionWatchdog()
-        let buttonValue: String
-        switch importMode {
-        case .single: buttonValue = "SP"
-        case .double: buttonValue = "DP"
-        case .tower: buttonValue = "tower"
-        }
-        webView.callAsyncJavaScript(
-            scoreDownloadFetchBody,
-            arguments: ["buttonValue": buttonValue],
-            in: nil,
-            in: .page
-        ) { result in
-            switch result {
-            case .success(let value): self.handleExtractionResult(value as? String)
-            case .failure: self.resolveFailure(with: .serverError)
-            }
-        }
-    }
-
-    func handleExtractionResult(_ value: String?) {
-        guard let value, !value.isEmpty else {
-            resolveFailure(with: .serverError)
-            return
-        }
-        if value.hasPrefix("ERR:") {
-            resolveFailure(with: Self.failureReason(forSentinel: String(value.dropFirst(4))))
-        } else {
-            resolveSuccess(with: value)
         }
     }
 
@@ -289,6 +353,7 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
 // swiftlint:disable class_delegate_protocol
 protocol UpdateScoreDataDelegate: Sendable {
     func importScoreData(using newScoreData: String) async
+    func importTowerData(using towerData: String) async
     func stopProcessing(with reason: ImportFailedReason)
 }
 // swiftlint:enable class_delegate_protocol

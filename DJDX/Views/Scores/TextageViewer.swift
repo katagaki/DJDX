@@ -44,7 +44,6 @@ struct TextageViewer: View {
             .navigationTitle("ViewTitle.TextageViewer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.visible, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Shared.Refresh", systemImage: "arrow.clockwise") {
@@ -148,6 +147,13 @@ struct WebViewForTextage: UIViewRepresentable {
         var playType: IIDXPlayType = .single
         var updateTextageState: (Bool) -> Void
 
+        // didFinish never fires for the Textage pages on iOS 18 (the page
+        // commits and renders but the load event never completes), so we drive
+        // the flow from didCommit instead. These guard against running twice
+        // when both didCommit and didFinish fire (iOS 26).
+        var hasInjectedNavigation: Bool = false
+        var hasRevealedChart: Bool = false
+
         init(
             songTitle: String,
             level: IIDXLevel,
@@ -163,19 +169,40 @@ struct WebViewForTextage: UIViewRepresentable {
             super.init()
         }
 
-        func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
-            if let webViewURL = webView.url {
-                let urlString = webViewURL.absoluteString
-                if urlString.starts(with: textageIIDXURL.absoluteString) {
-                    webView.evaluateJavaScript(
-                        textageNavigationJS
-                            .replacingOccurrences(of: "%@1", with: levelValue())
-                            .replacingOccurrences(of: "%@2", with: escapedForJavaScript(songTitle))
-                    )
-                } else {
-                    self.updateTextageState(true)
+        func handleNavigation(_ webView: WKWebView) {
+            guard let urlString = webView.url?.absoluteString else { return }
+            if urlString.starts(with: textageIIDXURL.absoluteString) {
+                guard !hasInjectedNavigation else { return }
+                hasInjectedNavigation = true
+                webView.evaluateJavaScript(
+                    textageNavigationJS
+                        .replacingOccurrences(of: "%@1", with: levelValue())
+                        .replacingOccurrences(of: "%@2", with: escapedForJavaScript(songTitle))
+                ) { result, error in
+                    #if DEBUG
+                    debugPrint("[Textage] navJS result:", result ?? "nil",
+                               "error:", error?.localizedDescription ?? "none")
+                    #endif
                 }
+            } else {
+                guard !hasRevealedChart else { return }
+                hasRevealedChart = true
+                self.updateTextageState(true)
             }
+        }
+
+        func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
+            #if DEBUG
+            debugPrint("[Textage] didCommit ->", webView.url?.absoluteString ?? "nil")
+            #endif
+            handleNavigation(webView)
+        }
+
+        func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
+            #if DEBUG
+            debugPrint("[Textage] didFinish ->", webView.url?.absoluteString ?? "nil")
+            #endif
+            handleNavigation(webView)
         }
 
         func escapedForJavaScript(_ string: String) -> String {

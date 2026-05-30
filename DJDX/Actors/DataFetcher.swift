@@ -59,6 +59,25 @@ actor DataFetcher {
         return closestGroup
     }
 
+    // Resolve the import group for a date scoped to a specific version, so the
+    // displayed data follows the selected version (matching the trends queries).
+    func importGroup(for selectedDate: Date, version: IIDXVersion?) -> ImportGroup? {
+        guard let version else { return importGroup(for: selectedDate) }
+        let groups = importGroups(for: version)
+        guard !groups.isEmpty else { return nil }
+
+        let startOfDay = Calendar.current.startOfDay(for: selectedDate)
+        let startOfNextDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
+
+        if let sameDay = groups.first(where: {
+            $0.importDate >= startOfDay && $0.importDate < startOfNextDay
+        }) {
+            return sameDay
+        }
+        // Fallback: closest earlier import group within the version.
+        return groups.last(where: { $0.importDate <= selectedDate })
+    }
+
     func importGroupID(for selectedDate: Date) -> String? {
         importGroup(for: selectedDate)?.id
     }
@@ -112,11 +131,12 @@ actor DataFetcher {
     // swiftlint:disable:next cyclomatic_complexity function_body_length
     func songRecords(
         on playDataDate: Date,
+        version: IIDXVersion? = nil,
         filters: FilterOptions?,
         sortOptions: SortOptions?
     ) -> [IIDXSongRecord]? {
 
-        guard let importGroup = importGroup(for: playDataDate) else {
+        guard let importGroup = importGroup(for: playDataDate, version: version) else {
             return nil
         }
 

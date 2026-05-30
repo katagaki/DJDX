@@ -68,7 +68,51 @@ extension AnalyticsView {
     }
 }
 
+// MARK: - Section Header
+
+struct AnalyticsSectionHeader: View {
+    let title: LocalizedStringKey
+
+    var body: some View {
+        Text(title)
+            .font(.title3.bold())
+            .foregroundStyle(.primary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+    }
+}
+
 // MARK: - Drag-and-Drop View Extensions
+
+extension View {
+    @ViewBuilder
+    func editableCard(
+        isVisible: Bool,
+        isEditing: Bool,
+        seed: Int,
+        cornerRadius: CGFloat = 20.0,
+        onToggle: @escaping () -> Void
+    ) -> some View {
+        self
+            .opacity(isEditing && !isVisible ? 0.4 : 1.0)
+            .overlay {
+                if isEditing && !isVisible {
+                    Image(systemName: "eye.slash.fill")
+                        .font(.title2)
+                        .foregroundStyle(.white)
+                        .shadow(radius: 3.0)
+                }
+            }
+            .overlay {
+                if isEditing {
+                    Color.white.opacity(0.001)
+                        .contentShape(.rect(cornerRadius: cornerRadius))
+                        .onTapGesture { onToggle() }
+                }
+            }
+            .jiggle(isActive: isEditing, seed: seed)
+    }
+}
 
 extension View {
     @ViewBuilder
@@ -79,10 +123,8 @@ extension View {
         cardOrder: Binding<[AnalyticsCardType]>,
         onReorder: @escaping () -> Void
     ) -> some View {
-        let seed = cardOrder.wrappedValue.firstIndex(of: cardType) ?? 0
         if editing {
             self
-                .jiggle(isActive: true, seed: seed)
                 .opacity(draggedCard.wrappedValue == cardType ? 0.4 : 1.0)
                 .onDrag {
                     draggedCard.wrappedValue = cardType
@@ -107,11 +149,8 @@ extension View {
         cardOrder: Binding<[PerLevelCardID]>,
         onReorder: @escaping () -> Void
     ) -> some View {
-        let seed = card.difficulty * 10 +
-            (AnalyticsPerLevelCategory.allCases.firstIndex(of: card.category) ?? 0)
         if editing {
             self
-                .jiggle(isActive: true, seed: seed)
                 .opacity(draggedCard.wrappedValue == card ? 0.4 : 1.0)
                 .onDrag {
                     draggedCard.wrappedValue = card

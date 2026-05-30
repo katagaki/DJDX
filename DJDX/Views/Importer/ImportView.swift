@@ -16,11 +16,12 @@ struct ImportView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
-    @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(\.dismiss) var dismiss
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var importPlayType: IIDXPlayType
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
+    @State var importPath = NavigationPath()
     @State var importGroups: [ImportGroup] = []
 
     @State var importToDate: Date = .now
@@ -34,11 +35,11 @@ struct ImportView: View {
     let fetcher = DataFetcher()
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.imports]) {
+        NavigationStack(path: $importPath) {
             List {
                 ForEach(importGroups) { importGroup in
                     Button {
-                        navigationManager.push(.importDetail(importGroup: importGroup), for: .imports)
+                        importPath.append(ImportPath.importDetail(importGroup: importGroup))
                     } label: {
                         HStack(alignment: .center, spacing: 6.0) {
                             Text(importGroup.importDate, style: .date)
@@ -60,37 +61,37 @@ struct ImportView: View {
                 })
                 .listRowBackground(Color.clear)
             }
-            .navigator("ViewTitle.Calendar")
-            .toolbarBackground(.hidden, for: .tabBar)
+            .listStyle(.plain)
+            .navigationTitle("ViewTitle.Calendar")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     if #available(iOS 26.0, *) {
-                        Menu(importPlayType.displayName()) {
-                            Picker("Shared.PlayType", selection: $importPlayType) {
-                                Text(verbatim: "SP")
-                                    .tag(IIDXPlayType.single)
-                                Text(verbatim: "DP")
-                                    .tag(IIDXPlayType.double)
-                            }
-                            .pickerStyle(.inline)
+                        Button(role: .close) {
+                            dismiss()
                         }
                     } else {
-                        PlayTypePicker(playTypeToShow: $importPlayType)
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .tint(.primary)
+                                .font(.title2)
+                                .symbolRenderingMode(.hierarchical)
+                        }
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    HStack {
-                        Menu {
-                            Section {
-                                Button("Calendar.Import.LoadSamples.Button") {
-                                    importSampleCSV()
-                                }
-                            } header: {
-                                Text("Calendar.Import.LoadSamples.Description")
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Section {
+                            Button("Calendar.Import.LoadSamples.Button") {
+                                importSampleCSV()
                             }
-                        } label: {
-                            Image(systemName: "questionmark.circle")
+                        } header: {
+                            Text("Calendar.Import.LoadSamples.Description")
                         }
+                    } label: {
+                        Image(systemName: "questionmark.circle")
                     }
                 }
             }
@@ -98,12 +99,14 @@ struct ImportView: View {
                 if #available(iOS 26.0, *) {
                     bottomBar()
                         .padding(.top, 2.0)
+                        .contentShape(.rect)
                         .clipShape(.rect(cornerRadius: 24.0))
                         .glassEffect(.regular, in: .rect(cornerRadius: 24.0))
                         .padding()
                 } else {
                     TabBarAccessory(placement: .bottom) {
                         bottomBar()
+                            .contentShape(.rect)
                     }
                 }
             }
@@ -113,7 +116,7 @@ struct ImportView: View {
                 actions: {
                     Button("Shared.OK", role: .cancel) {
                         didImportSucceed = false
-                        navigationManager.popToRoot(for: .imports)
+                        importPath = NavigationPath()
                     }
                 },
                 message: {
@@ -126,7 +129,7 @@ struct ImportView: View {
                 actions: {
                     Button("Shared.OK", role: .cancel) {
                         isAutoImportFailed = false
-                        navigationManager.popToRoot(for: .imports)
+                        importPath = NavigationPath()
                     }
                 },
                 message: {
@@ -139,6 +142,7 @@ struct ImportView: View {
             }
             .onChange(of: didImportSucceed) { _, newValue in
                 if newValue {
+                    NotificationCenter.default.post(name: .dataImported, object: nil)
                     Task { await reloadImportGroups() }
                 }
             }
@@ -151,7 +155,7 @@ struct ImportView: View {
                 })
                 .ignoresSafeArea(edges: [.bottom])
             }
-            .navigationDestination(for: ViewPath.self) { viewPath in
+            .navigationDestination(for: ImportPath.self) { viewPath in
                 switch viewPath {
                 case .importerWebIIDXSingle:
                     WebImporter(importToDate: $importToDate,
@@ -187,8 +191,8 @@ struct ImportView: View {
             HStack(spacing: 10.0) {
                 Button {
                     switch importPlayType {
-                    case .single: navigationManager.push(ViewPath.importerWebIIDXSingle, for: .imports)
-                    case .double: navigationManager.push(ViewPath.importerWebIIDXDouble, for: .imports)
+                    case .single: importPath.append(ImportPath.importerWebIIDXSingle)
+                    case .double: importPath.append(ImportPath.importerWebIIDXDouble)
                     }
                 } label: {
                     VStack(spacing: 8.0) {

@@ -7,9 +7,12 @@
 
 import SwiftUI
 
-struct ScoresView: View {
+struct ScoresView<Header: View>: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
+
+    @ViewBuilder var header: Header
+    @Binding var isEditingAnalytics: Bool
 
     @State var dataState: DataState = .initializing
 
@@ -35,15 +38,26 @@ struct ScoresView: View {
     @State var searchResults: [IIDXSongRecord]?
 
     @State var isSystemChangingFilterAndSort: Bool = false
+    @State var isShowingFilterSheet: Bool = false
     @State var isSystemChangingCalendarDate: Bool = false
     @State var isSystemChangingAllRecords: Bool = false
 
     var isTimeTravellingKey: String = "ScoresView.IsTimeTravelling"
     @State var isTimeTravelling: Bool
+    @State var isShowingDatePopover: Bool = false
+
+    @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.DJLevelVisible") var isDJLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreRateVisible") var isScoreRateVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
+    @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
     let actor = DataFetcher()
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @Namespace var scoresNamespace
 
@@ -55,13 +69,15 @@ struct ScoresView: View {
         difficultiesToShow.count == 1 ? difficultiesToShow.first! : .all
     }
 
-    static let allLevels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
-        (.beginner, \.beginnerScore),
-        (.normal, \.normalScore),
-        (.hyper, \.hyperScore),
-        (.another, \.anotherScore),
-        (.leggendaria, \.leggendariaScore)
-    ]
+    static var allLevels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] {
+        [
+            (.beginner, \.beginnerScore),
+            (.normal, \.normalScore),
+            (.hyper, \.hyperScore),
+            (.another, \.anotherScore),
+            (.leggendaria, \.leggendariaScore)
+        ]
+    }
 
     var conditionsForReload: [String] {
         [isShowingOnlyPlayDataWithScores.description,
@@ -74,114 +90,151 @@ struct ScoresView: View {
          sortOrder.rawValue]
     }
 
-    init() {
+    init(isEditingAnalytics: Binding<Bool> = .constant(false), @ViewBuilder header: () -> Header) {
+        self.header = header()
+        self._isEditingAnalytics = isEditingAnalytics
         self.isTimeTravelling = UserDefaults.standard.bool(forKey: isTimeTravellingKey)
     }
 
+    var searchPlacement: SearchFieldPlacement {
+        if #available(iOS 26.0, *) {
+            .automatic
+        } else {
+            .navigationBarDrawer(displayMode: .always)
+        }
+    }
+
+    @ViewBuilder var timeTravelButton: some View {
+        let button = Button {
+            withAnimation {
+                isTimeTravelling.toggle()
+            }
+            if !isTimeTravelling {
+                playDataDate = .now
+            } else {
+                isShowingDatePopover = true
+            }
+        } label: {
+            Label(
+                "Shared.ShowPastData",
+                systemImage: isTimeTravelling ? "arrowshape.turn.up.backward.badge.clock.fill" :
+                    "arrowshape.turn.up.backward.badge.clock"
+            )
+        }
+        .popover(isPresented: $isShowingDatePopover) {
+            VStack(alignment: .leading, spacing: 12.0) {
+                Text("Shared.SelectDate")
+                    .font(.headline)
+                DatePicker("Shared.SelectDate",
+                           selection: $playDataDate.animation(.snappy.speed(2.0)),
+                           in: ...Date.now,
+                           displayedComponents: .date)
+                .datePickerStyle(.graphical)
+                .labelsHidden()
+            }
+            .frame(minWidth: 320.0)
+            .padding()
+            .presentationCompactAdaptation(.popover)
+        }
+
+        if #available(iOS 26.0, *) {
+            if isTimeTravelling {
+                button.buttonStyle(.glassProminent)
+            } else {
+                button
+            }
+        } else {
+            button
+                .background {
+                    if isTimeTravelling {
+                        Capsule().fill(Color.accentColor.opacity(0.25))
+                    }
+                }
+        }
+    }
+
+    @ViewBuilder var sortControl: some View {
+        ScoreSortMenu(
+            sortMode: $sortMode.animation(.snappy.speed(2.0)),
+            sortOrder: $sortOrder.animation(.snappy.speed(2.0))
+        )
+    }
+
+    @ViewBuilder var filterControl: some View {
+        ScoreFilterButton(
+            isShowingFilterSheet: $isShowingFilterSheet,
+            filterNamespace: scoresNamespace
+        )
+    }
+
     var body: some View {
-        NavigationStack(path: $navigationManager[.scores]) {
-            List {
-                ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
-                        id: \.id) { entry in
-                    Button {
-                        navigationManager.push(
-                            .scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level),
-                            for: .scores
-                        )
-                    } label: {
-                        ScoreRow(
-                            namespace: scoresNamespace,
-                            songRecord: entry.songRecord,
-                            level: entry.level,
-                            score: entry.score,
-                            scoreRate: songRecordClearRates[entry.songRecord]?[entry.level]
-                        )
-                    }
-                    .listRowInsets(.init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 0.0))
-                    .alignmentGuide(.listRowSeparatorLeading) { dimensions in
-                        dimensions[.leading]
-                    }
-                }
-                .listRowBackground(Color.clear)
-            }
-            .navigator("ViewTitle.Scores")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if #available(iOS 26.0, *) {
-                        Menu(playTypeToShow.displayName()) {
-                            Picker("Shared.PlayType", selection: $playTypeToShow) {
-                                Text(verbatim: "SP")
-                                    .tag(IIDXPlayType.single)
-                                Text(verbatim: "DP")
-                                    .tag(IIDXPlayType.double)
-                            }
-                            .pickerStyle(.inline)
+        ScrollView {
+            LazyVStack(spacing: 0.0) {
+                if searchTerm.isEmpty {
+                    header
+                    if !isEditingAnalytics {
+                        HStack {
+                            Text("Analytics.Section.ScoreData")
+                                .font(.title3.bold())
+                                .foregroundStyle(.primary)
+                            Spacer()
                         }
-                    } else {
-                        PlayTypePicker(playTypeToShow: $playTypeToShow)
-                    }
-                }
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button(
-                        "Shared.ShowPastData",
-                        systemImage: isTimeTravelling ? "arrowshape.turn.up.backward.badge.clock.fill" :
-                            "arrowshape.turn.up.backward.badge.clock"
-                    ) {
-                        withAnimation {
-                            isTimeTravelling.toggle()
-                        }
-                        if !isTimeTravelling {
-                            playDataDate = .now
-                        }
-                    }
-                }
-                if #available(iOS 26.0, *) {
-                    ToolbarSpacer(.fixed, placement: .topBarTrailing)
-                }
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    if dataState == .initializing {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                    } else {
-                        ScoreSortAndFilter(
-                            isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                            difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
-                            levelsToShow: $levelsToShow.animation(.snappy.speed(2.0)),
-                            clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
-                            djLevelsToShow: $djLevelsToShow.animation(.snappy.speed(2.0)),
-                            versionsToShow: $versionsToShow.animation(.snappy.speed(2.0)),
-                            sortMode: $sortMode.animation(.snappy.speed(2.0)),
-                            sortOrder: $sortOrder.animation(.snappy.speed(2.0)),
-                            isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort
-                        ) {
-                            reloadDisplay()
-                        }
-                    }
-                }
-            }
-            .toolbarBackground(isTimeTravelling ? .hidden : .automatic, for: .navigationBar)
-            .safeAreaInset(edge: .top, spacing: 0.0) {
-                if isTimeTravelling {
-                    if #available(iOS 26.0, *) {
-                        DatePicker("Shared.SelectDate",
-                                   selection: $playDataDate.animation(.snappy.speed(2.0)),
-                                   in: ...Date.now,
-                                   displayedComponents: .date)
-                        .datePickerStyle(.compact)
-                        .padding(8.0)
-                        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 24.0))
-                        .padding(.horizontal, 16.0)
+                        .padding(.top, 16.0)
                         .padding(.bottom, 12.0)
-                    } else {
-                        TabBarAccessory(placement: .top) {
-                            DatePicker("Shared.SelectDate",
-                                       selection: $playDataDate.animation(.snappy.speed(2.0)),
-                                       in: ...Date.now,
-                                       displayedComponents: .date)
-                            .datePickerStyle(.compact)
-                            .padding(.horizontal, 18.0)
-                            .padding(.bottom, 12.0)
+                        .padding(.horizontal)
+                        Divider()
+                    }
+                }
+                if !isEditingAnalytics {
+                    ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
+                            id: \.id) { entry in
+                        Button {
+                            navigationManager.push(
+                                ScoresPath.scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level)
+                            )
+                        } label: {
+                            ScoreRow(
+                                namespace: scoresNamespace,
+                                songRecord: entry.songRecord,
+                                level: entry.level,
+                                score: entry.score,
+                                scoreRate: songRecordClearRates[entry.songRecord]?[entry.level]
+                            )
+                            .contentShape(.rect)
                         }
+                        .buttonStyle(.plain)
+                        Divider()
+                    }
+                }
+            }
+        }
+            .scrollContentBackground(.hidden)
+            .background {
+                LinearGradient(
+                    colors: [.backgroundGradientTop, .backgroundGradientBottom],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            }
+            .toolbar {
+                if #available(iOS 26.0, *) {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        timeTravelButton
+                    }
+                    ToolbarSpacer(.fixed, placement: .bottomBar)
+                    DefaultToolbarItem(kind: .search, placement: .bottomBar)
+                    ToolbarSpacer(.fixed, placement: .bottomBar)
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        sortControl
+                        filterControl
+                    }
+                } else {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        timeTravelButton
+                        Spacer()
+                        sortControl
+                        filterControl
                     }
                 }
             }
@@ -197,9 +250,33 @@ struct ScoresView: View {
                 }
             }
             .searchable(text: $searchTerm,
-                        placement: .navigationBarDrawer(displayMode: .always),
+                        placement: searchPlacement,
                         prompt: "Scores.Search.Prompt")
+            .sheet(isPresented: $isShowingFilterSheet) {
+                ScoreFilterSheet(
+                    isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
+                    difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
+                    levelsToShow: $levelsToShow.animation(.snappy.speed(2.0)),
+                    clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
+                    djLevelsToShow: $djLevelsToShow.animation(.snappy.speed(2.0)),
+                    versionsToShow: $versionsToShow.animation(.snappy.speed(2.0)),
+                    isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort,
+                    isGenreVisible: $isGenreVisible,
+                    isArtistVisible: $isArtistVisible,
+                    isLevelVisible: $isLevelVisible,
+                    isDJLevelVisible: $isDJLevelVisible,
+                    isScoreRateVisible: $isScoreRateVisible,
+                    isScoreVisible: $isScoreVisible,
+                    isLastPlayDateVisible: $isLastPlayDateVisible,
+                    onReset: { reloadDisplay() }
+                )
+                .automaticSheetNavigationTransition(id: "ScoreFilterSheet", in: scoresNamespace)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.hidden)
+                .interactiveDismissDisabled()
+            }
             .refreshable {
+                NotificationCenter.default.post(name: .profileRefreshRequested, object: nil)
                 reloadDisplay()
             }
             .onAppear {
@@ -213,11 +290,10 @@ struct ScoresView: View {
                 }
             }
             .onChange(of: playTypeToShow) { _, _ in
-                if navigationManager.selectedTab == .scores {
-                    reloadDisplay()
-                } else {
-                    dataState = .initializing
-                }
+                reloadDisplay()
+            }
+            .onChange(of: iidxVersion) { _, _ in
+                reloadDisplay()
             }
             .onChange(of: conditionsForReload) {_, _ in
                 if !isSystemChangingFilterAndSort {
@@ -243,19 +319,22 @@ struct ScoresView: View {
                 dataState = .initializing
                 reloadDisplay()
             }
-            .navigationDestination(for: ViewPath.self) { viewPath in
+            .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
+                dataState = .initializing
+                reloadDisplay()
+            }
+            .navigationDestination(for: ScoresPath.self) { viewPath in
                 switch viewPath {
                 case .scoreViewer(let songRecord, let initialLevel):
                     ScoreViewer(songRecord: songRecord, noteCount: noteCount,
                                 initialLevel: initialLevel)
-                    .automaticNavigationTransition(id: songRecord.title, in: scoresNamespace)
+                    .automaticNavigationTransition(id: "\(songRecord.title).\(initialLevel.rawValue)",
+                                                   in: scoresNamespace)
                 case .scoreHistory(let songTitle, let level, let noteCount):
                     ScoreHistoryViewer(songTitle: songTitle, level: level, noteCount: noteCount)
                 case .textageViewer(let songTitle, let level, let playSide, let playType):
                     TextageViewer(songTitle: songTitle, level: level, playSide: playSide, playType: playType)
-                default: Color.clear
                 }
             }
-        }
     }
 }

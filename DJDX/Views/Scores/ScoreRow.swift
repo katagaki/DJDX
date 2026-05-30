@@ -137,7 +137,7 @@ struct ScoreRow: View {
                 Spacer(minLength: 0.0)
             }
             .padding([.top, .bottom], 8.0)
-            .automaticMatchedTransitionSource(id: songRecord.title, in: namespace)
+            .automaticMatchedTransitionSource(id: "\(songRecord.title).\(level.rawValue)", in: namespace)
 
             // Level
             if isLevelVisible {
@@ -150,6 +150,6 @@ struct ScoreRow: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding([.trailing], 20.0)
+        .padding(.trailing)
     }
 }

@@ -17,6 +17,7 @@ struct NewHighScoresDetailView: View {
             if newHighScores.isEmpty {
                 Text("Analytics.NoData")
                     .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
             } else {
                 ForEach(newHighScores) { entry in
                     HStack(alignment: .center, spacing: 8.0) {
@@ -81,10 +82,12 @@ struct NewHighScoresDetailView: View {
                         .clipShape(.rect(cornerRadius: 6.0))
                     }
                     .padding(.vertical, 2.0)
+                    .listRowBackground(Color.clear)
                 }
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .navigationTitle("Analytics.NewHighScores")
         .navigationBarTitleDisplayMode(.inline)
     }
