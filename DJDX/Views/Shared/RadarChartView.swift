@@ -15,8 +15,8 @@ struct RadarChartView: View {
     var labelFontSize: CGFloat = 12.0
     var lineWidth: CGFloat = 2.0
 
-    init(_ data: RadarData, labelFontSize: CGFloat = 12.0, lineWidth: CGFloat = 2.0) {
-        self.color = data.color()
+    init(_ data: RadarData, isPlayerRadar: Bool = false, labelFontSize: CGFloat = 12.0, lineWidth: CGFloat = 2.0) {
+        self.color = data.color(isPlayerRadar: isPlayerRadar)
         self.points = data.points()
         self.labelFontSize = labelFontSize
         self.lineWidth = lineWidth
