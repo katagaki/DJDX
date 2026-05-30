@@ -53,11 +53,11 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
                 .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 0.0) {
-                HStack(alignment: .center, spacing: 2.0) {
+                HStack(alignment: .center, spacing: 6.0) {
                     Group {
                         Text(verbatim: "LEVEL \(difficulty)")
-                        Text(verbatim: "・")
-                            .foregroundStyle(.secondary)
+                        Divider()
+                            .frame(maxHeight: 14.0)
                         Text(subtitle)
                             .foregroundStyle(.secondary)
                     }
