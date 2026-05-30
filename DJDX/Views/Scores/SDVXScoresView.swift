@@ -176,7 +176,8 @@ struct SDVXScoresView<Header: View>: View {
                     filterControl
                 }
             } else {
-                ToolbarItemGroup(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Spacer()
                     sortControl
                     filterControl
                 }

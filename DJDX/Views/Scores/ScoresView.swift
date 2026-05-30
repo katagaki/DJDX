@@ -229,8 +229,9 @@ struct ScoresView<Header: View>: View {
                         filterControl
                     }
                 } else {
-                    ToolbarItemGroup(placement: .topBarTrailing) {
+                    ToolbarItemGroup(placement: .bottomBar) {
                         timeTravelButton
+                        Spacer()
                         sortControl
                         filterControl
                     }
