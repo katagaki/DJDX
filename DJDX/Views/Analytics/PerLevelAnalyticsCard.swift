@@ -34,15 +34,9 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
         segments.reduce(0) { $0 + $1.count }
     }
 
-    // The three largest segments, kept in the original segment order.
-    var topSegments: [PerLevelSegment] {
-        let topIDs = Set(
-            segments.filter { $0.count > 0 }
-                .sorted { $0.count > $1.count }
-                .prefix(3)
-                .map(\.id)
-        )
-        return segments.filter { topIDs.contains($0.id) }
+    // All non-empty segments, kept in the original segment order.
+    var visibleSegments: [PerLevelSegment] {
+        segments.filter { $0.count > 0 }
     }
 
     var body: some View {
@@ -99,7 +93,7 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
 
     var statsRow: some View {
         HStack(spacing: 10.0) {
-            ForEach(topSegments) { segment in
+            ForEach(visibleSegments) { segment in
                 HStack(spacing: 3.0) {
                     Text(verbatim: segment.label)
                         .foregroundStyle(segment.color)
