@@ -194,6 +194,10 @@ class SDVXCoordinatorForImporter: NSObject, WKNavigationDelegate {
     }
 
     func handleExtractionResult(_ value: String?) {
+        #if DEBUG
+        debugPrint("[SDVXImport] extraction result length:", value?.count ?? -1,
+                   "prefix:", value?.prefix(40) ?? "<nil>")
+        #endif
         guard let value, !value.isEmpty else {
             resolveFailure(with: .serverError)
             return

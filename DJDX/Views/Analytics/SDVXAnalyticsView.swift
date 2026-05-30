@@ -13,6 +13,8 @@ struct SDVXAnalyticsView: View {
 
     @Bindable var model: SDVXAnalyticsModel
 
+    @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
+
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
         GridItem(.flexible(), spacing: 12.0)
@@ -48,6 +50,9 @@ struct SDVXAnalyticsView: View {
             if model.dataState == .initializing {
                 await model.reload()
             }
+        }
+        .onChange(of: sdvxVersion) { _, _ in
+            Task { await model.reload() }
         }
         .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
             Task { await model.reload() }

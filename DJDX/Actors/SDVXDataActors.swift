@@ -103,9 +103,15 @@ actor SDVXDataImporter {
         let (stream, continuation) = AsyncStream.makeStream(of: ImportProgress.self)
         // Strip a leading UTF-8 BOM so the first CSV header (楽曲名) keys correctly.
         let sanitized = csvString.hasPrefix("\u{FEFF}") ? String(csvString.dropFirst()) : csvString
+        debugPrint("[SDVXImport] csv length:", sanitized.count,
+                   "first line:", sanitized.split(separator: "\n").first ?? "<none>")
         let parsedCSV = CSwiftV(with: sanitized)
         if let keyedRows = parsedCSV.keyedRows {
+            debugPrint("[SDVXImport] parsed headers:", parsedCSV.headers)
+            debugPrint("[SDVXImport] parsed rows:", keyedRows.count)
             importRows(keyedRows, to: importToDate, version: version, continuation: continuation)
+        } else {
+            debugPrint("[SDVXImport] CSwiftV produced no keyed rows")
         }
         continuation.finish()
         return stream
@@ -127,15 +133,18 @@ actor SDVXDataImporter {
         let total = keyedRows.count
         var processed = 0
 
+        var skipped = 0
         try? database.transaction {
             for keyedRow in keyedRows {
                 let record = SDVXSongRecord(csvRowData: keyedRow)
-                guard !record.title.isEmpty else { continue }
+                guard !record.title.isEmpty else { skipped += 1; continue }
                 Self.insertSongRecord(database: database, record: record, importGroupID: importGroupID)
                 processed += 1
                 continuation.yield(.init(nil, nil, processed, total))
             }
         }
+        debugPrint("[SDVXImport] inserted:", processed, "skipped:", skipped,
+                   "importGroupID:", importGroupID)
     }
 
     func prepareImportGroup(
