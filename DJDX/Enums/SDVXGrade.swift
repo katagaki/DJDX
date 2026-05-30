@@ -9,6 +9,7 @@ import SwiftUI
 
 // Maps to the スコアグレード column in the SDVX CSV.
 enum SDVXGrade: String, Codable {
+    // swiftlint:disable identifier_name
     case all = "Shared.All"
     case s = "S"
     case aaaPlus = "AAA+"
@@ -22,6 +23,7 @@ enum SDVXGrade: String, Codable {
     case d = "D"
     case none = "---"
     case unknown = ""
+    // swiftlint:enable identifier_name
 
     static let sorted: [SDVXGrade] = [
         .s, .aaaPlus, .aaa, .aaPlus, .aa, .aPlus, .a, .b, .c, .d
