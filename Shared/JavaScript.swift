@@ -339,8 +339,9 @@ async function fetchSDVXScoreData() {
     const buffer = await response.arrayBuffer();
     const text = new TextDecoder('utf-8').decode(buffer);
     const parsed = new DOMParser().parseFromString(text, 'text/html');
-    const candidate = parsed.querySelector('textarea, pre');
-    let csv = candidate ? (candidate.value || candidate.textContent || '') : '';
+    // After the 表示 POST, the CSV is rendered into <textarea id="score_data">.
+    const node = parsed.getElementById('score_data') || parsed.querySelector('textarea, pre');
+    let csv = node ? (node.value || node.textContent || '') : '';
     if (!csv && text.indexOf('楽曲名') !== -1) {
         // The response is the raw CSV itself, not wrapped in HTML
         csv = text;
