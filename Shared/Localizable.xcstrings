@@ -4144,6 +4144,22 @@
           }
         }
       }
+    },
+    "Shared.SDVX.ClearType" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランク"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
