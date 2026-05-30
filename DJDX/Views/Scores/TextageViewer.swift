@@ -165,17 +165,40 @@ struct WebViewForTextage: UIViewRepresentable {
         func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
             if let webViewURL = webView.url {
                 let urlString = webViewURL.absoluteString
+                #if DEBUG
+                debugPrint("[Textage] didFinish ->", urlString)
+                #endif
                 if urlString.starts(with: textageIIDXURL.absoluteString) {
                     webView.evaluateJavaScript(
                         textageNavigationJS
                             .replacingOccurrences(of: "%@1", with: levelValue())
                             .replacingOccurrences(of: "%@2", with: escapedForJavaScript(songTitle))
-                    )
+                    ) { result, error in
+                        #if DEBUG
+                        debugPrint("[Textage] navJS result:", result ?? "nil",
+                                   "error:", error?.localizedDescription ?? "none")
+                        #endif
+                    }
                 } else {
                     self.updateTextageState(true)
                 }
             }
         }
+
+        #if DEBUG
+        func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
+            debugPrint("[Textage] didStartProvisionalNavigation ->", webView.url?.absoluteString ?? "nil")
+        }
+
+        func webView(_ webView: WKWebView, didFail _: WKNavigation!, withError error: Error) {
+            debugPrint("[Textage] didFail ->", error.localizedDescription)
+        }
+
+        func webView(_ webView: WKWebView,
+                     didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
+            debugPrint("[Textage] didFailProvisionalNavigation ->", error.localizedDescription)
+        }
+        #endif
 
         func escapedForJavaScript(_ string: String) -> String {
             string
