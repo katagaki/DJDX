@@ -34,15 +34,13 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
         segments.reduce(0) { $0 + $1.count }
     }
 
-    // The three largest segments, kept in the original segment order.
+    // The three largest segments, ordered by count descending.
     var topSegments: [PerLevelSegment] {
-        let topIDs = Set(
+        Array(
             segments.filter { $0.count > 0 }
                 .sorted { $0.count > $1.count }
                 .prefix(3)
-                .map(\.id)
         )
-        return segments.filter { topIDs.contains($0.id) }
     }
 
     var body: some View {
