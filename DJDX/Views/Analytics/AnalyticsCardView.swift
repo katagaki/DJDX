@@ -36,7 +36,7 @@ struct AnalyticsCardView<Content: View>: View {
     init(title: LocalizedStringKey,
          systemImage: String,
          iconColor: Color,
-         contentHeight: CGFloat = 100.0,
+         contentHeight: CGFloat = 80.0,
          showsHeader: Bool = true,
          @ViewBuilder content: @escaping () -> Content) {
         self.title = Text(title)
@@ -55,7 +55,7 @@ struct AnalyticsCardView<Content: View>: View {
     init(verbatimTitle: String,
          systemImage: String,
          iconColor: Color,
-         contentHeight: CGFloat = 100.0,
+         contentHeight: CGFloat = 80.0,
          @ViewBuilder content: @escaping () -> Content) {
         self.title = Text(verbatim: verbatimTitle)
         self.systemImage = systemImage

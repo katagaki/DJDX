@@ -40,7 +40,7 @@ struct UnifiedView: View {
     var body: some View {
         @Bindable var progressAlertManager = progressAlertManager
         NavigationStack(path: $navigationManager.path) {
-            Group {
+            ZStack {
                 if selectedGame == .soundVoltex {
                     SDVXScoresView(isEditingAnalytics: $isEditingAnalytics) {
                         sdvxHeader
@@ -51,6 +51,7 @@ struct UnifiedView: View {
                     }
                 }
             }
+            .navigationTitle("ViewTitle.Scores")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .principal) {
