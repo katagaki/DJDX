@@ -42,6 +42,19 @@ struct SDVXImportView: View {
                         Button { dismiss() } label: { Image(systemName: "xmark.circle") }
                     }
                 }
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Section {
+                            Button("Calendar.Import.LoadSamples.Button") {
+                                importSampleCSV()
+                            }
+                        } header: {
+                            Text("Calendar.Import.LoadSamples.Description")
+                        }
+                    } label: {
+                        Image(systemName: "questionmark.circle")
+                    }
+                }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 bottomBar()
@@ -147,6 +160,29 @@ struct SDVXImportView: View {
                 .foregroundStyle(.white)
                 .adaptiveClipShape()
             }
+        }
+    }
+
+    func importSampleCSV() {
+        progressAlertManager.show(
+            title: "Alert.Importing.Title",
+            message: "Alert.Importing.Text"
+        ) {
+            Task { await performSampleImport() }
+        }
+    }
+
+    private func performSampleImport() async {
+        for await progress in await importer.importSampleCSV(to: importToDate, version: sdvxVersion) {
+            if let current = progress.currentFileProgress,
+               let total = progress.currentFileTotal, total > 0 {
+                let percentage = (current * 100) / total
+                await MainActor.run { progressAlertManager.updateProgress(percentage) }
+            }
+        }
+        await MainActor.run {
+            didImportSucceed = true
+            progressAlertManager.hide()
         }
     }
 

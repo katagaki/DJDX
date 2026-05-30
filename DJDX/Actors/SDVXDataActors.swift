@@ -95,6 +95,22 @@ actor SDVXDataImporter {
 
     typealias DB = SDVXPlayDataDatabase
 
+    func importSampleCSV(to importToDate: Date, version: SDVXVersion) -> AsyncStream<ImportProgress> {
+        let (stream, continuation) = AsyncStream.makeStream(of: ImportProgress.self)
+        if let url = Bundle.main.url(forResource: "SampleDataSDVX", withExtension: "csv"),
+           let csvString = try? String(contentsOf: url, encoding: .utf8) {
+            let sanitized = csvString.hasPrefix("\u{FEFF}") ? String(csvString.dropFirst()) : csvString
+            let parsedCSV = CSwiftV(with: sanitized)
+            if let keyedRows = parsedCSV.keyedRows {
+                importRows(keyedRows, to: importToDate, version: version, continuation: continuation)
+            }
+        } else {
+            debugPrint("[SDVXImport] sample data CSV not found in bundle")
+        }
+        continuation.finish()
+        return stream
+    }
+
     func importCSV(
         csv csvString: String,
         to importToDate: Date,
