@@ -110,12 +110,12 @@ struct AnalyticsCardButtonStyle: ButtonStyle {
 
 extension View {
     func perLevelCaption(_ key: LocalizedStringKey) -> some View {
-        VStack(spacing: 2.0) {
-            self
+        overlay(alignment: .bottom) {
             Text(key)
                 .font(.caption2.bold())
                 .foregroundStyle(.tertiary)
                 .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.bottom, 12.0)
         }
     }
 }
