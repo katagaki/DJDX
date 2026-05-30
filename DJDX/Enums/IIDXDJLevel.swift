@@ -37,6 +37,21 @@ enum IIDXDJLevel: String, Codable {
         sorted.firstIndex(of: lhs) ?? 1 < sorted.firstIndex(of: rhs) ?? 0
     }
 
+    // Solid colors matching the DJ-level chart palette (TrendsDJLevelGraph).
+    static func color(for djLevel: String) -> Color {
+        switch djLevel {
+        case "AAA": return .primary
+        case "AA": return .orange
+        case "A": return .yellow
+        case "B": return .green
+        case "C": return .teal
+        case "D": return .blue
+        case "E": return .indigo
+        case "F": return .red
+        default: return .gray
+        }
+    }
+
     static func style(for _: String, colorScheme: ColorScheme) -> any ShapeStyle {
         switch colorScheme {
         case .light:
