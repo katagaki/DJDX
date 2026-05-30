@@ -61,9 +61,8 @@ struct SDVXProfileHeaderView: View {
             }
         }
         .task {
-            if apCardImage == nil {
-                await refreshProfile()
-            }
+            loadCachedProfile()
+            await refreshProfile()
         }
         .onChange(of: sdvxVersion) { _, _ in
             Task { await refreshProfile() }
@@ -85,6 +84,7 @@ struct SDVXProfileHeaderView: View {
                     if let httpResponse = response as? HTTPURLResponse,
                        (200...299).contains(httpResponse.statusCode),
                        let image = UIImage(data: imageData) {
+                        saveAPCardImage(imageData)
                         await MainActor.run { withAnimation { self.apCardImage = image } }
                     }
                 }
@@ -94,6 +94,7 @@ struct SDVXProfileHeaderView: View {
             if let nameElement = try document.select("#player_name p").first() {
                 let name = try nameElement.text().trimmingCharacters(in: .whitespaces)
                 if !name.isEmpty {
+                    UserDefaults.standard.set(name, forKey: "SDVXProfile.PlayerName")
                     await MainActor.run { self.playerName = name }
                 }
             }
@@ -102,11 +103,36 @@ struct SDVXProfileHeaderView: View {
             if let forceElement = try document.select("#force_point").first() {
                 let force = try forceElement.text().trimmingCharacters(in: .whitespaces)
                 if !force.isEmpty {
+                    UserDefaults.standard.set(force, forKey: "SDVXProfile.Volforce")
                     await MainActor.run { self.volforce = force }
                 }
             }
         } catch {
             return
         }
+    }
+
+    func loadCachedProfile() {
+        apCardImage = loadCachedAPCardImage()
+        playerName = UserDefaults.standard.string(forKey: "SDVXProfile.PlayerName")
+        volforce = UserDefaults.standard.string(forKey: "SDVXProfile.Volforce")
+    }
+
+    func apCardImageFileURL() -> URL? {
+        guard let documentsDirectory = FileManager.default.urls(
+            for: .documentDirectory, in: .userDomainMask
+        ).first else { return nil }
+        return documentsDirectory.appendingPathComponent("APCard.png")
+    }
+
+    func loadCachedAPCardImage() -> UIImage? {
+        guard let fileURL = apCardImageFileURL(),
+              FileManager.default.fileExists(atPath: fileURL.path) else { return nil }
+        return UIImage(contentsOfFile: fileURL.path)
+    }
+
+    func saveAPCardImage(_ imageData: Data) {
+        guard let fileURL = apCardImageFileURL() else { return }
+        try? imageData.write(to: fileURL)
     }
 }
