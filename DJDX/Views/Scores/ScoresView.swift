@@ -179,6 +179,7 @@ struct ScoresView<Header: View>: View {
                                 .foregroundStyle(.primary)
                             Spacer()
                         }
+                        .padding(.top, 16.0)
                         .padding(.bottom, 12.0)
                         .padding(.horizontal)
                         Divider()

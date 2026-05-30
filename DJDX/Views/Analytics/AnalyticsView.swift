@@ -220,7 +220,6 @@ struct AnalyticsView: View {
                         }
                     }
                     .padding(.horizontal)
-                    .padding(.bottom, 16.0)
                 }
             }
             .onGeometryChange(for: CGFloat.self) { proxy in
