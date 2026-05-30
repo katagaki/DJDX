@@ -225,8 +225,11 @@ struct UnifiedView: View {
             HStack(spacing: 4.0) {
                 Text(selectedGame.displayName)
                     .fontWeight(.bold)
-                Image(systemName: "chevron.down")
+                    .tint(.primary)
+                Image(systemName: "chevron.down.circle.fill")
                     .font(.caption2.bold())
+                    .symbolRenderingMode(.hierarchical)
+                    .tint(.secondary)
             }
         }
         .menuActionDismissBehavior(.disabled)
