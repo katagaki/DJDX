@@ -13,7 +13,6 @@ struct OverviewClearTypeOverallGraph: View {
     @Binding var graphData: [Int: OrderedDictionary<String, Int>]
 
     @State var isInteractive: Bool = false
-    @State var difficultyBelowFinger: Int?
 
     var populatedDifficulties: [Int] {
         graphData.filter { _, counts in
@@ -59,23 +58,6 @@ struct OverviewClearTypeOverallGraph: View {
                     stacking: .standard
                 )
                 .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
-                .zIndex(0)
-            }
-            .annotation(position: .top) {
-                if let difficultyBelowFinger, difficulty == difficultyBelowFinger {
-                    let totalPlayedPerDifficulty: Int = graphData[difficulty]?
-                        .reduce(into: 0) { partialResult, keyValue in
-                            partialResult += keyValue.value
-                        } ?? 0
-                    Text("Shared.SongCount.\(totalPlayedPerDifficulty)")
-                        .padding([.top, .bottom], 2.0)
-                        .padding([.leading, .trailing], 4.0)
-                        .background(Color.accentColor)
-                        .foregroundStyle(.text)
-                        .clipShape(.capsule(style: .continuous))
-                        .shadow(color: .black.opacity(0.2), radius: 2.0, y: 1.5)
-                        .zIndex(999)
-                }
             }
         }
         .chartXAxis {
@@ -100,33 +82,5 @@ struct OverviewClearTypeOverallGraph: View {
             "EX HARD CLEAR": .yellow,
             "FAILED": .red
         ])
-        .chartOverlay { proxy in
-            if isInteractive {
-                GeometryReader { geometry in
-                    Rectangle().fill(.clear).contentShape(Rectangle())
-                        .gesture(
-                            DragGesture()
-                                .onChanged { value in
-                                    if let plotFrame = proxy.plotFrame {
-                                        let origin: CGPoint = geometry[plotFrame].origin
-                                        let location: CGPoint = CGPoint(
-                                            x: value.location.x - origin.x,
-                                            y: value.location.y - origin.y
-                                        )
-                                        let levelValue = proxy.value(atX: location.x, as: Double.self) ?? 0.0
-                                        withAnimation(.snappy.speed(2.0)) {
-                                            difficultyBelowFinger = Int(levelValue.rounded())
-                                        }
-                                    }
-                                }
-                                .onEnded { _ in
-                                    withAnimation(.snappy.speed(2.0)) {
-                                        difficultyBelowFinger = nil
-                                    }
-                                }
-                        )
-                }
-            }
-        }
     }
 }
