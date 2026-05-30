@@ -176,6 +176,7 @@ struct UnifiedView: View {
         VStack(spacing: 0.0) {
             SDVXProfileHeaderView()
                 .padding(.horizontal)
+                .padding(.top, 16.0)
             SDVXAnalyticsView(model: sdvxAnalyticsModel, isEditing: $isEditingAnalytics)
         }
         .padding(.bottom, 8.0)
