@@ -50,7 +50,7 @@ struct ClearTypeLegend: View {
 struct DJLevelLegend: View {
     var body: some View {
         AnalyticsChartLegend(
-            items: IIDXDJLevel.sorted.map {
+            items: IIDXDJLevel.sorted.reversed().map {
                 ($0.rawValue, IIDXDJLevel.color(for: $0.rawValue))
             }
         )
