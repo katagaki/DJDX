@@ -53,12 +53,15 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
                 .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 0.0) {
-                VStack(alignment: .leading, spacing: 1.0) {
-                    Text(verbatim: "LEVEL \(difficulty)")
-                        .font(.subheadline.bold())
-                    Text(subtitle)
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                HStack(alignment: .center, spacing: 2.0) {
+                    Group {
+                        Text(verbatim: "LEVEL \(difficulty)")
+                        Text(verbatim: "・")
+                            .foregroundStyle(.secondary)
+                        Text(subtitle)
+                            .foregroundStyle(.secondary)
+                    }
+                    .font(.caption2.weight(.semibold))
                 }
                 Spacer(minLength: 0.0)
                 if showsBar {
@@ -70,7 +73,7 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
             }
             .padding(12.0)
         }
-        .frame(height: showsBar ? 96.0 : 68.0)
+        .frame(height: 72.0)
         .background {
             switch colorScheme {
             case .light: Color.white
