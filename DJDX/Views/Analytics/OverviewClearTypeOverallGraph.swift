@@ -34,9 +34,9 @@ struct OverviewClearTypeOverallGraph: View {
         if populatedDifficulties.count == 1 {
             let lower = max(1, first - 1)
             let upper = min(12, first + 1)
-            return Double(lower) - 0.5...Double(upper) + 0.5
+            return (Double(lower) - 0.5)...(Double(upper) + 0.5)
         }
-        return Double(first) - 0.5...Double(last) + 0.5
+        return (Double(first) - 0.5)...(Double(last) + 0.5)
     }
 
     // Integer level ticks within the (half-unit padded) domain, so each axis
