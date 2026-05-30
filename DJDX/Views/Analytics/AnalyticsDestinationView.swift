@@ -40,6 +40,8 @@ struct AnalyticsDestinationView: View {
                         graphData: $model.clearTypePerDifficulty,
                         difficulty: $levelFilterForOverviewClearType
                     )
+                    ClearTypeLegend()
+                        .padding(.horizontal)
                     DifficultyPicker(
                         selection: $levelFilterForOverviewClearType,
                         difficulties: .constant(model.difficulties)
@@ -54,6 +56,8 @@ struct AnalyticsDestinationView: View {
                         graphData: $model.djLevelPerDifficulty,
                         difficulty: $levelFilterForOverviewScoreRate
                     )
+                    DJLevelLegend()
+                        .padding(.horizontal)
                     DifficultyPicker(
                         selection: $levelFilterForOverviewScoreRate,
                         difficulties: .constant(model.difficulties)
