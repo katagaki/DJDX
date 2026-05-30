@@ -18,7 +18,7 @@ struct NewDJLevelsCard: View {
                     .foregroundStyle(.secondary)
             } else {
                 Text("\(newDJLevels.count)")
-                    .font(.system(size: 36.0, weight: .black))
+                    .font(.system(size: 30.0, weight: .black))
                     .fontWidth(.expanded)
                     .foregroundStyle(.primary)
             }

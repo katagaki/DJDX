@@ -81,12 +81,12 @@ struct AnalyticsCardView<Content: View>: View {
     }
 
     var header: some View {
-        HStack(spacing: 6.0) {
+        HStack(spacing: 5.0) {
             Image(systemName: systemImage)
                 .resizable()
                 .scaledToFit()
                 .foregroundStyle(iconColor)
-                .frame(width: 18.0, height: 18.0)
+                .frame(width: 13.0, height: 13.0)
             title
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
@@ -95,7 +95,7 @@ struct AnalyticsCardView<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8.0) {
+        VStack(alignment: .leading, spacing: headerPlacement == .bottom ? 2.0 : 8.0) {
             if showsHeader && headerPlacement == .top {
                 header
             }
