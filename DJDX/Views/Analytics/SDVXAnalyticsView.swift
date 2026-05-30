@@ -8,12 +8,19 @@
 import Charts
 import OrderedCollections
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SDVXAnalyticsView: View {
 
     @Bindable var model: SDVXAnalyticsModel
 
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
+
+    @Binding var isEditing: Bool
+
+    @AppStorage(wrappedValue: Data(), "Analytics.SDVX.CardOrder") var cardOrderData: Data
+    @State var cardOrder: [SDVXAnalyticsCard] = SDVXAnalyticsCard.defaultOrder
+    @State var draggedCard: SDVXAnalyticsCard?
 
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
@@ -25,11 +32,19 @@ struct SDVXAnalyticsView: View {
             AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
 
             LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                clearBreakdownCard
-                gradeBreakdownCard
+                ForEach(cardOrder, id: \.self) { cardType in
+                    cardView(for: cardType)
+                        .jiggle(isActive: isEditing, seed: cardOrder.firstIndex(of: cardType) ?? 0)
+                        .sdvxCardDraggable(cardType, editing: isEditing,
+                                           draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                           onReorder: saveCardOrder)
+                }
             }
             .padding(.horizontal)
             .padding(.bottom, 16.0)
+        }
+        .onAppear {
+            loadCardOrder()
         }
         .task {
             if model.dataState == .initializing {
@@ -42,6 +57,30 @@ struct SDVXAnalyticsView: View {
         .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
             Task { await model.reload() }
         }
+    }
+
+    @ViewBuilder
+    func cardView(for cardType: SDVXAnalyticsCard) -> some View {
+        switch cardType {
+        case .clearBreakdown: clearBreakdownCard
+        case .gradeBreakdown: gradeBreakdownCard
+        }
+    }
+
+    func loadCardOrder() {
+        if let decoded = try? JSONDecoder().decode([SDVXAnalyticsCard].self, from: cardOrderData),
+           !decoded.isEmpty {
+            var order = decoded
+            for cardType in SDVXAnalyticsCard.defaultOrder where !order.contains(cardType) {
+                order.append(cardType)
+            }
+            order.removeAll { !SDVXAnalyticsCard.defaultOrder.contains($0) }
+            cardOrder = order
+        }
+    }
+
+    func saveCardOrder() {
+        cardOrderData = (try? JSONEncoder().encode(cardOrder)) ?? Data()
     }
 
     // Aggregate clear-type counts across all difficulty categories
@@ -111,4 +150,71 @@ struct SDVXAnalyticsView: View {
     func clearLabel(_ rawValue: String) -> String {
         SDVXClearType(rawValue: rawValue)?.abbreviation ?? rawValue
     }
+}
+
+enum SDVXAnalyticsCard: String, Codable, Hashable, CaseIterable {
+    case clearBreakdown
+    case gradeBreakdown
+
+    static var defaultOrder: [SDVXAnalyticsCard] { allCases }
+}
+
+extension View {
+    @ViewBuilder
+    func sdvxCardDraggable(
+        _ cardType: SDVXAnalyticsCard,
+        editing: Bool,
+        draggedCard: Binding<SDVXAnalyticsCard?>,
+        cardOrder: Binding<[SDVXAnalyticsCard]>,
+        onReorder: @escaping () -> Void
+    ) -> some View {
+        if editing {
+            self
+                .opacity(draggedCard.wrappedValue == cardType ? 0.4 : 1.0)
+                .onDrag {
+                    draggedCard.wrappedValue = cardType
+                    return NSItemProvider(object: cardType.rawValue as NSString)
+                }
+                .onDrop(of: [.text], delegate: SDVXCardReorderDropDelegate(
+                    target: cardType,
+                    cards: cardOrder,
+                    draggedCard: draggedCard,
+                    onReorder: onReorder
+                ))
+        } else {
+            self
+        }
+    }
+}
+
+struct SDVXCardReorderDropDelegate: DropDelegate {
+    let target: SDVXAnalyticsCard
+    @Binding var cards: [SDVXAnalyticsCard]
+    @Binding var draggedCard: SDVXAnalyticsCard?
+    let onReorder: () -> Void
+
+    func dropUpdated(info _: DropInfo) -> DropProposal? {
+        DropProposal(operation: .move)
+    }
+
+    func performDrop(info _: DropInfo) -> Bool {
+        draggedCard = nil
+        return true
+    }
+
+    func dropEntered(info _: DropInfo) {
+        guard let draggedCard, draggedCard != target else { return }
+        guard let fromIndex = cards.firstIndex(of: draggedCard),
+              let toIndex = cards.firstIndex(of: target) else { return }
+
+        withAnimation(.snappy(duration: 0.3)) {
+            cards.move(
+                fromOffsets: IndexSet(integer: fromIndex),
+                toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
+            )
+        }
+        onReorder()
+    }
+
+    func dropExited(info _: DropInfo) {}
 }
