@@ -33,10 +33,10 @@ struct ProfileHeaderView: View {
                             .scaledToFit()
                             .frame(height: profileHeight)
                     }
+                    Spacer(minLength: 0)
                     if spRadarData != nil || dpRadarData != nil {
                         MoreNotesRadarView(spRadarData: spRadarData, dpRadarData: dpRadarData,
                                            maxHeight: profileHeight)
-                            .frame(maxWidth: .infinity)
                     }
                 }
                 .frame(maxWidth: .infinity)

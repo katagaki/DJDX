@@ -92,6 +92,5 @@ struct MoreNotesRadarView: View {
             }
         }
         .clipShape(.rect(cornerRadius: cornerRadius))
-        .padding(.horizontal, 16.0)
     }
 }
