@@ -148,6 +148,9 @@ struct SettingsMenu: View {
     func deleteAllScoreData() {
         Task {
             await importer.deleteAllScoreData()
+            await MainActor.run {
+                NotificationCenter.default.post(name: .dataImported, object: nil)
+            }
         }
     }
 
