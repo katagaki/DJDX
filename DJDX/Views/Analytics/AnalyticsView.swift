@@ -48,6 +48,14 @@ struct AnalyticsView: View {
         GridItem(.flexible(), spacing: 12.0)
     ]
 
+    // Size summary cards so three fit across the screen, then widen by 20pt so
+    // the fourth peeks in to hint that the row scrolls horizontally.
+    var summaryCardWidth: CGFloat {
+        let gridGap = 12.0
+        let availableWidth = UIScreen.main.bounds.width - 40.0 - (2.0 * gridGap)
+        return (availableWidth / 3.0) + 20.0
+    }
+
     var analyticsNamespace: Namespace.ID
     var towerNamespace: Namespace.ID
 
@@ -171,7 +179,7 @@ struct AnalyticsView: View {
                         HStack(spacing: 12.0) {
                             ForEach(shownSummaryCards, id: \.self) { cardType in
                                 cardView(for: cardType)
-                                    .frame(width: 130.0)
+                                    .frame(width: summaryCardWidth)
                                     .editableCard(isVisible: visibleCards.contains(cardType),
                                                   isEditing: isEditing,
                                                   seed: cardOrder.firstIndex(of: cardType) ?? 0) {
