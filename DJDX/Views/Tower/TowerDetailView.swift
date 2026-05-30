@@ -65,6 +65,14 @@ struct TowerDetailView<Chart: View>: View {
             Section {
                 chart
                     .frame(height: 240.0)
+                    .opacity(entries.isEmpty ? 0.25 : 1.0)
+                    .overlay {
+                        if entries.isEmpty {
+                            Text("Shared.NoData")
+                                .font(.subheadline.bold())
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             }

@@ -79,19 +79,29 @@ struct AnalyticsView: View {
                 }
             } label: {
                 AnalyticsCardView(cardType: cardType, showsHeader: false) {
-                    switch cardType {
-                    case .towerRecent:
-                        TowerBarChart(entries: model.towerChartEntries, usesDateAxis: false)
+                    Group {
+                        switch cardType {
+                        case .towerRecent:
+                            TowerBarChart(entries: model.towerChartEntries, usesDateAxis: false)
+                                .chartXAxis { AxisMarks { AxisGridLine() } }
+                                .chartYAxis { AxisMarks { AxisGridLine() } }
+                        default:
+                            TowerTotalsChart(
+                                totalKeyCount: model.towerTotalKeyCount,
+                                totalScratchCount: model.towerTotalScratchCount,
+                                showsAnnotations: false
+                            )
                             .chartXAxis { AxisMarks { AxisGridLine() } }
                             .chartYAxis { AxisMarks { AxisGridLine() } }
-                    default:
-                        TowerTotalsChart(
-                            totalKeyCount: model.towerTotalKeyCount,
-                            totalScratchCount: model.towerTotalScratchCount,
-                            showsAnnotations: false
-                        )
-                        .chartXAxis { AxisMarks { AxisGridLine() } }
-                        .chartYAxis { AxisMarks { AxisGridLine() } }
+                        }
+                    }
+                    .opacity(model.towerEntries.isEmpty ? 0.25 : 1.0)
+                    .overlay {
+                        if model.towerEntries.isEmpty {
+                            Text("Shared.NoData")
+                                .font(.caption.bold())
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
                 .perLevelCaption(caption)
