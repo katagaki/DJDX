@@ -31,6 +31,7 @@ struct ClearTypeOverviewListView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
                 ClearTypeLegend()
+                    .listRowInsets(EdgeInsets(top: 0.0, leading: 16.0, bottom: 8.0, trailing: 16.0))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             }
@@ -56,7 +57,7 @@ struct ClearTypeLegend: View {
     ]
 
     var body: some View {
-        LazyVGrid(columns: columns, alignment: .leading, spacing: 6.0) {
+        LazyVGrid(columns: columns, alignment: .leading, spacing: 4.0) {
             ForEach(IIDXClearType.sortedWithoutNoPlay, id: \.self) { clearType in
                 HStack(spacing: 6.0) {
                     Circle()
@@ -70,7 +71,7 @@ struct ClearTypeLegend: View {
                 }
             }
         }
-        .padding(.vertical, 8.0)
+        .padding(.vertical, 2.0)
     }
 }
 
