@@ -39,11 +39,13 @@ struct ScoreSortMenu: View {
 struct ScoreFilterButton: View {
 
     @Binding var isShowingFilterSheet: Bool
+    var filterNamespace: Namespace.ID
 
     var body: some View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
+        .automaticSheetMatchedTransitionSource(id: "ScoreFilterSheet", in: filterNamespace)
     }
 }
 

@@ -27,6 +27,8 @@ struct SDVXScoresView<Header: View>: View {
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
 
+    @Namespace var sdvxNamespace
+
     let fetcher = SDVXDataFetcher()
 
     init(isEditingAnalytics: Binding<Bool> = .constant(false), @ViewBuilder header: () -> Header) {
@@ -125,6 +127,7 @@ struct SDVXScoresView<Header: View>: View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
+        .automaticSheetMatchedTransitionSource(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
     }
 
     var body: some View {
@@ -189,6 +192,7 @@ struct SDVXScoresView<Header: View>: View {
                 availableLevelBuckets: availableLevelBuckets,
                 onReset: {}
             )
+            .automaticSheetNavigationTransition(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
             .interactiveDismissDisabled()

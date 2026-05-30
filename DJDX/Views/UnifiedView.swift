@@ -35,6 +35,7 @@ struct UnifiedView: View {
 
     @Namespace var analyticsNamespace
     @Namespace var towerNamespace
+    @Namespace var importNamespace
 
     var body: some View {
         @Bindable var progressAlertManager = progressAlertManager
@@ -61,6 +62,7 @@ struct UnifiedView: View {
                         isPresentingImport = true
                     }
                     .popoverTip(ImportMovedTip(), arrowEdge: .top)
+                    .automaticSheetMatchedTransitionSource(id: "Import", in: importNamespace)
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
@@ -110,6 +112,7 @@ struct UnifiedView: View {
                     ImportView()
                 }
             }
+            .automaticSheetNavigationTransition(id: "Import", in: importNamespace)
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
             .interactiveDismissDisabled()
