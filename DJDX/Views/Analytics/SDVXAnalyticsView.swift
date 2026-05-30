@@ -22,6 +22,9 @@ struct SDVXAnalyticsView: View {
     @State var cardOrder: [SDVXAnalyticsCard] = SDVXAnalyticsCard.defaultOrder
     @State var draggedCard: SDVXAnalyticsCard?
 
+    @AppStorage(wrappedValue: Data(), "Analytics.SDVX.VisibleCards") var visibleCardsData: Data
+    @State var visibleCards: Set<SDVXAnalyticsCard> = Set(SDVXAnalyticsCard.allCases)
+
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
         GridItem(.flexible(), spacing: 12.0)
@@ -31,10 +34,15 @@ struct SDVXAnalyticsView: View {
         VStack(spacing: 0.0) {
             AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
 
+            let shownCards = isEditing ? cardOrder : cardOrder.filter { visibleCards.contains($0) }
             LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                ForEach(cardOrder, id: \.self) { cardType in
+                ForEach(shownCards, id: \.self) { cardType in
                     cardView(for: cardType)
-                        .jiggle(isActive: isEditing, seed: cardOrder.firstIndex(of: cardType) ?? 0)
+                        .editableCard(isVisible: visibleCards.contains(cardType),
+                                      isEditing: isEditing,
+                                      seed: cardOrder.firstIndex(of: cardType) ?? 0) {
+                            toggleCard(cardType)
+                        }
                         .sdvxCardDraggable(cardType, editing: isEditing,
                                            draggedCard: $draggedCard, cardOrder: $cardOrder,
                                            onReorder: saveCardOrder)
@@ -45,6 +53,7 @@ struct SDVXAnalyticsView: View {
         }
         .onAppear {
             loadCardOrder()
+            loadVisibleCards()
         }
         .task {
             if model.dataState == .initializing {
@@ -81,6 +90,27 @@ struct SDVXAnalyticsView: View {
 
     func saveCardOrder() {
         cardOrderData = (try? JSONEncoder().encode(cardOrder)) ?? Data()
+    }
+
+    func loadVisibleCards() {
+        if let decoded = try? JSONDecoder().decode(Set<SDVXAnalyticsCard>.self, from: visibleCardsData) {
+            visibleCards = decoded
+        }
+    }
+
+    func saveVisibleCards() {
+        visibleCardsData = (try? JSONEncoder().encode(visibleCards)) ?? Data()
+    }
+
+    func toggleCard(_ cardType: SDVXAnalyticsCard) {
+        withAnimation(.snappy) {
+            if visibleCards.contains(cardType) {
+                visibleCards.remove(cardType)
+            } else {
+                visibleCards.insert(cardType)
+            }
+            saveVisibleCards()
+        }
     }
 
     // Aggregate clear-type counts across all difficulty categories

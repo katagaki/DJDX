@@ -19,6 +19,7 @@ struct SDVXProfileHeaderView: View {
     @State var volforce: String?
 
     let profileHeight: CGFloat = 150.0
+    let apCardHeight: CGFloat = 110.0
     let volforceImageHeight: CGFloat = 72.0
 
     var hasData: Bool {
@@ -33,7 +34,7 @@ struct SDVXProfileHeaderView: View {
                         Image(uiImage: apCardImage)
                             .resizable()
                             .scaledToFit()
-                            .frame(height: profileHeight)
+                            .frame(height: apCardHeight)
                             .clipShape(.rect(cornerRadius: 8.0))
                     }
                     if let playerName {

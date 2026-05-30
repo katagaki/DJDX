@@ -57,10 +57,10 @@ struct SDVXScoreRow: View {
             // Difficulty + level label
             VStack(spacing: 1.0) {
                 Text(verbatim: record.difficultyEnum.abbreviation)
-                    .font(.caption2.weight(.black))
+                    .font(.system(size: 10.0).weight(.black))
                     .foregroundStyle(record.difficultyEnum.color)
                 Text(verbatim: record.level)
-                    .font(.title3.weight(.heavy))
+                    .font(.system(size: 18.0).weight(.heavy))
                     .fontWidth(.condensed)
                     .monospacedDigit()
             }
