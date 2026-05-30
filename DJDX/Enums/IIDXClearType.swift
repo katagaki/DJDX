@@ -48,6 +48,20 @@ enum IIDXClearType: String, Codable {
         sortedWithoutNoPlay.map({ $0.rawValue })
     }
 
+    // Solid colors matching the clear-type chart palette.
+    static func color(for clearType: String) -> Color {
+        switch clearType {
+        case "FULLCOMBO CLEAR": return .blue
+        case "CLEAR": return .cyan
+        case "EASY CLEAR": return .green
+        case "ASSIST CLEAR": return .purple
+        case "HARD CLEAR": return .pink
+        case "EX HARD CLEAR": return .yellow
+        case "FAILED": return .red
+        default: return .gray
+        }
+    }
+
     static func style(for clearType: String, colorScheme: ColorScheme) -> any ShapeStyle {
         func whiteOr(_ color: Color) -> Color {
             colorScheme == .dark ? .white : color

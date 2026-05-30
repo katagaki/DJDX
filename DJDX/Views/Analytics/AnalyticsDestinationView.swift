@@ -20,10 +20,6 @@ struct AnalyticsDestinationView: View {
     @AppStorage(wrappedValue: 1, "Analytics.Trends.ClearType.Level") var levelFilterForTrendsClearType: Int
     @AppStorage(wrappedValue: 1, "Analytics.Trends.DJLevel.Level") var levelFilterForTrendsDJLevel: Int
 
-    var filteredClearTypeData: [Int: OrderedDictionary<String, Int>] {
-        model.clearTypePerDifficulty
-    }
-
     func perLevelTitle(_ difficulty: Int, _ category: AnalyticsPerLevelCategory) -> String {
         let separator = NSLocalizedString("Analytics.PerLevel.TitleSeparator", comment: "")
         let categoryTitle = NSLocalizedString(category.titleKey, comment: "")
@@ -35,18 +31,9 @@ struct AnalyticsDestinationView: View {
         Group {
             switch path {
             case .clearTypeOverviewGraph:
-                OverviewClearTypeOverallGraph(
-                    graphData: .constant(filteredClearTypeData),
-                    isInteractive: true
-                )
-                .chartLegend(
-                    position: .bottom,
-                    alignment: .leading,
-                    spacing: 16.0
-                )
-                .padding()
-                .navigationTitle("Analytics.ClearType.Overall")
-                .automaticNavigationTransition(id: "ClearType.Overall", in: analyticsNamespace)
+                ClearTypeOverviewListView(graphData: $model.clearTypePerDifficulty)
+                    .navigationTitle("Analytics.ClearType.Overall")
+                    .automaticNavigationTransition(id: "ClearType.Overall", in: analyticsNamespace)
             case .clearTypePerDifficultyGraph:
                 VStack {
                     TogglableClearTypeDetailView(
