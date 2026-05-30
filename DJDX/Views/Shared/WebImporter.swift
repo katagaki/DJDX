@@ -174,9 +174,21 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         super.init()
     }
 
+    func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationAction: WKNavigationAction,
+                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        #if DEBUG
+        debugPrint("[WebImporter] navigate ->", navigationAction.request.url?.absoluteString ?? "nil")
+        #endif
+        decisionHandler(.allow)
+    }
+
     func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
         guard let webViewURL = webView.url else { return }
         let urlString = webViewURL.absoluteString
+        #if DEBUG
+        debugPrint("[WebImporter] didFinish ->", urlString)
+        #endif
         webView.evaluateJavaScript(self.cleanupJS) { _, _ in
             if urlString.starts(with: self.version.downloadPageURL().absoluteString) {
                 webView.layer.opacity = 0.0
@@ -203,6 +215,9 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
 
     func handleNavigationFailure(_ error: Error) {
         let nsError = error as NSError
+        #if DEBUG
+        debugPrint("[WebImporter] navFail ->", nsError.domain, nsError.code, nsError.localizedDescription)
+        #endif
         if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled { return }
         if nsError.domain == "WebKitErrorDomain" && nsError.code == 102 { return }
         resolveFailure(with: .serverError)
