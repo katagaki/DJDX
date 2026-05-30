@@ -129,6 +129,8 @@ actor SDVXDataImporter {
         version: SDVXVersion
     ) -> AsyncStream<ImportProgress> {
         let (stream, continuation) = AsyncStream.makeStream(of: ImportProgress.self)
+        // Back up the raw CSV to the documents directory, like the IIDX importer.
+        saveCSVStringToFile(csvString, appending: "-SDVX")
         // Strip a leading UTF-8 BOM so the first CSV header (楽曲名) keys correctly.
         let sanitized = csvString.hasPrefix("\u{FEFF}") ? String(csvString.dropFirst()) : csvString
         debugPrint("[SDVXImport] csv length:", sanitized.count,
@@ -231,6 +233,19 @@ actor SDVXDataImporter {
         guard let database = try? DB.shared.getWriteConnection() else { return }
         _ = try? database.run(DB.songRecordTable.filter(DB.srImportGroupID == id).delete())
         _ = try? database.run(DB.importGroupTable.filter(DB.igID == id).delete())
+    }
+
+    func saveCSVStringToFile(_ csvString: String, appending suffix: String? = nil) {
+        guard let documentsDirectoryURL = FileManager
+            .default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd-HH-mm-ss"
+        let dateString = dateFormatter.string(from: .now)
+        let csvFileName = "\(dateString)\(suffix ?? "").csv"
+        let csvFile = documentsDirectoryURL.appendingPathComponent(
+            csvFileName, conformingTo: .commaSeparatedText
+        )
+        try? csvString.write(to: csvFile, atomically: true, encoding: .utf8)
     }
 }
 

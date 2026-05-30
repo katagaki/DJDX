@@ -60,8 +60,8 @@ struct SDVXScoreRow: View {
                     .font(.caption2.weight(.black))
                     .foregroundStyle(record.difficultyEnum.color)
                 Text(verbatim: record.level)
-                    .font(.headline)
-                    .fontWidth(.expanded)
+                    .font(.title3.weight(.heavy))
+                    .fontWidth(.condensed)
                     .monospacedDigit()
             }
             .padding([.top, .bottom], 6.0)

@@ -37,6 +37,7 @@ struct AnalyticsCardView<Content: View>: View {
          systemImage: String,
          iconColor: Color,
          contentHeight: CGFloat = 100.0,
+         showsHeader: Bool = true,
          @ViewBuilder content: @escaping () -> Content) {
         self.title = Text(title)
         self.systemImage = systemImage
@@ -47,6 +48,7 @@ struct AnalyticsCardView<Content: View>: View {
         } else {
             self.cornerRadius = 12.0
         }
+        self.showsHeader = showsHeader
         self.content = content
     }
 

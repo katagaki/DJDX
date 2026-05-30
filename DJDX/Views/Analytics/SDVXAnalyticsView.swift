@@ -26,25 +26,14 @@ struct SDVXAnalyticsView: View {
 
             LazyVGrid(columns: cardColumns, spacing: 12.0) {
                 summaryCard(title: "Analytics.SDVX.Volforce",
-                            systemImage: "bolt.fill",
-                            iconColor: .orange,
                             value: String(format: "%.2f", model.volforce))
                 summaryCard(title: "Analytics.SDVX.TotalCharts",
-                            systemImage: "music.note.list",
-                            iconColor: .blue,
                             value: String(model.totalCharts))
+                clearBreakdownCard
+                gradeBreakdownCard
             }
             .padding(.horizontal)
-
-            AnalyticsSectionHeader(title: "Analytics.SDVX.ClearBreakdown")
-            clearBreakdownCard
-                .padding(.horizontal)
-                .padding(.bottom, 16.0)
-
-            AnalyticsSectionHeader(title: "Analytics.SDVX.GradeBreakdown")
-            gradeBreakdownCard
-                .padding(.horizontal)
-                .padding(.bottom, 16.0)
+            .padding(.bottom, 16.0)
         }
         .task {
             if model.dataState == .initializing {
@@ -59,18 +48,17 @@ struct SDVXAnalyticsView: View {
         }
     }
 
-    func summaryCard(title: LocalizedStringKey,
-                     systemImage: String,
-                     iconColor: Color,
-                     value: String) -> some View {
-        AnalyticsCardView(title: title, systemImage: systemImage, iconColor: iconColor, contentHeight: 44.0) {
+    func summaryCard(title: LocalizedStringKey, value: String) -> some View {
+        AnalyticsCardView(title: title, systemImage: "",
+                          iconColor: .clear, contentHeight: 80.0, showsHeader: false) {
             Text(verbatim: value)
                 .font(.title.bold())
                 .fontWidth(.expanded)
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
+        .perLevelCaption(title)
     }
 
     // Aggregate clear-type counts across all difficulty categories
@@ -102,9 +90,10 @@ struct SDVXAnalyticsView: View {
 
     var clearBreakdownCard: some View {
         AnalyticsCardView(title: "Analytics.SDVX.ClearBreakdown",
-                          systemImage: "checkmark.seal",
-                          iconColor: .green,
-                          contentHeight: 200.0) {
+                          systemImage: "",
+                          iconColor: .clear,
+                          contentHeight: 160.0,
+                          showsHeader: false) {
             Chart(totalClearCounts.elements.filter { $0.value > 0 }, id: \.key) { element in
                 BarMark(
                     x: .value("Shared.ClearCount", element.value),
@@ -114,13 +103,15 @@ struct SDVXAnalyticsView: View {
             }
             .chartXAxis { AxisMarks { AxisGridLine() } }
         }
+        .perLevelCaption("Analytics.SDVX.ClearBreakdown")
     }
 
     var gradeBreakdownCard: some View {
         AnalyticsCardView(title: "Analytics.SDVX.GradeBreakdown",
-                          systemImage: "rosette",
-                          iconColor: .yellow,
-                          contentHeight: 240.0) {
+                          systemImage: "",
+                          iconColor: .clear,
+                          contentHeight: 160.0,
+                          showsHeader: false) {
             Chart(totalGradeCounts.elements.filter { $0.value > 0 }, id: \.key) { element in
                 BarMark(
                     x: .value("Shared.ClearCount", element.value),
@@ -131,6 +122,7 @@ struct SDVXAnalyticsView: View {
             }
             .chartXAxis { AxisMarks { AxisGridLine() } }
         }
+        .perLevelCaption("Analytics.SDVX.GradeBreakdown")
     }
 
     func clearLabel(_ rawValue: String) -> String {
