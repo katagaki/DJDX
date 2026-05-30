@@ -48,6 +48,20 @@ enum IIDXClearType: String, Codable {
         sortedWithoutNoPlay.map({ $0.rawValue })
     }
 
+    // Short label for compact per-level stat rows.
+    static func abbreviation(for clearType: String) -> String {
+        switch clearType {
+        case "FULLCOMBO CLEAR": return "FC"
+        case "CLEAR": return "CLEAR"
+        case "EASY CLEAR": return "EASY"
+        case "ASSIST CLEAR": return "ASSIST"
+        case "HARD CLEAR": return "HARD"
+        case "EX HARD CLEAR": return "EXH"
+        case "FAILED": return "FAIL"
+        default: return clearType
+        }
+    }
+
     // Solid colors matching the clear-type chart palette.
     static func color(for clearType: String) -> Color {
         switch clearType {

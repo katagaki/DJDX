@@ -217,23 +217,46 @@ extension AnalyticsView {
         }
     }
 
+    func clearTypeSegments(difficulty: Int) -> [PerLevelSegment] {
+        let counts = model.clearTypePerDifficulty[difficulty] ?? [:]
+        return IIDXClearType.sortedStringsWithoutNoPlay.map { clearType in
+            PerLevelSegment(
+                label: IIDXClearType.abbreviation(for: clearType),
+                color: IIDXClearType.color(for: clearType),
+                count: counts[clearType] ?? 0
+            )
+        }
+    }
+
+    func djLevelSegments(difficulty: Int) -> [PerLevelSegment] {
+        let counts = model.djLevelPerDifficulty[difficulty] ?? [:]
+        return IIDXDJLevel.sorted.reversed().map { djLevel in
+            PerLevelSegment(
+                label: djLevel.rawValue,
+                color: IIDXDJLevel.color(for: djLevel.rawValue),
+                count: counts[djLevel] ?? 0
+            )
+        }
+    }
+
     func clearTypeForLevelCard(difficulty: Int) -> some View {
         Button {
             if !isEditingCards && model.clearTypePerDifficulty[difficulty] != nil {
                 navigationManager.push(AnalyticsPath.clearTypeForLevel(difficulty: difficulty))
             }
         } label: {
-            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "medal.star",
-                              iconColor: .secondary) {
-                OverviewClearTypePerDifficultyGraph(
-                    graphData: $model.clearTypePerDifficulty,
-                    difficulty: .constant(difficulty)
-                )
-                .chartLegend(.hidden)
-                .chartYAxis(.hidden)
+            PerLevelAnalyticsCard(
+                difficulty: difficulty,
+                subtitle: "Shared.IIDX.ClearType",
+                showsBar: true,
+                segments: clearTypeSegments(difficulty: difficulty)
+            ) {
+                TrendsClearTypeGraph(graphData: $model.clearTypePerImportGroup,
+                                     difficulty: .constant(difficulty))
+                    .chartLegend(.hidden)
+                    .chartYAxis(.hidden)
+                    .chartXAxis(.hidden)
             }
-            .perLevelCaption("Shared.IIDX.ClearType")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
@@ -245,16 +268,18 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.clearTypeTrendsForLevel(difficulty: difficulty))
             }
         } label: {
-            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "medal.star",
-                              iconColor: .secondary) {
+            PerLevelAnalyticsCard(
+                difficulty: difficulty,
+                subtitle: "Shared.IIDX.ClearType",
+                showsBar: false,
+                segments: []
+            ) {
                 TrendsClearTypeGraph(graphData: $model.clearTypePerImportGroup,
                                      difficulty: .constant(difficulty))
                     .chartLegend(.hidden)
                     .chartYAxis(.hidden)
                     .chartXAxis(.hidden)
             }
-            .perLevelCaption("Shared.IIDX.ClearType")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(
@@ -268,17 +293,18 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.djLevelForLevel(difficulty: difficulty))
             }
         } label: {
-            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "medal.star",
-                              iconColor: .secondary) {
-                OverviewDJLevelPerDifficultyGraph(
-                    graphData: $model.djLevelPerDifficulty,
-                    difficulty: .constant(difficulty)
-                )
-                .chartLegend(.hidden)
-                .chartYAxis(.hidden)
+            PerLevelAnalyticsCard(
+                difficulty: difficulty,
+                subtitle: "Shared.IIDX.DJLevel",
+                showsBar: true,
+                segments: djLevelSegments(difficulty: difficulty)
+            ) {
+                TrendsDJLevelGraph(graphData: $model.djLevelPerImportGroup,
+                                   difficulty: .constant(difficulty))
+                    .chartLegend(.hidden)
+                    .chartYAxis(.hidden)
+                    .chartXAxis(.hidden)
             }
-            .perLevelCaption("Shared.IIDX.DJLevel")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace)
@@ -290,16 +316,18 @@ extension AnalyticsView {
                 navigationManager.push(AnalyticsPath.djLevelTrendsForLevel(difficulty: difficulty))
             }
         } label: {
-            AnalyticsCardView(verbatimTitle: "LEVEL \(difficulty)",
-                              systemImage: "medal.star",
-                              iconColor: .secondary) {
+            PerLevelAnalyticsCard(
+                difficulty: difficulty,
+                subtitle: "Shared.IIDX.DJLevel",
+                showsBar: false,
+                segments: []
+            ) {
                 TrendsDJLevelGraph(graphData: $model.djLevelPerImportGroup,
                                    difficulty: .constant(difficulty))
                     .chartLegend(.hidden)
                     .chartYAxis(.hidden)
                     .chartXAxis(.hidden)
             }
-            .perLevelCaption("Shared.IIDX.DJLevel")
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(

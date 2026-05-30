@@ -209,7 +209,7 @@ struct AnalyticsView: View {
                 if !shownPerLevelCards.isEmpty {
                     VStack(spacing: 12.0) {
                         AnalyticsSectionHeader(title: AnalyticsSection.perLevel.titleKey)
-                        LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                        VStack(spacing: 12.0) {
                             ForEach(shownPerLevelCards, id: \.self) { card in
                                 perLevelCard(difficulty: card.difficulty, category: card.category)
                                     .editableCard(
