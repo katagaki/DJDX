@@ -170,7 +170,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
     // swiftlint:disable line_length
     func loginPageRedirectURL() -> URL {
         return URL(string: """
-https://p.eagate.573.jp/gate/p/login.html?path=http%3A%2F%2Fp.eagate.573.jp%2Fgame%2F2dx%2F\(self.rawValue)%2Fdjdata%2Fscore_download.html
+https://p.eagate.573.jp/gate/p/login.html?path=https%3A%2F%2Fp.eagate.573.jp%2Fgame%2F2dx%2F\(self.rawValue)%2Fdjdata%2Fscore_download.html
 """)!
     }
 
