@@ -184,7 +184,7 @@ struct MoreExternalDataSources: View {
         do {
             var iidxSongsFromWiki: [IIDXSong] = []
             let (data, _) = try await URLSession.shared.data(from: iidxVersion.bemaniWikiLatestVersionPageURL())
-            if let htmlString = String(bytes: data, encoding: .japaneseEUC),
+            if let htmlString = String(bytes: data, encoding: .utf8),
                let htmlDocument = try? SwiftSoup.parse(htmlString),
                let htmlDocumentBody = htmlDocument.body(),
                let documentContents = try? htmlDocumentBody.select("#contents").first(),
@@ -227,7 +227,7 @@ struct MoreExternalDataSources: View {
         do {
             var iidxSongsFromWiki: [IIDXSong] = []
             let (data, _) = try await URLSession.shared.data(from: iidxVersion.bemaniWikiExistingVersionsPageURL())
-            if let htmlString = String(bytes: data, encoding: .japaneseEUC),
+            if let htmlString = String(bytes: data, encoding: .utf8),
                let htmlDocument = try? SwiftSoup.parse(htmlString),
                let htmlDocumentBody = htmlDocument.body(),
                let documentContents = try? htmlDocumentBody.select("#contents").first(),
