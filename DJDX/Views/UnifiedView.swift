@@ -160,6 +160,7 @@ struct UnifiedView: View {
             if selectedGame.supportsProfile {
                 ProfileHeaderView()
                     .padding(.horizontal)
+                    .padding(.top, 16.0)
             }
             AnalyticsView(model: analyticsModel,
                           isEditing: $isEditingAnalytics,
