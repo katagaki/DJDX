@@ -180,7 +180,7 @@ struct ScoresView<Header: View>: View {
                             isCollapsible: true,
                             isExpanded: isScoreDataExpanded
                         ) {
-                            withAnimation(.snappy) { isScoreDataExpanded.toggle() }
+                            isScoreDataExpanded.toggle()
                         }
                         .padding(.top, 16.0)
                         .padding(.bottom, 12.0)

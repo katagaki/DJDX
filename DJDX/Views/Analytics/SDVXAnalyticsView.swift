@@ -43,7 +43,7 @@ struct SDVXAnalyticsView: View {
                         isCollapsible: !isEditing,
                         isExpanded: isExpanded
                     ) {
-                        withAnimation(.snappy) { isOverviewCollapsed.toggle() }
+                        isOverviewCollapsed.toggle()
                     }
                     if isExpanded {
                         LazyVGrid(columns: cardColumns, spacing: 12.0) {
@@ -62,6 +62,7 @@ struct SDVXAnalyticsView: View {
                         .padding(.horizontal)
                     }
                 }
+                .animation(.snappy, value: isExpanded)
             }
         }
         .padding(.top, 20.0)

@@ -125,6 +125,7 @@ struct AnalyticsSectionHeader: View {
                     .font(.subheadline.bold())
                     .foregroundStyle(.secondary)
                     .rotationEffect(.degrees(isExpanded ? 0.0 : -90.0))
+                    .animation(.snappy, value: isExpanded)
             }
             Spacer()
         }
