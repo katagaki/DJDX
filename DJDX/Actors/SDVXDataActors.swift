@@ -101,7 +101,9 @@ actor SDVXDataImporter {
         version: SDVXVersion
     ) -> AsyncStream<ImportProgress> {
         let (stream, continuation) = AsyncStream.makeStream(of: ImportProgress.self)
-        let parsedCSV = CSwiftV(with: csvString)
+        // Strip a leading UTF-8 BOM so the first CSV header (楽曲名) keys correctly.
+        let sanitized = csvString.hasPrefix("\u{FEFF}") ? String(csvString.dropFirst()) : csvString
+        let parsedCSV = CSwiftV(with: sanitized)
         if let keyedRows = parsedCSV.keyedRows {
             importRows(keyedRows, to: importToDate, version: version, continuation: continuation)
         }
