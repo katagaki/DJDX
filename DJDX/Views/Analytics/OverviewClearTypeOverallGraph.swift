@@ -113,7 +113,7 @@ struct OverviewClearTypeOverallGraph: View {
                                             x: value.location.x - origin.x,
                                             y: value.location.y - origin.y
                                         )
-                                        let levelValue = proxy.value(at: location, as: Double.self) ?? 0.0
+                                        let levelValue = proxy.value(atX: location.x, as: Double.self) ?? 0.0
                                         withAnimation(.snappy.speed(2.0)) {
                                             difficultyBelowFinger = Int(levelValue.rounded())
                                         }
