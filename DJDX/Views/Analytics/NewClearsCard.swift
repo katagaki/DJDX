@@ -14,11 +14,11 @@ struct NewClearsCard: View {
         VStack(alignment: .leading, spacing: 4.0) {
             if newClears.isEmpty {
                 Text("Analytics.NoData")
-                    .font(.caption)
+                    .font(.system(size: 14.0))
                     .foregroundStyle(.secondary)
             } else {
                 Text("\(newClears.count)")
-                    .font(.system(size: 30.0, weight: .black))
+                    .font(.system(size: 20.0, weight: .black))
                     .fontWidth(.expanded)
                     .foregroundStyle(.primary)
             }

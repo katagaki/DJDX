@@ -142,7 +142,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
              .newAAA,
              .newAA,
              .newA:
-            return 50.0
+            return 36.0
         }
     }
 
