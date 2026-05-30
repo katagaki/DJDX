@@ -114,7 +114,6 @@ struct UnifiedView: View {
             }
             .automaticSheetNavigationTransition(id: "Import", in: importNamespace)
             .presentationDetents([.large])
-            .presentationDragIndicator(.visible)
             .interactiveDismissDisabled()
         }
         .overlay {
