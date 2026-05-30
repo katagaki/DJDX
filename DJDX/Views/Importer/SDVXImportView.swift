@@ -22,8 +22,10 @@ struct SDVXImportView: View {
     @State var didImportSucceed: Bool = false
     @State var autoImportFailedReason: ImportFailedReason?
     @State var isSelectingCSVFile: Bool = false
+    @State var importGroups: [SDVXImportGroupInfo] = []
 
     let importer = SDVXDataImporter()
+    let fetcher = SDVXDataFetcher()
 
     enum SDVXImportPath: Hashable {
         case web
@@ -31,7 +33,26 @@ struct SDVXImportView: View {
 
     var body: some View {
         NavigationStack(path: $importPath) {
-            Color.clear
+            List {
+                ForEach(importGroups) { group in
+                    HStack(alignment: .center, spacing: 6.0) {
+                        Text(group.date, style: .date)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        if let version = group.version {
+                            Text(version.marketingName)
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .listRowBackground(Color.clear)
+                }
+                .onDelete(perform: { indexSet in
+                    deleteImport(indexSet)
+                })
+            }
+            .listStyle(.plain)
             .navigationTitle("ViewTitle.Calendar")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -86,7 +107,11 @@ struct SDVXImportView: View {
             .onChange(of: didImportSucceed) { _, newValue in
                 if newValue {
                     NotificationCenter.default.post(name: .dataImported, object: nil)
+                    Task { await reloadImportGroups() }
                 }
+            }
+            .task {
+                await reloadImportGroups()
             }
             .sheet(isPresented: $isSelectingCSVFile) {
                 DocumentPicker(allowedUTIs: [.commaSeparatedText], onDocumentPicked: { urls in
@@ -159,6 +184,23 @@ struct SDVXImportView: View {
                 .background(Color.accent)
                 .foregroundStyle(.white)
                 .adaptiveClipShape()
+            }
+        }
+    }
+
+    func reloadImportGroups() async {
+        importGroups = await fetcher.allImportGroups()
+    }
+
+    func deleteImport(_ indexSet: IndexSet) {
+        let groupsToDelete = indexSet.map { importGroups[$0] }
+        Task {
+            for group in groupsToDelete {
+                await importer.deleteImportGroup(id: group.id)
+            }
+            await reloadImportGroups()
+            await MainActor.run {
+                NotificationCenter.default.post(name: .dataImported, object: nil)
             }
         }
     }

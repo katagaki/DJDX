@@ -54,6 +54,18 @@ actor SDVXDataFetcher {
         }) ?? []
     }
 
+    func allImportGroups() -> [SDVXImportGroupInfo] {
+        guard let database = try? DB.shared.getReadConnection() else { return [] }
+        let query = DB.importGroupTable.order(DB.igImportDate.desc)
+        return (try? database.prepare(query).map { row in
+            SDVXImportGroupInfo(
+                id: row[DB.igID],
+                date: Date(timeIntervalSince1970: row[DB.igImportDate]),
+                version: row[DB.igVersion].flatMap { SDVXVersion(rawValue: $0) }
+            )
+        }) ?? []
+    }
+
     // MARK: Song Records
 
     func songRecords(for importGroupID: String) -> [SDVXSongRecord] {
@@ -214,4 +226,16 @@ actor SDVXDataImporter {
         _ = try? database.run(DB.songRecordTable.delete())
         _ = try? database.run(DB.importGroupTable.delete())
     }
+
+    func deleteImportGroup(id: String) {
+        guard let database = try? DB.shared.getWriteConnection() else { return }
+        _ = try? database.run(DB.songRecordTable.filter(DB.srImportGroupID == id).delete())
+        _ = try? database.run(DB.importGroupTable.filter(DB.igID == id).delete())
+    }
+}
+
+struct SDVXImportGroupInfo: Identifiable, Hashable {
+    let id: String
+    let date: Date
+    let version: SDVXVersion?
 }
