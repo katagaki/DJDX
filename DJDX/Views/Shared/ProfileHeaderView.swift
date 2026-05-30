@@ -24,7 +24,7 @@ struct ProfileHeaderView: View {
     }
 
     var body: some View {
-        Group {
+        ZStack {
             if hasData {
                 HStack(alignment: .center, spacing: 12.0) {
                     if let qproImage {
@@ -44,12 +44,8 @@ struct ProfileHeaderView: View {
             }
         }
         .task {
-            // Load cached values first so the profile shows immediately on launch,
-            // then refresh from the network in the background.
             loadRadarData()
-            if qproImage == nil {
-                qproImage = loadQproImage()
-            }
+            qproImage = loadQproImage()
             await refreshStatusPageData()
         }
         .onChange(of: iidxVersion) { _, _ in

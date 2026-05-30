@@ -24,7 +24,7 @@ struct SDVXProfileHeaderView: View {
     }
 
     var body: some View {
-        Group {
+        ZStack {
             if hasData {
                 HStack(alignment: .center, spacing: 12.0) {
                     if let apCardImage {
