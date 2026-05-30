@@ -34,6 +34,8 @@ struct OverviewClearTypeBarGraph: View {
                     "EX HARD CLEAR": .yellow,
                     "FAILED": .red
                 ])
+                .chartLegend(.hidden)
+                .chartLegend(.hidden)
             } else {
                 Spacer()
             }

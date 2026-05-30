@@ -30,6 +30,7 @@ struct OverviewClearTypePerDifficultyGraph: View {
                         "EX HARD CLEAR": .yellow,
                         "FAILED": .red
                       ])
+                      .chartLegend(.hidden)
             } else {
                 Spacer()
             }

@@ -39,5 +39,6 @@ struct OverviewDJLevelPerDifficultyGraph: View {
                 "B": .green,
                 "C": .teal
               ])
+              .chartLegend(.hidden)
     }
 }
