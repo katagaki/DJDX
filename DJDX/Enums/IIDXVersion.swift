@@ -186,6 +186,12 @@ https://p.eagate.573.jp/game/2dx/\(self.rawValue)/djdata/score_download.html
 """)!
     }
 
+    func downloadPageURL(style: String) -> URL {
+        return URL(string: """
+https://p.eagate.573.jp/game/2dx/\(self.rawValue)/djdata/score_download.html?style=\(style)
+""")!
+    }
+
     func errorPageURL() -> URL {
         return URL(string: """
 https://p.eagate.573.jp/game/2dx/\(self.rawValue)/error/error.html

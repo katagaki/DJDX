@@ -330,6 +330,28 @@ async function fetchSDVXScoreData() {
 return await fetchSDVXScoreData();
 """
 
+// IIDX: navigating directly to score_download.html?style=SP|DP|tower renders the
+// CSV into <textarea id="score_data"> on the current page. Read it directly,
+// rather than re-submitting the form.
+let scoreDataReadBody = """
+function readScoreData() {
+    const node = document.getElementById('score_data');
+    if (node) {
+        const value = (node.value !== undefined && node.value !== null && node.value !== '')
+            ? node.value
+            : (node.getAttribute('value') || node.textContent || '');
+        const csv = (value || '').trim();
+        if (csv.length > 0) { return csv; }
+    }
+    if (location.href.indexOf('/error/error.html') !== -1) {
+        const match = location.href.match(/[?&]err=([0-9]+)/);
+        return 'ERR:' + (match ? match[1] : 'server');
+    }
+    return 'ERR:empty';
+}
+return readScoreData();
+"""
+
 let iidxTowerCleanup = """
 var injectedCSS = `
 #base {
