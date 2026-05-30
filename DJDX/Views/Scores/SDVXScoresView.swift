@@ -22,6 +22,8 @@ struct SDVXScoresView<Header: View>: View {
     @AppStorage(wrappedValue: [], "SDVXScoresView.ClearTypeFilters") var clearTypesToShow: Set<SDVXClearType>
     @AppStorage(wrappedValue: [], "SDVXScoresView.GradeFilters") var gradesToShow: Set<SDVXGrade>
 
+    @AppStorage(wrappedValue: true, "SDVXScoresView.ScoreDataExpanded") var isScoreDataExpanded: Bool
+
     @State var dataState: DataState = .initializing
     @State var records: [SDVXSongRecord] = []
     @State var searchTerm: String = ""
@@ -136,19 +138,21 @@ struct SDVXScoresView<Header: View>: View {
                 if searchTerm.isEmpty {
                     header
                     if !isEditingAnalytics {
-                        HStack {
-                            Text("Analytics.Section.ScoreData")
-                                .font(.title3.bold())
-                                .foregroundStyle(.primary)
-                            Spacer()
+                        AnalyticsSectionHeader(
+                            title: "Analytics.Section.ScoreData",
+                            isCollapsible: true,
+                            isExpanded: isScoreDataExpanded
+                        ) {
+                            withAnimation(.snappy) { isScoreDataExpanded.toggle() }
                         }
                         .padding(.top, 16.0)
                         .padding(.bottom, 12.0)
-                        .padding(.horizontal)
-                        Divider()
+                        if isScoreDataExpanded {
+                            Divider()
+                        }
                     }
                 }
-                if !isEditingAnalytics {
+                if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
                     ForEach(sortedRecords, id: \.self) { record in
                         SDVXScoreRow(record: record)
                             .contentShape(.rect)
