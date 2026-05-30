@@ -60,7 +60,14 @@ struct SDVXImportView: View {
                     if #available(iOS 26.0, *) {
                         Button(role: .close) { dismiss() }
                     } else {
-                        Button { dismiss() } label: { Image(systemName: "xmark.circle") }
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .tint(.primary)
+                                .font(.title2)
+                                .symbolRenderingMode(.hierarchical)
+                        }
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {

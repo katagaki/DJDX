@@ -74,7 +74,10 @@ struct ImportView: View {
                         Button {
                             dismiss()
                         } label: {
-                            Image(systemName: "xmark.circle")
+                            Image(systemName: "xmark.circle.fill")
+                                .tint(.primary)
+                                .font(.title2)
+                                .symbolRenderingMode(.hierarchical)
                         }
                     }
                 }
