@@ -31,27 +31,29 @@ struct SDVXAnalyticsView: View {
     ]
 
     var body: some View {
-        VStack(spacing: 0.0) {
+        VStack(spacing: 20.0) {
             let shownCards = isEditing ? cardOrder : cardOrder.filter { visibleCards.contains($0) }
             if !shownCards.isEmpty {
-                AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
-                LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                    ForEach(shownCards, id: \.self) { cardType in
-                        cardView(for: cardType)
-                            .editableCard(isVisible: visibleCards.contains(cardType),
-                                          isEditing: isEditing,
-                                          seed: cardOrder.firstIndex(of: cardType) ?? 0) {
-                                toggleCard(cardType)
-                            }
-                            .sdvxCardDraggable(cardType, editing: isEditing,
-                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                               onReorder: saveCardOrder)
+                VStack(spacing: 12.0) {
+                    AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
+                    LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                        ForEach(shownCards, id: \.self) { cardType in
+                            cardView(for: cardType)
+                                .editableCard(isVisible: visibleCards.contains(cardType),
+                                              isEditing: isEditing,
+                                              seed: cardOrder.firstIndex(of: cardType) ?? 0) {
+                                    toggleCard(cardType)
+                                }
+                                .sdvxCardDraggable(cardType, editing: isEditing,
+                                                   draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                                   onReorder: saveCardOrder)
+                        }
                     }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 16.0)
             }
         }
+        .padding(.top, 20.0)
         .onAppear {
             loadCardOrder()
             loadVisibleCards()

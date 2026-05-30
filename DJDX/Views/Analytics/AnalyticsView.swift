@@ -150,40 +150,20 @@ struct AnalyticsView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0.0) {
+        // Inter-section gap is carried by this VStack's spacing; each section's
+        // own VStack carries the smaller header-to-content gap.
+        VStack(spacing: 20.0) {
                 // MARK: Overview section
                 let overviewCards = cardOrder.filter {
                     $0 == .clearTypeOverall || (selectedGame.supportsTower && $0.isTowerCard)
                 }
                 let shownOverviewCards = isEditing ? overviewCards : overviewCards.filter { visibleCards.contains($0) }
                 if !shownOverviewCards.isEmpty {
-                    AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
-                    LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                        ForEach(shownOverviewCards, id: \.self) { cardType in
-                            overviewCard(for: cardType)
-                                .editableCard(isVisible: visibleCards.contains(cardType),
-                                              isEditing: isEditing,
-                                              seed: cardOrder.firstIndex(of: cardType) ?? 0) {
-                                    toggleCard(cardType)
-                                }
-                                .cardDraggable(cardType, editing: isEditing,
-                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                               onReorder: saveCardOrder)
-                        }
-                    }
-                    .padding(.horizontal)
-                }
-
-                // MARK: Last Play section
-                let summaryCards = cardOrder.filter { $0.isSummaryCard }
-                let shownSummaryCards = isEditing ? summaryCards : summaryCards.filter { visibleCards.contains($0) }
-                if !shownSummaryCards.isEmpty {
-                    AnalyticsSectionHeader(title: AnalyticsSection.lastPlay.titleKey)
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12.0) {
-                            ForEach(shownSummaryCards, id: \.self) { cardType in
-                                cardView(for: cardType)
-                                    .frame(width: summaryCardWidth)
+                    VStack(spacing: 12.0) {
+                        AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
+                        LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                            ForEach(shownOverviewCards, id: \.self) { cardType in
+                                overviewCard(for: cardType)
                                     .editableCard(isVisible: visibleCards.contains(cardType),
                                                   isEditing: isEditing,
                                                   seed: cardOrder.firstIndex(of: cardType) ?? 0) {
@@ -198,30 +178,59 @@ struct AnalyticsView: View {
                     }
                 }
 
+                // MARK: Last Play section
+                let summaryCards = cardOrder.filter { $0.isSummaryCard }
+                let shownSummaryCards = isEditing ? summaryCards : summaryCards.filter { visibleCards.contains($0) }
+                if !shownSummaryCards.isEmpty {
+                    VStack(spacing: 12.0) {
+                        AnalyticsSectionHeader(title: AnalyticsSection.lastPlay.titleKey)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12.0) {
+                                ForEach(shownSummaryCards, id: \.self) { cardType in
+                                    cardView(for: cardType)
+                                        .frame(width: summaryCardWidth)
+                                        .editableCard(isVisible: visibleCards.contains(cardType),
+                                                      isEditing: isEditing,
+                                                      seed: cardOrder.firstIndex(of: cardType) ?? 0) {
+                                            toggleCard(cardType)
+                                        }
+                                        .cardDraggable(cardType, editing: isEditing,
+                                                       draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                                       onReorder: saveCardOrder)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                }
+
                 // MARK: Per-level section
                 let shownPerLevelCards = isEditing ? perLevelCardOrder : visiblePerLevelCards
                 if !shownPerLevelCards.isEmpty {
-                    AnalyticsSectionHeader(title: AnalyticsSection.perLevel.titleKey)
-                    LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                        ForEach(shownPerLevelCards, id: \.self) { card in
-                            perLevelCard(difficulty: card.difficulty, category: card.category)
-                                .editableCard(
-                                    isVisible: visiblePerLevelCardSet.contains(card),
-                                    isEditing: isEditing,
-                                    seed: card.difficulty * 10 +
-                                        (AnalyticsPerLevelCategory.allCases.firstIndex(of: card.category) ?? 0)
-                                ) {
-                                    togglePerLevelCard(card)
-                                }
-                                .perLevelCardDraggable(card, editing: isEditing,
-                                                       draggedCard: $draggedPerLevelCard,
-                                                       cardOrder: $perLevelCardOrder,
-                                                       onReorder: savePerLevelCardOrder)
+                    VStack(spacing: 12.0) {
+                        AnalyticsSectionHeader(title: AnalyticsSection.perLevel.titleKey)
+                        LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                            ForEach(shownPerLevelCards, id: \.self) { card in
+                                perLevelCard(difficulty: card.difficulty, category: card.category)
+                                    .editableCard(
+                                        isVisible: visiblePerLevelCardSet.contains(card),
+                                        isEditing: isEditing,
+                                        seed: card.difficulty * 10 +
+                                            (AnalyticsPerLevelCategory.allCases.firstIndex(of: card.category) ?? 0)
+                                    ) {
+                                        togglePerLevelCard(card)
+                                    }
+                                    .perLevelCardDraggable(card, editing: isEditing,
+                                                           draggedCard: $draggedPerLevelCard,
+                                                           cardOrder: $perLevelCardOrder,
+                                                           onReorder: savePerLevelCardOrder)
+                            }
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                 }
             }
+            .padding(.top, 20.0)
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.size.width
             } action: { newWidth in

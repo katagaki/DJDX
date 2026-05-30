@@ -77,8 +77,6 @@ struct AnalyticsSectionHeader: View {
         Text(title)
             .font(.title3.bold())
             .foregroundStyle(.primary)
-            .padding(.top, 20.0)
-            .padding(.bottom, 12.0)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
     }
