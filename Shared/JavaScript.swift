@@ -322,61 +322,12 @@ return 'ERR:network';
 // the CSV string.
 let sdvxScoreDownloadFetchBody = """
 async function fetchSDVXScoreData() {
-    const params = new URLSearchParams();
-    params.append('method', 'display');
-    const targetURL = location.href.split('#')[0];
-    const response = await fetch(targetURL, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString()
-    });
-    const finalURL = response.url || '';
-    if (finalURL.indexOf('/error/error.html') !== -1) {
-        const match = finalURL.match(/[?&]err=([0-9]+)/);
-        return 'ERR:' + (match ? match[1] : 'server');
-    }
-    const buffer = await response.arrayBuffer();
-    const text = new TextDecoder('utf-8').decode(buffer);
-
-    // After the 表示 POST, the CSV is rendered into <textarea id="score_data">...</textarea>.
-    // Extract its inner content directly by regex so we never mistake the surrounding
-    // HTML page for the CSV.
-    function htmlUnescape(value) {
-        return value
-            .replace(/&amp;/g, '&')
-            .replace(/&lt;/g, '<')
-            .replace(/&gt;/g, '>')
-            .replace(/&quot;/g, '"')
-            .replace(/&#0?39;/g, "'")
-            .replace(/&#x27;/gi, "'");
-    }
-
-    let csv = '';
-    const textareaMatch = text.match(/<textarea[^>]*id=["']?score_data["']?[^>]*>([\\s\\S]*?)<\\/textarea>/i);
-    if (textareaMatch && textareaMatch[1]) {
-        csv = htmlUnescape(textareaMatch[1]).trim();
-    }
-    if (!csv) {
-        // Fall back to DOMParser in case the markup differs.
-        const parsed = new DOMParser().parseFromString(text, 'text/html');
-        const node = parsed.getElementById('score_data');
-        if (node) { csv = (node.value || node.textContent || '').trim(); }
-    }
+    let csv = document.getElementById('score_data').value;
     if (csv.indexOf('楽曲名') !== -1) { return csv; }
-    if (text.indexOf('/error/error.html') !== -1) { return 'ERR:server'; }
     return 'ERR:empty';
 }
-
-for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-        return await fetchSDVXScoreData();
-    } catch (error) {
-        if (attempt === 2) { return 'ERR:network'; }
-        await new Promise(function(resolve) { setTimeout(resolve, 600 * (attempt + 1)); });
-    }
-}
-return 'ERR:network';
+    
+return await fetchSDVXScoreData();
 """
 
 let iidxTowerCleanup = """
