@@ -54,6 +54,8 @@ struct ScoresView<Header: View>: View {
     @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreDataExpanded") var isScoreDataExpanded: Bool
+
     let actor = DataFetcher()
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
@@ -173,19 +175,21 @@ struct ScoresView<Header: View>: View {
                 if searchTerm.isEmpty {
                     header
                     if !isEditingAnalytics {
-                        HStack {
-                            Text("Analytics.Section.ScoreData")
-                                .font(.title3.bold())
-                                .foregroundStyle(.primary)
-                            Spacer()
+                        AnalyticsSectionHeader(
+                            title: "Analytics.Section.ScoreData",
+                            isCollapsible: true,
+                            isExpanded: isScoreDataExpanded
+                        ) {
+                            withAnimation(.snappy) { isScoreDataExpanded.toggle() }
                         }
                         .padding(.top, 16.0)
                         .padding(.bottom, 12.0)
-                        .padding(.horizontal)
-                        Divider()
+                        if isScoreDataExpanded {
+                            Divider()
+                        }
                     }
                 }
-                if !isEditingAnalytics {
+                if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
                     ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
                             id: \.id) { entry in
                         Button {

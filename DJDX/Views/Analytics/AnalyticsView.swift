@@ -43,6 +43,10 @@ struct AnalyticsView: View {
     @AppStorage(wrappedValue: Data(), "Analytics.VisiblePerLevelCards") var visiblePerLevelCardsData: Data
     @State var visiblePerLevelCardSet: Set<PerLevelCardID> = PerLevelCardID.defaultVisible
 
+    // Collapsed sections
+    @AppStorage(wrappedValue: Data(), "Analytics.CollapsedSections") var collapsedSectionsData: Data
+    @State var collapsedSections: Set<AnalyticsSection> = []
+
     // Width of the layout container, measured rather than read from UIScreen.
     @State var containerWidth: CGFloat = 0.0
 
@@ -160,35 +164,17 @@ struct AnalyticsView: View {
                 let shownOverviewCards = isEditing ? overviewCards : overviewCards.filter { visibleCards.contains($0) }
                 if !shownOverviewCards.isEmpty {
                     VStack(spacing: 12.0) {
-                        AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
-                        LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                            ForEach(shownOverviewCards, id: \.self) { cardType in
-                                overviewCard(for: cardType)
-                                    .editableCard(isVisible: visibleCards.contains(cardType),
-                                                  isEditing: isEditing,
-                                                  seed: cardOrder.firstIndex(of: cardType) ?? 0) {
-                                        toggleCard(cardType)
-                                    }
-                                    .cardDraggable(cardType, editing: isEditing,
-                                                   draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                                   onReorder: saveCardOrder)
-                            }
+                        AnalyticsSectionHeader(
+                            title: AnalyticsSection.overview.titleKey,
+                            isCollapsible: !isEditing,
+                            isExpanded: isSectionExpanded(.overview)
+                        ) {
+                            toggleSection(.overview)
                         }
-                        .padding(.horizontal)
-                    }
-                }
-
-                // MARK: Last Play section
-                let summaryCards = cardOrder.filter { $0.isSummaryCard }
-                let shownSummaryCards = isEditing ? summaryCards : summaryCards.filter { visibleCards.contains($0) }
-                if !shownSummaryCards.isEmpty {
-                    VStack(spacing: 12.0) {
-                        AnalyticsSectionHeader(title: AnalyticsSection.lastPlay.titleKey)
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12.0) {
-                                ForEach(shownSummaryCards, id: \.self) { cardType in
-                                    cardView(for: cardType)
-                                        .frame(width: summaryCardWidth)
+                        if isSectionExpanded(.overview) {
+                            LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                                ForEach(shownOverviewCards, id: \.self) { cardType in
+                                    overviewCard(for: cardType)
                                         .editableCard(isVisible: visibleCards.contains(cardType),
                                                       isEditing: isEditing,
                                                       seed: cardOrder.firstIndex(of: cardType) ?? 0) {
@@ -204,29 +190,71 @@ struct AnalyticsView: View {
                     }
                 }
 
+                // MARK: Last Play section
+                let summaryCards = cardOrder.filter { $0.isSummaryCard }
+                let shownSummaryCards = isEditing ? summaryCards : summaryCards.filter { visibleCards.contains($0) }
+                if !shownSummaryCards.isEmpty {
+                    VStack(spacing: 12.0) {
+                        AnalyticsSectionHeader(
+                            title: AnalyticsSection.lastPlay.titleKey,
+                            isCollapsible: !isEditing,
+                            isExpanded: isSectionExpanded(.lastPlay)
+                        ) {
+                            toggleSection(.lastPlay)
+                        }
+                        if isSectionExpanded(.lastPlay) {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12.0) {
+                                    ForEach(shownSummaryCards, id: \.self) { cardType in
+                                        cardView(for: cardType)
+                                            .frame(width: summaryCardWidth)
+                                            .editableCard(isVisible: visibleCards.contains(cardType),
+                                                          isEditing: isEditing,
+                                                          seed: cardOrder.firstIndex(of: cardType) ?? 0) {
+                                                toggleCard(cardType)
+                                            }
+                                            .cardDraggable(cardType, editing: isEditing,
+                                                           draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                                           onReorder: saveCardOrder)
+                                    }
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+                    }
+                }
+
                 // MARK: Per-level section
                 let shownPerLevelCards = isEditing ? perLevelCardOrder : visiblePerLevelCards
                 if !shownPerLevelCards.isEmpty {
                     VStack(spacing: 12.0) {
-                        AnalyticsSectionHeader(title: AnalyticsSection.perLevel.titleKey)
-                        VStack(spacing: 12.0) {
-                            ForEach(shownPerLevelCards, id: \.self) { card in
-                                perLevelCard(difficulty: card.difficulty, category: card.category)
-                                    .editableCard(
-                                        isVisible: visiblePerLevelCardSet.contains(card),
-                                        isEditing: isEditing,
-                                        seed: card.difficulty * 10 +
-                                            (AnalyticsPerLevelCategory.allCases.firstIndex(of: card.category) ?? 0)
-                                    ) {
-                                        togglePerLevelCard(card)
-                                    }
-                                    .perLevelCardDraggable(card, editing: isEditing,
-                                                           draggedCard: $draggedPerLevelCard,
-                                                           cardOrder: $perLevelCardOrder,
-                                                           onReorder: savePerLevelCardOrder)
-                            }
+                        AnalyticsSectionHeader(
+                            title: AnalyticsSection.perLevel.titleKey,
+                            isCollapsible: !isEditing,
+                            isExpanded: isSectionExpanded(.perLevel)
+                        ) {
+                            toggleSection(.perLevel)
                         }
-                        .padding(.horizontal)
+                        if isSectionExpanded(.perLevel) {
+                            VStack(spacing: 12.0) {
+                                ForEach(shownPerLevelCards, id: \.self) { card in
+                                    perLevelCard(difficulty: card.difficulty, category: card.category)
+                                        .editableCard(
+                                            isVisible: visiblePerLevelCardSet.contains(card),
+                                            isEditing: isEditing,
+                                            seed: card.difficulty * 10 +
+                                                (AnalyticsPerLevelCategory.allCases.firstIndex(of: card.category) ?? 0)
+                                        ) {
+                                            togglePerLevelCard(card)
+                                        }
+                                        .perLevelCardDraggable(card, editing: isEditing,
+                                                               draggedCard: $draggedPerLevelCard,
+                                                               cardOrder: $perLevelCardOrder,
+                                                               onReorder: savePerLevelCardOrder)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
                     }
                 }
             }
@@ -241,6 +269,7 @@ struct AnalyticsView: View {
                 loadVisibleCards()
                 loadPerLevelCardOrder()
                 loadVisiblePerLevelCards()
+                loadCollapsedSections()
                 if model.dataState == .initializing {
                     await reload()
                 }
@@ -270,7 +299,9 @@ struct AnalyticsView: View {
                     visibleCards = AnalyticsCardType.defaultVisible
                     perLevelCardOrder = PerLevelCardID.defaultOrder
                     visiblePerLevelCardSet = PerLevelCardID.defaultVisible
+                    collapsedSections = []
                 }
+                saveCollapsedSections()
             }
     }
 

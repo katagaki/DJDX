@@ -66,19 +66,69 @@ extension AnalyticsView {
     func saveVisiblePerLevelCards() {
         visiblePerLevelCardsData = (try? JSONEncoder().encode(visiblePerLevelCardSet)) ?? Data()
     }
+
+    func loadCollapsedSections() {
+        if let decoded = try? JSONDecoder().decode(Set<AnalyticsSection>.self, from: collapsedSectionsData) {
+            collapsedSections = decoded
+        }
+    }
+
+    func saveCollapsedSections() {
+        collapsedSectionsData = (try? JSONEncoder().encode(collapsedSections)) ?? Data()
+    }
+
+    func isSectionExpanded(_ section: AnalyticsSection) -> Bool {
+        // While editing, always reveal a section's cards so they can be reordered.
+        isEditing || !collapsedSections.contains(section)
+    }
+
+    func toggleSection(_ section: AnalyticsSection) {
+        withAnimation(.snappy) {
+            if collapsedSections.contains(section) {
+                collapsedSections.remove(section)
+            } else {
+                collapsedSections.insert(section)
+            }
+        }
+        saveCollapsedSections()
+    }
 }
 
 // MARK: - Section Header
 
 struct AnalyticsSectionHeader: View {
     let title: LocalizedStringKey
+    var isCollapsible: Bool = false
+    var isExpanded: Bool = true
+    var onToggle: (() -> Void)?
 
     var body: some View {
-        Text(title)
-            .font(.title3.bold())
-            .foregroundStyle(.primary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal)
+        if isCollapsible, let onToggle {
+            Button(action: onToggle) {
+                headerContent
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+        } else {
+            headerContent
+        }
+    }
+
+    @ViewBuilder
+    var headerContent: some View {
+        HStack(spacing: 6.0) {
+            Text(title)
+                .font(.title3.bold())
+                .foregroundStyle(.primary)
+            if isCollapsible {
+                Image(systemName: "chevron.down")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.secondary)
+                    .rotationEffect(.degrees(isExpanded ? 0.0 : -90.0))
+            }
+            Spacer()
+        }
+        .padding(.horizontal)
     }
 }
 
