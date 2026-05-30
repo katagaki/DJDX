@@ -25,10 +25,6 @@ struct SDVXAnalyticsView: View {
             AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
 
             LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                summaryCard(title: "Analytics.SDVX.Volforce",
-                            value: String(format: "%.2f", model.volforce))
-                summaryCard(title: "Analytics.SDVX.TotalCharts",
-                            value: String(model.totalCharts))
                 clearBreakdownCard
                 gradeBreakdownCard
             }
@@ -46,19 +42,6 @@ struct SDVXAnalyticsView: View {
         .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
             Task { await model.reload() }
         }
-    }
-
-    func summaryCard(title: LocalizedStringKey, value: String) -> some View {
-        AnalyticsCardView(title: title, systemImage: "",
-                          iconColor: .clear, contentHeight: 80.0, showsHeader: false) {
-            Text(verbatim: value)
-                .font(.title.bold())
-                .fontWidth(.expanded)
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        }
-        .perLevelCaption(title)
     }
 
     // Aggregate clear-type counts across all difficulty categories
