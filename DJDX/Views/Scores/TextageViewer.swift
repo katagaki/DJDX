@@ -186,6 +186,28 @@ struct WebViewForTextage: UIViewRepresentable {
         }
 
         #if DEBUG
+        func webView(_ webView: WKWebView,
+                     decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+            debugPrint("[Textage] decide action ->", navigationAction.request.url?.absoluteString ?? "nil")
+            return .allow
+        }
+
+        func webView(_ webView: WKWebView,
+                     decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+            let status = (navigationResponse.response as? HTTPURLResponse)?.statusCode ?? -1
+            debugPrint("[Textage] decide response -> status", status,
+                       navigationResponse.response.url?.absoluteString ?? "nil")
+            return .allow
+        }
+
+        func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
+            debugPrint("[Textage] didCommit ->", webView.url?.absoluteString ?? "nil")
+        }
+
+        func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation _: WKNavigation!) {
+            debugPrint("[Textage] didReceiveServerRedirect ->", webView.url?.absoluteString ?? "nil")
+        }
+
         func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
             debugPrint("[Textage] didStartProvisionalNavigation ->", webView.url?.absoluteString ?? "nil")
         }
