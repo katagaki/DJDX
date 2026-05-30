@@ -32,24 +32,25 @@ struct SDVXAnalyticsView: View {
 
     var body: some View {
         VStack(spacing: 0.0) {
-            AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
-
             let shownCards = isEditing ? cardOrder : cardOrder.filter { visibleCards.contains($0) }
-            LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                ForEach(shownCards, id: \.self) { cardType in
-                    cardView(for: cardType)
-                        .editableCard(isVisible: visibleCards.contains(cardType),
-                                      isEditing: isEditing,
-                                      seed: cardOrder.firstIndex(of: cardType) ?? 0) {
-                            toggleCard(cardType)
-                        }
-                        .sdvxCardDraggable(cardType, editing: isEditing,
-                                           draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                           onReorder: saveCardOrder)
+            if !shownCards.isEmpty {
+                AnalyticsSectionHeader(title: AnalyticsSection.overview.titleKey)
+                LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                    ForEach(shownCards, id: \.self) { cardType in
+                        cardView(for: cardType)
+                            .editableCard(isVisible: visibleCards.contains(cardType),
+                                          isEditing: isEditing,
+                                          seed: cardOrder.firstIndex(of: cardType) ?? 0) {
+                                toggleCard(cardType)
+                            }
+                            .sdvxCardDraggable(cardType, editing: isEditing,
+                                               draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                               onReorder: saveCardOrder)
+                    }
                 }
+                .padding(.horizontal)
+                .padding(.bottom, 16.0)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 16.0)
         }
         .onAppear {
             loadCardOrder()
