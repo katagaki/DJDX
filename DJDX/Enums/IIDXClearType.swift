@@ -51,12 +51,12 @@ enum IIDXClearType: String, Codable {
     // Short label for compact per-level stat rows.
     static func abbreviation(for clearType: String) -> String {
         switch clearType {
-        case "FULLCOMBO CLEAR": return "FC"
+        case "FULLCOMBO CLEAR": return "F-COMBO"
         case "CLEAR": return "CLEAR"
-        case "EASY CLEAR": return "EASY"
-        case "ASSIST CLEAR": return "ASSIST"
-        case "HARD CLEAR": return "HARD"
-        case "EX HARD CLEAR": return "EXH"
+        case "EASY CLEAR": return "E-CLEAR"
+        case "ASSIST CLEAR": return "A-CLEAR"
+        case "HARD CLEAR": return "H-CLEAR"
+        case "EX HARD CLEAR": return "EXH-CLEAR"
         case "FAILED": return "FAIL"
         default: return clearType
         }

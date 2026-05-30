@@ -160,12 +160,12 @@ struct ImportDetailView: View {
 
     func clearTypeAbbreviation(_ clearType: String) -> String {
         switch clearType {
-        case "FULLCOMBO CLEAR": return "FC"
-        case "HARD CLEAR": return "HARD"
-        case "EX HARD CLEAR": return "EXH"
+        case "FULLCOMBO CLEAR": return "F-COMBO"
+        case "HARD CLEAR": return "H-CLEAR"
+        case "EX HARD CLEAR": return "EXH-CLEAR"
         case "CLEAR": return "CLEAR"
-        case "EASY CLEAR": return "EASY"
-        case "ASSIST CLEAR": return "ASSIST"
+        case "EASY CLEAR": return "E-CLEAR"
+        case "ASSIST CLEAR": return "A-CLEAR"
         case "FAILED": return "FAIL"
         case "NO PLAY": return "---"
         default: return "-"
