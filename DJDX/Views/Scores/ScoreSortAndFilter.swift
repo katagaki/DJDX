@@ -190,6 +190,11 @@ struct ScoreFilterSheet: View {
                         .scoresFilterShowWithScoreOnly, systemImage: "trophy.fill",
                         isOn: $isShowingOnlyPlayDataWithScores
                     )
+                    Toggle(
+                        "More.PlayDataDisplay.HideBeginnerLevel",
+                        systemImage: "shield.righthalf.filled",
+                        isOn: $isBeginnerLevelHidden
+                    )
                 }
                 Section("More.PlayDataDisplay.Header") {
                     Toggle("More.PlayDataDisplay.ShowGenre", isOn: $isGenreVisible)

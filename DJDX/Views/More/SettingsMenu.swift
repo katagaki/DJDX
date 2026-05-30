@@ -14,8 +14,6 @@ struct SettingsMenu: View {
 
     let importer = DataImporter()
 
-    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
-
     @State var isPresentingExternalDataSources: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingResetLayout: Bool = false
@@ -60,11 +58,6 @@ struct SettingsMenu: View {
                 Button("More.ExternalData.Header", image: .iconAnalytics) {
                     isPresentingExternalDataSources = true
                 }
-                Toggle(
-                    "More.PlayDataDisplay.HideBeginnerLevel",
-                    systemImage: "shield.righthalf.filled",
-                    isOn: $isBeginnerLevelHidden
-                )
             }
             Section("More.ManageData.Header") {
                 Button("More.ManageData.ResetLayout", systemImage: "arrow.counterclockwise", role: .destructive) {
