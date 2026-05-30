@@ -17,7 +17,9 @@ final class IIDXSong: Equatable, @unchecked Sendable {
     var movie: String = ""
     var layer: String = ""
 
-    init() {}
+    init() {
+        // Empty default initializer required by SwiftData
+    }
 
     init(_ tableColumnData: [String]) {
         self.title = tableColumnData[0]

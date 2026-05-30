@@ -40,7 +40,9 @@ struct CardReorderDropDelegate: DropDelegate {
         onReorder()
     }
 
-    func dropExited(info _: DropInfo) {}
+    func dropExited(info _: DropInfo) {
+        // No cleanup needed when a drag leaves this target
+    }
 }
 
 struct PerLevelCardID: Codable, Hashable {
@@ -101,5 +103,7 @@ struct PerLevelCardReorderDropDelegate: DropDelegate {
         onReorder()
     }
 
-    func dropExited(info _: DropInfo) {}
+    func dropExited(info _: DropInfo) {
+        // No cleanup needed when a drag leaves this target
+    }
 }

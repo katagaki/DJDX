@@ -96,12 +96,11 @@ struct AnalyticsView: View {
             } label: {
                 AnalyticsCardView(cardType: cardType, showsHeader: false) {
                     Group {
-                        switch cardType {
-                        case .towerRecent:
+                        if cardType == .towerRecent {
                             TowerBarChart(entries: model.towerChartEntries, usesDateAxis: false)
                                 .chartXAxis { AxisMarks { AxisGridLine() } }
                                 .chartYAxis { AxisMarks { AxisGridLine() } }
-                        default:
+                        } else {
                             TowerTotalsChart(
                                 totalKeyCount: model.towerTotalKeyCount,
                                 totalScratchCount: model.towerTotalScratchCount,

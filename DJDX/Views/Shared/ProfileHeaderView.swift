@@ -101,13 +101,12 @@ struct ProfileHeaderView: View {
                     let (imageData, response) = try await URLSession.shared.data(for: imageRequest)
 
                     if let httpResponse = response as? HTTPURLResponse,
-                       (200...299).contains(httpResponse.statusCode) {
-                        if let documentsDirectory = FileManager.default.urls(
-                            for: .documentDirectory, in: .userDomainMask
-                        ).first {
-                            let fileURL = documentsDirectory.appendingPathComponent("Qpro.png")
-                            try? imageData.write(to: fileURL)
-                        }
+                       (200...299).contains(httpResponse.statusCode),
+                       let documentsDirectory = FileManager.default.urls(
+                        for: .documentDirectory, in: .userDomainMask
+                       ).first {
+                        let fileURL = documentsDirectory.appendingPathComponent("Qpro.png")
+                        try? imageData.write(to: fileURL)
                     }
                 }
             }

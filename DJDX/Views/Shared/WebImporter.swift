@@ -142,7 +142,9 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
             to: importToDate,
             for: .tower,
             from: iidxVersion
-        ) { }
+        ) {
+            // Drains the import progress stream; no per-update handling needed
+        }
     }
 
     func stopProcessing(with reason: ImportFailedReason) {
@@ -182,7 +184,7 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         super.init()
     }
 
-    func webView(_ webView: WKWebView,
+    func webView(_: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         #if DEBUG
@@ -278,11 +280,11 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         }
     }
 
-    func webView(_ webView: WKWebView, didFail _: WKNavigation!, withError error: Error) {
+    func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
         handleNavigationFailure(error)
     }
 
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
+    func webView(_: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
         handleNavigationFailure(error)
     }
 
@@ -296,7 +298,7 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         resolveFailure(with: .serverError)
     }
 
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
         // Sync WebView cookie store with URLSession cookie store
         let webViewCookieStore = webView.configuration.websiteDataStore.httpCookieStore
         let nativeCookieStorage = HTTPCookieStorage.shared

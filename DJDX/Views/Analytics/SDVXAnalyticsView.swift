@@ -265,5 +265,7 @@ struct SDVXCardReorderDropDelegate: DropDelegate {
         onReorder()
     }
 
-    func dropExited(info _: DropInfo) {}
+    func dropExited(info _: DropInfo) {
+        // No cleanup needed when a drag leaves this target
+    }
 }

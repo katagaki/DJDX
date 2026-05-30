@@ -350,12 +350,7 @@ actor DataImporter {
     }
 
     func migrateSongs(_ songs: [IIDXSong]) {
-        guard let database = try? BEMANIWikiDatabase.shared.getWriteConnection() else { return }
-        try? database.transaction {
-            for song in songs {
-                Self.insertSongToBEMANIWiki(database: database, song: song)
-            }
-        }
+        insertSongs(songs)
     }
 
     func migrateTowerEntries(_ entries: [IIDXTowerEntry]) {

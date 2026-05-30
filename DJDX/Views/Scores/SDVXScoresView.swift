@@ -83,7 +83,8 @@ struct SDVXScoresView<Header: View>: View {
             sorted = base.sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
         case .clearType:
             sorted = base.sorted { lhs, rhs in
-                let lhsRank = clearRank(lhs), rhsRank = clearRank(rhs)
+                let lhsRank = clearRank(lhs)
+                let rhsRank = clearRank(rhs)
                 if lhsRank != rhsRank { return lhsRank < rhsRank }
                 return lhs.highScore > rhs.highScore
             }
@@ -94,7 +95,8 @@ struct SDVXScoresView<Header: View>: View {
             }
         case .level:
             sorted = base.sorted { lhs, rhs in
-                let lhsLevel = Double(lhs.level) ?? 0.0, rhsLevel = Double(rhs.level) ?? 0.0
+                let lhsLevel = Double(lhs.level) ?? 0.0
+                let rhsLevel = Double(rhs.level) ?? 0.0
                 if lhsLevel != rhsLevel { return lhsLevel < rhsLevel }
                 return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
             }
@@ -206,7 +208,9 @@ struct SDVXScoresView<Header: View>: View {
                 clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
                 gradesToShow: $gradesToShow.animation(.snappy.speed(2.0)),
                 availableLevelBuckets: availableLevelBuckets,
-                onReset: {}
+                onReset: {
+                    // No additional handling needed when filters are reset
+                }
             )
             .automaticSheetNavigationTransition(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
             .presentationDetents([.medium, .large])

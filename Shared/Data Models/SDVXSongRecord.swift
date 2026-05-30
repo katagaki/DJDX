@@ -25,7 +25,9 @@ final class SDVXSongRecord: Equatable, Hashable, @unchecked Sendable {
     var ultimateChainCount: Int = 0
     var perfectCount: Int = 0
 
-    init() {}
+    init() {
+        // Empty default initializer required by SwiftData
+    }
 
     // Based on the SDVX e-amusement CSV format.
     init(csvRowData: [String: Any]) {

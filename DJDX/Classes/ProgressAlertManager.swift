@@ -16,7 +16,8 @@ class ProgressAlertManager {
     var message: String = ""
     var percentage: Int = 0
 
-    func show(title: String, message: String, completion: @escaping @MainActor () -> Void = {}) {
+    func show(title: String, message: String,
+              completion: @escaping @MainActor () -> Void = { /* No completion handler by default */ }) {
         self.title = title
         self.message = message
         percentage = 0

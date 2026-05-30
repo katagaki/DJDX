@@ -27,7 +27,9 @@ final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
 
     var importGroup: ImportGroup?
 
-    init() {}
+    init() {
+        // Empty default initializer required by SwiftData
+    }
 
     // Based on EPOLIS CSV format
     init(csvRowData: [String: Any], playType: IIDXPlayType? = nil) {

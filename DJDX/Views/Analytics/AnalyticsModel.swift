@@ -141,7 +141,6 @@ final class AnalyticsModel {
         }
     }
 
-    // swiftlint:disable function_body_length
     func reloadNewClearsAndHighScores(playType: IIDXPlayType, iidxVersion: IIDXVersion) async {
         debugPrint("Calculating new clears and high scores")
         let importGroups = await fetcher.importGroups(for: iidxVersion)
@@ -194,7 +193,6 @@ final class AnalyticsModel {
             self.newA = computed.djLevels["A"]!
         }
     }
-    // swiftlint:enable function_body_length
 
     // swiftlint:disable function_body_length
     nonisolated static func computeNewEntries(

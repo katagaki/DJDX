@@ -37,45 +37,40 @@ struct ScoreViewer: View {
 
     var body: some View {
         List {
-            if selectedLevel == .all || selectedLevel == .beginner {
-                if !isBeginnerLevelHidden, songRecord.beginnerScore.difficulty != 0 {
-                    ScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
-                                 noteCount: noteCount(songRecord, .beginner),
-                                 playType: .single,
-                                 chartRadarData: radarDataByLevel["SP-0"])
-                }
+            if selectedLevel == .all || selectedLevel == .beginner,
+               !isBeginnerLevelHidden, songRecord.beginnerScore.difficulty != 0 {
+                ScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
+                             noteCount: noteCount(songRecord, .beginner),
+                             playType: .single,
+                             chartRadarData: radarDataByLevel["SP-0"])
             }
-            if selectedLevel == .all || selectedLevel == .normal {
-                if songRecord.normalScore.difficulty != 0 {
-                    ScoreSection(songTitle: songRecord.title, score: songRecord.normalScore,
-                                 noteCount: noteCount(songRecord, .normal),
-                                 playType: songRecord.playType,
-                                 chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 1)])
-                }
+            if selectedLevel == .all || selectedLevel == .normal,
+               songRecord.normalScore.difficulty != 0 {
+                ScoreSection(songTitle: songRecord.title, score: songRecord.normalScore,
+                             noteCount: noteCount(songRecord, .normal),
+                             playType: songRecord.playType,
+                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 1)])
             }
-            if selectedLevel == .all || selectedLevel == .hyper {
-                if songRecord.hyperScore.difficulty != 0 {
-                    ScoreSection(songTitle: songRecord.title, score: songRecord.hyperScore,
-                                 noteCount: noteCount(songRecord, .hyper),
-                                 playType: songRecord.playType,
-                                 chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 2)])
-                }
+            if selectedLevel == .all || selectedLevel == .hyper,
+               songRecord.hyperScore.difficulty != 0 {
+                ScoreSection(songTitle: songRecord.title, score: songRecord.hyperScore,
+                             noteCount: noteCount(songRecord, .hyper),
+                             playType: songRecord.playType,
+                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 2)])
             }
-            if selectedLevel == .all || selectedLevel == .another {
-                if songRecord.anotherScore.difficulty != 0 {
-                    ScoreSection(songTitle: songRecord.title, score: songRecord.anotherScore,
-                                 noteCount: noteCount(songRecord, .another),
-                                 playType: songRecord.playType,
-                                 chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 3)])
-                }
+            if selectedLevel == .all || selectedLevel == .another,
+               songRecord.anotherScore.difficulty != 0 {
+                ScoreSection(songTitle: songRecord.title, score: songRecord.anotherScore,
+                             noteCount: noteCount(songRecord, .another),
+                             playType: songRecord.playType,
+                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 3)])
             }
-            if selectedLevel == .all || selectedLevel == .leggendaria {
-                if songRecord.leggendariaScore.difficulty != 0 {
-                    ScoreSection(songTitle: songRecord.title, score: songRecord.leggendariaScore,
-                                 noteCount: noteCount(songRecord, .leggendaria),
-                                 playType: songRecord.playType,
-                                 chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 4)])
-                }
+            if selectedLevel == .all || selectedLevel == .leggendaria,
+               songRecord.leggendariaScore.difficulty != 0 {
+                ScoreSection(songTitle: songRecord.title, score: songRecord.leggendariaScore,
+                             noteCount: noteCount(songRecord, .leggendaria),
+                             playType: songRecord.playType,
+                             chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 4)])
             }
         }
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
@@ -262,11 +257,10 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
     func versionNumberToolbarItemContent() -> some View {
         Group {
             if let iidxVersion = IIDXVersion.marketingNames[songRecord.version] {
-                switch colorScheme {
-                case .dark:
+                if colorScheme == .dark {
                     Text(songRecord.version)
                         .foregroundStyle(Color(uiColor: iidxVersion.darkModeColor))
-                default:
+                } else {
                     Text(songRecord.version)
                         .foregroundStyle(Color(uiColor: iidxVersion.lightModeColor))
                 }

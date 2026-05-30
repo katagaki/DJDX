@@ -237,8 +237,7 @@ struct WebViewForTextage: UIViewRepresentable {
                 default: break
                 }
             case .double:
-                switch playSide {
-                case .notApplicable:
+                if playSide == .notApplicable {
                     switch level {
                     case .normal: return "307"
                     case .hyper: return "308"
@@ -246,7 +245,6 @@ struct WebViewForTextage: UIViewRepresentable {
                     case .leggendaria: return "310"
                     default: break
                     }
-                default: break
                 }
             }
             return "102"

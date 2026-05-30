@@ -28,7 +28,6 @@ extension ScoresView {
                     sortOptions: SortOptions(mode: sortMode, order: sortOrder)
                 )
                 let songCompactTitles = await actor.songCompactTitles()
-                let songNoteCounts = await actor.songNoteCounts
 
                 await MainActor.run {
                     withAnimation(.smooth.speed(2.0)) {

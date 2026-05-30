@@ -63,12 +63,6 @@ struct ScoreSection: View {
                     .fontWidth(.expanded)
                     .fontWeight(.black)
                 }
-            } else {
-                Text("Scores.Viewer.NoDataForCurrentVersion")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            if score.djLevelEnum() != .none {
                 VStack(alignment: .leading, spacing: 8.0) {
                     ClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
                     DetailRow("SCORE", value: score.score, style: scoreStyle())
@@ -81,6 +75,9 @@ struct ScoreSection: View {
                 }
                 .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
             } else {
+                Text("Scores.Viewer.NoDataForCurrentVersion")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
                 if score.clearType != "NO PLAY" {
                     ClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
                 }

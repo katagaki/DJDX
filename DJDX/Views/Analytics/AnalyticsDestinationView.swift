@@ -26,7 +26,6 @@ struct AnalyticsDestinationView: View {
         return "LEVEL \(difficulty)\(separator)\(categoryTitle)"
     }
 
-    // swiftlint:disable:next function_body_length
     var body: some View {
         Group {
             switch path {

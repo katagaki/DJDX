@@ -56,10 +56,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
 
     // The qpro + notes radar profile section is IIDX-AC-only for now.
     var supportsProfile: Bool {
-        switch self {
-        case .iidxArcade: true
-        case .soundVoltex, .iidxInfinitas: false
-        }
+        self == .iidxArcade
     }
 
     var databaseFileName: String {

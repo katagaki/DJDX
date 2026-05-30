@@ -250,14 +250,11 @@ struct ScoresView<Header: View>: View {
                 }
             }
             .background {
-                switch dataState {
-                case .presenting:
-                    if songRecords == nil || (searchResults != nil && (searchResults?.isEmpty ?? false)) {
-                        ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
-                    } else {
-                        Color.clear
-                    }
-                default: Color.clear
+                if dataState == .presenting,
+                   songRecords == nil || (searchResults != nil && (searchResults?.isEmpty ?? false)) {
+                    ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
+                } else {
+                    Color.clear
                 }
             }
             .searchable(text: $searchTerm,

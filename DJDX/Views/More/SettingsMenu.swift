@@ -90,7 +90,9 @@ struct SettingsMenu: View {
             Button("Alert.DeleteData.Web.Confirm", role: .destructive) {
                 deleteAllWebData()
             }
-            Button("Shared.Cancel", role: .cancel) { }
+            Button("Shared.Cancel", role: .cancel) {
+                // Dismisses the alert; no further action needed
+            }
         } message: {
             Text("Alert.DeleteData.Web.Subtitle")
         }
@@ -98,7 +100,9 @@ struct SettingsMenu: View {
             Button("Alert.ResetLayout.Confirm", role: .destructive) {
                 resetLayout()
             }
-            Button("Shared.Cancel", role: .cancel) { }
+            Button("Shared.Cancel", role: .cancel) {
+                // Dismisses the alert; no further action needed
+            }
         } message: {
             Text("Alert.ResetLayout.Subtitle")
         }
@@ -120,7 +124,9 @@ struct SettingsMenu: View {
             Button("Alert.DeleteData.Score.Confirm", role: .destructive) {
                 deleteAllScoreData()
             }
-            Button("Shared.Cancel", role: .cancel) { }
+            Button("Shared.Cancel", role: .cancel) {
+                // Dismisses the alert; no further action needed
+            }
         } message: {
             Text("Alert.DeleteData.Score.Subtitle")
         }
@@ -139,7 +145,9 @@ struct SettingsMenu: View {
                     WKWebsiteDataStore.default().removeData(
                         ofTypes: record.dataTypes,
                         for: [record],
-                        completionHandler: {}
+                        completionHandler: {
+                            // Fire-and-forget removal; nothing to do on completion
+                        }
                     )
                 }
             }

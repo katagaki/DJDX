@@ -76,6 +76,7 @@ struct SDVXWebViewForImporter: UIViewRepresentable, @preconcurrency SDVXUpdateSc
     }
 
     func updateUIView(_: WKWebView, context _: Context) {
+        // No dynamic updates needed; the web view is configured once in makeUIView
     }
 
     func importScoreData(using csvString: String) async {
@@ -153,11 +154,11 @@ class SDVXCoordinatorForImporter: NSObject, WKNavigationDelegate {
         }
     }
 
-    func webView(_ webView: WKWebView, didFail _: WKNavigation!, withError error: Error) {
+    func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
         handleNavigationFailure(error)
     }
 
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
+    func webView(_: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
         handleNavigationFailure(error)
     }
 
@@ -168,7 +169,7 @@ class SDVXCoordinatorForImporter: NSObject, WKNavigationDelegate {
         resolveFailure(with: .serverError)
     }
 
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
         let webViewCookieStore = webView.configuration.websiteDataStore.httpCookieStore
         let nativeCookieStorage = HTTPCookieStorage.shared
         webViewCookieStore.getAllCookies { cookies in
