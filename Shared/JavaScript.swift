@@ -338,15 +338,31 @@ async function fetchSDVXScoreData() {
     }
     const buffer = await response.arrayBuffer();
     const text = new TextDecoder('utf-8').decode(buffer);
-    const parsed = new DOMParser().parseFromString(text, 'text/html');
-    // After the 表示 POST, the CSV is rendered into <textarea id="score_data">.
-    const node = parsed.getElementById('score_data') || parsed.querySelector('textarea, pre');
-    let csv = node ? (node.value || node.textContent || '') : '';
-    if (!csv && text.indexOf('楽曲名') !== -1) {
-        // The response is the raw CSV itself, not wrapped in HTML
-        csv = text;
+
+    // After the 表示 POST, the CSV is rendered into <textarea id="score_data">...</textarea>.
+    // Extract its inner content directly by regex so we never mistake the surrounding
+    // HTML page for the CSV.
+    function htmlUnescape(value) {
+        return value
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#0?39;/g, "'")
+            .replace(/&#x27;/gi, "'");
     }
-    csv = csv.trim();
+
+    let csv = '';
+    const textareaMatch = text.match(/<textarea[^>]*id=["']?score_data["']?[^>]*>([\\s\\S]*?)<\\/textarea>/i);
+    if (textareaMatch && textareaMatch[1]) {
+        csv = htmlUnescape(textareaMatch[1]).trim();
+    }
+    if (!csv) {
+        // Fall back to DOMParser in case the markup differs.
+        const parsed = new DOMParser().parseFromString(text, 'text/html');
+        const node = parsed.getElementById('score_data');
+        if (node) { csv = (node.value || node.textContent || '').trim(); }
+    }
     if (csv.indexOf('楽曲名') !== -1) { return csv; }
     if (text.indexOf('/error/error.html') !== -1) { return 'ERR:server'; }
     return 'ERR:empty';

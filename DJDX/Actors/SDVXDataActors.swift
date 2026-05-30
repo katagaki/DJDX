@@ -129,10 +129,16 @@ actor SDVXDataImporter {
         version: SDVXVersion
     ) -> AsyncStream<ImportProgress> {
         let (stream, continuation) = AsyncStream.makeStream(of: ImportProgress.self)
-        // Back up the raw CSV to the documents directory, like the IIDX importer.
-        saveCSVStringToFile(csvString, appending: "-SDVX")
         // Strip a leading UTF-8 BOM so the first CSV header (楽曲名) keys correctly.
         let sanitized = csvString.hasPrefix("\u{FEFF}") ? String(csvString.dropFirst()) : csvString
+        // Guard against a non-CSV payload (e.g. an HTML page) being passed in.
+        guard sanitized.contains("楽曲名") else {
+            debugPrint("[SDVXImport] payload is not SDVX CSV; aborting import")
+            continuation.finish()
+            return stream
+        }
+        // Back up the raw CSV to the documents directory, like the IIDX importer.
+        saveCSVStringToFile(sanitized, appending: "-SDVX")
         debugPrint("[SDVXImport] csv length:", sanitized.count,
                    "first line:", sanitized.split(separator: "\n").first ?? "<none>")
         let parsedCSV = CSwiftV(with: sanitized)
