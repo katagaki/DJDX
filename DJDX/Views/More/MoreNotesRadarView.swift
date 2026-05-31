@@ -7,6 +7,8 @@ struct MoreNotesRadarView: View {
     let spRadarData: RadarData?
     let dpRadarData: RadarData?
     var maxHeight: CGFloat?
+    var radarFontSize: CGFloat = 10.0
+    var listFontSize: CGFloat = 10.0
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var selectedPlayType: IIDXPlayType
 
@@ -34,7 +36,7 @@ struct MoreNotesRadarView: View {
                     if isShowingValues {
                         valueList(for: radarData)
                     } else {
-                        RadarChartView(radarData, isPlayerRadar: true, labelFontSize: 10.0, lineWidth: 1.5)
+                        RadarChartView(radarData, isPlayerRadar: true, labelFontSize: radarFontSize, lineWidth: 1.5)
                             .padding(8.0)
                     }
                 }
@@ -57,11 +59,11 @@ struct MoreNotesRadarView: View {
             ForEach(radarData.displayPoints(), id: \.label) { point in
                 HStack {
                     Text(verbatim: point.label)
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: listFontSize, weight: .bold))
                         .foregroundStyle(point.color)
                     Spacer()
                     Text(verbatim: String(format: "%.2f", point.value))
-                        .font(.system(size: 10, weight: .semibold).monospacedDigit())
+                        .font(.system(size: listFontSize, weight: .semibold).monospacedDigit())
                         .foregroundStyle(.primary)
                 }
             }
@@ -69,10 +71,10 @@ struct MoreNotesRadarView: View {
                 .padding(.vertical, 1.0)
             HStack {
                 Text("More.NotesRadar.Total")
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.system(size: listFontSize, weight: .bold))
                 Spacer()
                 Text(verbatim: String(format: "%.2f", radarData.sum()))
-                    .font(.system(size: 10, weight: .bold).monospacedDigit())
+                    .font(.system(size: listFontSize, weight: .bold).monospacedDigit())
             }
         }
         .padding(.horizontal, 16.0)

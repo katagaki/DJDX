@@ -5,15 +5,29 @@ import UIKit
 struct IIDXProfileHeaderView: View {
 
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
 
     @State var qproImage: UIImage?
+    @State var djName: String?
+    @State var spRank: String?
+    @State var dpRank: String?
     @State var spRadarData: RadarData?
     @State var dpRadarData: RadarData?
 
     let profileHeight: CGFloat = 120.0
 
     var hasData: Bool {
-        qproImage != nil || spRadarData != nil || dpRadarData != nil
+        qproImage != nil || djName != nil || spRadarData != nil || dpRadarData != nil
+    }
+
+    var rankText: String? {
+        let rank: String?
+        switch playTypeToShow {
+        case .single: rank = spRank
+        case .double: rank = dpRank
+        }
+        guard let rank, rank != "--" else { return nil }
+        return rank
     }
 
     var body: some View {
@@ -26,10 +40,31 @@ struct IIDXProfileHeaderView: View {
                             .scaledToFit()
                             .frame(height: profileHeight)
                     }
+                    if djName != nil || rankText != nil {
+                        VStack(alignment: .leading, spacing: 2.0) {
+                            if let djName {
+                                Text(verbatim: djName)
+                                    .font(.system(size: 16.0, weight: .semibold))
+                                    .lineLimit(1)
+                            }
+                            if let rankText {
+                                Text(verbatim: rankText)
+                                    .font(.system(size: 14.0))
+                                    .lineLimit(1)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .fontWidth(.condensed)
+                    }
                     Spacer(minLength: 0)
                     if spRadarData != nil || dpRadarData != nil {
-                        MoreNotesRadarView(spRadarData: spRadarData, dpRadarData: dpRadarData,
-                                           maxHeight: profileHeight)
+                        MoreNotesRadarView(
+                            spRadarData: spRadarData,
+                            dpRadarData: dpRadarData,
+                            maxHeight: profileHeight,
+                            radarFontSize: 8.0,
+                            listFontSize: 10.0
+                        )
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -38,10 +73,12 @@ struct IIDXProfileHeaderView: View {
         }
         .task {
             loadRadarData()
+            loadProfileData()
             qproImage = loadQproImage()
         }
         .onChange(of: iidxVersion) { _, _ in
             loadRadarData()
+            loadProfileData()
             qproImage = loadQproImage()
         }
         .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
@@ -104,6 +141,8 @@ struct IIDXProfileHeaderView: View {
                 }
             }
 
+            try parseProfileData(from: document)
+
             let radarCategories = try document.select("div#notes div.rank-cat")
             for category in radarCategories {
                 guard let spanElement = try category.select("span").first() else { continue }
@@ -139,6 +178,7 @@ struct IIDXProfileHeaderView: View {
             }
 
             saveRadarData()
+            saveProfileData()
             await WidgetDataPublisher.shared.publishRadar()
             await WidgetDataPublisher.shared.publishQpro()
         } catch {
@@ -188,5 +228,43 @@ struct IIDXProfileHeaderView: View {
                 soflan: defaults.double(forKey: "NotesRadar.DP.Soflan")
             )
         }
+    }
+
+    func parseProfileData(from document: Document) throws {
+        for row in try document.select("div.dj-profile table tr") {
+            let cells = try row.select("td")
+            if cells.size() == 2, try cells.get(0).text() == "DJ NAME" {
+                djName = try cells.get(1).text()
+            }
+        }
+
+        for rankSection in try document.select("div.dj-rank") {
+            guard try rankSection.select("div.cat-name").first()?.text() == "段位認定" else { continue }
+            for category in try rankSection.select("div.rank-cat") {
+                guard let playTypeLabel = try category.select("span").first()?.text() else { continue }
+                let children = category.children()
+                guard children.size() == 2 else { continue }
+                let rank = try children.get(1).text()
+                if playTypeLabel == "SP" {
+                    spRank = rank
+                } else if playTypeLabel == "DP" {
+                    dpRank = rank
+                }
+            }
+        }
+    }
+
+    func saveProfileData() {
+        let defaults = UserDefaults.standard
+        defaults.set(djName, forKey: "Profile.IIDX.DJName")
+        defaults.set(spRank, forKey: "Profile.IIDX.SPRank")
+        defaults.set(dpRank, forKey: "Profile.IIDX.DPRank")
+    }
+
+    func loadProfileData() {
+        let defaults = UserDefaults.standard
+        djName = defaults.string(forKey: "Profile.IIDX.DJName")
+        spRank = defaults.string(forKey: "Profile.IIDX.SPRank")
+        dpRank = defaults.string(forKey: "Profile.IIDX.DPRank")
     }
 }
