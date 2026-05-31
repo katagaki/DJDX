@@ -19,13 +19,12 @@ struct MoreMenu: View {
     @State var scoreDeleteCodeEntry: String = ""
 
     let appIcons: [AppIconChoice] = [
-        AppIconChoice("Sparkle Shower", imageName: nil),
+        AppIconChoice("Default", imageName: nil, isNameLocalized: true),
+        AppIconChoice("Sparkle Shower", imageName: "AppIcon.33"),
         AppIconChoice("Pinky Crush", imageName: "AppIcon.32"),
         AppIconChoice("EPOLIS", imageName: "AppIcon.31"),
-        AppIconChoice("RESIDENT", imageName: "AppIcon.30"),
-        AppIconChoice("CastHour", imageName: "AppIcon.29"),
-        AppIconChoice("BISTROVER", imageName: "AppIcon.28"),
-        AppIconChoice("HEROIC VERSE", imageName: "AppIcon.27")
+        AppIconChoice("NABLA", imageName: "AppIcon.VII"),
+        AppIconChoice("EXCEED GEAR", imageName: "AppIcon.VI")
     ]
 
     var body: some View {
@@ -38,7 +37,7 @@ struct MoreMenu: View {
                 Toggle("More.General.ShowAnalytics", systemImage: "chart.xyaxis.line", isOn: $showAnalytics)
             }
             Section {
-                Menu("More.General.AppIcon", systemImage: "app.gift") {
+                Menu("More.General.AppIcon", systemImage: "app.dashed") {
                     ForEach(appIcons, id: \.name) { icon in
                         Button {
                             UIApplication.shared.setAlternateIconName(icon.imageName) { error in
@@ -48,7 +47,11 @@ struct MoreMenu: View {
                             }
                         } label: {
                             Label {
-                                Text(verbatim: icon.name)
+                                if icon.isNameLocalized {
+                                    Text(LocalizedStringKey(icon.name))
+                                } else {
+                                    Text(verbatim: icon.name)
+                                }
                             } icon: {
                                 Image(icon.previewImageName)
                                     .resizable()
@@ -181,10 +184,12 @@ struct MoreMenu: View {
 struct AppIconChoice {
     let name: String
     let imageName: String?
+    let isNameLocalized: Bool
 
-    init(_ name: String, imageName: String?) {
+    init(_ name: String, imageName: String?, isNameLocalized: Bool = false) {
         self.name = name
         self.imageName = imageName
+        self.isNameLocalized = isNameLocalized
     }
 
     var previewImageName: String {

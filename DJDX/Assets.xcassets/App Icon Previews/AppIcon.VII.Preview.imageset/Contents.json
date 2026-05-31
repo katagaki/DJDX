@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "AppIcon.VII-Preview.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.90196,0.48315,0.64210,1.00000",
+      "display-p3:0.90196,0.25098,0.49804,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "blend-mode" : "plus-lighter",
+      "layers" : [
+        {
+          "image-name" : "DJDX.021.png",
+          "name" : "DJDX.021"
+        }
+      ],
+      "name" : "Keys",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blur-material" : null,
+      "layers" : [
+        {
+          "fill" : {
+            "linear-gradient" : [
+              "extended-gray:0.45683,1.00000",
+              "gray:0.04286,1.00000"
+            ]
+          },
+          "image-name" : "DJDX.020.png",
+          "name" : "DJDX.020"
+        }
+      ],
+      "name" : "Cab",
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "glass" : true,
+          "image-name" : "DJDX.018.png",
+          "name" : "32"
+        }
+      ],
+      "name" : "Number",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "DJDX.017.png",
+          "name" : "Arrow"
+        },
+        {
+          "glass" : false,
+          "image-name" : "DJDX.017 3.png",
+          "name" : "Gradient",
+          "opacity-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : 0
+            }
+          ]
+        }
+      ],
+      "name" : "Accessory",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

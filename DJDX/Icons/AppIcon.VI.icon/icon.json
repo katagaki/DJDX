@@ -1,0 +1,123 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.06595,0.24206,0.59236,1.00000",
+      "display-p3:1.00000,0.30405,0.81376,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "blend-mode" : "plus-lighter",
+      "layers" : [
+        {
+          "image-name" : "DJDX.015.png",
+          "name" : "DJDX.015"
+        }
+      ],
+      "name" : "Keys",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blur-material" : null,
+      "layers" : [
+        {
+          "fill" : {
+            "linear-gradient" : [
+              "extended-gray:0.45683,1.00000",
+              "gray:0.04286,1.00000"
+            ]
+          },
+          "image-name" : "DJDX.020.png",
+          "name" : "DJDX.020"
+        }
+      ],
+      "name" : "Cab",
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "display-p3:0.87830,0.87830,0.87830,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "linear-gradient" : [
+                  "display-p3:0.37160,0.48630,0.80433,1.00000",
+                  "display-p3:0.87830,0.69726,0.85484,1.00000"
+                ],
+                "orientation" : {
+                  "start" : {
+                    "x" : 0.6344800920383046,
+                    "y" : 0.45277119136068783
+                  },
+                  "stop" : {
+                    "x" : 0.40050372466042994,
+                    "y" : 0.21865540214497214
+                  }
+                }
+              }
+            }
+          ],
+          "image-name" : "DJDX.018.png",
+          "name" : "DJDX.018",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -7.263379484063535,
+              -20.84920170323528
+            ]
+          }
+        }
+      ],
+      "name" : "Accessory",
+      "position-specializations" : [
+        {
+          "idiom" : "square",
+          "value" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              11
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

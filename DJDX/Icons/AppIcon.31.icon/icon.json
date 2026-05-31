@@ -1,0 +1,124 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.87843,0.92941,0.30588,1.00000",
+      "display-p3:0.90980,0.80000,0.25098,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "blend-mode" : "plus-lighter",
+      "layers" : [
+        {
+          "image-name" : "DJDX.021.png",
+          "name" : "DJDX.021"
+        }
+      ],
+      "name" : "Keys",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blur-material" : null,
+      "layers" : [
+        {
+          "fill" : {
+            "linear-gradient" : [
+              "extended-gray:0.45683,1.00000",
+              "gray:0.04286,1.00000"
+            ]
+          },
+          "image-name" : "DJDX.020.png",
+          "name" : "DJDX.020"
+        }
+      ],
+      "name" : "Cab",
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "glass" : true,
+          "image-name" : "DJDX.015.png",
+          "name" : "31"
+        }
+      ],
+      "name" : "Number",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "DJDX.014.png",
+          "name" : "Top Area",
+          "opacity-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : 0
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 0
+            }
+          ]
+        },
+        {
+          "hidden" : false,
+          "image-name" : "DJDX.013.png",
+          "name" : "Bottom Area",
+          "opacity-specializations" : [
+            {
+              "value" : 0
+            },
+            {
+              "appearance" : "dark",
+              "value" : 1
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 0.53
+            }
+          ]
+        }
+      ],
+      "name" : "Accessory",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.17
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

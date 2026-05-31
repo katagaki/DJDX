@@ -1139,6 +1139,17 @@
     "Date" : {
       "shouldTranslate" : false
     },
+    "Default" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デフォルト"
+          }
+        }
+      }
+    },
     "DJ Level" : {
       "shouldTranslate" : false
     },
