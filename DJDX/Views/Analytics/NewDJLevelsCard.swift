@@ -13,8 +13,9 @@ struct NewDJLevelsCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4.0) {
             if newDJLevels.isEmpty {
-                Text("Analytics.NoData")
-                    .font(.system(size: 14.0))
+                Text(verbatim: "0")
+                    .font(.system(size: 20.0, weight: .black))
+                    .fontWidth(.expanded)
                     .foregroundStyle(.secondary)
             } else {
                 Text("\(newDJLevels.count)")
