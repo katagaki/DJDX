@@ -51,8 +51,8 @@ enum SDVXClearType: String, Codable {
 
     var color: Color {
         switch self {
-        case .perfectUltimateChain: return .yellow
-        case .ultimateChain: return .cyan
+        case .perfectUltimateChain: return .pink
+        case .ultimateChain: return .pink
         case .excessive: return .red
         case .complete: return .green
         case .played: return .gray

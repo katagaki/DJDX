@@ -92,8 +92,7 @@ struct PolarisChordProfileHeaderView: View {
         .frame(minWidth: 64.0)
         .padding(.vertical, 8.0)
         .padding(.horizontal, 10.0)
-        .background(.thinMaterial)
-        .clipShape(.rect(cornerRadius: 8.0))
+        .cardBackground(cornerRadius: 8.0)
     }
 
     // The profile is rendered client-side from the same JSON API as the score

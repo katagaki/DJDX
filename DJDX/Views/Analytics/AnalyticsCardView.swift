@@ -14,8 +14,6 @@ enum AnalyticsCardHeaderPlacement {
 
 struct AnalyticsCardView<Content: View>: View {
 
-    @Environment(\.colorScheme) var colorScheme
-
     let title: Text
     let systemImage: String
     let iconColor: Color
@@ -113,14 +111,35 @@ struct AnalyticsCardView<Content: View>: View {
         }
         .padding(12.0)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            switch colorScheme {
-            case .light: Color.white
-            case .dark: Color.clear.background(.regularMaterial)
-            @unknown default: Color.clear
+        .cardBackground(cornerRadius: cornerRadius)
+    }
+}
+
+// Shared card background: solid white in light mode (so it reads against the
+// gradient), frosted material in dark mode. Reused by analytics cards and the
+// Polaris Chord score rows / profile header stat blocks.
+struct CardBackground: ViewModifier {
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    let cornerRadius: CGFloat
+
+    func body(content: Content) -> some View {
+        content
+            .background {
+                switch colorScheme {
+                case .light: Color.white
+                case .dark: Color.clear.background(.regularMaterial)
+                @unknown default: Color.clear
+                }
             }
-        }
-        .clipShape(.rect(cornerRadius: cornerRadius))
+            .clipShape(.rect(cornerRadius: cornerRadius))
+    }
+}
+
+extension View {
+    func cardBackground(cornerRadius: CGFloat) -> some View {
+        modifier(CardBackground(cornerRadius: cornerRadius))
     }
 }
 

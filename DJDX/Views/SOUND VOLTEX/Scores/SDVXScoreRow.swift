@@ -2,8 +2,6 @@ import SwiftUI
 
 struct SDVXScoreRow: View {
 
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
-
     var record: SDVXSongRecord
 
     var body: some View {
@@ -59,8 +57,7 @@ struct SDVXScoreRow: View {
             }
             .padding([.top, .bottom], 6.0)
             .frame(width: 78.0, alignment: .center)
-            .background(.thinMaterial)
-            .clipShape(.rect(cornerRadius: 6.0))
+            .cardBackground(cornerRadius: 6.0)
             .padding([.top, .bottom], 8.0)
         }
         .frame(maxWidth: .infinity)

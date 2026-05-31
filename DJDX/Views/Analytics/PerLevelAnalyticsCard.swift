@@ -11,8 +11,6 @@ struct PerLevelSegment: Identifiable {
 // with an optional segmented makeup bar and a top-counts row for static cards.
 struct PerLevelAnalyticsCard<TrendChart: View>: View {
 
-    @Environment(\.colorScheme) var colorScheme
-
     let difficulty: Int
     let subtitle: LocalizedStringKey
     let showsBar: Bool
@@ -61,14 +59,7 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
             .padding(12.0)
         }
         .frame(height: 72.0)
-        .background {
-            switch colorScheme {
-            case .light: Color.white
-            case .dark: Color.clear.background(.regularMaterial)
-            @unknown default: Color.clear
-            }
-        }
-        .clipShape(.rect(cornerRadius: cornerRadius))
+        .cardBackground(cornerRadius: cornerRadius)
     }
 
     var segmentedBar: some View {
