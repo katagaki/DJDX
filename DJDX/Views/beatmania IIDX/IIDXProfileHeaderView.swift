@@ -10,7 +10,7 @@ struct IIDXProfileHeaderView: View {
     @State var spRadarData: RadarData?
     @State var dpRadarData: RadarData?
 
-    let profileHeight: CGFloat = 150.0
+    let profileHeight: CGFloat = 120.0
 
     var hasData: Bool {
         qproImage != nil || spRadarData != nil || dpRadarData != nil

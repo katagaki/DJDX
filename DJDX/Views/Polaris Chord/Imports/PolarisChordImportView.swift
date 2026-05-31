@@ -2,12 +2,8 @@ import SwiftUI
 
 struct PolarisChordImportView: View {
 
-    @Environment(\.openURL) var openURL
     @Environment(\.dismiss) var dismiss
     @Environment(ProgressAlertManager.self) var progressAlertManager
-
-    @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
-    var polarisChordVersion: PolarisChordVersion
 
     @State var importPath = NavigationPath()
     @State var importToDate: Date = .now
@@ -60,15 +56,6 @@ struct PolarisChordImportView: View {
                                 .font(.title2)
                                 .symbolRenderingMode(.hierarchical)
                         }
-                    }
-                }
-                ToolbarItem(placement: .topBarLeading) {
-                    Menu {
-                        Button("Importer.OpenInSafari", systemImage: "safari") {
-                            openURL(polarisChordVersion.musicDataPageURL())
-                        }
-                    } label: {
-                        Image(systemName: "questionmark.circle")
                     }
                 }
             }
