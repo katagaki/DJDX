@@ -1,10 +1,3 @@
-//
-//  ChartStyleEnum.swift
-//  Widgets
-//
-//  Created by シン・ジャスティン on 2026/03/01.
-//
-
 import AppIntents
 
 enum WidgetChartDisplay: String, AppEnum {

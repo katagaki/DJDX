@@ -1,10 +1,3 @@
-//
-//  SDVXSortMode.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/30.
-//
-
 import Foundation
 
 enum SDVXSortMode: String, CaseIterable, Codable {

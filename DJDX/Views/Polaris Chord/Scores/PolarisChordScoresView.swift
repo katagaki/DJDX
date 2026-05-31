@@ -1,10 +1,3 @@
-//
-//  PolarisChordScoresView.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/31.
-//
-
 import SwiftUI
 
 struct PolarisChordScoresView<Header: View>: View {

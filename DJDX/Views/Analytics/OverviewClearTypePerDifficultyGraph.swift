@@ -1,10 +1,3 @@
-//
-//  OverviewClearTypePerDifficultyGraph.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/05/21.
-//
-
 import Charts
 import OrderedCollections
 import SwiftUI

@@ -1,10 +1,3 @@
-//
-//  AnalyticsChartLegend.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/30.
-//
-
 import SwiftUI
 
 // A compact two-column wrapping legend used in place of the built-in chart

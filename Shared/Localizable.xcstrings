@@ -2626,23 +2626,6 @@
         }
       }
     },
-    "Shared.IIDX.Version" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "バージョン"
-          }
-        }
-      }
-    },
     "Shared.Import" : {
       "localizations" : {
         "en" : {
@@ -2898,23 +2881,6 @@
         }
       }
     },
-    "Shared.PolarisChord.Version" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Polaris Chord Version"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ポラリスコード バージョン"
-          }
-        }
-      }
-    },
     "Shared.Refresh" : {
       "localizations" : {
         "en" : {
@@ -2992,23 +2958,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコアグレード"
-          }
-        }
-      }
-    },
-    "Shared.SDVX.Version" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SOUND VOLTEX Version"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SOUND VOLTEX バージョン"
           }
         }
       }

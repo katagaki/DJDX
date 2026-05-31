@@ -1,10 +1,3 @@
-//
-//  MoreMenu.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/29.
-//
-
 import SwiftUI
 import WebKit
 

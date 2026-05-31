@@ -1,10 +1,3 @@
-//
-//  IIDXVersion.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/10/05.
-//
-
 import SwiftUI
 import UIKit
 

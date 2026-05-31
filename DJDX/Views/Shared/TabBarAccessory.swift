@@ -1,10 +1,3 @@
-//
-//  TabBarAccessory.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/06/22.
-//
-
 import SwiftUI
 
 struct TabBarAccessory<Content: View>: View {

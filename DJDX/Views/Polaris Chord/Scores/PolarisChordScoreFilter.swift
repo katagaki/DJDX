@@ -1,10 +1,3 @@
-//
-//  PolarisChordScoreFilter.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/31.
-//
-
 import SwiftUI
 
 struct PolarisChordScoreFilterSheet: View {

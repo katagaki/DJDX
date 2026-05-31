@@ -1,10 +1,3 @@
-//
-//  SDVXGrade.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/30.
-//
-
 import SwiftUI
 
 // Maps to the スコアグレード column in the SDVX CSV.

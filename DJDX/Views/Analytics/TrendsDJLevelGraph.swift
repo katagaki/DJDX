@@ -1,10 +1,3 @@
-//
-//  TrendsDJLevelGraph.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/07/07.
-//
-
 import Charts
 import OrderedCollections
 import SwiftUI

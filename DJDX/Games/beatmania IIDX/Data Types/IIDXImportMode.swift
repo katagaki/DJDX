@@ -1,10 +1,3 @@
-//
-//  IIDXImportMode.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2026/02/20.
-//
-
 import Foundation
 
 enum IIDXImportMode: String, Codable {

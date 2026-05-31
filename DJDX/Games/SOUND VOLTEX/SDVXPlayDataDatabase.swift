@@ -1,10 +1,3 @@
-//
-//  SDVXPlayDataDatabase.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/30.
-//
-
 import Foundation
 import SQLite
 

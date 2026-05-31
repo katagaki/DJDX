@@ -1,10 +1,3 @@
-//
-//  SDVXClearType.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/30.
-//
-
 import SwiftUI
 
 // Maps to the クリアランク column in the SDVX CSV.

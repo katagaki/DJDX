@@ -1,10 +1,3 @@
-//
-//  IIDXImportView.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/05/23.
-//
-
 import Komponents
 import SwiftUI
 

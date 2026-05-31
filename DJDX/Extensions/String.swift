@@ -1,10 +1,3 @@
-//
-//  String.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/06/05.
-//
-
 import Foundation
 
 let charactersToReplace = [

@@ -1,10 +1,3 @@
-//
-//  IIDXScoreSortMenu.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/06/03.
-//
-
 import SwiftUI
 
 struct IIDXScoreSortMenu: View {

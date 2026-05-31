@@ -1,10 +1,3 @@
-//
-//  SDVXDataImporter.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2026/05/31.
-//
-
 import Foundation
 import SQLite
 

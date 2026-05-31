@@ -1,10 +1,3 @@
-//
-//  TrendsClearTypeGraph.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/06/23.
-//
-
 import Charts
 import OrderedCollections
 import SwiftUI

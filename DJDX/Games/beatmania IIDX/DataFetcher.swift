@@ -1,10 +1,3 @@
-//
-//  DataFetcher.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/10/05.
-//
-
 import Foundation
 import SQLite
 

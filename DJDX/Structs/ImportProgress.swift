@@ -1,10 +1,3 @@
-//
-//  ImportProgress.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/12/15.
-//
-
 import Foundation
 
 struct ImportProgress {

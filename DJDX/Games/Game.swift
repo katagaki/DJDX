@@ -1,10 +1,3 @@
-//
-//  Game.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/29.
-//
-
 import SwiftUI
 
 enum Game: Int, Codable, CaseIterable, Identifiable {

@@ -1,10 +1,3 @@
-//
-//  PolarisChordPlayDataDatabase.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/31.
-//
-
 import Foundation
 import SQLite
 

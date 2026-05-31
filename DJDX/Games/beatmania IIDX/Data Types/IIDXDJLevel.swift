@@ -1,10 +1,3 @@
-//
-//  IIDXDJLevel.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/06/02.
-//
-
 import SwiftUI
 
 enum IIDXDJLevel: String, Codable {

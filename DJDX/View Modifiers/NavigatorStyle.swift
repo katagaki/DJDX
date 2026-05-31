@@ -1,10 +1,3 @@
-//
-//  NavigatorStyle.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/12/20.
-//
-
 import SwiftUI
 
 struct NavigatorStyle: ViewModifier {

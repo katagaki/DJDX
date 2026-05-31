@@ -1,10 +1,3 @@
-//
-//  LevelLabelGlow.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/05/26.
-//
-
 import Foundation
 import SwiftUI
 

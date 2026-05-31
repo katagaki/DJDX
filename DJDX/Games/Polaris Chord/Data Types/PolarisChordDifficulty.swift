@@ -1,10 +1,3 @@
-//
-//  PolarisChordDifficulty.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/31.
-//
-
 import SwiftUI
 
 enum PolarisChordDifficulty: String, Codable, CaseIterable {

@@ -1,10 +1,3 @@
-//
-//  AnalyticsModel.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/29.
-//
-
 import OrderedCollections
 import SwiftUI
 

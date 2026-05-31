@@ -1,10 +1,3 @@
-//
-//  MoreNotesRadarView.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2026/02/21.
-//
-
 import SwiftUI
 
 struct MoreNotesRadarView: View {

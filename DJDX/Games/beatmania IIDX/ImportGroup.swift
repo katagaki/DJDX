@@ -1,10 +1,3 @@
-//
-//  ImportGroup.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/05/23.
-//
-
 import Foundation
 import SwiftData
 

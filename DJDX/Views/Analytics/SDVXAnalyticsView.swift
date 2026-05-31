@@ -1,10 +1,3 @@
-//
-//  SDVXAnalyticsView.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/30.
-//
-
 import Charts
 import OrderedCollections
 import SwiftUI

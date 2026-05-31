@@ -1,10 +1,3 @@
-//
-//  SDVXScoreRow.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/30.
-//
-
 import SwiftUI
 
 struct SDVXScoreRow: View {

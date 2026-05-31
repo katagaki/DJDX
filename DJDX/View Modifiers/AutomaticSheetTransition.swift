@@ -1,10 +1,3 @@
-//
-//  AutomaticSheetTransition.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/30.
-//
-
 import SwiftUI
 
 // The zoom transition forces sheets fullscreen on iOS 18, overriding their

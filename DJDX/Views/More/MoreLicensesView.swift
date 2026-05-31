@@ -1,10 +1,3 @@
-//
-//  MoreLicensesView.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2026/02/20.
-//
-
 import SwiftUI
 
 struct MoreLicensesView: View {

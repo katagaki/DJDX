@@ -1,10 +1,3 @@
-//
-//  UnifiedView.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/29.
-//
-
 import StoreKit
 import SwiftData
 import SwiftUI
@@ -219,37 +212,31 @@ struct UnifiedView: View {
                     }
                 }
             }
-            if selectedGame == .soundVoltex {
-                Section("Shared.SDVX.Version") {
-                    Picker("Shared.SDVX.Version", selection: $sdvxVersion) {
+            Section("Shared.Version") {
+                if selectedGame == .soundVoltex {
+                    Picker("Shared.Version", selection: $sdvxVersion) {
                         ForEach(SDVXVersion.supportedVersions.reversed(), id: \.self) { version in
                             Text(version.marketingName).tag(version)
                         }
                     }
                     .pickerStyle(.inline)
-                }
-                .labelsVisibility(.visible)
-            } else if selectedGame == .polarisChord {
-                Section("Shared.PolarisChord.Version") {
-                    Picker("Shared.PolarisChord.Version", selection: $polarisChordVersion) {
+                } else if selectedGame == .polarisChord {
+                    Picker("Shared.Version", selection: $polarisChordVersion) {
                         ForEach(PolarisChordVersion.supportedVersions, id: \.self) { version in
                             Text(version.marketingName).tag(version)
                         }
                     }
                     .pickerStyle(.inline)
-                }
-                .labelsVisibility(.visible)
-            } else {
-                Section("Shared.IIDX.Version") {
-                    Picker("Shared.IIDX.Version", selection: $iidxVersion) {
+                } else {
+                    Picker("Shared.Version", selection: $iidxVersion) {
                         ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
                             Text(version.marketingName).tag(version)
                         }
                     }
                     .pickerStyle(.inline)
                 }
-                .labelsVisibility(.visible)
             }
+            .labelsVisibility(.visible)
         } label: {
             HStack(spacing: 4.0) {
                 Text(selectedGame.displayName)

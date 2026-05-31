@@ -1,10 +1,3 @@
-//
-//  ChartRadarData.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2026/03/08.
-//
-
 import Foundation
 
 struct ChartRadarData {

@@ -1,10 +1,3 @@
-//
-//  SDVXDifficulty.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/30.
-//
-
 import SwiftUI
 
 // Maps to the 難易度 column in the SDVX CSV.

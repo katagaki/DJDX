@@ -1,10 +1,3 @@
-//
-//  DataImporter.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/09/21.
-//
-
 import Foundation
 import SQLite
 

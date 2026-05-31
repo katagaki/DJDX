@@ -1,10 +1,3 @@
-//
-//  ClearTypeWidgetIntent.swift
-//  Widgets
-//
-//  Created by シン・ジャスティン on 2026/03/01.
-//
-
 import AppIntents
 import WidgetKit
 

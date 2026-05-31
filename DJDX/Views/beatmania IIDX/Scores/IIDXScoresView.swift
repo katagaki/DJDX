@@ -1,10 +1,3 @@
-//
-//  IIDXScoresView.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/05/18.
-//
-
 import SwiftUI
 
 struct IIDXScoresView<Header: View>: View {

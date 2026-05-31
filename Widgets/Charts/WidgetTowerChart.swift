@@ -1,10 +1,3 @@
-//
-//  WidgetTowerChart.swift
-//  Widgets
-//
-//  Created by シン・ジャスティン on 2026/03/01.
-//
-
 import Charts
 import SwiftUI
 

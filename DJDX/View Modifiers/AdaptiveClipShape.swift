@@ -1,10 +1,3 @@
-//
-//  AdaptiveClipShape.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2026/02/17.
-//
-
 import SwiftUI
 
 struct AdaptiveClipShape: ViewModifier {

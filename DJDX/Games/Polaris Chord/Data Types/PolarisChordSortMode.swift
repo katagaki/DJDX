@@ -1,10 +1,3 @@
-//
-//  PolarisChordSortMode.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/31.
-//
-
 import Foundation
 
 enum PolarisChordSortMode: String, CaseIterable, Codable {

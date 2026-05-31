@@ -1,10 +1,3 @@
-//
-//  PolarisChordImportView.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/31.
-//
-
 import SwiftUI
 
 struct PolarisChordImportView: View {
@@ -80,9 +73,19 @@ struct PolarisChordImportView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                bottomBar()
-                    .contentShape(.rect)
-                    .padding()
+                if #available(iOS 26.0, *) {
+                    bottomBar()
+                        .padding(.top, 2.0)
+                        .contentShape(.rect)
+                        .clipShape(.rect(cornerRadius: 24.0))
+                        .glassEffect(.regular, in: .rect(cornerRadius: 24.0))
+                        .padding()
+                } else {
+                    TabBarAccessory(placement: .bottom) {
+                        bottomBar()
+                            .contentShape(.rect)
+                    }
+                }
             }
             .alert(
                 "Alert.Import.Success.Title",
@@ -129,24 +132,34 @@ struct PolarisChordImportView: View {
 
     @ViewBuilder
     func bottomBar() -> some View {
-        Button {
-            importPath.append(PolarisChordImportPath.web)
-        } label: {
-            VStack(spacing: 8.0) {
-                Image(systemName: "globe")
-                    .font(.system(size: 24))
-                    .frame(maxHeight: 30.0)
-                Text(.calendarImportFromWeb)
-                    .fontWeight(.medium)
-                    .font(.subheadline)
-                    .lineLimit(1)
+        VStack(spacing: 16.0) {
+            HStack(spacing: 8.0) {
+                DatePicker("Calendar.Import.SelectDate",
+                           selection: $importToDate,
+                           in: ...Date.now,
+                           displayedComponents: .date)
+                .datePickerStyle(.compact)
             }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.accent)
-            .foregroundStyle(.white)
-            .adaptiveClipShape()
+            Button {
+                importPath.append(PolarisChordImportPath.web)
+            } label: {
+                VStack(spacing: 8.0) {
+                    Image(systemName: "globe")
+                        .font(.system(size: 24))
+                        .frame(maxHeight: 30.0)
+                    Text(.calendarImportFromWeb)
+                        .fontWeight(.medium)
+                        .font(.subheadline)
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.accent)
+                .foregroundStyle(.white)
+                .adaptiveClipShape()
+            }
         }
+        .padding(12.0)
     }
 
     func reloadImportGroups() async {

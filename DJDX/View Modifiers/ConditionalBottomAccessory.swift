@@ -1,10 +1,3 @@
-//
-//  ConditionalBottomAccessory.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2025/09/16.
-//
-
 import SwiftUI
 
 struct ConditionalBottomAccessory: ViewModifier {

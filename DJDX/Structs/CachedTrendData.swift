@@ -1,10 +1,3 @@
-//
-//  CachedTrendData.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/06/25.
-//
-
 import Foundation
 import OrderedCollections
 

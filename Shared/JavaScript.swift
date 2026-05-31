@@ -1,10 +1,3 @@
-//
-//  JavaScript.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/10/06.
-//
-
 let globalJSFunctions = """
 function waitForElementToExist(selector) {
     return new Promise(resolve => {

@@ -1,10 +1,3 @@
-//
-//  TextStroke.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/10/19.
-//
-
 import Foundation
 import SwiftUI
 

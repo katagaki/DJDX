@@ -1,10 +1,3 @@
-//
-//  ProgressAlertManager.swift
-//  DJDX
-//
-//  Created by シン・ジャスティン on 2024/06/01.
-//
-
 import Foundation
 import SwiftUI
 

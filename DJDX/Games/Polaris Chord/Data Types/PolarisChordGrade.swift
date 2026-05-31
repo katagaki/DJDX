@@ -1,10 +1,3 @@
-//
-//  PolarisChordGrade.swift
-//  DJDX
-//
-//  Created by Claude on 2026/05/31.
-//
-
 import SwiftUI
 
 enum PolarisChordGrade: String, Codable {
