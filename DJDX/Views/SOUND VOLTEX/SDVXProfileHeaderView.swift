@@ -49,7 +49,6 @@ struct SDVXProfileHeaderView: View {
                             if let volforce {
                                 Text(verbatim: volforce)
                                     .font(.title3.bold())
-                                    .fontWidth(.expanded)
                                     .monospacedDigit()
                             }
                         }
