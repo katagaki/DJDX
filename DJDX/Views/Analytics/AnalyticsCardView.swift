@@ -86,7 +86,7 @@ struct AnalyticsCardView<Content: View>: View {
                 .resizable()
                 .scaledToFit()
                 .foregroundStyle(iconColor)
-                .frame(width: 13.0, height: 13.0)
+                .frame(width: 12.0, height: 12.0)
             title
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
@@ -107,7 +107,7 @@ struct AnalyticsCardView<Content: View>: View {
             if let caption {
                 Text(caption)
                     .font(.caption2.bold())
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
             }
         }

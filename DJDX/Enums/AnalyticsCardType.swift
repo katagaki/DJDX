@@ -50,11 +50,16 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         self == .towerRecent || self == .towerTotals
     }
 
+    /// Grade cards (AAA, AA, A) render at half the standard summary card width
+    var isGradeCard: Bool {
+        self == .newAAA || self == .newAA || self == .newA
+    }
+
     var titleText: Text {
         switch self {
         case .clearTypeOverall: return Text("Analytics.ClearType.Overall")
         case .towerRecent: return Text("Tower.ChartMode.Recent")
-        case .towerTotals: return Text("Tower.ChartMode.Totals")
+        case .towerTotals: return Text("Shared.IIDX.Tower")
         case .newHighScores: return Text("Analytics.NewHighScores")
         case .newFullComboClear: return Text(verbatim: "FULLCOMBO CLEAR")
         case .newClears: return Text(verbatim: "CLEAR")
@@ -73,7 +78,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .clearTypeOverall: return "Analytics.ClearType.Overall"
         case .towerRecent: return "Tower.ChartMode.Recent"
-        case .towerTotals: return "Tower.ChartMode.Totals"
+        case .towerTotals: return "Shared.IIDX.Tower"
         case .newHighScores: return "Analytics.NewHighScores"
         case .newFullComboClear: return "FULLCOMBO CLEAR"
         case .newClears: return "CLEAR"

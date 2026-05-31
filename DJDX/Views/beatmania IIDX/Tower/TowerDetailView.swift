@@ -33,7 +33,7 @@ struct TowerDetailContainer: View {
                     TowerBarChart(entries: chartEntries)
                 }
             case .totals:
-                TowerDetailView(title: "Tower.ChartMode.Totals", entries: towerEntries) {
+                TowerDetailView(title: "Shared.IIDX.Tower", entries: towerEntries) {
                     TowerTotalsChart(
                         totalKeyCount: totalKeyCount,
                         totalScratchCount: totalScratchCount

@@ -3426,22 +3426,6 @@
         }
       }
     },
-    "Tower.ChartMode.Totals" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tower"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "タワー"
-          }
-        }
-      }
-    },
     "Tower.Header.PlayDate" : {
       "localizations" : {
         "en" : {

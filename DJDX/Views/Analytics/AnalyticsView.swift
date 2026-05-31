@@ -81,7 +81,7 @@ struct AnalyticsView: View {
         case .towerRecent, .towerTotals:
             let transitionID = cardType == .towerRecent ? "Tower.Recent" : "Tower.Totals"
             let caption: LocalizedStringKey = cardType == .towerRecent
-                ? "Tower.ChartMode.Recent" : "Tower.ChartMode.Totals"
+                ? "Tower.ChartMode.Recent" : "Shared.IIDX.Tower"
             Button {
                 if !isEditingCards {
                     navigationManager.push(cardType == .towerRecent ? TowerPath.recent : TowerPath.totals)
@@ -199,7 +199,8 @@ struct AnalyticsView: View {
                                 HStack(spacing: 12.0) {
                                     ForEach(shownSummaryCards, id: \.self) { cardType in
                                         cardView(for: cardType)
-                                            .frame(width: summaryCardWidth)
+                                            .frame(width: cardType.isGradeCard
+                                                   ? summaryCardWidth * 0.6 : summaryCardWidth)
                                             .editableCard(isVisible: visibleCards.contains(cardType),
                                                           isEditing: isEditing,
                                                           seed: cardOrder.firstIndex(of: cardType) ?? 0) {
