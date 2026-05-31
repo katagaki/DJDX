@@ -115,34 +115,6 @@ struct AnalyticsCardView<Content: View>: View {
     }
 }
 
-// Shared card background: solid white in light mode (so it reads against the
-// gradient), frosted material in dark mode. Reused by analytics cards and the
-// Polaris Chord score rows / profile header stat blocks.
-struct CardBackground: ViewModifier {
-
-    @Environment(\.colorScheme) private var colorScheme
-
-    let cornerRadius: CGFloat
-
-    func body(content: Content) -> some View {
-        content
-            .background {
-                switch colorScheme {
-                case .light: Color.white
-                case .dark: Color.clear.background(.regularMaterial)
-                @unknown default: Color.clear
-                }
-            }
-            .clipShape(.rect(cornerRadius: cornerRadius))
-    }
-}
-
-extension View {
-    func cardBackground(cornerRadius: CGFloat) -> some View {
-        modifier(CardBackground(cornerRadius: cornerRadius))
-    }
-}
-
 struct AnalyticsCardButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
