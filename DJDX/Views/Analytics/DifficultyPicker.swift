@@ -5,7 +5,7 @@ struct DifficultyPicker: View {
     @Binding var difficulties: [Int]
 
     var body: some View {
-        Picker(selection: $selection.animation(.snappy.speed(2.0))) {
+        Picker(selection: $selection.animation(.smooth.speed(2.0))) {
             ForEach(difficulties, id: \.self) { difficulty in
                 Text("LEVEL \(difficulty)").tag(difficulty)
             }

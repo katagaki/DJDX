@@ -115,7 +115,7 @@ struct SDVXAnalyticsView: View {
     }
 
     func toggleCard(_ cardType: SDVXAnalyticsCard) {
-        withAnimation(.snappy) {
+        withAnimation(.smooth.speed(2.0)) {
             if visibleCards.contains(cardType) {
                 visibleCards.remove(cardType)
             } else {

@@ -67,7 +67,7 @@ struct UnifiedView: View {
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
-                        withAnimation(.snappy) { isEditingAnalytics.toggle() }
+                        withAnimation(.smooth.speed(2.0)) { isEditingAnalytics.toggle() }
                     } label: {
                         if isEditingAnalytics {
                             Label("Shared.Done", systemImage: "checkmark")
@@ -164,15 +164,19 @@ struct UnifiedView: View {
                 IIDXProfileHeaderView()
                     .padding(.horizontal)
                     .padding(.top, 16.0)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
             if showAnalytics {
                 AnalyticsView(model: analyticsModel,
                               isEditing: $isEditingAnalytics,
                               analyticsNamespace: analyticsNamespace,
                               towerNamespace: towerNamespace)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
         }
         .padding(.bottom, 8.0)
+        .animation(.smooth.speed(2.0), value: showProfileHeader)
+        .animation(.smooth.speed(2.0), value: showAnalytics)
     }
 
     @ViewBuilder
@@ -182,12 +186,16 @@ struct UnifiedView: View {
                 SDVXProfileHeaderView()
                     .padding(.horizontal)
                     .padding(.top, 16.0)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
             if showAnalytics {
                 SDVXAnalyticsView(model: sdvxAnalyticsModel, isEditing: $isEditingAnalytics)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
         }
         .padding(.bottom, 8.0)
+        .animation(.smooth.speed(2.0), value: showProfileHeader)
+        .animation(.smooth.speed(2.0), value: showAnalytics)
     }
 
     @ViewBuilder
@@ -197,9 +205,11 @@ struct UnifiedView: View {
                 PolarisChordProfileHeaderView()
                     .padding(.horizontal)
                     .padding(.top, 16.0)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
         }
         .padding(.bottom, 8.0)
+        .animation(.snappy, value: showProfileHeader)
     }
 
     @ViewBuilder

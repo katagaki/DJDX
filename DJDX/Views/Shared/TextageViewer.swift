@@ -72,7 +72,7 @@ struct TextageViewer: View {
 
     func refresh() {
         webView.layer.opacity = 0.0
-        withAnimation(.snappy.speed(2.0)) {
+        withAnimation(.smooth.speed(2.0)) {
             isLoading = true
             isShowingFallbackButton = false
         } completion: {
@@ -86,7 +86,7 @@ struct TextageViewer: View {
     func showFallbackAfterDelay() async {
         try? await Task.sleep(for: .seconds(4.0))
         if isLoading {
-            withAnimation(.snappy.speed(2.0)) {
+            withAnimation(.smooth.speed(2.0)) {
                 isShowingFallbackButton = true
             }
         }

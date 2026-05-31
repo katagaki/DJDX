@@ -61,7 +61,7 @@ final class AnalyticsModel {
         await WidgetDataPublisher.shared.publishClearTypeAndDJLevel(
             playType: playType, iidxVersion: iidxVersion
         )
-        withAnimation(.snappy.speed(2.0)) {
+        withAnimation(.smooth.speed(2.0)) {
             dataState = .presenting
         }
     }
@@ -80,18 +80,18 @@ final class AnalyticsModel {
                 let newClearType = buildOrderedClearType(from: rawClearType)
                 let newDJLevel = buildOrderedDJLevel(from: rawDJLevel ?? [:])
                 let newDJLevelPerDifficulty = convertToEnumKeyed(newDJLevel)
-                withAnimation(.snappy.speed(2.0)) {
+                withAnimation(.smooth.speed(2.0)) {
                     self.clearTypePerDifficulty = newClearType
                     self.djLevelPerDifficulty = newDJLevelPerDifficulty
                 }
             } else {
-                withAnimation(.snappy.speed(2.0)) {
+                withAnimation(.smooth.speed(2.0)) {
                     self.clearTypePerDifficulty.removeAll()
                     self.djLevelPerDifficulty.removeAll()
                 }
             }
         } else {
-            withAnimation(.snappy.speed(2.0)) {
+            withAnimation(.smooth.speed(2.0)) {
                 self.clearTypePerDifficulty.removeAll()
                 self.djLevelPerDifficulty.removeAll()
             }
@@ -128,7 +128,7 @@ final class AnalyticsModel {
             }
         }
 
-        withAnimation(.snappy.speed(2.0)) {
+        withAnimation(.smooth.speed(2.0)) {
             self.clearTypePerImportGroup = newClearTypeData
             self.djLevelPerImportGroup = newDJLevelData
         }
@@ -139,7 +139,7 @@ final class AnalyticsModel {
         let importGroups = await fetcher.importGroups(for: iidxVersion)
 
         guard importGroups.count >= 2 else {
-            withAnimation(.snappy.speed(2.0)) {
+            withAnimation(.smooth.speed(2.0)) {
                 self.newClears = []
                 self.newAssistClears = []
                 self.newEasyClears = []
@@ -172,7 +172,7 @@ final class AnalyticsModel {
 
         let computed = Self.computeNewEntries(latestRecords: latestRecords, previousRecords: previousRecords)
 
-        withAnimation(.snappy.speed(2.0)) {
+        withAnimation(.smooth.speed(2.0)) {
             self.newClears = computed.clears["CLEAR"]!
             self.newEasyClears = computed.clears["EASY CLEAR"]!
             self.newAssistClears = computed.clears["ASSIST CLEAR"]!

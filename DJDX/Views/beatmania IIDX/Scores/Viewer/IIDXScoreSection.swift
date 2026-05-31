@@ -126,7 +126,7 @@ struct IIDXScoreSection: View {
     @ViewBuilder
     func historyRow() -> some View {
         Button {
-            withAnimation(.snappy.speed(2.0)) {
+            withAnimation(.smooth.speed(2.0)) {
                 isShowingHistory.toggle()
             }
         } label: {

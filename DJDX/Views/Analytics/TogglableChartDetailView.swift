@@ -35,7 +35,7 @@ struct TogglableClearTypeDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    withAnimation(.snappy) {
+                    withAnimation(.smooth.speed(2.0)) {
                         showAsPieChart.toggle()
                     }
                 } label: {
@@ -73,7 +73,7 @@ struct TogglableDJLevelDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    withAnimation(.snappy) {
+                    withAnimation(.smooth.speed(2.0)) {
                         showAsPieChart.toggle()
                     }
                 } label: {

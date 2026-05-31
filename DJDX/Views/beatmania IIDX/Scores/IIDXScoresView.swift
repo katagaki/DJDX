@@ -127,7 +127,7 @@ struct IIDXScoresView<Header: View>: View {
                 Text("Shared.SelectDate")
                     .font(.headline)
                 DatePicker("Shared.SelectDate",
-                           selection: $playDataDate.animation(.snappy.speed(2.0)),
+                           selection: $playDataDate.animation(.smooth.speed(2.0)),
                            in: ...Date.now,
                            displayedComponents: .date)
                 .datePickerStyle(.graphical)
@@ -156,8 +156,8 @@ struct IIDXScoresView<Header: View>: View {
 
     @ViewBuilder var sortControl: some View {
         IIDXScoreSortMenu(
-            sortMode: $sortMode.animation(.snappy.speed(2.0)),
-            sortOrder: $sortOrder.animation(.snappy.speed(2.0))
+            sortMode: $sortMode.animation(.smooth.speed(2.0)),
+            sortOrder: $sortOrder.animation(.smooth.speed(2.0))
         )
     }
 
@@ -256,11 +256,11 @@ struct IIDXScoresView<Header: View>: View {
             .sheet(isPresented: $isShowingFilterSheet) {
                 ScoreFilterSheet(
                     isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
-                    difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
-                    levelsToShow: $levelsToShow.animation(.snappy.speed(2.0)),
-                    clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
-                    djLevelsToShow: $djLevelsToShow.animation(.snappy.speed(2.0)),
-                    versionsToShow: $versionsToShow.animation(.snappy.speed(2.0)),
+                    difficultiesToShow: $difficultiesToShow.animation(.smooth.speed(2.0)),
+                    levelsToShow: $levelsToShow.animation(.smooth.speed(2.0)),
+                    clearTypesToShow: $clearTypesToShow.animation(.smooth.speed(2.0)),
+                    djLevelsToShow: $djLevelsToShow.animation(.smooth.speed(2.0)),
+                    versionsToShow: $versionsToShow.animation(.smooth.speed(2.0)),
                     isSystemChangingFilterAndSort: $isSystemChangingFilterAndSort,
                     isGenreVisible: $isGenreVisible,
                     isArtistVisible: $isArtistVisible,

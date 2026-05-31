@@ -105,7 +105,7 @@ struct SDVXScoresView<Header: View>: View {
 
     @ViewBuilder var sortControl: some View {
         Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
-            Picker("Shared.Sort", selection: $sortMode.animation(.snappy.speed(2.0))) {
+            Picker("Shared.Sort", selection: $sortMode.animation(.smooth.speed(2.0))) {
                 ForEach(SDVXSortMode.allCases, id: \.self) { mode in
                     Text(LocalizedStringKey(mode.rawValue))
                         .tag(mode)
@@ -113,7 +113,7 @@ struct SDVXScoresView<Header: View>: View {
             }
             .pickerStyle(.inline)
             Section {
-                Picker("Shared.Sort.Order", selection: $sortOrder.animation(.snappy.speed(2.0))) {
+                Picker("Shared.Sort.Order", selection: $sortOrder.animation(.smooth.speed(2.0))) {
                     Label("Shared.Sort.Ascending", systemImage: "arrow.up")
                         .tag(SortOrder.ascending)
                     Label("Shared.Sort.Descending", systemImage: "arrow.down")
@@ -196,10 +196,10 @@ struct SDVXScoresView<Header: View>: View {
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             SDVXScoreFilterSheet(
-                difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
-                levelBucketsToShow: $levelBucketsToShow.animation(.snappy.speed(2.0)),
-                clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
-                gradesToShow: $gradesToShow.animation(.snappy.speed(2.0)),
+                difficultiesToShow: $difficultiesToShow.animation(.smooth.speed(2.0)),
+                levelBucketsToShow: $levelBucketsToShow.animation(.smooth.speed(2.0)),
+                clearTypesToShow: $clearTypesToShow.animation(.smooth.speed(2.0)),
+                gradesToShow: $gradesToShow.animation(.smooth.speed(2.0)),
                 availableLevelBuckets: availableLevelBuckets,
                 onReset: {
                     // No additional handling needed when filters are reset

@@ -150,7 +150,7 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
     @ViewBuilder
     private func difficultyChip(level: IIDXLevel, label: String, color: Color) -> some View {
         Button {
-            withAnimation(.snappy.speed(2.0)) {
+            withAnimation(.smooth.speed(2.0)) {
                 if selectedLevel == level {
                     selectedLevel = .all
                 } else {

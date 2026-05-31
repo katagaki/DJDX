@@ -167,7 +167,7 @@ struct MoreExternalDataSources: View {
         bemaniWikiEntryCount = await fetcher.bemaniWikiSongCount()
         await MainActor.run {
             progressAlertManager.hide()
-            withAnimation(.snappy.speed(2.0)) {
+            withAnimation(.smooth.speed(2.0)) {
                 dataImported = 0
             }
         }

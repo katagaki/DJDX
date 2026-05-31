@@ -115,7 +115,7 @@ struct PolarisChordScoresView<Header: View>: View {
 
     @ViewBuilder var sortControl: some View {
         Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
-            Picker("Shared.Sort", selection: $sortMode.animation(.snappy.speed(2.0))) {
+            Picker("Shared.Sort", selection: $sortMode.animation(.smooth.speed(2.0))) {
                 ForEach(PolarisChordSortMode.allCases, id: \.self) { mode in
                     Text(LocalizedStringKey(mode.rawValue))
                         .tag(mode)
@@ -123,7 +123,7 @@ struct PolarisChordScoresView<Header: View>: View {
             }
             .pickerStyle(.inline)
             Section {
-                Picker("Shared.Sort.Order", selection: $sortOrder.animation(.snappy.speed(2.0))) {
+                Picker("Shared.Sort.Order", selection: $sortOrder.animation(.smooth.speed(2.0))) {
                     Label("Shared.Sort.Ascending", systemImage: "arrow.up")
                         .tag(SortOrder.ascending)
                     Label("Shared.Sort.Descending", systemImage: "arrow.down")
@@ -206,10 +206,10 @@ struct PolarisChordScoresView<Header: View>: View {
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             PolarisChordScoreFilterSheet(
-                difficultiesToShow: $difficultiesToShow.animation(.snappy.speed(2.0)),
-                levelsToShow: $levelsToShow.animation(.snappy.speed(2.0)),
-                clearTypesToShow: $clearTypesToShow.animation(.snappy.speed(2.0)),
-                gradesToShow: $gradesToShow.animation(.snappy.speed(2.0)),
+                difficultiesToShow: $difficultiesToShow.animation(.smooth.speed(2.0)),
+                levelsToShow: $levelsToShow.animation(.smooth.speed(2.0)),
+                clearTypesToShow: $clearTypesToShow.animation(.smooth.speed(2.0)),
+                gradesToShow: $gradesToShow.animation(.smooth.speed(2.0)),
                 availableLevels: availableLevels,
                 onReset: {}
             )

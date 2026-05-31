@@ -124,7 +124,7 @@ struct AnalyticsView: View {
     var isEditingCards: Bool { isEditing }
 
     func toggleCard(_ cardType: AnalyticsCardType) {
-        withAnimation(.snappy) {
+        withAnimation(.smooth.speed(2.0)) {
             if visibleCards.contains(cardType) {
                 visibleCards.remove(cardType)
             } else {
@@ -135,7 +135,7 @@ struct AnalyticsView: View {
     }
 
     func togglePerLevelCard(_ card: PerLevelCardID) {
-        withAnimation(.snappy) {
+        withAnimation(.smooth.speed(2.0)) {
             if visiblePerLevelCardSet.contains(card) {
                 visiblePerLevelCardSet.remove(card)
             } else {
@@ -286,7 +286,7 @@ struct AnalyticsView: View {
                 Task { await reload() }
             }
             .onReceive(NotificationCenter.default.publisher(for: .analyticsLayoutReset)) { _ in
-                withAnimation(.snappy) {
+                withAnimation(.smooth.speed(2.0)) {
                     isEditing = false
                     cardOrder = AnalyticsCardType.defaultOrder
                     visibleCards = AnalyticsCardType.defaultVisible

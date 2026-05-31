@@ -75,7 +75,7 @@ final class SDVXAnalyticsModel {
         let topForces = records.map { chartForce($0) }.sorted(by: >).prefix(50)
         let computedVolforce = (topForces.reduce(0.0, +) * 100).rounded() / 100
 
-        withAnimation(.snappy.speed(2.0)) {
+        withAnimation(.smooth.speed(2.0)) {
             self.clearTypePerDifficulty = clearByDiff
             self.gradePerDifficulty = gradeByDiff
             self.clearTypePerLevel = clearByLevel
