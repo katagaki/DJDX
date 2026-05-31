@@ -1,9 +1,9 @@
 import Foundation
 import SQLite
 
-final class PlayDataDatabase: Sendable {
+final class IIDXPlayDataDatabase: Sendable {
 
-    static let shared = PlayDataDatabase()
+    static let shared = IIDXPlayDataDatabase()
 
     let databasePath: String
 
