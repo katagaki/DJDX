@@ -1,0 +1,155 @@
+//
+//  IIDXScoreRow.swift
+//  DJDX
+//
+//  Created by シン・ジャスティン on 2024/06/02.
+//
+
+import SwiftUI
+
+struct IIDXScoreRow: View {
+
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
+
+    @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.LevelVisible") var isLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.DJLevelVisible") var isDJLevelVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreRateVisible") var isScoreRateVisible: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
+    @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
+
+    var namespace: Namespace.ID
+
+    var songRecord: IIDXSongRecord
+    var level: IIDXLevel
+    var score: IIDXLevelScore
+    @State var scoreRate: Float?
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 8.0) {
+            // Leading Clear Lamp
+            VStack {
+                switch score.clearType {
+                case "FULLCOMBO CLEAR":
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.red,
+                            Color.orange,
+                            Color.yellow,
+                            Color.green,
+                            Color.blue,
+                            Color.indigo,
+                            Color.purple
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                case "CLEAR": Color.cyan
+                case "EASY CLEAR": Color.green
+                case "ASSIST CLEAR": Color.purple
+                case "HARD CLEAR": colorScheme == .dark ? Color.white : Color.gray
+                case "EX HARD CLEAR": Color.orange
+                case "FAILED": Color.red
+                default: Color.clear
+                }
+            }
+            .frame(width: 12.0)
+            .frame(maxHeight: .infinity)
+            .conditionalShadow(.black.opacity(0.2), radius: 1.0, x: 2.0)
+
+            HStack(alignment: .center, spacing: 0.0) {
+                // Song Info
+                VStack(alignment: .leading, spacing: 2.0) {
+                    if isGenreVisible {
+                        Text(songRecord.genre)
+                            .foregroundStyle(.secondary)
+                            .font(.caption2)
+                            .fontWidth(.condensed)
+                    }
+                    Text(songRecord.title)
+                        .bold()
+                        .fontWidth(.condensed)
+                    if isArtistVisible {
+                        Text(songRecord.artist)
+                            .font(.caption)
+                            .fontWidth(.condensed)
+                    }
+                    // Metadata Row
+                    if isDJLevelVisible || isScoreRateVisible || isScoreVisible || isLastPlayDateVisible {
+                        HStack(alignment: .center, spacing: 6.0) {
+                            if score.score != 0 {
+                                Group {
+                                    if isDJLevelVisible {
+                                        Text(score.djLevel)
+                                            .foregroundStyle(
+                                                IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme)
+                                            )
+                                            .fontWidth(.expanded)
+                                            .fontWeight(.black)
+                                    }
+                                    if isScoreRateVisible, let scoreRate {
+                                        if isDJLevelVisible {
+                                            Divider()
+                                                .frame(maxHeight: 14.0)
+                                        }
+                                        Text(scoreRate, format: .percent.precision(.fractionLength(1)))
+                                            .foregroundStyle(LinearGradient(
+                                                colors: [.primary.opacity(0.55), .primary.opacity(0.3)],
+                                                startPoint: .top,
+                                                endPoint: .bottom
+                                            ))
+                                            .fontWidth(.expanded)
+                                            .fontWeight(.black)
+                                    }
+                                    if isScoreVisible {
+                                        if isDJLevelVisible || isScoreRateVisible {
+                                            Divider()
+                                                .frame(maxHeight: 14.0)
+                                        }
+                                        Text(String(score.score))
+                                            .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
+                                                                            startPoint: .top,
+                                                                            endPoint: .bottom))
+                                            .fontWidth(.expanded)
+                                            .fontWeight(.heavy)
+                                    }
+                                }
+                                .font(.caption)
+                                if isLastPlayDateVisible {
+                                    if isDJLevelVisible || isScoreRateVisible || isScoreVisible {
+                                        Divider()
+                                            .frame(maxHeight: 14.0)
+                                    }
+                                    Text(RelativeDateTimeFormatter().localizedString(
+                                        for: songRecord.lastPlayDate,
+                                        relativeTo: .now
+                                    ))
+                                    .foregroundStyle(.secondary)
+                                    .fontWidth(.condensed)
+                                }
+                            }
+                        }
+                        .offset(y: 1.0)
+                        .font(.caption)
+                    }
+                }
+                Spacer(minLength: 0.0)
+            }
+            .padding([.top, .bottom], 8.0)
+            .automaticMatchedTransitionSource(id: "\(songRecord.title).\(level.rawValue)", in: namespace)
+
+            // Level
+            if isLevelVisible {
+                IIDXLevelLabel(levelType: level, score: score)
+                    .padding([.top, .bottom], 6.0)
+                    .frame(width: 78.0, alignment: .center)
+                    .background(.thinMaterial)
+                    .clipShape(.rect(cornerRadius: 6.0))
+                    .padding([.top, .bottom], 8.0)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.trailing)
+    }
+}

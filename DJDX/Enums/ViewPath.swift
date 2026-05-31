@@ -43,12 +43,10 @@ enum ImportPath: Hashable {
     case importerWebIIDXDouble
     case importerWebIIDXTower
     case importerManual
-    case importDetail(importGroup: ImportGroup)
 }
 
 enum MorePath: Hashable {
     case moreExternalDataSources
-    case moreAppIcon
     case moreAttributions
 }
 

@@ -1337,6 +1337,23 @@
         }
       }
     },
+    "Importer.OpenInSafari" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Safari"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Safariで開く"
+          }
+        }
+      }
+    },
     "LEVEL" : {
       "localizations" : {
         "en" : {
@@ -2815,6 +2832,89 @@
       },
       "shouldTranslate" : false
     },
+    "Shared.PolarisChord.ClearType" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Status"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランク"
+          }
+        }
+      }
+    },
+    "Shared.PolarisChord.Grade" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grade"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "達成度ランク"
+          }
+        }
+      }
+    },
+    "Shared.PolarisChord.PAClass" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PA CLASS"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PA CLASS"
+          }
+        }
+      }
+    },
+    "Shared.PolarisChord.PASkill" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PA SKILL"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PA SKILL"
+          }
+        }
+      }
+    },
+    "Shared.PolarisChord.Version" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Polaris Chord Version"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポラリスコード バージョン"
+          }
+        }
+      }
+    },
     "Shared.Refresh" : {
       "localizations" : {
         "en" : {
@@ -3088,6 +3188,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "並べ替え順序"
+          }
+        }
+      }
+    },
+    "Shared.Sort.Rate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achievement Rate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "達成率"
           }
         }
       }
@@ -3629,6 +3746,7 @@
       }
     },
     "ViewTitle.More.Customization.AppIcon" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

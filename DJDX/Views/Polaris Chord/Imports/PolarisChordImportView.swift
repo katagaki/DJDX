@@ -1,0 +1,178 @@
+//
+//  PolarisChordImportView.swift
+//  DJDX
+//
+//  Created by Claude on 2026/05/31.
+//
+
+import SwiftUI
+
+struct PolarisChordImportView: View {
+
+    @Environment(\.openURL) var openURL
+    @Environment(\.dismiss) var dismiss
+    @Environment(ProgressAlertManager.self) var progressAlertManager
+
+    @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
+    var polarisChordVersion: PolarisChordVersion
+
+    @State var importPath = NavigationPath()
+    @State var importToDate: Date = .now
+    @State var isAutoImportFailed: Bool = false
+    @State var didImportSucceed: Bool = false
+    @State var autoImportFailedReason: ImportFailedReason?
+    @State var importGroups: [PolarisChordImportGroupInfo] = []
+
+    let importer = PolarisChordDataImporter()
+    let fetcher = PolarisChordDataFetcher()
+
+    enum PolarisChordImportPath: Hashable {
+        case web
+    }
+
+    var body: some View {
+        NavigationStack(path: $importPath) {
+            List {
+                ForEach(importGroups) { group in
+                    HStack(alignment: .center, spacing: 6.0) {
+                        Text(group.date, style: .date)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        if let version = group.version {
+                            Text(version.marketingName)
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .listRowBackground(Color.clear)
+                }
+                .onDelete(perform: { indexSet in
+                    deleteImport(indexSet)
+                })
+            }
+            .listStyle(.plain)
+            .navigationTitle("ViewTitle.Calendar")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    if #available(iOS 26.0, *) {
+                        Button(role: .close) { dismiss() }
+                    } else {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .tint(.primary)
+                                .font(.title2)
+                                .symbolRenderingMode(.hierarchical)
+                        }
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Button("Importer.OpenInSafari", systemImage: "safari") {
+                            openURL(polarisChordVersion.musicDataPageURL())
+                        }
+                    } label: {
+                        Image(systemName: "questionmark.circle")
+                    }
+                }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0.0) {
+                bottomBar()
+                    .contentShape(.rect)
+                    .padding()
+            }
+            .alert(
+                "Alert.Import.Success.Title",
+                isPresented: $didImportSucceed,
+                actions: {
+                    Button("Shared.OK", role: .cancel) {
+                        didImportSucceed = false
+                        importPath = NavigationPath()
+                    }
+                },
+                message: { Text("Alert.Import.Success.Subtitle") }
+            )
+            .alert(
+                "Alert.Import.Error.Title",
+                isPresented: $isAutoImportFailed,
+                actions: {
+                    Button("Shared.OK", role: .cancel) {
+                        isAutoImportFailed = false
+                        importPath = NavigationPath()
+                    }
+                },
+                message: { Text(errorMessage(for: autoImportFailedReason ?? .serverError)) }
+            )
+            .onChange(of: didImportSucceed) { _, newValue in
+                if newValue {
+                    NotificationCenter.default.post(name: .dataImported, object: nil)
+                    Task { await reloadImportGroups() }
+                }
+            }
+            .task {
+                await reloadImportGroups()
+            }
+            .navigationDestination(for: PolarisChordImportPath.self) { path in
+                switch path {
+                case .web:
+                    PolarisChordWebImporter(importToDate: $importToDate,
+                                            isAutoImportFailed: $isAutoImportFailed,
+                                            didImportSucceed: $didImportSucceed,
+                                            autoImportFailedReason: $autoImportFailedReason)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    func bottomBar() -> some View {
+        Button {
+            importPath.append(PolarisChordImportPath.web)
+        } label: {
+            VStack(spacing: 8.0) {
+                Image(systemName: "globe")
+                    .font(.system(size: 24))
+                    .frame(maxHeight: 30.0)
+                Text(.calendarImportFromWeb)
+                    .fontWeight(.medium)
+                    .font(.subheadline)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.accent)
+            .foregroundStyle(.white)
+            .adaptiveClipShape()
+        }
+    }
+
+    func reloadImportGroups() async {
+        importGroups = await fetcher.allImportGroups()
+    }
+
+    func deleteImport(_ indexSet: IndexSet) {
+        let groupsToDelete = indexSet.map { importGroups[$0] }
+        Task {
+            for group in groupsToDelete {
+                await importer.deleteImportGroup(id: group.id)
+            }
+            await reloadImportGroups()
+            await MainActor.run {
+                NotificationCenter.default.post(name: .dataImported, object: nil)
+            }
+        }
+    }
+
+    func errorMessage(for reason: ImportFailedReason) -> String {
+        switch reason {
+        case .noPremiumCourse: return NSLocalizedString("Alert.Import.Error.Subtitle.NoPremiumCourse", comment: "")
+        case .noEAmusementPass: return NSLocalizedString("Alert.Import.Error.Subtitle.NoEAmusementPass", comment: "")
+        case .noPlayData: return NSLocalizedString("Alert.Import.Error.Subtitle.NoPlayData", comment: "")
+        case .serverError: return NSLocalizedString("Alert.Import.Error.Subtitle.ServerError", comment: "")
+        case .maintenance: return NSLocalizedString("Alert.Import.Error.Subtitle.Maintenance", comment: "")
+        }
+    }
+}

@@ -330,6 +330,67 @@ async function fetchSDVXScoreData() {
 return await fetchSDVXScoreData();
 """
 
+// Polaris Chord has no CSV export and renders its music list client-side from a
+// JSON API (json/pdata_getdata.html), so the DOM is empty in a headless WKWebView.
+// POST to that API directly and flatten music[].chart[] into one record per chart.
+let polarisChordScoreDataFetchBody = """
+async function fetchPolarisChordScoreData() {
+    const endpoint = new URL('../json/pdata_getdata.html', location.href).href;
+    const body = new URLSearchParams({ service_kind: 'music_data', pdata_kind: 'music_data' });
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+    });
+
+    const finalURL = response.url || '';
+    if (finalURL.indexOf('/error/error.html') !== -1) {
+        const match = finalURL.match(/[?&]err=([0-9]+)/);
+        return 'ERR:' + (match ? match[1] : 'server');
+    }
+
+    const json = JSON.parse(await response.text());
+    const highscore = json && json.data && json.data.score_data
+        && json.data.score_data.usr_music_highscore;
+    let music = highscore && highscore.music;
+    if (!music) { return 'ERR:empty'; }
+    if (!Array.isArray(music)) { music = [music]; }
+
+    const rows = [];
+    music.forEach(function(entry) {
+        const chartList = entry.chart_list && entry.chart_list.chart;
+        if (!chartList) { return; }
+        const charts = Array.isArray(chartList) ? chartList : [chartList];
+        charts.forEach(function(chart) {
+            rows.push({
+                musicID: String(entry.music_id || ''),
+                title: entry.name || '',
+                category: String(entry.genre || ''),
+                difficulty: chart.chart_difficulty_type,
+                level: String(chart.difficult_disp || ''),
+                rate: chart.achievement_rate,
+                score: chart.highscore,
+                clearStatus: chart.clear_status
+            });
+        });
+    });
+
+    if (rows.length === 0) { return 'ERR:empty'; }
+    return JSON.stringify(rows);
+}
+
+for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+        return await fetchPolarisChordScoreData();
+    } catch (error) {
+        if (attempt === 2) { return 'ERR:network'; }
+        await new Promise(function(resolve) { setTimeout(resolve, 600 * (attempt + 1)); });
+    }
+}
+return 'ERR:network';
+"""
+
 // IIDX: navigating directly to score_download.html?style=SP|DP|tower renders the
 // CSV into <textarea id="score_data"> on the current page. Read it directly,
 // rather than re-submitting the form.

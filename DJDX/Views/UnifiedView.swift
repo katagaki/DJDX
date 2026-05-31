@@ -21,6 +21,8 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: Game.iidxArcade, "Global.SelectedGame") var selectedGame: Game
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
+    @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
+    var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
 
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
@@ -45,9 +47,13 @@ struct UnifiedView: View {
                     SDVXScoresView(isEditingAnalytics: $isEditingAnalytics) {
                         sdvxHeader
                     }
+                } else if selectedGame == .polarisChord {
+                    PolarisChordScoresView(isEditingAnalytics: $isEditingAnalytics) {
+                        polarisChordHeader
+                    }
                 } else {
-                    ScoresView(isEditingAnalytics: $isEditingAnalytics) {
-                        unifiedHeader
+                    IIDXScoresView(isEditingAnalytics: $isEditingAnalytics) {
+                        iidxHeader
                     }
                 }
             }
@@ -79,13 +85,12 @@ struct UnifiedView: View {
                     ToolbarSpacer(.fixed, placement: .topBarTrailing)
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    SettingsMenu()
+                    MoreMenu()
                 }
             }
             .navigationDestination(for: MorePath.self) { viewPath in
                 switch viewPath {
                 case .moreExternalDataSources: MoreExternalDataSources()
-                case .moreAppIcon: MoreAppIconView()
                 case .moreAttributions: MoreLicensesView()
                 }
             }
@@ -108,8 +113,10 @@ struct UnifiedView: View {
             Group {
                 if selectedGame == .soundVoltex {
                     SDVXImportView()
+                } else if selectedGame == .polarisChord {
+                    PolarisChordImportView()
                 } else {
-                    ImportView()
+                    IIDXImportView()
                 }
             }
             .automaticSheetNavigationTransition(id: "Import", in: importNamespace)
@@ -145,7 +152,7 @@ struct UnifiedView: View {
     }
 
     @ViewBuilder
-    var unifiedHeader: some View {
+    var iidxHeader: some View {
         VStack(spacing: 0.0) {
             if selectedGame.supportsPlayType {
                 Picker("Shared.PlayType", selection: $playTypeToShow) {
@@ -159,7 +166,7 @@ struct UnifiedView: View {
                 .padding(.top, 8.0)
             }
             if selectedGame.supportsProfile {
-                ProfileHeaderView()
+                IIDXProfileHeaderView()
                     .padding(.horizontal)
                     .padding(.top, 16.0)
             }
@@ -178,6 +185,16 @@ struct UnifiedView: View {
                 .padding(.horizontal)
                 .padding(.top, 16.0)
             SDVXAnalyticsView(model: sdvxAnalyticsModel, isEditing: $isEditingAnalytics)
+        }
+        .padding(.bottom, 8.0)
+    }
+
+    @ViewBuilder
+    var polarisChordHeader: some View {
+        VStack(spacing: 0.0) {
+            PolarisChordProfileHeaderView()
+                .padding(.horizontal)
+                .padding(.top, 16.0)
         }
         .padding(.bottom, 8.0)
     }
@@ -206,6 +223,16 @@ struct UnifiedView: View {
                 Section("Shared.SDVX.Version") {
                     Picker("Shared.SDVX.Version", selection: $sdvxVersion) {
                         ForEach(SDVXVersion.supportedVersions.reversed(), id: \.self) { version in
+                            Text(version.marketingName).tag(version)
+                        }
+                    }
+                    .pickerStyle(.inline)
+                }
+                .labelsVisibility(.visible)
+            } else if selectedGame == .polarisChord {
+                Section("Shared.PolarisChord.Version") {
+                    Picker("Shared.PolarisChord.Version", selection: $polarisChordVersion) {
+                        ForEach(PolarisChordVersion.supportedVersions, id: \.self) { version in
                             Text(version.marketingName).tag(version)
                         }
                     }
