@@ -27,7 +27,7 @@ struct SDVXScoresView<Header: View>: View {
 
     @Namespace var sdvxNamespace
 
-    let fetcher = SDVXDataFetcher()
+    let fetcher = SDVXReader()
 
     init(isEditingAnalytics: Binding<Bool> = .constant(false), @ViewBuilder header: () -> Header) {
         self.header = header()

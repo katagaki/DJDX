@@ -31,7 +31,7 @@ final class AnalyticsModel {
 
     var dataState: DataState = .initializing
 
-    let fetcher = DataFetcher()
+    let fetcher = IIDXReader()
     let difficulties: [Int] = Array(1...12)
 
     var towerChartEntries: [IIDXTowerEntry] {

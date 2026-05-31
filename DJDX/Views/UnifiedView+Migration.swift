@@ -29,7 +29,7 @@ extension UnifiedView {
             case "Internal.DataMigrationForSwiftDataToSQLite":
                 await migrateSwiftDataToSQLite()
             case "Internal.BEMANIWikiMigratedToSeparateDB":
-                let migrationImporter = DataImporter()
+                let migrationImporter = IIDXImporter()
                 await migrationImporter.migrateBEMANIWikiDataIfNeeded()
             default: break
             }
@@ -75,7 +75,7 @@ extension UnifiedView {
         // Small delay to allow the alert to appear
         try? await Task.sleep(for: .milliseconds(500))
 
-        let importer = DataImporter()
+        let importer = IIDXImporter()
 
         // Migrate ImportGroups and their song records
         for (index, importGroup) in importGroups.enumerated() {

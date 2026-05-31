@@ -3,7 +3,7 @@ import SQLite
 
 // swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
-actor DataFetcher {
+actor IIDXReader {
 
     var previousFilters: FilterOptions?
     var previousSortOptions: SortOptions?

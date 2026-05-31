@@ -1,9 +1,9 @@
 import Foundation
 import SQLite
 
-actor SDVXDataFetcher {
+actor PolarisChordReader {
 
-    typealias DB = SDVXPlayDataDatabase
+    typealias DB = PolarisChordPlayDataDatabase
 
     // MARK: Import Groups
 
@@ -13,7 +13,7 @@ actor SDVXDataFetcher {
         return (try? database.pluck(query))?[DB.igID]
     }
 
-    func latestImportGroupID(for version: SDVXVersion) -> String? {
+    func latestImportGroupID(for version: PolarisChordVersion) -> String? {
         guard let database = try? DB.shared.getReadConnection() else { return nil }
         let query = DB.importGroupTable
             .filter(DB.igVersion == version.rawValue)
@@ -56,21 +56,21 @@ actor SDVXDataFetcher {
         }) ?? []
     }
 
-    func allImportGroups() -> [SDVXImportGroupInfo] {
+    func allImportGroups() -> [PolarisChordImportGroupInfo] {
         guard let database = try? DB.shared.getReadConnection() else { return [] }
         let query = DB.importGroupTable.order(DB.igImportDate.desc)
         return (try? database.prepare(query).map { row in
-            SDVXImportGroupInfo(
+            PolarisChordImportGroupInfo(
                 id: row[DB.igID],
                 date: Date(timeIntervalSince1970: row[DB.igImportDate]),
-                version: row[DB.igVersion].flatMap { SDVXVersion(rawValue: $0) }
+                version: row[DB.igVersion].flatMap { PolarisChordVersion(rawValue: $0) }
             )
         }) ?? []
     }
 
     // MARK: Song Records
 
-    func songRecords(for importGroupID: String) -> [SDVXSongRecord] {
+    func songRecords(for importGroupID: String) -> [PolarisChordSongRecord] {
         guard let database = try? DB.shared.getReadConnection() else { return [] }
         let query = DB.songRecordTable
             .filter(DB.srImportGroupID == importGroupID)
@@ -78,34 +78,32 @@ actor SDVXDataFetcher {
         return (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
     }
 
-    func latestSongRecords() -> [SDVXSongRecord] {
+    func latestSongRecords() -> [PolarisChordSongRecord] {
         guard let importGroupID = latestImportGroupID() else { return [] }
         return songRecords(for: importGroupID)
     }
 
-    func latestSongRecords(for version: SDVXVersion) -> [SDVXSongRecord] {
+    func latestSongRecords(for version: PolarisChordVersion) -> [PolarisChordSongRecord] {
         guard let importGroupID = latestImportGroupID(for: version) else { return [] }
         return songRecords(for: importGroupID)
     }
 
-    func songRecords(on date: Date) -> [SDVXSongRecord] {
+    func songRecords(on date: Date) -> [PolarisChordSongRecord] {
         guard let importGroupID = importGroupID(for: date) else { return [] }
         return songRecords(for: importGroupID)
     }
 
-    static func songRecord(from row: Row) -> SDVXSongRecord {
-        let record = SDVXSongRecord()
+    static func songRecord(from row: Row) -> PolarisChordSongRecord {
+        let record = PolarisChordSongRecord()
         record.title = row[DB.srTitle]
+        record.musicID = row[DB.srMusicID]
+        record.category = row[DB.srCategory]
         record.difficulty = row[DB.srDifficulty]
         record.level = row[DB.srLevel]
+        record.achievementRate = row[DB.srAchievementRate]
+        record.score = row[DB.srScore]
         record.clearType = row[DB.srClearType]
         record.grade = row[DB.srGrade]
-        record.highScore = row[DB.srHighScore]
-        record.exScore = row[DB.srEXScore]
-        record.playCount = row[DB.srPlayCount]
-        record.clearCount = row[DB.srClearCount]
-        record.ultimateChainCount = row[DB.srUltimateChainCount]
-        record.perfectCount = row[DB.srPerfectCount]
         return record
     }
 }

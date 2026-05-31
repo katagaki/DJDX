@@ -4,7 +4,7 @@ import WidgetKit
 actor WidgetDataPublisher {
     static let shared = WidgetDataPublisher()
     private let store = WidgetDataStore.shared
-    private let fetcher = DataFetcher()
+    private let fetcher = IIDXReader()
 
     func publishAll(playType: IIDXPlayType, iidxVersion: IIDXVersion) async {
         await publishClearTypeAndDJLevel(playType: playType, iidxVersion: iidxVersion)

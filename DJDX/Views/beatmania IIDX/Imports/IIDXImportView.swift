@@ -24,8 +24,8 @@ struct IIDXImportView: View {
 
     @State var isSelectingCSVFile: Bool = false
 
-    let actor = DataImporter()
-    let fetcher = DataFetcher()
+    let actor = IIDXImporter()
+    let fetcher = IIDXReader()
 
     var body: some View {
         NavigationStack(path: $importPath) {

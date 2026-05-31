@@ -1,7 +1,7 @@
 import Foundation
 import SQLite
 
-actor SDVXDataImporter {
+actor SDVXImporter {
 
     typealias DB = SDVXPlayDataDatabase
 

@@ -309,23 +309,16 @@ for (let attempt = 0; attempt < 3; attempt++) {
 return 'ERR:network';
 """
 
-// SDVX: the score data page (playdata/index.html) exposes its CSV by POSTing
-// method=display to itself (the disp_data() function). The response body is an
-// HTML page whose <pre>/<textarea> contains the CSV text; we POST and return
-// the CSV string.
 let sdvxScoreDownloadFetchBody = """
 async function fetchSDVXScoreData() {
     let csv = document.getElementById('score_data').value;
     if (csv.indexOf('楽曲名') !== -1) { return csv; }
     return 'ERR:empty';
 }
-    
+
 return await fetchSDVXScoreData();
 """
 
-// Polaris Chord has no CSV export and renders its music list client-side from a
-// JSON API (json/pdata_getdata.html), so the DOM is empty in a headless WKWebView.
-// POST to that API directly and flatten music[].chart[] into one record per chart.
 let polarisChordScoreDataFetchBody = """
 async function fetchPolarisChordScoreData() {
     const endpoint = new URL('../json/pdata_getdata.html', location.href).href;
@@ -384,9 +377,6 @@ for (let attempt = 0; attempt < 3; attempt++) {
 return 'ERR:network';
 """
 
-// IIDX: navigating directly to score_download.html?style=SP|DP|tower renders the
-// CSV into <textarea id="score_data"> on the current page. Read it directly,
-// rather than re-submitting the form.
 let scoreDataReadBody = """
 function readScoreData() {
     const node = document.getElementById('score_data');
@@ -478,9 +468,6 @@ style.appendChild(document.createTextNode(injectedCSS))
 head.appendChild(style)
 """
 
-// Polls for the form elements and do_djauto until ready. On iOS 18 the page
-// commits/renders but never fires didFinish, so this script is injected at
-// didCommit and may run before the page's own scripts finish initializing.
 let textageNavigationJS = """
 (function() {
     var attempts = 0;

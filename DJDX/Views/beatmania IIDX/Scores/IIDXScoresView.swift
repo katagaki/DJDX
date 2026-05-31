@@ -52,7 +52,7 @@ struct IIDXScoresView<Header: View>: View {
     var isScoreDataExpandedKey: String = "ScoresView.ScoreDataExpanded"
     @State var isScoreDataExpanded: Bool
 
-    let actor = DataFetcher()
+    let actor = IIDXReader()
 
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion

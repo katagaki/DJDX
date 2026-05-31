@@ -21,8 +21,8 @@ struct MoreExternalDataSources: View {
     @State var dataImported: Int = 0
     @State var dataTotal: Int = 2
 
-    let fetcher = DataFetcher()
-    let importer = DataImporter()
+    let fetcher = IIDXReader()
+    let importer = IIDXImporter()
 
     var body: some View {
         List {

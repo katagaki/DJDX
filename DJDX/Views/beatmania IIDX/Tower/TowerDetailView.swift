@@ -6,7 +6,7 @@ struct TowerDetailContainer: View {
 
     @State var towerEntries: [IIDXTowerEntry] = []
 
-    let fetcher = DataFetcher()
+    let fetcher = IIDXReader()
 
     var chartEntries: [IIDXTowerEntry] {
         let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: .now)!

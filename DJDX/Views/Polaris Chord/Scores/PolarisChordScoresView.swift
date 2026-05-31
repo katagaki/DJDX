@@ -34,7 +34,7 @@ struct PolarisChordScoresView<Header: View>: View {
 
     @Namespace var polarisChordNamespace
 
-    let fetcher = PolarisChordDataFetcher()
+    let fetcher = PolarisChordReader()
 
     init(isEditingAnalytics: Binding<Bool> = .constant(false), @ViewBuilder header: () -> Header) {
         self.header = header()

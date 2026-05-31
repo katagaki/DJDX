@@ -78,7 +78,7 @@ struct SDVXWebViewForImporter: UIViewRepresentable, @preconcurrency SDVXUpdateSc
             message: "Alert.Importing.Text"
         ) {
             Task {
-                let importer = SDVXDataImporter()
+                let importer = SDVXImporter()
                 for await progress in await importer.importCSV(
                     csv: csvString,
                     to: importToDate,

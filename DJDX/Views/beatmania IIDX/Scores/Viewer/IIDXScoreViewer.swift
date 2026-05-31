@@ -13,7 +13,7 @@ struct IIDXScoreViewer: View {
     @State private var selectedLevel: IIDXLevel = .all
     @State private var radarDataByLevel: [String: ChartRadarData] = [:]
 
-    private let radarFetcher = DataFetcher()
+    private let radarFetcher = IIDXReader()
 
     var availableLevels: [IIDXLevel] {
         var levels: [IIDXLevel] = []

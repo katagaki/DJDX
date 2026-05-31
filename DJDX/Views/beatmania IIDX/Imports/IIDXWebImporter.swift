@@ -104,7 +104,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
             message: "Alert.Importing.Text"
         ) {
             Task {
-                let actor = DataImporter()
+                let actor = IIDXImporter()
                 for await progress in await actor.importCSV(
                     csv: csvString,
                     to: importToDate,
@@ -129,7 +129,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     }
 
     func importTowerData(using towerData: String) async {
-        let actor = DataImporter()
+        let actor = IIDXImporter()
         for await _ in await actor.importCSV(
             csv: towerData,
             to: importToDate,

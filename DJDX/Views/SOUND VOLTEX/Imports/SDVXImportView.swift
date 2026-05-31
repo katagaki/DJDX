@@ -17,8 +17,8 @@ struct SDVXImportView: View {
     @State var isSelectingCSVFile: Bool = false
     @State var importGroups: [SDVXImportGroupInfo] = []
 
-    let importer = SDVXDataImporter()
-    let fetcher = SDVXDataFetcher()
+    let importer = SDVXImporter()
+    let fetcher = SDVXReader()
 
     enum SDVXImportPath: Hashable {
         case web

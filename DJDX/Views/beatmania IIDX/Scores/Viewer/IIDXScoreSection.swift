@@ -21,7 +21,7 @@ struct IIDXScoreSection: View {
     @State private var earliestDate: Date = Calendar.current.date(byAdding: .day, value: -1, to: .now)!
     @State private var latestDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: .now)!
 
-    private let fetcher = DataFetcher()
+    private let fetcher = IIDXReader()
 
     var body: some View {
         Section {

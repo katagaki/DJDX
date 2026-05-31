@@ -78,7 +78,7 @@ struct PolarisChordWebViewForImporter: UIViewRepresentable,
             message: "Alert.Importing.Text"
         ) {
             Task {
-                let importer = PolarisChordDataImporter()
+                let importer = PolarisChordImporter()
                 for await progress in await importer.importJSON(
                     json: jsonString,
                     to: importToDate,

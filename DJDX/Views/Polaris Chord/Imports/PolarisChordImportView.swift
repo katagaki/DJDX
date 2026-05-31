@@ -12,8 +12,8 @@ struct PolarisChordImportView: View {
     @State var autoImportFailedReason: ImportFailedReason?
     @State var importGroups: [PolarisChordImportGroupInfo] = []
 
-    let importer = PolarisChordDataImporter()
-    let fetcher = PolarisChordDataFetcher()
+    let importer = PolarisChordImporter()
+    let fetcher = PolarisChordReader()
 
     enum PolarisChordImportPath: Hashable {
         case web

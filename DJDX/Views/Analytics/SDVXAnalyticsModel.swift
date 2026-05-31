@@ -18,7 +18,7 @@ final class SDVXAnalyticsModel {
 
     var dataState: DataState = .initializing
 
-    let fetcher = SDVXDataFetcher()
+    let fetcher = SDVXReader()
 
     // VOLFORCE per chart: floor(level * grade_coef * clear_coef * 2) / 100, summed over best 50.
     // Score-based single-chart force ~= level * 2 * (score / 10_000_000) as an approximation.

@@ -74,7 +74,7 @@ final class PolarisChordPlayDataDatabase: Sendable {
             })
 
             // Ensure the score column exists on tables created before the rename.
-            try? database.run(Self.songRecordTable.addColumn(Self.srScore, defaultValue: 0))
+            _ = try? database.run(Self.songRecordTable.addColumn(Self.srScore, defaultValue: 0))
 
             try database.run(Self.songRecordTable.createIndex(
                 Self.srImportGroupID,

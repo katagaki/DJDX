@@ -1781,6 +1781,40 @@
         }
       }
     },
+    "More.General.ShowAnalytics" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Analytics"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アナリティクスを表示"
+          }
+        }
+      }
+    },
+    "More.General.ShowProfileHeader" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Profile Header"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プロフィールを表示"
+          }
+        }
+      }
+    },
     "More.GitHub" : {
       "localizations" : {
         "en" : {

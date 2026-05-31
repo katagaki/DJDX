@@ -17,6 +17,8 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
+    @AppStorage(wrappedValue: true, "More.General.ShowProfileHeader") var showProfileHeader: Bool
+    @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
 
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
@@ -158,15 +160,17 @@ struct UnifiedView: View {
                 .padding(.horizontal)
                 .padding(.top, 8.0)
             }
-            if selectedGame.supportsProfile {
+            if selectedGame.supportsProfile && showProfileHeader {
                 IIDXProfileHeaderView()
                     .padding(.horizontal)
                     .padding(.top, 16.0)
             }
-            AnalyticsView(model: analyticsModel,
-                          isEditing: $isEditingAnalytics,
-                          analyticsNamespace: analyticsNamespace,
-                          towerNamespace: towerNamespace)
+            if showAnalytics {
+                AnalyticsView(model: analyticsModel,
+                              isEditing: $isEditingAnalytics,
+                              analyticsNamespace: analyticsNamespace,
+                              towerNamespace: towerNamespace)
+            }
         }
         .padding(.bottom, 8.0)
     }
@@ -174,10 +178,14 @@ struct UnifiedView: View {
     @ViewBuilder
     var sdvxHeader: some View {
         VStack(spacing: 0.0) {
-            SDVXProfileHeaderView()
-                .padding(.horizontal)
-                .padding(.top, 16.0)
-            SDVXAnalyticsView(model: sdvxAnalyticsModel, isEditing: $isEditingAnalytics)
+            if showProfileHeader {
+                SDVXProfileHeaderView()
+                    .padding(.horizontal)
+                    .padding(.top, 16.0)
+            }
+            if showAnalytics {
+                SDVXAnalyticsView(model: sdvxAnalyticsModel, isEditing: $isEditingAnalytics)
+            }
         }
         .padding(.bottom, 8.0)
     }
@@ -185,9 +193,11 @@ struct UnifiedView: View {
     @ViewBuilder
     var polarisChordHeader: some View {
         VStack(spacing: 0.0) {
-            PolarisChordProfileHeaderView()
-                .padding(.horizontal)
-                .padding(.top, 16.0)
+            if showProfileHeader {
+                PolarisChordProfileHeaderView()
+                    .padding(.horizontal)
+                    .padding(.top, 16.0)
+            }
         }
         .padding(.bottom, 8.0)
     }

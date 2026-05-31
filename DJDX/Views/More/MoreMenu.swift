@@ -5,7 +5,10 @@ struct MoreMenu: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
 
-    let importer = DataImporter()
+    @AppStorage(wrappedValue: true, "More.General.ShowProfileHeader") var showProfileHeader: Bool
+    @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
+
+    let importer = IIDXImporter()
 
     @State var isPresentingExternalDataSources: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
@@ -28,6 +31,13 @@ struct MoreMenu: View {
     var body: some View {
         Menu {
             Section("More.General.Header") {
+                Button("More.ExternalData.Header", image: .iconAnalytics) {
+                    isPresentingExternalDataSources = true
+                }
+                Toggle("More.General.ShowProfileHeader", systemImage: "person.crop.circle", isOn: $showProfileHeader)
+                Toggle("More.General.ShowAnalytics", systemImage: "chart.xyaxis.line", isOn: $showAnalytics)
+            }
+            Section {
                 Menu("More.General.AppIcon", systemImage: "app.gift") {
                     ForEach(appIcons, id: \.name) { icon in
                         Button {
@@ -47,9 +57,6 @@ struct MoreMenu: View {
                             }
                         }
                     }
-                }
-                Button("More.ExternalData.Header", image: .iconAnalytics) {
-                    isPresentingExternalDataSources = true
                 }
             }
             Section("More.ManageData.Header") {
@@ -74,6 +81,7 @@ struct MoreMenu: View {
         } label: {
             Label("Tab.More", systemImage: "ellipsis")
         }
+        .menuActionDismissBehavior(.disabled)
         .sheet(isPresented: $isPresentingExternalDataSources) {
             NavigationStack {
                 MoreExternalDataSources()

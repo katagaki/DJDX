@@ -2,7 +2,7 @@ import Foundation
 import SQLite
 
 // swiftlint:disable:next type_body_length
-actor DataImporter {
+actor IIDXImporter {
 
     let dateFormat = "yyyy-MM-dd-HH-mm-ss"
 
@@ -452,12 +452,12 @@ actor DataImporter {
         song.time = row[PlayDataDatabase.songTime]
         song.movie = row[PlayDataDatabase.songMovie]
         song.layer = row[PlayDataDatabase.songLayer]
-        let db = PlayDataDatabase.self
-        let spB = row[db.songSPBeginnerNoteCount]
-        let spN = row[db.songSPNormalNoteCount]
-        let spH = row[db.songSPHyperNoteCount]
-        let spA = row[db.songSPAnotherNoteCount]
-        let spL = row[db.songSPLeggendariaNoteCount]
+        let database = PlayDataDatabase.self
+        let spB = row[database.songSPBeginnerNoteCount]
+        let spN = row[database.songSPNormalNoteCount]
+        let spH = row[database.songSPHyperNoteCount]
+        let spA = row[database.songSPAnotherNoteCount]
+        let spL = row[database.songSPLeggendariaNoteCount]
         if spB != nil || spN != nil || spH != nil || spA != nil || spL != nil {
             song.spNoteCount = IIDXNoteCount(
                 beginnerNoteCount: spB.map(String.init) ?? "-",
@@ -468,11 +468,11 @@ actor DataImporter {
                 playType: .single
             )
         }
-        let dpB = row[db.songDPBeginnerNoteCount]
-        let dpN = row[db.songDPNormalNoteCount]
-        let dpH = row[db.songDPHyperNoteCount]
-        let dpA = row[db.songDPAnotherNoteCount]
-        let dpL = row[db.songDPLeggendariaNoteCount]
+        let dpB = row[database.songDPBeginnerNoteCount]
+        let dpN = row[database.songDPNormalNoteCount]
+        let dpH = row[database.songDPHyperNoteCount]
+        let dpA = row[database.songDPAnotherNoteCount]
+        let dpL = row[database.songDPLeggendariaNoteCount]
         if dpB != nil || dpN != nil || dpH != nil || dpA != nil || dpL != nil {
             song.dpNoteCount = IIDXNoteCount(
                 beginnerNoteCount: dpB.map(String.init) ?? "-",
