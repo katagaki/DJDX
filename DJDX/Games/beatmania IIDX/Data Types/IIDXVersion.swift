@@ -35,9 +35,19 @@ enum IIDXVersion: Int, Codable, CaseIterable {
     case epolis = 31
     case pinkyCrush = 32
     case sparkleShower = 33
+    // Home (PC) version. Has no e-amusement export, so scores are entered manually.
+    // Sentinel raw value kept clearly outside the arcade numbering range.
+    case infinitas = 1000
 
     static var supportedVersions: [IIDXVersion] {
-        [.epolis, .pinkyCrush, .sparkleShower]
+        // INFINITAS is placed first so that, after the picker reverses the list,
+        // it appears as the last (bottom) entry.
+        [.infinitas, .epolis, .pinkyCrush, .sparkleShower]
+    }
+
+    // Whether this version is the manually-tracked home version (no import path).
+    var isManualEntry: Bool {
+        self == .infinitas
     }
 
     var marketingName: String {
@@ -75,6 +85,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .epolis: return "EPOLIS"
         case .pinkyCrush: return "Pinky Crush"
         case .sparkleShower: return "Sparkle Shower"
+        case .infinitas: return "INFINITAS"
         }
     }
 
@@ -119,6 +130,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .epolis: return UIColor(red: 50 / 255, green: 50 / 255, blue: 50 / 255, alpha: 1.0)
         case .pinkyCrush: return UIColor(red: 249 / 255, green: 87 / 255, blue: 142 / 255, alpha: 1.0)
         case .sparkleShower: return UIColor(red: 67 / 255, green: 143 / 255, blue: 82 / 255, alpha: 1.0)
+        case .infinitas: return UIColor(red: 88 / 255, green: 86 / 255, blue: 214 / 255, alpha: 1.0)
         }
     }
 
@@ -157,6 +169,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .epolis: return UIColor(red: 240 / 255, green: 254 / 255, blue: 0 / 255, alpha: 1.0)
         case .pinkyCrush: return UIColor(red: 1.0, green: 97 / 255, blue: 178 / 255, alpha: 1.0)
         case .sparkleShower: return UIColor(red: 173 / 255, green: 227 / 255, blue: 77 / 255, alpha: 1.0)
+        case .infinitas: return UIColor(red: 153 / 255, green: 151 / 255, blue: 255 / 255, alpha: 1.0)
         }
     }
 

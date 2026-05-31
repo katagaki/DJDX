@@ -20,6 +20,11 @@ final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
 
     var importGroup: ImportGroup?
 
+    // Row id of the backing SQLite record, when fetched from PlayData.db.
+    // Used to target manual (INFINITAS) entries for edit/delete. Not persisted
+    // by SwiftData since storage is handled by the custom SQLite layer.
+    @Transient var databaseID: Int64?
+
     init() {
         // Empty default initializer required by SwiftData
     }

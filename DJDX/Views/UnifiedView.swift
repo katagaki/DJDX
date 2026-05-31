@@ -24,6 +24,7 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
 
     @State var isPresentingImport: Bool = false
+    @State var isPresentingScoreEditor: Bool = false
     @State var isFirstStartCleanupComplete: Bool = false
     @State var isEditingAnalytics: Bool = false
 
@@ -33,6 +34,11 @@ struct UnifiedView: View {
     @Namespace var analyticsNamespace
     @Namespace var towerNamespace
     @Namespace var importNamespace
+
+    // INFINITAS has no import path; scores are added manually via a `+` button.
+    var isManualEntryMode: Bool {
+        selectedGame == .iidxArcade && iidxVersion.isManualEntry
+    }
 
     var body: some View {
         @Bindable var progressAlertManager = progressAlertManager
@@ -59,11 +65,18 @@ struct UnifiedView: View {
                     gameMenu
                 }
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    Button("Shared.Import", systemImage: "arrow.down.circle.dotted") {
-                        isPresentingImport = true
+                    if isManualEntryMode {
+                        Button("Scores.ManualEntry.Add.Title", systemImage: "plus") {
+                            isPresentingScoreEditor = true
+                        }
+                        .automaticSheetMatchedTransitionSource(id: "Import", in: importNamespace)
+                    } else {
+                        Button("Shared.Import", systemImage: "arrow.down.circle.dotted") {
+                            isPresentingImport = true
+                        }
+                        .popoverTip(ImportMovedTip(), arrowEdge: .top)
+                        .automaticSheetMatchedTransitionSource(id: "Import", in: importNamespace)
                     }
-                    .popoverTip(ImportMovedTip(), arrowEdge: .top)
-                    .automaticSheetMatchedTransitionSource(id: "Import", in: importNamespace)
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
@@ -117,6 +130,11 @@ struct UnifiedView: View {
             .automaticSheetNavigationTransition(id: "Import", in: importNamespace)
             .presentationDetents([.large])
             .interactiveDismissDisabled()
+        }
+        .sheet(isPresented: $isPresentingScoreEditor) {
+            IIDXInfinitasScoreEditor()
+                .automaticSheetNavigationTransition(id: "Import", in: importNamespace)
+                .presentationDetents([.large])
         }
         .overlay {
             if progressAlertManager.isShowing {

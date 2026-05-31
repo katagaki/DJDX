@@ -223,10 +223,13 @@ struct IIDXScoresView<Header: View>: View {
             }
             .toolbar {
                 if #available(iOS 26.0, *) {
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        timeTravelButton
+                    // INFINITAS is a date-agnostic manual collection, so hide time travel.
+                    if iidxVersion != .infinitas {
+                        ToolbarItemGroup(placement: .bottomBar) {
+                            timeTravelButton
+                        }
+                        ToolbarSpacer(.fixed, placement: .bottomBar)
                     }
-                    ToolbarSpacer(.fixed, placement: .bottomBar)
                     DefaultToolbarItem(kind: .search, placement: .bottomBar)
                     ToolbarSpacer(.fixed, placement: .bottomBar)
                     ToolbarItemGroup(placement: .bottomBar) {
@@ -235,7 +238,9 @@ struct IIDXScoresView<Header: View>: View {
                     }
                 } else {
                     ToolbarItemGroup(placement: .bottomBar) {
-                        timeTravelButton
+                        if iidxVersion != .infinitas {
+                            timeTravelButton
+                        }
                         Spacer()
                         sortControl
                         filterControl

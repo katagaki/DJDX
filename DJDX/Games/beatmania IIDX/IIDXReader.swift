@@ -56,6 +56,11 @@ actor IIDXReader {
     // displayed data follows the selected version (matching the trends queries).
     func importGroup(for selectedDate: Date, version: IIDXVersion?) -> ImportGroup? {
         guard let version else { return importGroup(for: selectedDate) }
+        // INFINITAS is a manually-tracked persistent collection: always return its
+        // single import group regardless of the selected date.
+        if version == .infinitas {
+            return importGroups(for: .infinitas).first
+        }
         let groups = importGroups(for: version)
         guard !groups.isEmpty else { return nil }
 
@@ -133,7 +138,9 @@ actor IIDXReader {
             return nil
         }
 
-        if importGroupID != importGroup.id {
+        // For INFINITAS the group id never changes across manual add/edit/delete,
+        // so always re-query to reflect the latest entries.
+        if importGroupID != importGroup.id || version == .infinitas {
             importGroupID = importGroup.id
             previousFilters = nil
             previousSortOptions = nil
@@ -567,6 +574,7 @@ actor IIDXReader {
 
     static func songRecord(from row: Row) -> IIDXSongRecord {
         let record = IIDXSongRecord()
+        record.databaseID = row[PlayDataDatabase.srID]
         record.version = row[PlayDataDatabase.srVersion]
         record.title = row[PlayDataDatabase.srTitle]
         record.genre = row[PlayDataDatabase.srGenre]

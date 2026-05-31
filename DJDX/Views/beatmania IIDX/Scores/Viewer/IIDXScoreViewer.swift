@@ -3,17 +3,27 @@ import SwiftUI
 struct IIDXScoreViewer: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
+    @EnvironmentObject var navigationManager: NavigationManager
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
-    var songRecord: IIDXSongRecord
+    @State private var songRecord: IIDXSongRecord
     var noteCount: (IIDXSongRecord, IIDXLevel) -> Int?
     var initialLevel: IIDXLevel
 
     @State private var selectedLevel: IIDXLevel = .all
     @State private var radarDataByLevel: [String: ChartRadarData] = [:]
+    @State private var isPresentingEditor: Bool = false
 
     private let radarFetcher = IIDXReader()
+
+    init(songRecord: IIDXSongRecord,
+         noteCount: @escaping (IIDXSongRecord, IIDXLevel) -> Int?,
+         initialLevel: IIDXLevel) {
+        self._songRecord = State(initialValue: songRecord)
+        self.noteCount = noteCount
+        self.initialLevel = initialLevel
+    }
 
     var availableLevels: [IIDXLevel] {
         var levels: [IIDXLevel] = []
@@ -25,6 +35,12 @@ struct IIDXScoreViewer: View {
         if songRecord.anotherScore.difficulty != 0 { levels.append(.another) }
         if songRecord.leggendariaScore.difficulty != 0 { levels.append(.leggendaria) }
         return levels
+    }
+
+    @ViewBuilder var editButton: some View {
+        Button("Shared.Edit", systemImage: "pencil") {
+            isPresentingEditor = true
+        }
     }
 
     var body: some View {
@@ -73,6 +89,28 @@ struct IIDXScoreViewer: View {
                 Spacer()
             }
             versionNumberToolbarItem()
+            // INFINITAS entries are manually maintained, so offer an edit affordance.
+            if iidxVersion == .infinitas {
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
+                    ToolbarItem(placement: .bottomBar) {
+                        editButton
+                    }
+                } else {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Spacer()
+                        editButton
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $isPresentingEditor) {
+            IIDXInfinitasScoreEditor(
+                record: songRecord,
+                onSaved: { updatedRecord in songRecord = updatedRecord },
+                onDeleted: { navigationManager.popToRoot() }
+            )
+            .presentationDetents([.large])
         }
         .safeAreaInset(edge: .top, spacing: 0.0) {
             TabBarAccessory(placement: .top) {
