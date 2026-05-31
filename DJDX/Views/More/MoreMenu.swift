@@ -9,6 +9,8 @@ struct MoreMenu: View {
     @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
 
     let importer = IIDXImporter()
+    let sdvxImporter = SDVXImporter()
+    let polarisChordImporter = PolarisChordImporter()
 
     @State var isPresentingExternalDataSources: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
@@ -160,6 +162,8 @@ struct MoreMenu: View {
     func deleteAllScoreData() {
         Task {
             await importer.deleteAllScoreData()
+            await sdvxImporter.deleteAllScoreData()
+            await polarisChordImporter.deleteAllScoreData()
             await MainActor.run {
                 NotificationCenter.default.post(name: .dataImported, object: nil)
             }
