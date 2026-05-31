@@ -7,7 +7,7 @@ struct IIDXScoreViewer: View {
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
-    @State private var songRecord: IIDXSongRecord
+    var songRecord: IIDXSongRecord
     var noteCount: (IIDXSongRecord, IIDXLevel) -> Int?
     var initialLevel: IIDXLevel
 
@@ -16,14 +16,6 @@ struct IIDXScoreViewer: View {
     @State private var isPresentingEditor: Bool = false
 
     private let radarFetcher = IIDXReader()
-
-    init(songRecord: IIDXSongRecord,
-         noteCount: @escaping (IIDXSongRecord, IIDXLevel) -> Int?,
-         initialLevel: IIDXLevel) {
-        self._songRecord = State(initialValue: songRecord)
-        self.noteCount = noteCount
-        self.initialLevel = initialLevel
-    }
 
     var availableLevels: [IIDXLevel] {
         var levels: [IIDXLevel] = []
@@ -105,9 +97,11 @@ struct IIDXScoreViewer: View {
             }
         }
         .sheet(isPresented: $isPresentingEditor) {
+            // IIDXSongRecord is a reference type; the editor mutates this same
+            // instance in place, so dismissing the sheet re-renders with the
+            // updated values. Deleting pops back to the list.
             IIDXInfinitasScoreEditor(
                 record: songRecord,
-                onSaved: { updatedRecord in songRecord = updatedRecord },
                 onDeleted: { navigationManager.popToRoot() }
             )
             .presentationDetents([.large])

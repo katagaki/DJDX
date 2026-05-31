@@ -11,7 +11,6 @@ struct IIDXInfinitasScoreEditor: View {
 
     // nil = add a new entry; non-nil = edit the existing entry.
     var record: IIDXSongRecord? = nil
-    var onSaved: (IIDXSongRecord) -> Void = { _ in }
     var onDeleted: () -> Void = {}
 
     @State private var title: String = ""
@@ -219,13 +218,6 @@ struct IIDXInfinitasScoreEditor: View {
         result.playCount = playCount
         result.lastPlayDate = lastPlayDate
 
-        // Each manual entry holds exactly one populated level; clear the rest.
-        result.beginnerScore = IIDXLevelScore()
-        result.normalScore = IIDXLevelScore()
-        result.hyperScore = IIDXLevelScore()
-        result.anotherScore = IIDXLevelScore()
-        result.leggendariaScore = IIDXLevelScore()
-
         let score = IIDXLevelScore(
             level: level,
             difficulty: difficulty,
@@ -236,14 +228,12 @@ struct IIDXInfinitasScoreEditor: View {
             clearType: clearType.rawValue,
             djLevel: djLevel.rawValue
         )
-        switch level {
-        case .beginner: result.beginnerScore = score
-        case .normal: result.normalScore = score
-        case .hyper: result.hyperScore = score
-        case .another: result.anotherScore = score
-        case .leggendaria: result.leggendariaScore = score
-        default: result.anotherScore = score
-        }
+        // Each manual entry holds exactly one populated level; the rest stay empty.
+        result.beginnerScore = level == .beginner ? score : IIDXLevelScore()
+        result.normalScore = level == .normal ? score : IIDXLevelScore()
+        result.hyperScore = level == .hyper ? score : IIDXLevelScore()
+        result.anotherScore = level == .another ? score : IIDXLevelScore()
+        result.leggendariaScore = level == .leggendaria ? score : IIDXLevelScore()
         return result
     }
 
@@ -258,7 +248,6 @@ struct IIDXInfinitasScoreEditor: View {
             }
             await MainActor.run {
                 NotificationCenter.default.post(name: .dataImported, object: nil)
-                onSaved(builtRecord)
                 dismiss()
             }
         }
