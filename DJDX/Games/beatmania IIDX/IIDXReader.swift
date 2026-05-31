@@ -19,9 +19,9 @@ actor IIDXReader {
     // MARK: Import Groups
 
     func importGroup(for selectedDate: Date) -> ImportGroup? {
-        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return nil }
-        let table = PlayDataDatabase.importGroupTable
-        let col = PlayDataDatabase.self
+        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return nil }
+        let table = IIDXPlayDataDatabase.importGroupTable
+        let col = IIDXPlayDataDatabase.self
 
         let startOfDay = Calendar.current.startOfDay(for: selectedDate)
         let startOfNextDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
@@ -76,49 +76,49 @@ actor IIDXReader {
     }
 
     func allImportGroups() -> [ImportGroup] {
-        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
-        let query = PlayDataDatabase.importGroupTable.order(PlayDataDatabase.igImportDate.asc)
+        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = IIDXPlayDataDatabase.importGroupTable.order(IIDXPlayDataDatabase.igImportDate.asc)
         return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
     }
 
     func allImportGroupsSortedByDateDescending() -> [ImportGroup] {
-        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
-        let query = PlayDataDatabase.importGroupTable.order(PlayDataDatabase.igImportDate.desc)
+        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = IIDXPlayDataDatabase.importGroupTable.order(IIDXPlayDataDatabase.igImportDate.desc)
         return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
     }
 
     // MARK: Song Records
 
     func songRecords(for importGroupID: String) -> [IIDXSongRecord] {
-        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
-        let query = PlayDataDatabase.songRecordTable
-            .filter(PlayDataDatabase.srImportGroupID == importGroupID)
-            .order(PlayDataDatabase.srTitle.asc)
+        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = IIDXPlayDataDatabase.songRecordTable
+            .filter(IIDXPlayDataDatabase.srImportGroupID == importGroupID)
+            .order(IIDXPlayDataDatabase.srTitle.asc)
         return (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
     }
 
     func songRecords(for importGroupID: String, playType: IIDXPlayType) -> [IIDXSongRecord] {
-        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
-        let query = PlayDataDatabase.songRecordTable
-            .filter(PlayDataDatabase.srImportGroupID == importGroupID
-                    && PlayDataDatabase.srPlayType == playType.rawValue)
-            .order(PlayDataDatabase.srTitle.asc)
+        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = IIDXPlayDataDatabase.songRecordTable
+            .filter(IIDXPlayDataDatabase.srImportGroupID == importGroupID
+                    && IIDXPlayDataDatabase.srPlayType == playType.rawValue)
+            .order(IIDXPlayDataDatabase.srTitle.asc)
         return (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
     }
 
     func songRecordsForSong(title: String) -> [IIDXSongRecord] {
-        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
-        let query = PlayDataDatabase.songRecordTable
-            .filter(PlayDataDatabase.srTitle == title)
+        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = IIDXPlayDataDatabase.songRecordTable
+            .filter(IIDXPlayDataDatabase.srTitle == title)
         return (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
     }
 
     func songRecordImportGroupIDs(for title: String) -> [String] {
-        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
-        let query = PlayDataDatabase.songRecordTable
-            .select(PlayDataDatabase.srImportGroupID)
-            .filter(PlayDataDatabase.srTitle == title)
-        return (try? database.prepare(query).map { $0[PlayDataDatabase.srImportGroupID] }) ?? []
+        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = IIDXPlayDataDatabase.songRecordTable
+            .select(IIDXPlayDataDatabase.srImportGroupID)
+            .filter(IIDXPlayDataDatabase.srTitle == title)
+        return (try? database.prepare(query).map { $0[IIDXPlayDataDatabase.srImportGroupID] }) ?? []
     }
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
@@ -461,10 +461,10 @@ actor IIDXReader {
         for importGroupIDs: [String],
         playType: IIDXPlayType
     ) -> (clearType: [String: [Int: [String: Int]]], djLevel: [String: [Int: [String: Int]]]) {
-        guard let database = try? PlayDataDatabase.shared.getReadConnection() else {
+        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else {
             return ([:], [:])
         }
-        let cols = PlayDataDatabase.self
+        let cols = IIDXPlayDataDatabase.self
 
         var clearTypeResult: [String: [Int: [String: Int]]] = [:]
         var djLevelResult: [String: [Int: [String: Int]]] = [:]
@@ -483,7 +483,7 @@ actor IIDXReader {
         ]
 
         let idSet = importGroupIDs
-        let table = PlayDataDatabase.songRecordTable
+        let table = IIDXPlayDataDatabase.songRecordTable
             .filter(idSet.contains(cols.srImportGroupID) && cols.srPlayType == playType.rawValue)
 
         for level in levelColumns {
@@ -522,18 +522,18 @@ actor IIDXReader {
     }
 
     func importGroups(for version: IIDXVersion) -> [ImportGroup] {
-        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
-        let query = PlayDataDatabase.importGroupTable
-            .filter(PlayDataDatabase.igIIDXVersion == version.rawValue)
-            .order(PlayDataDatabase.igImportDate.asc)
+        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = IIDXPlayDataDatabase.importGroupTable
+            .filter(IIDXPlayDataDatabase.igIIDXVersion == version.rawValue)
+            .order(IIDXPlayDataDatabase.igImportDate.asc)
         return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
     }
 
     // MARK: Tower Entries
 
     func allTowerEntries() -> [IIDXTowerEntry] {
-        guard let database = try? PlayDataDatabase.shared.getReadConnection() else { return [] }
-        let query = PlayDataDatabase.towerEntryTable.order(PlayDataDatabase.tePlayDate.desc)
+        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        let query = IIDXPlayDataDatabase.towerEntryTable.order(IIDXPlayDataDatabase.tePlayDate.desc)
         return (try? database.prepare(query).map { Self.towerEntry(from: $0) }) ?? []
     }
 
@@ -554,12 +554,12 @@ actor IIDXReader {
 
     static func importGroup(from row: Row) -> ImportGroup {
         let group = ImportGroup(
-            importDate: Date(timeIntervalSince1970: row[PlayDataDatabase.igImportDate]),
+            importDate: Date(timeIntervalSince1970: row[IIDXPlayDataDatabase.igImportDate]),
             iidxData: [],
-            iidxVersion: row[PlayDataDatabase.igIIDXVersion].flatMap { IIDXVersion(rawValue: $0) } ?? .epolis
+            iidxVersion: row[IIDXPlayDataDatabase.igIIDXVersion].flatMap { IIDXVersion(rawValue: $0) } ?? .epolis
         )
-        group.id = row[PlayDataDatabase.igID]
-        if row[PlayDataDatabase.igIIDXVersion] == nil {
+        group.id = row[IIDXPlayDataDatabase.igID]
+        if row[IIDXPlayDataDatabase.igIIDXVersion] == nil {
             group.iidxVersion = nil
         }
         return group
@@ -567,13 +567,13 @@ actor IIDXReader {
 
     static func songRecord(from row: Row) -> IIDXSongRecord {
         let record = IIDXSongRecord()
-        record.version = row[PlayDataDatabase.srVersion]
-        record.title = row[PlayDataDatabase.srTitle]
-        record.genre = row[PlayDataDatabase.srGenre]
-        record.artist = row[PlayDataDatabase.srArtist]
-        record.playCount = row[PlayDataDatabase.srPlayCount]
-        record.playType = IIDXPlayType(rawValue: row[PlayDataDatabase.srPlayType]) ?? .single
-        record.lastPlayDate = Date(timeIntervalSince1970: row[PlayDataDatabase.srLastPlayDate])
+        record.version = row[IIDXPlayDataDatabase.srVersion]
+        record.title = row[IIDXPlayDataDatabase.srTitle]
+        record.genre = row[IIDXPlayDataDatabase.srGenre]
+        record.artist = row[IIDXPlayDataDatabase.srArtist]
+        record.playCount = row[IIDXPlayDataDatabase.srPlayCount]
+        record.playType = IIDXPlayType(rawValue: row[IIDXPlayDataDatabase.srPlayType]) ?? .single
+        record.lastPlayDate = Date(timeIntervalSince1970: row[IIDXPlayDataDatabase.srLastPlayDate])
 
         record.beginnerScore = levelScore(from: row, prefix: "beginner")
         record.normalScore = levelScore(from: row, prefix: "normal")
@@ -585,7 +585,7 @@ actor IIDXReader {
     }
 
     private static func levelScore(from row: Row, prefix: String) -> IIDXLevelScore {
-        let database = PlayDataDatabase.self
+        let database = IIDXPlayDataDatabase.self
         let levelCol: SQLite.Expression<String>
         let diffCol: SQLite.Expression<Int>
         let scoreCol: SQLite.Expression<Int>
@@ -677,9 +677,9 @@ actor IIDXReader {
 
     static func towerEntry(from row: Row) -> IIDXTowerEntry {
         IIDXTowerEntry(
-            playDate: Date(timeIntervalSince1970: row[PlayDataDatabase.tePlayDate]),
-            keyCount: row[PlayDataDatabase.teKeyCount],
-            scratchCount: row[PlayDataDatabase.teScratchCount]
+            playDate: Date(timeIntervalSince1970: row[IIDXPlayDataDatabase.tePlayDate]),
+            keyCount: row[IIDXPlayDataDatabase.teKeyCount],
+            scratchCount: row[IIDXPlayDataDatabase.teScratchCount]
         )
     }
 }

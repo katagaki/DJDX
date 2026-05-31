@@ -18,7 +18,7 @@ struct DJDXApp: App {
     }
 
     init() {
-        _ = PlayDataDatabase.shared
+        _ = IIDXPlayDataDatabase.shared
         Task {
             let playTypeRaw = UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter") ?? "single"
             let playType = IIDXPlayType(rawValue: playTypeRaw) ?? .single

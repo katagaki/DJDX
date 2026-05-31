@@ -63,7 +63,8 @@ actor IIDXImporter {
         from version: IIDXVersion,
         continuation: AsyncStream<ImportProgress>.Continuation
     ) {
-        if let urlOfData: URL = url, let stringFromData: String = try? String(contentsOf: urlOfData) {
+        if let urlOfData: URL = url,
+            let stringFromData: String = try? String(contentsOf: urlOfData) {
             let parsedCSV = CSwiftV(with: stringFromData)
             if let keyedRows = parsedCSV.keyedRows {
 
@@ -132,7 +133,7 @@ actor IIDXImporter {
         from version: IIDXVersion,
         continuation: AsyncStream<ImportProgress>.Continuation
     ) {
-        guard let database = try? PlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
         let importGroupID = prepareImportGroupForPartialImport(
             database: database,
             importToDate: importToDate,
@@ -176,7 +177,7 @@ actor IIDXImporter {
         playType: IIDXPlayType,
         version: IIDXVersion
     ) -> String {
-        let col = PlayDataDatabase.self
+        let col = IIDXPlayDataDatabase.self
         let startOfDay = Calendar.current.startOfDay(for: importToDate)
         let startOfNextDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
 
@@ -207,7 +208,7 @@ actor IIDXImporter {
     // MARK: Insert Helpers
 
     static func insertSongRecord(database: Connection, record: IIDXSongRecord, importGroupID: String) {
-        let col = PlayDataDatabase.self
+        let col = IIDXPlayDataDatabase.self
         _ = try? database.run(col.songRecordTable.insert(
             col.srImportGroupID <- importGroupID,
             col.srVersion <- record.version,
@@ -286,7 +287,7 @@ actor IIDXImporter {
     }
 
     static func insertTowerEntry(database: Connection, entry: IIDXTowerEntry) {
-        let col = PlayDataDatabase.self
+        let col = IIDXPlayDataDatabase.self
         _ = try? database.run(col.towerEntryTable.insert(
             col.tePlayDate <- entry.playDate.timeIntervalSince1970,
             col.teKeyCount <- entry.keyCount,
@@ -297,10 +298,10 @@ actor IIDXImporter {
     // MARK: Tower Import
 
     func importTowerCSV(_ keyedRows: [[String: String]]) {
-        guard let database = try? PlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
 
         // Delete all existing tower entries
-        _ = try? database.run(PlayDataDatabase.towerEntryTable.delete())
+        _ = try? database.run(IIDXPlayDataDatabase.towerEntryTable.delete())
 
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -328,8 +329,8 @@ actor IIDXImporter {
         _ importGroup: ImportGroup,
         songRecords: [IIDXSongRecord]
     ) {
-        guard let database = try? PlayDataDatabase.shared.getWriteConnection() else { return }
-        let col = PlayDataDatabase.self
+        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
+        let col = IIDXPlayDataDatabase.self
         try? database.transaction {
             try database.run(col.importGroupTable.insert(
                 col.igID <- importGroup.id,
@@ -347,7 +348,7 @@ actor IIDXImporter {
     }
 
     func migrateTowerEntries(_ entries: [IIDXTowerEntry]) {
-        guard let database = try? PlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
         try? database.transaction {
             for entry in entries {
                 Self.insertTowerEntry(database: database, entry: entry)
@@ -358,8 +359,8 @@ actor IIDXImporter {
     // MARK: Delete Helpers
 
     func deleteImportGroup(id: String) {
-        guard let database = try? PlayDataDatabase.shared.getWriteConnection() else { return }
-        let col = PlayDataDatabase.self
+        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
+        let col = IIDXPlayDataDatabase.self
         try? database.transaction {
             try database.run(col.songRecordTable.filter(col.srImportGroupID == id).delete())
             try database.run(col.importGroupTable.filter(col.igID == id).delete())
@@ -367,8 +368,8 @@ actor IIDXImporter {
     }
 
     func deleteAllScoreData() {
-        guard let database = try? PlayDataDatabase.shared.getWriteConnection() else { return }
-        let col = PlayDataDatabase.self
+        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
+        let col = IIDXPlayDataDatabase.self
         try? database.transaction {
             try database.run(col.songRecordTable.delete())
             try database.run(col.importGroupTable.delete())
@@ -424,8 +425,8 @@ actor IIDXImporter {
         guard !UserDefaults.standard.bool(forKey: migrationKey) else { return }
 
         // Check if old data exists in PlayData.db
-        guard let oldDatabase = try? PlayDataDatabase.shared.getReadConnection() else { return }
-        let oldQuery = PlayDataDatabase.songTable
+        guard let oldDatabase = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return }
+        let oldQuery = IIDXPlayDataDatabase.songTable
         guard let rows = try? oldDatabase.prepare(oldQuery) else { return }
 
         var songs: [IIDXSong] = []
@@ -448,11 +449,11 @@ actor IIDXImporter {
 
     private static func songFromPlayDataDB(from row: Row) -> IIDXSong {
         let song = IIDXSong()
-        song.title = row[PlayDataDatabase.songTitle]
-        song.time = row[PlayDataDatabase.songTime]
-        song.movie = row[PlayDataDatabase.songMovie]
-        song.layer = row[PlayDataDatabase.songLayer]
-        let database = PlayDataDatabase.self
+        song.title = row[IIDXPlayDataDatabase.songTitle]
+        song.time = row[IIDXPlayDataDatabase.songTime]
+        song.movie = row[IIDXPlayDataDatabase.songMovie]
+        song.layer = row[IIDXPlayDataDatabase.songLayer]
+        let database = IIDXPlayDataDatabase.self
         let spB = row[database.songSPBeginnerNoteCount]
         let spN = row[database.songSPNormalNoteCount]
         let spH = row[database.songSPHyperNoteCount]
