@@ -130,7 +130,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .epolis: return UIColor(red: 50 / 255, green: 50 / 255, blue: 50 / 255, alpha: 1.0)
         case .pinkyCrush: return UIColor(red: 249 / 255, green: 87 / 255, blue: 142 / 255, alpha: 1.0)
         case .sparkleShower: return UIColor(red: 67 / 255, green: 143 / 255, blue: 82 / 255, alpha: 1.0)
-        case .infinitas: return UIColor(red: 88 / 255, green: 86 / 255, blue: 214 / 255, alpha: 1.0)
+        case .infinitas: return UIColor(red: 88.0 / 255.0, green: 86.0 / 255.0, blue: 214.0 / 255.0, alpha: 1.0)
         }
     }
 
@@ -169,7 +169,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .epolis: return UIColor(red: 240 / 255, green: 254 / 255, blue: 0 / 255, alpha: 1.0)
         case .pinkyCrush: return UIColor(red: 1.0, green: 97 / 255, blue: 178 / 255, alpha: 1.0)
         case .sparkleShower: return UIColor(red: 173 / 255, green: 227 / 255, blue: 77 / 255, alpha: 1.0)
-        case .infinitas: return UIColor(red: 153 / 255, green: 151 / 255, blue: 255 / 255, alpha: 1.0)
+        case .infinitas: return UIColor(red: 153.0 / 255.0, green: 151.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0)
         }
     }
 
