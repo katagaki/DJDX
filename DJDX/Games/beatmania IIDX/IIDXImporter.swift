@@ -250,67 +250,22 @@ actor IIDXImporter {
     static func insertSongRecord(database: Connection, record: IIDXSongRecord, importGroupID: String) {
         let col = IIDXPlayDataDatabase.self
         _ = try? database.run(col.songRecordTable.insert(
-            col.srImportGroupID <- importGroupID,
-            col.srVersion <- record.version,
-            col.srTitle <- record.title,
-            col.srGenre <- record.genre,
-            col.srArtist <- record.artist,
-            col.srPlayCount <- record.playCount,
-            col.srPlayType <- record.playType.rawValue,
-            col.srLastPlayDate <- record.lastPlayDate.timeIntervalSince1970,
-            // Beginner
-            col.srBeginnerLevel <- record.beginnerScore.level.code(),
-            col.srBeginnerDifficulty <- record.beginnerScore.difficulty,
-            col.srBeginnerScore <- record.beginnerScore.score,
-            col.srBeginnerPerfectGreatCount <- record.beginnerScore.perfectGreatCount,
-            col.srBeginnerGreatCount <- record.beginnerScore.greatCount,
-            col.srBeginnerMissCount <- record.beginnerScore.missCount,
-            col.srBeginnerClearType <- record.beginnerScore.clearType,
-            col.srBeginnerDJLevel <- record.beginnerScore.djLevel,
-            // Normal
-            col.srNormalLevel <- record.normalScore.level.code(),
-            col.srNormalDifficulty <- record.normalScore.difficulty,
-            col.srNormalScore <- record.normalScore.score,
-            col.srNormalPerfectGreatCount <- record.normalScore.perfectGreatCount,
-            col.srNormalGreatCount <- record.normalScore.greatCount,
-            col.srNormalMissCount <- record.normalScore.missCount,
-            col.srNormalClearType <- record.normalScore.clearType,
-            col.srNormalDJLevel <- record.normalScore.djLevel,
-            // Hyper
-            col.srHyperLevel <- record.hyperScore.level.code(),
-            col.srHyperDifficulty <- record.hyperScore.difficulty,
-            col.srHyperScore <- record.hyperScore.score,
-            col.srHyperPerfectGreatCount <- record.hyperScore.perfectGreatCount,
-            col.srHyperGreatCount <- record.hyperScore.greatCount,
-            col.srHyperMissCount <- record.hyperScore.missCount,
-            col.srHyperClearType <- record.hyperScore.clearType,
-            col.srHyperDJLevel <- record.hyperScore.djLevel,
-            // Another
-            col.srAnotherLevel <- record.anotherScore.level.code(),
-            col.srAnotherDifficulty <- record.anotherScore.difficulty,
-            col.srAnotherScore <- record.anotherScore.score,
-            col.srAnotherPerfectGreatCount <- record.anotherScore.perfectGreatCount,
-            col.srAnotherGreatCount <- record.anotherScore.greatCount,
-            col.srAnotherMissCount <- record.anotherScore.missCount,
-            col.srAnotherClearType <- record.anotherScore.clearType,
-            col.srAnotherDJLevel <- record.anotherScore.djLevel,
-            // Leggendaria
-            col.srLeggendariaLevel <- record.leggendariaScore.level.code(),
-            col.srLeggendariaDifficulty <- record.leggendariaScore.difficulty,
-            col.srLeggendariaScore <- record.leggendariaScore.score,
-            col.srLeggendariaPerfectGreatCount <- record.leggendariaScore.perfectGreatCount,
-            col.srLeggendariaGreatCount <- record.leggendariaScore.greatCount,
-            col.srLeggendariaMissCount <- record.leggendariaScore.missCount,
-            col.srLeggendariaClearType <- record.leggendariaScore.clearType,
-            col.srLeggendariaDJLevel <- record.leggendariaScore.djLevel
+            [col.srImportGroupID <- importGroupID] + recordSetters(for: record)
         ))
     }
 
-    // swiftlint:disable:next function_body_length
     static func updateSongRecord(database: Connection, id: Int64, record: IIDXSongRecord) {
         let col = IIDXPlayDataDatabase.self
         let row = col.songRecordTable.filter(col.srID == id)
-        _ = try? database.run(row.update(
+        _ = try? database.run(row.update(recordSetters(for: record)))
+    }
+
+    // Column setters shared by insert and update (everything except the import
+    // group id, which only applies on insert).
+    // swiftlint:disable:next function_body_length
+    static func recordSetters(for record: IIDXSongRecord) -> [Setter] {
+        let col = IIDXPlayDataDatabase.self
+        return [
             col.srVersion <- record.version,
             col.srTitle <- record.title,
             col.srGenre <- record.genre,
@@ -363,7 +318,7 @@ actor IIDXImporter {
             col.srLeggendariaMissCount <- record.leggendariaScore.missCount,
             col.srLeggendariaClearType <- record.leggendariaScore.clearType,
             col.srLeggendariaDJLevel <- record.leggendariaScore.djLevel
-        ))
+        ]
     }
 
     static func insertSongToBEMANIWiki(database: Connection, song: IIDXSong) {
