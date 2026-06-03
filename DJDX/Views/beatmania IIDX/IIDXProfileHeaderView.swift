@@ -115,6 +115,9 @@ struct IIDXProfileHeaderView: View {
     }
 
     func downloadStatusPageData() async {
+        // Manually-tracked versions (INFINITAS) have no e-amusement presence, so
+        // there is no status page to fetch. Skip to avoid requesting a bogus URL.
+        guard !iidxVersion.isManualEntry else { return }
         let baseURLString = "https://p.eagate.573.jp"
         let request = URLRequest(url: iidxVersion.statusPageURL())
 
