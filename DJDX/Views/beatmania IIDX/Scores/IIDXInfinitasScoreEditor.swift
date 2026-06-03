@@ -29,6 +29,7 @@ struct IIDXInfinitasScoreEditor: View {
     @State private var playCount: Int = 1
 
     @State private var songs: [IIDXSong] = []
+    @State private var hasBEMANIWikiData: Bool = false
     @State private var isShowingSongPicker: Bool = false
     @State private var isShowingDeleteConfirmation: Bool = false
     @State private var didLoadInitialValues: Bool = false
@@ -85,7 +86,9 @@ struct IIDXInfinitasScoreEditor: View {
             }
             .onAppear(perform: loadInitialValuesIfNeeded)
             .task {
-                songs = await reader.fetchAllSongs()
+                // Only check whether BEMANIWiki data exists (cheap COUNT); defer
+                // loading the full song catalog until the picker is opened.
+                hasBEMANIWikiData = await reader.bemaniWikiSongCount() > 0
             }
         }
     }
@@ -95,7 +98,7 @@ struct IIDXInfinitasScoreEditor: View {
     @ViewBuilder private var songSection: some View {
         Section("Scores.ManualEntry.Section.Song") {
             TextField("Scores.ManualEntry.Title", text: $title)
-            if !songs.isEmpty {
+            if hasBEMANIWikiData {
                 Button("Scores.ManualEntry.PickFromBEMANIWiki", systemImage: "magnifyingglass") {
                     isShowingSongPicker = true
                 }
@@ -172,6 +175,11 @@ struct IIDXInfinitasScoreEditor: View {
         SongSearchPicker(songs: songs) { selectedTitle in
             title = selectedTitle
             isShowingSongPicker = false
+        }
+        .task {
+            if songs.isEmpty {
+                songs = await reader.fetchAllSongs()
+            }
         }
     }
 
