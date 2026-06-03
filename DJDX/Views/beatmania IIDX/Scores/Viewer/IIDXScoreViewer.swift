@@ -82,7 +82,7 @@ struct IIDXScoreViewer: View {
             }
             versionNumberToolbarItem()
             // INFINITAS entries are manually maintained, so offer an edit affordance.
-            if iidxVersion == .infinitas {
+            if iidxVersion.isManualEntry {
                 if #available(iOS 26.0, *) {
                     ToolbarSpacer(.flexible, placement: .bottomBar)
                     ToolbarItem(placement: .bottomBar) {

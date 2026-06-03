@@ -225,7 +225,7 @@ struct IIDXScoresView<Header: View>: View {
                 if #available(iOS 26.0, *) {
                     // INFINITAS is a date-agnostic manual collection, so hide time
                     // travel. The leading spacer stays so search keeps its inset.
-                    if iidxVersion != .infinitas {
+                    if !iidxVersion.isManualEntry {
                         ToolbarItemGroup(placement: .bottomBar) {
                             timeTravelButton
                         }
@@ -239,7 +239,7 @@ struct IIDXScoresView<Header: View>: View {
                     }
                 } else {
                     ToolbarItemGroup(placement: .bottomBar) {
-                        if iidxVersion != .infinitas {
+                        if !iidxVersion.isManualEntry {
                             timeTravelButton
                         }
                         Spacer()
