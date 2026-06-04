@@ -620,6 +620,23 @@
         }
       }
     },
+    "Analytics.DJLevel.Overall" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grade Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グレード内訳"
+          }
+        }
+      }
+    },
     "Analytics.NewClears.Subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
