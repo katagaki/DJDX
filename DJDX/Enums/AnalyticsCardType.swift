@@ -139,7 +139,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     /// Fixed content height for the card body (excluding header)
     var cardContentHeight: CGFloat {
         switch self {
-        case .clearTypeOverall, .gradeBreakdown: return 160.0
+        case .clearTypeOverall, .gradeBreakdown: return 120.0
         case .towerRecent, .towerTotals: return 80.0
         case .newFullComboClear,
              .newClears,
