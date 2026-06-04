@@ -34,7 +34,7 @@ struct SDVXScoreViewer: View {
                 .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                 chartActions()
             } header: {
-                HStack(spacing: 8.0) {
+                HStack(spacing: 4.0) {
                     Text(verbatim: difficulty.abbreviation)
                         .foregroundStyle(difficulty.color)
                         .fontWeight(.black)
@@ -42,12 +42,17 @@ struct SDVXScoreViewer: View {
                         .monospacedDigit()
                     Spacer()
                 }
-                .fontWidth(.expanded)
+                .fontWidth(.condensed)
             }
         }
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
         .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Spacer()
+            }
+        }
         .safeAreaInset(edge: .top, spacing: 0.0) {
             TabBarAccessory(placement: .top) {
                 VStack(alignment: .center, spacing: 8.0) {
@@ -56,18 +61,7 @@ struct SDVXScoreViewer: View {
                         .fontWeight(.heavy)
                         .fontWidth(.compressed)
                         .multilineTextAlignment(.center)
-                        .foregroundStyle(difficulty.color)
                         .textSelection(.enabled)
-                    Divider()
-                    HStack(spacing: 6.0) {
-                        Text(verbatim: difficulty.abbreviation)
-                            .foregroundStyle(difficulty.color)
-                            .fontWeight(.black)
-                        Text(verbatim: songRecord.level)
-                            .monospacedDigit()
-                    }
-                    .font(.subheadline)
-                    .fontWidth(.expanded)
                 }
                 .frame(maxWidth: .infinity)
                 .padding([.bottom], 8.0)
@@ -82,7 +76,7 @@ struct SDVXScoreViewer: View {
 
     @ViewBuilder
     func headline() -> some View {
-        HStack {
+        HStack(spacing: 16.0) {
             if songRecord.gradeEnum != .none, songRecord.gradeEnum != .unknown {
                 Text(verbatim: songRecord.grade)
                     .foregroundStyle(gradeStyle)
@@ -91,7 +85,7 @@ struct SDVXScoreViewer: View {
             Text(songRecord.highScore, format: .number)
                 .foregroundStyle(scoreStyle)
         }
-        .font(.largeTitle)
+        .font(.title)
         .fontWidth(.expanded)
         .fontWeight(.black)
     }
@@ -102,7 +96,7 @@ struct SDVXScoreViewer: View {
             Button {
                 openYouTube()
             } label: {
-                chartActionLabel(systemImage: "play.rectangle.fill", label: "YouTube")
+                chartActionLabel(image: Image(.listIconYouTube), label: "YouTube")
             }
             .buttonStyle(.plain)
             if let sdvxInChart {
@@ -110,7 +104,8 @@ struct SDVXScoreViewer: View {
                 Button {
                     navigationManager.push(SDVXScoresPath.chartViewer(chart: sdvxInChart))
                 } label: {
-                    chartActionLabel(systemImage: "music.note.list", label: "Scores.SDVX.ViewChart")
+                    chartActionLabel(image: Image(.listIconSdvxIn),
+                                     label: "Scores.SDVX.ViewChart")
                 }
                 .buttonStyle(.plain)
             }
@@ -118,11 +113,12 @@ struct SDVXScoreViewer: View {
     }
 
     @ViewBuilder
-    func chartActionLabel(systemImage: String, label: LocalizedStringKey) -> some View {
+    private func chartActionLabel(image: Image, label: LocalizedStringKey) -> some View {
         VStack(spacing: 8.0) {
-            Image(systemName: systemImage)
-                .font(.system(size: 22.0))
-                .frame(height: 26.0)
+            image
+                .resizable()
+                .scaledToFit()
+                .frame(width: 26.0, height: 26.0)
             Text(label)
                 .font(.caption)
                 .fontWeight(.semibold)

@@ -620,6 +620,23 @@
         }
       }
     },
+    "Analytics.DJLevel.Overall" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grade Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グレード内訳"
+          }
+        }
+      }
+    },
     "Analytics.NewClears.Subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -779,6 +796,22 @@
         }
       }
     },
+    "Analytics.PerLevel.TitleSeparator" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " - "
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "・"
+          }
+        }
+      }
+    },
     "Analytics.PerLevel.Trend" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -792,22 +825,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "推移"
-          }
-        }
-      }
-    },
-    "Analytics.PerLevel.TitleSeparator" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " - "
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "・"
           }
         }
       }
@@ -1693,74 +1710,6 @@
         }
       }
     },
-    "More.ExternalData.SDVXIn" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SDVX譜面保管所∇"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SDVX譜面保管所∇"
-          }
-        }
-      }
-    },
-    "More.ExternalData.SDVXIn.Description" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chart Images"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "譜面画像"
-          }
-        }
-      }
-    },
-    "More.ExternalData.SDVXIn.EntryCount" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Number of Charts"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "譜面数"
-          }
-        }
-      }
-    },
-    "More.ExternalData.SDVXIn.Footer" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Provides chart images for SOUND VOLTEX. DJDX is not affiliated with or endorsed by SDVX譜面保管所∇."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SOUND VOLTEXの譜面画像を提供します。DJDXはSDVX譜面保管所∇とは一切関係ありません。"
-          }
-        }
-      }
-    },
     "More.ExternalData.Charts" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1825,6 +1774,69 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "外部データソース"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SDVX譜面保管所"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "More.ExternalData.SDVXIn.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Images"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面画像"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn.EntryCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Charts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面数"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Provides chart indexes for SOUND VOLTEX. DJDX is not affiliated with or endorsed by SDVX譜面保管所."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SOUND VOLTEXの譜面インデックスを提供します。DJDXはSDVX譜面保管所とは一切関係ありません。"
           }
         }
       }
@@ -2400,6 +2412,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴を見る"
+          }
+        }
+      }
+    },
+    "SDVXInChartViewer.FallbackMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart not opening?\nTry opening it manually on sdvx.in."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面が開きませんか？\nお手数ですが、sdvx.inで手動で開いてみてください。"
           }
         }
       }
@@ -3457,22 +3485,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレーデータ"
-          }
-        }
-      }
-    },
-    "SDVXInChartViewer.FallbackMessage" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chart not opening?\nTry opening it manually on sdvx.in."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "譜面が開きませんか？\nお手数ですが、sdvx.inで手動で開いてみてください。"
           }
         }
       }

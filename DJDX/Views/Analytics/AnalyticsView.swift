@@ -60,6 +60,17 @@ struct AnalyticsView: View {
     var analyticsNamespace: Namespace.ID
     var towerNamespace: Namespace.ID
 
+    var totalDJLevelCounts: OrderedDictionary<String, Int> {
+        let order = Array(IIDXDJLevel.sortedStrings.reversed())
+        var totals = OrderedDictionary(uniqueKeys: order, values: order.map { _ in 0 })
+        for (_, counts) in model.djLevelPerDifficulty {
+            for (level, value) in counts {
+                totals[level.rawValue, default: 0] += value
+            }
+        }
+        return totals
+    }
+
     @ViewBuilder
     func overviewCard(for cardType: AnalyticsCardType) -> some View {
         switch cardType {
@@ -70,14 +81,37 @@ struct AnalyticsView: View {
                 }
             } label: {
                 AnalyticsCardView(cardType: .clearTypeOverall, showsHeader: false) {
-                    OverviewClearTypeOverallGraph(graphData: .constant(model.clearTypePerDifficulty))
+                    OverviewClearTypeOverallGraph(graphData: .constant(model.clearTypePerDifficulty),
+                                                  isHorizontal: true)
                         .chartLegend(.hidden)
-                        .chartYAxis(.hidden)
+                        .chartXAxis(.hidden)
                 }
                 .perLevelCaption("Analytics.ClearType.Overall")
             }
             .buttonStyle(AnalyticsCardButtonStyle())
             .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
+        case .gradeBreakdown:
+            Button {
+                if !isEditingCards && !model.djLevelPerDifficulty.isEmpty {
+                    navigationManager.push(AnalyticsPath.gradeBreakdownDetail)
+                }
+            } label: {
+                AnalyticsCardView(cardType: .gradeBreakdown, showsHeader: false) {
+                    let counts = totalDJLevelCounts.elements.filter { $0.value > 0 }
+                    Chart(counts, id: \.key) { element in
+                        BarMark(
+                            x: .value("Shared.ClearCount", element.value),
+                            y: .value("Shared.IIDX.DJLevel", element.key)
+                        )
+                        .foregroundStyle(IIDXDJLevel.color(for: element.key))
+                    }
+                    .chartXAxis { AxisMarks { AxisGridLine() } }
+                    .chartYScale(domain: Array(counts.map(\.key).reversed()))
+                }
+                .perLevelCaption("Analytics.DJLevel.Overall")
+            }
+            .buttonStyle(AnalyticsCardButtonStyle())
+            .automaticMatchedTransitionSource(id: "DJLevel.Overall", in: analyticsNamespace)
         case .towerRecent, .towerTotals:
             let transitionID = cardType == .towerRecent ? "Tower.Recent" : "Tower.Totals"
             let caption: LocalizedStringKey = cardType == .towerRecent
@@ -151,7 +185,8 @@ struct AnalyticsView: View {
         VStack(spacing: 20.0) {
                 // MARK: Overview section
                 let overviewCards = cardOrder.filter {
-                    $0 == .clearTypeOverall || (selectedGame.supportsTower && $0.isTowerCard)
+                    $0 == .clearTypeOverall || $0 == .gradeBreakdown ||
+                    (selectedGame.supportsTower && $0.isTowerCard)
                 }
                 let shownOverviewCards = isEditing ? overviewCards : overviewCards.filter { visibleCards.contains($0) }
                 if !shownOverviewCards.isEmpty {

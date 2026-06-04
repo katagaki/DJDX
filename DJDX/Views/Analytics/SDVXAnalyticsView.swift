@@ -305,20 +305,11 @@ struct SDVXAnalyticsView: View {
             Chart(totalGradeCounts.elements.filter { $0.value > 0 }, id: \.key) { element in
                 BarMark(
                     x: .value("Shared.ClearCount", element.value),
-                    y: .value("Grade", element.key),
-                    height: .fixed(22.0)
+                    y: .value("Grade", element.key)
                 )
-                .foregroundStyle(.orange)
-                .annotation(position: .overlay, alignment: .leading) {
-                    Text(verbatim: element.key)
-                        .font(.caption2.weight(.heavy))
-                        .fontWidth(.expanded)
-                        .foregroundStyle(.white)
-                        .padding(.leading, 6.0)
-                }
+                .foregroundStyle(SDVXGrade.color(for: element.key))
             }
             .chartXAxis { AxisMarks { AxisGridLine() } }
-            .chartYAxis(.hidden)
         }
         .perLevelCaption("Analytics.SDVX.GradeBreakdown")
     }

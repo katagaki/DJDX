@@ -6,6 +6,7 @@ struct OverviewClearTypeOverallGraph: View {
     @Binding var graphData: [Int: OrderedDictionary<String, Int>]
 
     @State var isInteractive: Bool = false
+    var isHorizontal: Bool = false
 
     var populatedDifficulties: [Int] {
         graphData.filter { _, counts in
@@ -15,7 +16,7 @@ struct OverviewClearTypeOverallGraph: View {
 
     // Pad the domain by half a unit on each side so the first and last bars
     // sit fully inside the plot instead of overflowing its edges.
-    var xDomain: ClosedRange<Double> {
+    var levelDomain: ClosedRange<Double> {
         if isInteractive {
             return 0.5...12.5
         }
@@ -34,13 +35,32 @@ struct OverviewClearTypeOverallGraph: View {
     // Integer level ticks within the (half-unit padded) domain, so each axis
     // label lines up exactly with its bar.
     var axisValues: [Double] {
-        let lower = Int(xDomain.lowerBound.rounded(.up))
-        let upper = Int(xDomain.upperBound.rounded(.down))
+        let lower = Int(levelDomain.lowerBound.rounded(.up))
+        let upper = Int(levelDomain.upperBound.rounded(.down))
         guard lower <= upper else { return [] }
         return (lower...upper).map(Double.init)
     }
 
+    let clearTypeColorScale: KeyValuePairs<String, Color> = [
+        "FULLCOMBO CLEAR": .blue,
+        "CLEAR": .cyan,
+        "EASY CLEAR": .green,
+        "ASSIST CLEAR": .purple,
+        "HARD CLEAR": .pink,
+        "EX HARD CLEAR": .yellow,
+        "FAILED": .red
+    ]
+
     var body: some View {
+        if isHorizontal {
+            horizontalChart
+        } else {
+            verticalChart
+        }
+    }
+
+    @ViewBuilder
+    var verticalChart: some View {
         Chart(graphData.keys.sorted(), id: \.self) { difficulty in
             ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
                 let count = graphData[difficulty]![clearType]!
@@ -65,15 +85,24 @@ struct OverviewClearTypeOverallGraph: View {
         .chartPlotStyle { plotArea in
             plotArea.padding(.horizontal, 0.0)
         }
-        .chartXScale(domain: xDomain)
-        .chartForegroundStyleScale([
-            "FULLCOMBO CLEAR": .blue,
-            "CLEAR": .cyan,
-            "EASY CLEAR": .green,
-            "ASSIST CLEAR": .purple,
-            "HARD CLEAR": .pink,
-            "EX HARD CLEAR": .yellow,
-            "FAILED": .red
-        ])
+        .chartXScale(domain: levelDomain)
+        .chartForegroundStyleScale(clearTypeColorScale)
+    }
+
+    @ViewBuilder
+    var horizontalChart: some View {
+        Chart(populatedDifficulties, id: \.self) { difficulty in
+            ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
+                let count = graphData[difficulty]![clearType]!
+                BarMark(
+                    x: .value("Shared.ClearCount", count),
+                    y: .value("LEVEL", "\(difficulty)"),
+                    stacking: .standard
+                )
+                .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
+            }
+        }
+        .chartYScale(domain: populatedDifficulties.map { "\($0)" })
+        .chartForegroundStyleScale(clearTypeColorScale)
     }
 }
