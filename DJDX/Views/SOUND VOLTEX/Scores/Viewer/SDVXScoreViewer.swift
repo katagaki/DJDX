@@ -61,7 +61,6 @@ struct SDVXScoreViewer: View {
                         .fontWeight(.heavy)
                         .fontWidth(.compressed)
                         .multilineTextAlignment(.center)
-                        .foregroundStyle(.white)
                         .textSelection(.enabled)
                 }
                 .frame(maxWidth: .infinity)
