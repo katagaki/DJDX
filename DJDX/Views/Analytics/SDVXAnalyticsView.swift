@@ -308,16 +308,8 @@ struct SDVXAnalyticsView: View {
                     y: .value("Grade", element.key)
                 )
                 .foregroundStyle(.orange)
-                .annotation(position: .overlay, alignment: .leading) {
-                    Text(verbatim: element.key)
-                        .font(.caption2.weight(.heavy))
-                        .fontWidth(.expanded)
-                        .foregroundStyle(.white)
-                        .padding(.leading, 6.0)
-                }
             }
             .chartXAxis { AxisMarks { AxisGridLine() } }
-            .chartYAxis(.hidden)
         }
         .perLevelCaption("Analytics.SDVX.GradeBreakdown")
     }
