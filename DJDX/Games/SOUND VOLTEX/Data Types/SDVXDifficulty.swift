@@ -39,6 +39,15 @@ enum SDVXDifficulty: String, Codable, CaseIterable {
         }
     }
 
+    var sdvxInSlot: String {
+        switch self {
+        case .novice: return "n"
+        case .advanced: return "a"
+        case .exhaust: return "e"
+        default: return "m"
+        }
+    }
+
     // Whether this difficulty occupies the infinite-tier (5th) slot
     var isInfiniteTier: Bool {
         switch self {

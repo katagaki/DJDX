@@ -31,6 +31,11 @@ enum AnalyticsPath: Hashable {
     case newADetail
 }
 
+enum SDVXScoresPath: Hashable {
+    case scoreViewer(songRecord: SDVXSongRecord)
+    case chartViewer(chart: SDVXInChart)
+}
+
 enum SDVXAnalyticsPath: Hashable {
     case clearBreakdownDetail
     case gradeBreakdownDetail

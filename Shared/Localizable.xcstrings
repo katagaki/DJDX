@@ -10,6 +10,9 @@
     "[%@](https://bm2dx.com/IIDX/notes_radar/)" : {
       "shouldTranslate" : false
     },
+    "[%@](https://sdvx.in)" : {
+      "shouldTranslate" : false
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -1656,6 +1659,74 @@
         }
       }
     },
+    "More.ExternalData.SDVXIn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SDVX譜面保管所∇"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SDVX譜面保管所∇"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Images"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面画像"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn.EntryCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Charts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面数"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Provides chart images for SOUND VOLTEX. DJDX is not affiliated with or endorsed by SDVX譜面保管所∇."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SOUND VOLTEXの譜面画像を提供します。DJDXはSDVX譜面保管所∇とは一切関係ありません。"
+          }
+        }
+      }
+    },
     "More.ExternalData.Charts" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2110,6 +2181,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコア履歴を閲覧するには、「マイ弐寺」画面でBEMANIWiki 2ndのデータを取得する必要があります。"
+          }
+        }
+      }
+    },
+    "Scores.SDVX.ViewChart" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面"
           }
         }
       }
@@ -3339,6 +3427,22 @@
         }
       }
     },
+    "SDVXInChartViewer.FallbackMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart not opening?\nTry opening it manually on sdvx.in."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面が開きませんか？\nお手数ですが、sdvx.inで手動で開いてみてください。"
+          }
+        }
+      }
+    },
     "Textage.FallbackMessage" : {
       "localizations" : {
         "en" : {
@@ -3769,6 +3873,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコアデータ"
+          }
+        }
+      }
+    },
+    "ViewTitle.SDVXInChartViewer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面"
           }
         }
       }

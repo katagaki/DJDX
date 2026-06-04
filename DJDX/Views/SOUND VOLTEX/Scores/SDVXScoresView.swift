@@ -156,8 +156,13 @@ struct SDVXScoresView<Header: View>: View {
                 }
                 if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
                     ForEach(sortedRecords, id: \.self) { record in
-                        SDVXScoreRow(record: record)
-                            .contentShape(.rect)
+                        Button {
+                            navigationManager.push(SDVXScoresPath.scoreViewer(songRecord: record))
+                        } label: {
+                            SDVXScoreRow(record: record)
+                                .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                         Divider()
                             .padding(.leading, 16.0)
                     }
@@ -213,6 +218,14 @@ struct SDVXScoresView<Header: View>: View {
         .background {
             if dataState == .presenting && records.isEmpty {
                 ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
+            }
+        }
+        .navigationDestination(for: SDVXScoresPath.self) { viewPath in
+            switch viewPath {
+            case .scoreViewer(let songRecord):
+                SDVXScoreViewer(songRecord: songRecord)
+            case .chartViewer(let chart):
+                SDVXInChartViewer(chart: chart)
             }
         }
         .task {

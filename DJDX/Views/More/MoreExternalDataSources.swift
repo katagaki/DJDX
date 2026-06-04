@@ -11,23 +11,29 @@ struct MoreExternalDataSources: View {
 
     @AppStorage(wrappedValue: true, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
     @AppStorage(wrappedValue: true, "ExternalData.BM2DX.Enabled") var isBM2DXEnabled: Bool
+    @AppStorage(wrappedValue: true, "ExternalData.SDVXIn.Enabled") var isSDVXInEnabled: Bool
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var bemaniWikiEntryCount: Int = 0
     @State var bm2dxEntryCount: Int = 0
+    @State var sdvxInEntryCount: Int = 0
 
     @State var isBemaniWikiReloadCompleted: Bool = false
     @State var isBM2DXReloadCompleted: Bool = false
+    @State var isSDVXInReloadCompleted: Bool = false
     @State var dataImported: Int = 0
     @State var dataTotal: Int = 2
 
     let fetcher = IIDXReader()
     let importer = IIDXImporter()
+    let sdvxFetcher = SDVXReader()
+    let sdvxInImporter = SDVXInImporter()
 
     var body: some View {
         List {
             bemaniWikiSection()
             bm2dxSection()
+            sdvxInSection()
         }
         .navigationTitle("More.ExternalData.Header")
         .navigationBarTitleDisplayMode(.inline)
@@ -59,6 +65,7 @@ struct MoreExternalDataSources: View {
         .task {
             bemaniWikiEntryCount = await fetcher.bemaniWikiSongCount()
             bm2dxEntryCount = await fetcher.chartRadarDataCount()
+            sdvxInEntryCount = await sdvxFetcher.sdvxInChartCount()
         }
         .alert(
             "Alert.ExternalData.Completed.Title",
@@ -82,6 +89,18 @@ struct MoreExternalDataSources: View {
             },
             message: {
                 Text("Alert.ExternalData.Completed.Text.\(bm2dxEntryCount)")
+            }
+        )
+        .alert(
+            "Alert.ExternalData.Completed.Title",
+            isPresented: $isSDVXInReloadCompleted,
+            actions: {
+                Button("Shared.OK", role: .cancel) {
+                    isSDVXInReloadCompleted = false
+                }
+            },
+            message: {
+                Text("Alert.ExternalData.Completed.Text.\(sdvxInEntryCount)")
             }
         )
     }
@@ -151,6 +170,81 @@ struct MoreExternalDataSources: View {
             Text("More.ExternalData.BM2DX.Footer") +
             Text(" ") +
             Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://bm2dx.com/IIDX/notes_radar/)")
+        }
+    }
+
+    // MARK: - sdvx.in
+
+    @ViewBuilder
+    private func sdvxInSection() -> some View {
+        Section {
+            Toggle(isOn: $isSDVXInEnabled) {
+                Text("More.ExternalData.SDVXIn")
+            }
+            if isSDVXInEnabled {
+                Button("More.ExternalData.UpdateData") {
+                    progressAlertManager.show(title: "Alert.ExternalData.Downloading.Title",
+                                              message: "Alert.ExternalData.Downloading.Text")
+                    Task {
+                        await reloadSDVXInData()
+                        isSDVXInReloadCompleted = true
+                    }
+                }
+                HStack {
+                    Text("More.ExternalData.SDVXIn.EntryCount")
+                    Spacer()
+                    Text(verbatim: "\(sdvxInEntryCount)")
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } header: {
+            ListSectionHeader(text: "More.ExternalData.SDVXIn.Description")
+                .font(.body)
+        } footer: {
+            Text("More.ExternalData.SDVXIn.Footer") +
+            Text(" ") +
+            Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://sdvx.in)")
+        }
+    }
+
+    // MARK: - sdvx.in Data Loading
+
+    func reloadSDVXInData() async {
+        var charts: [SDVXInChart] = []
+        let pattern = "SORT([0-9]{5})([NAEMnaem])\\(\\);</script><!--(.*?)-->"
+        let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])
+
+        dataTotal = 20
+        dataImported = 0
+        for level in 1...20 {
+            defer { dataImported += 1 }
+            let levelSlug = String(format: "%02d", level)
+            guard let regex,
+                  let url = URL(string: "https://sdvx.in/sort/sort_\(levelSlug).htm"),
+                  let (data, _) = try? await URLSession.shared.data(from: url),
+                  let html = String(data: data, encoding: .utf8) else { continue }
+            let htmlString = html as NSString
+            let matches = regex.matches(in: html, range: NSRange(location: 0, length: htmlString.length))
+            for match in matches where match.numberOfRanges == 4 {
+                let code = htmlString.substring(with: match.range(at: 1))
+                let slot = htmlString.substring(with: match.range(at: 2)).lowercased()
+                let rawTitle = htmlString.substring(with: match.range(at: 3))
+                let title = ((try? SwiftSoup.Entities.unescape(rawTitle)) ?? rawTitle)
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !title.isEmpty else { continue }
+                charts.append(SDVXInChart(code: code, slot: slot, title: title, level: level))
+            }
+        }
+
+        await sdvxInImporter.replaceAllCharts(charts)
+        sdvxInEntryCount = await sdvxFetcher.sdvxInChartCount()
+
+        await MainActor.run {
+            progressAlertManager.hide()
+            withAnimation(.smooth.speed(2.0)) {
+                dataImported = 0
+                dataTotal = 2
+            }
         }
     }
 
