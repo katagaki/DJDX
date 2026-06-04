@@ -133,59 +133,69 @@ struct SDVXImportView: View {
 
     @ViewBuilder
     func bottomBar() -> some View {
-        HStack(spacing: 10.0) {
-            Button {
-                importPath.append(SDVXImportPath.web)
-            } label: {
-                VStack(spacing: 8.0) {
-                    Image(systemName: "globe")
-                        .font(.system(size: 24))
-                        .frame(maxHeight: 30.0)
-                    Text(.calendarImportFromWeb)
-                        .fontWeight(.medium)
-                        .font(.subheadline)
-                        .lineLimit(1)
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.accent)
-                .foregroundStyle(.white)
-                .adaptiveClipShape()
+        VStack(spacing: 16.0) {
+            HStack(spacing: 8.0) {
+                DatePicker("Calendar.Import.SelectDate",
+                           selection: $importToDate,
+                           in: ...Date.now,
+                           displayedComponents: .date)
+                .datePickerStyle(.compact)
             }
-            Menu {
-                Section {
-                    Button(.importerCsvDownloadButton, systemImage: "safari") {
-                        openURL(sdvxVersion.downloadPageURL())
+            HStack(spacing: 10.0) {
+                Button {
+                    importPath.append(SDVXImportPath.web)
+                } label: {
+                    VStack(spacing: 8.0) {
+                        Image(systemName: "globe")
+                            .font(.system(size: 24))
+                            .frame(maxHeight: 30.0)
+                        Text(.calendarImportFromWeb)
+                            .fontWeight(.medium)
+                            .font(.subheadline)
+                            .lineLimit(1)
                     }
-                } header: {
-                    Text("Importer.CSV.Download.Description")
-                        .foregroundColor(.primary).textCase(nil).font(.body)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accent)
+                    .foregroundStyle(.white)
+                    .adaptiveClipShape()
                 }
-                Section {
-                    Button(.importerCsvLoadButton, systemImage: "folder") {
-                        isSelectingCSVFile = true
+                Menu {
+                    Section {
+                        Button(.importerCsvDownloadButton, systemImage: "safari") {
+                            openURL(sdvxVersion.downloadPageURL())
+                        }
+                    } header: {
+                        Text("Importer.CSV.Download.Description")
+                            .foregroundColor(.primary).textCase(nil).font(.body)
                     }
-                } header: {
-                    Text("Importer.CSV.Load.Description")
-                        .foregroundColor(.primary).textCase(nil).font(.body)
+                    Section {
+                        Button(.importerCsvLoadButton, systemImage: "folder") {
+                            isSelectingCSVFile = true
+                        }
+                    } header: {
+                        Text("Importer.CSV.Load.Description")
+                            .foregroundColor(.primary).textCase(nil).font(.body)
+                    }
+                } label: {
+                    VStack(spacing: 8.0) {
+                        Image(systemName: "document.badge.plus")
+                            .font(.system(size: 24))
+                            .frame(maxHeight: 30.0)
+                        Text(.calendarImportFromCSV)
+                            .fontWeight(.medium)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accent)
+                    .foregroundStyle(.white)
+                    .adaptiveClipShape()
                 }
-            } label: {
-                VStack(spacing: 8.0) {
-                    Image(systemName: "document.badge.plus")
-                        .font(.system(size: 24))
-                        .frame(maxHeight: 30.0)
-                    Text(.calendarImportFromCSV)
-                        .fontWeight(.medium)
-                        .font(.subheadline)
-                        .lineLimit(1)
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.accent)
-                .foregroundStyle(.white)
-                .adaptiveClipShape()
             }
         }
+        .padding(12.0)
     }
 
     func reloadImportGroups() async {
