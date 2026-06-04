@@ -3,13 +3,18 @@ import OrderedCollections
 import SwiftUI
 import UniformTypeIdentifiers
 
+// swiftlint:disable type_body_length
 struct SDVXAnalyticsView: View {
+
+    @EnvironmentObject var navigationManager: NavigationManager
 
     @Bindable var model: SDVXAnalyticsModel
 
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
 
     @Binding var isEditing: Bool
+
+    var analyticsNamespace: Namespace.ID
 
     @AppStorage(wrappedValue: Data(), "Analytics.SDVX.CardOrder") var cardOrderData: Data
     @State var cardOrder: [SDVXAnalyticsCard] = SDVXAnalyticsCard.defaultOrder
@@ -23,6 +28,9 @@ struct SDVXAnalyticsView: View {
     @AppStorage(wrappedValue: false, "Analytics.SDVX.OverviewCollapsed") var isOverviewCollapsedStored: Bool
     @State var isOverviewCollapsed: Bool = false
 
+    @AppStorage(wrappedValue: false, "Analytics.SDVX.LastPlayCollapsed") var isLastPlayCollapsedStored: Bool
+    @State var isLastPlayCollapsed: Bool = false
+
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
         GridItem(.flexible(), spacing: 12.0)
@@ -30,22 +38,87 @@ struct SDVXAnalyticsView: View {
 
     var body: some View {
         VStack(spacing: 20.0) {
-            let shownCards = isEditing ? cardOrder : cardOrder.filter { visibleCards.contains($0) }
-            if !shownCards.isEmpty {
-                let isExpanded = isEditing || !isOverviewCollapsed
-                VStack(spacing: 12.0) {
-                    AnalyticsSectionHeader(
-                        title: AnalyticsSection.overview.titleKey,
-                        isCollapsible: !isEditing,
-                        isExpanded: isExpanded
-                    ) {
-                        withAnimation(.smooth.speed(2.0)) { isOverviewCollapsed.toggle() }
-                        isOverviewCollapsedStored = isOverviewCollapsed
+            overviewSection
+            lastPlaySection
+        }
+        .padding(.top, 20.0)
+        .onAppear {
+            loadCardOrder()
+            loadVisibleCards()
+            isOverviewCollapsed = isOverviewCollapsedStored
+            isLastPlayCollapsed = isLastPlayCollapsedStored
+        }
+        .task {
+            if model.dataState == .initializing {
+                await model.reload(version: sdvxVersion)
+            }
+        }
+        .onChange(of: sdvxVersion) { _, _ in
+            Task { await model.reload(version: sdvxVersion) }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
+            Task { await model.reload(version: sdvxVersion) }
+        }
+    }
+
+    // MARK: - Sections
+
+    @ViewBuilder
+    var overviewSection: some View {
+        let overviewCards = cardOrder.filter { $0.section == .overview }
+        let shownCards = isEditing ? overviewCards : overviewCards.filter { visibleCards.contains($0) }
+        if !shownCards.isEmpty {
+            let isExpanded = isEditing || !isOverviewCollapsed
+            VStack(spacing: 12.0) {
+                AnalyticsSectionHeader(
+                    title: AnalyticsSection.overview.titleKey,
+                    isCollapsible: !isEditing,
+                    isExpanded: isExpanded
+                ) {
+                    withAnimation(.smooth.speed(2.0)) { isOverviewCollapsed.toggle() }
+                    isOverviewCollapsedStored = isOverviewCollapsed
+                }
+                if isExpanded {
+                    LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                        ForEach(shownCards, id: \.self) { cardType in
+                            overviewCardView(for: cardType)
+                                .editableCard(isVisible: visibleCards.contains(cardType),
+                                              isEditing: isEditing,
+                                              seed: cardOrder.firstIndex(of: cardType) ?? 0) {
+                                    toggleCard(cardType)
+                                }
+                                .sdvxCardDraggable(cardType, editing: isEditing,
+                                                   draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                                   onReorder: saveCardOrder)
+                        }
                     }
-                    if isExpanded {
-                        LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                    .padding(.horizontal)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    var lastPlaySection: some View {
+        let lastPlayCards = cardOrder.filter { $0.section == .lastPlay }
+        let shownCards = isEditing ? lastPlayCards : lastPlayCards.filter { visibleCards.contains($0) }
+        if !shownCards.isEmpty {
+            let isExpanded = isEditing || !isLastPlayCollapsed
+            VStack(spacing: 12.0) {
+                AnalyticsSectionHeader(
+                    title: AnalyticsSection.lastPlay.titleKey,
+                    isCollapsible: !isEditing,
+                    isExpanded: isExpanded
+                ) {
+                    withAnimation(.smooth.speed(2.0)) { isLastPlayCollapsed.toggle() }
+                    isLastPlayCollapsedStored = isLastPlayCollapsed
+                }
+                if isExpanded {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12.0) {
                             ForEach(shownCards, id: \.self) { cardType in
-                                cardView(for: cardType)
+                                lastPlayCardView(for: cardType)
+                                    .frame(width: cardType == .newHighScores ? 130.0 : 96.0)
                                     .editableCard(isVisible: visibleCards.contains(cardType),
                                                   isEditing: isEditing,
                                                   seed: cardOrder.firstIndex(of: cardType) ?? 0) {
@@ -61,32 +134,83 @@ struct SDVXAnalyticsView: View {
                 }
             }
         }
-        .padding(.top, 20.0)
-        .onAppear {
-            loadCardOrder()
-            loadVisibleCards()
-            isOverviewCollapsed = isOverviewCollapsedStored
-        }
-        .task {
-            if model.dataState == .initializing {
-                await model.reload(version: sdvxVersion)
+    }
+
+    // MARK: - Cards
+
+    @ViewBuilder
+    func overviewCardView(for cardType: SDVXAnalyticsCard) -> some View {
+        Button {
+            if !isEditing, let destination = cardType.destination {
+                navigationManager.push(destination)
+            }
+        } label: {
+            switch cardType {
+            case .clearBreakdown: clearBreakdownCard
+            case .gradeBreakdown: gradeBreakdownCard
+            default: EmptyView()
             }
         }
-        .onChange(of: sdvxVersion) { _, _ in
-            Task { await model.reload(version: sdvxVersion) }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
-            Task { await model.reload(version: sdvxVersion) }
-        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
     }
 
     @ViewBuilder
-    func cardView(for cardType: SDVXAnalyticsCard) -> some View {
-        switch cardType {
-        case .clearBreakdown: clearBreakdownCard
-        case .gradeBreakdown: gradeBreakdownCard
+    func lastPlayCardView(for cardType: SDVXAnalyticsCard) -> some View {
+        Button {
+            if !isEditing, let destination = cardType.destination {
+                navigationManager.push(destination)
+            }
+        } label: {
+            lastPlayCountCard(for: cardType)
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
+    }
+
+    @ViewBuilder
+    func lastPlayCountCard(for cardType: SDVXAnalyticsCard) -> some View {
+        let count = lastPlayCount(for: cardType)
+        VStack(alignment: .leading, spacing: 2.0) {
+            Text("\(count)")
+                .font(.system(size: 20.0, weight: .black))
+                .fontWidth(.expanded)
+                .foregroundStyle(count > 0 ? .primary : .secondary)
+                .frame(height: 36.0, alignment: .topLeading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(spacing: 5.0) {
+                Image(systemName: cardType.systemImage)
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(cardType.iconColor)
+                    .frame(width: 12.0, height: 12.0)
+                cardType.titleText
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+        }
+        .padding(12.0)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardBackground(cornerRadius: cardCornerRadius)
+    }
+
+    var cardCornerRadius: CGFloat {
+        if #available(iOS 26.0, *) {
+            return 20.0
+        } else {
+            return 12.0
         }
     }
+
+    func lastPlayCount(for cardType: SDVXAnalyticsCard) -> Int {
+        if cardType == .newHighScores { return model.newHighScores.count }
+        if let clearType = cardType.clearType { return model.newClears[clearType]?.count ?? 0 }
+        if let grade = cardType.grade { return model.newGrades[grade]?.count ?? 0 }
+        return 0
+    }
+
+    // MARK: - Card storage
 
     func loadCardOrder() {
         if let decoded = try? JSONDecoder().decode([SDVXAnalyticsCard].self, from: cardOrderData),
@@ -124,6 +248,8 @@ struct SDVXAnalyticsView: View {
             saveVisibleCards()
         }
     }
+
+    // MARK: - Overview card content
 
     // Aggregate clear-type counts across all difficulty categories
     var totalClearCounts: OrderedDictionary<String, Int> {
@@ -193,72 +319,4 @@ struct SDVXAnalyticsView: View {
         SDVXClearType(rawValue: rawValue)?.abbreviation ?? rawValue
     }
 }
-
-enum SDVXAnalyticsCard: String, Codable, Hashable, CaseIterable {
-    case clearBreakdown
-    case gradeBreakdown
-
-    static var defaultOrder: [SDVXAnalyticsCard] { allCases }
-}
-
-extension View {
-    @ViewBuilder
-    func sdvxCardDraggable(
-        _ cardType: SDVXAnalyticsCard,
-        editing: Bool,
-        draggedCard: Binding<SDVXAnalyticsCard?>,
-        cardOrder: Binding<[SDVXAnalyticsCard]>,
-        onReorder: @escaping () -> Void
-    ) -> some View {
-        if editing {
-            self
-                .opacity(draggedCard.wrappedValue == cardType ? 0.4 : 1.0)
-                .onDrag {
-                    draggedCard.wrappedValue = cardType
-                    return NSItemProvider(object: cardType.rawValue as NSString)
-                }
-                .onDrop(of: [.text], delegate: SDVXCardReorderDropDelegate(
-                    target: cardType,
-                    cards: cardOrder,
-                    draggedCard: draggedCard,
-                    onReorder: onReorder
-                ))
-        } else {
-            self
-        }
-    }
-}
-
-struct SDVXCardReorderDropDelegate: DropDelegate {
-    let target: SDVXAnalyticsCard
-    @Binding var cards: [SDVXAnalyticsCard]
-    @Binding var draggedCard: SDVXAnalyticsCard?
-    let onReorder: () -> Void
-
-    func dropUpdated(info _: DropInfo) -> DropProposal? {
-        DropProposal(operation: .move)
-    }
-
-    func performDrop(info _: DropInfo) -> Bool {
-        draggedCard = nil
-        return true
-    }
-
-    func dropEntered(info _: DropInfo) {
-        guard let draggedCard, draggedCard != target else { return }
-        guard let fromIndex = cards.firstIndex(of: draggedCard),
-              let toIndex = cards.firstIndex(of: target) else { return }
-
-        withAnimation(.snappy(duration: 0.3)) {
-            cards.move(
-                fromOffsets: IndexSet(integer: fromIndex),
-                toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
-            )
-        }
-        onReorder()
-    }
-
-    func dropExited(info _: DropInfo) {
-        // No cleanup needed when a drag leaves this target
-    }
-}
+// swiftlint:enable type_body_length

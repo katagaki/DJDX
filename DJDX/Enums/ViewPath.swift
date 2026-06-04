@@ -31,6 +31,14 @@ enum AnalyticsPath: Hashable {
     case newADetail
 }
 
+enum SDVXAnalyticsPath: Hashable {
+    case clearBreakdownDetail
+    case gradeBreakdownDetail
+    case newHighScoresDetail
+    case newClearsDetail(clearType: String)
+    case newGradesDetail(grade: String)
+}
+
 enum ImportPath: Hashable {
     case importerWebIIDXSingle
     case importerWebIIDXDouble

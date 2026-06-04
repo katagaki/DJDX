@@ -107,12 +107,14 @@ struct IIDXScoresView<Header: View>: View {
 
     @ViewBuilder var timeTravelButton: some View {
         let button = Button {
-            withAnimation {
-                isTimeTravelling.toggle()
-            }
-            if !isTimeTravelling {
-                playDataDate = .now
+            if isTimeTravelling {
+                // Already time travelling: tapping turns it off without showing the popover.
+                withAnimation {
+                    isTimeTravelling = false
+                }
             } else {
+                // Not time travelling: only show the popover. Selecting a non-today
+                // date is what turns the feature on (see onChange of playDataDate).
                 isShowingDatePopover = true
             }
         } label: {
@@ -319,6 +321,12 @@ struct IIDXScoresView<Header: View>: View {
             .onChange(of: playDataDate) { oldValue, newValue in
                 if !isSystemChangingCalendarDate,
                    !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
+                    if !isTimeTravelling, !Calendar.current.isDateInToday(newValue) {
+                        // Selecting a date other than today turns on time travelling.
+                        withAnimation {
+                            isTimeTravelling = true
+                        }
+                    }
                     reloadDisplay()
                 }
             }
