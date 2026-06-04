@@ -91,31 +91,21 @@ struct OverviewClearTypeOverallGraph: View {
 
     @ViewBuilder
     var horizontalChart: some View {
-        Chart(graphData.keys.sorted(), id: \.self) { difficulty in
+        // A horizontal bar needs a categorical axis for the level (the bar's
+        // position) and a quantitative axis for the count (its length). Using a
+        // quantitative level axis makes Swift Charts fall back to vertical bars.
+        Chart(populatedDifficulties, id: \.self) { difficulty in
             ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
                 let count = graphData[difficulty]![clearType]!
                 BarMark(
                     x: .value("Shared.ClearCount", count),
-                    y: .value("LEVEL", Double(difficulty)),
-                    height: .ratio(0.7),
+                    y: .value("LEVEL", "\(difficulty)"),
                     stacking: .standard
                 )
                 .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
             }
         }
-        .chartYAxis {
-            AxisMarks(values: axisValues) { value in
-                AxisGridLine()
-                AxisTick()
-                if let level = value.as(Double.self) {
-                    AxisValueLabel { Text(verbatim: "\(Int(level))") }
-                }
-            }
-        }
-        .chartPlotStyle { plotArea in
-            plotArea.padding(.vertical, 0.0)
-        }
-        .chartYScale(domain: levelDomain)
+        .chartYScale(domain: populatedDifficulties.map { "\($0)" })
         .chartForegroundStyleScale(clearTypeColorScale)
     }
 }
