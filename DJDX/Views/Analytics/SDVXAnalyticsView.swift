@@ -118,7 +118,7 @@ struct SDVXAnalyticsView: View {
                         HStack(spacing: 12.0) {
                             ForEach(shownCards, id: \.self) { cardType in
                                 lastPlayCardView(for: cardType)
-                                    .frame(width: cardType.grade != nil ? 96.0 : 130.0)
+                                    .frame(width: cardType == .newHighScores ? 130.0 : 96.0)
                                     .editableCard(isVisible: visibleCards.contains(cardType),
                                                   isEditing: isEditing,
                                                   seed: cardOrder.firstIndex(of: cardType) ?? 0) {
