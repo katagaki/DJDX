@@ -37,7 +37,7 @@ struct SDVXImportView: View {
                             Text(version.marketingName)
                                 .font(.caption)
                                 .fontWeight(.bold)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(version.color)
                         }
                     }
                     .listRowBackground(Color.clear)
