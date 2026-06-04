@@ -91,9 +91,6 @@ struct OverviewClearTypeOverallGraph: View {
 
     @ViewBuilder
     var horizontalChart: some View {
-        // A horizontal bar needs a categorical axis for the level (the bar's
-        // position) and a quantitative axis for the count (its length). Using a
-        // quantitative level axis makes Swift Charts fall back to vertical bars.
         Chart(populatedDifficulties, id: \.self) { difficulty in
             ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
                 let count = graphData[difficulty]![clearType]!

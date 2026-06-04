@@ -41,7 +41,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// Summary cards are the count-based cards (not the overview chart cards or tower cards)
+    /// Summary cards are the count-based cards (not clearTypeOverall or tower cards)
     var isSummaryCard: Bool {
         self != .clearTypeOverall && self != .gradeBreakdown && !isTowerCard
     }

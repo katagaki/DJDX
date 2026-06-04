@@ -25,9 +25,6 @@ enum SDVXVersion: Int, Codable, CaseIterable {
         [.exceedGear, .nabla]
     }
 
-    // Lime reads too bright on a white background, so light mode uses a deeper,
-    // more saturated lime. EXCEED GEAR leans towards hot pink rather than the
-    // reddish system pink.
     var lightModeColor: UIColor {
         switch self {
         case .exceedGear: return UIColor(red: 222 / 255, green: 49 / 255, blue: 124 / 255, alpha: 1.0)
@@ -42,7 +39,6 @@ enum SDVXVersion: Int, Codable, CaseIterable {
         }
     }
 
-    // Resolves the appropriate version color for the current interface style.
     var color: Color {
         Color(uiColor: UIColor { traits in
             traits.userInterfaceStyle == .dark ? darkModeColor : lightModeColor
