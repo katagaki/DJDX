@@ -68,6 +68,11 @@ actor SDVXReader {
         }) ?? []
     }
 
+    // Import groups for a single version, newest-first (inherits allImportGroups' date-desc order).
+    func importGroups(for version: SDVXVersion) -> [SDVXImportGroupInfo] {
+        allImportGroups().filter { $0.version == version }
+    }
+
     // MARK: Song Records
 
     func songRecords(for importGroupID: String) -> [SDVXSongRecord] {
