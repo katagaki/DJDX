@@ -337,8 +337,7 @@ struct SDVXGradeBreakdownDetailView: View {
                                 x: .value("Shared.SDVX.Grade", element.key),
                                 y: .value("Shared.ClearCount", element.value)
                             )
-                            .foregroundStyle(LinearGradient(colors: [.yellow, .orange],
-                                                            startPoint: .bottom, endPoint: .top))
+                            .foregroundStyle(.orange)
                         }
                         .frame(height: 140.0)
                         .listRowBackground(Color.clear)
