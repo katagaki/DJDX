@@ -58,6 +58,10 @@ struct AnalyticsDestinationView: View {
                 }
                 .navigationTitle("Analytics.DJLevel.ByDifficulty")
                 .automaticNavigationTransition(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
+            case .gradeBreakdownDetail:
+                IIDXGradeBreakdownDetailView(djLevelPerDifficulty: model.djLevelPerDifficulty)
+                    .navigationTitle("Analytics.DJLevel.Overall")
+                    .automaticNavigationTransition(id: "DJLevel.Overall", in: analyticsNamespace)
             case .trendsClearTypeGraph:
                 VStack {
                     TrendsClearTypeGraph(
@@ -190,6 +194,51 @@ struct AnalyticsDestinationView: View {
             .automaticNavigationTransition(id: "NewA", in: analyticsNamespace)
         default:
             Color.clear
+        }
+    }
+}
+
+struct IIDXGradeBreakdownDetailView: View {
+    let djLevelPerDifficulty: [Int: [IIDXDJLevel: Int]]
+
+    var populatedDifficulties: [Int] {
+        djLevelPerDifficulty.keys.filter { difficulty in
+            (djLevelPerDifficulty[difficulty]?.values.contains(where: { $0 > 0 })) ?? false
+        }.sorted()
+    }
+
+    var body: some View {
+        List {
+            if populatedDifficulties.isEmpty {
+                Text("Analytics.NoData")
+                    .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
+            } else {
+                ForEach(populatedDifficulties, id: \.self) { difficulty in
+                    Section {
+                        Chart(gradeElements(for: difficulty), id: \.key) { element in
+                            BarMark(
+                                x: .value("Shared.IIDX.DJLevel", element.key),
+                                y: .value("Shared.ClearCount", element.value)
+                            )
+                            .foregroundStyle(IIDXDJLevel.color(for: element.key))
+                        }
+                        .frame(height: 140.0)
+                        .listRowBackground(Color.clear)
+                    } header: {
+                        Text(verbatim: "LEVEL \(difficulty)")
+                    }
+                }
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+    }
+
+    func gradeElements(for difficulty: Int) -> [(key: String, value: Int)] {
+        let counts = djLevelPerDifficulty[difficulty] ?? [:]
+        return Array(IIDXDJLevel.sortedStrings.reversed()).map { grade in
+            (grade, counts[IIDXDJLevel(rawValue: grade) ?? .none] ?? 0)
         }
     }
 }

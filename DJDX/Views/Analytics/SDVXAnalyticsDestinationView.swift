@@ -337,7 +337,7 @@ struct SDVXGradeBreakdownDetailView: View {
                                 x: .value("Shared.SDVX.Grade", element.key),
                                 y: .value("Shared.ClearCount", element.value)
                             )
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(SDVXGrade.color(for: element.key))
                         }
                         .frame(height: 140.0)
                         .listRowBackground(Color.clear)
@@ -354,9 +354,8 @@ struct SDVXGradeBreakdownDetailView: View {
 
     func gradeElements(for difficulty: SDVXDifficulty) -> [(key: String, value: Int)] {
         let counts = gradePerDifficulty[difficulty] ?? [:]
-        return SDVXGrade.sortedStrings.compactMap { grade in
-            let count = counts[grade] ?? 0
-            return count > 0 ? (grade, count) : nil
+        return SDVXGrade.sortedStrings.map { grade in
+            (grade, counts[grade] ?? 0)
         }
     }
 }

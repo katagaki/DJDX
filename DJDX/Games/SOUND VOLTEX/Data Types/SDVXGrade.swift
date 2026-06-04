@@ -26,6 +26,22 @@ enum SDVXGrade: String, Codable {
         sorted.map { $0.rawValue }
     }
 
+    static func color(for grade: String) -> Color {
+        switch grade {
+        case "S": return .primary
+        case "AAA+": return .pink
+        case "AAA": return .orange
+        case "AA+": return .yellow
+        case "AA": return .green
+        case "A+": return .mint
+        case "A": return .teal
+        case "B": return .blue
+        case "C": return .indigo
+        case "D": return .red
+        default: return .gray
+        }
+    }
+
     // Minimum score (out of 10,000,000) required for each grade
     static func grade(forScore score: Int) -> SDVXGrade {
         switch score {

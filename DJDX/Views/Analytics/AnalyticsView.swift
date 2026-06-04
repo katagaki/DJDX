@@ -93,7 +93,7 @@ struct AnalyticsView: View {
         case .gradeBreakdown:
             Button {
                 if !isEditingCards && !model.djLevelPerDifficulty.isEmpty {
-                    navigationManager.push(AnalyticsPath.scoreRatePerDifficultyGraph)
+                    navigationManager.push(AnalyticsPath.gradeBreakdownDetail)
                 }
             } label: {
                 AnalyticsCardView(cardType: .gradeBreakdown, showsHeader: false) {
@@ -111,7 +111,7 @@ struct AnalyticsView: View {
                 .perLevelCaption("Analytics.DJLevel.Overall")
             }
             .buttonStyle(AnalyticsCardButtonStyle())
-            .automaticMatchedTransitionSource(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
+            .automaticMatchedTransitionSource(id: "DJLevel.Overall", in: analyticsNamespace)
         case .towerRecent, .towerTotals:
             let transitionID = cardType == .towerRecent ? "Tower.Recent" : "Tower.Totals"
             let caption: LocalizedStringKey = cardType == .towerRecent

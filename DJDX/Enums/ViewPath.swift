@@ -12,6 +12,7 @@ enum AnalyticsPath: Hashable {
     case clearTypeOverviewGraph
     case clearTypePerDifficultyGraph
     case scoreRatePerDifficultyGraph
+    case gradeBreakdownDetail
     case trendsClearTypeGraph
     case trendsDJLevelGraph
     case clearTypeForLevel(difficulty: Int)

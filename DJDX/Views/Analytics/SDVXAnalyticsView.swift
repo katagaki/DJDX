@@ -307,7 +307,7 @@ struct SDVXAnalyticsView: View {
                     x: .value("Shared.ClearCount", element.value),
                     y: .value("Grade", element.key)
                 )
-                .foregroundStyle(.orange)
+                .foregroundStyle(SDVXGrade.color(for: element.key))
             }
             .chartXAxis { AxisMarks { AxisGridLine() } }
         }
