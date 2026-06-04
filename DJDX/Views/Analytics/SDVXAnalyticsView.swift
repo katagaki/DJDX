@@ -21,7 +21,7 @@ struct SDVXAnalyticsView: View {
     @State var draggedCard: SDVXAnalyticsCard?
 
     @AppStorage(wrappedValue: Data(), "Analytics.SDVX.VisibleCards") var visibleCardsData: Data
-    @State var visibleCards: Set<SDVXAnalyticsCard> = Set(SDVXAnalyticsCard.allCases)
+    @State var visibleCards: Set<SDVXAnalyticsCard> = SDVXAnalyticsCard.defaultVisible
 
     // Persisted store; `isOverviewCollapsed` mirrors it so a global `withAnimation`
     // can drive the collapse (animating @AppStorage directly does not work).
@@ -305,12 +305,20 @@ struct SDVXAnalyticsView: View {
             Chart(totalGradeCounts.elements.filter { $0.value > 0 }, id: \.key) { element in
                 BarMark(
                     x: .value("Shared.ClearCount", element.value),
-                    y: .value("Grade", element.key)
+                    y: .value("Grade", element.key),
+                    height: .fixed(22.0)
                 )
-                .foregroundStyle(LinearGradient(colors: [.yellow, .orange],
-                                                startPoint: .leading, endPoint: .trailing))
+                .foregroundStyle(.orange)
+                .annotation(position: .overlay, alignment: .leading) {
+                    Text(verbatim: element.key)
+                        .font(.caption2.weight(.heavy))
+                        .fontWidth(.expanded)
+                        .foregroundStyle(.white)
+                        .padding(.leading, 6.0)
+                }
             }
             .chartXAxis { AxisMarks { AxisGridLine() } }
+            .chartYAxis(.hidden)
         }
         .perLevelCaption("Analytics.SDVX.GradeBreakdown")
     }

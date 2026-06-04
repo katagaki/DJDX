@@ -117,7 +117,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .clearTypeOverall: return .blue
         case .towerRecent: return .red
         case .towerTotals: return .red
-        case .newHighScores: return .orange
+        case .newHighScores: return .primary
         case .newFullComboClear: return .blue
         case .newClears: return .cyan
         case .newEasyClears: return .green

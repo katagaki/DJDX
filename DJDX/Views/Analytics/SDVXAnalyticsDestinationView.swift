@@ -54,6 +54,10 @@ struct SDVXAnalyticsDestinationView: View {
         case .s: return "SDVX.newGradeS"
         case .aaaPlus: return "SDVX.newGradeAAAPlus"
         case .aaa: return "SDVX.newGradeAAA"
+        case .aaPlus: return "SDVX.newGradeAAPlus"
+        case .aa: return "SDVX.newGradeAA"
+        case .aPlus: return "SDVX.newGradeAPlus"
+        case .a: return "SDVX.newGradeA"
         default: return "SDVX.newGrades"
         }
     }
