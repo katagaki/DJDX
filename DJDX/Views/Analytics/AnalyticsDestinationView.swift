@@ -218,11 +218,12 @@ struct IIDXGradeBreakdownDetailView: View {
                     Section {
                         Chart(gradeElements(for: difficulty), id: \.key) { element in
                             BarMark(
-                                x: .value("Shared.IIDX.DJLevel", element.key),
-                                y: .value("Shared.ClearCount", element.value)
+                                x: .value("Shared.ClearCount", element.value),
+                                y: .value("Shared.IIDX.DJLevel", element.key)
                             )
                             .foregroundStyle(IIDXDJLevel.color(for: element.key))
                         }
+                        .chartYScale(domain: IIDXDJLevel.sortedStrings)
                         .frame(height: 140.0)
                         .listRowBackground(Color.clear)
                     } header: {
