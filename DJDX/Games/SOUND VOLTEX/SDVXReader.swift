@@ -121,9 +121,6 @@ actor SDVXReader {
         return (try? database.scalar(SDVXInDatabase.chartTable.count)) ?? 0
     }
 
-    // Resolves a play record's (title, difficulty) to the matching sdvx.in chart.
-    // Matching is done on the normalized title plus the difficulty slot, since a
-    // song has exactly one chart per slot.
     func sdvxInChart(title: String, difficulty: SDVXDifficulty) -> SDVXInChart? {
         guard let database = try? SDVXInDatabase.shared.getReadConnection() else { return nil }
         let query = SDVXInDatabase.chartTable

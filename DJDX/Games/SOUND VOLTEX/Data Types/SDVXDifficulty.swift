@@ -39,9 +39,6 @@ enum SDVXDifficulty: String, Codable, CaseIterable {
         }
     }
 
-    // The sdvx.in difficulty slot letter for this difficulty. NOVICE/ADVANCED/
-    // EXHAUST map to their own slots; every top-tier difficulty (the infinite
-    // tier plus MAXIMUM) lives in sdvx.in's shared "m" slot.
     var sdvxInSlot: String {
         switch self {
         case .novice: return "n"

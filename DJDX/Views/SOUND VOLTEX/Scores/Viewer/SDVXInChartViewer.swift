@@ -1,8 +1,6 @@
 import SwiftUI
 import WebKit
 
-// Hides only the sdvx.in "back to top" button so it doesn't overlap the chart;
-// everything else on the page is left as-is.
 let sdvxInChartViewerUserScript = """
 (function() {
   var style = document.createElement('style');
@@ -118,7 +116,6 @@ struct WebViewForSDVXIn: UIViewRepresentable {
     }
 
     func updateUIView(_: WKWebView, context _: Context) {
-        // Blank function to conform to protocol
     }
 
     func updateState(_ isReady: Bool) {

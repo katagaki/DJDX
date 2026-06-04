@@ -1,9 +1,6 @@
 import Foundation
 import SQLite
 
-// External data source backing the sdvx.in (SDVX譜面保管所∇) chart archive.
-// Stores a title → chart-code index so the SDVX chart viewer can resolve a
-// player's score record to the matching chart page on sdvx.in.
 final class SDVXInDatabase: Sendable {
 
     static let shared = SDVXInDatabase()
@@ -17,7 +14,6 @@ final class SDVXInDatabase: Sendable {
     static let chartCode = SQLite.Expression<String>("code")
     static let chartSlot = SQLite.Expression<String>("slot")
     static let chartTitle = SQLite.Expression<String>("title")
-    // Normalized title (String.compact) used for matching against play records.
     static let chartTitleCompact = SQLite.Expression<String>("titleCompact")
     static let chartLevel = SQLite.Expression<Int>("level")
 

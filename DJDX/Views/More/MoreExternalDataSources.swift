@@ -210,10 +210,6 @@ struct MoreExternalDataSources: View {
     // MARK: - sdvx.in Data Loading
 
     func reloadSDVXInData() async {
-        // sdvx.in groups every chart under a per-level page (sort_01.htm ...
-        // sort_20.htm). Each entry is self-describing: the SORT function names the
-        // 5-digit code and the difficulty slot, and the trailing HTML comment is
-        // the song title. Sweeping all 20 pages yields the full chart index.
         var charts: [SDVXInChart] = []
         let pattern = "SORT([0-9]{5})([NAEMnaem])\\(\\);</script><!--(.*?)-->"
         let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])

@@ -1,12 +1,10 @@
 import Foundation
 import SQLite
 
-// Writes the sdvx.in chart index into SDVXInDatabase.
 actor SDVXInImporter {
 
     typealias DB = SDVXInDatabase
 
-    // Replaces the entire chart index in a single transaction.
     func replaceAllCharts(_ charts: [SDVXInChart]) {
         guard let database = try? DB.shared.getWriteConnection() else { return }
         try? database.transaction {
