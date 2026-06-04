@@ -123,7 +123,7 @@ struct AnalyticsView: View {
                         .foregroundStyle(IIDXDJLevel.color(for: element.key))
                     }
                     .chartXAxis { AxisMarks { AxisGridLine() } }
-                    .chartYScale(domain: Array(counts.map(\.key).reversed()))
+                    .chartYScale(domain: counts.map(\.key))
                 }
                 .perLevelCaption("Analytics.DJLevel.Overall")
             }

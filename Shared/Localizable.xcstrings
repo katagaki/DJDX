@@ -626,13 +626,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grade Breakdown"
+            "value" : "DJ LEVEL Breakdown"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "グレード内訳"
+            "value" : "DJ LEVEL内訳"
           }
         }
       }
