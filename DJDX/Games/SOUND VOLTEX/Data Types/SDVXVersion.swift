@@ -33,6 +33,10 @@ https://p.eagate.573.jp/gate/p/login.html?path=https%3A%2F%2Fp.eagate.573.jp%2Fg
         URL(string: "https://p.eagate.573.jp/game/sdvx/\(slug)/playdata/download/index.html?method=display")!
     }
 
+    func errorPageURL() -> URL {
+        URL(string: "https://p.eagate.573.jp/game/sdvx/\(slug)/error/index.html")!
+    }
+
     func profilePageURL() -> URL {
         URL(string: "https://p.eagate.573.jp/game/sdvx/\(slug)/playdata/profile/index.html")!
     }
