@@ -694,6 +694,23 @@
         }
       }
     },
+    "Analytics.PerLevel.Breakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内訳"
+          }
+        }
+      }
+    },
     "Analytics.PerLevel.ClearRate" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -758,6 +775,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJ LEVEL推移"
+          }
+        }
+      }
+    },
+    "Analytics.PerLevel.Trend" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trend"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推移"
           }
         }
       }
