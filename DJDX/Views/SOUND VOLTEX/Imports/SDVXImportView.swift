@@ -1,3 +1,4 @@
+import Komponents
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -78,9 +79,19 @@ struct SDVXImportView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                bottomBar()
-                    .contentShape(.rect)
-                    .padding()
+                if #available(iOS 26.0, *) {
+                    bottomBar()
+                        .padding(.top, 2.0)
+                        .contentShape(.rect)
+                        .clipShape(.rect(cornerRadius: 24.0))
+                        .glassEffect(.regular, in: .rect(cornerRadius: 24.0))
+                        .padding()
+                } else {
+                    TabBarAccessory(placement: .bottom) {
+                        bottomBar()
+                            .contentShape(.rect)
+                    }
+                }
             }
             .alert(
                 "Alert.Import.Success.Title",
