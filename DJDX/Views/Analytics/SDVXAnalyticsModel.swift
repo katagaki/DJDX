@@ -16,6 +16,25 @@ final class SDVXAnalyticsModel {
     var totalPlays: Int = 0
     var volforce: Double = 0.0
 
+    // "前回のプレー" (Last Play): improvements between the latest two import groups.
+    var newHighScores: [SDVXNewHighScoreEntry] = []
+    var newClears: [String: [SDVXNewClearEntry]] = [:]   // key = SDVXClearType.rawValue
+    var newGrades: [String: [SDVXNewGradeEntry]] = [:]   // key = SDVXGrade.rawValue
+
+    // Clear ranks surfaced as "new clear" cards (mirrors IIDX's per-type cards, minus PLAYED).
+    nonisolated static let trackedClearTypes: [String] = [
+        SDVXClearType.complete.rawValue,
+        SDVXClearType.excessive.rawValue,
+        SDVXClearType.ultimateChain.rawValue,
+        SDVXClearType.perfectUltimateChain.rawValue
+    ]
+    // Top grades surfaced as "new grade" cards (parallels IIDX's AAA/AA/A).
+    nonisolated static let trackedGrades: [String] = [
+        SDVXGrade.s.rawValue,
+        SDVXGrade.aaaPlus.rawValue,
+        SDVXGrade.aaa.rawValue
+    ]
+
     var dataState: DataState = .initializing
 
     let fetcher = SDVXReader()
@@ -75,6 +94,8 @@ final class SDVXAnalyticsModel {
         let topForces = records.map { chartForce($0) }.sorted(by: >).prefix(50)
         let computedVolforce = (topForces.reduce(0.0, +) * 100).rounded() / 100
 
+        let lastPlay = await computeLastPlay(version: version)
+
         withAnimation(.smooth.speed(2.0)) {
             self.clearTypePerDifficulty = clearByDiff
             self.gradePerDifficulty = gradeByDiff
@@ -82,7 +103,92 @@ final class SDVXAnalyticsModel {
             self.totalCharts = records.count
             self.totalPlays = plays
             self.volforce = computedVolforce
+            self.newClears = lastPlay.clears
+            self.newHighScores = lastPlay.highScores
+            self.newGrades = lastPlay.grades
             self.dataState = .presenting
         }
+    }
+
+    // Compares the latest two import groups for the version and computes what improved.
+    private func computeLastPlay(version: SDVXVersion) async -> (
+        clears: [String: [SDVXNewClearEntry]],
+        highScores: [SDVXNewHighScoreEntry],
+        grades: [String: [SDVXNewGradeEntry]]
+    ) {
+        let groups = await fetcher.importGroups(for: version)
+        guard groups.count >= 2 else {
+            return ([:], [], [:])
+        }
+        // importGroups is newest-first, so [0] is the latest and [1] the previous.
+        let latestRecords = await fetcher.songRecords(for: groups[0].id)
+        let previousRecords = await fetcher.songRecords(for: groups[1].id)
+        return Self.computeNewEntries(latestRecords: latestRecords, previousRecords: previousRecords)
+    }
+
+    nonisolated static func computeNewEntries(
+        latestRecords: [SDVXSongRecord],
+        previousRecords: [SDVXSongRecord]
+    ) -> (
+        clears: [String: [SDVXNewClearEntry]],
+        highScores: [SDVXNewHighScoreEntry],
+        grades: [String: [SDVXNewGradeEntry]]
+    ) {
+        func key(_ record: SDVXSongRecord) -> String {
+            "\(record.titleCompact())|\(record.difficulty)"
+        }
+
+        var previousByKey: [String: SDVXSongRecord] = [:]
+        previousByKey.reserveCapacity(previousRecords.count)
+        for record in previousRecords {
+            previousByKey[key(record)] = record
+        }
+
+        var clears: [String: [SDVXNewClearEntry]] =
+            Dictionary(uniqueKeysWithValues: trackedClearTypes.map { ($0, []) })
+        var grades: [String: [SDVXNewGradeEntry]] =
+            Dictionary(uniqueKeysWithValues: trackedGrades.map { ($0, []) })
+        var highScores: [SDVXNewHighScoreEntry] = []
+
+        for record in latestRecords {
+            let previous = previousByKey[key(record)]
+            let previousClearType = previous?.clearType ?? SDVXClearType.noPlay.rawValue
+            let previousGrade = previous?.grade ?? SDVXGrade.none.rawValue
+            let previousScore = previous?.highScore ?? 0
+
+            if trackedClearTypes.contains(record.clearType), record.clearType != previousClearType {
+                clears[record.clearType]?.append(SDVXNewClearEntry(
+                    songTitle: record.title,
+                    level: record.level,
+                    difficulty: record.difficultyEnum,
+                    clearType: record.clearType,
+                    previousClearType: previousClearType
+                ))
+            }
+
+            if trackedGrades.contains(record.grade), record.grade != previousGrade {
+                grades[record.grade]?.append(SDVXNewGradeEntry(
+                    songTitle: record.title,
+                    level: record.level,
+                    difficulty: record.difficultyEnum,
+                    grade: record.grade,
+                    previousGrade: previousGrade
+                ))
+            }
+
+            if record.highScore > previousScore {
+                highScores.append(SDVXNewHighScoreEntry(
+                    songTitle: record.title,
+                    level: record.level,
+                    difficulty: record.difficultyEnum,
+                    newScore: record.highScore,
+                    previousScore: previousScore,
+                    newGrade: record.grade,
+                    previousGrade: previousGrade
+                ))
+            }
+        }
+
+        return (clears, highScores, grades)
     }
 }

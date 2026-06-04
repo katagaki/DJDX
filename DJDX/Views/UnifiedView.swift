@@ -31,6 +31,7 @@ struct UnifiedView: View {
     @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
 
     @Namespace var analyticsNamespace
+    @Namespace var sdvxAnalyticsNamespace
     @Namespace var towerNamespace
     @Namespace var importNamespace
 
@@ -102,6 +103,13 @@ struct UnifiedView: View {
                         id: path == .recent ? "Tower.Recent" : "Tower.Totals",
                         in: towerNamespace
                     )
+            }
+            .navigationDestination(for: SDVXAnalyticsPath.self) { path in
+                SDVXAnalyticsDestinationView(
+                    model: sdvxAnalyticsModel,
+                    path: path,
+                    namespace: sdvxAnalyticsNamespace
+                )
             }
         }
         .sheet(isPresented: $isPresentingImport) {
@@ -189,7 +197,8 @@ struct UnifiedView: View {
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
             if showAnalytics {
-                SDVXAnalyticsView(model: sdvxAnalyticsModel, isEditing: $isEditingAnalytics)
+                SDVXAnalyticsView(model: sdvxAnalyticsModel, isEditing: $isEditingAnalytics,
+                                  analyticsNamespace: sdvxAnalyticsNamespace)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
         }
