@@ -97,7 +97,7 @@ struct OverviewClearTypeOverallGraph: View {
                 BarMark(
                     x: .value("Shared.ClearCount", count),
                     y: .value("LEVEL", Double(difficulty)),
-                    height: .inset(8.0),
+                    height: .ratio(0.7),
                     stacking: .standard
                 )
                 .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
