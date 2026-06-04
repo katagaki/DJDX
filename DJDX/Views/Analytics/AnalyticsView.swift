@@ -9,6 +9,8 @@ struct AnalyticsView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
     @Bindable var model: AnalyticsModel
 
     @AppStorage(wrappedValue: Game.iidxArcade, "Global.SelectedGame") var selectedGame: Game
@@ -43,16 +45,31 @@ struct AnalyticsView: View {
     // Width of the layout container, measured rather than read from UIScreen.
     @State var containerWidth: CGFloat = 0.0
 
-    let cardColumns = [
-        GridItem(.flexible(), spacing: 12.0),
-        GridItem(.flexible(), spacing: 12.0)
-    ]
+    // On iPad (regular width) we have room for a wider layout: 4-column grids
+    // and a denser Last Play carousel.
+    var isRegularWidth: Bool { horizontalSizeClass == .regular }
 
-    // Size summary cards so three fit across the screen, then widen by 20pt so
-    // the fourth peeks in to hint that the row scrolls horizontally.
+    // Overview grid: 4 columns on iPad, 2 on iPhone.
+    var cardColumns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 12.0), count: isRegularWidth ? 4 : 2)
+    }
+
+    // Per-level grid: 2 columns on iPad, a single column (vertical list) on iPhone.
+    var perLevelColumns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 12.0), count: isRegularWidth ? 2 : 1)
+    }
+
+    // Grade/half-width cards take half the standard width on iPad, 60% on iPhone.
+    var halfCardWidthRatio: CGFloat { isRegularWidth ? 0.5 : 0.6 }
+
+    // Size summary cards.
     var summaryCardWidth: CGFloat {
         guard containerWidth > 0.0 else { return 130.0 }
         let gridGap = 12.0
+        if isRegularWidth {
+            let availableWidth = containerWidth - 40.0 - (5.0 * gridGap)
+            return availableWidth / 5.0
+        }
         let availableWidth = containerWidth - 40.0 - (2.0 * gridGap)
         return (availableWidth / 3.0) + 20.0
     }
@@ -235,7 +252,7 @@ struct AnalyticsView: View {
                                     ForEach(shownSummaryCards, id: \.self) { cardType in
                                         cardView(for: cardType)
                                             .frame(width: cardType.isGradeCard
-                                                   ? summaryCardWidth * 0.6 : summaryCardWidth)
+                                                   ? summaryCardWidth * halfCardWidthRatio : summaryCardWidth)
                                             .editableCard(isVisible: visibleCards.contains(cardType),
                                                           isEditing: isEditing,
                                                           seed: cardOrder.firstIndex(of: cardType) ?? 0) {
@@ -264,7 +281,7 @@ struct AnalyticsView: View {
                             toggleSection(.perLevel)
                         }
                         if isSectionExpanded(.perLevel) {
-                            VStack(spacing: 12.0) {
+                            LazyVGrid(columns: perLevelColumns, spacing: 12.0) {
                                 ForEach(shownPerLevelCards, id: \.self) { card in
                                     perLevelCard(difficulty: card.difficulty, category: card.category)
                                         .editableCard(
