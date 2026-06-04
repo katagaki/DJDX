@@ -8,10 +8,6 @@ struct AnalyticsDestinationView: View {
     let path: AnalyticsPath
     var analyticsNamespace: Namespace.ID
 
-    @AppStorage(wrappedValue: 1, "Analytics.Overview.ClearType.Level") var levelFilterForOverviewClearType: Int
-    @AppStorage(wrappedValue: 1, "Analytics.Trends.ClearType.Level") var levelFilterForTrendsClearType: Int
-    @AppStorage(wrappedValue: 1, "Analytics.Trends.DJLevel.Level") var levelFilterForTrendsDJLevel: Int
-
     func perLevelTitle(_ difficulty: Int, _ category: AnalyticsPerLevelCategory) -> String {
         let separator = NSLocalizedString("Analytics.PerLevel.TitleSeparator", comment: "")
         let categoryTitle = NSLocalizedString(category.titleKey, comment: "")
@@ -25,58 +21,10 @@ struct AnalyticsDestinationView: View {
                 ClearTypeOverviewListView(graphData: $model.clearTypePerDifficulty)
                     .navigationTitle("Analytics.ClearType.Overall")
                     .automaticNavigationTransition(id: "ClearType.Overall", in: analyticsNamespace)
-            case .clearTypePerDifficultyGraph:
-                VStack {
-                    TogglableClearTypeDetailView(
-                        graphData: $model.clearTypePerDifficulty,
-                        difficulty: $levelFilterForOverviewClearType
-                    )
-                    ClearTypeLegend()
-                        .padding(.horizontal)
-                    DifficultyPicker(
-                        selection: $levelFilterForOverviewClearType,
-                        difficulties: .constant(model.difficulties)
-                    )
-                }
-                .padding(.top)
-                .navigationTitle("Analytics.ClearType.ByDifficulty")
-                .automaticNavigationTransition(id: "ClearType.ByDifficulty", in: analyticsNamespace)
             case .gradeBreakdownDetail:
                 IIDXGradeBreakdownDetailView(djLevelPerDifficulty: model.djLevelPerDifficulty)
                     .navigationTitle("Analytics.DJLevel.Overall")
                     .automaticNavigationTransition(id: "DJLevel.Overall", in: analyticsNamespace)
-            case .trendsClearTypeGraph:
-                VStack {
-                    TrendsClearTypeGraph(
-                        graphData: $model.clearTypePerImportGroup,
-                        difficulty: $levelFilterForTrendsClearType
-                    )
-                    .chartLegend(.visible)
-                    DifficultyPicker(
-                        selection: $levelFilterForTrendsClearType,
-                        difficulties: .constant(model.difficulties)
-                    )
-                    .padding(.top)
-                }
-                .padding()
-                .navigationTitle("Analytics.Trends.ClearType")
-                .automaticNavigationTransition(id: "Trends.ClearType", in: analyticsNamespace)
-            case .trendsDJLevelGraph:
-                VStack {
-                    TrendsDJLevelGraph(
-                        graphData: $model.djLevelPerImportGroup,
-                        difficulty: $levelFilterForTrendsDJLevel
-                    )
-                    .chartLegend(.visible)
-                    DifficultyPicker(
-                        selection: $levelFilterForTrendsDJLevel,
-                        difficulties: .constant(model.difficulties)
-                    )
-                    .padding(.top)
-                }
-                .padding()
-                .navigationTitle("Analytics.Trends.DJLevel")
-                .automaticNavigationTransition(id: "Trends.DJLevel", in: analyticsNamespace)
             case .clearTypeForLevel(let difficulty):
                 ClearTypePerLevelDetailView(model: model, difficulty: difficulty)
                     .navigationTitle(perLevelTitle(difficulty, .clearRate))

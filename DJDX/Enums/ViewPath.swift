@@ -10,10 +10,7 @@ enum ScoresPath: Hashable {
 
 enum AnalyticsPath: Hashable {
     case clearTypeOverviewGraph
-    case clearTypePerDifficultyGraph
     case gradeBreakdownDetail
-    case trendsClearTypeGraph
-    case trendsDJLevelGraph
     case clearTypeForLevel(difficulty: Int)
     case clearTypeTrendsForLevel(difficulty: Int)
     case djLevelForLevel(difficulty: Int)
