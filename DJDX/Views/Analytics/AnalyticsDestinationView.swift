@@ -9,7 +9,6 @@ struct AnalyticsDestinationView: View {
     var analyticsNamespace: Namespace.ID
 
     @AppStorage(wrappedValue: 1, "Analytics.Overview.ClearType.Level") var levelFilterForOverviewClearType: Int
-    @AppStorage(wrappedValue: 1, "Analytics.Overview.ScoreRate.Level") var levelFilterForOverviewScoreRate: Int
     @AppStorage(wrappedValue: 1, "Analytics.Trends.ClearType.Level") var levelFilterForTrendsClearType: Int
     @AppStorage(wrappedValue: 1, "Analytics.Trends.DJLevel.Level") var levelFilterForTrendsDJLevel: Int
 
@@ -42,22 +41,6 @@ struct AnalyticsDestinationView: View {
                 .padding(.top)
                 .navigationTitle("Analytics.ClearType.ByDifficulty")
                 .automaticNavigationTransition(id: "ClearType.ByDifficulty", in: analyticsNamespace)
-            case .scoreRatePerDifficultyGraph:
-                VStack {
-                    TogglableDJLevelDetailView(
-                        graphData: $model.djLevelPerDifficulty,
-                        difficulty: $levelFilterForOverviewScoreRate
-                    )
-                    DJLevelLegend()
-                        .padding(.horizontal)
-                    DifficultyPicker(
-                        selection: $levelFilterForOverviewScoreRate,
-                        difficulties: .constant(model.difficulties)
-                    )
-                    .padding(.top)
-                }
-                .navigationTitle("Analytics.DJLevel.ByDifficulty")
-                .automaticNavigationTransition(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
             case .gradeBreakdownDetail:
                 IIDXGradeBreakdownDetailView(djLevelPerDifficulty: model.djLevelPerDifficulty)
                     .navigationTitle("Analytics.DJLevel.Overall")
