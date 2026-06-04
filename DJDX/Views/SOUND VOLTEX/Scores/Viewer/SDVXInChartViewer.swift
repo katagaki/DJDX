@@ -1,13 +1,32 @@
 import SwiftUI
 import WebKit
 
+let sdvxInChartViewerCSS = """
+.btntop { display: none !important; }
+#reload_btn, .rebtn2 { display: none !important; }
+td.r { display: none !important; }
+img[src*="/logo/"] { display: none !important; }
+"""
+
 let sdvxInChartViewerUserScript = """
 (function() {
   var style = document.createElement('style');
-  style.textContent = ".btntop { display: none !important; }";
+  style.textContent = `\(sdvxInChartViewerCSS)`;
   (document.head || document.documentElement).appendChild(style);
 })();
 """
+
+private func makeSDVXInWebView() -> WKWebView {
+    let contentController = WKUserContentController()
+    contentController.addUserScript(
+        WKUserScript(source: sdvxInChartViewerUserScript,
+                     injectionTime: .atDocumentStart,
+                     forMainFrameOnly: true)
+    )
+    let configuration = WKWebViewConfiguration()
+    configuration.userContentController = contentController
+    return WKWebView(frame: .zero, configuration: configuration)
+}
 
 struct SDVXInChartViewer: View {
 
@@ -15,7 +34,7 @@ struct SDVXInChartViewer: View {
 
     var chart: SDVXInChart
 
-    @State var webView = WKWebView()
+    @State var webView = makeSDVXInWebView()
     @State var isLoading: Bool = true
     @State var isShowingFallbackButton: Bool = false
 
@@ -95,14 +114,6 @@ struct WebViewForSDVXIn: UIViewRepresentable {
     var chart: SDVXInChart
 
     func makeUIView(context: Context) -> WKWebView {
-        let contentController = WKUserContentController()
-        contentController.addUserScript(
-            WKUserScript(source: sdvxInChartViewerUserScript,
-                         injectionTime: .atDocumentEnd,
-                         forMainFrameOnly: true)
-        )
-        let configuration = webView.configuration
-        configuration.userContentController = contentController
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
         if let pageURL = chart.pageURL {
