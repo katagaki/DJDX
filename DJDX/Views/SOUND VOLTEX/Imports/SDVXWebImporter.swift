@@ -231,6 +231,10 @@ class SDVXCoordinatorForImporter: NSObject, WKNavigationDelegate {
         }
     }
 
+    // SOUND VOLTEX uses a different set of error codes than beatmania IIDX:
+    //   err=1 -> no e-amusement ベーシックコース subscription
+    //   err=3 -> no e-amusement pass linked
+    //   err=4 -> no SOUND VOLTEX play data
     static func failureReason(forSentinel sentinel: String) -> ImportFailedReason {
         switch sentinel {
         case "1": return .noPremiumCourse

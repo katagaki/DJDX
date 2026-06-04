@@ -8,7 +8,7 @@ struct SDVXScoreRow: View {
         HStack(alignment: .center, spacing: 8.0) {
             // Leading clear-mark lamp
             record.clearTypeEnum.color
-                .frame(width: 12.0)
+                .frame(width: 10.0)
                 .frame(maxHeight: .infinity)
                 .conditionalShadow(.black.opacity(0.2), radius: 1.0, x: 2.0)
 
