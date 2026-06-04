@@ -2185,6 +2185,23 @@
         }
       }
     },
+    "Scores.SDVX.ViewChart" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面"
+          }
+        }
+      }
+    },
     "Scores.Search.Prompt" : {
       "extractionState" : "manual",
       "localizations" : {
