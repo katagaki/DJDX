@@ -1,13 +1,12 @@
 import SwiftUI
 import WebKit
 
-// Declutters the sdvx.in chart page (hides ads and site chrome) without touching
-// the chart image layout, which relies on overlaid, absolutely-sized images.
+// Hides only the sdvx.in "back to top" button so it doesn't overlap the chart;
+// everything else on the page is left as-is.
 let sdvxInChartViewerUserScript = """
 (function() {
   var style = document.createElement('style');
-  style.textContent = "ins.adsbygoogle, .adsbygoogle, iframe { display: none !important; } " +
-                      ".btntop { display: none !important; }";
+  style.textContent = ".btntop { display: none !important; }";
   (document.head || document.documentElement).appendChild(style);
 })();
 """
