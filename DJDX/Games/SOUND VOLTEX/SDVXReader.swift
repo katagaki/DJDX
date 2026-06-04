@@ -113,4 +113,29 @@ actor SDVXReader {
         record.perfectCount = row[DB.srPerfectCount]
         return record
     }
+
+    // MARK: sdvx.in Chart Index (external data source)
+
+    func sdvxInChartCount() -> Int {
+        guard let database = try? SDVXInDatabase.shared.getReadConnection() else { return 0 }
+        return (try? database.scalar(SDVXInDatabase.chartTable.count)) ?? 0
+    }
+
+    // Resolves a play record's (title, difficulty) to the matching sdvx.in chart.
+    // Matching is done on the normalized title plus the difficulty slot, since a
+    // song has exactly one chart per slot.
+    func sdvxInChart(title: String, difficulty: SDVXDifficulty) -> SDVXInChart? {
+        guard let database = try? SDVXInDatabase.shared.getReadConnection() else { return nil }
+        let query = SDVXInDatabase.chartTable
+            .filter(SDVXInDatabase.chartTitleCompact == title.compact
+                    && SDVXInDatabase.chartSlot == difficulty.sdvxInSlot)
+            .limit(1)
+        guard let row = try? database.pluck(query) else { return nil }
+        return SDVXInChart(
+            code: row[SDVXInDatabase.chartCode],
+            slot: row[SDVXInDatabase.chartSlot],
+            title: row[SDVXInDatabase.chartTitle],
+            level: row[SDVXInDatabase.chartLevel]
+        )
+    }
 }
