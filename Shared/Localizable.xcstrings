@@ -10,6 +10,9 @@
     "[%@](https://bm2dx.com/IIDX/notes_radar/)" : {
       "shouldTranslate" : false
     },
+    "[%@](https://sdvx.in)" : {
+      "shouldTranslate" : false
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -1652,6 +1655,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面別のノーツレーダーデータを提供します。DJDXはbm2dx.comとは一切関係ありません。"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SDVX譜面保管所∇"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SDVX譜面保管所∇"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Images"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面画像"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn.EntryCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Charts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面数"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Provides chart images for SOUND VOLTEX. DJDX is not affiliated with or endorsed by SDVX譜面保管所∇."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SOUND VOLTEXの譜面画像を提供します。DJDXはSDVX譜面保管所∇とは一切関係ありません。"
           }
         }
       }
