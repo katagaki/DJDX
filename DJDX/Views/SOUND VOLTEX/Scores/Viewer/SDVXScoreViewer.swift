@@ -48,6 +48,11 @@ struct SDVXScoreViewer: View {
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
         .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Spacer()
+            }
+        }
         .safeAreaInset(edge: .top, spacing: 0.0) {
             TabBarAccessory(placement: .top) {
                 VStack(alignment: .center, spacing: 8.0) {
@@ -56,7 +61,7 @@ struct SDVXScoreViewer: View {
                         .fontWeight(.heavy)
                         .fontWidth(.compressed)
                         .multilineTextAlignment(.center)
-                        .foregroundStyle(difficulty.color)
+                        .foregroundStyle(.white)
                         .textSelection(.enabled)
                     Divider()
                     HStack(spacing: 6.0) {

@@ -141,6 +141,12 @@ class SDVXCoordinatorForImporter: NSObject, WKNavigationDelegate {
                 guard !self.hasStartedExtraction else { return }
                 self.hasStartedExtraction = true
                 self.extractScoreData(from: webView)
+            } else if urlString.starts(with: self.version.errorPageURL().absoluteString) {
+                // e-amusement redirects to the error page when the play data,
+                // e-amusement pass, or course requirement isn't met. Keep the
+                // web view hidden and surface a localized failure instead.
+                webView.layer.opacity = 0.0
+                self.resolveFailure(with: Self.failureReason(forErrorPageURL: urlString))
             } else {
                 webView.layer.opacity = 1.0
             }
@@ -228,14 +234,27 @@ class SDVXCoordinatorForImporter: NSObject, WKNavigationDelegate {
         }
     }
 
+    // SOUND VOLTEX uses a different set of error codes than beatmania IIDX:
+    //   err=1 -> no e-amusement ベーシックコース subscription
+    //   err=3 -> no e-amusement pass linked
+    //   err=4 -> no SOUND VOLTEX play data
     static func failureReason(forSentinel sentinel: String) -> ImportFailedReason {
         switch sentinel {
-        case "1", "5": return .noPremiumCourse
-        case "2": return .noEAmusementPass
-        case "3": return .noPlayData
+        case "1": return .noPremiumCourse
+        case "3": return .noEAmusementPass
+        case "4": return .noPlayData
         case "maintenance": return .maintenance
         default: return .serverError
         }
+    }
+
+    static func failureReason(forErrorPageURL urlString: String) -> ImportFailedReason {
+        if let range = urlString.range(of: "err=") {
+            let remainder = urlString[range.upperBound...]
+            let code = remainder.prefix { $0 != "&" }
+            return failureReason(forSentinel: String(code))
+        }
+        return .serverError
     }
 }
 
