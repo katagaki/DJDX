@@ -3410,6 +3410,22 @@
         }
       }
     },
+    "SDVXInChartViewer.FallbackMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart not opening?\nTry opening it manually on sdvx.in."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面が開きませんか？\nお手数ですが、sdvx.inで手動で開いてみてください。"
+          }
+        }
+      }
+    },
     "Textage.FallbackMessage" : {
       "localizations" : {
         "en" : {
@@ -3840,6 +3856,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコアデータ"
+          }
+        }
+      }
+    },
+    "ViewTitle.SDVXInChartViewer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面"
           }
         }
       }
