@@ -29,9 +29,11 @@ struct UnifiedView: View {
 
     @State var analyticsModel = AnalyticsModel()
     @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
+    @State var polarisChordAnalyticsModel = PolarisChordAnalyticsModel()
 
     @Namespace var analyticsNamespace
     @Namespace var sdvxAnalyticsNamespace
+    @Namespace var polarisChordAnalyticsNamespace
     @Namespace var towerNamespace
     @Namespace var importNamespace
 
@@ -109,6 +111,13 @@ struct UnifiedView: View {
                     model: sdvxAnalyticsModel,
                     path: path,
                     namespace: sdvxAnalyticsNamespace
+                )
+            }
+            .navigationDestination(for: PolarisChordAnalyticsPath.self) { path in
+                PolarisChordAnalyticsDestinationView(
+                    model: polarisChordAnalyticsModel,
+                    path: path,
+                    namespace: polarisChordAnalyticsNamespace
                 )
             }
         }
@@ -216,9 +225,16 @@ struct UnifiedView: View {
                     .padding(.top, 16.0)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
+            if showAnalytics {
+                PolarisChordAnalyticsView(model: polarisChordAnalyticsModel,
+                                          isEditing: $isEditingAnalytics,
+                                          analyticsNamespace: polarisChordAnalyticsNamespace)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
+            }
         }
         .padding(.bottom, 8.0)
         .animation(.snappy, value: showProfileHeader)
+        .animation(.smooth.speed(2.0), value: showAnalytics)
     }
 
     @ViewBuilder

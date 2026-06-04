@@ -39,6 +39,12 @@ enum SDVXAnalyticsPath: Hashable {
     case newGradesDetail(grade: String)
 }
 
+enum PolarisChordAnalyticsPath: Hashable {
+    case newHighScoresDetail
+    case newClearsDetail(clearType: String)
+    case newGradesDetail(grade: String)
+}
+
 enum ImportPath: Hashable {
     case importerWebIIDXSingle
     case importerWebIIDXDouble
