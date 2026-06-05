@@ -14,7 +14,14 @@
       "shouldTranslate" : false
     },
     "[%@](https://textage.cc)" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[%@](https://textage.cc)"
+          }
+        }
+      }
     },
     "%lld" : {
       "shouldTranslate" : false
@@ -1199,6 +1206,12 @@
     "Default" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3574,6 +3587,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面が開きませんか？\nお手数ですが、Textageで手動で検索してみてください。"
+          }
+        }
+      }
+    },
+    "Tips.ExternalDataSources.Text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable External Data Sources to view note counts, Notes Radar values, and more."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「外部データソース」から、ノーツ数やノーツレーダーなどの追加データを有効化できます。"
+          }
+        }
+      }
+    },
+    "Tips.ExternalDataSources.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "External Data Sources"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外部データソース"
           }
         }
       }
