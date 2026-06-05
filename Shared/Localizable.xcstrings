@@ -1614,13 +1614,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Provides chart time and note count data. DJDX is not affiliated with or endorsed by BEMANIWiki 2nd."
+            "value" : "DJDX is not affiliated with or endorsed by BEMANIWiki 2nd."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "譜面の時間やノーツ数を提供します。DJDXはBEMANIWiki 2ndとは一切関係ありません。"
+            "value" : "DJDXはBEMANIWiki 2ndとは一切関係ありません。"
           }
         }
       }
@@ -1699,13 +1699,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Provides per-chart notes radar data. DJDX is not affiliated with or endorsed by bm2dx.com."
+            "value" : "DJDX is not affiliated with or endorsed by bm2dx.com."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "譜面別のノーツレーダーデータを提供します。DJDXはbm2dx.comとは一切関係ありません。"
+            "value" : "DJDXはbm2dx.comとは一切関係ありません。"
           }
         }
       }
@@ -1796,13 +1796,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chart Images"
+            "value" : "Chart Index"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "譜面画像"
+            "value" : "譜面インデックス"
           }
         }
       }
@@ -1830,13 +1830,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Provides chart indexes for SOUND VOLTEX. DJDX is not affiliated with or endorsed by SDVX譜面保管所."
+            "value" : "DJDX is not affiliated with or endorsed by SDVX譜面保管所."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SOUND VOLTEXの譜面インデックスを提供します。DJDXはSDVX譜面保管所とは一切関係ありません。"
+            "value" : "DJDXはSDVX譜面保管所とは一切関係ありません。"
           }
         }
       }
