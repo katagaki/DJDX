@@ -159,7 +159,7 @@ struct SDVXScoresView<Header: View>: View {
                         Button {
                             navigationManager.push(SDVXScoresPath.scoreViewer(songRecord: record))
                         } label: {
-                            SDVXScoreRow(record: record)
+                            SDVXScoreRow(namespace: sdvxNamespace, record: record)
                                 .contentShape(.rect)
                         }
                         .buttonStyle(.plain)
@@ -224,6 +224,8 @@ struct SDVXScoresView<Header: View>: View {
             switch viewPath {
             case .scoreViewer(let songRecord):
                 SDVXScoreViewer(songRecord: songRecord)
+                    .automaticNavigationTransition(id: "\(songRecord.title).\(songRecord.difficulty)",
+                                                   in: sdvxNamespace)
             case .chartViewer(let chart):
                 SDVXInChartViewer(chart: chart)
             }

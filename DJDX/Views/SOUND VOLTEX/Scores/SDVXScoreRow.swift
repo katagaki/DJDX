@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SDVXScoreRow: View {
 
+    var namespace: Namespace.ID
+
     var record: SDVXSongRecord
 
     var body: some View {
@@ -42,6 +44,7 @@ struct SDVXScoreRow: View {
                 .font(.caption)
             }
             .padding([.top, .bottom], 8.0)
+            .automaticMatchedTransitionSource(id: "\(record.title).\(record.difficulty)", in: namespace)
 
             Spacer(minLength: 0.0)
 
