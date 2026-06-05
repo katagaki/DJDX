@@ -1,3 +1,4 @@
+import Komponents
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -5,7 +6,8 @@ struct SDVXImportView: View {
 
     @Environment(\.openURL) var openURL
     @Environment(\.dismiss) var dismiss
-    @Environment(ProgressAlertManager.self) var progressAlertManager
+
+    @State var importProgress = ProgressReporter()
 
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
 
@@ -36,7 +38,7 @@ struct SDVXImportView: View {
                             Text(version.marketingName)
                                 .font(.caption)
                                 .fontWeight(.bold)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(version.color)
                         }
                     }
                     .listRowBackground(Color.clear)
@@ -78,9 +80,19 @@ struct SDVXImportView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                bottomBar()
-                    .contentShape(.rect)
-                    .padding()
+                if #available(iOS 26.0, *) {
+                    bottomBar()
+                        .padding(.top, 2.0)
+                        .contentShape(.rect)
+                        .clipShape(.rect(cornerRadius: 24.0))
+                        .glassEffect(.regular, in: .rect(cornerRadius: 24.0))
+                        .padding()
+                } else {
+                    TabBarAccessory(placement: .bottom) {
+                        bottomBar()
+                            .contentShape(.rect)
+                    }
+                }
             }
             .alert(
                 "Alert.Import.Success.Title",
@@ -129,63 +141,75 @@ struct SDVXImportView: View {
                 }
             }
         }
+        .environment(importProgress)
+        .progressOverlay(importProgress)
     }
 
     @ViewBuilder
     func bottomBar() -> some View {
-        HStack(spacing: 10.0) {
-            Button {
-                importPath.append(SDVXImportPath.web)
-            } label: {
-                VStack(spacing: 8.0) {
-                    Image(systemName: "globe")
-                        .font(.system(size: 24))
-                        .frame(maxHeight: 30.0)
-                    Text(.calendarImportFromWeb)
-                        .fontWeight(.medium)
-                        .font(.subheadline)
-                        .lineLimit(1)
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.accent)
-                .foregroundStyle(.white)
-                .adaptiveClipShape()
+        VStack(spacing: 16.0) {
+            HStack(spacing: 8.0) {
+                DatePicker("Calendar.Import.SelectDate",
+                           selection: $importToDate,
+                           in: ...Date.now,
+                           displayedComponents: .date)
+                .datePickerStyle(.compact)
             }
-            Menu {
-                Section {
-                    Button(.importerCsvDownloadButton, systemImage: "safari") {
-                        openURL(sdvxVersion.downloadPageURL())
+            HStack(spacing: 10.0) {
+                Button {
+                    importPath.append(SDVXImportPath.web)
+                } label: {
+                    VStack(spacing: 8.0) {
+                        Image(systemName: "globe")
+                            .font(.system(size: 24))
+                            .frame(maxHeight: 30.0)
+                        Text(.calendarImportFromWeb)
+                            .fontWeight(.medium)
+                            .font(.subheadline)
+                            .lineLimit(1)
                     }
-                } header: {
-                    Text("Importer.CSV.Download.Description")
-                        .foregroundColor(.primary).textCase(nil).font(.body)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accent)
+                    .foregroundStyle(.white)
+                    .adaptiveClipShape()
                 }
-                Section {
-                    Button(.importerCsvLoadButton, systemImage: "folder") {
-                        isSelectingCSVFile = true
+                Menu {
+                    Section {
+                        Button(.importerCsvDownloadButton, systemImage: "safari") {
+                            openURL(sdvxVersion.downloadPageURL())
+                        }
+                    } header: {
+                        Text("Importer.CSV.Download.Description")
+                            .foregroundColor(.primary).textCase(nil).font(.body)
                     }
-                } header: {
-                    Text("Importer.CSV.Load.Description")
-                        .foregroundColor(.primary).textCase(nil).font(.body)
+                    Section {
+                        Button(.importerCsvLoadButton, systemImage: "folder") {
+                            isSelectingCSVFile = true
+                        }
+                    } header: {
+                        Text("Importer.CSV.Load.Description")
+                            .foregroundColor(.primary).textCase(nil).font(.body)
+                    }
+                } label: {
+                    VStack(spacing: 8.0) {
+                        Image(systemName: "document.badge.plus")
+                            .font(.system(size: 24))
+                            .frame(maxHeight: 30.0)
+                        Text(.calendarImportFromCSV)
+                            .fontWeight(.medium)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accent)
+                    .foregroundStyle(.white)
+                    .adaptiveClipShape()
                 }
-            } label: {
-                VStack(spacing: 8.0) {
-                    Image(systemName: "document.badge.plus")
-                        .font(.system(size: 24))
-                        .frame(maxHeight: 30.0)
-                    Text(.calendarImportFromCSV)
-                        .fontWeight(.medium)
-                        .font(.subheadline)
-                        .lineLimit(1)
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.accent)
-                .foregroundStyle(.white)
-                .adaptiveClipShape()
             }
         }
+        .padding(12.0)
     }
 
     func reloadImportGroups() async {
@@ -206,12 +230,11 @@ struct SDVXImportView: View {
     }
 
     func importSampleCSV() {
-        progressAlertManager.show(
+        importProgress.show(
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
-        ) {
-            Task { await performSampleImport() }
-        }
+        )
+        Task { await performSampleImport() }
     }
 
     private func performSampleImport() async {
@@ -219,22 +242,21 @@ struct SDVXImportView: View {
             if let current = progress.currentFileProgress,
                let total = progress.currentFileTotal, total > 0 {
                 let percentage = (current * 100) / total
-                await MainActor.run { progressAlertManager.updateProgress(percentage) }
+                await MainActor.run { importProgress.updateProgress(percentage) }
             }
         }
         await MainActor.run {
             didImportSucceed = true
-            progressAlertManager.hide()
+            importProgress.hide()
         }
     }
 
     func importCSVs(from urls: [URL]) {
-        progressAlertManager.show(
+        importProgress.show(
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
-        ) {
-            Task { await performCSVImport(from: urls) }
-        }
+        )
+        Task { await performCSVImport(from: urls) }
     }
 
     private func performCSVImport(from urls: [URL]) async {
@@ -250,13 +272,13 @@ struct SDVXImportView: View {
                 if let current = progress.currentFileProgress,
                    let total = progress.currentFileTotal, total > 0 {
                     let percentage = (current * 100) / total
-                    await MainActor.run { progressAlertManager.updateProgress(percentage) }
+                    await MainActor.run { importProgress.updateProgress(percentage) }
                 }
             }
         }
         await MainActor.run {
             didImportSucceed = true
-            progressAlertManager.hide()
+            importProgress.hide()
         }
     }
 

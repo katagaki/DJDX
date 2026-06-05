@@ -3,21 +3,18 @@ import SwiftUI
 
 @Observable
 @MainActor
-class ProgressAlertManager {
+final class ProgressReporter {
     var isShowing: Bool = false
     var title: String = ""
     var message: String = ""
     var percentage: Int = 0
 
-    func show(title: String, message: String,
-              completion: @escaping @MainActor () -> Void = { /* No completion handler by default */ }) {
+    func show(title: String, message: String) {
         self.title = title
         self.message = message
         percentage = 0
         withAnimation {
             isShowing = true
-        } completion: {
-            completion()
         }
     }
 

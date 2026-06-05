@@ -2,18 +2,12 @@ import Foundation
 
 enum ScoresPath: Hashable {
     case scoreViewer(songRecord: IIDXSongRecord, initialLevel: IIDXLevel = .all)
-    case textageViewer(songTitle: String,
-                       level: IIDXLevel,
-                       playSide: IIDXPlaySide,
-                       playType: IIDXPlayType)
+    case textageViewer(url: URL)
 }
 
 enum AnalyticsPath: Hashable {
     case clearTypeOverviewGraph
-    case clearTypePerDifficultyGraph
-    case scoreRatePerDifficultyGraph
-    case trendsClearTypeGraph
-    case trendsDJLevelGraph
+    case gradeBreakdownDetail
     case clearTypeForLevel(difficulty: Int)
     case clearTypeTrendsForLevel(difficulty: Int)
     case djLevelForLevel(difficulty: Int)
@@ -31,9 +25,20 @@ enum AnalyticsPath: Hashable {
     case newADetail
 }
 
+enum SDVXScoresPath: Hashable {
+    case scoreViewer(songRecord: SDVXSongRecord)
+    case chartViewer(chart: SDVXInChart)
+}
+
 enum SDVXAnalyticsPath: Hashable {
     case clearBreakdownDetail
     case gradeBreakdownDetail
+    case newHighScoresDetail
+    case newClearsDetail(clearType: String)
+    case newGradesDetail(grade: String)
+}
+
+enum PolarisChordAnalyticsPath: Hashable {
     case newHighScoresDetail
     case newClearsDetail(clearType: String)
     case newGradesDetail(grade: String)

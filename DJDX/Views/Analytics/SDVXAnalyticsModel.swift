@@ -28,11 +28,16 @@ final class SDVXAnalyticsModel {
         SDVXClearType.ultimateChain.rawValue,
         SDVXClearType.perfectUltimateChain.rawValue
     ]
-    // Top grades surfaced as "new grade" cards (parallels IIDX's AAA/AA/A).
+    // Grades surfaced as "new grade" cards, offered down to A (the view defaults
+    // to showing only the top grades, down to AAA).
     nonisolated static let trackedGrades: [String] = [
         SDVXGrade.s.rawValue,
         SDVXGrade.aaaPlus.rawValue,
-        SDVXGrade.aaa.rawValue
+        SDVXGrade.aaa.rawValue,
+        SDVXGrade.aaPlus.rawValue,
+        SDVXGrade.aa.rawValue,
+        SDVXGrade.aPlus.rawValue,
+        SDVXGrade.a.rawValue
     ]
 
     var dataState: DataState = .initializing

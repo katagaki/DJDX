@@ -10,6 +10,19 @@
     "[%@](https://bm2dx.com/IIDX/notes_radar/)" : {
       "shouldTranslate" : false
     },
+    "[%@](https://sdvx.in)" : {
+      "shouldTranslate" : false
+    },
+    "[%@](https://textage.cc)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[%@](https://textage.cc)"
+          }
+        }
+      }
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -617,6 +630,23 @@
         }
       }
     },
+    "Analytics.DJLevel.Overall" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL内訳"
+          }
+        }
+      }
+    },
     "Analytics.NewClears.Subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -687,6 +717,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データなし"
+          }
+        }
+      }
+    },
+    "Analytics.PerLevel.Breakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内訳"
           }
         }
       }
@@ -771,6 +818,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "・"
+          }
+        }
+      }
+    },
+    "Analytics.PerLevel.Trend" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trend"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推移"
           }
         }
       }
@@ -1140,8 +1204,14 @@
       "shouldTranslate" : false
     },
     "Default" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1560,13 +1630,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Provides chart time and note count data. DJDX is not affiliated with or endorsed by BEMANIWiki 2nd."
+            "value" : "DJDX is not affiliated with or endorsed by BEMANIWiki 2nd."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "譜面の時間やノーツ数を提供します。DJDXはBEMANIWiki 2ndとは一切関係ありません。"
+            "value" : "DJDXはBEMANIWiki 2ndとは一切関係ありません。"
           }
         }
       }
@@ -1645,13 +1715,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Provides per-chart notes radar data. DJDX is not affiliated with or endorsed by bm2dx.com."
+            "value" : "DJDX is not affiliated with or endorsed by bm2dx.com."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "譜面別のノーツレーダーデータを提供します。DJDXはbm2dx.comとは一切関係ありません。"
+            "value" : "DJDXはbm2dx.comとは一切関係ありません。"
           }
         }
       }
@@ -1720,6 +1790,138 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "外部データソース"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SDVX譜面保管所"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "More.ExternalData.SDVXIn.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Index"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面インデックス"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn.EntryCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Charts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面数"
+          }
+        }
+      }
+    },
+    "More.ExternalData.SDVXIn.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX is not affiliated with or endorsed by SDVX譜面保管所."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDXはSDVX譜面保管所とは一切関係ありません。"
+          }
+        }
+      }
+    },
+    "More.ExternalData.Textage" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textage"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textage"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "More.ExternalData.Textage.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Index"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面インデックス"
+          }
+        }
+      }
+    },
+    "More.ExternalData.Textage.EntryCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Charts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面数"
+          }
+        }
+      }
+    },
+    "More.ExternalData.Textage.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX is not affiliated with or endorsed by Textage."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDXはTextageとは一切関係ありません。"
           }
         }
       }
@@ -2114,6 +2316,23 @@
         }
       }
     },
+    "Scores.SDVX.ViewChart" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面"
+          }
+        }
+      }
+    },
     "Scores.Search.Prompt" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2278,6 +2497,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴を見る"
+          }
+        }
+      }
+    },
+    "SDVXInChartViewer.FallbackMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart not opening?\nTry opening it manually on sdvx.in."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面が開きませんか？\nお手数ですが、sdvx.inで手動で開いてみてください。"
           }
         }
       }
@@ -2624,6 +2859,7 @@
       }
     },
     "Shared.IIDX.Qpro" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3355,6 +3591,40 @@
         }
       }
     },
+    "Tips.ExternalDataSources.Text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable External Data Sources to view note counts, Notes Radar values, and more."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「外部データソース」から、ノーツ数やノーツレーダーなどの追加データを有効化できます。"
+          }
+        }
+      }
+    },
+    "Tips.ExternalDataSources.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "External Data Sources"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外部データソース"
+          }
+        }
+      }
+    },
     "Tips.ImportMoved.Text" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3723,23 +3993,6 @@
         }
       }
     },
-    "ViewTitle.More.Customization.AppIcon" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App Icon"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリアイコン"
-          }
-        }
-      }
-    },
     "ViewTitle.Scores" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3769,6 +4022,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコアデータ"
+          }
+        }
+      }
+    },
+    "ViewTitle.SDVXInChartViewer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面"
           }
         }
       }
@@ -3913,6 +4182,81 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "レベル"
+          }
+        }
+      }
+    },
+    "Widget.Name.ClearType" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Type（IIDX）"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランプ（IIDX）"
+          }
+        }
+      }
+    },
+    "Widget.Name.DJLevel" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL（IIDX）"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "Widget.Name.NotesRadar" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Radar（IIDX）"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ノーツレーダー（IIDX）"
+          }
+        }
+      }
+    },
+    "Widget.Name.Qpro" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qpro（IIDX）"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クプロ（IIDX）"
+          }
+        }
+      }
+    },
+    "Widget.Name.Tower" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDX Tower"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDXタワー"
           }
         }
       }

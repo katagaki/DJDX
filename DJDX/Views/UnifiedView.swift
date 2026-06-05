@@ -8,7 +8,6 @@ struct UnifiedView: View {
     @Environment(\.requestReview) var requestReview
     @Environment(\.modelContext) var modelContext
 
-    @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: Game.iidxArcade, "Global.SelectedGame") var selectedGame: Game
@@ -28,11 +27,15 @@ struct UnifiedView: View {
     @State var isFirstStartCleanupComplete: Bool = false
     @State var isEditingAnalytics: Bool = false
 
+    @State var migrationProgress = ProgressReporter()
+
     @State var analyticsModel = AnalyticsModel()
     @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
+    @State var polarisChordAnalyticsModel = PolarisChordAnalyticsModel()
 
     @Namespace var analyticsNamespace
     @Namespace var sdvxAnalyticsNamespace
+    @Namespace var polarisChordAnalyticsNamespace
     @Namespace var towerNamespace
     @Namespace var importNamespace
 
@@ -42,7 +45,7 @@ struct UnifiedView: View {
     }
 
     var body: some View {
-        @Bindable var progressAlertManager = progressAlertManager
+        @Bindable var migrationProgress = migrationProgress
         NavigationStack(path: $navigationManager.path) {
             ZStack {
                 if selectedGame == .soundVoltex {
@@ -124,6 +127,13 @@ struct UnifiedView: View {
                     namespace: sdvxAnalyticsNamespace
                 )
             }
+            .navigationDestination(for: PolarisChordAnalyticsPath.self) { path in
+                PolarisChordAnalyticsDestinationView(
+                    model: polarisChordAnalyticsModel,
+                    path: path,
+                    namespace: polarisChordAnalyticsNamespace
+                )
+            }
         }
         .sheet(isPresented: $isPresentingImport) {
             Group {
@@ -144,17 +154,21 @@ struct UnifiedView: View {
                 .automaticSheetNavigationTransition(id: "Import", in: importNamespace)
                 .presentationDetents([.large])
         }
-        .overlay {
-            if progressAlertManager.isShowing {
-                ProgressAlert(
-                    title: $progressAlertManager.title,
-                    message: $progressAlertManager.message
-                )
-            } else {
-                // HACK: DO NOT REMOVE. Removing this will cause a freeze when isShowing is false.
-                Color.clear
+        .fullScreenCover(isPresented: $migrationProgress.isShowing) {
+            ProgressCard(
+                title: migrationProgress.title,
+                message: migrationProgress.message,
+                percentage: migrationProgress.percentage
+            )
+            .presentationBackground(.clear)
+        }
+#if DEBUG
+        .onOpenURL { url in
+            if url.scheme == "djdx", url.host == "max300" {
+                Task { await runFakeMigration() }
             }
         }
+#endif
         .task {
             if !isFirstStartCleanupComplete {
                 await migrateData()
@@ -234,9 +248,16 @@ struct UnifiedView: View {
                     .padding(.top, 16.0)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
+            if showAnalytics {
+                PolarisChordAnalyticsView(model: polarisChordAnalyticsModel,
+                                          isEditing: $isEditingAnalytics,
+                                          analyticsNamespace: polarisChordAnalyticsNamespace)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
+            }
         }
         .padding(.bottom, 8.0)
         .animation(.snappy, value: showProfileHeader)
+        .animation(.smooth.speed(2.0), value: showAnalytics)
     }
 
     @ViewBuilder

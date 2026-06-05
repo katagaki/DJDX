@@ -455,6 +455,31 @@ actor IIDXReader {
         return (try? database.scalar(BM2DXDatabase.notesRadarTable.count)) ?? 0
     }
 
+    func textageChartCount() -> Int {
+        guard let database = try? TextageDatabase.shared.getReadConnection() else { return 0 }
+        return (try? database.scalar(TextageDatabase.chartTable.count)) ?? 0
+    }
+
+    func textageChart(title: String) -> TextageChart? {
+        guard let database = try? TextageDatabase.shared.getReadConnection() else { return nil }
+        let col = TextageDatabase.self
+        let query = col.chartTable.filter(col.chartTitleCompact == title.compact).limit(1)
+        guard let row = try? database.pluck(query) else { return nil }
+        return TextageChart(
+            tag: row[col.chartTag],
+            version: row[col.chartVersion],
+            title: row[col.chartTitle],
+            spNormal: row[col.chartSPNormal],
+            spHyper: row[col.chartSPHyper],
+            spAnother: row[col.chartSPAnother],
+            spLeggendaria: row[col.chartSPLeggendaria],
+            dpNormal: row[col.chartDPNormal],
+            dpHyper: row[col.chartDPHyper],
+            dpAnother: row[col.chartDPAnother],
+            dpLeggendaria: row[col.chartDPLeggendaria]
+        )
+    }
+
     // MARK: Analytics - Aggregated Counts
 
     private struct LevelColumns {

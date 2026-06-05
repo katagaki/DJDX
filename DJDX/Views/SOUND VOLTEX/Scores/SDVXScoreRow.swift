@@ -2,13 +2,15 @@ import SwiftUI
 
 struct SDVXScoreRow: View {
 
+    var namespace: Namespace.ID
+
     var record: SDVXSongRecord
 
     var body: some View {
         HStack(alignment: .center, spacing: 8.0) {
             // Leading clear-mark lamp
             record.clearTypeEnum.color
-                .frame(width: 12.0)
+                .frame(width: 10.0)
                 .frame(maxHeight: .infinity)
                 .conditionalShadow(.black.opacity(0.2), radius: 1.0, x: 2.0)
 
@@ -42,6 +44,7 @@ struct SDVXScoreRow: View {
                 .font(.caption)
             }
             .padding([.top, .bottom], 8.0)
+            .automaticMatchedTransitionSource(id: "\(record.title).\(record.difficulty)", in: namespace)
 
             Spacer(minLength: 0.0)
 

@@ -47,7 +47,7 @@ struct IIDXScoreRow: View {
                 default: Color.clear
                 }
             }
-            .frame(width: 12.0)
+            .frame(width: 10.0)
             .frame(maxHeight: .infinity)
             .conditionalShadow(.black.opacity(0.2), radius: 1.0, x: 2.0)
 

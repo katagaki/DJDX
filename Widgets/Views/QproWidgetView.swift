@@ -9,7 +9,7 @@ struct QproWidget: Widget {
             QproWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Shared.IIDX.Qpro")
+        .configurationDisplayName("Widget.Name.Qpro")
         .description("Widget.Qpro.Description")
         .supportedFamilies([.systemSmall, .systemLarge])
     }

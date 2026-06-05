@@ -5,27 +5,42 @@ import SwiftUI
 // swiftlint:disable:next type_body_length
 struct MoreExternalDataSources: View {
 
-    @Environment(ProgressAlertManager.self) var progressAlertManager
     @Environment(\.openURL) var openURL
     @Environment(\.dismiss) var dismiss
-
-    @AppStorage(wrappedValue: true, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
-    @AppStorage(wrappedValue: true, "ExternalData.BM2DX.Enabled") var isBM2DXEnabled: Bool
+    
+    @AppStorage(wrappedValue: false, "ExternalData.Textage.Enabled") var isTextageEnabled: Bool
+    @AppStorage(wrappedValue: false, "ExternalData.SDVXIn.Enabled") var isSDVXInEnabled: Bool
+    @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
+    @AppStorage(wrappedValue: false, "ExternalData.BM2DX.Enabled") var isBM2DXEnabled: Bool
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var bemaniWikiEntryCount: Int = 0
     @State var bm2dxEntryCount: Int = 0
+    @State var sdvxInEntryCount: Int = 0
+    @State var textageEntryCount: Int = 0
 
     @State var isBemaniWikiReloadCompleted: Bool = false
     @State var isBM2DXReloadCompleted: Bool = false
+    @State var isSDVXInReloadCompleted: Bool = false
+    @State var isTextageReloadCompleted: Bool = false
     @State var dataImported: Int = 0
     @State var dataTotal: Int = 2
+    @State var reloadingSource: ExternalDataReloadSource?
+
+    enum ExternalDataReloadSource {
+        case bemaniWiki, bm2dx, sdvxIn, textage
+    }
 
     let fetcher = IIDXReader()
     let importer = IIDXImporter()
+    let sdvxFetcher = SDVXReader()
+    let sdvxInImporter = SDVXInImporter()
+    let textageImporter = TextageImporter()
 
     var body: some View {
         List {
+            textageSection()
+            sdvxInSection()
             bemaniWikiSection()
             bm2dxSection()
         }
@@ -49,16 +64,11 @@ struct MoreExternalDataSources: View {
                 }
             }
         }
-        .onChange(of: dataImported, { _, _ in
-            Task {
-                await MainActor.run {
-                    progressAlertManager.updateProgress(Int(Float(dataImported) / Float(dataTotal) * 100.0))
-                }
-            }
-        })
         .task {
             bemaniWikiEntryCount = await fetcher.bemaniWikiSongCount()
             bm2dxEntryCount = await fetcher.chartRadarDataCount()
+            sdvxInEntryCount = await sdvxFetcher.sdvxInChartCount()
+            textageEntryCount = await fetcher.textageChartCount()
         }
         .alert(
             "Alert.ExternalData.Completed.Title",
@@ -84,6 +94,42 @@ struct MoreExternalDataSources: View {
                 Text("Alert.ExternalData.Completed.Text.\(bm2dxEntryCount)")
             }
         )
+        .alert(
+            "Alert.ExternalData.Completed.Title",
+            isPresented: $isSDVXInReloadCompleted,
+            actions: {
+                Button("Shared.OK", role: .cancel) {
+                    isSDVXInReloadCompleted = false
+                }
+            },
+            message: {
+                Text("Alert.ExternalData.Completed.Text.\(sdvxInEntryCount)")
+            }
+        )
+        .alert(
+            "Alert.ExternalData.Completed.Title",
+            isPresented: $isTextageReloadCompleted,
+            actions: {
+                Button("Shared.OK", role: .cancel) {
+                    isTextageReloadCompleted = false
+                }
+            },
+            message: {
+                Text("Alert.ExternalData.Completed.Text.\(textageEntryCount)")
+            }
+        )
+    }
+
+    @ViewBuilder
+    private func reloadIndicator(for source: ExternalDataReloadSource) -> some View {
+        if reloadingSource == source {
+            switch source {
+            case .bm2dx:
+                ProgressView()
+            default:
+                ProgressDonut(progress: dataTotal > 0 ? Double(dataImported) / Double(dataTotal) : 0.0)
+            }
+        }
     }
 
     // MARK: - BEMANIWiki 2nd
@@ -92,16 +138,21 @@ struct MoreExternalDataSources: View {
     private func bemaniWikiSection() -> some View {
         Section {
             Toggle(isOn: $isBemaniWikiEnabled) {
-                Text("More.ExternalData.BemaniWiki2nd")
+                Text("More.ExternalData.BemaniWiki2nd.Description")
             }
             if isBemaniWikiEnabled {
-                Button("More.ExternalData.UpdateData") {
-                    progressAlertManager.show(title: "Alert.ExternalData.Downloading.Title",
-                                              message: "Alert.ExternalData.Downloading.Text")
-                    Task {
-                        await reloadBemaniWikiData()
-                        isBemaniWikiReloadCompleted = true
+                HStack {
+                    Button("More.ExternalData.UpdateData") {
+                        reloadingSource = .bemaniWiki
+                        Task {
+                            await reloadBemaniWikiData()
+                            reloadingSource = nil
+                            isBemaniWikiReloadCompleted = true
+                        }
                     }
+                    .disabled(reloadingSource != nil)
+                    Spacer()
+                    reloadIndicator(for: .bemaniWiki)
                 }
                 HStack {
                     Text("More.ExternalData.BemaniWiki2nd.EntryCount")
@@ -111,7 +162,7 @@ struct MoreExternalDataSources: View {
                 }
             }
         } header: {
-            ListSectionHeader(text: "More.ExternalData.BemaniWiki2nd.Description")
+            ListSectionHeader(text: "More.ExternalData.BemaniWiki2nd")
                 .font(.body)
         } footer: {
             Text("More.ExternalData.BemaniWiki2nd.Footer") +
@@ -126,16 +177,21 @@ struct MoreExternalDataSources: View {
     private func bm2dxSection() -> some View {
         Section {
             Toggle(isOn: $isBM2DXEnabled) {
-                Text("More.ExternalData.BM2DX")
+                Text("More.ExternalData.BM2DX.Description")
             }
             if isBM2DXEnabled {
-                Button("More.ExternalData.UpdateData") {
-                    progressAlertManager.show(title: "Alert.ExternalData.Downloading.Title",
-                                              message: "Alert.ExternalData.Downloading.Text")
-                    Task {
-                        await reloadBM2DXData()
-                        isBM2DXReloadCompleted = true
+                HStack {
+                    Button("More.ExternalData.UpdateData") {
+                        reloadingSource = .bm2dx
+                        Task {
+                            await reloadBM2DXData()
+                            reloadingSource = nil
+                            isBM2DXReloadCompleted = true
+                        }
                     }
+                    .disabled(reloadingSource != nil)
+                    Spacer()
+                    reloadIndicator(for: .bm2dx)
                 }
                 HStack {
                     Text("More.ExternalData.BM2DX.EntryCount")
@@ -145,7 +201,7 @@ struct MoreExternalDataSources: View {
                 }
             }
         } header: {
-            ListSectionHeader(text: "More.ExternalData.BM2DX.Description")
+            ListSectionHeader(text: "More.ExternalData.BM2DX")
                 .font(.body)
         } footer: {
             Text("More.ExternalData.BM2DX.Footer") +
@@ -154,9 +210,151 @@ struct MoreExternalDataSources: View {
         }
     }
 
+    // MARK: - sdvx.in
+
+    @ViewBuilder
+    private func sdvxInSection() -> some View {
+        Section {
+            Toggle(isOn: $isSDVXInEnabled) {
+                Text("More.ExternalData.SDVXIn.Description")
+            }
+            if isSDVXInEnabled {
+                HStack {
+                    Button("More.ExternalData.UpdateData") {
+                        reloadingSource = .sdvxIn
+                        Task {
+                            await reloadSDVXInData()
+                            reloadingSource = nil
+                            isSDVXInReloadCompleted = true
+                        }
+                    }
+                    .disabled(reloadingSource != nil)
+                    Spacer()
+                    reloadIndicator(for: .sdvxIn)
+                }
+                HStack {
+                    Text("More.ExternalData.SDVXIn.EntryCount")
+                    Spacer()
+                    Text(verbatim: "\(sdvxInEntryCount)")
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } header: {
+            ListSectionHeader(text: "More.ExternalData.SDVXIn")
+                .font(.body)
+        } footer: {
+            Text("More.ExternalData.SDVXIn.Footer") +
+            Text(" ") +
+            Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://sdvx.in)")
+        }
+    }
+
+    // MARK: - Textage
+
+    @ViewBuilder
+    private func textageSection() -> some View {
+        Section {
+            Toggle(isOn: $isTextageEnabled) {
+                Text("More.ExternalData.Textage.Description")
+            }
+            if isTextageEnabled {
+                HStack {
+                    Button("More.ExternalData.UpdateData") {
+                        reloadingSource = .textage
+                        Task {
+                            await reloadTextageData()
+                            reloadingSource = nil
+                            isTextageReloadCompleted = true
+                        }
+                    }
+                    .disabled(reloadingSource != nil)
+                    Spacer()
+                    reloadIndicator(for: .textage)
+                }
+                HStack {
+                    Text("More.ExternalData.Textage.EntryCount")
+                    Spacer()
+                    Text(verbatim: "\(textageEntryCount)")
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } header: {
+            ListSectionHeader(text: "More.ExternalData.Textage")
+                .font(.body)
+        } footer: {
+            Text("More.ExternalData.Textage.Footer") +
+            Text(" ") +
+            Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://textage.cc)")
+        }
+    }
+
+    // MARK: - Textage Data Loading
+
+    func reloadTextageData() async {
+        dataTotal = 2
+        dataImported = 0
+
+        guard let titleURL = URL(string: "https://textage.cc/score/titletbl.js"),
+              let accessURL = URL(string: "https://textage.cc/score/actbl.js") else { return }
+
+        var titleTableText: String?
+        var accessTableText: String?
+
+        if let (data, _) = try? await URLSession.shared.data(from: titleURL) {
+            titleTableText = data.decodedAsTextageTable()
+        }
+        dataImported += 1
+
+        if let (data, _) = try? await URLSession.shared.data(from: accessURL) {
+            accessTableText = data.decodedAsTextageTable()
+        }
+        dataImported += 1
+
+        guard let titleTableText, let accessTableText else { return }
+        let charts = TextageTableParser.charts(titleTableText: titleTableText,
+                                               accessTableText: accessTableText)
+        await textageImporter.replaceAllCharts(charts)
+        textageEntryCount = await fetcher.textageChartCount()
+    }
+
+    // MARK: - sdvx.in Data Loading
+
+    func reloadSDVXInData() async {
+        var charts: [SDVXInChart] = []
+        let pattern = "SORT([0-9]{5})([NAEMnaem])\\(\\);</script><!--(.*?)-->"
+        let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])
+
+        dataTotal = 20
+        dataImported = 0
+        for level in 1...20 {
+            defer { dataImported += 1 }
+            let levelSlug = String(format: "%02d", level)
+            guard let regex,
+                  let url = URL(string: "https://sdvx.in/sort/sort_\(levelSlug).htm"),
+                  let (data, _) = try? await URLSession.shared.data(from: url),
+                  let html = String(data: data, encoding: .utf8) else { continue }
+            let htmlString = html as NSString
+            let matches = regex.matches(in: html, range: NSRange(location: 0, length: htmlString.length))
+            for match in matches where match.numberOfRanges == 4 {
+                let code = htmlString.substring(with: match.range(at: 1))
+                let slot = htmlString.substring(with: match.range(at: 2)).lowercased()
+                let rawTitle = htmlString.substring(with: match.range(at: 3))
+                let title = ((try? SwiftSoup.Entities.unescape(rawTitle)) ?? rawTitle)
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !title.isEmpty else { continue }
+                charts.append(SDVXInChart(code: code, slot: slot, title: title, level: level))
+            }
+        }
+
+        await sdvxInImporter.replaceAllCharts(charts)
+        sdvxInEntryCount = await sdvxFetcher.sdvxInChartCount()
+    }
+
     // MARK: - BEMANIWiki Data Loading
 
     func reloadBemaniWikiData() async {
+        dataTotal = 2
+        dataImported = 0
         await importer.deleteAllSongs()
         var iidxSongs: [IIDXSong] = []
         iidxSongs.append(contentsOf: await reloadBemaniWikiDataForLatestVersion())
@@ -165,12 +363,6 @@ struct MoreExternalDataSources: View {
         dataImported += 1
         await importer.insertSongs(iidxSongs)
         bemaniWikiEntryCount = await fetcher.bemaniWikiSongCount()
-        await MainActor.run {
-            progressAlertManager.hide()
-            withAnimation(.smooth.speed(2.0)) {
-                dataImported = 0
-            }
-        }
     }
 
     func reloadBemaniWikiDataForLatestVersion() async -> [IIDXSong] {
@@ -259,14 +451,12 @@ struct MoreExternalDataSources: View {
             let (data, _) = try await URLSession.shared.data(from: url)
 
             guard let decompressedData = data.gunzip() else {
-                await MainActor.run { progressAlertManager.hide() }
                 return
             }
 
             guard let json = try? JSONSerialization.jsonObject(with: decompressedData) as? [String: Any],
                   let midDict = json["mid"] as? [String: String],
                   let notesRadar = json["notes_radar"] as? [String: [String: [[String: Any]]]] else {
-                await MainActor.run { progressAlertManager.hide() }
                 return
             }
 
@@ -320,9 +510,5 @@ struct MoreExternalDataSources: View {
 
         await importer.insertNotesRadarEntries(allEntries)
         bm2dxEntryCount = await fetcher.chartRadarDataCount()
-
-        await MainActor.run {
-            progressAlertManager.hide()
-        }
     }
 }

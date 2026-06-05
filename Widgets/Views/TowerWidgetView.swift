@@ -9,7 +9,7 @@ struct TowerWidget: Widget {
             TowerWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Shared.IIDX.Tower")
+        .configurationDisplayName("Widget.Name.Tower")
         .description("Widget.Tower.Description")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }

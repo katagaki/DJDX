@@ -8,8 +8,9 @@ struct IIDXImportView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
-    @Environment(ProgressAlertManager.self) var progressAlertManager
     @Environment(\.dismiss) var dismiss
+
+    @State var importProgress = ProgressReporter()
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var importPlayType: IIDXPlayType
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
@@ -162,6 +163,8 @@ struct IIDXImportView: View {
                 }
             }
         }
+        .environment(importProgress)
+        .progressOverlay(importProgress)
     }
 
     // swiftlint:disable function_body_length
@@ -302,12 +305,11 @@ struct IIDXImportView: View {
     }
 
     func importSampleCSV() {
-        progressAlertManager.show(
+        importProgress.show(
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
-        ) {
-            Task { await performSampleCSVImport() }
-        }
+        )
+        Task { await performSampleCSVImport() }
     }
 
     private func performSampleCSVImport() async {
@@ -319,23 +321,22 @@ struct IIDXImportView: View {
                 let currentFileTotal = progress.currentFileTotal {
                 let progress = (currentFileProgress * 100) / currentFileTotal
                 await MainActor.run {
-                    progressAlertManager.updateProgress(progress)
+                    importProgress.updateProgress(progress)
                 }
             }
         }
         await MainActor.run {
             didImportSucceed = true
-            progressAlertManager.hide()
+            importProgress.hide()
         }
     }
 
     func importCSVs(from urls: [URL]) {
-        progressAlertManager.show(
+        importProgress.show(
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
-        ) {
-            Task { await performCSVImport(from: urls) }
-        }
+        )
+        Task { await performCSVImport(from: urls) }
     }
 
     private func performCSVImport(from urls: [URL]) async {
@@ -348,7 +349,7 @@ struct IIDXImportView: View {
             if let filesProcessed = progress.filesProcessed,
                let fileCount = progress.fileCount {
                 await MainActor.run {
-                    progressAlertManager.updateTitle("Alert.Importing.Title.\(filesProcessed).\(fileCount)")
+                    importProgress.updateTitle("Alert.Importing.Title.\(filesProcessed).\(fileCount)")
                 }
             }
             if let currentFileProgress = progress.currentFileProgress,
@@ -356,13 +357,13 @@ struct IIDXImportView: View {
                currentFileTotal > 0 {
                 let progress = (currentFileProgress * 100) / currentFileTotal
                 await MainActor.run {
-                    progressAlertManager.updateProgress(progress)
+                    importProgress.updateProgress(progress)
                 }
             }
         }
         await MainActor.run {
             didImportSucceed = true
-            progressAlertManager.hide()
+            importProgress.hide()
         }
     }
 }

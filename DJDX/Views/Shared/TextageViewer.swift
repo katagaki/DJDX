@@ -1,38 +1,21 @@
 import SwiftUI
 import WebKit
 
-let textageIIDXURL: URL = URL(string: """
-https://textage.cc/score/index.html
-""")!
-
 struct TextageViewer: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
-    var songTitle: String
-    var level: IIDXLevel
-    var playSide: IIDXPlaySide
-    var playType: IIDXPlayType
+    var url: URL
 
     @State var webView = WKWebView()
     @State var isLoading: Bool = true
     @State var isShowingFallbackButton: Bool = false
 
-    init(songTitle: String, level: IIDXLevel, playSide: IIDXPlaySide, playType: IIDXPlayType) {
-        self.songTitle = songTitle
-        self.level = level
-        self.playSide = playSide
-        self.playType = playType
-    }
-
     var body: some View {
         WebViewForTextage(
             webView: $webView,
             isLoading: $isLoading,
-            songTitle: songTitle,
-            level: level,
-            playSide: playSide,
-            playType: playType
+            url: url
         )
             .navigationTitle("ViewTitle.TextageViewer")
             .navigationBarTitleDisplayMode(.inline)
@@ -52,7 +35,7 @@ struct TextageViewer: View {
                     if isShowingFallbackButton {
                         VStack(spacing: 8.0) {
                             Text("Textage.FallbackMessage")
-                            Link(destination: textageIIDXURL) {
+                            Link(destination: url) {
                                 Label("Shared.OpenInSafari", systemImage: "safari")
                             }
                         }
@@ -76,7 +59,7 @@ struct TextageViewer: View {
             isLoading = true
             isShowingFallbackButton = false
         } completion: {
-            webView.load(URLRequest(url: textageIIDXURL))
+            webView.load(URLRequest(url: url))
             Task {
                 await showFallbackAfterDelay()
             }
@@ -98,33 +81,27 @@ struct WebViewForTextage: UIViewRepresentable {
     @Binding var webView: WKWebView
     @Binding var isLoading: Bool
 
-    var songTitle: String
-    var level: IIDXLevel
-    var playSide: IIDXPlaySide = .notApplicable
-    var playType: IIDXPlayType = .single
+    var url: URL
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
-        webView.load(URLRequest(url: textageIIDXURL))
+        #if DEBUG
+        webView.isInspectable = true
+        #endif
+        webView.load(URLRequest(url: url))
         return webView
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(
-            songTitle: songTitle,
-            level: level, playSide: playSide,
-            playType: playType,
-            updateTextageState: updateTextageState
-        )
+        Coordinator(updateState: updateState)
     }
 
     func updateUIView(_: WKWebView, context _: Context) {
-        // Blank function to conform to protocol
     }
 
-    func updateTextageState(_ isTextageReady: Bool) {
-        if isTextageReady {
+    func updateState(_ isReady: Bool) {
+        if isReady {
             webView.layer.opacity = 1.0
             isLoading = false
         } else {
@@ -134,116 +111,26 @@ struct WebViewForTextage: UIViewRepresentable {
 
     class Coordinator: NSObject, WKNavigationDelegate {
 
-        var songTitle: String
-        var level: IIDXLevel
-        var playSide: IIDXPlaySide = .notApplicable
-        var playType: IIDXPlayType = .single
-        var updateTextageState: (Bool) -> Void
+        var updateState: (Bool) -> Void
+        var hasRevealed: Bool = false
 
-        // didFinish never fires for the Textage pages on iOS 18 (the page
-        // commits and renders but the load event never completes), so we drive
-        // the flow from didCommit instead. These guard against running twice
-        // when both didCommit and didFinish fire (iOS 26).
-        var hasInjectedNavigation: Bool = false
-        var hasRevealedChart: Bool = false
-
-        init(
-            songTitle: String,
-            level: IIDXLevel,
-            playSide: IIDXPlaySide,
-            playType: IIDXPlayType,
-            updateTextageState: @escaping (Bool) -> Void
-        ) {
-            self.songTitle = songTitle
-            self.level = level
-            self.playSide = playSide
-            self.playType = playType
-            self.updateTextageState = updateTextageState
+        init(updateState: @escaping (Bool) -> Void) {
+            self.updateState = updateState
             super.init()
         }
 
-        func handleNavigation(_ webView: WKWebView) {
-            guard let urlString = webView.url?.absoluteString else { return }
-            if urlString.starts(with: textageIIDXURL.absoluteString) {
-                guard !hasInjectedNavigation else { return }
-                hasInjectedNavigation = true
-                webView.evaluateJavaScript(
-                    textageNavigationJS
-                        .replacingOccurrences(of: "%@1", with: levelValue())
-                        .replacingOccurrences(of: "%@2", with: escapedForJavaScript(songTitle))
-                ) { result, error in
-                    #if DEBUG
-                    debugPrint("[Textage] navJS result:", result ?? "nil",
-                               "error:", error?.localizedDescription ?? "none")
-                    #endif
-                }
-            } else {
-                guard !hasRevealedChart else { return }
-                hasRevealedChart = true
-                self.updateTextageState(true)
-            }
+        func reveal() {
+            guard !hasRevealed else { return }
+            hasRevealed = true
+            updateState(true)
         }
 
-        func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
-            #if DEBUG
-            debugPrint("[Textage] didCommit ->", webView.url?.absoluteString ?? "nil")
-            #endif
-            handleNavigation(webView)
+        func webView(_: WKWebView, didFinish _: WKNavigation!) {
+            reveal()
         }
 
-        func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
-            #if DEBUG
-            debugPrint("[Textage] didFinish ->", webView.url?.absoluteString ?? "nil")
-            #endif
-            handleNavigation(webView)
+        func webView(_: WKWebView, didCommit _: WKNavigation!) {
+            reveal()
         }
-
-        func escapedForJavaScript(_ string: String) -> String {
-            string
-                .replacingOccurrences(of: "\\", with: "\\\\")
-                .replacingOccurrences(of: "\"", with: "\\\"")
-                .replacingOccurrences(of: "\n", with: "\\n")
-                .replacingOccurrences(of: "\r", with: "\\r")
-        }
-
-        // swiftlint: disable cyclomatic_complexity
-        func levelValue() -> String {
-            switch playType {
-            case .single:
-                switch playSide {
-                case .side1P:
-                    switch level {
-                    case .normal: return "102"
-                    case .hyper: return "103"
-                    case .another: return "104"
-                    case .leggendaria: return "105"
-                    default: break
-                    }
-                case .side2P:
-                    switch level {
-                    case .normal: return "202"
-                    case .hyper: return "203"
-                    case .another: return "204"
-                    case .leggendaria: return "205"
-                    default: break
-                    }
-                default: break
-                }
-            case .double:
-                if playSide == .notApplicable {
-                    switch level {
-                    case .normal: return "307"
-                    case .hyper: return "308"
-                    case .another: return "309"
-                    case .leggendaria: return "310"
-                    default: break
-                    }
-                }
-            }
-            return "102"
-        }
-        // swiftlint: enable cyclomatic_complexity
-
     }
-
 }

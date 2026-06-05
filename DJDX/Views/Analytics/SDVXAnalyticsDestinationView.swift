@@ -54,6 +54,10 @@ struct SDVXAnalyticsDestinationView: View {
         case .s: return "SDVX.newGradeS"
         case .aaaPlus: return "SDVX.newGradeAAAPlus"
         case .aaa: return "SDVX.newGradeAAA"
+        case .aaPlus: return "SDVX.newGradeAAPlus"
+        case .aa: return "SDVX.newGradeAA"
+        case .aPlus: return "SDVX.newGradeAPlus"
+        case .a: return "SDVX.newGradeA"
         default: return "SDVX.newGrades"
         }
     }
@@ -333,8 +337,7 @@ struct SDVXGradeBreakdownDetailView: View {
                                 x: .value("Shared.SDVX.Grade", element.key),
                                 y: .value("Shared.ClearCount", element.value)
                             )
-                            .foregroundStyle(LinearGradient(colors: [.yellow, .orange],
-                                                            startPoint: .bottom, endPoint: .top))
+                            .foregroundStyle(SDVXGrade.color(for: element.key))
                         }
                         .frame(height: 140.0)
                         .listRowBackground(Color.clear)
@@ -351,9 +354,8 @@ struct SDVXGradeBreakdownDetailView: View {
 
     func gradeElements(for difficulty: SDVXDifficulty) -> [(key: String, value: Int)] {
         let counts = gradePerDifficulty[difficulty] ?? [:]
-        return SDVXGrade.sortedStrings.compactMap { grade in
-            let count = counts[grade] ?? 0
-            return count > 0 ? (grade, count) : nil
+        return SDVXGrade.sortedStrings.map { grade in
+            (grade, counts[grade] ?? 0)
         }
     }
 }

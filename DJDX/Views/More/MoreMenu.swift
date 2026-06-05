@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 import WebKit
 
 struct MoreMenu: View {
@@ -87,6 +88,7 @@ struct MoreMenu: View {
             Label("Tab.More", systemImage: "ellipsis")
         }
         .menuActionDismissBehavior(.disabled)
+        .popoverTip(ExternalDataSourcesTip(), arrowEdge: .top)
         .sheet(isPresented: $isPresentingExternalDataSources) {
             NavigationStack {
                 MoreExternalDataSources()

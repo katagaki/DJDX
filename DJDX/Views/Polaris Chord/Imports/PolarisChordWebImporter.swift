@@ -29,7 +29,7 @@ struct PolarisChordWebViewForImporter: UIViewRepresentable,
                                        @preconcurrency PolarisChordUpdateScoreDataDelegate {
 
     @Environment(\.dismiss) var dismiss
-    @Environment(ProgressAlertManager.self) var progressAlertManager
+    @Environment(ProgressReporter.self) var progressReporter
 
     @Binding var importToDate: Date
     @Binding var isAutoImportFailed: Bool
@@ -73,32 +73,29 @@ struct PolarisChordWebViewForImporter: UIViewRepresentable,
     func updateUIView(_: WKWebView, context _: Context) {}
 
     func importScoreData(using jsonString: String) async {
-        progressAlertManager.show(
+        progressReporter.show(
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
+        )
+        let importer = PolarisChordImporter()
+        for await progress in await importer.importJSON(
+            json: jsonString,
+            to: importToDate,
+            version: polarisChordVersion
         ) {
-            Task {
-                let importer = PolarisChordImporter()
-                for await progress in await importer.importJSON(
-                    json: jsonString,
-                    to: importToDate,
-                    version: polarisChordVersion
-                ) {
-                    if let currentFileProgress = progress.currentFileProgress,
-                       let currentFileTotal = progress.currentFileTotal,
-                       currentFileTotal > 0 {
-                        let percentage = (currentFileProgress * 100) / currentFileTotal
-                        await MainActor.run {
-                            progressAlertManager.updateProgress(percentage)
-                        }
-                    }
-                }
+            if let currentFileProgress = progress.currentFileProgress,
+               let currentFileTotal = progress.currentFileTotal,
+               currentFileTotal > 0 {
+                let percentage = (currentFileProgress * 100) / currentFileTotal
                 await MainActor.run {
-                    dismiss()
-                    progressAlertManager.hide()
-                    didImportSucceed = true
+                    progressReporter.updateProgress(percentage)
                 }
             }
+        }
+        await MainActor.run {
+            dismiss()
+            progressReporter.hide()
+            didImportSucceed = true
         }
     }
 

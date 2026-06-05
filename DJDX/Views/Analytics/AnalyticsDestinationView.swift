@@ -8,11 +8,6 @@ struct AnalyticsDestinationView: View {
     let path: AnalyticsPath
     var analyticsNamespace: Namespace.ID
 
-    @AppStorage(wrappedValue: 1, "Analytics.Overview.ClearType.Level") var levelFilterForOverviewClearType: Int
-    @AppStorage(wrappedValue: 1, "Analytics.Overview.ScoreRate.Level") var levelFilterForOverviewScoreRate: Int
-    @AppStorage(wrappedValue: 1, "Analytics.Trends.ClearType.Level") var levelFilterForTrendsClearType: Int
-    @AppStorage(wrappedValue: 1, "Analytics.Trends.DJLevel.Level") var levelFilterForTrendsDJLevel: Int
-
     func perLevelTitle(_ difficulty: Int, _ category: AnalyticsPerLevelCategory) -> String {
         let separator = NSLocalizedString("Analytics.PerLevel.TitleSeparator", comment: "")
         let categoryTitle = NSLocalizedString(category.titleKey, comment: "")
@@ -26,126 +21,34 @@ struct AnalyticsDestinationView: View {
                 ClearTypeOverviewListView(graphData: $model.clearTypePerDifficulty)
                     .navigationTitle("Analytics.ClearType.Overall")
                     .automaticNavigationTransition(id: "ClearType.Overall", in: analyticsNamespace)
-            case .clearTypePerDifficultyGraph:
-                VStack {
-                    TogglableClearTypeDetailView(
-                        graphData: $model.clearTypePerDifficulty,
-                        difficulty: $levelFilterForOverviewClearType
-                    )
-                    ClearTypeLegend()
-                        .padding(.horizontal)
-                    DifficultyPicker(
-                        selection: $levelFilterForOverviewClearType,
-                        difficulties: .constant(model.difficulties)
-                    )
-                }
-                .padding(.top)
-                .navigationTitle("Analytics.ClearType.ByDifficulty")
-                .automaticNavigationTransition(id: "ClearType.ByDifficulty", in: analyticsNamespace)
-            case .scoreRatePerDifficultyGraph:
-                VStack {
-                    TogglableDJLevelDetailView(
-                        graphData: $model.djLevelPerDifficulty,
-                        difficulty: $levelFilterForOverviewScoreRate
-                    )
-                    DJLevelLegend()
-                        .padding(.horizontal)
-                    DifficultyPicker(
-                        selection: $levelFilterForOverviewScoreRate,
-                        difficulties: .constant(model.difficulties)
-                    )
-                    .padding(.top)
-                }
-                .navigationTitle("Analytics.DJLevel.ByDifficulty")
-                .automaticNavigationTransition(id: "DJLevel.ByDifficulty", in: analyticsNamespace)
-            case .trendsClearTypeGraph:
-                VStack {
-                    TrendsClearTypeGraph(
-                        graphData: $model.clearTypePerImportGroup,
-                        difficulty: $levelFilterForTrendsClearType
-                    )
-                    .chartLegend(.visible)
-                    DifficultyPicker(
-                        selection: $levelFilterForTrendsClearType,
-                        difficulties: .constant(model.difficulties)
-                    )
-                    .padding(.top)
-                }
-                .padding()
-                .navigationTitle("Analytics.Trends.ClearType")
-                .automaticNavigationTransition(id: "Trends.ClearType", in: analyticsNamespace)
-            case .trendsDJLevelGraph:
-                VStack {
-                    TrendsDJLevelGraph(
-                        graphData: $model.djLevelPerImportGroup,
-                        difficulty: $levelFilterForTrendsDJLevel
-                    )
-                    .chartLegend(.visible)
-                    DifficultyPicker(
-                        selection: $levelFilterForTrendsDJLevel,
-                        difficulties: .constant(model.difficulties)
-                    )
-                    .padding(.top)
-                }
-                .padding()
-                .navigationTitle("Analytics.Trends.DJLevel")
-                .automaticNavigationTransition(id: "Trends.DJLevel", in: analyticsNamespace)
+            case .gradeBreakdownDetail:
+                IIDXGradeBreakdownDetailView(djLevelPerDifficulty: model.djLevelPerDifficulty)
+                    .navigationTitle("Analytics.DJLevel.Overall")
+                    .automaticNavigationTransition(id: "DJLevel.Overall", in: analyticsNamespace)
             case .clearTypeForLevel(let difficulty):
-                VStack {
-                    TogglableClearTypeDetailView(
-                        graphData: $model.clearTypePerDifficulty,
-                        difficulty: .constant(difficulty)
+                ClearTypePerLevelDetailView(model: model, difficulty: difficulty)
+                    .navigationTitle(perLevelTitle(difficulty, .clearRate))
+                    .automaticNavigationTransition(
+                        id: "ClearType.Level.\(difficulty)", in: analyticsNamespace
                     )
-                    .chartLegend(.hidden)
-                    ClearTypeLegend()
-                        .padding(.horizontal)
-                }
-                .navigationTitle(perLevelTitle(difficulty, .clearRate))
-                .automaticNavigationTransition(
-                    id: "ClearType.Level.\(difficulty)", in: analyticsNamespace
-                )
             case .clearTypeTrendsForLevel(let difficulty):
-                VStack {
-                    TrendsClearTypeGraph(
-                        graphData: $model.clearTypePerImportGroup,
-                        difficulty: .constant(difficulty)
+                ClearTypePerLevelDetailView(model: model, difficulty: difficulty)
+                    .navigationTitle(perLevelTitle(difficulty, .clearRate))
+                    .automaticNavigationTransition(
+                        id: "ClearTypeTrends.Level.\(difficulty)", in: analyticsNamespace
                     )
-                    .chartLegend(.hidden)
-                    ClearTypeLegend()
-                }
-                .padding()
-                .navigationTitle(perLevelTitle(difficulty, .clearRateTrend))
-                .automaticNavigationTransition(
-                    id: "ClearTypeTrends.Level.\(difficulty)", in: analyticsNamespace
-                )
             case .djLevelForLevel(let difficulty):
-                VStack {
-                    TogglableDJLevelDetailView(
-                        graphData: $model.djLevelPerDifficulty,
-                        difficulty: .constant(difficulty)
+                DJLevelPerLevelDetailView(model: model, difficulty: difficulty)
+                    .navigationTitle(perLevelTitle(difficulty, .djLevel))
+                    .automaticNavigationTransition(
+                        id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace
                     )
-                    .chartLegend(.hidden)
-                    DJLevelLegend()
-                        .padding(.horizontal)
-                }
-                .navigationTitle(perLevelTitle(difficulty, .djLevel))
-                .automaticNavigationTransition(
-                    id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace
-                )
             case .djLevelTrendsForLevel(let difficulty):
-                VStack {
-                    TrendsDJLevelGraph(
-                        graphData: $model.djLevelPerImportGroup,
-                        difficulty: .constant(difficulty)
+                DJLevelPerLevelDetailView(model: model, difficulty: difficulty)
+                    .navigationTitle(perLevelTitle(difficulty, .djLevel))
+                    .automaticNavigationTransition(
+                        id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
                     )
-                    .chartLegend(.hidden)
-                    DJLevelLegend()
-                }
-                .padding()
-                .navigationTitle(perLevelTitle(difficulty, .djLevelTrend))
-                .automaticNavigationTransition(
-                    id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
-                )
             default:
                 newEntryDestination
             }
@@ -222,6 +125,52 @@ struct AnalyticsDestinationView: View {
             .automaticNavigationTransition(id: "NewA", in: analyticsNamespace)
         default:
             Color.clear
+        }
+    }
+}
+
+struct IIDXGradeBreakdownDetailView: View {
+    let djLevelPerDifficulty: [Int: [IIDXDJLevel: Int]]
+
+    var populatedDifficulties: [Int] {
+        djLevelPerDifficulty.keys.filter { difficulty in
+            (djLevelPerDifficulty[difficulty]?.values.contains(where: { $0 > 0 })) ?? false
+        }.sorted()
+    }
+
+    var body: some View {
+        List {
+            if populatedDifficulties.isEmpty {
+                Text("Analytics.NoData")
+                    .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
+            } else {
+                ForEach(populatedDifficulties, id: \.self) { difficulty in
+                    Section {
+                        Chart(gradeElements(for: difficulty), id: \.key) { element in
+                            BarMark(
+                                x: .value("Shared.IIDX.DJLevel", element.key),
+                                y: .value("Shared.ClearCount", element.value)
+                            )
+                            .foregroundStyle(IIDXDJLevel.color(for: element.key))
+                        }
+                        .chartXScale(domain: Array(IIDXDJLevel.sortedStrings.reversed()))
+                        .frame(height: 140.0)
+                        .listRowBackground(Color.clear)
+                    } header: {
+                        Text(verbatim: "LEVEL \(difficulty)")
+                    }
+                }
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+    }
+
+    func gradeElements(for difficulty: Int) -> [(key: String, value: Int)] {
+        let counts = djLevelPerDifficulty[difficulty] ?? [:]
+        return Array(IIDXDJLevel.sortedStrings.reversed()).map { grade in
+            (grade, counts[IIDXDJLevel(rawValue: grade) ?? .none] ?? 0)
         }
     }
 }

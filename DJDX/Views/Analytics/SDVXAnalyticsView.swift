@@ -21,7 +21,7 @@ struct SDVXAnalyticsView: View {
     @State var draggedCard: SDVXAnalyticsCard?
 
     @AppStorage(wrappedValue: Data(), "Analytics.SDVX.VisibleCards") var visibleCardsData: Data
-    @State var visibleCards: Set<SDVXAnalyticsCard> = Set(SDVXAnalyticsCard.allCases)
+    @State var visibleCards: Set<SDVXAnalyticsCard> = SDVXAnalyticsCard.defaultVisible
 
     // Persisted store; `isOverviewCollapsed` mirrors it so a global `withAnimation`
     // can drive the collapse (animating @AppStorage directly does not work).
@@ -307,8 +307,7 @@ struct SDVXAnalyticsView: View {
                     x: .value("Shared.ClearCount", element.value),
                     y: .value("Grade", element.key)
                 )
-                .foregroundStyle(LinearGradient(colors: [.yellow, .orange],
-                                                startPoint: .leading, endPoint: .trailing))
+                .foregroundStyle(SDVXGrade.color(for: element.key))
             }
             .chartXAxis { AxisMarks { AxisGridLine() } }
         }

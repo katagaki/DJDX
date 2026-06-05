@@ -9,7 +9,7 @@ extension AnalyticsView {
     @ViewBuilder
     func cardView(for cardType: AnalyticsCardType) -> some View {
         switch cardType {
-        case .clearTypeOverall, .towerRecent, .towerTotals:
+        case .clearTypeOverall, .gradeBreakdown, .towerRecent, .towerTotals:
             EmptyView()
         case .newClears:
             newClearsCard

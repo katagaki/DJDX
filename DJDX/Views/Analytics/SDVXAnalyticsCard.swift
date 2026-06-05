@@ -11,8 +11,24 @@ enum SDVXAnalyticsCard: String, Codable, Hashable, CaseIterable {
     case newGradeS
     case newGradeAAAPlus
     case newGradeAAA
+    case newGradeAAPlus
+    case newGradeAA
+    case newGradeAPlus
+    case newGradeA
 
     static var defaultOrder: [SDVXAnalyticsCard] { allCases }
+
+    /// Cards shown by default. The grade cards are offered down to A, but only
+    /// the top grades (down to AAA) are visible until the user opts the rest in.
+    static var defaultVisible: Set<SDVXAnalyticsCard> {
+        [
+            .clearBreakdown, .gradeBreakdown,
+            .newHighScores,
+            .newClearComplete, .newClearExcessive,
+            .newClearUltimateChain, .newClearPerfectUC,
+            .newGradeS, .newGradeAAAPlus, .newGradeAAA
+        ]
+    }
 
     var section: AnalyticsSection {
         switch self {
@@ -38,6 +54,10 @@ enum SDVXAnalyticsCard: String, Codable, Hashable, CaseIterable {
         case .newGradeS: return SDVXGrade.s.rawValue
         case .newGradeAAAPlus: return SDVXGrade.aaaPlus.rawValue
         case .newGradeAAA: return SDVXGrade.aaa.rawValue
+        case .newGradeAAPlus: return SDVXGrade.aaPlus.rawValue
+        case .newGradeAA: return SDVXGrade.aa.rawValue
+        case .newGradeAPlus: return SDVXGrade.aPlus.rawValue
+        case .newGradeA: return SDVXGrade.a.rawValue
         default: return nil
         }
     }
@@ -63,13 +83,15 @@ enum SDVXAnalyticsCard: String, Codable, Hashable, CaseIterable {
         case .newHighScores: return "trophy"
         case .newClearComplete, .newClearExcessive,
              .newClearUltimateChain, .newClearPerfectUC: return "checkmark.circle"
-        case .newGradeS, .newGradeAAAPlus, .newGradeAAA: return "crown"
+        case .newGradeS, .newGradeAAAPlus, .newGradeAAA,
+             .newGradeAAPlus, .newGradeAA, .newGradeAPlus, .newGradeA: return "crown"
         }
     }
 
     var iconColor: Color {
+        // NEW RECORD uses the primary color (white/black per appearance).
+        if self == .newHighScores { return .primary }
         if let clearType { return SDVXClearType(rawValue: clearType)?.color ?? .gray }
-        if grade != nil { return .orange }
         return .orange
     }
 
