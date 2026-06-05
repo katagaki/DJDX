@@ -1,17 +1,6 @@
 import Foundation
+import SwiftSoup
 
-// Parses Textage's JavaScript data tables into chart entries.
-//
-// Both tables are plain JS object literals, one `'tag':[...]` entry per line,
-// encoded in CP932 (Windows-31J). They are NOT JSON: bare hex constants A–F
-// stand for 10–15, lines may be commented out with `//`, and `/* ... */`
-// comments can appear inline.
-//
-// - titletbl.js maps `tag` to `[version, id, availability, "genre", "artist", "title", ...]`
-// - actbl.js maps `tag` to 23 values: `[ttnum, then (level, option) pairs]` for
-//   chart types in the order: SBo SB SN SH SA SX DB DN DH DA DX. The level of a
-//   chart sits at the odd index of its pair (SN=5, SH=7, SA=9, SX=11,
-//   DN=15, DH=17, DA=19, DX=21).
 enum TextageTableParser {
 
     static func charts(titleTableText: String, accessTableText: String) -> [TextageChart] {
@@ -34,7 +23,6 @@ enum TextageTableParser {
                 dpAnother: values[19],
                 dpLeggendaria: values[21]
             )
-            // Keep only songs with at least one playable normal/hyper/another/leggendaria chart.
             let hasAnyChart = [
                 chart.spNormal, chart.spHyper, chart.spAnother, chart.spLeggendaria,
                 chart.dpNormal, chart.dpHyper, chart.dpAnother, chart.dpLeggendaria
@@ -57,7 +45,6 @@ enum TextageTableParser {
                   let bracket = extractBracketContent(line),
                   let version = parseVersion(bracket) else { continue }
             let strings = quotedStrings(in: bracket)
-            // Order within the array: genre, artist, title, (subtitle).
             guard strings.count >= 3 else { continue }
             let title = cleanTitle(strings[2])
             guard !title.isEmpty else { continue }
@@ -99,8 +86,8 @@ enum TextageTableParser {
     private static func parseLevelToken(_ token: Substring) -> Int {
         let value = token.trimmingCharacters(in: .whitespaces)
         if let number = Int(value) { return number }
-        if value.count == 1, let hex = Int(value, radix: 16) { return hex } // A–F → 10–15
-        return 0 // "" or any non-numeric placeholder
+        if value.count == 1, let hex = Int(value, radix: 16) { return hex }
+        return 0
     }
 
     private static func extractTag(_ line: String) -> String? {
@@ -124,12 +111,11 @@ enum TextageTableParser {
     }
 
     private static func cleanTitle(_ raw: String) -> String {
-        raw
-            .replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let stripped = raw.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+        let unescaped = (try? SwiftSoup.Entities.unescape(stripped)) ?? stripped
+        return unescaped.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    // Extracts the contents of each top-level double-quoted string, honouring `\"` escapes.
     private static func quotedStrings(in string: String) -> [String] {
         var result: [String] = []
         var current = ""
@@ -160,9 +146,6 @@ enum TextageTableParser {
 
 extension Data {
 
-    // Textage's data tables are encoded in CP932 (Windows-31J), a superset of
-    // Shift-JIS. Foundation's `.shiftJIS` rejects bytes that CP932 accepts, so
-    // decode via the DOS Japanese (CP932) encoding instead.
     func decodedAsTextageTable() -> String? {
         let cp932 = CFStringConvertEncodingToNSStringEncoding(
             CFStringEncoding(CFStringEncodings.dosJapanese.rawValue)

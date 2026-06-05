@@ -1,21 +1,11 @@
 import Foundation
 
-// A chart entry indexed from Textage (https://textage.cc).
-//
-// One entry holds every difficulty's level for a single song. A level of 0
-// means that difficulty does not exist, which lets the UI decide whether to
-// offer a Textage button without probing the network (Textage returns 200 for
-// any URL, so existence can only be determined from this index).
-//
-// The chart page URL is reconstructed from Textage's own `get_url` logic in
-// scrlist.js: `<version>/<tag>.html?<side><difficulty><levelChar><scratchOption>0`.
 struct TextageChart: Sendable, Hashable {
 
     var tag: String
     var version: Int
     var title: String
 
-    // Level value per difficulty (0 = chart does not exist).
     var spNormal: Int
     var spHyper: Int
     var spAnother: Int
@@ -59,7 +49,6 @@ struct TextageChart: Sendable, Hashable {
         case .single: sideChar = playSide == .side2P ? "2" : "1"
         }
         let levelChar = String(Self.base36[levelValue])
-        // Trailing "00" = default scratch-side/option (no battle, no special gauge).
         let query = "\(sideChar)\(difficultyChar)\(levelChar)00"
         return URL(string: "https://textage.cc/score/\(folder)/\(tag).html?\(query)")
     }

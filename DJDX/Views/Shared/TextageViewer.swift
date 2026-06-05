@@ -119,8 +119,6 @@ struct WebViewForTextage: UIViewRepresentable {
             super.init()
         }
 
-        // didFinish never fires for Textage pages on iOS 18 (the page commits and
-        // renders but the load event never completes), so reveal from didCommit too.
         func reveal() {
             guard !hasRevealed else { return }
             hasRevealed = true
