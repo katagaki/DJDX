@@ -5,7 +5,6 @@ import SwiftUI
 // swiftlint:disable:next type_body_length
 struct MoreExternalDataSources: View {
 
-    @Environment(ProgressAlertManager.self) var progressAlertManager
     @Environment(\.openURL) var openURL
     @Environment(\.dismiss) var dismiss
 
@@ -23,6 +22,11 @@ struct MoreExternalDataSources: View {
     @State var isSDVXInReloadCompleted: Bool = false
     @State var dataImported: Int = 0
     @State var dataTotal: Int = 2
+    @State var reloadingSource: ExternalDataReloadSource?
+
+    enum ExternalDataReloadSource {
+        case bemaniWiki, bm2dx, sdvxIn
+    }
 
     let fetcher = IIDXReader()
     let importer = IIDXImporter()
@@ -55,13 +59,6 @@ struct MoreExternalDataSources: View {
                 }
             }
         }
-        .onChange(of: dataImported, { _, _ in
-            Task {
-                await MainActor.run {
-                    progressAlertManager.updateProgress(Int(Float(dataImported) / Float(dataTotal) * 100.0))
-                }
-            }
-        })
         .task {
             bemaniWikiEntryCount = await fetcher.bemaniWikiSongCount()
             bm2dxEntryCount = await fetcher.chartRadarDataCount()
@@ -105,6 +102,18 @@ struct MoreExternalDataSources: View {
         )
     }
 
+    @ViewBuilder
+    private func reloadIndicator(for source: ExternalDataReloadSource) -> some View {
+        if reloadingSource == source {
+            switch source {
+            case .bm2dx:
+                ProgressView()
+            default:
+                ProgressDonut(progress: dataTotal > 0 ? Double(dataImported) / Double(dataTotal) : 0.0)
+            }
+        }
+    }
+
     // MARK: - BEMANIWiki 2nd
 
     @ViewBuilder
@@ -114,13 +123,18 @@ struct MoreExternalDataSources: View {
                 Text("More.ExternalData.BemaniWiki2nd")
             }
             if isBemaniWikiEnabled {
-                Button("More.ExternalData.UpdateData") {
-                    progressAlertManager.show(title: "Alert.ExternalData.Downloading.Title",
-                                              message: "Alert.ExternalData.Downloading.Text")
-                    Task {
-                        await reloadBemaniWikiData()
-                        isBemaniWikiReloadCompleted = true
+                HStack {
+                    Button("More.ExternalData.UpdateData") {
+                        reloadingSource = .bemaniWiki
+                        Task {
+                            await reloadBemaniWikiData()
+                            reloadingSource = nil
+                            isBemaniWikiReloadCompleted = true
+                        }
                     }
+                    .disabled(reloadingSource != nil)
+                    Spacer()
+                    reloadIndicator(for: .bemaniWiki)
                 }
                 HStack {
                     Text("More.ExternalData.BemaniWiki2nd.EntryCount")
@@ -148,13 +162,18 @@ struct MoreExternalDataSources: View {
                 Text("More.ExternalData.BM2DX")
             }
             if isBM2DXEnabled {
-                Button("More.ExternalData.UpdateData") {
-                    progressAlertManager.show(title: "Alert.ExternalData.Downloading.Title",
-                                              message: "Alert.ExternalData.Downloading.Text")
-                    Task {
-                        await reloadBM2DXData()
-                        isBM2DXReloadCompleted = true
+                HStack {
+                    Button("More.ExternalData.UpdateData") {
+                        reloadingSource = .bm2dx
+                        Task {
+                            await reloadBM2DXData()
+                            reloadingSource = nil
+                            isBM2DXReloadCompleted = true
+                        }
                     }
+                    .disabled(reloadingSource != nil)
+                    Spacer()
+                    reloadIndicator(for: .bm2dx)
                 }
                 HStack {
                     Text("More.ExternalData.BM2DX.EntryCount")
@@ -182,13 +201,18 @@ struct MoreExternalDataSources: View {
                 Text("More.ExternalData.SDVXIn")
             }
             if isSDVXInEnabled {
-                Button("More.ExternalData.UpdateData") {
-                    progressAlertManager.show(title: "Alert.ExternalData.Downloading.Title",
-                                              message: "Alert.ExternalData.Downloading.Text")
-                    Task {
-                        await reloadSDVXInData()
-                        isSDVXInReloadCompleted = true
+                HStack {
+                    Button("More.ExternalData.UpdateData") {
+                        reloadingSource = .sdvxIn
+                        Task {
+                            await reloadSDVXInData()
+                            reloadingSource = nil
+                            isSDVXInReloadCompleted = true
+                        }
                     }
+                    .disabled(reloadingSource != nil)
+                    Spacer()
+                    reloadIndicator(for: .sdvxIn)
                 }
                 HStack {
                     Text("More.ExternalData.SDVXIn.EntryCount")
@@ -238,19 +262,13 @@ struct MoreExternalDataSources: View {
 
         await sdvxInImporter.replaceAllCharts(charts)
         sdvxInEntryCount = await sdvxFetcher.sdvxInChartCount()
-
-        await MainActor.run {
-            progressAlertManager.hide()
-            withAnimation(.smooth.speed(2.0)) {
-                dataImported = 0
-                dataTotal = 2
-            }
-        }
     }
 
     // MARK: - BEMANIWiki Data Loading
 
     func reloadBemaniWikiData() async {
+        dataTotal = 2
+        dataImported = 0
         await importer.deleteAllSongs()
         var iidxSongs: [IIDXSong] = []
         iidxSongs.append(contentsOf: await reloadBemaniWikiDataForLatestVersion())
@@ -259,12 +277,6 @@ struct MoreExternalDataSources: View {
         dataImported += 1
         await importer.insertSongs(iidxSongs)
         bemaniWikiEntryCount = await fetcher.bemaniWikiSongCount()
-        await MainActor.run {
-            progressAlertManager.hide()
-            withAnimation(.smooth.speed(2.0)) {
-                dataImported = 0
-            }
-        }
     }
 
     func reloadBemaniWikiDataForLatestVersion() async -> [IIDXSong] {
@@ -353,14 +365,12 @@ struct MoreExternalDataSources: View {
             let (data, _) = try await URLSession.shared.data(from: url)
 
             guard let decompressedData = data.gunzip() else {
-                await MainActor.run { progressAlertManager.hide() }
                 return
             }
 
             guard let json = try? JSONSerialization.jsonObject(with: decompressedData) as? [String: Any],
                   let midDict = json["mid"] as? [String: String],
                   let notesRadar = json["notes_radar"] as? [String: [String: [[String: Any]]]] else {
-                await MainActor.run { progressAlertManager.hide() }
                 return
             }
 
@@ -414,9 +424,5 @@ struct MoreExternalDataSources: View {
 
         await importer.insertNotesRadarEntries(allEntries)
         bm2dxEntryCount = await fetcher.chartRadarDataCount()
-
-        await MainActor.run {
-            progressAlertManager.hide()
-        }
     }
 }

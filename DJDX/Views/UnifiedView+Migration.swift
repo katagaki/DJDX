@@ -3,6 +3,23 @@ import SwiftUI
 import UIKit
 
 extension UnifiedView {
+#if DEBUG
+    // Triggered by djdx://max300 to preview the migration fullscreen cover.
+    // Animates fake progress over 3 seconds without touching any data.
+    func runFakeMigration() async {
+        migrationProgress.show(
+            title: "Migration.Title",
+            message: "Migration.Description"
+        )
+        let steps = 30
+        for step in 1...steps {
+            try? await Task.sleep(for: .milliseconds(3000 / steps))
+            migrationProgress.updateProgress((step * 100) / steps)
+        }
+        migrationProgress.hide()
+    }
+#endif
+
     func migrateData() async {
         let defaults = UserDefaults.standard
         let dataMigrationKeys = [
@@ -16,16 +33,15 @@ extension UnifiedView {
             switch dataMigrationKey {
             case "Internal.DataMigrationForEpolisToPinkyCrush.2":
                 debugPrint("Performing migration when migrating from 1.x to 32.x")
-                progressAlertManager.show(
+                migrationProgress.show(
                     title: "Migration.Title",
                     message: "Migration.Description"
-                ) {
-                    let importGroups = try? modelContext.fetch(FetchDescriptor<ImportGroup>())
-                    for importGroup in importGroups ?? [] where importGroup.iidxVersion == nil {
-                        importGroup.iidxVersion = .epolis
-                    }
-                    progressAlertManager.hide()
+                )
+                let importGroups = try? modelContext.fetch(FetchDescriptor<ImportGroup>())
+                for importGroup in importGroups ?? [] where importGroup.iidxVersion == nil {
+                    importGroup.iidxVersion = .epolis
                 }
+                migrationProgress.hide()
             case "Internal.DataMigrationForSwiftDataToSQLite":
                 await migrateSwiftDataToSQLite()
             case "Internal.BEMANIWikiMigratedToSeparateDB":
@@ -66,7 +82,7 @@ extension UnifiedView {
         let totalGroups = importGroups.count
 
         await MainActor.run {
-            progressAlertManager.show(
+            migrationProgress.show(
                 title: "Migration.Title",
                 message: "Migration.Description"
             )
@@ -86,7 +102,7 @@ extension UnifiedView {
 
             let progress = ((index + 1) * 100) / totalGroups
             await MainActor.run {
-                progressAlertManager.updateProgress(progress)
+                migrationProgress.updateProgress(progress)
             }
         }
 
@@ -108,7 +124,7 @@ extension UnifiedView {
 
         debugPrint("Migration from SwiftData to SQLite completed")
         await MainActor.run {
-            progressAlertManager.hide()
+            migrationProgress.hide()
             NotificationCenter.default.post(name: .dataMigrationCompleted, object: nil)
         }
     }

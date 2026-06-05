@@ -28,7 +28,7 @@ struct SDVXWebImporter: View {
 struct SDVXWebViewForImporter: UIViewRepresentable, @preconcurrency SDVXUpdateScoreDataDelegate {
 
     @Environment(\.dismiss) var dismiss
-    @Environment(ProgressAlertManager.self) var progressAlertManager
+    @Environment(ProgressReporter.self) var progressReporter
 
     @Binding var importToDate: Date
     @Binding var isAutoImportFailed: Bool
@@ -73,32 +73,29 @@ struct SDVXWebViewForImporter: UIViewRepresentable, @preconcurrency SDVXUpdateSc
     }
 
     func importScoreData(using csvString: String) async {
-        progressAlertManager.show(
+        progressReporter.show(
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
+        )
+        let importer = SDVXImporter()
+        for await progress in await importer.importCSV(
+            csv: csvString,
+            to: importToDate,
+            version: sdvxVersion
         ) {
-            Task {
-                let importer = SDVXImporter()
-                for await progress in await importer.importCSV(
-                    csv: csvString,
-                    to: importToDate,
-                    version: sdvxVersion
-                ) {
-                    if let currentFileProgress = progress.currentFileProgress,
-                       let currentFileTotal = progress.currentFileTotal,
-                       currentFileTotal > 0 {
-                        let percentage = (currentFileProgress * 100) / currentFileTotal
-                        await MainActor.run {
-                            progressAlertManager.updateProgress(percentage)
-                        }
-                    }
-                }
+            if let currentFileProgress = progress.currentFileProgress,
+               let currentFileTotal = progress.currentFileTotal,
+               currentFileTotal > 0 {
+                let percentage = (currentFileProgress * 100) / currentFileTotal
                 await MainActor.run {
-                    dismiss()
-                    progressAlertManager.hide()
-                    didImportSucceed = true
+                    progressReporter.updateProgress(percentage)
                 }
             }
+        }
+        await MainActor.run {
+            dismiss()
+            progressReporter.hide()
+            didImportSucceed = true
         }
     }
 

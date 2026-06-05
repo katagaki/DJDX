@@ -3,7 +3,8 @@ import SwiftUI
 struct PolarisChordImportView: View {
 
     @Environment(\.dismiss) var dismiss
-    @Environment(ProgressAlertManager.self) var progressAlertManager
+
+    @State var importProgress = ProgressReporter()
 
     @State var importPath = NavigationPath()
     @State var importToDate: Date = .now
@@ -115,6 +116,8 @@ struct PolarisChordImportView: View {
                 }
             }
         }
+        .environment(importProgress)
+        .progressOverlay(importProgress)
     }
 
     @ViewBuilder

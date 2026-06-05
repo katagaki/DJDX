@@ -8,7 +8,6 @@ struct UnifiedView: View {
     @Environment(\.requestReview) var requestReview
     @Environment(\.modelContext) var modelContext
 
-    @Environment(ProgressAlertManager.self) var progressAlertManager
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: Game.iidxArcade, "Global.SelectedGame") var selectedGame: Game
@@ -27,6 +26,8 @@ struct UnifiedView: View {
     @State var isFirstStartCleanupComplete: Bool = false
     @State var isEditingAnalytics: Bool = false
 
+    @State var migrationProgress = ProgressReporter()
+
     @State var analyticsModel = AnalyticsModel()
     @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
     @State var polarisChordAnalyticsModel = PolarisChordAnalyticsModel()
@@ -38,7 +39,7 @@ struct UnifiedView: View {
     @Namespace var importNamespace
 
     var body: some View {
-        @Bindable var progressAlertManager = progressAlertManager
+        @Bindable var migrationProgress = migrationProgress
         NavigationStack(path: $navigationManager.path) {
             ZStack {
                 if selectedGame == .soundVoltex {
@@ -135,17 +136,21 @@ struct UnifiedView: View {
             .presentationDetents([.large])
             .interactiveDismissDisabled()
         }
-        .overlay {
-            if progressAlertManager.isShowing {
-                ProgressAlert(
-                    title: $progressAlertManager.title,
-                    message: $progressAlertManager.message
-                )
-            } else {
-                // HACK: DO NOT REMOVE. Removing this will cause a freeze when isShowing is false.
-                Color.clear
+        .fullScreenCover(isPresented: $migrationProgress.isShowing) {
+            ProgressCard(
+                title: migrationProgress.title,
+                message: migrationProgress.message,
+                percentage: migrationProgress.percentage
+            )
+            .presentationBackground(.clear)
+        }
+#if DEBUG
+        .onOpenURL { url in
+            if url.scheme == "djdx", url.host == "max300" {
+                Task { await runFakeMigration() }
             }
         }
+#endif
         .task {
             if !isFirstStartCleanupComplete {
                 await migrateData()

@@ -6,7 +6,6 @@ import WidgetKit
 struct DJDXApp: App {
 
     @StateObject var navigationManager = NavigationManager()
-    @State var progressAlertManager = ProgressAlertManager()
 
     var body: some Scene {
         WindowGroup {
@@ -14,7 +13,6 @@ struct DJDXApp: App {
         }
         .modelContainer(sharedModelContainer)
         .environmentObject(navigationManager)
-        .environment(progressAlertManager)
     }
 
     init() {

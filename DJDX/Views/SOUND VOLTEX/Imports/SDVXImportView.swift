@@ -6,7 +6,8 @@ struct SDVXImportView: View {
 
     @Environment(\.openURL) var openURL
     @Environment(\.dismiss) var dismiss
-    @Environment(ProgressAlertManager.self) var progressAlertManager
+
+    @State var importProgress = ProgressReporter()
 
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
 
@@ -140,6 +141,8 @@ struct SDVXImportView: View {
                 }
             }
         }
+        .environment(importProgress)
+        .progressOverlay(importProgress)
     }
 
     @ViewBuilder
@@ -227,12 +230,11 @@ struct SDVXImportView: View {
     }
 
     func importSampleCSV() {
-        progressAlertManager.show(
+        importProgress.show(
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
-        ) {
-            Task { await performSampleImport() }
-        }
+        )
+        Task { await performSampleImport() }
     }
 
     private func performSampleImport() async {
@@ -240,22 +242,21 @@ struct SDVXImportView: View {
             if let current = progress.currentFileProgress,
                let total = progress.currentFileTotal, total > 0 {
                 let percentage = (current * 100) / total
-                await MainActor.run { progressAlertManager.updateProgress(percentage) }
+                await MainActor.run { importProgress.updateProgress(percentage) }
             }
         }
         await MainActor.run {
             didImportSucceed = true
-            progressAlertManager.hide()
+            importProgress.hide()
         }
     }
 
     func importCSVs(from urls: [URL]) {
-        progressAlertManager.show(
+        importProgress.show(
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
-        ) {
-            Task { await performCSVImport(from: urls) }
-        }
+        )
+        Task { await performCSVImport(from: urls) }
     }
 
     private func performCSVImport(from urls: [URL]) async {
@@ -271,13 +272,13 @@ struct SDVXImportView: View {
                 if let current = progress.currentFileProgress,
                    let total = progress.currentFileTotal, total > 0 {
                     let percentage = (current * 100) / total
-                    await MainActor.run { progressAlertManager.updateProgress(percentage) }
+                    await MainActor.run { importProgress.updateProgress(percentage) }
                 }
             }
         }
         await MainActor.run {
             didImportSucceed = true
-            progressAlertManager.hide()
+            importProgress.hide()
         }
     }
 

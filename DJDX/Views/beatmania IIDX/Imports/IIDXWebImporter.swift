@@ -44,7 +44,7 @@ struct IIDXWebImporter: View {
 struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataDelegate {
 
     @Environment(\.dismiss) var dismiss
-    @Environment(ProgressAlertManager.self) var progressAlertManager
+    @Environment(ProgressReporter.self) var progressReporter
 
     @Binding var importToDate: Date
     @Binding var importMode: IIDXImportMode
@@ -99,32 +99,29 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     }
 
     func importScoreData(using csvString: String) async {
-        progressAlertManager.show(
+        progressReporter.show(
             title: "Alert.Importing.Title",
             message: "Alert.Importing.Text"
+        )
+        let actor = IIDXImporter()
+        for await progress in await actor.importCSV(
+            csv: csvString,
+            to: importToDate,
+            for: importMode,
+            from: iidxVersion
         ) {
-            Task {
-                let actor = IIDXImporter()
-                for await progress in await actor.importCSV(
-                    csv: csvString,
-                    to: importToDate,
-                    for: importMode,
-                    from: iidxVersion
-                ) {
-                    if let currentFileProgress = progress.currentFileProgress,
-                        let currentFileTotal = progress.currentFileTotal {
-                        let progress = (currentFileProgress * 100) / currentFileTotal
-                        await MainActor.run {
-                            progressAlertManager.updateProgress(progress)
-                        }
-                    }
-                }
+            if let currentFileProgress = progress.currentFileProgress,
+                let currentFileTotal = progress.currentFileTotal {
+                let progress = (currentFileProgress * 100) / currentFileTotal
                 await MainActor.run {
-                    dismiss()
-                    progressAlertManager.hide()
-                    didImportSucceed = true
+                    progressReporter.updateProgress(progress)
                 }
             }
+        }
+        await MainActor.run {
+            dismiss()
+            progressReporter.hide()
+            didImportSucceed = true
         }
     }
 

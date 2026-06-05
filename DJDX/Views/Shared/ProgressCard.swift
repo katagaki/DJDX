@@ -1,12 +1,12 @@
 import SwiftUI
 
-struct ProgressAlert: View {
+struct ProgressCard: View {
 
     @Environment(\.colorScheme) var colorScheme
-    @Environment(ProgressAlertManager.self) var progressAlertManager
 
-    @Binding var title: String
-    @Binding var message: String
+    let title: String
+    let message: String
+    let percentage: Int
 
     var body: some View {
         ZStack(alignment: .center) {
@@ -17,10 +17,10 @@ struct ProgressAlert: View {
                     Text(LocalizedStringKey(title))
                         .bold()
                         .multilineTextAlignment(.center)
-                    ProgressView(value: min(Float(progressAlertManager.percentage), 100.0), total: 100.0)
+                    ProgressView(value: min(Float(percentage), 100.0), total: 100.0)
                         .progressViewStyle(.linear)
                     Text(NSLocalizedString(message, comment: "")
-                        .replacingOccurrences(of: "%1", with: String(progressAlertManager.percentage)))
+                        .replacingOccurrences(of: "%1", with: String(percentage)))
                     .font(.subheadline)
                     .multilineTextAlignment(.center)
                 }
@@ -30,7 +30,24 @@ struct ProgressAlert: View {
             .clipShape(.rect(cornerRadius: 16.0))
             .padding(.all, 32.0)
         }
-        .presentationBackground(.clear)
         .ignoresSafeArea(.all)
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func progressOverlay(_ reporter: ProgressReporter) -> some View {
+        overlay {
+            if reporter.isShowing {
+                ProgressCard(
+                    title: reporter.title,
+                    message: reporter.message,
+                    percentage: reporter.percentage
+                )
+            } else {
+                // HACK: DO NOT REMOVE. Removing this will cause a freeze when isShowing is false.
+                Color.clear
+            }
+        }
     }
 }
