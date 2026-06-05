@@ -10,7 +10,7 @@ struct NotesRadarWidget: Widget {
             NotesRadarWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Shared.IIDX.NotesRadar")
+        .configurationDisplayName("Widget.Name.NotesRadar")
         .description("Widget.NotesRadar.Description")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }

@@ -12,7 +12,7 @@ struct DJLevelWidget: Widget {
                 .widgetAccentable(false)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Shared.IIDX.DJLevel")
+        .configurationDisplayName("Widget.Name.DJLevel")
         .description("Widget.DJLevel.Description")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }

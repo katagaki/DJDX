@@ -1194,7 +1194,7 @@
       "shouldTranslate" : false
     },
     "Default" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -3873,23 +3873,6 @@
         }
       }
     },
-    "ViewTitle.More.Customization.AppIcon" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App Icon"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリアイコン"
-          }
-        }
-      }
-    },
     "ViewTitle.Scores" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4079,6 +4062,81 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "レベル"
+          }
+        }
+      }
+    },
+    "Widget.Name.ClearType" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Type（IIDX）"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランプ（IIDX）"
+          }
+        }
+      }
+    },
+    "Widget.Name.DJLevel" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL（IIDX）"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "Widget.Name.NotesRadar" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Radar（IIDX）"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ノーツレーダー（IIDX）"
+          }
+        }
+      }
+    },
+    "Widget.Name.Qpro" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qpro（IIDX）"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クプロ（IIDX）"
+          }
+        }
+      }
+    },
+    "Widget.Name.Tower" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDX Tower"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDXタワー"
           }
         }
       }

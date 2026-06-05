@@ -12,7 +12,7 @@ struct ClearTypeWidget: Widget {
                 .widgetAccentable(false)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Shared.IIDX.ClearType")
+        .configurationDisplayName("Widget.Name.ClearType")
         .description("Widget.ClearType.Description")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
