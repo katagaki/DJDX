@@ -8,9 +8,9 @@ struct MoreExternalDataSources: View {
     @Environment(\.openURL) var openURL
     @Environment(\.dismiss) var dismiss
 
-    @AppStorage(wrappedValue: true, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
-    @AppStorage(wrappedValue: true, "ExternalData.BM2DX.Enabled") var isBM2DXEnabled: Bool
-    @AppStorage(wrappedValue: true, "ExternalData.SDVXIn.Enabled") var isSDVXInEnabled: Bool
+    @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
+    @AppStorage(wrappedValue: false, "ExternalData.BM2DX.Enabled") var isBM2DXEnabled: Bool
+    @AppStorage(wrappedValue: false, "ExternalData.SDVXIn.Enabled") var isSDVXInEnabled: Bool
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var bemaniWikiEntryCount: Int = 0
