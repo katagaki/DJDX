@@ -21,6 +21,8 @@ struct IIDXScoreSection: View {
     @State private var earliestDate: Date = Calendar.current.date(byAdding: .day, value: -1, to: .now)!
     @State private var latestDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: .now)!
 
+    @State private var textageChart: TextageChart?
+
     private let fetcher = IIDXReader()
 
     var body: some View {
@@ -119,6 +121,9 @@ struct IIDXScoreSection: View {
         .task {
             if score.djLevelEnum() != .none {
                 await reloadScoreHistory()
+            }
+            if score.level != .beginner {
+                textageChart = await fetcher.textageChart(title: songTitle)
             }
         }
     }
@@ -220,45 +225,37 @@ struct IIDXScoreSection: View {
                 chartActionLabel(image: Image(.listIconYouTube), label: "YouTube")
             }
             .buttonStyle(.plain)
-            if score.level != .beginner {
+            if let textageChart, score.level != .beginner {
                 switch playType {
                 case .single:
-                    Divider()
-                    Button {
-                        navigationManager.push(ScoresPath.textageViewer(songTitle: songTitle,
-                                                              level: score.level,
-                                                              playSide: .side1P,
-                                                              playType: playType))
-                    } label: {
-                        chartActionLabel(image: Image(.listIconTextage),
-                                         label: "Scores.Viewer.OpenTextage.1P")
-                    }
-                    .buttonStyle(.plain)
-                    Divider()
-                    Button {
-                        navigationManager.push(ScoresPath.textageViewer(songTitle: songTitle,
-                                                              level: score.level,
-                                                              playSide: .side2P,
-                                                              playType: playType))
-                    } label: {
-                        chartActionLabel(image: Image(.listIconTextageFlipped),
-                                         label: "Scores.Viewer.OpenTextage.2P")
-                    }
-                    .buttonStyle(.plain)
+                    textageButton(chart: textageChart, playSide: .side1P,
+                                  image: Image(.listIconTextage),
+                                  label: "Scores.Viewer.OpenTextage.1P")
+                    textageButton(chart: textageChart, playSide: .side2P,
+                                  image: Image(.listIconTextageFlipped),
+                                  label: "Scores.Viewer.OpenTextage.2P")
                 case .double:
-                    Divider()
-                    Button {
-                        navigationManager.push(ScoresPath.textageViewer(songTitle: songTitle,
-                                                              level: score.level,
-                                                              playSide: .notApplicable,
-                                                              playType: playType))
-                    } label: {
-                        chartActionLabel(image: Image(.listIconTextage),
-                                         label: "Scores.Viewer.OpenTextage.DP")
-                    }
-                    .buttonStyle(.plain)
+                    textageButton(chart: textageChart, playSide: .notApplicable,
+                                  image: Image(.listIconTextage),
+                                  label: "Scores.Viewer.OpenTextage.DP")
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    func textageButton(chart: TextageChart,
+                       playSide: IIDXPlaySide,
+                       image: Image,
+                       label: LocalizedStringKey) -> some View {
+        if let url = chart.pageURL(for: score.level, playType: playType, playSide: playSide) {
+            Divider()
+            Button {
+                navigationManager.push(ScoresPath.textageViewer(url: url))
+            } label: {
+                chartActionLabel(image: image, label: label)
+            }
+            .buttonStyle(.plain)
         }
     }
 

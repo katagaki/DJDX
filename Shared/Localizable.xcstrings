@@ -13,6 +13,9 @@
     "[%@](https://sdvx.in)" : {
       "shouldTranslate" : false
     },
+    "[%@](https://textage.cc)" : {
+
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -1841,6 +1844,75 @@
         }
       }
     },
+    "More.ExternalData.Textage" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textage"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textage"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "More.ExternalData.Textage.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Index"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面インデックス"
+          }
+        }
+      }
+    },
+    "More.ExternalData.Textage.EntryCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Charts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面数"
+          }
+        }
+      }
+    },
+    "More.ExternalData.Textage.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX is not affiliated with or endorsed by Textage."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDXはTextageとは一切関係ありません。"
+          }
+        }
+      }
+    },
     "More.ExternalData.UpdateData" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2774,6 +2846,7 @@
       }
     },
     "Shared.IIDX.Qpro" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

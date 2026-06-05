@@ -2,10 +2,7 @@ import Foundation
 
 enum ScoresPath: Hashable {
     case scoreViewer(songRecord: IIDXSongRecord, initialLevel: IIDXLevel = .all)
-    case textageViewer(songTitle: String,
-                       level: IIDXLevel,
-                       playSide: IIDXPlaySide,
-                       playType: IIDXPlayType)
+    case textageViewer(url: URL)
 }
 
 enum AnalyticsPath: Hashable {
