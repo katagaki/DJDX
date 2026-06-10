@@ -1,3 +1,5 @@
+import Charts
+import OrderedCollections
 import SwiftUI
 
 struct PolarisChordAnalyticsDestinationView: View {
@@ -9,6 +11,14 @@ struct PolarisChordAnalyticsDestinationView: View {
     var body: some View {
         Group {
             switch path {
+            case .clearBreakdownDetail:
+                PolarisChordClearBreakdownDetailView(clearTypePerLevel: model.clearTypePerLevel)
+                    .navigationTitle("Analytics.PolarisChord.ClearBreakdown")
+                    .automaticNavigationTransition(id: "PolarisChord.clearBreakdown", in: namespace)
+            case .gradeBreakdownDetail:
+                PolarisChordGradeBreakdownDetailView(gradePerDifficulty: model.gradePerDifficulty)
+                    .navigationTitle("Analytics.PolarisChord.GradeBreakdown")
+                    .automaticNavigationTransition(id: "PolarisChord.gradeBreakdown", in: namespace)
             case .newHighScoresDetail:
                 PolarisChordNewHighScoresDetailView(newHighScores: model.newHighScores)
                     .navigationTitle("Analytics.NewHighScores")
@@ -93,6 +103,131 @@ private struct PolarisChordGradeText: View {
         }
         .font(.caption.weight(.semibold))
         .fontWidth(.expanded)
+    }
+}
+
+// MARK: - Overview expansion detail views
+
+struct PolarisChordClearBreakdownDetailView: View {
+    let clearTypePerLevel: [Int: OrderedDictionary<String, Int>]
+
+    var populatedLevels: [Int] {
+        clearTypePerLevel.filter { _, counts in
+            counts.values.contains(where: { $0 > 0 })
+        }.keys.sorted()
+    }
+
+    var body: some View {
+        List {
+            if populatedLevels.isEmpty {
+                Text("Analytics.NoData")
+                    .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
+            } else {
+                Section {
+                    ForEach(populatedLevels, id: \.self) { level in
+                        PolarisChordClearTypeLevelRow(counts: clearTypePerLevel[level] ?? [:], level: level)
+                            .listRowBackground(Color.clear)
+                    }
+                } header: {
+                    Text("Shared.Level")
+                }
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+    }
+}
+
+struct PolarisChordClearTypeLevelRow: View {
+    let counts: OrderedDictionary<String, Int>
+    let level: Int
+
+    var total: Int { counts.values.reduce(0, +) }
+
+    var segments: [(type: String, count: Int)] {
+        PolarisChordClearType.sortedStringsWithoutNoPlay.compactMap { type in
+            let count = counts[type] ?? 0
+            return count > 0 ? (type, count) : nil
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6.0) {
+            HStack {
+                Text(verbatim: "LEVEL \(level)")
+                    .font(.subheadline.bold())
+                Spacer()
+                Text("Shared.SongCount.\(total)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            GeometryReader { geometry in
+                HStack(spacing: 0.0) {
+                    ForEach(segments, id: \.type) { segment in
+                        (PolarisChordClearType(rawValue: segment.type)?.color ?? .gray)
+                            .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
+                    }
+                }
+                .clipShape(.rect(cornerRadius: 4.0))
+            }
+            .frame(height: 16.0)
+        }
+        .padding(.vertical, 4.0)
+    }
+}
+
+struct PolarisChordGradeBreakdownDetailView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    let gradePerDifficulty: [PolarisChordDifficulty: OrderedDictionary<String, Int>]
+
+    var populatedDifficulties: [PolarisChordDifficulty] {
+        PolarisChordDifficulty.sorted.filter { difficulty in
+            (gradePerDifficulty[difficulty]?.values.contains(where: { $0 > 0 })) ?? false
+        }
+    }
+
+    var body: some View {
+        List {
+            if populatedDifficulties.isEmpty {
+                Text("Analytics.NoData")
+                    .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
+            } else {
+                ForEach(populatedDifficulties, id: \.self) { difficulty in
+                    Section {
+                        Chart(gradeElements(for: difficulty), id: \.key) { element in
+                            BarMark(
+                                x: .value("Shared.PolarisChord.Grade", element.key),
+                                y: .value("Shared.ClearCount", element.value)
+                            )
+                            .foregroundStyle(gradeStyle(element.key))
+                        }
+                        .frame(height: 140.0)
+                        .listRowBackground(Color.clear)
+                    } header: {
+                        Text(verbatim: difficulty.abbreviation)
+                            .foregroundStyle(difficulty.color)
+                    }
+                }
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+    }
+
+    func gradeElements(for difficulty: PolarisChordDifficulty) -> [(key: String, value: Int)] {
+        let counts = gradePerDifficulty[difficulty] ?? [:]
+        return PolarisChordGrade.sortedStrings.map { grade in
+            (grade, counts[grade] ?? 0)
+        }
+    }
+
+    func gradeStyle(_ rawValue: String) -> AnyShapeStyle {
+        let grade = PolarisChordGrade(rawValue: rawValue) ?? .unknown
+        return AnyShapeStyle(grade.style(colorScheme: colorScheme))
     }
 }
 

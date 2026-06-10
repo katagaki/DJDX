@@ -13,6 +13,14 @@ enum PolarisChordClearType: String, Codable {
         .allPerfect, .fullCombo, .success, .failed, .noPlay
     ]
 
+    static let sortedWithoutNoPlay: [PolarisChordClearType] = [
+        .allPerfect, .fullCombo, .success, .failed
+    ]
+
+    static var sortedStringsWithoutNoPlay: [String] {
+        sortedWithoutNoPlay.map { $0.rawValue }
+    }
+
     // Maps the API's clear_status integer (4=perfect, 3=full, 2=success).
     init(statusCode: Int) {
         switch statusCode {

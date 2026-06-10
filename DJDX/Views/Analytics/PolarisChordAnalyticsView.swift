@@ -1,6 +1,11 @@
+import Charts
+import OrderedCollections
 import SwiftUI
 
+// swiftlint:disable type_body_length
 struct PolarisChordAnalyticsView: View {
+
+    @Environment(\.colorScheme) var colorScheme
 
     @EnvironmentObject var navigationManager: NavigationManager
 
@@ -20,19 +25,29 @@ struct PolarisChordAnalyticsView: View {
     @AppStorage(wrappedValue: Data(), "Analytics.PolarisChord.VisibleCards") var visibleCardsData: Data
     @State var visibleCards: Set<PolarisChordAnalyticsCard> = PolarisChordAnalyticsCard.defaultVisible
 
-    // Persisted store; `isLastPlayCollapsed` mirrors it so a global `withAnimation`
+    // Persisted store; `isOverviewCollapsed` mirrors it so a global `withAnimation`
     // can drive the collapse (animating @AppStorage directly does not work).
+    @AppStorage(wrappedValue: false, "Analytics.PolarisChord.OverviewCollapsed") var isOverviewCollapsedStored: Bool
+    @State var isOverviewCollapsed: Bool = false
+
     @AppStorage(wrappedValue: false, "Analytics.PolarisChord.LastPlayCollapsed") var isLastPlayCollapsedStored: Bool
     @State var isLastPlayCollapsed: Bool = false
 
+    let cardColumns = [
+        GridItem(.flexible(), spacing: 12.0),
+        GridItem(.flexible(), spacing: 12.0)
+    ]
+
     var body: some View {
         VStack(spacing: 20.0) {
+            overviewSection
             lastPlaySection
         }
         .padding(.top, 20.0)
         .onAppear {
             loadCardOrder()
             loadVisibleCards()
+            isOverviewCollapsed = isOverviewCollapsedStored
             isLastPlayCollapsed = isLastPlayCollapsedStored
         }
         .task {
@@ -49,6 +64,41 @@ struct PolarisChordAnalyticsView: View {
     }
 
     // MARK: - Sections
+
+    @ViewBuilder
+    var overviewSection: some View {
+        let overviewCards = cardOrder.filter { $0.section == .overview }
+        let shownCards = isEditing ? overviewCards : overviewCards.filter { visibleCards.contains($0) }
+        if !shownCards.isEmpty {
+            let isExpanded = isEditing || !isOverviewCollapsed
+            VStack(spacing: 12.0) {
+                AnalyticsSectionHeader(
+                    title: AnalyticsSection.overview.titleKey,
+                    isCollapsible: !isEditing,
+                    isExpanded: isExpanded
+                ) {
+                    withAnimation(.smooth.speed(2.0)) { isOverviewCollapsed.toggle() }
+                    isOverviewCollapsedStored = isOverviewCollapsed
+                }
+                if isExpanded {
+                    LazyVGrid(columns: cardColumns, spacing: 12.0) {
+                        ForEach(shownCards, id: \.self) { cardType in
+                            overviewCardView(for: cardType)
+                                .editableCard(isVisible: visibleCards.contains(cardType),
+                                              isEditing: isEditing,
+                                              seed: cardOrder.firstIndex(of: cardType) ?? 0) {
+                                    toggleCard(cardType)
+                                }
+                                .polarisChordCardDraggable(cardType, editing: isEditing,
+                                                           draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                                           onReorder: saveCardOrder)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+            }
+        }
+    }
 
     @ViewBuilder
     var lastPlaySection: some View {
@@ -89,6 +139,23 @@ struct PolarisChordAnalyticsView: View {
     }
 
     // MARK: - Cards
+
+    @ViewBuilder
+    func overviewCardView(for cardType: PolarisChordAnalyticsCard) -> some View {
+        Button {
+            if !isEditing, let destination = cardType.destination {
+                navigationManager.push(destination)
+            }
+        } label: {
+            switch cardType {
+            case .clearBreakdown: clearBreakdownCard
+            case .gradeBreakdown: gradeBreakdownCard
+            default: EmptyView()
+            }
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
+    }
 
     @ViewBuilder
     func lastPlayCardView(for cardType: PolarisChordAnalyticsCard) -> some View {
@@ -183,4 +250,79 @@ struct PolarisChordAnalyticsView: View {
             saveVisibleCards()
         }
     }
+
+    // MARK: - Overview card content
+
+    // Aggregate clear-type counts across all difficulty categories
+    var totalClearCounts: OrderedDictionary<String, Int> {
+        var totals: OrderedDictionary<String, Int> = OrderedDictionary(
+            uniqueKeys: PolarisChordClearType.sortedStringsWithoutNoPlay,
+            values: PolarisChordClearType.sortedStringsWithoutNoPlay.map { _ in 0 }
+        )
+        for (_, counts) in model.clearTypePerDifficulty {
+            for (key, value) in counts {
+                totals[key, default: 0] += value
+            }
+        }
+        return totals
+    }
+
+    var totalGradeCounts: OrderedDictionary<String, Int> {
+        var totals: OrderedDictionary<String, Int> = OrderedDictionary(
+            uniqueKeys: PolarisChordGrade.sortedStrings,
+            values: PolarisChordGrade.sortedStrings.map { _ in 0 }
+        )
+        for (_, counts) in model.gradePerDifficulty {
+            for (key, value) in counts {
+                totals[key, default: 0] += value
+            }
+        }
+        return totals
+    }
+
+    var clearBreakdownCard: some View {
+        AnalyticsCardView(title: "Analytics.PolarisChord.ClearBreakdown",
+                          systemImage: "",
+                          iconColor: .clear,
+                          contentHeight: 160.0,
+                          showsHeader: false) {
+            Chart(totalClearCounts.elements.filter { $0.value > 0 }, id: \.key) { element in
+                BarMark(
+                    x: .value("Shared.ClearCount", element.value),
+                    y: .value("Type", clearLabel(element.key))
+                )
+                .foregroundStyle(PolarisChordClearType(rawValue: element.key)?.color ?? .gray)
+            }
+            .chartXAxis { AxisMarks { AxisGridLine() } }
+        }
+        .perLevelCaption("Analytics.PolarisChord.ClearBreakdown")
+    }
+
+    var gradeBreakdownCard: some View {
+        AnalyticsCardView(title: "Analytics.PolarisChord.GradeBreakdown",
+                          systemImage: "",
+                          iconColor: .clear,
+                          contentHeight: 160.0,
+                          showsHeader: false) {
+            Chart(totalGradeCounts.elements.filter { $0.value > 0 }, id: \.key) { element in
+                BarMark(
+                    x: .value("Shared.ClearCount", element.value),
+                    y: .value("Grade", element.key)
+                )
+                .foregroundStyle(gradeStyle(element.key))
+            }
+            .chartXAxis { AxisMarks { AxisGridLine() } }
+        }
+        .perLevelCaption("Analytics.PolarisChord.GradeBreakdown")
+    }
+
+    func clearLabel(_ rawValue: String) -> String {
+        PolarisChordClearType(rawValue: rawValue)?.abbreviation ?? rawValue
+    }
+
+    func gradeStyle(_ rawValue: String) -> AnyShapeStyle {
+        let grade = PolarisChordGrade(rawValue: rawValue) ?? .unknown
+        return AnyShapeStyle(grade.style(colorScheme: colorScheme))
+    }
 }
+// swiftlint:enable type_body_length

@@ -1,8 +1,18 @@
+import OrderedCollections
 import SwiftUI
 
 @MainActor
 @Observable
 final class PolarisChordAnalyticsModel {
+
+    // Clear-type counts per difficulty category (EASY/NORMAL/HARD/INFLUENCE/POLAR)
+    var clearTypePerDifficulty: [PolarisChordDifficulty: OrderedDictionary<String, Int>] = [:]
+    // Grade counts per difficulty category
+    var gradePerDifficulty: [PolarisChordDifficulty: OrderedDictionary<String, Int>] = [:]
+    // Counts per integer level
+    var clearTypePerLevel: [Int: OrderedDictionary<String, Int>] = [:]
+
+    var totalCharts: Int = 0
 
     // "前回のプレー" (Last Play): improvements between the latest two import groups.
     var newHighScores: [PolarisChordNewHighScoreEntry] = []
@@ -29,10 +39,51 @@ final class PolarisChordAnalyticsModel {
 
     func reload(version: PolarisChordVersion) async {
         dataState = .loading
+        let records = await fetcher.latestSongRecords(for: version)
+
+        var clearByDiff: [PolarisChordDifficulty: OrderedDictionary<String, Int>] = [:]
+        var gradeByDiff: [PolarisChordDifficulty: OrderedDictionary<String, Int>] = [:]
+        var clearByLevel: [Int: OrderedDictionary<String, Int>] = [:]
+
+        let clearKeys = PolarisChordClearType.sortedStringsWithoutNoPlay
+        let gradeKeys = PolarisChordGrade.sortedStrings
+
+        func emptyClearCounts() -> OrderedDictionary<String, Int> {
+            OrderedDictionary(uniqueKeys: clearKeys, values: clearKeys.map { _ in 0 })
+        }
+        func emptyGradeCounts() -> OrderedDictionary<String, Int> {
+            OrderedDictionary(uniqueKeys: gradeKeys, values: gradeKeys.map { _ in 0 })
+        }
+
+        for record in records {
+            let difficulty = record.difficultyEnum
+
+            if clearByDiff[difficulty] == nil { clearByDiff[difficulty] = emptyClearCounts() }
+            if gradeByDiff[difficulty] == nil { gradeByDiff[difficulty] = emptyGradeCounts() }
+
+            if clearKeys.contains(record.clearType) {
+                clearByDiff[difficulty]?[record.clearType]? += 1
+            }
+            if gradeKeys.contains(record.grade) {
+                gradeByDiff[difficulty]?[record.grade]? += 1
+            }
+
+            let levelInt = Int(Double(record.level) ?? 0.0)
+            if levelInt > 0 {
+                if clearByLevel[levelInt] == nil { clearByLevel[levelInt] = emptyClearCounts() }
+                if clearKeys.contains(record.clearType) {
+                    clearByLevel[levelInt]?[record.clearType]? += 1
+                }
+            }
+        }
 
         let lastPlay = await computeLastPlay(version: version)
 
         withAnimation(.smooth.speed(2.0)) {
+            self.clearTypePerDifficulty = clearByDiff
+            self.gradePerDifficulty = gradeByDiff
+            self.clearTypePerLevel = clearByLevel
+            self.totalCharts = records.count
             self.newClears = lastPlay.clears
             self.newHighScores = lastPlay.highScores
             self.newGrades = lastPlay.grades

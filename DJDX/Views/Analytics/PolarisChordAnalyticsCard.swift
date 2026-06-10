@@ -1,6 +1,8 @@
 import SwiftUI
 
 enum PolarisChordAnalyticsCard: String, Codable, Hashable, CaseIterable {
+    case clearBreakdown
+    case gradeBreakdown
     case newHighScores
     case newGradeSSSPlus
     case newGradeSSS
@@ -14,8 +16,12 @@ enum PolarisChordAnalyticsCard: String, Codable, Hashable, CaseIterable {
 
     static var defaultVisible: Set<PolarisChordAnalyticsCard> { Set(allCases) }
 
-    // Polaris Chord analytics only surfaces the "前回のプレー" (Last Play) section.
-    var section: AnalyticsSection { .lastPlay }
+    var section: AnalyticsSection {
+        switch self {
+        case .clearBreakdown, .gradeBreakdown: return .overview
+        default: return .lastPlay
+        }
+    }
 
     /// Clear-type rawValue surfaced by a "new clear" card, if any.
     var clearType: String? {
@@ -40,6 +46,8 @@ enum PolarisChordAnalyticsCard: String, Codable, Hashable, CaseIterable {
 
     var destination: PolarisChordAnalyticsPath? {
         switch self {
+        case .clearBreakdown: return .clearBreakdownDetail
+        case .gradeBreakdown: return .gradeBreakdownDetail
         case .newHighScores: return .newHighScoresDetail
         default:
             if let clearType { return .newClearsDetail(clearType: clearType) }
@@ -52,6 +60,7 @@ enum PolarisChordAnalyticsCard: String, Codable, Hashable, CaseIterable {
 
     var systemImage: String {
         switch self {
+        case .clearBreakdown, .gradeBreakdown: return "chart.bar"
         case .newHighScores: return "trophy"
         case .newClearSuccess: return "checkmark.circle"
         case .newClearFullCombo: return "star.circle"
@@ -125,6 +134,8 @@ struct PolarisChordCardReorderDropDelegate: DropDelegate {
 
     func dropEntered(info _: DropInfo) {
         guard let draggedCard, draggedCard != target else { return }
+        // Only reorder within the same section so cards can't jump between sections.
+        guard draggedCard.section == target.section else { return }
         guard let fromIndex = cards.firstIndex(of: draggedCard),
               let toIndex = cards.firstIndex(of: target) else { return }
 

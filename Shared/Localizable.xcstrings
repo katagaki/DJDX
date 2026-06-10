@@ -839,6 +839,40 @@
         }
       }
     },
+    "Analytics.PolarisChord.ClearBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリア内訳"
+          }
+        }
+      }
+    },
+    "Analytics.PolarisChord.GradeBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grade Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グレード内訳"
+          }
+        }
+      }
+    },
     "Analytics.SDVX.ClearBreakdown" : {
       "extractionState" : "manual",
       "localizations" : {

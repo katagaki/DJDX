@@ -39,6 +39,8 @@ enum SDVXAnalyticsPath: Hashable {
 }
 
 enum PolarisChordAnalyticsPath: Hashable {
+    case clearBreakdownDetail
+    case gradeBreakdownDetail
     case newHighScoresDetail
     case newClearsDetail(clearType: String)
     case newGradesDetail(grade: String)
