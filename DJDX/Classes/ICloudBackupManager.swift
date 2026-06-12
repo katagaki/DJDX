@@ -74,8 +74,8 @@ enum ICloudBackupManager {
         guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
             throw BackupError.documentsUnavailable
         }
-        let backupFolderURL = try backupFolderURL(in: fileManager)
-        try fileManager.createDirectory(at: backupFolderURL, withIntermediateDirectories: true)
+        let backupFolder = try backupFolderURL(in: fileManager)
+        try fileManager.createDirectory(at: backupFolder, withIntermediateDirectories: true)
 
         let stagingURL = fileManager.temporaryDirectory
             .appendingPathComponent("DJDXBackup-\(UUID().uuidString)")
@@ -84,7 +84,7 @@ enum ICloudBackupManager {
         try ZipArchive.zip(directoryAt: documentsURL, to: stagingURL)
 
         let backupDate = Date.now
-        let archiveURL = backupFolderURL.appendingPathComponent("Data.zip")
+        let archiveURL = backupFolder.appendingPathComponent("Data.zip")
         if fileManager.fileExists(atPath: archiveURL.path) {
             try fileManager.removeItem(at: archiveURL)
         }
@@ -92,7 +92,7 @@ enum ICloudBackupManager {
 
         let timestamp = ISO8601DateFormatter().string(from: backupDate)
         try Data(timestamp.utf8).write(
-            to: backupFolderURL.appendingPathComponent("LastBackup"),
+            to: backupFolder.appendingPathComponent("LastBackup"),
             options: .atomic
         )
 
@@ -103,11 +103,11 @@ enum ICloudBackupManager {
     // MARK: Restore
 
     static func existingBackupDate() async -> Date? {
-        await Task.detached(priority: .utility) { () -> Date? in
-            guard let backupFolderURL = try? backupFolderURL(in: FileManager.default) else {
+        await Task.detached(priority: .utility) { () async -> Date? in
+            guard let backupFolder = try? backupFolderURL(in: FileManager.default) else {
                 return nil
             }
-            let timestampURL = backupFolderURL.appendingPathComponent("LastBackup")
+            let timestampURL = backupFolder.appendingPathComponent("LastBackup")
             guard await ensureDownloaded(timestampURL, timeout: 30.0),
                   let timestamp = try? String(contentsOf: timestampURL, encoding: .utf8) else {
                 return nil
@@ -121,8 +121,8 @@ enum ICloudBackupManager {
     static func restore(onProgress: @escaping @Sendable (Int) -> Void) async throws {
         try await Task.detached(priority: .userInitiated) {
             let fileManager = FileManager.default
-            let backupFolderURL = try backupFolderURL(in: fileManager)
-            let archiveURL = backupFolderURL.appendingPathComponent("Data.zip")
+            let backupFolder = try backupFolderURL(in: fileManager)
+            let archiveURL = backupFolder.appendingPathComponent("Data.zip")
             onProgress(10)
             guard await ensureDownloaded(archiveURL, timeout: 600.0) else {
                 throw BackupError.downloadTimedOut
