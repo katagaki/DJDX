@@ -8,7 +8,7 @@ extension UnifiedView {
         )
         Task {
             do {
-                try await ICloudBackupManager.restore { percentage in
+                try await ICloudBackupManager.restore { [migrationProgress] percentage in
                     Task { @MainActor in
                         migrationProgress.updateProgress(percentage)
                     }
