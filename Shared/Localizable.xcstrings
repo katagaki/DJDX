@@ -325,6 +325,176 @@
         }
       }
     },
+    "Alert.ICloudBackup.Failed.Subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data could not be backed up to iCloud. Check that you are signed in to iCloud, then try again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudへのバックアップに失敗しました。iCloudにサインインしていることを確認して、もう一度お試しください。"
+          }
+        }
+      }
+    },
+    "Alert.ICloudBackup.Failed.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup Failed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップに失敗しました"
+          }
+        }
+      }
+    },
+    "Alert.ICloudBackup.Restore.Confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元"
+          }
+        }
+      }
+    },
+    "Alert.ICloudBackup.Restore.Decline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Don't Restore"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元しない"
+          }
+        }
+      }
+    },
+    "Alert.ICloudBackup.Restore.Subtitle.%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A backup created on %@ was found in iCloud. Do you want to restore it?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@に作成されたバックアップがiCloudで見つかりました。復元しますか？"
+          }
+        }
+      }
+    },
+    "Alert.ICloudBackup.Restore.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore From iCloud Backup?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudバックアップから復元しますか？"
+          }
+        }
+      }
+    },
+    "Alert.ICloudBackup.RestoreCompleted.Subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart the app to finish restoring your data."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元を完了するには、アプリを再起動してください。"
+          }
+        }
+      }
+    },
+    "Alert.ICloudBackup.RestoreCompleted.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Completed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元が完了しました"
+          }
+        }
+      }
+    },
+    "Alert.ICloudBackup.RestoreFailed.Subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data could not be restored from iCloud. You can try again the next time you open the app."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudからの復元に失敗しました。次回アプリ起動時に、もう一度お試しください。"
+          }
+        }
+      }
+    },
+    "Alert.ICloudBackup.RestoreFailed.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Failed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元に失敗しました"
+          }
+        }
+      }
+    },
     "Alert.Import.Error.Subtitle.Maintenance" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1292,6 +1462,142 @@
     "Height" : {
       "shouldTranslate" : false
     },
+    "ICloudBackup.BackUpNow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back Up Now"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今すぐバックアップ"
+          }
+        }
+      }
+    },
+    "ICloudBackup.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data will be backed up to iCloud every night at midnight."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "毎晩0時にデータがiCloudにバックアップされます。"
+          }
+        }
+      }
+    },
+    "ICloudBackup.Enable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back Up Automatically"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動バックアップ"
+          }
+        }
+      }
+    },
+    "ICloudBackup.LastBackup" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前回のバックアップ"
+          }
+        }
+      }
+    },
+    "ICloudBackup.LastBackup.Never" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "なし"
+          }
+        }
+      }
+    },
+    "ICloudBackup.Restore.ProgressMessage" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restoring your data from iCloud. This may take a while."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudからデータを復元しています。しばらくお待ちください。"
+          }
+        }
+      }
+    },
+    "ICloudBackup.Restore.ProgressTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restoring Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを復元中"
+          }
+        }
+      }
+    },
+    "ICloudBackup.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudバックアップ"
+          }
+        }
+      }
+    },
     "Importer.CSV.Backup.Button" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2142,6 +2448,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データ管理"
+          }
+        }
+      }
+    },
+    "More.ManageData.ICloudBackup" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudバックアップ"
           }
         }
       }

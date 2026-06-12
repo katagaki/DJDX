@@ -17,6 +17,8 @@ struct DJDXApp: App {
 
     init() {
         _ = IIDXPlayDataDatabase.shared
+        ICloudBackupManager.registerBackgroundTask()
+        ICloudBackupManager.scheduleNextBackup()
         Task {
             let playTypeRaw = UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter") ?? "single"
             let playType = IIDXPlayType(rawValue: playTypeRaw) ?? .single
