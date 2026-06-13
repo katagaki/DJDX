@@ -1,9 +1,7 @@
 import Foundation
-import SwiftData
 
 let songLevelCSVHeaders: [String] = ["BEGINNER", "NORMAL", "HYPER", "ANOTHER", "LEGGENDARIA"]
 
-@Model
 final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
     var version: String = ""
     var title: String = ""
@@ -18,11 +16,7 @@ final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
     var playType: IIDXPlayType = IIDXPlayType.single
     var lastPlayDate: Date = Date.distantPast
 
-    var importGroup: ImportGroup?
-
-    init() {
-        // Empty default initializer required by SwiftData
-    }
+    init() {}
 
     // Based on EPOLIS CSV format
     init(csvRowData: [String: Any], playType: IIDXPlayType? = nil) {
@@ -120,6 +114,12 @@ final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
         let lhsTitle = lhs.titleCompact()
         let rhsTitle = rhs.titleCompact()
         return lhsTitle == rhsTitle
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(titleCompact())
+        hasher.combine(artist)
+        hasher.combine(playType)
     }
 }
 

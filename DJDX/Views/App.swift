@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 import WidgetKit
 
@@ -11,12 +10,13 @@ struct DJDXApp: App {
         WindowGroup {
             UnifiedView()
         }
-        .modelContainer(sharedModelContainer)
         .environmentObject(navigationManager)
     }
 
     init() {
         _ = IIDXPlayDataDatabase.shared
+        ICloudBackupManager.registerBackgroundTask()
+        ICloudBackupManager.scheduleNextBackup()
         Task {
             let playTypeRaw = UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter") ?? "single"
             let playType = IIDXPlayType(rawValue: playTypeRaw) ?? .single
@@ -26,19 +26,3 @@ struct DJDXApp: App {
         }
     }
 }
-
-let sharedModelContainer: ModelContainer = {
-    let schema = Schema([
-        ImportGroup.self,
-        IIDXSongRecord.self,
-        IIDXSong.self,
-        IIDXTowerEntry.self
-    ])
-    let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-    do {
-        return try ModelContainer(for: schema, configurations: [modelConfiguration])
-    } catch {
-        fatalError("Could not create ModelContainer: \(error)")
-    }
-}()

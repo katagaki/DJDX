@@ -1,12 +1,10 @@
 import StoreKit
-import SwiftData
 import SwiftUI
 import TipKit
 
 struct UnifiedView: View {
 
     @Environment(\.requestReview) var requestReview
-    @Environment(\.modelContext) var modelContext
 
     @EnvironmentObject var navigationManager: NavigationManager
 
@@ -21,10 +19,17 @@ struct UnifiedView: View {
 
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
+    @AppStorage(wrappedValue: false, ICloudBackupManager.restorePromptCompletedKey)
+    var hasCompletedRestorePrompt: Bool
 
     @State var isPresentingImport: Bool = false
     @State var isFirstStartCleanupComplete: Bool = false
     @State var isEditingAnalytics: Bool = false
+
+    @State var availableBackupDate: Date?
+    @State var isPromptingBackupRestore: Bool = false
+    @State var isBackupRestoreCompleted: Bool = false
+    @State var isBackupRestoreFailed: Bool = false
 
     @State var migrationProgress = ProgressReporter()
 
@@ -165,6 +170,42 @@ struct UnifiedView: View {
                 requestReview()
                 hasReviewBeenPrompted = true
             }
+            if !hasCompletedRestorePrompt {
+                if await hasExistingPlayData() {
+                    hasCompletedRestorePrompt = true
+                } else {
+                    let backupDate = await ICloudBackupManager.existingBackupDate()
+                    // Re-check: the user may have made their own backup while the check was in flight.
+                    if let backupDate, !hasCompletedRestorePrompt {
+                        availableBackupDate = backupDate
+                        isPromptingBackupRestore = true
+                    }
+                }
+            }
+        }
+        .alert("Alert.ICloudBackup.Restore.Title", isPresented: $isPromptingBackupRestore) {
+            Button("Alert.ICloudBackup.Restore.Confirm") {
+                restoreFromBackup()
+            }
+            Button("Alert.ICloudBackup.Restore.Decline", role: .cancel) {
+                hasCompletedRestorePrompt = true
+            }
+        } message: {
+            Text("Alert.ICloudBackup.Restore.Subtitle.\(availableBackupDate ?? .now, format: .dateTime)")
+        }
+        .alert("Alert.ICloudBackup.RestoreCompleted.Title", isPresented: $isBackupRestoreCompleted) {
+            Button("Shared.OK", role: .cancel) {
+                isBackupRestoreCompleted = false
+            }
+        } message: {
+            Text("Alert.ICloudBackup.RestoreCompleted.Subtitle")
+        }
+        .alert("Alert.ICloudBackup.RestoreFailed.Title", isPresented: $isBackupRestoreFailed) {
+            Button("Shared.OK", role: .cancel) {
+                isBackupRestoreFailed = false
+            }
+        } message: {
+            Text("Alert.ICloudBackup.RestoreFailed.Subtitle")
         }
     }
 

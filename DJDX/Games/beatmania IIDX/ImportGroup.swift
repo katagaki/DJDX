@@ -1,16 +1,12 @@
 import Foundation
-import SwiftData
 
-@Model
-final class ImportGroup: @unchecked Sendable {
+final class ImportGroup: Identifiable, @unchecked Sendable {
     var id: String = UUID().uuidString
     var importDate: Date = Date.distantPast
-    @Relationship(deleteRule: .cascade, inverse: \IIDXSongRecord.importGroup) var iidxData: [IIDXSongRecord]?
     var iidxVersion: IIDXVersion?
 
-    init(importDate: Date, iidxData: [IIDXSongRecord], iidxVersion: IIDXVersion) {
+    init(importDate: Date, iidxVersion: IIDXVersion) {
         self.importDate = importDate
-        self.iidxData = iidxData
         self.iidxVersion = iidxVersion
     }
 }

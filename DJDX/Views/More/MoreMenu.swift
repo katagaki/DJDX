@@ -14,6 +14,7 @@ struct MoreMenu: View {
     let polarisChordImporter = PolarisChordImporter()
 
     @State var isPresentingExternalDataSources: Bool = false
+    @State var isPresentingICloudBackup: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingResetLayout: Bool = false
     @State var isPromptingScoreDeleteCode: Bool = false
@@ -66,6 +67,9 @@ struct MoreMenu: View {
                 }
             }
             Section("More.ManageData.Header") {
+                Button("More.ManageData.ICloudBackup", systemImage: "icloud") {
+                    isPresentingICloudBackup = true
+                }
                 Button("More.ManageData.ResetLayout", systemImage: "arrow.counterclockwise", role: .destructive) {
                     isConfirmingResetLayout = true
                 }
@@ -92,6 +96,11 @@ struct MoreMenu: View {
         .sheet(isPresented: $isPresentingExternalDataSources) {
             NavigationStack {
                 MoreExternalDataSources()
+            }
+        }
+        .sheet(isPresented: $isPresentingICloudBackup) {
+            NavigationStack {
+                MoreICloudBackup()
             }
         }
         .alert("Alert.DeleteData.Web.Title", isPresented: $isConfirmingWebDataDelete) {

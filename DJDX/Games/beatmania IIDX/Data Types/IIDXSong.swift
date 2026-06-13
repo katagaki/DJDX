@@ -1,7 +1,5 @@
 import Foundation
-import SwiftData
 
-@Model
 final class IIDXSong: Equatable, @unchecked Sendable {
     var title: String = ""
     var spNoteCount: IIDXNoteCount?
@@ -10,9 +8,7 @@ final class IIDXSong: Equatable, @unchecked Sendable {
     var movie: String = ""
     var layer: String = ""
 
-    init() {
-        // Empty default initializer required by SwiftData
-    }
+    init() {}
 
     init(_ tableColumnData: [String]) {
         self.title = tableColumnData[0]
@@ -59,6 +55,10 @@ final class IIDXSong: Equatable, @unchecked Sendable {
 
     func titleCompact() -> String {
         return title.compact
+    }
+
+    static func == (lhs: IIDXSong, rhs: IIDXSong) -> Bool {
+        return lhs.title == rhs.title
     }
 
     static func == (lhs: IIDXSong, rhs: IIDXSongRecord) -> Bool {

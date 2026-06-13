@@ -12,25 +12,36 @@ struct ProgressCard: View {
         ZStack(alignment: .center) {
             Color.black.opacity(colorScheme == .dark ? 0.5 : 0.2)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            VStack(alignment: .center, spacing: 0.0) {
-                VStack(alignment: .center, spacing: 10.0) {
-                    Text(LocalizedStringKey(title))
-                        .bold()
-                        .multilineTextAlignment(.center)
-                    ProgressView(value: min(Float(percentage), 100.0), total: 100.0)
-                        .progressViewStyle(.linear)
-                    Text(NSLocalizedString(message, comment: "")
-                        .replacingOccurrences(of: "%1", with: String(percentage)))
-                    .font(.subheadline)
-                    .multilineTextAlignment(.center)
-                }
-                .padding()
+            if #available(iOS 26.0, *) {
+                contentView
+                    .padding(20.0)
+                    .glassEffect(.regular.interactive(),
+                                 in: .rect(cornerRadius: 20.0))
+                    .padding(.all, 24.0)
+            } else {
+                contentView
+                    .padding()
+                    .background(.thickMaterial)
+                    .clipShape(.rect(cornerRadius: 16.0))
+                    .padding(.all, 32.0)
             }
-            .background(.thickMaterial)
-            .clipShape(.rect(cornerRadius: 16.0))
-            .padding(.all, 32.0)
         }
         .ignoresSafeArea(.all)
+    }
+
+    @ViewBuilder
+    private var contentView: some View {
+        VStack(alignment: .center, spacing: 10.0) {
+            Text(LocalizedStringKey(title))
+                .bold()
+                .multilineTextAlignment(.center)
+            ProgressView(value: min(Float(percentage), 100.0), total: 100.0)
+                .progressViewStyle(.linear)
+            Text(NSLocalizedString(message, comment: "")
+                .replacingOccurrences(of: "%1", with: String(percentage)))
+            .font(.subheadline)
+            .multilineTextAlignment(.center)
+        }
     }
 }
 

@@ -331,9 +331,6 @@ struct AnalyticsView: View {
                     debugPrint("Reloaded on change of version")
                 }
             }
-            .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
-                Task { await reload() }
-            }
             .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
                 Task { await reload() }
             }
