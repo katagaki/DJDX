@@ -1,6 +1,13 @@
 import SwiftUI
 
 extension UnifiedView {
+    func hasExistingPlayData() async -> Bool {
+        if await !IIDXReader().allImportGroups().isEmpty { return true }
+        if await SDVXReader().latestImportGroupID() != nil { return true }
+        if await PolarisChordReader().latestImportGroupID() != nil { return true }
+        return false
+    }
+
     func restoreFromBackup() {
         migrationProgress.show(
             title: "ICloudBackup.Restore.ProgressTitle",

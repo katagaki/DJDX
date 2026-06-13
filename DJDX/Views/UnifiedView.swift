@@ -171,11 +171,15 @@ struct UnifiedView: View {
                 hasReviewBeenPrompted = true
             }
             if !hasCompletedRestorePrompt {
-                let backupDate = await ICloudBackupManager.existingBackupDate()
-                // Re-check: the user may have made their own backup while the check was in flight.
-                if let backupDate, !hasCompletedRestorePrompt {
-                    availableBackupDate = backupDate
-                    isPromptingBackupRestore = true
+                if await hasExistingPlayData() {
+                    hasCompletedRestorePrompt = true
+                } else {
+                    let backupDate = await ICloudBackupManager.existingBackupDate()
+                    // Re-check: the user may have made their own backup while the check was in flight.
+                    if let backupDate, !hasCompletedRestorePrompt {
+                        availableBackupDate = backupDate
+                        isPromptingBackupRestore = true
+                    }
                 }
             }
         }
