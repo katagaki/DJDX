@@ -1,10 +1,8 @@
 import Foundation
-import SwiftData
 
 // The SDVX CSV is one row per chart (song + difficulty), unlike the IIDX CSV
 // which is one row per song. Each SDVXSongRecord therefore carries a single
 // chart's score.
-@Model
 final class SDVXSongRecord: Equatable, Hashable, @unchecked Sendable {
     var title: String = ""
     var difficulty: String = SDVXDifficulty.novice.rawValue
@@ -18,9 +16,7 @@ final class SDVXSongRecord: Equatable, Hashable, @unchecked Sendable {
     var ultimateChainCount: Int = 0
     var perfectCount: Int = 0
 
-    init() {
-        // Empty default initializer required by SwiftData
-    }
+    init() {}
 
     // Based on the SDVX e-amusement CSV format.
     init(csvRowData: [String: Any]) {
@@ -60,6 +56,15 @@ final class SDVXSongRecord: Equatable, Hashable, @unchecked Sendable {
         lhs.highScore == rhs.highScore &&
         lhs.clearType == rhs.clearType &&
         lhs.grade == rhs.grade
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(titleCompact())
+        hasher.combine(difficulty)
+        hasher.combine(level)
+        hasher.combine(highScore)
+        hasher.combine(clearType)
+        hasher.combine(grade)
     }
 
     func hash(into hasher: inout Hasher) {

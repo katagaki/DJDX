@@ -136,9 +136,6 @@ struct IIDXImportView: View {
                     Task { await reloadImportGroups() }
                 }
             }
-            .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
-                Task { await reloadImportGroups() }
-            }
             .sheet(isPresented: $isSelectingCSVFile) {
                 DocumentPicker(allowedUTIs: [.commaSeparatedText], onDocumentPicked: { urls in
                     importCSVs(from: urls)

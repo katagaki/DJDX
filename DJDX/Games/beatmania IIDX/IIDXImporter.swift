@@ -323,39 +323,6 @@ actor IIDXImporter {
         }
     }
 
-    // MARK: Migration
-
-    func migrateImportGroup(
-        _ importGroup: ImportGroup,
-        songRecords: [IIDXSongRecord]
-    ) {
-        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
-        let col = IIDXPlayDataDatabase.self
-        try? database.transaction {
-            try database.run(col.importGroupTable.insert(
-                col.igID <- importGroup.id,
-                col.igImportDate <- importGroup.importDate.timeIntervalSince1970,
-                col.igIIDXVersion <- importGroup.iidxVersion?.rawValue
-            ))
-            for record in songRecords {
-                Self.insertSongRecord(database: database, record: record, importGroupID: importGroup.id)
-            }
-        }
-    }
-
-    func migrateSongs(_ songs: [IIDXSong]) {
-        insertSongs(songs)
-    }
-
-    func migrateTowerEntries(_ entries: [IIDXTowerEntry]) {
-        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
-        try? database.transaction {
-            for entry in entries {
-                Self.insertTowerEntry(database: database, entry: entry)
-            }
-        }
-    }
-
     // MARK: Delete Helpers
 
     func deleteImportGroup(id: String) {

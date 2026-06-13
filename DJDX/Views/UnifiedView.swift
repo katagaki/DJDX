@@ -1,12 +1,10 @@
 import StoreKit
-import SwiftData
 import SwiftUI
 import TipKit
 
 struct UnifiedView: View {
 
     @Environment(\.requestReview) var requestReview
-    @Environment(\.modelContext) var modelContext
 
     @EnvironmentObject var navigationManager: NavigationManager
 

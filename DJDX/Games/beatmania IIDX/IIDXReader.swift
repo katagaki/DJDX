@@ -580,7 +580,6 @@ actor IIDXReader {
     static func importGroup(from row: Row) -> ImportGroup {
         let group = ImportGroup(
             importDate: Date(timeIntervalSince1970: row[IIDXPlayDataDatabase.igImportDate]),
-            iidxData: [],
             iidxVersion: row[IIDXPlayDataDatabase.igIIDXVersion].flatMap { IIDXVersion(rawValue: $0) } ?? .epolis
         )
         group.id = row[IIDXPlayDataDatabase.igID]

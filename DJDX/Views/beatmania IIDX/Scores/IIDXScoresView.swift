@@ -324,10 +324,6 @@ struct IIDXScoresView<Header: View>: View {
                     reloadDisplay()
                 }
             }
-            .onReceive(NotificationCenter.default.publisher(for: .dataMigrationCompleted)) { _ in
-                dataState = .initializing
-                reloadDisplay()
-            }
             .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
                 dataState = .initializing
                 reloadDisplay()

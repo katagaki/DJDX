@@ -1,9 +1,7 @@
 import Foundation
-import SwiftData
 
 // Polaris Chord has no CSV export; each record is built from a chart in the
 // json/pdata_getdata.html API response. Stored via SQLite, like SDVXSongRecord.
-@Model
 final class PolarisChordSongRecord: Equatable, Hashable, @unchecked Sendable {
     var title: String = ""
     var musicID: String = ""
@@ -15,9 +13,7 @@ final class PolarisChordSongRecord: Equatable, Hashable, @unchecked Sendable {
     var clearType: String = PolarisChordClearType.noPlay.rawValue
     var grade: String = PolarisChordGrade.none.rawValue
 
-    init() {
-        // Empty default initializer required by SwiftData
-    }
+    init() {}
 
     init(jsonRow: [String: Any]) {
         self.title = jsonRow["title"] as? String ?? ""
@@ -76,6 +72,15 @@ final class PolarisChordSongRecord: Equatable, Hashable, @unchecked Sendable {
         lhs.achievementRate == rhs.achievementRate &&
         lhs.clearType == rhs.clearType &&
         lhs.grade == rhs.grade
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(titleCompact())
+        hasher.combine(difficulty)
+        hasher.combine(level)
+        hasher.combine(achievementRate)
+        hasher.combine(clearType)
+        hasher.combine(grade)
     }
 
     func hash(into hasher: inout Hasher) {

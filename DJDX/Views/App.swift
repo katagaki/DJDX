@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 import WidgetKit
 
@@ -11,7 +10,6 @@ struct DJDXApp: App {
         WindowGroup {
             UnifiedView()
         }
-        .modelContainer(sharedModelContainer)
         .environmentObject(navigationManager)
     }
 
@@ -28,19 +26,3 @@ struct DJDXApp: App {
         }
     }
 }
-
-let sharedModelContainer: ModelContainer = {
-    let schema = Schema([
-        ImportGroup.self,
-        IIDXSongRecord.self,
-        IIDXSong.self,
-        IIDXTowerEntry.self
-    ])
-    let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-    do {
-        return try ModelContainer(for: schema, configurations: [modelConfiguration])
-    } catch {
-        fatalError("Could not create ModelContainer: \(error)")
-    }
-}()
