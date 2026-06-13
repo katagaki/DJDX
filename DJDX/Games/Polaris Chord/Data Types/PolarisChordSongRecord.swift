@@ -77,14 +77,5 @@ final class PolarisChordSongRecord: Equatable, Hashable, @unchecked Sendable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(titleCompact())
         hasher.combine(difficulty)
-        hasher.combine(level)
-        hasher.combine(achievementRate)
-        hasher.combine(clearType)
-        hasher.combine(grade)
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(titleCompact())
-        hasher.combine(difficulty)
     }
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-final class ImportGroup: @unchecked Sendable {
+final class ImportGroup: Identifiable, @unchecked Sendable {
     var id: String = UUID().uuidString
     var importDate: Date = Date.distantPast
     var iidxVersion: IIDXVersion?

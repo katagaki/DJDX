@@ -61,14 +61,5 @@ final class SDVXSongRecord: Equatable, Hashable, @unchecked Sendable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(titleCompact())
         hasher.combine(difficulty)
-        hasher.combine(level)
-        hasher.combine(highScore)
-        hasher.combine(clearType)
-        hasher.combine(grade)
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(titleCompact())
-        hasher.combine(difficulty)
     }
 }
