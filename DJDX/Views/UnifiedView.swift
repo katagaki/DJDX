@@ -170,10 +170,13 @@ struct UnifiedView: View {
                 requestReview()
                 hasReviewBeenPrompted = true
             }
-            if !hasCompletedRestorePrompt,
-               let backupDate = await ICloudBackupManager.existingBackupDate() {
-                availableBackupDate = backupDate
-                isPromptingBackupRestore = true
+            if !hasCompletedRestorePrompt {
+                let backupDate = await ICloudBackupManager.existingBackupDate()
+                // Re-check: the user may have made their own backup while the check was in flight.
+                if let backupDate, !hasCompletedRestorePrompt {
+                    availableBackupDate = backupDate
+                    isPromptingBackupRestore = true
+                }
             }
         }
         .alert("Alert.ICloudBackup.Restore.Title", isPresented: $isPromptingBackupRestore) {
