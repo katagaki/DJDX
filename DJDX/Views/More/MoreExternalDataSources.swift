@@ -6,7 +6,7 @@ struct MoreExternalDataSources: View {
 
     @Environment(\.openURL) var openURL
     @Environment(\.dismiss) var dismiss
-    
+
     @AppStorage(wrappedValue: false, "ExternalData.Textage.Enabled") var isTextageEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.SDVXIn.Enabled") var isSDVXInEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
@@ -133,6 +133,60 @@ struct MoreExternalDataSources: View {
         )
     }
 
+    // MARK: - Data Source Card
+
+    @ViewBuilder
+    // swiftlint:disable:next function_parameter_count
+    private func dataSourceCard<Title: View>(
+        @ViewBuilder title: () -> Title,
+        count: Int,
+        isOn: Binding<Bool>,
+        source: ExternalDataReloadSource,
+        reload: @escaping () async -> Void,
+        completed: Binding<Bool>
+    ) -> some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12.0) {
+                title()
+                    .font(.body)
+                    .opacity(isOn.wrappedValue ? 1.0 : 0.5)
+                Spacer(minLength: 8.0)
+                Text(count.formatted())
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+                    .opacity(isOn.wrappedValue ? 1.0 : 0.5)
+                Toggle(isOn: isOn) {
+                    EmptyView()
+                }
+                .labelsHidden()
+            }
+            if isOn.wrappedValue {
+                Divider()
+                    .padding(.vertical, 12.0)
+                HStack {
+                    Button("More.ExternalData.UpdateData") {
+                        reloadingSource = source
+                        Task {
+                            await reload()
+                            reloadingSource = nil
+                            completed.wrappedValue = true
+                        }
+                    }
+                    .disabled(reloadingSource != nil)
+                    Spacer()
+                    reloadIndicator(for: source)
+                }
+            }
+        }
+        .padding(16.0)
+        .background(Color(uiColor: .secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: 24.0))
+        .listRowInsets(EdgeInsets(top: 5.0, leading: 0.0, bottom: 5.0, trailing: 0.0))
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+    }
+
     @ViewBuilder
     private func reloadIndicator(for source: ExternalDataReloadSource) -> some View {
         if reloadingSource == source {
@@ -150,54 +204,22 @@ struct MoreExternalDataSources: View {
     @ViewBuilder
     private func bemaniWikiSection() -> some View {
         Section {
-            Toggle(isOn: $isBemaniWikiEnabled) {
-                Text(verbatim: "beatmania IIDX")
-            }
-            if isBemaniWikiEnabled {
-                HStack {
-                    Button("More.ExternalData.UpdateData") {
-                        reloadingSource = .bemaniWiki
-                        Task {
-                            await reloadBemaniWikiData()
-                            reloadingSource = nil
-                            isBemaniWikiReloadCompleted = true
-                        }
-                    }
-                    .disabled(reloadingSource != nil)
-                    Spacer()
-                    reloadIndicator(for: .bemaniWiki)
-                }
-                HStack {
-                    Text("More.ExternalData.BemaniWiki2nd.EntryCount")
-                    Spacer()
-                    Text(verbatim: "\(bemaniWikiEntryCount)")
-                        .foregroundStyle(.secondary)
-                }
-            }
-            Toggle(isOn: $isDDREnabled) {
-                Text(verbatim: "DanceDanceRevolution")
-            }
-            if isDDREnabled {
-                HStack {
-                    Button("More.ExternalData.UpdateData") {
-                        reloadingSource = .ddr
-                        Task {
-                            await reloadDDRData()
-                            reloadingSource = nil
-                            isDDRReloadCompleted = true
-                        }
-                    }
-                    .disabled(reloadingSource != nil)
-                    Spacer()
-                    reloadIndicator(for: .ddr)
-                }
-                HStack {
-                    Text("More.ExternalData.BemaniWiki2nd.EntryCount")
-                    Spacer()
-                    Text(verbatim: "\(ddrSongMetaCount)")
-                        .foregroundStyle(.secondary)
-                }
-            }
+            dataSourceCard(
+                title: { Text(verbatim: "beatmania IIDX") },
+                count: bemaniWikiEntryCount,
+                isOn: $isBemaniWikiEnabled,
+                source: .bemaniWiki,
+                reload: reloadBemaniWikiData,
+                completed: $isBemaniWikiReloadCompleted
+            )
+            dataSourceCard(
+                title: { Text(verbatim: "DanceDanceRevolution") },
+                count: ddrSongMetaCount,
+                isOn: $isDDREnabled,
+                source: .ddr,
+                reload: reloadDDRData,
+                completed: $isDDRReloadCompleted
+            )
         } header: {
             ListSectionHeader(text: "More.ExternalData.BemaniWiki2nd")
                 .font(.body)
@@ -213,30 +235,14 @@ struct MoreExternalDataSources: View {
     @ViewBuilder
     private func bm2dxSection() -> some View {
         Section {
-            Toggle(isOn: $isBM2DXEnabled) {
-                Text("More.ExternalData.BM2DX.Description")
-            }
-            if isBM2DXEnabled {
-                HStack {
-                    Button("More.ExternalData.UpdateData") {
-                        reloadingSource = .bm2dx
-                        Task {
-                            await reloadBM2DXData()
-                            reloadingSource = nil
-                            isBM2DXReloadCompleted = true
-                        }
-                    }
-                    .disabled(reloadingSource != nil)
-                    Spacer()
-                    reloadIndicator(for: .bm2dx)
-                }
-                HStack {
-                    Text("More.ExternalData.BM2DX.EntryCount")
-                    Spacer()
-                    Text(verbatim: "\(bm2dxEntryCount)")
-                        .foregroundStyle(.secondary)
-                }
-            }
+            dataSourceCard(
+                title: { Text("More.ExternalData.BM2DX.Description") },
+                count: bm2dxEntryCount,
+                isOn: $isBM2DXEnabled,
+                source: .bm2dx,
+                reload: reloadBM2DXData,
+                completed: $isBM2DXReloadCompleted
+            )
         } header: {
             ListSectionHeader(text: "More.ExternalData.BM2DX")
                 .font(.body)
@@ -252,30 +258,14 @@ struct MoreExternalDataSources: View {
     @ViewBuilder
     private func sdvxInSection() -> some View {
         Section {
-            Toggle(isOn: $isSDVXInEnabled) {
-                Text("More.ExternalData.SDVXIn.Description")
-            }
-            if isSDVXInEnabled {
-                HStack {
-                    Button("More.ExternalData.UpdateData") {
-                        reloadingSource = .sdvxIn
-                        Task {
-                            await reloadSDVXInData()
-                            reloadingSource = nil
-                            isSDVXInReloadCompleted = true
-                        }
-                    }
-                    .disabled(reloadingSource != nil)
-                    Spacer()
-                    reloadIndicator(for: .sdvxIn)
-                }
-                HStack {
-                    Text("More.ExternalData.SDVXIn.EntryCount")
-                    Spacer()
-                    Text(verbatim: "\(sdvxInEntryCount)")
-                        .foregroundStyle(.secondary)
-                }
-            }
+            dataSourceCard(
+                title: { Text("More.ExternalData.SDVXIn.Description") },
+                count: sdvxInEntryCount,
+                isOn: $isSDVXInEnabled,
+                source: .sdvxIn,
+                reload: reloadSDVXInData,
+                completed: $isSDVXInReloadCompleted
+            )
         } header: {
             ListSectionHeader(text: "More.ExternalData.SDVXIn")
                 .font(.body)
@@ -291,30 +281,14 @@ struct MoreExternalDataSources: View {
     @ViewBuilder
     private func textageSection() -> some View {
         Section {
-            Toggle(isOn: $isTextageEnabled) {
-                Text("More.ExternalData.Textage.Description")
-            }
-            if isTextageEnabled {
-                HStack {
-                    Button("More.ExternalData.UpdateData") {
-                        reloadingSource = .textage
-                        Task {
-                            await reloadTextageData()
-                            reloadingSource = nil
-                            isTextageReloadCompleted = true
-                        }
-                    }
-                    .disabled(reloadingSource != nil)
-                    Spacer()
-                    reloadIndicator(for: .textage)
-                }
-                HStack {
-                    Text("More.ExternalData.Textage.EntryCount")
-                    Spacer()
-                    Text(verbatim: "\(textageEntryCount)")
-                        .foregroundStyle(.secondary)
-                }
-            }
+            dataSourceCard(
+                title: { Text("More.ExternalData.Textage.Description") },
+                count: textageEntryCount,
+                isOn: $isTextageEnabled,
+                source: .textage,
+                reload: reloadTextageData,
+                completed: $isTextageReloadCompleted
+            )
         } header: {
             ListSectionHeader(text: "More.ExternalData.Textage")
                 .font(.body)
