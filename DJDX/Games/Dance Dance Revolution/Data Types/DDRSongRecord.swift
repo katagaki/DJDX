@@ -1,4 +1,4 @@
-import Foundation
+import SwiftUI
 
 final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
     var songIndex: String = ""
@@ -72,6 +72,33 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
             let rhsRank = rankOrder.firstIndex(of: rhs) ?? rankOrder.count
             if lhsRank != rhsRank { return lhsRank < rhsRank }
             return lhs < rhs
+        }
+    }
+
+    static func clearColor(for clearKind: String) -> Color {
+        switch clearKind {
+        case "marv": Color(red: 0.45, green: 0.85, blue: 1.0)
+        case "perf": Color(red: 1.0, green: 0.82, blue: 0.0)
+        case "great": .green
+        case "good": Color(red: 0.2, green: 0.55, blue: 1.0)
+        case "life4": .red
+        case "clear": Color(red: 0.0, green: 0.8, blue: 0.5)
+        case "assist": .purple
+        case "fail": .gray
+        default: .secondary
+        }
+    }
+
+    static func rankColor(forStem stem: String) -> Color {
+        let letter = stem.split(separator: "_").first.map(String.init) ?? stem
+        switch letter {
+        case "aaa": return Color(red: 1.0, green: 0.82, blue: 0.0)
+        case "aa": return .orange
+        case "a": return Color(red: 1.0, green: 0.55, blue: 0.2)
+        case "b": return .green
+        case "c": return .blue
+        case "d": return .purple
+        default: return .gray
         }
     }
 

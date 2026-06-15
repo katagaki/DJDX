@@ -38,10 +38,12 @@ struct UnifiedView: View {
     @State var analyticsModel = AnalyticsModel()
     @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
     @State var polarisChordAnalyticsModel = PolarisChordAnalyticsModel()
+    @State var ddrAnalyticsModel = DDRAnalyticsModel()
 
     @Namespace var analyticsNamespace
     @Namespace var sdvxAnalyticsNamespace
     @Namespace var polarisChordAnalyticsNamespace
+    @Namespace var ddrAnalyticsNamespace
     @Namespace var towerNamespace
     @Namespace var importNamespace
 
@@ -131,6 +133,9 @@ struct UnifiedView: View {
                     path: path,
                     namespace: polarisChordAnalyticsNamespace
                 )
+            }
+            .navigationDestination(for: DDRAnalyticsPath.self) { path in
+                DDRAnalyticsDestinationView(model: ddrAnalyticsModel, path: path, namespace: ddrAnalyticsNamespace)
             }
         }
         .sheet(isPresented: $isPresentingImport) {

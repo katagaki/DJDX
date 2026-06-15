@@ -51,6 +51,10 @@ https://p.eagate.573.jp/game/ddr/\(slug)/playdata/music_data_single.html?offset=
 """)!
     }
 
+    func profilePageURL() -> URL {
+        URL(string: "https://p.eagate.573.jp/game/ddr/\(slug)/playdata/index.html")!
+    }
+
     func errorPageURL() -> URL {
         URL(string: "https://p.eagate.573.jp/game/ddr/\(slug)/error/")!
     }

@@ -783,6 +783,40 @@
         }
       }
     },
+    "Analytics.DDR.ClearBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリア内訳"
+          }
+        }
+      }
+    },
+    "Analytics.DDR.RankBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rank Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ランク内訳"
+          }
+        }
+      }
+    },
     "Analytics.DJLevel.ByDifficulty" : {
       "extractionState" : "manual",
       "localizations" : {
