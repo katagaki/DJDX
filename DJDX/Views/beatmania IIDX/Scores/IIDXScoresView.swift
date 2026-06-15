@@ -214,6 +214,10 @@ struct IIDXScoresView<Header: View>: View {
                 }
             }
         }
+            .refreshable {
+                NotificationCenter.default.post(name: .profileRefreshRequested, object: nil)
+                reloadDisplay()
+            }
             .scrollContentBackground(.hidden)
             .background {
                 LinearGradient(
@@ -277,10 +281,6 @@ struct IIDXScoresView<Header: View>: View {
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.hidden)
                 .interactiveDismissDisabled()
-            }
-            .refreshable {
-                NotificationCenter.default.post(name: .profileRefreshRequested, object: nil)
-                reloadDisplay()
             }
             .onAppear {
                 if dataState == .initializing {
