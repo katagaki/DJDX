@@ -5,9 +5,9 @@ extension UnifiedView {
     var ddrHeader: some View {
         VStack(spacing: 0.0) {
             Picker("Shared.PlayType", selection: $ddrStyleToShow) {
-                Text(verbatim: "SP")
+                Text(verbatim: "SINGLE")
                     .tag(DDRPlayStyle.single)
-                Text(verbatim: "DP")
+                Text(verbatim: "DOUBLE")
                     .tag(DDRPlayStyle.double)
             }
             .pickerStyle(.segmented)
