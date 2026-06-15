@@ -153,6 +153,8 @@ struct UnifiedView: View {
         .onOpenURL { url in
             if url.scheme == "djdx", url.host == "max300" {
                 Task { await runFakeMigration() }
+            } else {
+                handleDebugDeepLink(url)
             }
         }
 #endif

@@ -1,0 +1,72 @@
+import SwiftUI
+
+extension UnifiedView {
+#if DEBUG
+    func handleDebugDeepLink(_ url: URL) {
+        guard url.scheme == "djdx", url.host == "open",
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return
+        }
+        let queryItems = components.queryItems ?? []
+        func value(for name: String) -> String? {
+            queryItems.first { $0.name.lowercased() == name.lowercased() }?.value
+        }
+        guard value(for: "type")?.lowercased() == "detail",
+              value(for: "game")?.lowercased() == "iidx",
+              let songName = value(for: "songName"), !songName.isEmpty else {
+            return
+        }
+        Task { await openIIDXScoreDetail(songName: songName) }
+    }
+
+    func openIIDXScoreDetail(songName: String) async {
+        let reader = IIDXReader()
+        guard let record = await resolveIIDXSongRecord(named: songName, using: reader) else {
+            debugPrint("Deep link: no IIDX song record found for \(songName)")
+            return
+        }
+        await MainActor.run {
+            if selectedGame != .iidxArcade {
+                selectedGame = .iidxArcade
+            }
+            navigationManager.popToRoot()
+        }
+        let level = highestDifficultyLevel(for: record)
+        try? await Task.sleep(for: .milliseconds(150))
+        await MainActor.run {
+            navigationManager.push(ScoresPath.scoreViewer(songRecord: record, initialLevel: level))
+        }
+    }
+
+    func highestDifficultyLevel(for record: IIDXSongRecord) -> IIDXLevel {
+        let candidates: [(IIDXLevel, Int)] = [
+            (.beginner, record.beginnerScore.difficulty),
+            (.normal, record.normalScore.difficulty),
+            (.hyper, record.hyperScore.difficulty),
+            (.another, record.anotherScore.difficulty),
+            (.leggendaria, record.leggendariaScore.difficulty)
+        ]
+        var best: (IIDXLevel, Int)?
+        for candidate in candidates where candidate.1 != 0 {
+            if best == nil || candidate.1 >= best!.1 {
+                best = candidate
+            }
+        }
+        return best?.0 ?? .all
+    }
+
+    func resolveIIDXSongRecord(named songName: String, using reader: IIDXReader) async -> IIDXSongRecord? {
+        if let importGroup = await reader.importGroup(for: .now, version: iidxVersion) {
+            let records = await reader.songRecords(for: importGroup.id, playType: playTypeToShow)
+            if let exact = records.first(where: { $0.title.compact == songName.compact }) {
+                return exact
+            }
+            if let fuzzy = records.first(where: { $0.title.localizedCaseInsensitiveContains(songName) }) {
+                return fuzzy
+            }
+        }
+        let matching = await reader.songRecordsForSong(title: songName)
+        return matching.first { $0.playType == playTypeToShow } ?? matching.first
+    }
+#endif
+}
