@@ -13,6 +13,8 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
     @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
     var polarisChordVersion: PolarisChordVersion
+    @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
+    @AppStorage(wrappedValue: DDRPlayStyle.single, "Global.DDR.Style") var ddrStyleToShow: DDRPlayStyle
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: true, "More.General.ShowProfileHeader") var showProfileHeader: Bool
     @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
@@ -54,6 +56,10 @@ struct UnifiedView: View {
                 } else if selectedGame == .polarisChord {
                     PolarisChordScoresView(isEditingAnalytics: $isEditingAnalytics) {
                         polarisChordHeader
+                    }
+                } else if selectedGame == .danceDanceRevolution {
+                    DDRScoresView(isEditingAnalytics: $isEditingAnalytics) {
+                        ddrHeader
                     }
                 } else {
                     IIDXScoresView(isEditingAnalytics: $isEditingAnalytics) {
@@ -133,6 +139,8 @@ struct UnifiedView: View {
                     SDVXImportView()
                 } else if selectedGame == .polarisChord {
                     PolarisChordImportView()
+                } else if selectedGame == .danceDanceRevolution {
+                    DDRImportView()
                 } else {
                     IIDXImportView()
                 }
@@ -316,6 +324,13 @@ struct UnifiedView: View {
                 } else if selectedGame == .polarisChord {
                     Picker("Shared.Version", selection: $polarisChordVersion) {
                         ForEach(PolarisChordVersion.supportedVersions, id: \.self) { version in
+                            Text(version.marketingName).tag(version)
+                        }
+                    }
+                    .pickerStyle(.inline)
+                } else if selectedGame == .danceDanceRevolution {
+                    Picker("Shared.Version", selection: $ddrVersion) {
+                        ForEach(DDRVersion.supportedVersions, id: \.self) { version in
                             Text(version.marketingName).tag(version)
                         }
                     }

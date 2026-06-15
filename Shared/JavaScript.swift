@@ -377,6 +377,97 @@ for (let attempt = 0; attempt < 3; attempt++) {
 return 'ERR:network';
 """
 
+let ddrScoreDataFetchBody = """
+async function fetchDDRScoreData() {
+    const styles = [{ key: 'SINGLE', page: 'music_data_single.html' },
+                    { key: 'DOUBLE', page: 'music_data_double.html' }];
+    const diffNames = ['BEGINNER', 'BASIC', 'DIFFICULT', 'EXPERT', 'CHALLENGE'];
+    const rows = [];
+
+    function pageURL(page, offset) {
+        const u = new URL(page, location.href);
+        u.search = 'offset=' + offset + '&filter=0&display=score';
+        return u.href;
+    }
+
+    function imgStem(el) {
+        if (!el) { return ''; }
+        const img = el.querySelector('img');
+        if (!img) { return ''; }
+        const file = (img.getAttribute('src') || '').split('/').pop() || '';
+        return file.split('.')[0];
+    }
+
+    for (const style of styles) {
+        const seen = new Set();
+        for (let offset = 0; offset < 80; offset++) {
+            const response = await fetch(pageURL(style.page, offset),
+                                         { method: 'GET', credentials: 'same-origin' });
+            const finalURL = response.url || '';
+            if (finalURL.indexOf('/error/') !== -1 || finalURL.indexOf('login.html') !== -1) {
+                const match = finalURL.match(/[?&]err=([0-9]+)/);
+                return 'ERR:' + (match ? match[1] : 'server');
+            }
+            const html = await response.text();
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const cards = Array.prototype.slice.call(doc.querySelectorAll('.music-card'));
+            if (cards.length === 0) { break; }
+
+            let newCount = 0;
+            for (const card of cards) {
+                const header = card.querySelector('.chart a.music_info');
+                if (!header) { continue; }
+                const indexMatch = (header.getAttribute('href') || '').match(/index=([^&]+)/);
+                const songIndex = indexMatch ? indexMatch[1] : '';
+                if (!songIndex || seen.has(songIndex)) { continue; }
+                seen.add(songIndex);
+                newCount++;
+
+                const nameEl = card.querySelector('.music-name');
+                const title = nameEl ? nameEl.textContent.trim() : '';
+                const jacketEl = card.querySelector('img.left-image');
+                const jacket = jacketEl ? (jacketEl.getAttribute('src') || '') : '';
+
+                diffNames.forEach(function(diff) {
+                    const cell = card.querySelector('.rank.' + diff + ' .data');
+                    if (!cell) { return; }
+                    const link = cell.querySelector('a[href*="difficulty="]');
+                    if (!link) { return; }
+                    const scoreEl = cell.querySelector('.data_score');
+                    const flareEl = cell.querySelector('.data_flareskill');
+                    rows.push({
+                        songIndex: songIndex,
+                        title: title,
+                        jacket: jacket,
+                        style: style.key,
+                        difficulty: diff,
+                        score: scoreEl ? scoreEl.textContent.trim() : '',
+                        rank: imgStem(cell.querySelector('.data_rank')),
+                        clearKind: imgStem(cell.querySelector('.data_clearkind')),
+                        flareSkill: flareEl ? flareEl.textContent.trim() : '',
+                        flareRank: imgStem(cell.querySelector('.data_flarerank'))
+                    });
+                });
+            }
+            if (newCount === 0) { break; }
+        }
+    }
+
+    if (rows.length === 0) { return 'ERR:empty'; }
+    return JSON.stringify(rows);
+}
+
+for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+        return await fetchDDRScoreData();
+    } catch (error) {
+        if (attempt === 2) { return 'ERR:network'; }
+        await new Promise(function(resolve) { setTimeout(resolve, 800 * (attempt + 1)); });
+    }
+}
+return 'ERR:network';
+"""
+
 let scoreDataReadBody = """
 function readScoreData() {
     const node = document.getElementById('score_data');

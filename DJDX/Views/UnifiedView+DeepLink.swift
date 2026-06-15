@@ -10,12 +10,31 @@ extension UnifiedView {
         func value(for name: String) -> String? {
             queryItems.first { $0.name.lowercased() == name.lowercased() }?.value
         }
-        guard value(for: "type")?.lowercased() == "detail",
-              value(for: "game")?.lowercased() == "iidx",
-              let songName = value(for: "songName"), !songName.isEmpty else {
+        let type = value(for: "type")?.lowercased()
+        let game = value(for: "game")?.lowercased()
+
+        if type == "detail" {
+            guard game == "iidx", let songName = value(for: "songName"), !songName.isEmpty else {
+                return
+            }
+            Task { await openIIDXScoreDetail(songName: songName) }
             return
         }
-        Task { await openIIDXScoreDetail(songName: songName) }
+
+        if let game, let target = Self.game(named: game), target.isAvailable {
+            navigationManager.popToRoot()
+            selectedGame = target
+        }
+    }
+
+    static func game(named name: String) -> Game? {
+        switch name {
+        case "iidx", "iidxarcade", "beatmania": .iidxArcade
+        case "sdvx", "soundvoltex": .soundVoltex
+        case "polaris", "polarischord": .polarisChord
+        case "ddr", "ddrworld", "dancedancerevolution": .danceDanceRevolution
+        default: nil
+        }
     }
 
     func openIIDXScoreDetail(songName: String) async {
