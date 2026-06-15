@@ -69,7 +69,6 @@ struct DDRWebViewForImporter: UIViewRepresentable, @preconcurrency DDRUpdateScor
     }
 
     func updateUIView(_: WKWebView, context _: Context) {
-        // No dynamic updates needed; the web view is configured once in makeUIView
     }
 
     func importScoreData(using jsonString: String) async {

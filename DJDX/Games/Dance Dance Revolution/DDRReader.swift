@@ -82,7 +82,6 @@ actor DDRReader {
         return applyMetadata(to: records)
     }
 
-    // Fill level + debut version from the BEMANIWiki metadata, joined by compact title.
     private func applyMetadata(to records: [DDRSongRecord]) -> [DDRSongRecord] {
         let metaByTitle = loadMetaByTitle()
         guard !metaByTitle.isEmpty else { return records }

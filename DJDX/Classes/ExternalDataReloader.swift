@@ -14,7 +14,6 @@ struct ExternalDataReloader {
 
     typealias Progress = (Int, Int) -> Void
 
-    // Reloads one external data source and returns its resulting entry count.
     @discardableResult
     static func reload(
         _ id: ExternalDataSourceID,

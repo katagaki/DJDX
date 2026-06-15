@@ -1,8 +1,5 @@
 import Foundation
 
-// One DDRSongRecord is one chart (song + play style + difficulty), mirroring the
-// SDVX per-chart model. Levels are not present in the scraped HTML and stay 0
-// until backfilled from an external metadata source.
 final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
     var songIndex: String = ""
     var title: String = ""
@@ -31,7 +28,6 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
         score > 0 || !clearKind.isEmpty
     }
 
-    // Grade tokens look like "a", "aa", "aaa", "a_p" (A+), "a_m" (A-).
     var rankDisplay: String {
         guard !rank.isEmpty else { return "" }
         let parts = rank.split(separator: "_")

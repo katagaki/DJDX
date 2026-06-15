@@ -23,9 +23,6 @@ actor DDRMetadataImporter {
         return String(bytes: data, encoding: .utf8)
     }
 
-    // BEMANIWiki song tables: the last 9 cells of a data row are the levels
-    // (SP Be/Ba/Di/Ex/Ch + DP Ba/Di/Ex/Ch), and the title sits 14 cells from the
-    // end. Single-cell rows naming a version advance the running version index.
     func parseSongs(from html: String, baseVersion: Int?) -> [DDRSongMeta] {
         guard let document = try? SwiftSoup.parse(html),
               let body = document.body(),

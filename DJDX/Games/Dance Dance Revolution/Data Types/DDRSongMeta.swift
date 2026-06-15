@@ -1,8 +1,5 @@
 import Foundation
 
-// Chart metadata for one song (levels per chart + debut version), sourced from
-// BEMANIWiki and joined to scraped records by compact title. A level of 0 means
-// the chart does not exist.
 final class DDRSongMeta: Equatable, Hashable, @unchecked Sendable {
     var title: String = ""
     var version: Int = 0
@@ -18,7 +15,6 @@ final class DDRSongMeta: Equatable, Hashable, @unchecked Sendable {
 
     init() {}
 
-    // levelStrings is the 9-cell BEMANIWiki tail: SP(Be,Ba,Di,Ex,Ch) + DP(Ba,Di,Ex,Ch).
     init(title: String, version: Int, levelStrings: [String]) {
         self.title = title
         self.version = version

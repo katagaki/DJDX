@@ -79,9 +79,6 @@ actor DDRImporter {
         return record
     }
 
-    // Image filenames carry a field prefix and a possibly multi-token value:
-    // "rank_s_c_p" -> "c_p" (C+), "cl_clear" -> "clear", "flare_none" -> "".
-    // The empty/absent markers normalize to "no value".
     static func strippedStem(_ stem: String, prefix: String) -> String {
         var token = stem
         if token.hasPrefix(prefix) {
