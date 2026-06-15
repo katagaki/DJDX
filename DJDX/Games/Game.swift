@@ -24,7 +24,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         case .iidxArcade, .iidxInfinitas: .iconIIDX
         case .soundVoltex: .iconSDVX
         case .polarisChord: .iconPolarisChord
-        case .danceDanceRevolution: nil
+        case .danceDanceRevolution: .iconDDR
         }
     }
 
