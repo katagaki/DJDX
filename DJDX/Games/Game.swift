@@ -19,6 +19,16 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         }
     }
 
+    var shortName: String {
+        switch self {
+        case .iidxArcade: "IIDX"
+        case .soundVoltex: "SDVX"
+        case .iidxInfinitas: "INFINITAS"
+        case .polarisChord: "ぽらりこ"
+        case .danceDanceRevolution: "DDR"
+        }
+    }
+
     var iconResource: ImageResource? {
         switch self {
         case .iidxArcade, .iidxInfinitas: .iconIIDX

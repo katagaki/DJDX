@@ -347,7 +347,13 @@ struct UnifiedView: View {
             .labelsVisibility(.visible)
         } label: {
             HStack(spacing: 4.0) {
-                Text(selectedGame.displayName)
+                if let icon = selectedGame.iconResource {
+                    Image(icon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
+                }
+                Text(selectedGame.shortName)
                     .fontWeight(.bold)
                     .tint(.primary)
                 Image(systemName: "chevron.down.circle.fill")
@@ -356,6 +362,5 @@ struct UnifiedView: View {
                     .tint(.secondary)
             }
         }
-        .menuActionDismissBehavior(.disabled)
     }
 }

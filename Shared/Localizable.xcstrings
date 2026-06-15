@@ -2696,13 +2696,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Song Name, Artist Name"
+            "value" : "Charts"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "曲名、アーティスト名"
+            "value" : "譜面"
           }
         }
       }
