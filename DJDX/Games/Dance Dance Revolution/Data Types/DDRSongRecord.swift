@@ -53,7 +53,7 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
     }
 
     func titleCompact() -> String {
-        title.compact
+        title.ddrCompact
     }
 
     static func == (lhs: DDRSongRecord, rhs: DDRSongRecord) -> Bool {

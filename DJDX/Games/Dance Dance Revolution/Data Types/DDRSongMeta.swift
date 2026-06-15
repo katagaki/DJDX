@@ -38,7 +38,7 @@ final class DDRSongMeta: Equatable, Hashable, @unchecked Sendable {
     }
 
     func titleCompact() -> String {
-        title.compact
+        title.ddrCompact
     }
 
     func level(style: DDRPlayStyle, difficulty: DDRDifficulty) -> Int {
