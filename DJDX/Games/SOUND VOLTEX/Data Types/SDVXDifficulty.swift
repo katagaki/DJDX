@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // Maps to the 難易度 column in the SDVX CSV.
 enum SDVXDifficulty: String, Codable, CaseIterable {
@@ -59,10 +60,12 @@ enum SDVXDifficulty: String, Codable, CaseIterable {
     var color: Color {
         switch self {
         case .novice: return .purple
-        case .advanced: return .yellow
+        case .advanced: return Color(UIColor { $0.userInterfaceStyle == .dark
+            ? UIColor(red: 0.78, green: 0.58, blue: 0.0, alpha: 1.0) : .systemYellow })
         case .exhaust: return .red
         case .infinite: return .pink
-        case .maximum: return Color(white: 0.7)
+        case .maximum: return Color(UIColor { $0.userInterfaceStyle == .dark
+            ? UIColor(white: 0.4, alpha: 1.0) : UIColor(white: 0.7, alpha: 1.0) })
         case .gravity: return .orange
         case .heavenly: return .cyan
         case .vivid: return Color(red: 1.0, green: 0.4, blue: 0.7)

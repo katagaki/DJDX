@@ -49,18 +49,21 @@ struct SDVXScoreRow: View {
             Spacer(minLength: 0.0)
 
             // Difficulty + level label
-            VStack(spacing: 1.0) {
+            HStack(alignment: .center, spacing: 4.0) {
                 Text(verbatim: record.difficultyEnum.abbreviation)
-                    .font(.system(size: 10.0).weight(.black))
-                    .foregroundStyle(record.difficultyEnum.color)
+                    .lineLimit(1)
+                Spacer(minLength: 0.0)
                 Text(verbatim: record.level)
-                    .font(.system(size: 18.0).weight(.heavy))
-                    .fontWidth(.condensed)
                     .monospacedDigit()
+                    .lineLimit(1)
             }
-            .padding([.top, .bottom], 6.0)
-            .frame(width: 78.0, alignment: .center)
-            .cardBackground(cornerRadius: 6.0)
+            .font(.system(size: 14.0).weight(.bold))
+            .foregroundStyle(.white)
+            .padding([.leading, .trailing], 8.0)
+            .padding([.top, .bottom], 8.0)
+            .frame(width: 92.0)
+            .background(record.difficultyEnum.color)
+            .clipShape(.rect(cornerRadius: 6.0))
             .padding([.top, .bottom], 8.0)
         }
         .frame(maxWidth: .infinity)

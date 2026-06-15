@@ -21,17 +21,6 @@ enum DDRDifficulty: String, Codable, CaseIterable {
 
     static let sorted: [DDRDifficulty] = [.beginner, .basic, .difficult, .expert, .challenge]
 
-    var abbreviation: String {
-        switch self {
-        case .beginner: "BEG"
-        case .basic: "BAS"
-        case .difficult: "DIF"
-        case .expert: "EXP"
-        case .challenge: "CHA"
-        case .unknown: ""
-        }
-    }
-
     var color: Color {
         switch self {
         case .beginner: Color(red: 0.0, green: 0.7, blue: 1.0)

@@ -52,13 +52,15 @@ struct PolarisChordScoreRow: View {
             Spacer(minLength: 0.0)
 
             VStack(spacing: 1.0) {
-                Text(verbatim: record.difficultyEnum.abbreviation)
-                    .font(.system(size: 10.0).weight(.black))
-                    .foregroundStyle(record.difficultyEnum.color)
                 Text(verbatim: record.level)
                     .font(.system(size: 18.0).weight(.heavy))
-                    .fontWidth(.condensed)
                     .monospacedDigit()
+                Text(verbatim: record.difficultyEnum.rawValue)
+                    .font(.system(size: 10.0).weight(.black))
+                    .fontWidth(.condensed)
+                    .foregroundStyle(record.difficultyEnum.color)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
             .padding([.top, .bottom], 6.0)
             .frame(width: 78.0, alignment: .center)

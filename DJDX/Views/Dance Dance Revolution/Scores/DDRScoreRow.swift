@@ -47,8 +47,11 @@ struct DDRScoreRow: View {
             Spacer(minLength: 0.0)
 
             VStack(spacing: 1.0) {
-                Text(verbatim: record.difficultyEnum.abbreviation)
+                Text(verbatim: record.difficultyEnum.rawValue)
                     .font(.system(size: 10.0).weight(.black))
+                    .fontWidth(.condensed)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
                     .foregroundStyle(record.difficultyEnum.color)
                 Text(verbatim: record.levelText)
                     .font(.system(size: 18.0).weight(.heavy))

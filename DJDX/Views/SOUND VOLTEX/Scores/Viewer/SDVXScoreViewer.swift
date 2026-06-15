@@ -103,7 +103,7 @@ struct SDVXScoreViewer: View {
             DifficultySegmentedPicker<SDVXDifficulty>.Segment(
                 tag: record.difficultyEnum,
                 number: record.level,
-                name: Text(verbatim: record.difficultyEnum.abbreviation),
+                name: Text(verbatim: record.difficultyEnum.rawValue),
                 color: record.difficultyEnum.color
             )
         }
