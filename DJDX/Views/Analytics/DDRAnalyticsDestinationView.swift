@@ -64,7 +64,7 @@ struct DDRClearTypeLevelRow: View {
     var total: Int { counts.values.reduce(0, +) }
 
     var segments: [(type: String, count: Int)] {
-        DDRSongRecord.clearLampOrder.compactMap { type in
+        DDRSongRecord.clearBreakdownOrder.compactMap { type in
             let count = counts[type] ?? 0
             return count > 0 ? (type, count) : nil
         }

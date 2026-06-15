@@ -48,6 +48,10 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
         "marv", "perf", "great", "good", "life4", "clear", "assist", "fail"
     ]
 
+    static let noClearKey = "noclear"
+
+    static var clearBreakdownOrder: [String] { clearLampOrder + [noClearKey] }
+
     static let rankOrder: [String] = [
         "aaa", "aa_p", "aa", "aa_m", "a_p", "a", "a_m",
         "b_p", "b", "b_m", "c_p", "c", "c_m", "d_p", "d", "e"
@@ -85,6 +89,7 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
         case "clear": Color(red: 0.0, green: 0.8, blue: 0.5)
         case "assist": .purple
         case "fail": .gray
+        case noClearKey: .gray
         default: .secondary
         }
     }

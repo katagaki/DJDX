@@ -25,10 +25,11 @@ final class DDRAnalyticsModel {
         var clearByLevel: [Int: OrderedDictionary<String, Int>] = [:]
 
         let clearKeys = DDRSongRecord.clearLampOrder
+        let breakdownKeys = DDRSongRecord.clearBreakdownOrder
         let rankKeys = DDRSongRecord.rankOrder
 
         func emptyClearCounts() -> OrderedDictionary<String, Int> {
-            OrderedDictionary(uniqueKeys: clearKeys, values: clearKeys.map { _ in 0 })
+            OrderedDictionary(uniqueKeys: breakdownKeys, values: breakdownKeys.map { _ in 0 })
         }
         func emptyRankCounts() -> OrderedDictionary<String, Int> {
             OrderedDictionary(uniqueKeys: rankKeys, values: rankKeys.map { _ in 0 })
@@ -40,18 +41,20 @@ final class DDRAnalyticsModel {
             if clearByDiff[difficulty] == nil { clearByDiff[difficulty] = emptyClearCounts() }
             if rankByDiff[difficulty] == nil { rankByDiff[difficulty] = emptyRankCounts() }
 
-            if clearKeys.contains(record.clearKind) {
-                clearByDiff[difficulty]?[record.clearKind]? += 1
+            let clearBucket: String? = clearKeys.contains(record.clearKind)
+                ? record.clearKind
+                : (record.hasScore ? DDRSongRecord.noClearKey : nil)
+
+            if let clearBucket {
+                clearByDiff[difficulty]?[clearBucket]? += 1
             }
             if rankKeys.contains(record.rank) {
                 rankByDiff[difficulty]?[record.rank]? += 1
             }
 
-            if record.level > 0 {
+            if record.level > 0, let clearBucket {
                 if clearByLevel[record.level] == nil { clearByLevel[record.level] = emptyClearCounts() }
-                if clearKeys.contains(record.clearKind) {
-                    clearByLevel[record.level]?[record.clearKind]? += 1
-                }
+                clearByLevel[record.level]?[clearBucket]? += 1
             }
         }
 

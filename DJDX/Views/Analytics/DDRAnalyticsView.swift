@@ -154,8 +154,8 @@ struct DDRAnalyticsView: View {
 
     var totalClearCounts: OrderedDictionary<String, Int> {
         var totals: OrderedDictionary<String, Int> = OrderedDictionary(
-            uniqueKeys: DDRSongRecord.clearLampOrder,
-            values: DDRSongRecord.clearLampOrder.map { _ in 0 }
+            uniqueKeys: DDRSongRecord.clearBreakdownOrder,
+            values: DDRSongRecord.clearBreakdownOrder.map { _ in 0 }
         )
         for (_, counts) in model.clearTypePerDifficulty {
             for (key, value) in counts {
@@ -178,6 +178,10 @@ struct DDRAnalyticsView: View {
         return totals
     }
 
+    func clearLabel(_ key: String) -> String {
+        key == DDRSongRecord.noClearKey ? "NO CLEAR" : key.uppercased()
+    }
+
     var clearBreakdownCard: some View {
         AnalyticsCardView(title: "Analytics.DDR.ClearBreakdown",
                           systemImage: "",
@@ -187,7 +191,7 @@ struct DDRAnalyticsView: View {
             Chart(totalClearCounts.elements.filter { $0.value > 0 }, id: \.key) { element in
                 BarMark(
                     x: .value("Shared.ClearCount", element.value),
-                    y: .value("Type", element.key.uppercased())
+                    y: .value("Type", clearLabel(element.key))
                 )
                 .foregroundStyle(DDRSongRecord.clearColor(for: element.key))
             }
