@@ -112,11 +112,6 @@ struct IIDXScoreSection: View {
                 .buttonStyle(.plain)
             }
             chartActions()
-        } header: {
-            HStack(spacing: 16.0) {
-                IIDXLevelLabel(orientation: .horizontal, levelType: score.level, score: score)
-                Spacer()
-            }
         }
         .task {
             if score.djLevelEnum() != .none {

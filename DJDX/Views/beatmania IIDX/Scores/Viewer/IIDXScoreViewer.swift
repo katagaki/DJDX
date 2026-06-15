@@ -71,6 +71,7 @@ struct IIDXScoreViewer: View {
                              chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 4)])
             }
         }
+        .listSectionSpacing(.compact)
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
         .contentMargins(.top, 0.0, for: .scrollContent)
