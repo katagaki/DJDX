@@ -29,14 +29,49 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
     }
 
     var rankDisplay: String {
-        guard !rank.isEmpty else { return "" }
-        let parts = rank.split(separator: "_")
-        let letter = (parts.first.map(String.init) ?? rank).uppercased()
+        Self.rankDisplay(forStem: rank)
+    }
+
+    static func rankDisplay(forStem stem: String) -> String {
+        guard !stem.isEmpty else { return "" }
+        let parts = stem.split(separator: "_")
+        let letter = (parts.first.map(String.init) ?? stem).uppercased()
         guard parts.count > 1 else { return letter }
         switch parts[1] {
         case "p": return letter + "+"
         case "m": return letter + "-"
         default: return letter
+        }
+    }
+
+    static let clearLampOrder: [String] = [
+        "marv", "perf", "great", "good", "life4", "clear", "assist", "fail"
+    ]
+
+    static let rankOrder: [String] = [
+        "aaa", "aa_p", "aa", "aa_m", "a_p", "a", "a_m",
+        "b_p", "b", "b_m", "c_p", "c", "c_m", "d_p", "d", "e"
+    ]
+
+    var clearLampSortIndex: Int {
+        Self.clearLampOrder.firstIndex(of: clearKind) ?? Self.clearLampOrder.count
+    }
+
+    static func orderedClearLamps(_ lamps: Set<String>) -> [String] {
+        lamps.sorted { lhs, rhs in
+            let lhsRank = clearLampOrder.firstIndex(of: lhs) ?? clearLampOrder.count
+            let rhsRank = clearLampOrder.firstIndex(of: rhs) ?? clearLampOrder.count
+            if lhsRank != rhsRank { return lhsRank < rhsRank }
+            return lhs < rhs
+        }
+    }
+
+    static func orderedRanks(_ ranks: Set<String>) -> [String] {
+        ranks.sorted { lhs, rhs in
+            let lhsRank = rankOrder.firstIndex(of: lhs) ?? rankOrder.count
+            let rhsRank = rankOrder.firstIndex(of: rhs) ?? rankOrder.count
+            if lhsRank != rhsRank { return lhsRank < rhsRank }
+            return lhs < rhs
         }
     }
 

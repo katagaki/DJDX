@@ -23,13 +23,13 @@ enum DDRVersion: Int, Codable, CaseIterable {
 
     var lightModeColor: UIColor {
         switch self {
-        case .world: UIColor(red: 224 / 255, green: 32 / 255, blue: 96 / 255, alpha: 1.0)
+        case .world: UIColor(red: 99 / 255, green: 214 / 255, blue: 143 / 255, alpha: 1.0)
         }
     }
 
     var darkModeColor: UIColor {
         switch self {
-        case .world: UIColor(red: 255 / 255, green: 96 / 255, blue: 160 / 255, alpha: 1.0)
+        case .world: UIColor(red: 99 / 255, green: 214 / 255, blue: 143 / 255, alpha: 1.0)
         }
     }
 
