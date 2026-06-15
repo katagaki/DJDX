@@ -1930,6 +1930,23 @@
         }
       }
     },
+    "More.Disclaimer.NotAffiliated" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app is not affiliated with KONAMI. KONAMI bears no responsibility for any content shown in this app."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリはコナミとは一切関係がありません。アプリ内に表示される内容について、コナミは一切の責任を負いません。"
+          }
+        }
+      }
+    },
     "More.ExternalData.BemaniWiki2nd" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2431,6 +2448,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アナリティクスキャッシュをクリア"
+          }
+        }
+      }
+    },
+    "More.ManageData.DeleteOrReset" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete or Reset…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "消去またはリセット…"
           }
         }
       }

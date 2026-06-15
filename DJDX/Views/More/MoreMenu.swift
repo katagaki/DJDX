@@ -70,14 +70,16 @@ struct MoreMenu: View {
                 Button("More.ManageData.ICloudBackup", systemImage: "icloud") {
                     isPresentingICloudBackup = true
                 }
-                Button("More.ManageData.ResetLayout", systemImage: "arrow.counterclockwise", role: .destructive) {
-                    isConfirmingResetLayout = true
-                }
-                Button("More.ManageData.DeleteWebData", image: .globeSlash, role: .destructive) {
-                    isConfirmingWebDataDelete = true
-                }
-                Button("More.ManageData.DeleteScoreData", systemImage: "trash", role: .destructive) {
-                    beginScoreDataDelete()
+                Menu("More.ManageData.DeleteOrReset", systemImage: "trash") {
+                    Button("More.ManageData.ResetLayout", systemImage: "arrow.counterclockwise", role: .destructive) {
+                        isConfirmingResetLayout = true
+                    }
+                    Button("More.ManageData.DeleteWebData", image: .globeSlash, role: .destructive) {
+                        isConfirmingWebDataDelete = true
+                    }
+                    Button("More.ManageData.DeleteScoreData", systemImage: "trash", role: .destructive) {
+                        beginScoreDataDelete()
+                    }
                 }
             }
             Section {
@@ -87,6 +89,9 @@ struct MoreMenu: View {
                 Button("More.Attributions") {
                     navigationManager.push(MorePath.moreAttributions)
                 }
+            }
+            Section {
+                Text("More.Disclaimer.NotAffiliated")
             }
         } label: {
             Label("Tab.More", systemImage: "ellipsis")
