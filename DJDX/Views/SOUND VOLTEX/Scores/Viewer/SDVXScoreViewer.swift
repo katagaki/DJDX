@@ -26,6 +26,12 @@ struct SDVXScoreViewer: View {
     var body: some View {
         List {
             Section {
+                header()
+            }
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            Section {
                 headline()
                 VStack(alignment: .leading, spacing: 8.0) {
                     SDVXDetailRow("CLEAR TYPE",
@@ -55,29 +61,22 @@ struct SDVXScoreViewer: View {
                 .fontWidth(.condensed)
             }
         }
+        .listSectionSpacing(.compact)
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
+        .contentMargins(.top, 0.0, for: .scrollContent)
+        .softTopScrollEdgeEffect()
+        .softBottomScrollEdgeEffect()
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Spacer()
             }
         }
-        .safeAreaInset(edge: .top, spacing: 0.0) {
-            TabBarAccessory(placement: .top) {
-                VStack(alignment: .center, spacing: 8.0) {
-                    Text(verbatim: title)
-                        .font(.title)
-                        .fontWeight(.heavy)
-                        .fontWidth(.compressed)
-                        .multilineTextAlignment(.center)
-                        .textSelection(.enabled)
-                    difficultySwitcher()
-                }
-                .frame(maxWidth: .infinity)
-                .padding([.bottom], 8.0)
-                .padding([.leading, .trailing], 20.0)
-            }
+        .safeAreaInset(edge: .bottom, spacing: 0.0) {
+            difficultySwitcher()
+                .padding(.horizontal, 20.0)
+                .padding(.bottom, 8.0)
         }
         .conditionalBottomTabBarAccessory()
         .onAppear {
@@ -90,6 +89,22 @@ struct SDVXScoreViewer: View {
         .task(id: selectedDifficulty) {
             sdvxInChart = await fetcher.sdvxInChart(title: songRecord.title, difficulty: difficulty)
         }
+    }
+
+    @ViewBuilder
+    private func header() -> some View {
+        VStack(alignment: .center, spacing: 8.0) {
+            Text(verbatim: title)
+                .font(.title)
+                .fontWeight(.heavy)
+                .fontWidth(.compressed)
+                .multilineTextAlignment(.center)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity)
+        }
+        .padding(.top, 8.0)
+        .padding(.bottom, 8.0)
+        .padding([.leading, .trailing], 20.0)
     }
 
     @ViewBuilder
