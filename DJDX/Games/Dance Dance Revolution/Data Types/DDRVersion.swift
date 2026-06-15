@@ -56,4 +56,21 @@ https://p.eagate.573.jp/game/ddr/\(slug)/playdata/music_data_single.html?offset=
     func errorPageURL() -> URL {
         URL(string: "https://p.eagate.573.jp/game/ddr/\(slug)/error/")!
     }
+
+    // BEMANIWiki 2nd DDR WORLD song lists (UTF-8 page paths). 新曲リスト covers
+    // WORLD's new songs; 旧曲リスト covers every earlier version, grouped by
+    // version section headers.
+    func bemaniWikiNewSongsPageURL() -> URL {
+        URL(string: """
+https://bemaniwiki.com/?DanceDanceRevolution+WORLD/%E6%96%B0%E6%9B%B2%E3%83%AA%E3%82%B9%E3%83%88
+""")!
+    }
+
+    func bemaniWikiOldSongsPageURL() -> URL {
+        URL(string: """
+https://bemaniwiki.com/?DanceDanceRevolution+WORLD/%E6%97%A7%E6%9B%B2%E3%83%AA%E3%82%B9%E3%83%88
+""")!
+    }
+
+    static let worldVersionNumber = 20
 }

@@ -9,6 +9,7 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
     var style: String = DDRPlayStyle.single.rawValue
     var difficulty: String = DDRDifficulty.beginner.rawValue
     var level: Int = 0
+    var version: Int = 0
     var score: Int = 0
     var rank: String = ""
     var clearKind: String = ""

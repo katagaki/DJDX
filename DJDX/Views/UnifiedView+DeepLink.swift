@@ -13,6 +13,13 @@ extension UnifiedView {
         let type = value(for: "type")?.lowercased()
         let game = value(for: "game")?.lowercased()
 
+#if DEBUG
+        if value(for: "action")?.lowercased() == "reload-ddr-meta" {
+            Task { _ = await DDRMetadataImporter().reloadBemaniWikiData() }
+            return
+        }
+#endif
+
         if type == "detail" {
             guard game == "iidx", let songName = value(for: "songName"), !songName.isEmpty else {
                 return

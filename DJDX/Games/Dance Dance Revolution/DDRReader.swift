@@ -78,7 +78,32 @@ actor DDRReader {
         let query = DB.songRecordTable
             .filter(DB.srImportGroupID == importGroupID)
             .order(DB.srTitle.asc)
-        return (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
+        let records = (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
+        return applyMetadata(to: records)
+    }
+
+    // Fill level + debut version from the BEMANIWiki metadata, joined by compact title.
+    private func applyMetadata(to records: [DDRSongRecord]) -> [DDRSongRecord] {
+        let metaByTitle = loadMetaByTitle()
+        guard !metaByTitle.isEmpty else { return records }
+        for record in records {
+            if let meta = metaByTitle[record.titleCompact()] {
+                record.level = meta.level(style: record.styleEnum, difficulty: record.difficultyEnum)
+                record.version = meta.version
+            }
+        }
+        return records
+    }
+
+    private func loadMetaByTitle() -> [String: DDRSongMeta] {
+        guard let database = try? DDRMetadataDatabase.shared.getReadConnection() else { return [:] }
+        var result: [String: DDRSongMeta] = [:]
+        if let rows = try? database.prepare(DDRMetadataDatabase.songMetaTable) {
+            for row in rows {
+                result[row[DDRMetadataDatabase.smTitleCompact]] = DDRMetadataImporter.meta(from: row)
+            }
+        }
+        return result
     }
 
     func latestSongRecords() -> [DDRSongRecord] {

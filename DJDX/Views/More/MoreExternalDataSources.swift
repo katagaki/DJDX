@@ -12,23 +12,26 @@ struct MoreExternalDataSources: View {
     @AppStorage(wrappedValue: false, "ExternalData.SDVXIn.Enabled") var isSDVXInEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.BM2DX.Enabled") var isBM2DXEnabled: Bool
+    @AppStorage(wrappedValue: false, "ExternalData.DDR.Enabled") var isDDREnabled: Bool
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var bemaniWikiEntryCount: Int = 0
     @State var bm2dxEntryCount: Int = 0
     @State var sdvxInEntryCount: Int = 0
     @State var textageEntryCount: Int = 0
+    @State var ddrSongMetaCount: Int = 0
 
     @State var isBemaniWikiReloadCompleted: Bool = false
     @State var isBM2DXReloadCompleted: Bool = false
     @State var isSDVXInReloadCompleted: Bool = false
     @State var isTextageReloadCompleted: Bool = false
+    @State var isDDRReloadCompleted: Bool = false
     @State var dataImported: Int = 0
     @State var dataTotal: Int = 2
     @State var reloadingSource: ExternalDataReloadSource?
 
     enum ExternalDataReloadSource {
-        case bemaniWiki, bm2dx, sdvxIn, textage
+        case bemaniWiki, bm2dx, sdvxIn, textage, ddr
     }
 
     let fetcher = IIDXReader()
@@ -36,6 +39,7 @@ struct MoreExternalDataSources: View {
     let sdvxFetcher = SDVXReader()
     let sdvxInImporter = SDVXInImporter()
     let textageImporter = TextageImporter()
+    let ddrMetaImporter = DDRMetadataImporter()
 
     var body: some View {
         List {
@@ -43,6 +47,7 @@ struct MoreExternalDataSources: View {
             sdvxInSection()
             bemaniWikiSection()
             bm2dxSection()
+            ddrSection()
         }
         .navigationTitle("More.ExternalData.Header")
         .navigationBarTitleDisplayMode(.inline)
@@ -69,6 +74,7 @@ struct MoreExternalDataSources: View {
             bm2dxEntryCount = await fetcher.chartRadarDataCount()
             sdvxInEntryCount = await sdvxFetcher.sdvxInChartCount()
             textageEntryCount = await fetcher.textageChartCount()
+            ddrSongMetaCount = await ddrMetaImporter.songMetaCount()
         }
         .alert(
             "Alert.ExternalData.Completed.Title",
@@ -118,17 +124,67 @@ struct MoreExternalDataSources: View {
                 Text("Alert.ExternalData.Completed.Text.\(textageEntryCount)")
             }
         )
+        .alert(
+            "Alert.ExternalData.Completed.Title",
+            isPresented: $isDDRReloadCompleted,
+            actions: {
+                Button("Shared.OK", role: .cancel) {
+                    isDDRReloadCompleted = false
+                }
+            },
+            message: {
+                Text("Alert.ExternalData.Completed.Text.\(ddrSongMetaCount)")
+            }
+        )
     }
 
     @ViewBuilder
     private func reloadIndicator(for source: ExternalDataReloadSource) -> some View {
         if reloadingSource == source {
             switch source {
-            case .bm2dx:
+            case .bm2dx, .ddr:
                 ProgressView()
             default:
                 ProgressDonut(progress: dataTotal > 0 ? Double(dataImported) / Double(dataTotal) : 0.0)
             }
+        }
+    }
+
+    // MARK: - DanceDanceRevolution (BEMANIWiki)
+
+    @ViewBuilder
+    private func ddrSection() -> some View {
+        Section {
+            Toggle(isOn: $isDDREnabled) {
+                Text(verbatim: "DanceDanceRevolution WORLD")
+            }
+            if isDDREnabled {
+                HStack {
+                    Button("More.ExternalData.UpdateData") {
+                        reloadingSource = .ddr
+                        Task {
+                            ddrSongMetaCount = await ddrMetaImporter.reloadBemaniWikiData()
+                            reloadingSource = nil
+                            isDDRReloadCompleted = true
+                        }
+                    }
+                    .disabled(reloadingSource != nil)
+                    Spacer()
+                    reloadIndicator(for: .ddr)
+                }
+                HStack {
+                    Text("More.ExternalData.BemaniWiki2nd.EntryCount")
+                    Spacer()
+                    Text(verbatim: "\(ddrSongMetaCount)")
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } header: {
+            ListSectionHeader(text: "DanceDanceRevolution")
+                .font(.body)
+        } footer: {
+            Text(verbatim: "DanceDanceRevolution WORLD chart levels and versions. ") +
+            Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://bemaniwiki.com)")
         }
     }
 
