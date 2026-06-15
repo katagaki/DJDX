@@ -89,9 +89,11 @@ struct DDRProfileHeaderView: View {
         .background {
             LinearGradient(
                 stops: [
-                    .init(color: .clear, location: 0.0),
-                    .init(color: .clear, location: 0.5),
-                    .init(color: .white, location: 1.0)
+                    .init(color: .white.opacity(0.0), location: 0.0),
+                    .init(color: .white.opacity(0.04), location: 0.45),
+                    .init(color: .white.opacity(0.18), location: 0.65),
+                    .init(color: .white.opacity(0.5), location: 0.82),
+                    .init(color: .white.opacity(1.0), location: 1.0)
                 ],
                 startPoint: .top,
                 endPoint: .bottom
