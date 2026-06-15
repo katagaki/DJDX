@@ -1,8 +1,7 @@
 import SwiftUI
 
 extension UnifiedView {
-#if DEBUG
-    func handleDebugDeepLink(_ url: URL) {
+    func handleDeepLink(_ url: URL) {
         guard url.scheme == "djdx", url.host == "open",
               let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return
@@ -68,5 +67,4 @@ extension UnifiedView {
         let matching = await reader.songRecordsForSong(title: songName)
         return matching.first { $0.playType == playTypeToShow } ?? matching.first
     }
-#endif
 }

@@ -149,15 +149,15 @@ struct UnifiedView: View {
             )
             .presentationBackground(.clear)
         }
-#if DEBUG
         .onOpenURL { url in
+#if DEBUG
             if url.scheme == "djdx", url.host == "max300" {
                 Task { await runFakeMigration() }
-            } else {
-                handleDebugDeepLink(url)
+                return
             }
-        }
 #endif
+            handleDeepLink(url)
+        }
         .task {
             if !isFirstStartCleanupComplete {
                 await migrateData()
