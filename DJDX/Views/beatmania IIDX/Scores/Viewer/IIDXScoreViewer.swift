@@ -29,35 +29,41 @@ struct IIDXScoreViewer: View {
 
     var body: some View {
         List {
-            if selectedLevel == .all || selectedLevel == .beginner,
+            Section {
+                header()
+            }
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            if selectedLevel == .beginner,
                !isBeginnerLevelHidden, songRecord.beginnerScore.difficulty != 0 {
                 IIDXScoreSection(songTitle: songRecord.title, score: songRecord.beginnerScore,
                              noteCount: noteCount(songRecord, .beginner),
                              playType: .single,
                              chartRadarData: radarDataByLevel["SP-0"])
             }
-            if selectedLevel == .all || selectedLevel == .normal,
+            if selectedLevel == .normal,
                songRecord.normalScore.difficulty != 0 {
                 IIDXScoreSection(songTitle: songRecord.title, score: songRecord.normalScore,
                              noteCount: noteCount(songRecord, .normal),
                              playType: songRecord.playType,
                              chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 1)])
             }
-            if selectedLevel == .all || selectedLevel == .hyper,
+            if selectedLevel == .hyper,
                songRecord.hyperScore.difficulty != 0 {
                 IIDXScoreSection(songTitle: songRecord.title, score: songRecord.hyperScore,
                              noteCount: noteCount(songRecord, .hyper),
                              playType: songRecord.playType,
                              chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 2)])
             }
-            if selectedLevel == .all || selectedLevel == .another,
+            if selectedLevel == .another,
                songRecord.anotherScore.difficulty != 0 {
                 IIDXScoreSection(songTitle: songRecord.title, score: songRecord.anotherScore,
                              noteCount: noteCount(songRecord, .another),
                              playType: songRecord.playType,
                              chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 3)])
             }
-            if selectedLevel == .all || selectedLevel == .leggendaria,
+            if selectedLevel == .leggendaria,
                songRecord.leggendariaScore.difficulty != 0 {
                 IIDXScoreSection(songTitle: songRecord.title, score: songRecord.leggendariaScore,
                              noteCount: noteCount(songRecord, .leggendaria),
@@ -67,6 +73,9 @@ struct IIDXScoreViewer: View {
         }
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
+        .contentMargins(.top, 0.0, for: .scrollContent)
+        .softTopScrollEdgeEffect()
+        .softBottomScrollEdgeEffect()
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -74,108 +83,88 @@ struct IIDXScoreViewer: View {
             }
             versionNumberToolbarItem()
         }
-        .safeAreaInset(edge: .top, spacing: 0.0) {
-            TabBarAccessory(placement: .top) {
-                VStack(alignment: .center, spacing: 8.0) {
-                    VStack(alignment: .center, spacing: 4.0) {
-                        Group {
-                            Text(songRecord.genre)
-                                .font(.subheadline)
-                                .fontWeight(.heavy)
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(.white)
-                                .strokeText(color: .black.opacity(0.7), width: 0.5)
-                            Text(songRecord.title)
-                                .font(.title)
-                                .fontWeight(.heavy)
-                                .fontWidth(.compressed)
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(
-                                    iidxVersion.songTitleTextColor(for: songRecord.version)
-                                )
-                                .strokeText(
-                                    color: iidxVersion.songTitleStrokeColor(for: songRecord.version),
-                                    width: 0.5
-                                )
-                                .textSelection(.enabled)
-                                .padding(.bottom, 2.0)
-                            Text(songRecord.artist)
-                                .font(.subheadline)
-                                .fontWeight(.heavy)
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(.white)
-                                .strokeText(color: .black.opacity(0.7), width: 0.5)
-                        }
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                    }
-                    .frame(maxWidth: .infinity)
-                    Divider()
-                    HStack {
-                        Text("""
-Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time: .shortened))
-""")
-                        .foregroundStyle(.tertiary)
-                    }
-                    .font(.caption2)
-                    difficultySwitcher()
-                }
-                .padding([.bottom], 8.0)
-                .padding([.leading, .trailing], 20.0)
-            }
+        .safeAreaInset(edge: .bottom, spacing: 0.0) {
+            difficultySwitcher()
+                .padding(.horizontal, 20.0)
+                .padding(.bottom, 8.0)
         }
         .conditionalBottomTabBarAccessory()
         .task {
             await loadRadarData()
         }
         .onAppear {
-            if initialLevel != .all, availableLevels.contains(initialLevel) {
-                selectedLevel = initialLevel
+            if selectedLevel == .all {
+                if initialLevel != .all, availableLevels.contains(initialLevel) {
+                    selectedLevel = initialLevel
+                } else {
+                    selectedLevel = availableLevels.last ?? .all
+                }
             }
         }
+    }
+
+    @ViewBuilder
+    private func header() -> some View {
+        VStack(alignment: .center, spacing: 8.0) {
+            VStack(alignment: .center, spacing: 4.0) {
+                Group {
+                    Text(songRecord.genre)
+                        .font(.subheadline)
+                        .fontWeight(.heavy)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(.white)
+                        .strokeText(color: .black.opacity(0.7), width: 0.5)
+                    Text(songRecord.title)
+                        .font(.title)
+                        .fontWeight(.heavy)
+                        .fontWidth(.compressed)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(
+                            iidxVersion.songTitleTextColor(for: songRecord.version)
+                        )
+                        .strokeText(
+                            color: iidxVersion.songTitleStrokeColor(for: songRecord.version),
+                            width: 0.5
+                        )
+                        .textSelection(.enabled)
+                        .padding(.bottom, 2.0)
+                    Text(songRecord.artist)
+                        .font(.subheadline)
+                        .fontWeight(.heavy)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(.white)
+                        .strokeText(color: .black.opacity(0.7), width: 0.5)
+                }
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+            }
+            .frame(maxWidth: .infinity)
+            Divider()
+            HStack {
+                Text("""
+Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time: .shortened))
+""")
+                .foregroundStyle(.tertiary)
+            }
+            .font(.caption2)
+        }
+        .padding(.top, 8.0)
+        .padding(.bottom, 8.0)
+        .padding([.leading, .trailing], 20.0)
     }
 
     @ViewBuilder
     private func difficultySwitcher() -> some View {
-        HStack(spacing: 6.0) {
-            ForEach(availableLevels, id: \.self) { level in
-                difficultyChip(level: level,
-                               label: String(difficultyNumber(for: level)),
-                               color: difficultyColor(for: level))
-            }
+        let segments: [DifficultySegmentedPicker<IIDXLevel>.Segment] = availableLevels.map { level in
+            DifficultySegmentedPicker<IIDXLevel>.Segment(
+                tag: level,
+                number: String(difficultyNumber(for: level)),
+                name: Text(LocalizedStringKey(level.rawValue)),
+                color: difficultyColor(for: level)
+            )
         }
-        .padding(.top, 4.0)
-    }
-
-    @ViewBuilder
-    private func difficultyChip(level: IIDXLevel, label: String, color: Color) -> some View {
-        Button {
-            withAnimation(.smooth.speed(2.0)) {
-                if selectedLevel == level {
-                    selectedLevel = .all
-                } else {
-                    selectedLevel = level
-                }
-            }
-        } label: {
-            Text(verbatim: label)
-                .font(.title3)
-                .fontWeight(.heavy)
-                .fontWidth(.expanded)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8.0)
-                .background(selectedLevel == level ? color : color.opacity(0.1))
-                .foregroundStyle(selectedLevel == level ? .white : .secondary)
-                .clipShape(.capsule)
-                .overlay {
-                    if selectedLevel != level {
-                        Capsule(style: .continuous)
-                            .stroke(.secondary.opacity(0.3), lineWidth: 1.0)
-                    }
-                }
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
+        DifficultySegmentedPicker(segments: segments, selection: $selectedLevel)
+            .padding(.top, 4.0)
     }
 
     private func difficultyNumber(for level: IIDXLevel) -> Int {

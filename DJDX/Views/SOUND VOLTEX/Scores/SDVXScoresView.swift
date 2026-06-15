@@ -58,6 +58,16 @@ struct SDVXScoresView<Header: View>: View {
         return result
     }
 
+    func siblingCharts(of record: SDVXSongRecord) -> [SDVXSongRecord] {
+        records
+            .filter { $0.titleCompact() == record.titleCompact() }
+            .sorted { lhs, rhs in
+                let lhsRank = SDVXDifficulty.sorted.firstIndex(of: lhs.difficultyEnum) ?? Int.max
+                let rhsRank = SDVXDifficulty.sorted.firstIndex(of: rhs.difficultyEnum) ?? Int.max
+                return lhsRank < rhsRank
+            }
+    }
+
     // Group decimal levels into 0.5-wide buckets (e.g. 17.0–17.4 -> 17.0).
     func levelBucket(_ level: String) -> Double {
         let value = Double(level) ?? 0.0
@@ -223,7 +233,8 @@ struct SDVXScoresView<Header: View>: View {
         .navigationDestination(for: SDVXScoresPath.self) { viewPath in
             switch viewPath {
             case .scoreViewer(let songRecord):
-                SDVXScoreViewer(songRecord: songRecord)
+                SDVXScoreViewer(songRecords: siblingCharts(of: songRecord),
+                                initialDifficulty: songRecord.difficultyEnum)
                     .automaticNavigationTransition(id: "\(songRecord.title).\(songRecord.difficulty)",
                                                    in: sdvxNamespace)
             case .chartViewer(let chart):

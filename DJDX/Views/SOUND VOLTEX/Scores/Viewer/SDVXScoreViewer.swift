@@ -5,13 +5,23 @@ struct SDVXScoreViewer: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(\.openURL) var openURL
 
-    var songRecord: SDVXSongRecord
+    var songRecords: [SDVXSongRecord]
+    var initialDifficulty: SDVXDifficulty
 
+    @State private var selectedDifficulty: SDVXDifficulty = .unknown
     @State private var sdvxInChart: SDVXInChart?
 
     private let fetcher = SDVXReader()
 
+    private var songRecord: SDVXSongRecord {
+        songRecords.first { $0.difficultyEnum == selectedDifficulty } ?? songRecords.first ?? SDVXSongRecord()
+    }
+
     private var difficulty: SDVXDifficulty { songRecord.difficultyEnum }
+
+    private var title: String {
+        songRecords.first?.title ?? songRecord.title
+    }
 
     var body: some View {
         List {
@@ -56,12 +66,13 @@ struct SDVXScoreViewer: View {
         .safeAreaInset(edge: .top, spacing: 0.0) {
             TabBarAccessory(placement: .top) {
                 VStack(alignment: .center, spacing: 8.0) {
-                    Text(verbatim: songRecord.title)
+                    Text(verbatim: title)
                         .font(.title)
                         .fontWeight(.heavy)
                         .fontWidth(.compressed)
                         .multilineTextAlignment(.center)
                         .textSelection(.enabled)
+                    difficultySwitcher()
                 }
                 .frame(maxWidth: .infinity)
                 .padding([.bottom], 8.0)
@@ -69,9 +80,30 @@ struct SDVXScoreViewer: View {
             }
         }
         .conditionalBottomTabBarAccessory()
-        .task {
+        .onAppear {
+            if selectedDifficulty == .unknown {
+                selectedDifficulty = songRecords.contains(where: { $0.difficultyEnum == initialDifficulty })
+                    ? initialDifficulty
+                    : (songRecords.first?.difficultyEnum ?? .unknown)
+            }
+        }
+        .task(id: selectedDifficulty) {
             sdvxInChart = await fetcher.sdvxInChart(title: songRecord.title, difficulty: difficulty)
         }
+    }
+
+    @ViewBuilder
+    private func difficultySwitcher() -> some View {
+        let segments: [DifficultySegmentedPicker<SDVXDifficulty>.Segment] = songRecords.map { record in
+            DifficultySegmentedPicker<SDVXDifficulty>.Segment(
+                tag: record.difficultyEnum,
+                number: record.level,
+                name: Text(verbatim: record.difficultyEnum.abbreviation),
+                color: record.difficultyEnum.color
+            )
+        }
+        DifficultySegmentedPicker(segments: segments, selection: $selectedDifficulty)
+            .padding(.top, 4.0)
     }
 
     @ViewBuilder
