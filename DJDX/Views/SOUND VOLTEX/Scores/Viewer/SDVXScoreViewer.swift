@@ -49,16 +49,6 @@ struct SDVXScoreViewer: View {
                 }
                 .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                 chartActions()
-            } header: {
-                HStack(spacing: 4.0) {
-                    Text(verbatim: difficulty.abbreviation)
-                        .foregroundStyle(difficulty.color)
-                        .fontWeight(.black)
-                    Text(verbatim: songRecord.level)
-                        .monospacedDigit()
-                    Spacer()
-                }
-                .fontWidth(.condensed)
             }
         }
         .listSectionSpacing(.compact)
