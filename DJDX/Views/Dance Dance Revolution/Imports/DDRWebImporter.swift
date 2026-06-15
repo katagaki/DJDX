@@ -56,6 +56,7 @@ struct DDRWebViewForImporter: UIViewRepresentable, @preconcurrency DDRUpdateScor
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
+        webView.configuration.userContentController.add(context.coordinator, name: "ddrProgress")
         webView.layer.opacity = 0.0
         webView.load(URLRequest(url: ddrVersion.loginPageRedirectURL()))
         #if DEBUG
@@ -71,11 +72,20 @@ struct DDRWebViewForImporter: UIViewRepresentable, @preconcurrency DDRUpdateScor
     func updateUIView(_: WKWebView, context _: Context) {
     }
 
+    static func dismantleUIView(_ uiView: WKWebView, coordinator: DDRCoordinatorForImporter) {
+        uiView.configuration.userContentController.removeScriptMessageHandler(forName: "ddrProgress")
+    }
+
+    func beginScrapeProgress() {
+        progressReporter.show(title: "Alert.Importing.Title", message: "Alert.Importing.Text")
+    }
+
+    func updateScrapeProgress(pagesFetched: Int) {
+        let estimatedTotalPages = 52
+        progressReporter.updateProgress(min(90, pagesFetched * 90 / estimatedTotalPages))
+    }
+
     func importScoreData(using jsonString: String) async {
-        progressReporter.show(
-            title: "Alert.Importing.Title",
-            message: "Alert.Importing.Text"
-        )
         let importer = DDRImporter()
         for await progress in await importer.importJSON(
             json: jsonString,
@@ -85,7 +95,7 @@ struct DDRWebViewForImporter: UIViewRepresentable, @preconcurrency DDRUpdateScor
             if let currentFileProgress = progress.currentFileProgress,
                let currentFileTotal = progress.currentFileTotal,
                currentFileTotal > 0 {
-                let percentage = (currentFileProgress * 100) / currentFileTotal
+                let percentage = 90 + (currentFileProgress * 10) / currentFileTotal
                 await MainActor.run {
                     progressReporter.updateProgress(percentage)
                 }
@@ -105,7 +115,7 @@ struct DDRWebViewForImporter: UIViewRepresentable, @preconcurrency DDRUpdateScor
     }
 }
 
-class DDRCoordinatorForImporter: NSObject, WKNavigationDelegate {
+class DDRCoordinatorForImporter: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
     let cleanupJS = """
 \(globalJSFunctions)
 
@@ -171,7 +181,18 @@ class DDRCoordinatorForImporter: NSObject, WKNavigationDelegate {
         }
     }
 
+    func userContentController(_ userContentController: WKUserContentController,
+                               didReceive message: WKScriptMessage) {
+        guard message.name == "ddrProgress",
+              let body = message.body as? [String: Any],
+              let pages = body["pages"] as? Int else { return }
+        let delegate = self.delegate
+        Task { @MainActor in delegate.updateScrapeProgress(pagesFetched: pages) }
+    }
+
     func extractScoreData(from webView: WKWebView) {
+        let delegate = self.delegate
+        Task { @MainActor in delegate.beginScrapeProgress() }
         startExtractionWatchdog()
         webView.callAsyncJavaScript(
             ddrScoreDataFetchBody,
@@ -251,5 +272,7 @@ class DDRCoordinatorForImporter: NSObject, WKNavigationDelegate {
 protocol DDRUpdateScoreDataDelegate: Sendable {
     func importScoreData(using newScoreData: String) async
     func stopProcessing(with reason: ImportFailedReason)
+    @MainActor func beginScrapeProgress()
+    @MainActor func updateScrapeProgress(pagesFetched: Int)
 }
 // swiftlint:enable class_delegate_protocol

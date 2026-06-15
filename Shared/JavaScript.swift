@@ -398,6 +398,7 @@ async function fetchDDRScoreData() {
         return file.split('.')[0];
     }
 
+    let pagesFetched = 0;
     for (const style of styles) {
         const seen = new Set();
         for (let offset = 0; offset < 80; offset++) {
@@ -411,6 +412,11 @@ async function fetchDDRScoreData() {
             const html = await response.text();
             const doc = new DOMParser().parseFromString(html, 'text/html');
             const cards = Array.prototype.slice.call(doc.querySelectorAll('.music-card'));
+            pagesFetched++;
+            if (window.webkit && window.webkit.messageHandlers
+                && window.webkit.messageHandlers.ddrProgress) {
+                window.webkit.messageHandlers.ddrProgress.postMessage({ pages: pagesFetched });
+            }
             if (cards.length === 0) { break; }
 
             let newCount = 0;
