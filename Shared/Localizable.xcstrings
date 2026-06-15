@@ -783,6 +783,40 @@
         }
       }
     },
+    "Analytics.DDR.ClearBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリア内訳"
+          }
+        }
+      }
+    },
+    "Analytics.DDR.RankBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rank Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ランク内訳"
+          }
+        }
+      }
+    },
     "Analytics.DJLevel.ByDifficulty" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1896,6 +1930,23 @@
         }
       }
     },
+    "More.Disclaimer.NotAffiliated" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app is not affiliated with KONAMI. KONAMI bears no responsibility for any content shown in this app."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリはコナミとは一切関係がありません。アプリ内に表示される内容について、コナミは一切の責任を負いません。"
+          }
+        }
+      }
+    },
     "More.ExternalData.BemaniWiki2nd" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2401,6 +2452,23 @@
         }
       }
     },
+    "More.ManageData.DeleteOrReset" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete or Reset…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "消去またはリセット…"
+          }
+        }
+      }
+    },
     "More.ManageData.DeleteScoreData" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2696,13 +2764,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Song Name, Artist Name"
+            "value" : "Charts"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "曲名、アーティスト名"
+            "value" : "譜面"
           }
         }
       }
@@ -2950,6 +3018,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日付"
+          }
+        }
+      }
+    },
+    "Shared.DDR.ClearType" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Lamp"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアマーク"
+          }
+        }
+      }
+    },
+    "Shared.DDR.Rank" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score Rank"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコアランク"
           }
         }
       }

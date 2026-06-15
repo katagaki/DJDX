@@ -13,6 +13,8 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
     @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
     var polarisChordVersion: PolarisChordVersion
+    @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
+    @AppStorage(wrappedValue: DDRPlayStyle.single, "Global.DDR.Style") var ddrStyleToShow: DDRPlayStyle
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: true, "More.General.ShowProfileHeader") var showProfileHeader: Bool
     @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
@@ -36,10 +38,12 @@ struct UnifiedView: View {
     @State var analyticsModel = AnalyticsModel()
     @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
     @State var polarisChordAnalyticsModel = PolarisChordAnalyticsModel()
+    @State var ddrAnalyticsModel = DDRAnalyticsModel()
 
     @Namespace var analyticsNamespace
     @Namespace var sdvxAnalyticsNamespace
     @Namespace var polarisChordAnalyticsNamespace
+    @Namespace var ddrAnalyticsNamespace
     @Namespace var towerNamespace
     @Namespace var importNamespace
 
@@ -54,6 +58,10 @@ struct UnifiedView: View {
                 } else if selectedGame == .polarisChord {
                     PolarisChordScoresView(isEditingAnalytics: $isEditingAnalytics) {
                         polarisChordHeader
+                    }
+                } else if selectedGame == .danceDanceRevolution {
+                    DDRScoresView(isEditingAnalytics: $isEditingAnalytics) {
+                        ddrHeader
                     }
                 } else {
                     IIDXScoresView(isEditingAnalytics: $isEditingAnalytics) {
@@ -126,6 +134,9 @@ struct UnifiedView: View {
                     namespace: polarisChordAnalyticsNamespace
                 )
             }
+            .navigationDestination(for: DDRAnalyticsPath.self) { path in
+                DDRAnalyticsDestinationView(model: ddrAnalyticsModel, path: path, namespace: ddrAnalyticsNamespace)
+            }
         }
         .sheet(isPresented: $isPresentingImport) {
             Group {
@@ -133,6 +144,8 @@ struct UnifiedView: View {
                     SDVXImportView()
                 } else if selectedGame == .polarisChord {
                     PolarisChordImportView()
+                } else if selectedGame == .danceDanceRevolution {
+                    DDRImportView()
                 } else {
                     IIDXImportView()
                 }
@@ -320,6 +333,13 @@ struct UnifiedView: View {
                         }
                     }
                     .pickerStyle(.inline)
+                } else if selectedGame == .danceDanceRevolution {
+                    Picker("Shared.Version", selection: $ddrVersion) {
+                        ForEach(DDRVersion.supportedVersions, id: \.self) { version in
+                            Text(version.marketingName).tag(version)
+                        }
+                    }
+                    .pickerStyle(.inline)
                 } else {
                     Picker("Shared.Version", selection: $iidxVersion) {
                         ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
@@ -332,7 +352,13 @@ struct UnifiedView: View {
             .labelsVisibility(.visible)
         } label: {
             HStack(spacing: 4.0) {
-                Text(selectedGame.displayName)
+                if let icon = selectedGame.iconResource {
+                    Image(icon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
+                }
+                Text(selectedGame.shortName)
                     .fontWeight(.bold)
                     .tint(.primary)
                 Image(systemName: "chevron.down.circle.fill")
@@ -341,6 +367,5 @@ struct UnifiedView: View {
                     .tint(.secondary)
             }
         }
-        .menuActionDismissBehavior(.disabled)
     }
 }

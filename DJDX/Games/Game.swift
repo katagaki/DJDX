@@ -5,6 +5,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
     case soundVoltex = 1
     case iidxInfinitas = 2
     case polarisChord = 3
+    case danceDanceRevolution = 4
 
     var id: Int { rawValue }
 
@@ -14,6 +15,17 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         case .soundVoltex: "SOUND VOLTEX"
         case .iidxInfinitas: "beatmania IIDX INFINITAS"
         case .polarisChord: "ポラリスコード"
+        case .danceDanceRevolution: "DanceDanceRevolution"
+        }
+    }
+
+    var shortName: String {
+        switch self {
+        case .iidxArcade: "IIDX"
+        case .soundVoltex: "SDVX"
+        case .iidxInfinitas: "INFINITAS"
+        case .polarisChord: "ぽらりこ"
+        case .danceDanceRevolution: "DDR"
         }
     }
 
@@ -22,13 +34,14 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         case .iidxArcade, .iidxInfinitas: .iconIIDX
         case .soundVoltex: .iconSDVX
         case .polarisChord: .iconPolarisChord
+        case .danceDanceRevolution: .iconDDR
         }
     }
 
     // Only IIDX AC ships in Phase 0; the other games become selectable as their phases land.
     var isAvailable: Bool {
         switch self {
-        case .iidxArcade, .soundVoltex, .polarisChord: true
+        case .iidxArcade, .soundVoltex, .polarisChord, .danceDanceRevolution: true
         case .iidxInfinitas: false
         }
     }
@@ -37,7 +50,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
     var isIIDXFamily: Bool {
         switch self {
         case .iidxArcade, .iidxInfinitas: true
-        case .soundVoltex, .polarisChord: false
+        case .soundVoltex, .polarisChord, .danceDanceRevolution: false
         }
     }
 
@@ -46,7 +59,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
     var supportsTower: Bool {
         switch self {
         case .iidxArcade: true
-        case .soundVoltex, .iidxInfinitas, .polarisChord: false
+        case .soundVoltex, .iidxInfinitas, .polarisChord, .danceDanceRevolution: false
         }
     }
 
@@ -61,6 +74,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         case .soundVoltex: "PlayDataSDVX.db"
         case .iidxInfinitas: "PlayDataInfinitas.db"
         case .polarisChord: "PlayDataPolarisChord.db"
+        case .danceDanceRevolution: "PlayDataDDR.db"
         }
     }
 }

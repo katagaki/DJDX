@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 enum PolarisChordDifficulty: String, Codable, CaseIterable {
     case all = "Shared.All"
@@ -38,10 +39,10 @@ enum PolarisChordDifficulty: String, Codable, CaseIterable {
 
     var color: Color {
         switch self {
-        case .easy: return .green
-        case .normal: return .blue
-        case .hard: return .red
-        case .influence: return .purple
+        case .easy: return .blue
+        case .normal: return .green
+        case .hard: return Color(UIColor { $0.userInterfaceStyle == .dark ? .systemYellow : .systemOrange })
+        case .influence: return Color(red: 1.0, green: 0.35, blue: 0.7)
         case .polar: return Color(red: 0.0, green: 0.8, blue: 0.8)
         default: return .gray
         }
