@@ -1,5 +1,4 @@
 import Komponents
-import SwiftSoup
 import SwiftUI
 
 // swiftlint:disable:next type_body_length
@@ -35,10 +34,7 @@ struct MoreExternalDataSources: View {
     }
 
     let fetcher = IIDXReader()
-    let importer = IIDXImporter()
     let sdvxFetcher = SDVXReader()
-    let sdvxInImporter = SDVXInImporter()
-    let textageImporter = TextageImporter()
     let ddrMetaImporter = DDRMetadataImporter()
 
     var body: some View {
@@ -47,7 +43,6 @@ struct MoreExternalDataSources: View {
             sdvxInSection()
             bemaniWikiSection()
             bm2dxSection()
-            ddrSection()
         }
         .navigationTitle("More.ExternalData.Header")
         .navigationBarTitleDisplayMode(.inline)
@@ -150,51 +145,13 @@ struct MoreExternalDataSources: View {
         }
     }
 
-    // MARK: - DanceDanceRevolution (BEMANIWiki)
-
-    @ViewBuilder
-    private func ddrSection() -> some View {
-        Section {
-            Toggle(isOn: $isDDREnabled) {
-                Text(verbatim: "DanceDanceRevolution WORLD")
-            }
-            if isDDREnabled {
-                HStack {
-                    Button("More.ExternalData.UpdateData") {
-                        reloadingSource = .ddr
-                        Task {
-                            ddrSongMetaCount = await ddrMetaImporter.reloadBemaniWikiData()
-                            reloadingSource = nil
-                            isDDRReloadCompleted = true
-                        }
-                    }
-                    .disabled(reloadingSource != nil)
-                    Spacer()
-                    reloadIndicator(for: .ddr)
-                }
-                HStack {
-                    Text("More.ExternalData.BemaniWiki2nd.EntryCount")
-                    Spacer()
-                    Text(verbatim: "\(ddrSongMetaCount)")
-                        .foregroundStyle(.secondary)
-                }
-            }
-        } header: {
-            ListSectionHeader(text: "DanceDanceRevolution")
-                .font(.body)
-        } footer: {
-            Text(verbatim: "DanceDanceRevolution WORLD chart levels and versions. ") +
-            Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://bemaniwiki.com)")
-        }
-    }
-
     // MARK: - BEMANIWiki 2nd
 
     @ViewBuilder
     private func bemaniWikiSection() -> some View {
         Section {
             Toggle(isOn: $isBemaniWikiEnabled) {
-                Text("More.ExternalData.BemaniWiki2nd.Description")
+                Text(verbatim: "beatmania IIDX")
             }
             if isBemaniWikiEnabled {
                 HStack {
@@ -214,6 +171,30 @@ struct MoreExternalDataSources: View {
                     Text("More.ExternalData.BemaniWiki2nd.EntryCount")
                     Spacer()
                     Text(verbatim: "\(bemaniWikiEntryCount)")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Toggle(isOn: $isDDREnabled) {
+                Text(verbatim: "DanceDanceRevolution")
+            }
+            if isDDREnabled {
+                HStack {
+                    Button("More.ExternalData.UpdateData") {
+                        reloadingSource = .ddr
+                        Task {
+                            await reloadDDRData()
+                            reloadingSource = nil
+                            isDDRReloadCompleted = true
+                        }
+                    }
+                    .disabled(reloadingSource != nil)
+                    Spacer()
+                    reloadIndicator(for: .ddr)
+                }
+                HStack {
+                    Text("More.ExternalData.BemaniWiki2nd.EntryCount")
+                    Spacer()
+                    Text(verbatim: "\(ddrSongMetaCount)")
                         .foregroundStyle(.secondary)
                 }
             }
@@ -347,224 +328,43 @@ struct MoreExternalDataSources: View {
     // MARK: - Textage Data Loading
 
     func reloadTextageData() async {
-        dataTotal = 2
-        dataImported = 0
-
-        guard let titleURL = URL(string: "https://textage.cc/score/titletbl.js"),
-              let accessURL = URL(string: "https://textage.cc/score/actbl.js") else { return }
-
-        var titleTableText: String?
-        var accessTableText: String?
-
-        if let (data, _) = try? await URLSession.shared.data(from: titleURL) {
-            titleTableText = data.decodedAsTextageTable()
+        textageEntryCount = await ExternalDataReloader.reload(.textage, iidxVersion: iidxVersion) { done, total in
+            dataImported = done
+            dataTotal = total
         }
-        dataImported += 1
-
-        if let (data, _) = try? await URLSession.shared.data(from: accessURL) {
-            accessTableText = data.decodedAsTextageTable()
-        }
-        dataImported += 1
-
-        guard let titleTableText, let accessTableText else { return }
-        let charts = TextageTableParser.charts(titleTableText: titleTableText,
-                                               accessTableText: accessTableText)
-        await textageImporter.replaceAllCharts(charts)
-        textageEntryCount = await fetcher.textageChartCount()
     }
 
     // MARK: - sdvx.in Data Loading
 
     func reloadSDVXInData() async {
-        var charts: [SDVXInChart] = []
-        let pattern = "SORT([0-9]{5})([NAEMnaem])\\(\\);</script><!--(.*?)-->"
-        let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])
-
-        dataTotal = 20
-        dataImported = 0
-        for level in 1...20 {
-            defer { dataImported += 1 }
-            let levelSlug = String(format: "%02d", level)
-            guard let regex,
-                  let url = URL(string: "https://sdvx.in/sort/sort_\(levelSlug).htm"),
-                  let (data, _) = try? await URLSession.shared.data(from: url),
-                  let html = String(data: data, encoding: .utf8) else { continue }
-            let htmlString = html as NSString
-            let matches = regex.matches(in: html, range: NSRange(location: 0, length: htmlString.length))
-            for match in matches where match.numberOfRanges == 4 {
-                let code = htmlString.substring(with: match.range(at: 1))
-                let slot = htmlString.substring(with: match.range(at: 2)).lowercased()
-                let rawTitle = htmlString.substring(with: match.range(at: 3))
-                let title = ((try? SwiftSoup.Entities.unescape(rawTitle)) ?? rawTitle)
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !title.isEmpty else { continue }
-                charts.append(SDVXInChart(code: code, slot: slot, title: title, level: level))
-            }
+        sdvxInEntryCount = await ExternalDataReloader.reload(.sdvxIn, iidxVersion: iidxVersion) { done, total in
+            dataImported = done
+            dataTotal = total
         }
-
-        await sdvxInImporter.replaceAllCharts(charts)
-        sdvxInEntryCount = await sdvxFetcher.sdvxInChartCount()
     }
 
     // MARK: - BEMANIWiki Data Loading
 
     func reloadBemaniWikiData() async {
-        dataTotal = 2
-        dataImported = 0
-        await importer.deleteAllSongs()
-        var iidxSongs: [IIDXSong] = []
-        iidxSongs.append(contentsOf: await reloadBemaniWikiDataForLatestVersion())
-        dataImported += 1
-        iidxSongs.append(contentsOf: await reloadBemaniWikiDataForExistingVersions())
-        dataImported += 1
-        await importer.insertSongs(iidxSongs)
-        bemaniWikiEntryCount = await fetcher.bemaniWikiSongCount()
-    }
-
-    func reloadBemaniWikiDataForLatestVersion() async -> [IIDXSong] {
-        do {
-            var iidxSongsFromWiki: [IIDXSong] = []
-            let (data, _) = try await URLSession.shared.data(from: iidxVersion.bemaniWikiLatestVersionPageURL())
-            if let htmlString = String(bytes: data, encoding: .utf8),
-               let htmlDocument = try? SwiftSoup.parse(htmlString),
-               let htmlDocumentBody = htmlDocument.body(),
-               let documentContents = try? htmlDocumentBody.select("#contents").first(),
-               let documentBody = try? documentContents.select("#body").first() {
-                let indexOfHeader = documentBody.children().firstIndex { element in
-                    (element.tag().getName() == "h3" || element.tag().getName() == "h4") &&
-                    (try? element.text().contains("総ノーツ数")) ?? false
-                }
-                if let indexOfHeader {
-                    let documentAfterHeader = Elements(Array(documentBody.children()[
-                        indexOfHeader..<documentBody.children().count
-                    ]))
-                    if let tables = try? documentAfterHeader.select("div.ie5") {
-                        for table in tables {
-                            debugPrint(table)
-                            if let tableRows = try? table.select("tr") {
-                                for tableRow in tableRows {
-                                    if let tableRowColumns = try? tableRow.select("td"),
-                                       tableRowColumns.count == 13 {
-                                        let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
-                                        if tableColumnData.count == 13 {
-                                            let iidxSong = IIDXSong(tableColumnData)
-                                            iidxSongsFromWiki.append(iidxSong)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return iidxSongsFromWiki
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
-    func reloadBemaniWikiDataForExistingVersions() async -> [IIDXSong] {
-        do {
-            var iidxSongsFromWiki: [IIDXSong] = []
-            let (data, _) = try await URLSession.shared.data(from: iidxVersion.bemaniWikiExistingVersionsPageURL())
-            if let htmlString = String(bytes: data, encoding: .utf8),
-               let htmlDocument = try? SwiftSoup.parse(htmlString),
-               let htmlDocumentBody = htmlDocument.body(),
-               let documentContents = try? htmlDocumentBody.select("#contents").first(),
-               let documentBody = try? documentContents.select("#body").first(),
-               let tables = try? documentBody.select("div.ie5") {
-                for table in tables {
-                    if let tableRows = try? table.select("tr") {
-                        for tableRow in tableRows {
-                            if let tableRowColumns = try? tableRow.select("td"),
-                               tableRowColumns.count == 13 {
-                                let tableColumnData = tableRowColumns.compactMap({ try? $0.text()})
-                                if tableColumnData.count == 13 {
-                                    let iidxSong = IIDXSong(tableColumnData)
-                                    iidxSongsFromWiki.append(iidxSong)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return iidxSongsFromWiki
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
+        bemaniWikiEntryCount = await ExternalDataReloader.reload(.wikiIidx, iidxVersion: iidxVersion) { done, total in
+            dataImported = done
+            dataTotal = total
         }
     }
 
     // MARK: - BM2DX Data Loading
 
     func reloadBM2DXData() async {
-        await importer.deleteAllNotesRadar()
-        var allEntries: [ChartRadarData] = []
-
-        do {
-            let url = URL(string: "https://bm2dx.com/IIDX/notes_radar/notes_radar.json.gz")!
-            let (data, _) = try await URLSession.shared.data(from: url)
-
-            guard let decompressedData = data.gunzip() else {
-                return
-            }
-
-            guard let json = try? JSONSerialization.jsonObject(with: decompressedData) as? [String: Any],
-                  let midDict = json["mid"] as? [String: String],
-                  let notesRadar = json["notes_radar"] as? [String: [String: [[String: Any]]]] else {
-                return
-            }
-
-            var lookup: [String: [String: [Int: (noteCount: Int, values: [String: Double])]]] = [:]
-
-            for (playType, radarTypes) in notesRadar {
-                for (radarType, entries) in radarTypes {
-                    for entry in entries {
-                        guard let mid = entry["mid"] as? String,
-                              let difficulty = entry["difficult"] as? Int,
-                              let noteCount = entry["note"] as? Int,
-                              let value = entry["value"] as? Double else { continue }
-
-                        lookup[playType, default: [:]][mid, default: [:]][difficulty, default: (
-                            noteCount: noteCount,
-                            values: [:]
-                        )].noteCount = noteCount
-                        lookup[playType, default: [:]][mid, default: [:]][difficulty, default: (
-                            noteCount: noteCount,
-                            values: [:]
-                        )].values[radarType] = value
-                    }
-                }
-            }
-
-            for (playType, mids) in lookup {
-                for (mid, difficulties) in mids {
-                    guard let title = midDict[mid] else { continue }
-                    for (difficulty, data) in difficulties {
-                        let radarData = RadarData(
-                            notes: data.values["NOTES"] ?? 0.0,
-                            chord: data.values["CHORD"] ?? 0.0,
-                            peak: data.values["PEAK"] ?? 0.0,
-                            charge: data.values["CHARGE"] ?? 0.0,
-                            scratch: data.values["SCRATCH"] ?? 0.0,
-                            soflan: data.values["SOFLAN"] ?? 0.0
-                        )
-                        allEntries.append(ChartRadarData(
-                            title: title,
-                            playType: playType,
-                            difficulty: difficulty,
-                            noteCount: data.noteCount,
-                            radarData: radarData
-                        ))
-                    }
-                }
-            }
-        } catch {
-            debugPrint("Failed to fetch BM2DX data: \(error)")
+        bm2dxEntryCount = await ExternalDataReloader.reload(.bm2dx, iidxVersion: iidxVersion) { done, total in
+            dataImported = done
+            dataTotal = total
         }
+    }
 
-        await importer.insertNotesRadarEntries(allEntries)
-        bm2dxEntryCount = await fetcher.chartRadarDataCount()
+    func reloadDDRData() async {
+        ddrSongMetaCount = await ExternalDataReloader.reload(.wikiDdr, iidxVersion: iidxVersion) { done, total in
+            dataImported = done
+            dataTotal = total
+        }
     }
 }

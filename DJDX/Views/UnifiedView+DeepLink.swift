@@ -2,7 +2,7 @@ import SwiftUI
 
 extension UnifiedView {
     func handleDeepLink(_ url: URL) {
-        guard url.scheme == "djdx", url.host == "open",
+        guard url.scheme == "djdx",
               let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return
         }
@@ -10,27 +10,35 @@ extension UnifiedView {
         func value(for name: String) -> String? {
             queryItems.first { $0.name.lowercased() == name.lowercased() }?.value
         }
-        let type = value(for: "type")?.lowercased()
-        let game = value(for: "game")?.lowercased()
 
-#if DEBUG
-        if value(for: "action")?.lowercased() == "reload-ddr-meta" {
-            Task { _ = await DDRMetadataImporter().reloadBemaniWikiData() }
-            return
-        }
-#endif
-
-        if type == "detail" {
-            guard game == "iidx", let songName = value(for: "songName"), !songName.isEmpty else {
+        switch url.host {
+        case "update":
+            guard value(for: "type")?.lowercased() == "datasource",
+                  let id = value(for: "id"),
+                  let source = ExternalDataSourceID.allCases.first(where: {
+                      $0.rawValue.lowercased() == id.lowercased()
+                  }) else {
                 return
             }
-            Task { await openIIDXScoreDetail(songName: songName) }
-            return
-        }
+            Task { await ExternalDataReloader.reload(source, iidxVersion: iidxVersion) }
 
-        if let game, let target = Self.game(named: game), target.isAvailable {
-            navigationManager.popToRoot()
-            selectedGame = target
+        case "open":
+            let type = value(for: "type")?.lowercased()
+            let game = value(for: "game")?.lowercased()
+            if type == "detail" {
+                guard game == "iidx", let songName = value(for: "songName"), !songName.isEmpty else {
+                    return
+                }
+                Task { await openIIDXScoreDetail(songName: songName) }
+                return
+            }
+            if let game, let target = Self.game(named: game), target.isAvailable {
+                navigationManager.popToRoot()
+                selectedGame = target
+            }
+
+        default:
+            break
         }
     }
 
