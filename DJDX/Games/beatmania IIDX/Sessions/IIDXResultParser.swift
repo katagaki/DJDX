@@ -10,6 +10,12 @@ struct IIDXSongCandidate: Sendable {
     let id: Int64
     let title: String
     let compact: String
+    let playType: IIDXPlayType
+    let difficulties: [IIDXLevel: Int]
+
+    func matchesChart(level: IIDXLevel, difficulty: Int, playType: IIDXPlayType) -> Bool {
+        self.playType == playType && difficulties[level] == difficulty
+    }
 }
 
 struct IIDXResultParse: Sendable {
@@ -50,16 +56,19 @@ enum IIDXResultParser {
         var parse = IIDXResultParse()
         var hits = 0
 
-        if let resolved = resolveTitle(lines: lines, songs: songs) {
-            parse.songTitle = resolved.title
-            parse.matchedSongID = resolved.id
-            if resolved.id != nil { hits += 1 }
-        }
-
         parse.playType = detectPlayType(lines: lines)
         if let (level, difficulty) = detectChart(lines: lines) {
             parse.level = level
             parse.difficulty = difficulty
+        }
+
+        if let resolved = resolveTitle(lines: lines, songs: songs,
+                                       level: parse.level,
+                                       difficulty: parse.difficulty,
+                                       playType: parse.playType) {
+            parse.songTitle = resolved.title
+            parse.matchedSongID = resolved.id
+            if resolved.id != nil { hits += 1 }
         }
 
         if let label = findLabel(lines, keywords: ["CLEARTYPE"]),
@@ -114,35 +123,81 @@ enum IIDXResultParser {
 
     // MARK: - Title
 
+    // Narrow the song pool by the parsed chart (play type + level + difficulty)
+    // first, then fuzzy-match the OCR title within that small set. Filtering makes
+    // edit-distance matching safe enough to absorb OCR errors; an unfiltered pool
+    // stays strict to avoid false matches, and anything unmatched keeps the raw text.
     private static func resolveTitle(lines: [OCRLine],
-                                     songs: [IIDXSongCandidate]) -> (title: String, id: Int64?)? {
-        if !songs.isEmpty {
-            let candidates = lines.filter { $0.text.compact.count >= 2 }
-            for line in candidates {
-                let needle = line.text.compact
-                if let exact = songs.first(where: { $0.compact == needle }) {
-                    return (exact.title, exact.id)
-                }
-            }
-            var best: (song: IIDXSongCandidate, distance: Int)?
-            for line in candidates {
-                let needle = line.text.compact
-                guard needle.count >= 3 else { continue }
-                for song in songs where song.compact.contains(needle) || needle.contains(song.compact) {
-                    let distance = abs(song.compact.count - needle.count)
-                    if best == nil || distance < best!.distance {
-                        best = (song, distance)
-                    }
-                }
-            }
-            if let best, best.distance <= 4 {
-                return (best.song.title, best.song.id)
+                                     songs: [IIDXSongCandidate],
+                                     level: IIDXLevel,
+                                     difficulty: Int,
+                                     playType: IIDXPlayType) -> (title: String, id: Int64?)? {
+        guard !songs.isEmpty else {
+            return rawTitleCandidate(lines).map { ($0, nil) }
+        }
+
+        let chartFilter = level != .unknown && difficulty > 0
+        let filtered = chartFilter
+            ? songs.filter { $0.matchesChart(level: level, difficulty: difficulty, playType: playType) }
+            : []
+        let pool = filtered.isEmpty ? songs : filtered
+        let threshold = filtered.isEmpty ? 0.15 : 0.40
+
+        let needles = titleNeedles(lines)
+
+        for needle in needles {
+            if let exact = pool.first(where: { $0.compact == needle }) {
+                return (exact.title, exact.id)
             }
         }
-        if let raw = rawTitleCandidate(lines) {
-            return (raw, nil)
+
+        var best: (song: IIDXSongCandidate, ratio: Double)?
+        for needle in needles where needle.count >= 3 {
+            for song in pool where song.compact.count >= 2 {
+                let ratio = editRatio(needle, song.compact)
+                if ratio <= threshold, best == nil || ratio < best!.ratio {
+                    best = (song, ratio)
+                }
+            }
         }
-        return nil
+        if let best {
+            return (best.song.title, best.song.id)
+        }
+        return rawTitleCandidate(lines).map { ($0, nil) }
+    }
+
+    private static func titleNeedles(_ lines: [OCRLine]) -> [String] {
+        var seen = Set<String>()
+        var needles: [String] = []
+        for line in lines where isFreeText(line.text) {
+            let needle = line.text.compact
+            if needle.count >= 2, seen.insert(needle).inserted {
+                needles.append(needle)
+            }
+        }
+        return needles
+    }
+
+    private static func editRatio(_ lhs: String, _ rhs: String) -> Double {
+        let distance = levenshtein(Array(lhs), Array(rhs))
+        let longest = max(lhs.count, rhs.count)
+        return longest == 0 ? 0.0 : Double(distance) / Double(longest)
+    }
+
+    private static func levenshtein(_ lhs: [Character], _ rhs: [Character]) -> Int {
+        if lhs.isEmpty { return rhs.count }
+        if rhs.isEmpty { return lhs.count }
+        var previous = Array(0...rhs.count)
+        var current = [Int](repeating: 0, count: rhs.count + 1)
+        for row in 1...lhs.count {
+            current[0] = row
+            for col in 1...rhs.count {
+                let cost = lhs[row - 1] == rhs[col - 1] ? 0 : 1
+                current[col] = min(previous[col] + 1, current[col - 1] + 1, previous[col - 1] + cost)
+            }
+            swap(&previous, &current)
+        }
+        return previous[rhs.count]
     }
 
     private static func rawTitleCandidate(_ lines: [OCRLine]) -> String? {

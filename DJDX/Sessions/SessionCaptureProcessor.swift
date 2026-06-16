@@ -87,13 +87,37 @@ actor SessionCaptureProcessor {
     }
 
     private static func fetchSongCandidates() -> [IIDXSongCandidate] {
+        let columns = IIDXPlayDataDatabase.self
         guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection(),
-              let rows = try? database.prepare(IIDXPlayDataDatabase.songTable) else {
+              let rows = try? database.prepare(columns.songRecordTable.order(columns.srID.desc)) else {
             return []
         }
-        return rows.map { row in
-            let title = row[IIDXPlayDataDatabase.songTitle]
-            return IIDXSongCandidate(id: row[IIDXPlayDataDatabase.songID], title: title, compact: title.compact)
+        var seen = Set<String>()
+        var candidates: [IIDXSongCandidate] = []
+        for row in rows {
+            let title = row[columns.srTitle]
+            let playTypeRaw = row[columns.srPlayType]
+            let key = title.compact + "|" + playTypeRaw
+            guard !title.isEmpty, seen.insert(key).inserted else { continue }
+            var difficulties: [IIDXLevel: Int] = [:]
+            let pairs: [(IIDXLevel, Int)] = [
+                (.beginner, row[columns.srBeginnerDifficulty]),
+                (.normal, row[columns.srNormalDifficulty]),
+                (.hyper, row[columns.srHyperDifficulty]),
+                (.another, row[columns.srAnotherDifficulty]),
+                (.leggendaria, row[columns.srLeggendariaDifficulty])
+            ]
+            for (level, value) in pairs where value > 0 {
+                difficulties[level] = value
+            }
+            candidates.append(IIDXSongCandidate(
+                id: row[columns.srID],
+                title: title,
+                compact: title.compact,
+                playType: IIDXPlayType(rawValue: playTypeRaw) ?? .single,
+                difficulties: difficulties
+            ))
         }
+        return candidates
     }
 }
