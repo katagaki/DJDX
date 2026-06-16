@@ -98,13 +98,13 @@ enum IIDXResultParser {
         }
 
         if let label = findLabel(lines, keywords: ["EXSCORE", "SCORE"]),
-           let value = rightmostValue(on: label, in: lines, map: intOf) {
+           let value = rightmostValue(on: label, in: lines, map: scoreOf) {
             parse.exScore = value
             hits += 1
         }
 
         if let label = findLabel(lines, keywords: ["MISSCOUNT", "MISS"]),
-           let value = rightmostValue(on: label, in: lines, map: intOf) {
+           let value = rightmostValue(on: label, in: lines, map: scoreOf) {
             parse.miss = value
             hits += 1
         }
@@ -306,8 +306,8 @@ enum IIDXResultParser {
     private static func detectGreats(lines: [OCRLine]) -> (Int?, Int?) {
         var rows: [(midY: CGFloat, value: Int)] = []
         for line in lines where normalize(line.text).contains("GREAT") {
-            let inline = integers(in: line.text).first
-            if let value = inline ?? rightmostValue(on: line, in: lines, map: intOf) {
+            let inline = integers(in: line.text).last
+            if let value = inline ?? rightmostValue(on: line, in: lines, map: scoreOf) {
                 rows.append((line.box.midY, value))
             }
         }
@@ -386,6 +386,15 @@ enum IIDXResultParser {
         let mapped = String(cleaned.map(confusedDigit))
         guard mapped.allSatisfy({ $0.isNumber }), let value = Int(mapped) else { return nil }
         return value
+    }
+
+    // A metric row carries best (old, left) and this-play (new, right) values.
+    // When OCR merges both columns into one line ("999 9999"), split on whitespace
+    // and keep the rightmost number so the new value still wins.
+    private static func scoreOf(_ text: String) -> Int? {
+        text.split(whereSeparator: { $0 == " " || $0 == "\t" })
+            .compactMap { intOf(String($0)) }
+            .last
     }
 
     private static func confusedDigit(_ character: Character) -> Character {

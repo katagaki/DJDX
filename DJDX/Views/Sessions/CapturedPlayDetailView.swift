@@ -16,6 +16,7 @@ struct CapturedPlayDetailView: View {
     @State private var miss: Int = 0
     @State private var clearType: IIDXClearType = .noPlay
     @State private var djLevel: IIDXDJLevel = .none
+    @State private var hasLoaded: Bool = false
 
     var body: some View {
         Form {
@@ -92,16 +93,16 @@ struct CapturedPlayDetailView: View {
         }
         .navigationTitle("Sessions.Detail.Title")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Shared.Done") {
-                    save()
-                    dismiss()
-                }
-                .fontWeight(.semibold)
-            }
-        }
         .onAppear(perform: loadFields)
+        .onChange(of: fields) {
+            guard hasLoaded else { return }
+            save()
+        }
+    }
+
+    private var fields: [AnyHashable] {
+        [songTitle, level, difficulty, playType, exScore,
+         perfectGreat, great, miss, clearType, djLevel]
     }
 
     private func numberRow(_ titleKey: LocalizedStringKey, value: Binding<Int>) -> some View {
@@ -144,6 +145,7 @@ struct CapturedPlayDetailView: View {
         miss = play.miss
         clearType = IIDXClearType(rawValue: play.clearType) ?? .noPlay
         djLevel = IIDXDJLevel(rawValue: play.djLevel) ?? .none
+        DispatchQueue.main.async { hasLoaded = true }
     }
 
     private func save() {

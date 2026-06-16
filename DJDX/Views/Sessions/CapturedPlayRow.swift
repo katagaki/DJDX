@@ -16,15 +16,22 @@ struct CapturedPlayRow: View {
             )
             .overlay(alignment: .topTrailing) {
                 if play.state == .needsReview {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.caption2)
-                        .foregroundStyle(.orange)
-                        .padding(6.0)
+                    reviewBadge
+                        .padding(.trailing, 8.0)
                 }
             }
         } else {
             statusRow
         }
+    }
+
+    private var reviewBadge: some View {
+        Image(systemName: "exclamationmark")
+            .font(.system(size: 10.0, weight: .black))
+            .foregroundStyle(.white)
+            .frame(width: 16.0, height: 16.0)
+            .background(.orange, in: Circle())
+            .shadow(color: .black.opacity(0.25), radius: 1.5, y: 1.0)
     }
 
     private var songRecord: IIDXSongRecord {
