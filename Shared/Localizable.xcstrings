@@ -3260,13 +3260,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "EX Score"
+            "value" : "Score"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "EXスコア"
+            "value" : "スコア"
           }
         }
       }
