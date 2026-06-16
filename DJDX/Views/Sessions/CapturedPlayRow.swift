@@ -36,28 +36,41 @@ struct CapturedPlayRow: View {
     }
 
     private var statusRow: some View {
-        HStack(spacing: 12.0) {
-            switch play.state {
-            case .pending:
-                Image(systemName: "clock")
-                    .foregroundStyle(.secondary)
-            case .processing:
-                ProgressView()
-                    .controlSize(.small)
-            default:
-                Image(systemName: "xmark.circle.fill")
-                    .foregroundStyle(.red)
-            }
+        HStack(alignment: .center, spacing: 8.0) {
+            Rectangle()
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: 10.0)
+                .frame(maxHeight: .infinity)
             Text(verbatim: play.songTitle ?? String(localized: "Sessions.UnknownSong"))
-                .font(.subheadline.weight(.semibold))
+                .bold()
+                .fontWidth(.condensed)
                 .lineLimit(1)
-            Spacer()
-            Text(statusText)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .padding(.vertical, 16.0)
+            Spacer(minLength: 8.0)
+            HStack(spacing: 6.0) {
+                stateIcon
+                Text(statusText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
-        .padding(.vertical, 16.0)
-        .padding(.horizontal, 20.0)
+        .frame(maxWidth: .infinity)
+        .padding(.trailing)
+    }
+
+    @ViewBuilder
+    private var stateIcon: some View {
+        switch play.state {
+        case .pending:
+            Image(systemName: "clock")
+                .foregroundStyle(.secondary)
+        case .processing:
+            ProgressView()
+                .controlSize(.small)
+        default:
+            Image(systemName: "xmark.circle.fill")
+                .foregroundStyle(.red)
+        }
     }
 
     private var statusText: LocalizedStringKey {
