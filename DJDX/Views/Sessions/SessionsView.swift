@@ -46,6 +46,15 @@ struct SessionsView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background {
+            LinearGradient(
+                colors: [.backgroundGradientTop, .backgroundGradientBottom],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        }
         .onChange(of: healthKitEnabled) { _, enabled in
             if enabled {
                 Task { _ = await SessionWorkoutBridge.shared.requestAuthorization() }

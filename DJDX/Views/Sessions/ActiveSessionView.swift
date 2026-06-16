@@ -18,12 +18,27 @@ struct ActiveSessionView: View {
                 playList
                 captureBar
             }
+            .background {
+                LinearGradient(
+                    colors: [.backgroundGradientTop, .backgroundGradientBottom],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            }
             .navigationTitle("Sessions.Active.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Sessions.End", role: .destructive) {
-                        store.endSession()
+                    if #available(iOS 26.0, *) {
+                        Button(role: .close) {
+                            store.endSession()
+                        }
+                        .accessibilityLabel("Sessions.End")
+                    } else {
+                        Button("Sessions.End", role: .destructive) {
+                            store.endSession()
+                        }
                     }
                 }
             }
@@ -53,40 +68,48 @@ struct ActiveSessionView: View {
         }
     }
 
+    private var numberFont: Font {
+        .system(.largeTitle, design: .rounded).weight(.semibold).monospacedDigit()
+    }
+
     @ViewBuilder
     private var header: some View {
         if let session = store.activeSession {
             TimelineView(.periodic(from: .now, by: 1.0)) { context in
-                HStack {
-                    VStack(alignment: .leading, spacing: 2.0) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 0.0) {
                         Text("Sessions.Elapsed")
-                            .font(.caption2)
+                            .font(.body)
                             .foregroundStyle(.secondary)
                         Text(verbatim: elapsedString(since: session.startDate, now: context.date))
-                            .font(.title2.monospacedDigit().weight(.semibold))
+                            .font(numberFont)
                     }
                     Spacer()
                     if workoutBridge.isWorkoutActive {
-                        VStack(alignment: .trailing, spacing: 2.0) {
-                            Label(
-                                workoutBridge.heartRate > 0 ? "\(workoutBridge.heartRate)" : "--",
-                                systemImage: "heart.fill"
-                            )
-                            .font(.callout.monospacedDigit().weight(.semibold))
+                        VStack(alignment: .center, spacing: 0.0) {
+                            Text("Sessions.HeartRate")
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+                            HStack(spacing: 4.0) {
+                                Image(systemName: "heart.fill")
+                                Text(verbatim: workoutBridge.heartRate > 0 ? "\(workoutBridge.heartRate)" : "--")
+                            }
+                            .font(numberFont)
                             .foregroundStyle(.red)
                             if workoutBridge.activeCalories > 0 {
                                 Text(verbatim: "\(workoutBridge.activeCalories) kcal")
-                                    .font(.caption2.monospacedDigit())
+                                    .font(.caption.monospacedDigit())
                                     .foregroundStyle(.secondary)
                             }
                         }
+                        Spacer()
                     }
-                    VStack(alignment: .trailing, spacing: 2.0) {
+                    VStack(alignment: .trailing, spacing: 0.0) {
                         Text("Sessions.Plays")
-                            .font(.caption2)
+                            .font(.body)
                             .foregroundStyle(.secondary)
                         Text(verbatim: "\(store.plays.count)")
-                            .font(.title2.monospacedDigit().weight(.semibold))
+                            .font(numberFont)
                     }
                 }
                 .padding()
@@ -118,27 +141,44 @@ struct ActiveSessionView: View {
                 }
             }
             .listStyle(.plain)
+            .scrollContentBackground(.hidden)
         }
     }
 
     private var captureBar: some View {
         HStack(spacing: 12.0) {
-            Button {
-                requestCameraThenPresent()
-            } label: {
-                Label("Sessions.Capture", systemImage: "camera.fill")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-
-            PhotosPicker(selection: $pickerItems, maxSelectionCount: 0, matching: .images) {
-                Label("Sessions.Import", systemImage: "photo.on.rectangle")
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
+            captureButton
+            importButton
         }
         .padding()
+    }
+
+    @ViewBuilder
+    private var captureButton: some View {
+        let button = Button {
+            requestCameraThenPresent()
+        } label: {
+            Label("Sessions.Capture", systemImage: "camera.fill")
+                .frame(maxWidth: .infinity)
+        }
+        if #available(iOS 26.0, *) {
+            button.buttonStyle(.glassProminent).controlSize(.large)
+        } else {
+            button.buttonStyle(.borderedProminent).controlSize(.large)
+        }
+    }
+
+    @ViewBuilder
+    private var importButton: some View {
+        let picker = PhotosPicker(selection: $pickerItems, maxSelectionCount: 0, matching: .images) {
+            Label("Sessions.Import", systemImage: "photo.on.rectangle")
+                .frame(maxWidth: .infinity)
+        }
+        if #available(iOS 26.0, *) {
+            picker.buttonStyle(.glass).controlSize(.large)
+        } else {
+            picker.buttonStyle(.bordered).controlSize(.large)
+        }
     }
 
     private func requestCameraThenPresent() {
