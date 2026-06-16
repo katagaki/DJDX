@@ -80,6 +80,16 @@ struct UnifiedView: View {
                     gameMenu
                 }
                 ToolbarItemGroup(placement: .topBarLeading) {
+                    Picker("ViewTitle.Mode", selection: $appMode) {
+                        Label("ViewTitle.Scores", systemImage: "music.note.list").tag(AppMode.imports)
+                        Label("ViewTitle.Sessions", systemImage: "figure.dance").tag(AppMode.sessions)
+                    }
+                    .pickerStyle(.menu)
+                }
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer(.fixed, placement: .topBarLeading)
+                }
+                ToolbarItemGroup(placement: .topBarLeading) {
                     if appMode == .sessions {
                         Button {
                             if sessionStore.activeSession == nil {
@@ -101,13 +111,6 @@ struct UnifiedView: View {
                         .popoverTip(ImportMovedTip(), arrowEdge: .top)
                         .automaticSheetMatchedTransitionSource(id: "Import", in: importNamespace)
                     }
-                }
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Picker("ViewTitle.Mode", selection: $appMode) {
-                        Label("ViewTitle.Scores", systemImage: "music.note.list").tag(AppMode.imports)
-                        Label("ViewTitle.Sessions", systemImage: "figure.dance").tag(AppMode.sessions)
-                    }
-                    .pickerStyle(.menu)
                 }
                 if appMode == .imports {
                     ToolbarItemGroup(placement: .topBarTrailing) {
