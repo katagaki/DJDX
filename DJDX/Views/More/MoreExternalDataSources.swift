@@ -149,13 +149,11 @@ struct MoreExternalDataSources: View {
             HStack(spacing: 12.0) {
                 title()
                     .font(.body)
-                    .opacity(isOn.wrappedValue ? 1.0 : 0.5)
                 Spacer(minLength: 8.0)
                 Text(count.formatted())
                     .font(.caption)
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
-                    .opacity(isOn.wrappedValue ? 1.0 : 0.5)
                 Toggle(isOn: isOn) {
                     EmptyView()
                 }
@@ -179,10 +177,10 @@ struct MoreExternalDataSources: View {
                 }
             }
         }
-        .padding(16.0)
+        .padding()
         .background(Color(uiColor: .secondarySystemGroupedBackground),
                     in: RoundedRectangle(cornerRadius: 24.0))
-        .listRowInsets(EdgeInsets(top: 5.0, leading: 0.0, bottom: 5.0, trailing: 0.0))
+        .listRowInsets(.init())
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
     }
@@ -212,6 +210,7 @@ struct MoreExternalDataSources: View {
                 reload: reloadBemaniWikiData,
                 completed: $isBemaniWikiReloadCompleted
             )
+            .padding(.bottom, 8.0)
             dataSourceCard(
                 title: { Text(verbatim: "DanceDanceRevolution") },
                 count: ddrSongMetaCount,
