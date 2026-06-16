@@ -306,7 +306,7 @@ enum IIDXResultParser {
     private static func rightmostValue<T>(on label: OCRLine,
                                           in lines: [OCRLine],
                                           map: (String) -> T?) -> T? {
-        let maxDeltaX = label.box.height * 14.0
+        let maxDeltaX = max(label.box.height * 18.0, 0.42)
         var best: (midX: CGFloat, value: T)?
         for line in lines where line.text != label.text {
             guard onRow(line, label: label) else { continue }
@@ -321,7 +321,7 @@ enum IIDXResultParser {
     }
 
     private static func onRow(_ line: OCRLine, label: OCRLine) -> Bool {
-        abs(line.box.midY - label.box.midY) < label.box.height
+        line.box.maxY > label.box.minY && line.box.minY < label.box.maxY
     }
 
     // MARK: - Value maps

@@ -53,6 +53,7 @@ actor SessionCaptureProcessor {
 
         do {
             let lines = try await SessionTextRecognizer.recognize(imageData: imageData)
+            SessionImageStore.shared.writeOCRText(lines.map { $0.text }.joined(separator: "\n"), id: playID)
             let parse = IIDXResultParser.parse(lines: lines, songs: loadSongCandidates())
             play.apply(parse)
             play.processedAt = .now

@@ -129,21 +129,25 @@ struct ActiveSessionView: View {
             )
             .frame(maxHeight: .infinity)
         } else {
-            List {
-                ForEach(store.plays.reversed()) { play in
-                    NavigationLink {
-                        CapturedPlayDetailView(store: store, play: play)
-                    } label: {
-                        CapturedPlayRow(play: play)
+            ScrollView {
+                LazyVStack(spacing: 0.0) {
+                    ForEach(store.plays.reversed()) { play in
+                        NavigationLink {
+                            CapturedPlayDetailView(store: store, play: play)
+                        } label: {
+                            CapturedPlayRow(play: play)
+                                .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
+                        .contextMenu {
+                            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                                store.deletePlay(play)
+                            }
+                        }
+                        Divider()
                     }
                 }
-                .onDelete { offsets in
-                    let reversed = Array(store.plays.reversed())
-                    for offset in offsets { store.deletePlay(reversed[offset]) }
-                }
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
         }
     }
 

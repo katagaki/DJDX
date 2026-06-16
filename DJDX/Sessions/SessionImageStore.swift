@@ -33,7 +33,21 @@ final class SessionImageStore: Sendable {
         return UIImage(data: data)
     }
 
+    func writeOCRText(_ text: String, id: String) {
+        try? Data(text.utf8).write(to: ocrTextURL(id: id), options: .atomic)
+    }
+
+    func ocrText(id: String) -> String? {
+        try? String(contentsOf: ocrTextURL(id: id), encoding: .utf8)
+    }
+
     func delete(filename: String) {
         try? FileManager.default.removeItem(at: url(for: filename))
+        let id = (filename as NSString).deletingPathExtension
+        try? FileManager.default.removeItem(at: ocrTextURL(id: id))
+    }
+
+    private func ocrTextURL(id: String) -> URL {
+        directory.appendingPathComponent("\(id).ocr.txt")
     }
 }

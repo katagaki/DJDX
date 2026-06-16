@@ -45,6 +45,17 @@ struct CapturedPlayDetailView: View {
                 }
             }
 
+            if let recognizedText = SessionImageStore.shared.ocrText(id: play.id), !recognizedText.isEmpty {
+                Section("Sessions.Detail.RecognizedText") {
+                    DisclosureGroup("Sessions.Detail.ShowText") {
+                        Text(verbatim: recognizedText)
+                            .font(.caption.monospaced())
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
+                    }
+                }
+            }
+
             Section("Sessions.Detail.Chart") {
                 TextField("Sessions.Detail.Song", text: $songTitle)
                 Picker("Shared.Level", selection: $level) {
