@@ -64,6 +64,7 @@ actor SessionCaptureProcessor {
         } catch {
             fail(play, message: error.localizedDescription)
         }
+        await SessionLiveActivityController.shared.refresh(sessionID: play.sessionID)
     }
 
     private func fail(_ play: CapturedPlay, message: String) {

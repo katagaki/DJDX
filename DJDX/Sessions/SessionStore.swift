@@ -35,6 +35,7 @@ final class SessionStore {
         activeSession = session
         plays = []
         loadSessions()
+        SessionLiveActivityController.shared.start(session)
         NotificationCenter.default.post(name: .playSessionDidChange, object: session.id)
         return session
     }
@@ -46,6 +47,7 @@ final class SessionStore {
         self.activeSession = nil
         plays = []
         loadSessions()
+        SessionLiveActivityController.shared.end()
         NotificationCenter.default.post(name: .playSessionDidChange, object: endedID)
     }
 
@@ -62,6 +64,7 @@ final class SessionStore {
         )
         db.insertPlay(play)
         refreshPlays()
+        SessionLiveActivityController.shared.refresh(sessionID: activeSession.id)
         Task { await SessionCaptureProcessor.shared.submit(id) }
     }
 
