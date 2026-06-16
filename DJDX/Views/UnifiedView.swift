@@ -83,10 +83,10 @@ struct UnifiedView: View {
                     Menu {
                         Picker("ViewTitle.Mode", selection: $appMode) {
                             Label("ViewTitle.Scores", systemImage: "music.note.list").tag(AppMode.imports)
-                            Label("ViewTitle.Sessions", systemImage: "figure.dance").tag(AppMode.sessions)
+                            Label("ViewTitle.Sessions.Beta", systemImage: "figure.walk").tag(AppMode.sessions)
                         }
                     } label: {
-                        Image(systemName: appMode == .sessions ? "figure.dance" : "music.note.list")
+                        Image(systemName: appMode == .sessions ? "figure.walk" : "music.note.list")
                     }
                 }
                 if #available(iOS 26.0, *) {

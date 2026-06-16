@@ -1,6 +1,23 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "ViewTitle.Sessions.Beta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sessions (Beta)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション（ベータ）"
+          }
+        }
+      }
+    },
     "Sessions.Detail.Annotations.Title" : {
       "extractionState" : "manual",
       "localizations" : {
