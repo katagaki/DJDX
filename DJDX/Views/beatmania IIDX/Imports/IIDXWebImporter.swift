@@ -9,6 +9,8 @@ struct IIDXWebImporter: View {
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
 
+    @State private var loadingState = WebImporterLoadingState()
+
     init(
         importToDate: Binding<Date> = .constant(Date()),
         importMode: IIDXImportMode,
@@ -29,13 +31,14 @@ struct IIDXWebImporter: View {
             importMode: $importMode,
             isAutoImportFailed: $isAutoImportFailed,
             didImportSucceed: $didImportSucceed,
-            autoImportFailedReason: $autoImportFailedReason
+            autoImportFailedReason: $autoImportFailedReason,
+            loadingState: loadingState
         )
         .navigationTitle("ViewTitle.Importer.Web")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
         .background {
-            ProgressView("Shared.Loading")
+            ProgressView { Text(loadingState.label) }
         }
         .padding(0.0)
     }
@@ -52,6 +55,8 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
     @State var observers = [NSKeyValueObservation]()
+
+    let loadingState: WebImporterLoadingState
 
     @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
@@ -91,7 +96,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     }
 
     func makeCoordinator() -> CoordinatorForImporter {
-        Coordinator(delegate: self, importMode: importMode, version: iidxVersion)
+        Coordinator(delegate: self, importMode: importMode, version: iidxVersion, loadingState: loadingState)
     }
 
     func updateUIView(_: WKWebView, context _: Context) {
@@ -139,6 +144,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
 
     func stopProcessing(with reason: ImportFailedReason) {
         dismiss()
+        progressReporter.hide()
         autoImportFailedReason = reason
         isAutoImportFailed = true
     }
@@ -156,6 +162,7 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
     var delegate: UpdateScoreDataDelegate
     var importMode: IIDXImportMode
     var version: IIDXVersion
+    let loadingState: WebImporterLoadingState
 
     var hasStartedExtraction: Bool = false
     var hasResolved: Bool = false
@@ -166,12 +173,19 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
     init(
         delegate: UpdateScoreDataDelegate,
         importMode: IIDXImportMode = .single,
-        version: IIDXVersion
+        version: IIDXVersion,
+        loadingState: WebImporterLoadingState
     ) {
         self.delegate = delegate
         self.importMode = importMode
         self.version = version
+        self.loadingState = loadingState
         super.init()
+    }
+
+    func webView(_: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
+        let loadingState = self.loadingState
+        Task { @MainActor in loadingState.phase = .connecting }
     }
 
     func webView(_: WKWebView,
@@ -289,6 +303,8 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
+        let loadingState = self.loadingState
+        Task { @MainActor in loadingState.phase = .loading }
         // Sync WebView cookie store with URLSession cookie store
         let webViewCookieStore = webView.configuration.websiteDataStore.httpCookieStore
         let nativeCookieStorage = HTTPCookieStorage.shared

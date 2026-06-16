@@ -8,18 +8,21 @@ struct DDRWebImporter: View {
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
 
+    @State private var loadingState = WebImporterLoadingState()
+
     var body: some View {
         DDRWebViewForImporter(
             importToDate: $importToDate,
             isAutoImportFailed: $isAutoImportFailed,
             didImportSucceed: $didImportSucceed,
-            autoImportFailedReason: $autoImportFailedReason
+            autoImportFailedReason: $autoImportFailedReason,
+            loadingState: loadingState
         )
         .navigationTitle("ViewTitle.Importer.Web")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
         .background {
-            ProgressView("Shared.Loading")
+            ProgressView { Text(loadingState.label) }
         }
         .padding(0.0)
     }
@@ -34,6 +37,8 @@ struct DDRWebViewForImporter: UIViewRepresentable, @preconcurrency DDRUpdateScor
     @Binding var isAutoImportFailed: Bool
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
+
+    let loadingState: WebImporterLoadingState
 
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
 
@@ -66,7 +71,7 @@ struct DDRWebViewForImporter: UIViewRepresentable, @preconcurrency DDRUpdateScor
     }
 
     func makeCoordinator() -> DDRCoordinatorForImporter {
-        DDRCoordinatorForImporter(delegate: self, version: ddrVersion)
+        DDRCoordinatorForImporter(delegate: self, version: ddrVersion, loadingState: loadingState)
     }
 
     func updateUIView(_: WKWebView, context _: Context) {
@@ -110,6 +115,7 @@ struct DDRWebViewForImporter: UIViewRepresentable, @preconcurrency DDRUpdateScor
 
     func stopProcessing(with reason: ImportFailedReason) {
         dismiss()
+        progressReporter.hide()
         autoImportFailedReason = reason
         isAutoImportFailed = true
     }
@@ -126,15 +132,22 @@ class DDRCoordinatorForImporter: NSObject, WKNavigationDelegate, WKScriptMessage
 
     var delegate: DDRUpdateScoreDataDelegate
     var version: DDRVersion
+    let loadingState: WebImporterLoadingState
 
     var hasStartedExtraction: Bool = false
     var hasResolved: Bool = false
     var watchdog: Task<Void, Never>?
 
-    init(delegate: DDRUpdateScoreDataDelegate, version: DDRVersion) {
+    init(delegate: DDRUpdateScoreDataDelegate, version: DDRVersion, loadingState: WebImporterLoadingState) {
         self.delegate = delegate
         self.version = version
+        self.loadingState = loadingState
         super.init()
+    }
+
+    func webView(_: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
+        let loadingState = self.loadingState
+        Task { @MainActor in loadingState.phase = .connecting }
     }
 
     func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
@@ -172,6 +185,8 @@ class DDRCoordinatorForImporter: NSObject, WKNavigationDelegate, WKScriptMessage
     }
 
     func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
+        let loadingState = self.loadingState
+        Task { @MainActor in loadingState.phase = .loading }
         let webViewCookieStore = webView.configuration.websiteDataStore.httpCookieStore
         let nativeCookieStorage = HTTPCookieStorage.shared
         webViewCookieStore.getAllCookies { cookies in

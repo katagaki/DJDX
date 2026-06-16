@@ -8,18 +8,21 @@ struct SDVXWebImporter: View {
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
 
+    @State private var loadingState = WebImporterLoadingState()
+
     var body: some View {
         SDVXWebViewForImporter(
             importToDate: $importToDate,
             isAutoImportFailed: $isAutoImportFailed,
             didImportSucceed: $didImportSucceed,
-            autoImportFailedReason: $autoImportFailedReason
+            autoImportFailedReason: $autoImportFailedReason,
+            loadingState: loadingState
         )
         .navigationTitle("ViewTitle.Importer.Web")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
         .background {
-            ProgressView("Shared.Loading")
+            ProgressView { Text(loadingState.label) }
         }
         .padding(0.0)
     }
@@ -34,6 +37,8 @@ struct SDVXWebViewForImporter: UIViewRepresentable, @preconcurrency SDVXUpdateSc
     @Binding var isAutoImportFailed: Bool
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
+
+    let loadingState: WebImporterLoadingState
 
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
 
@@ -65,7 +70,7 @@ struct SDVXWebViewForImporter: UIViewRepresentable, @preconcurrency SDVXUpdateSc
     }
 
     func makeCoordinator() -> SDVXCoordinatorForImporter {
-        SDVXCoordinatorForImporter(delegate: self, version: sdvxVersion)
+        SDVXCoordinatorForImporter(delegate: self, version: sdvxVersion, loadingState: loadingState)
     }
 
     func updateUIView(_: WKWebView, context _: Context) {
@@ -101,6 +106,7 @@ struct SDVXWebViewForImporter: UIViewRepresentable, @preconcurrency SDVXUpdateSc
 
     func stopProcessing(with reason: ImportFailedReason) {
         dismiss()
+        progressReporter.hide()
         autoImportFailedReason = reason
         isAutoImportFailed = true
     }
@@ -117,15 +123,22 @@ class SDVXCoordinatorForImporter: NSObject, WKNavigationDelegate {
 
     var delegate: SDVXUpdateScoreDataDelegate
     var version: SDVXVersion
+    let loadingState: WebImporterLoadingState
 
     var hasStartedExtraction: Bool = false
     var hasResolved: Bool = false
     var watchdog: Task<Void, Never>?
 
-    init(delegate: SDVXUpdateScoreDataDelegate, version: SDVXVersion) {
+    init(delegate: SDVXUpdateScoreDataDelegate, version: SDVXVersion, loadingState: WebImporterLoadingState) {
         self.delegate = delegate
         self.version = version
+        self.loadingState = loadingState
         super.init()
+    }
+
+    func webView(_: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
+        let loadingState = self.loadingState
+        Task { @MainActor in loadingState.phase = .connecting }
     }
 
     func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
@@ -166,6 +179,8 @@ class SDVXCoordinatorForImporter: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
+        let loadingState = self.loadingState
+        Task { @MainActor in loadingState.phase = .loading }
         let webViewCookieStore = webView.configuration.websiteDataStore.httpCookieStore
         let nativeCookieStorage = HTTPCookieStorage.shared
         webViewCookieStore.getAllCookies { cookies in

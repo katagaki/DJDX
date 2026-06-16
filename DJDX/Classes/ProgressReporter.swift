@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UIKit
 
 @Observable
 @MainActor
@@ -13,12 +14,14 @@ final class ProgressReporter {
         self.title = title
         self.message = message
         percentage = 0
+        UIApplication.shared.isIdleTimerDisabled = true
         withAnimation {
             isShowing = true
         }
     }
 
     func hide() {
+        UIApplication.shared.isIdleTimerDisabled = false
         withAnimation {
             isShowing = false
         } completion: {

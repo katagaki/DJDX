@@ -1930,6 +1930,23 @@
         }
       }
     },
+    "More.Disclaimer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disclaimer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免責事項"
+          }
+        }
+      }
+    },
     "More.Disclaimer.NotAffiliated" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3456,6 +3473,23 @@
         }
       },
       "shouldTranslate" : false
+    },
+    "Shared.Connecting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecting…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続中…"
+          }
+        }
+      }
     },
     "Shared.Loading" : {
       "extractionState" : "manual",

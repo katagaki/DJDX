@@ -19,6 +19,7 @@ struct MoreMenu: View {
     @State var isConfirmingResetLayout: Bool = false
     @State var isPromptingScoreDeleteCode: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
+    @State var isPresentingDisclaimer: Bool = false
     @State var scoreDeleteCode: String = ""
     @State var scoreDeleteCodeEntry: String = ""
 
@@ -89,9 +90,9 @@ struct MoreMenu: View {
                 Button("More.Attributions") {
                     navigationManager.push(MorePath.moreAttributions)
                 }
-            }
-            Section {
-                Text("More.Disclaimer.NotAffiliated")
+                Button("More.Disclaimer") {
+                    isPresentingDisclaimer = true
+                }
             }
         } label: {
             Label("Tab.More", systemImage: "ellipsis")
@@ -151,6 +152,13 @@ struct MoreMenu: View {
             }
         } message: {
             Text("Alert.DeleteData.Score.Subtitle")
+        }
+        .alert("More.Disclaimer", isPresented: $isPresentingDisclaimer) {
+            Button("Shared.OK", role: .cancel) {
+                // Dismisses the alert; no further action needed
+            }
+        } message: {
+            Text("More.Disclaimer.NotAffiliated")
         }
     }
 

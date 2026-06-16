@@ -8,18 +8,21 @@ struct PolarisChordWebImporter: View {
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
 
+    @State private var loadingState = WebImporterLoadingState()
+
     var body: some View {
         PolarisChordWebViewForImporter(
             importToDate: $importToDate,
             isAutoImportFailed: $isAutoImportFailed,
             didImportSucceed: $didImportSucceed,
-            autoImportFailedReason: $autoImportFailedReason
+            autoImportFailedReason: $autoImportFailedReason,
+            loadingState: loadingState
         )
         .navigationTitle("ViewTitle.Importer.Web")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
         .background {
-            ProgressView("Shared.Loading")
+            ProgressView { Text(loadingState.label) }
         }
         .padding(0.0)
     }
@@ -35,6 +38,8 @@ struct PolarisChordWebViewForImporter: UIViewRepresentable,
     @Binding var isAutoImportFailed: Bool
     @Binding var didImportSucceed: Bool
     @Binding var autoImportFailedReason: ImportFailedReason?
+
+    let loadingState: WebImporterLoadingState
 
     @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
     var polarisChordVersion: PolarisChordVersion
@@ -67,7 +72,9 @@ struct PolarisChordWebViewForImporter: UIViewRepresentable,
     }
 
     func makeCoordinator() -> PolarisChordCoordinatorForImporter {
-        PolarisChordCoordinatorForImporter(delegate: self, version: polarisChordVersion)
+        PolarisChordCoordinatorForImporter(delegate: self,
+                                           version: polarisChordVersion,
+                                           loadingState: loadingState)
     }
 
     func updateUIView(_: WKWebView, context _: Context) {}
@@ -101,6 +108,7 @@ struct PolarisChordWebViewForImporter: UIViewRepresentable,
 
     func stopProcessing(with reason: ImportFailedReason) {
         dismiss()
+        progressReporter.hide()
         autoImportFailedReason = reason
         isAutoImportFailed = true
     }
@@ -117,15 +125,24 @@ class PolarisChordCoordinatorForImporter: NSObject, WKNavigationDelegate {
 
     var delegate: PolarisChordUpdateScoreDataDelegate
     var version: PolarisChordVersion
+    let loadingState: WebImporterLoadingState
 
     var hasStartedExtraction: Bool = false
     var hasResolved: Bool = false
     var watchdog: Task<Void, Never>?
 
-    init(delegate: PolarisChordUpdateScoreDataDelegate, version: PolarisChordVersion) {
+    init(delegate: PolarisChordUpdateScoreDataDelegate,
+         version: PolarisChordVersion,
+         loadingState: WebImporterLoadingState) {
         self.delegate = delegate
         self.version = version
+        self.loadingState = loadingState
         super.init()
+    }
+
+    func webView(_: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
+        let loadingState = self.loadingState
+        Task { @MainActor in loadingState.phase = .connecting }
     }
 
     func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
@@ -160,6 +177,8 @@ class PolarisChordCoordinatorForImporter: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didCommit _: WKNavigation!) {
+        let loadingState = self.loadingState
+        Task { @MainActor in loadingState.phase = .loading }
         let webViewCookieStore = webView.configuration.websiteDataStore.httpCookieStore
         let nativeCookieStorage = HTTPCookieStorage.shared
         webViewCookieStore.getAllCookies { cookies in
