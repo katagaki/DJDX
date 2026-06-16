@@ -80,11 +80,14 @@ struct UnifiedView: View {
                     gameMenu
                 }
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    Picker("ViewTitle.Mode", selection: $appMode) {
-                        Label("ViewTitle.Scores", systemImage: "music.note.list").tag(AppMode.imports)
-                        Label("ViewTitle.Sessions", systemImage: "figure.dance").tag(AppMode.sessions)
+                    Menu {
+                        Picker("ViewTitle.Mode", selection: $appMode) {
+                            Label("ViewTitle.Scores", systemImage: "music.note.list").tag(AppMode.imports)
+                            Label("ViewTitle.Sessions", systemImage: "figure.dance").tag(AppMode.sessions)
+                        }
+                    } label: {
+                        Image(systemName: appMode == .sessions ? "figure.dance" : "music.note.list")
                     }
-                    .pickerStyle(.menu)
                 }
                 if #available(iOS 26.0, *) {
                     ToolbarSpacer(.fixed, placement: .topBarLeading)
@@ -99,9 +102,9 @@ struct UnifiedView: View {
                             }
                         } label: {
                             if sessionStore.activeSession == nil {
-                                Label("Sessions.Start", systemImage: "play.circle.fill")
+                                Label("Sessions.Start", systemImage: "play.fill")
                             } else {
-                                Label("Sessions.End", systemImage: "stop.circle.fill")
+                                Label("Sessions.End", systemImage: "stop.fill")
                             }
                         }
                     } else {
