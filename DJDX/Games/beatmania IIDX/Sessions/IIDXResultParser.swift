@@ -32,17 +32,28 @@ struct IIDXResultParse: Sendable {
 // of the expected type on a metric's row, which also skips NEW RECORD badges.
 enum IIDXResultParser {
 
-    private static let rowMaxDeltaX: CGFloat = 0.42
     private static let grades = ["AAA", "AA", "A", "B", "C", "D", "E", "F"]
+
+    // Free-text title lookup ignores UI chrome words; matching against the song
+    // DB is position-independent, with a largest-font fallback so the captured
+    // title survives an unrecognized song, an odd angle, or a different crop.
+    private static let titleStopwords: Set<String> = [
+        "RESULT", "STAGE", "JUDGE", "FAST", "SLOW", "COMBO", "BREAK", "NOTES",
+        "PLAYER", "PASELI", "NEWRECORD", "RECORD", "BEST", "SCORE", "TYPE",
+        "DJLEVEL", "LEVEL", "MISSCOUNT", "MISS", "COUNT", "GREAT", "GOOD", "BAD",
+        "POOR", "AMUSEMENT", "EAMUSEMENT", "BEGINNER", "NORMAL", "HYPER",
+        "ANOTHER", "LEGGENDARIA", "NOPLAY", "PERFECT", "PGREAT", "FEAT", "SP", "DP",
+        "テンキー", "アプリ", "画像", "保存", "スコア", "ベスト", "今回", "プレー"
+    ]
 
     static func parse(lines: [OCRLine], songs: [IIDXSongCandidate]) -> IIDXResultParse {
         var parse = IIDXResultParse()
         var hits = 0
 
-        if let (title, id) = matchTitle(lines: lines, songs: songs) {
-            parse.songTitle = title
-            parse.matchedSongID = id
-            hits += 1
+        if let resolved = resolveTitle(lines: lines, songs: songs) {
+            parse.songTitle = resolved.title
+            parse.matchedSongID = resolved.id
+            if resolved.id != nil { hits += 1 }
         }
 
         parse.playType = detectPlayType(lines: lines)
@@ -103,33 +114,58 @@ enum IIDXResultParser {
 
     // MARK: - Title
 
-    private static func matchTitle(lines: [OCRLine],
-                                   songs: [IIDXSongCandidate]) -> (String, Int64)? {
-        guard !songs.isEmpty else { return nil }
-        let candidates = lines.filter { $0.text.compact.count >= 2 }
-
-        for line in candidates {
-            let needle = line.text.compact
-            if let exact = songs.first(where: { $0.compact == needle }) {
-                return (exact.title, exact.id)
-            }
-        }
-
-        var best: (song: IIDXSongCandidate, distance: Int)?
-        for line in candidates {
-            let needle = line.text.compact
-            guard needle.count >= 3 else { continue }
-            for song in songs where song.compact.contains(needle) || needle.contains(song.compact) {
-                let distance = abs(song.compact.count - needle.count)
-                if best == nil || distance < best!.distance {
-                    best = (song, distance)
+    private static func resolveTitle(lines: [OCRLine],
+                                     songs: [IIDXSongCandidate]) -> (title: String, id: Int64?)? {
+        if !songs.isEmpty {
+            let candidates = lines.filter { $0.text.compact.count >= 2 }
+            for line in candidates {
+                let needle = line.text.compact
+                if let exact = songs.first(where: { $0.compact == needle }) {
+                    return (exact.title, exact.id)
                 }
             }
+            var best: (song: IIDXSongCandidate, distance: Int)?
+            for line in candidates {
+                let needle = line.text.compact
+                guard needle.count >= 3 else { continue }
+                for song in songs where song.compact.contains(needle) || needle.contains(song.compact) {
+                    let distance = abs(song.compact.count - needle.count)
+                    if best == nil || distance < best!.distance {
+                        best = (song, distance)
+                    }
+                }
+            }
+            if let best, best.distance <= 4 {
+                return (best.song.title, best.song.id)
+            }
         }
-        if let best, best.distance <= 4 {
-            return (best.song.title, best.song.id)
+        if let raw = rawTitleCandidate(lines) {
+            return (raw, nil)
         }
         return nil
+    }
+
+    private static func rawTitleCandidate(_ lines: [OCRLine]) -> String? {
+        let candidates = lines.filter { isFreeText($0.text) }
+        let best = candidates.max { lhs, rhs in
+            if abs(lhs.box.height - rhs.box.height) > 0.005 {
+                return lhs.box.height < rhs.box.height
+            }
+            return lhs.text.count < rhs.text.count
+        }
+        return best?.text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func isFreeText(_ text: String) -> Bool {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count >= 2 else { return false }
+        let letters = trimmed.unicodeScalars.filter { CharacterSet.letters.contains($0) }
+        guard letters.count >= 2 else { return false }
+        guard intOf(trimmed) == nil, gradeOf(trimmed) == nil, clearTypeOf(trimmed) == nil else {
+            return false
+        }
+        let normalized = normalize(trimmed)
+        return !titleStopwords.contains { normalized.contains($0) }
     }
 
     // MARK: - Chart / play type
@@ -215,11 +251,12 @@ enum IIDXResultParser {
     private static func rightmostValue<T>(on label: OCRLine,
                                           in lines: [OCRLine],
                                           map: (String) -> T?) -> T? {
+        let maxDeltaX = label.box.height * 14.0
         var best: (midX: CGFloat, value: T)?
         for line in lines where line.text != label.text {
             guard onRow(line, label: label) else { continue }
             guard line.box.midX > label.box.maxX else { continue }
-            guard line.box.midX - label.box.midX < rowMaxDeltaX else { continue }
+            guard line.box.midX - label.box.midX < maxDeltaX else { continue }
             guard let value = map(line.text) else { continue }
             if best == nil || line.box.midX > best!.midX {
                 best = (line.box.midX, value)
@@ -229,8 +266,7 @@ enum IIDXResultParser {
     }
 
     private static func onRow(_ line: OCRLine, label: OCRLine) -> Bool {
-        let tolerance = max(0.02, label.box.height * 0.7)
-        return abs(line.box.midY - label.box.midY) < tolerance
+        abs(line.box.midY - label.box.midY) < label.box.height
     }
 
     // MARK: - Value maps
