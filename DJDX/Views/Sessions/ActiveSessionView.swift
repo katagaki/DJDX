@@ -69,7 +69,9 @@ struct ActiveSessionView: View {
     }
 
     private var numberFont: Font {
-        .system(.largeTitle, design: .rounded).weight(.semibold).monospacedDigit()
+        .system(.largeTitle, design: .rounded)
+        .weight(.bold)
+        .monospacedDigit()
     }
 
     @ViewBuilder

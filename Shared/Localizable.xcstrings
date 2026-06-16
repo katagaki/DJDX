@@ -1,31 +1,11 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
-    "Sessions.HeartRate" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Heart Rate"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "心拍数"
-          }
-        }
-      }
-    },
     "" : {
 
     },
     " " : {
       "shouldTranslate" : false
-    },
-    "--" : {
-
     },
     "[%@](https://bemaniwiki.com)" : {
       "shouldTranslate" : false
@@ -3452,6 +3432,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ヘルスケアでワークアウトを記録"
+          }
+        }
+      }
+    },
+    "Sessions.HeartRate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heart Rate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心拍数"
           }
         }
       }

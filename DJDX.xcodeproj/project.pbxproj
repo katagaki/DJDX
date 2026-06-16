@@ -74,7 +74,6 @@
 /* Begin PBXFileReference section */
 		AA000001300100000000000D /* DJDX Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "DJDX Widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DJDX CHARGE.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E4449F2F2FE1787E003AC8B6 /* DJDX CHARGE.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "DJDX CHARGE.entitlements"; sourceTree = "<group>"; };
 		E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DJDX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -85,6 +84,20 @@
 				Info.plist,
 			);
 			target = AA000001300100000000000C /* DJDX Widgets */;
+		};
+		E4449F382FE18674003AC8B6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppIcon.icon,
+			);
+			target = AA000001300100000000000C /* DJDX Widgets */;
+		};
+		E4449F392FE18674003AC8B6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppIcon.icon,
+			);
+			target = E4449F142FE17495003AC8B6 /* DJDX CHARGE */;
 		};
 		E4B263BC2E7998840031A646 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -98,8 +111,8 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AA000001300100000000000E /* Widgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AA00000130010000000000E1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Widgets; sourceTree = "<group>"; };
-		E4449F162FE17495003AC8B6 /* DJDX CHARGE Watch App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "DJDX CHARGE Watch App"; sourceTree = "<group>"; };
-		E4B2630B2E79986D0031A646 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
+		E4449F162FE17495003AC8B6 /* DJDX CHARGE */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "DJDX CHARGE"; sourceTree = "<group>"; };
+		E4B2630B2E79986D0031A646 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4449F382FE18674003AC8B6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, E4449F392FE18674003AC8B6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 		E4B2636E2E7998840031A646 /* DJDX */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4B263BC2E7998840031A646 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DJDX; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -142,11 +155,10 @@
 		E4B123A32BF8E8E400D4A3D1 = {
 			isa = PBXGroup;
 			children = (
-				E4449F2F2FE1787E003AC8B6 /* DJDX CHARGE.entitlements */,
 				E4B2630B2E79986D0031A646 /* Shared */,
 				E4B2636E2E7998840031A646 /* DJDX */,
 				AA000001300100000000000E /* Widgets */,
-				E4449F162FE17495003AC8B6 /* DJDX CHARGE Watch App */,
+				E4449F162FE17495003AC8B6 /* DJDX CHARGE */,
 				E49816D22F53F04A00EFFB8B /* Frameworks */,
 				E4B123AD2BF8E8E400D4A3D1 /* Products */,
 			);
@@ -199,7 +211,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				E4449F162FE17495003AC8B6 /* DJDX CHARGE Watch App */,
+				E4449F162FE17495003AC8B6 /* DJDX CHARGE */,
 			);
 			name = "DJDX CHARGE";
 			packageProductDependencies = (
@@ -386,7 +398,7 @@
 		AA00000130010000000000F4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Widgets/Widgets.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Widgets/Entitlements.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -417,7 +429,7 @@
 		AA00000130010000000000F5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Widgets/Widgets.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Widgets/Entitlements.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -450,7 +462,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "DJDX CHARGE.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "DJDX CHARGE/Entitlements.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -483,7 +495,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "DJDX CHARGE.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "DJDX CHARGE/Entitlements.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -645,7 +657,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = DJDX/DJDX.entitlements;
+				CODE_SIGN_ENTITLEMENTS = DJDX/Entitlements.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -689,7 +701,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = DJDX/DJDX.entitlements;
+				CODE_SIGN_ENTITLEMENTS = DJDX/Entitlements.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_MODULE_VERIFIER = YES;
