@@ -15,8 +15,13 @@ struct DJDXApp: App {
 
     init() {
         _ = IIDXPlayDataDatabase.shared
+        _ = PlaySessionsDatabase.shared
         ICloudBackupManager.registerBackgroundTask()
         ICloudBackupManager.scheduleNextBackup()
+        SessionOCRBackgroundTask.register()
+        Task {
+            await SessionCaptureProcessor.shared.recover()
+        }
         Task {
             let playTypeRaw = UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter") ?? "single"
             let playType = IIDXPlayType(rawValue: playTypeRaw) ?? .single

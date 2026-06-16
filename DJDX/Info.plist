@@ -5,6 +5,7 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.tsubuzaki.DJDX.iCloudBackup</string>
+		<string>com.tsubuzaki.DJDX.sessionOCR</string>
 	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
@@ -39,6 +40,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>DJDX uses the camera to capture your result screens during a session.</string>
 	<key>NSUbiquitousContainers</key>
 	<dict>
 		<key>iCloud.com.tsubuzaki.DJDX</key>
