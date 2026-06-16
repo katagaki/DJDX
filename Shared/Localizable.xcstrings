@@ -3169,6 +3169,23 @@
         }
       }
     },
+    "Sessions.Detail.ClearTypeBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Lamp Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランプ内訳"
+          }
+        }
+      }
+    },
     "Sessions.Detail.Confidence" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3199,6 +3216,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJ LEVEL"
+          }
+        }
+      }
+    },
+    "Sessions.Detail.DJLevelBreakdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL内訳"
           }
         }
       }
