@@ -3135,6 +3135,57 @@
         }
       }
     },
+    "Sessions.DataSource.Warning.Action" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Data Sources"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外部データソースを開く"
+          }
+        }
+      }
+    },
+    "Sessions.DataSource.Warning.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Without BEMANIWiki 2nd data, song names may be inaccurate or may not appear. Enable it under External Data Sources for the best results."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEMANIWiki 2ndのデータがないと、曲名が正しく取得できなかったり、表示されないことがあります。外部データソースから有効にすることをおすすめします。"
+          }
+        }
+      }
+    },
+    "Sessions.DataSource.Warning.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Song Names May Be Inaccurate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "曲名が正しく表示されない場合があります"
+          }
+        }
+      }
+    },
     "Sessions.Detail.Chart" : {
       "extractionState" : "manual",
       "localizations" : {

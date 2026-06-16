@@ -4,7 +4,9 @@ struct SessionsView: View {
     var store: SessionStore
 
     @State private var isPresentingActive: Bool = false
+    @State private var isPresentingExternalDataSources: Bool = false
     @AppStorage(wrappedValue: false, SessionWorkoutBridge.healthKitEnabledKey) private var healthKitEnabled: Bool
+    @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") private var isBemaniWikiEnabled: Bool
 
     private var pastSessions: [PlaySession] {
         store.sessions.filter { !$0.isActive }
@@ -12,6 +14,11 @@ struct SessionsView: View {
 
     var body: some View {
         List {
+            if !isBemaniWikiEnabled {
+                Section {
+                    bemaniWikiWarning
+                }
+            }
             Section {
                 Toggle(isOn: $healthKitEnabled) {
                     Label("Sessions.HealthKit.Toggle", systemImage: "heart.text.square")
@@ -74,6 +81,27 @@ struct SessionsView: View {
         .fullScreenCover(isPresented: $isPresentingActive) {
             ActiveSessionView(store: store)
         }
+        .sheet(isPresented: $isPresentingExternalDataSources) {
+            NavigationStack {
+                MoreExternalDataSources()
+            }
+        }
+    }
+
+    private var bemaniWikiWarning: some View {
+        VStack(alignment: .leading, spacing: 8.0) {
+            Label("Sessions.DataSource.Warning.Title", systemImage: "exclamationmark.triangle.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.orange)
+            Text("Sessions.DataSource.Warning.Message")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Button("Sessions.DataSource.Warning.Action") {
+                isPresentingExternalDataSources = true
+            }
+            .font(.caption.weight(.semibold))
+        }
+        .padding(.vertical, 4.0)
     }
 
     private func resumeCard(_ session: PlaySession) -> some View {
