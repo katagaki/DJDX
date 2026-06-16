@@ -8,7 +8,13 @@ enum SessionTextRecognizerError: Error {
 
 enum SessionTextRecognizer {
 
-    static func recognize(imageData: Data) async throws -> [OCRLine] {
+    // Numbers on the result screen get misread as kanji/kana when Japanese is a
+    // recognition language, so callers run two passes: this set for the song
+    // title, and an English-only set for the scores.
+    static let titleLanguages = ["ja-JP", "ja", "en-US", "en"]
+    static let numericLanguages = ["en-US", "en"]
+
+    static func recognize(imageData: Data, languages: [String]) async throws -> [OCRLine] {
         try await withCheckedThrowingContinuation { continuation in
             guard let decoded = decodeImage(from: imageData) else {
                 continuation.resume(throwing: SessionTextRecognizerError.invalidImage)
@@ -29,7 +35,7 @@ enum SessionTextRecognizer {
             }
             request.recognitionLevel = .accurate
             request.usesLanguageCorrection = false
-            request.recognitionLanguages = preferredLanguages(for: request)
+            request.recognitionLanguages = supportedLanguages(languages, request: request)
 
             let handler = VNImageRequestHandler(
                 cgImage: decoded.image,
@@ -46,8 +52,8 @@ enum SessionTextRecognizer {
         }
     }
 
-    private static func preferredLanguages(for request: VNRecognizeTextRequest) -> [String] {
-        let desired = ["ja-JP", "ja", "en-US", "en-JP", "en"]
+    private static func supportedLanguages(_ desired: [String],
+                                           request: VNRecognizeTextRequest) -> [String] {
         let supported = Set((try? request.supportedRecognitionLanguages()) ?? [])
         var chosen: [String] = []
         var seenPrefixes = Set<String>()
@@ -57,7 +63,7 @@ enum SessionTextRecognizer {
                 chosen.append(language)
             }
         }
-        return chosen.isEmpty ? ["ja-JP"] : chosen
+        return chosen.isEmpty ? [desired.first ?? "en-US"] : chosen
     }
 
     private static func decodeImage(

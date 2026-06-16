@@ -52,9 +52,14 @@ actor SessionCaptureProcessor {
         }
 
         do {
-            let lines = try await SessionTextRecognizer.recognize(imageData: imageData)
+            let numericLines = try await SessionTextRecognizer.recognize(
+                imageData: imageData, languages: SessionTextRecognizer.numericLanguages
+            )
+            let titleLines = try await SessionTextRecognizer.recognize(
+                imageData: imageData, languages: SessionTextRecognizer.titleLanguages
+            )
             SessionImageStore.shared.writeRecognizedText(
-                lines.map {
+                numericLines.map {
                     RecognizedTextBox(
                         text: $0.text,
                         originX: $0.box.minX, originY: $0.box.minY,
@@ -63,7 +68,9 @@ actor SessionCaptureProcessor {
                 },
                 id: playID
             )
-            let parse = IIDXResultParser.parse(lines: lines, songs: loadSongCandidates())
+            let parse = IIDXResultParser.parse(
+                lines: numericLines, titleLines: titleLines, songs: loadSongCandidates()
+            )
             play.apply(parse)
             play.processedAt = .now
             play.parseError = nil

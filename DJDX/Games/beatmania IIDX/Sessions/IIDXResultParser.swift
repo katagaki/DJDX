@@ -52,7 +52,9 @@ enum IIDXResultParser {
         "テンキー", "アプリ", "画像", "保存", "スコア", "ベスト", "今回", "プレー"
     ]
 
-    static func parse(lines: [OCRLine], songs: [IIDXSongCandidate]) -> IIDXResultParse {
+    static func parse(lines: [OCRLine],
+                      titleLines: [OCRLine],
+                      songs: [IIDXSongCandidate]) -> IIDXResultParse {
         var parse = IIDXResultParse()
         var hits = 0
 
@@ -62,7 +64,7 @@ enum IIDXResultParser {
             parse.difficulty = difficulty
         }
 
-        let resolved = resolveTitle(lines: lines, songs: songs,
+        let resolved = resolveTitle(lines: titleLines, songs: songs,
                                     level: parse.level,
                                     difficulty: parse.difficulty,
                                     playType: parse.playType)
