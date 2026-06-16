@@ -23,6 +23,9 @@ struct DJDXApp: App {
         Task {
             await SessionCaptureProcessor.shared.recover()
         }
+        Task { @MainActor in
+            SessionLiveActivityController.shared.reconcile()
+        }
         Task {
             let playTypeRaw = UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter") ?? "single"
             let playType = IIDXPlayType(rawValue: playTypeRaw) ?? .single

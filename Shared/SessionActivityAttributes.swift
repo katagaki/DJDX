@@ -12,6 +12,7 @@ struct SessionActivityAttributes: ActivityAttributes {
         var isProcessing: Bool
     }
 
+    var sessionID: String
     var sessionStart: Date
     var gameShortName: String
     var gameIconAssetName: String

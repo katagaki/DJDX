@@ -13,6 +13,7 @@ final class SessionLiveActivityController {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         end()
         let attributes = SessionActivityAttributes(
+            sessionID: session.id,
             sessionStart: session.startDate,
             gameShortName: session.game.shortName,
             gameIconAssetName: "GameIconIIDX"
@@ -20,6 +21,41 @@ final class SessionLiveActivityController {
         let content = ActivityContent(state: contentState(for: session.id), staleDate: nil)
         activity = try? Activity.request(attributes: attributes, content: content)
         sessionID = session.id
+    }
+
+    // Cold-launch recovery: if a session is still active, adopt a Live Activity
+    // that the system kept alive, or start a fresh one if it was removed (e.g.
+    // force quit). Any activity for an already-ended session is cleaned up.
+    func reconcile() {
+        let activeSession = database.activeSession()
+        var adopted: Activity<SessionActivityAttributes>?
+        for existing in Activity<SessionActivityAttributes>.activities {
+            if let activeSession, existing.attributes.sessionID == activeSession.id {
+                adopted = existing
+            } else {
+                endActivity(existing, sessionID: existing.attributes.sessionID)
+            }
+        }
+
+        guard let activeSession else {
+            activity = nil
+            sessionID = nil
+            return
+        }
+
+        if let adopted {
+            activity = adopted
+            sessionID = activeSession.id
+            refresh(sessionID: activeSession.id)
+        } else if activity == nil {
+            start(activeSession)
+        }
+    }
+
+    private func endActivity(_ activity: Activity<SessionActivityAttributes>, sessionID: String) {
+        let content = ActivityContent(state: contentState(for: sessionID), staleDate: nil)
+        nonisolated(unsafe) let target = activity
+        Task { await target.end(content, dismissalPolicy: .immediate) }
     }
 
     func refresh(sessionID: String) {
