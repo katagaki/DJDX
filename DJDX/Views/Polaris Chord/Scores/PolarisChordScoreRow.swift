@@ -68,6 +68,6 @@ struct PolarisChordScoreRow: View {
             .padding([.top, .bottom], 8.0)
         }
         .frame(maxWidth: .infinity)
-        .padding([.trailing], 20.0)
+        .padding(.trailing)
     }
 }
