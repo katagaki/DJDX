@@ -11,7 +11,7 @@
 		E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = E46A65E22C0ACAC400D9544B /* SwiftSoup */; };
 		E46D51B42C284CFE000524B9 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = E46D51B32C284CFE000524B9 /* Collections */; };
 		E474AEC92F4931A40014149D /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E474AEC82F4931A40014149D /* SQLite */; };
-		E47D068D2F53F4E6006081EF /* DJDXWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA000001300100000000000D /* DJDXWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E47D068D2F53F4E6006081EF /* DJDX Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA000001300100000000000D /* DJDX Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4E3D0D62BF9A220001942FE /* Komponents */; };
 /* End PBXBuildFile section */
 
@@ -64,7 +64,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				E47D068D2F53F4E6006081EF /* DJDXWidgets.appex in Embed Foundation Extensions */,
+				E47D068D2F53F4E6006081EF /* DJDX Widgets.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -72,8 +72,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		AA000001300100000000000D /* DJDXWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DJDXWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000001300100000000000D /* DJDX Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "DJDX Widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DJDX CHARGE.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4449F2F2FE1787E003AC8B6 /* DJDX CHARGE.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "DJDX CHARGE.entitlements"; sourceTree = "<group>"; };
 		E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DJDX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -83,7 +84,7 @@
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = AA000001300100000000000C /* DJDXWidgets */;
+			target = AA000001300100000000000C /* DJDX Widgets */;
 		};
 		E4B263BC2E7998840031A646 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -141,6 +142,7 @@
 		E4B123A32BF8E8E400D4A3D1 = {
 			isa = PBXGroup;
 			children = (
+				E4449F2F2FE1787E003AC8B6 /* DJDX CHARGE.entitlements */,
 				E4B2630B2E79986D0031A646 /* Shared */,
 				E4B2636E2E7998840031A646 /* DJDX */,
 				AA000001300100000000000E /* Widgets */,
@@ -154,7 +156,7 @@
 			isa = PBXGroup;
 			children = (
 				E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */,
-				AA000001300100000000000D /* DJDXWidgets.appex */,
+				AA000001300100000000000D /* DJDX Widgets.appex */,
 				E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */,
 			);
 			name = Products;
@@ -163,9 +165,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AA000001300100000000000C /* DJDXWidgets */ = {
+		AA000001300100000000000C /* DJDX Widgets */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AA00000130010000000000F8 /* Build configuration list for PBXNativeTarget "DJDXWidgets" */;
+			buildConfigurationList = AA00000130010000000000F8 /* Build configuration list for PBXNativeTarget "DJDX Widgets" */;
 			buildPhases = (
 				AA00000130010000000000F2 /* Sources */,
 				AA00000130010000000000F1 /* Frameworks */,
@@ -179,9 +181,9 @@
 				AA000001300100000000000E /* Widgets */,
 				E4B2630B2E79986D0031A646 /* Shared */,
 			);
-			name = DJDXWidgets;
+			name = "DJDX Widgets";
 			productName = DJDXWidgets;
-			productReference = AA000001300100000000000D /* DJDXWidgets.appex */;
+			productReference = AA000001300100000000000D /* DJDX Widgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		E4449F142FE17495003AC8B6 /* DJDX CHARGE */ = {
@@ -282,7 +284,7 @@
 			projectRoot = "";
 			targets = (
 				E4B123AB2BF8E8E400D4A3D1 /* DJDX */,
-				AA000001300100000000000C /* DJDXWidgets */,
+				AA000001300100000000000C /* DJDX Widgets */,
 				E4449F142FE17495003AC8B6 /* DJDX CHARGE */,
 			);
 		};
@@ -365,17 +367,17 @@
 		};
 		E47D068F2F53F4E6006081EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AA000001300100000000000C /* DJDXWidgets */;
+			target = AA000001300100000000000C /* DJDX Widgets */;
 			targetProxy = E47D068E2F53F4E6006081EF /* PBXContainerItemProxy */;
 		};
 		E47D06922F53F4EC006081EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AA000001300100000000000C /* DJDXWidgets */;
+			target = AA000001300100000000000C /* DJDX Widgets */;
 			targetProxy = E47D06912F53F4EC006081EF /* PBXContainerItemProxy */;
 		};
 		E49816D52F53F04A00EFFB8B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AA000001300100000000000C /* DJDXWidgets */;
+			target = AA000001300100000000000C /* DJDX Widgets */;
 			targetProxy = E49816D42F53F04A00EFFB8B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -448,6 +450,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "DJDX CHARGE.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -459,7 +462,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 33.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -480,6 +483,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "DJDX CHARGE.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -491,7 +495,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 33.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -648,8 +652,13 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DJDX/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "DJDX uses the camera to capture your result screens during a session.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -688,8 +697,13 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DJDX/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "DJDX uses the camera to capture your result screens during a session.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -716,7 +730,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AA00000130010000000000F8 /* Build configuration list for PBXNativeTarget "DJDXWidgets" */ = {
+		AA00000130010000000000F8 /* Build configuration list for PBXNativeTarget "DJDX Widgets" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA00000130010000000000F4 /* Debug */,
