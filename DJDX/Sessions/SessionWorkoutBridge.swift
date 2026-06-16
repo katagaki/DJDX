@@ -14,7 +14,7 @@ final class SessionWorkoutBridge: NSObject, ObservableObject {
     @Published var isWorkoutActive: Bool = false
 
     private let healthStore = HKHealthStore()
-    private let db = PlaySessionsDatabase.shared
+    private let database = PlaySessionsDatabase.shared
     private var activeSessionID: String?
     private var workoutStart: Date?
 
@@ -71,12 +71,12 @@ final class SessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     private func send(_ payload: [String: Any]) {
-        let wc = WCSession.default
-        guard wc.activationState == .activated else { return }
-        if wc.isReachable {
-            wc.sendMessage(payload, replyHandler: nil, errorHandler: nil)
+        let connectivity = WCSession.default
+        guard connectivity.activationState == .activated else { return }
+        if connectivity.isReachable {
+            connectivity.sendMessage(payload, replyHandler: nil, errorHandler: nil)
         } else {
-            wc.transferUserInfo(payload)
+            connectivity.transferUserInfo(payload)
         }
     }
 
@@ -93,9 +93,9 @@ final class SessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     fileprivate func storeWorkoutUUID(_ uuid: String, sessionID: String) {
-        guard let session = db.session(id: sessionID) else { return }
+        guard let session = database.session(id: sessionID) else { return }
         session.workoutUUID = uuid
-        db.updateSession(session)
+        database.updateSession(session)
     }
 
     private func saveFallbackWorkout(for session: PlaySession) {
@@ -111,12 +111,12 @@ final class SessionWorkoutBridge: NSObject, ObservableObject {
         )
         let sessionID = session.id
         nonisolated(unsafe) let liveBuilder = builder
-        nonisolated(unsafe) let me = self
+        nonisolated(unsafe) let bridge = self
         liveBuilder.beginCollection(withStart: start) { _, _ in
             liveBuilder.endCollection(withEnd: end) { _, _ in
                 liveBuilder.finishWorkout { workout, _ in
                     guard let uuid = workout?.uuid.uuidString else { return }
-                    Task { @MainActor in me.storeWorkoutUUID(uuid, sessionID: sessionID) }
+                    Task { @MainActor in bridge.storeWorkoutUUID(uuid, sessionID: sessionID) }
                 }
             }
         }
@@ -144,16 +144,16 @@ extension SessionWorkoutBridge: WCSessionDelegate {
 
     private nonisolated func route(_ message: [String: Any]) {
         let sessionID = message["sessionID"] as? String ?? ""
-        nonisolated(unsafe) let me = self
+        nonisolated(unsafe) let bridge = self
         if let uuid = message["workoutUUID"] as? String {
-            Task { @MainActor in me.storeWorkoutUUID(uuid, sessionID: sessionID) }
+            Task { @MainActor in bridge.storeWorkoutUUID(uuid, sessionID: sessionID) }
             return
         }
         let heartRate = message["heartRate"] as? Int
         let activeCalories = message["activeCalories"] as? Int
         if heartRate != nil || activeCalories != nil {
             Task { @MainActor in
-                me.ingestMetrics(heartRate: heartRate, activeCalories: activeCalories, sessionID: sessionID)
+                bridge.ingestMetrics(heartRate: heartRate, activeCalories: activeCalories, sessionID: sessionID)
             }
         }
     }

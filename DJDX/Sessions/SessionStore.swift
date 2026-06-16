@@ -9,29 +9,29 @@ final class SessionStore {
     var plays: [CapturedPlay] = []
     var sessions: [PlaySession] = []
 
-    private let db = PlaySessionsDatabase.shared
+    private let database = PlaySessionsDatabase.shared
 
     func bootstrap() {
-        activeSession = db.activeSession()
+        activeSession = database.activeSession()
         loadSessions()
         if let activeSession {
-            plays = db.plays(forSession: activeSession.id)
+            plays = database.plays(forSession: activeSession.id)
         }
     }
 
     func loadSessions() {
-        sessions = db.allSessions()
+        sessions = database.allSessions()
     }
 
     func refreshPlays() {
         guard let activeSession else { plays = []; return }
-        plays = db.plays(forSession: activeSession.id)
+        plays = database.plays(forSession: activeSession.id)
     }
 
     @discardableResult
     func startSession() -> PlaySession {
         let session = PlaySession(game: .iidxArcade)
-        db.createSession(session)
+        database.createSession(session)
         activeSession = session
         plays = []
         loadSessions()
@@ -43,7 +43,7 @@ final class SessionStore {
 
     func endSession() {
         guard let activeSession else { return }
-        db.endSession(id: activeSession.id)
+        database.endSession(id: activeSession.id)
         let endedID = activeSession.id
         SessionWorkoutBridge.shared.endWorkout(session: activeSession)
         self.activeSession = nil
@@ -64,7 +64,7 @@ final class SessionStore {
             rawImageFilename: filename,
             state: .pending
         )
-        db.insertPlay(play)
+        database.insertPlay(play)
         refreshPlays()
         SessionLiveActivityController.shared.refresh(sessionID: activeSession.id)
         Task { await SessionCaptureProcessor.shared.submit(id) }
@@ -76,23 +76,23 @@ final class SessionStore {
 
     func saveCorrected(_ play: CapturedPlay) {
         play.state = .done
-        db.updatePlay(play)
+        database.updatePlay(play)
         refreshPlays()
         NotificationCenter.default.post(name: .capturedPlayDidChange, object: play.id)
     }
 
     func deletePlay(_ play: CapturedPlay) {
-        db.deletePlay(id: play.id)
+        database.deletePlay(id: play.id)
         refreshPlays()
     }
 
     func deleteSession(_ session: PlaySession) {
-        db.deleteSession(id: session.id)
+        database.deleteSession(id: session.id)
         if activeSession?.id == session.id { activeSession = nil; plays = [] }
         loadSessions()
     }
 
     func plays(for session: PlaySession) -> [CapturedPlay] {
-        db.plays(forSession: session.id)
+        database.plays(forSession: session.id)
     }
 }

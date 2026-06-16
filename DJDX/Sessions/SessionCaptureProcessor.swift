@@ -6,7 +6,7 @@ actor SessionCaptureProcessor {
 
     static let acceptableConfidence = 0.6
 
-    private let db = PlaySessionsDatabase.shared
+    private let database = PlaySessionsDatabase.shared
     private var songCandidates: [IIDXSongCandidate]?
     private var queue: [String] = []
     private var isDraining = false
@@ -17,13 +17,13 @@ actor SessionCaptureProcessor {
     }
 
     func reprocess(_ playID: String) {
-        db.updatePlayState(id: playID, state: .pending)
+        database.updatePlayState(id: playID, state: .pending)
         notify(playID)
         submit(playID)
     }
 
     func recover() async {
-        for play in db.incompletePlays() where !queue.contains(play.id) {
+        for play in database.incompletePlays() where !queue.contains(play.id) {
             queue.append(play.id)
         }
         await drain()
@@ -42,8 +42,8 @@ actor SessionCaptureProcessor {
     }
 
     private func process(_ playID: String) async {
-        guard let play = db.play(id: playID) else { return }
-        db.updatePlayState(id: playID, state: .processing)
+        guard let play = database.play(id: playID) else { return }
+        database.updatePlayState(id: playID, state: .processing)
         notify(playID)
 
         guard let imageData = SessionImageStore.shared.data(for: play.rawImageFilename) else {
@@ -59,7 +59,7 @@ actor SessionCaptureProcessor {
             play.parseError = nil
             let acceptable = parse.matchedSongID != nil && parse.confidence >= Self.acceptableConfidence
             play.state = acceptable ? .done : .needsReview
-            db.updatePlay(play)
+            database.updatePlay(play)
             notify(playID)
         } catch {
             fail(play, message: error.localizedDescription)
@@ -71,7 +71,7 @@ actor SessionCaptureProcessor {
         play.state = .failed
         play.parseError = message
         play.processedAt = .now
-        db.updatePlay(play)
+        database.updatePlay(play)
         notify(play.id)
     }
 

@@ -258,12 +258,12 @@ enum IIDXResultParser {
         if let inline = integers(in: classLine.text).first(where: { (1...12).contains($0) }) {
             difficulty = inline
         } else {
-            var best: (value: Int, dx: CGFloat)?
+            var best: (value: Int, deltaX: CGFloat)?
             for line in lines where onRow(line, label: classLine) && line.box.midX > classLine.box.minX {
                 for value in integers(in: line.text) where (1...12).contains(value) {
-                    let dx = line.box.midX - classLine.box.maxX
-                    if best == nil || dx < best!.dx {
-                        best = (value, dx)
+                    let deltaX = line.box.midX - classLine.box.maxX
+                    if best == nil || deltaX < best!.deltaX {
+                        best = (value, deltaX)
                     }
                 }
             }

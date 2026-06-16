@@ -7,7 +7,7 @@ final class SessionLiveActivityController {
 
     private var activity: Activity<SessionActivityAttributes>?
     private var sessionID: String?
-    private let db = PlaySessionsDatabase.shared
+    private let database = PlaySessionsDatabase.shared
 
     func start(_ session: PlaySession) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
@@ -49,7 +49,7 @@ final class SessionLiveActivityController {
     }
 
     private func contentState(for sessionID: String) -> SessionActivityAttributes.ContentState {
-        let plays = db.plays(forSession: sessionID)
+        let plays = database.plays(forSession: sessionID)
         let last = plays.last
         let isProcessing = plays.contains { !$0.state.isTerminal }
         return SessionActivityAttributes.ContentState(

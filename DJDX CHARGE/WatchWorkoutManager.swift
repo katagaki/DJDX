@@ -26,10 +26,10 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     func requestAuthorizationAndStart(sessionID: String) {
         let share: Set = [HKQuantityType.workoutType()]
         let read: Set = [HKQuantityType(.heartRate), HKQuantityType(.activeEnergyBurned)]
-        nonisolated(unsafe) let me = self
+        nonisolated(unsafe) let manager = self
         healthStore.requestAuthorization(toShare: share, read: read) { success, _ in
             guard success else { return }
-            Task { @MainActor in me.startWorkout(sessionID: sessionID) }
+            Task { @MainActor in manager.startWorkout(sessionID: sessionID) }
         }
     }
 
@@ -66,13 +66,13 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         let sid = sessionID
         nonisolated(unsafe) let liveSession = session
         nonisolated(unsafe) let liveBuilder = builder
-        nonisolated(unsafe) let me = self
+        nonisolated(unsafe) let manager = self
         let end = Date()
         liveSession.end()
         liveBuilder.endCollection(withEnd: end) { _, _ in
             liveBuilder.finishWorkout { workout, _ in
                 let uuid = workout?.uuid.uuidString
-                Task { @MainActor in me.finishUp(workoutUUID: uuid, sessionID: sid) }
+                Task { @MainActor in manager.finishUp(workoutUUID: uuid, sessionID: sid) }
             }
         }
     }
@@ -109,11 +109,11 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     private func sendToPhone(_ payload: [String: Any]) {
-        let wc = WCSession.default
-        if wc.isReachable {
-            wc.sendMessage(payload, replyHandler: nil, errorHandler: nil)
+        let connectivity = WCSession.default
+        if connectivity.isReachable {
+            connectivity.sendMessage(payload, replyHandler: nil, errorHandler: nil)
         } else {
-            wc.transferUserInfo(payload)
+            connectivity.transferUserInfo(payload)
         }
     }
 }
@@ -133,7 +133,7 @@ extension WatchWorkoutManager: HKLiveWorkoutBuilderDelegate {
 
     nonisolated func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder,
                                     didCollectDataOf collectedTypes: Set<HKSampleType>) {
-        nonisolated(unsafe) let me = self
+        nonisolated(unsafe) let manager = self
         var newHeartRate: Int?
         var newCalories: Int?
         for type in collectedTypes {
@@ -150,7 +150,7 @@ extension WatchWorkoutManager: HKLiveWorkoutBuilderDelegate {
                 }
             }
         }
-        Task { @MainActor in me.ingest(heartRate: newHeartRate, activeCalories: newCalories) }
+        Task { @MainActor in manager.ingest(heartRate: newHeartRate, activeCalories: newCalories) }
     }
 }
 
@@ -170,7 +170,7 @@ extension WatchWorkoutManager: WCSessionDelegate {
     private nonisolated func route(_ message: [String: Any]) {
         guard let command = message["command"] as? String else { return }
         let sessionID = message["sessionID"] as? String ?? ""
-        nonisolated(unsafe) let me = self
-        Task { @MainActor in me.handleCommand(command, sessionID: sessionID) }
+        nonisolated(unsafe) let manager = self
+        Task { @MainActor in manager.handleCommand(command, sessionID: sessionID) }
     }
 }
