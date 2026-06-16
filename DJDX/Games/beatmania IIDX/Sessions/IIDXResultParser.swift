@@ -136,12 +136,9 @@ enum IIDXResultParser {
             return rawTitleCandidate(lines).map { ($0, nil) }
         }
 
-        let chartFilter = level != .unknown && difficulty > 0
-        let filtered = chartFilter
-            ? songs.filter { $0.matchesChart(level: level, difficulty: difficulty, playType: playType) }
-            : []
-        let pool = filtered.isEmpty ? songs : filtered
-        let threshold = filtered.isEmpty ? 0.15 : 0.40
+        let (pool, threshold) = candidatePool(
+            songs: songs, level: level, difficulty: difficulty, playType: playType
+        )
 
         let needles = titleNeedles(lines)
 
@@ -164,6 +161,27 @@ enum IIDXResultParser {
             return (best.song.title, best.song.id)
         }
         return rawTitleCandidate(lines).map { ($0, nil) }
+    }
+
+    // The difficulty number is easily misread (10 -> IO), and it gates the pool,
+    // so tolerate an off-by-one before falling back to the whole level category.
+    private static func candidatePool(
+        songs: [IIDXSongCandidate],
+        level: IIDXLevel,
+        difficulty: Int,
+        playType: IIDXPlayType
+    ) -> (pool: [IIDXSongCandidate], threshold: Double) {
+        guard level != .unknown else { return (songs, 0.15) }
+        if difficulty > 0 {
+            let near = songs.filter { candidate in
+                candidate.playType == playType
+                && (candidate.difficulties[level].map { abs($0 - difficulty) <= 1 } ?? false)
+            }
+            if !near.isEmpty { return (near, 0.40) }
+        }
+        let category = songs.filter { $0.playType == playType && $0.difficulties[level] != nil }
+        if !category.isEmpty { return (category, 0.15) }
+        return (songs, 0.15)
     }
 
     private static func titleNeedles(_ lines: [OCRLine]) -> [String] {
@@ -255,12 +273,14 @@ enum IIDXResultParser {
         guard foundLevel != .unknown, let classLine else { return nil }
 
         var difficulty = 0
-        if let inline = integers(in: classLine.text).first(where: { (1...12).contains($0) }) {
-            difficulty = inline
-        } else {
+        for token in tokens(classLine.text) where difficulty == 0 {
+            if let value = difficultyToken(token) { difficulty = value }
+        }
+        if difficulty == 0 {
             var best: (value: Int, deltaX: CGFloat)?
             for line in lines where onRow(line, label: classLine) && line.box.midX > classLine.box.minX {
-                for value in integers(in: line.text) where (1...12).contains(value) {
+                for token in tokens(line.text) {
+                    guard let value = difficultyToken(token) else { continue }
                     let deltaX = line.box.midX - classLine.box.maxX
                     if best == nil || deltaX < best!.deltaX {
                         best = (value, deltaX)
@@ -378,6 +398,32 @@ enum IIDXResultParser {
 
     private static func integers(in text: String) -> [Int] {
         text.split(whereSeparator: { !$0.isNumber }).compactMap { Int($0) }
+    }
+
+    private static func tokens(_ text: String) -> [String] {
+        text.split(whereSeparator: { $0 == " " || $0 == "\t" }).map(String.init)
+    }
+
+    // Recover a 1-12 difficulty from a token, mapping common OCR letter/digit
+    // confusions (I/L -> 1, O/Q -> 0, S -> 5, B -> 8, ...). Rejects tokens that
+    // still contain non-digits after mapping, so "SP"/"NOTES" never become numbers.
+    private static func difficultyToken(_ text: String) -> Int? {
+        let cleaned = text.uppercased().filter { $0.isLetter || $0.isNumber }
+        guard !cleaned.isEmpty, cleaned.count <= 3 else { return nil }
+        var mapped = ""
+        for character in cleaned {
+            switch character {
+            case "I", "L": mapped.append("1")
+            case "O", "Q": mapped.append("0")
+            case "S": mapped.append("5")
+            case "B": mapped.append("8")
+            case "Z": mapped.append("2")
+            case "G": mapped.append("9")
+            default: mapped.append(character)
+            }
+        }
+        guard mapped.allSatisfy({ $0.isNumber }), let value = Int(mapped) else { return nil }
+        return (1...12).contains(value) ? value : nil
     }
 
     private static func normalize(_ text: String) -> String {
