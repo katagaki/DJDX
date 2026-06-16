@@ -62,16 +62,22 @@ enum IIDXResultParser {
             parse.difficulty = difficulty
         }
 
-        if let resolved = resolveTitle(lines: lines, songs: songs,
-                                       level: parse.level,
-                                       difficulty: parse.difficulty,
-                                       playType: parse.playType) {
-            parse.songTitle = resolved.title
-            parse.matchedSongID = resolved.id
-            if resolved.id != nil { hits += 1 }
+        let resolved = resolveTitle(lines: lines, songs: songs,
+                                    level: parse.level,
+                                    difficulty: parse.difficulty,
+                                    playType: parse.playType)
+        if let matched = resolved.matched {
+            parse.songTitle = matched.title
+            parse.matchedSongID = matched.id
+            if parse.level != .unknown, let known = matched.difficulties[parse.level] {
+                parse.difficulty = known
+            }
+            hits += 1
+        } else if let rawTitle = resolved.rawTitle {
+            parse.songTitle = rawTitle
         }
 
-        if let label = findLabel(lines, keywords: ["CLEARTYPE"]),
+        if let label = findLabel(lines, keywords: ["CLEARTYPE", "TYPE"]),
            let value = rightmostValue(on: label, in: lines, map: clearTypeOf) {
             parse.clearType = value
             hits += 1
@@ -83,7 +89,7 @@ enum IIDXResultParser {
             }
         }
 
-        if let label = findLabel(lines, keywords: ["DJLEVEL"]),
+        if let label = findLabel(lines, keywords: ["DJLEVEL", "DJ"]),
            let value = rightmostValue(on: label, in: lines, map: gradeOf) {
             parse.djLevel = value
             hits += 1
@@ -131,9 +137,10 @@ enum IIDXResultParser {
                                      songs: [IIDXSongCandidate],
                                      level: IIDXLevel,
                                      difficulty: Int,
-                                     playType: IIDXPlayType) -> (title: String, id: Int64?)? {
+                                     playType: IIDXPlayType)
+    -> (matched: IIDXSongCandidate?, rawTitle: String?) {
         guard !songs.isEmpty else {
-            return rawTitleCandidate(lines).map { ($0, nil) }
+            return (nil, rawTitleCandidate(lines))
         }
 
         let (pool, threshold) = candidatePool(
@@ -144,7 +151,7 @@ enum IIDXResultParser {
 
         for needle in needles {
             if let exact = pool.first(where: { $0.compact == needle }) {
-                return (exact.title, exact.id)
+                return (exact, nil)
             }
         }
 
@@ -158,9 +165,9 @@ enum IIDXResultParser {
             }
         }
         if let best {
-            return (best.song.title, best.song.id)
+            return (best.song, nil)
         }
-        return rawTitleCandidate(lines).map { ($0, nil) }
+        return (nil, rawTitleCandidate(lines))
     }
 
     // The difficulty number is easily misread (10 -> IO), and it gates the pool,
@@ -372,9 +379,23 @@ enum IIDXResultParser {
     }
 
     private static func intOf(_ text: String) -> Int? {
-        let cleaned = text.filter { $0 != " " && $0 != "," && $0 != "+" }
-        guard !cleaned.isEmpty, cleaned.allSatisfy({ $0.isNumber }) else { return nil }
-        return Int(cleaned)
+        let cleaned = text.uppercased().filter { $0 != " " && $0 != "," && $0 != "+" }
+        guard !cleaned.isEmpty else { return nil }
+        let mapped = String(cleaned.map(confusedDigit))
+        guard mapped.allSatisfy({ $0.isNumber }), let value = Int(mapped) else { return nil }
+        return value
+    }
+
+    private static func confusedDigit(_ character: Character) -> Character {
+        switch character {
+        case "I", "L", "|": return "1"
+        case "O", "Q": return "0"
+        case "S": return "5"
+        case "B": return "8"
+        case "Z": return "2"
+        case "G": return "9"
+        default: return character
+        }
     }
 
     private static func detectClearTypeGlobal(_ lines: [OCRLine]) -> String {
@@ -410,18 +431,7 @@ enum IIDXResultParser {
     private static func difficultyToken(_ text: String) -> Int? {
         let cleaned = text.uppercased().filter { $0.isLetter || $0.isNumber }
         guard !cleaned.isEmpty, cleaned.count <= 3 else { return nil }
-        var mapped = ""
-        for character in cleaned {
-            switch character {
-            case "I", "L": mapped.append("1")
-            case "O", "Q": mapped.append("0")
-            case "S": mapped.append("5")
-            case "B": mapped.append("8")
-            case "Z": mapped.append("2")
-            case "G": mapped.append("9")
-            default: mapped.append(character)
-            }
-        }
+        let mapped = String(cleaned.map(confusedDigit))
         guard mapped.allSatisfy({ $0.isNumber }), let value = Int(mapped) else { return nil }
         return (1...12).contains(value) ? value : nil
     }

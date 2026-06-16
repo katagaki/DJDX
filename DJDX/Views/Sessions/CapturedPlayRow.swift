@@ -56,8 +56,8 @@ struct CapturedPlayRow: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
-        .padding(.vertical, 8.0)
-        .padding(.trailing)
+        .padding(.vertical, 16.0)
+        .padding(.horizontal, 20.0)
     }
 
     private var statusText: LocalizedStringKey {

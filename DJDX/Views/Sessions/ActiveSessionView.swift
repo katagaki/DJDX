@@ -92,11 +92,12 @@ struct ActiveSessionView: View {
                             Text("Sessions.HeartRate")
                                 .font(.body)
                                 .foregroundStyle(.secondary)
-                            HStack(spacing: 4.0) {
+                            HStack(spacing: 6.0) {
                                 Image(systemName: "heart.fill")
+                                    .font(.title3)
                                 Text(verbatim: workoutBridge.heartRate > 0 ? "\(workoutBridge.heartRate)" : "--")
+                                    .font(numberFont)
                             }
-                            .font(numberFont)
                             .foregroundStyle(.red)
                             if workoutBridge.activeCalories > 0 {
                                 Text(verbatim: "\(workoutBridge.activeCalories) kcal")

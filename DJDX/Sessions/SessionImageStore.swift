@@ -1,6 +1,14 @@
 import Foundation
 import UIKit
 
+struct RecognizedTextBox: Codable, Sendable {
+    let text: String
+    let originX: Double
+    let originY: Double
+    let width: Double
+    let height: Double
+}
+
 final class SessionImageStore: Sendable {
     static let shared = SessionImageStore()
 
@@ -33,21 +41,26 @@ final class SessionImageStore: Sendable {
         return UIImage(data: data)
     }
 
-    func writeOCRText(_ text: String, id: String) {
-        try? Data(text.utf8).write(to: ocrTextURL(id: id), options: .atomic)
+    func writeRecognizedText(_ boxes: [RecognizedTextBox], id: String) {
+        guard let data = try? JSONEncoder().encode(boxes) else { return }
+        try? data.write(to: ocrJSONURL(id: id), options: .atomic)
     }
 
-    func ocrText(id: String) -> String? {
-        try? String(contentsOf: ocrTextURL(id: id), encoding: .utf8)
+    func recognizedText(id: String) -> [RecognizedTextBox] {
+        guard let data = try? Data(contentsOf: ocrJSONURL(id: id)),
+              let boxes = try? JSONDecoder().decode([RecognizedTextBox].self, from: data) else {
+            return []
+        }
+        return boxes
     }
 
     func delete(filename: String) {
         try? FileManager.default.removeItem(at: url(for: filename))
         let id = (filename as NSString).deletingPathExtension
-        try? FileManager.default.removeItem(at: ocrTextURL(id: id))
+        try? FileManager.default.removeItem(at: ocrJSONURL(id: id))
     }
 
-    private func ocrTextURL(id: String) -> URL {
-        directory.appendingPathComponent("\(id).ocr.txt")
+    private func ocrJSONURL(id: String) -> URL {
+        directory.appendingPathComponent("\(id).ocr.json")
     }
 }
