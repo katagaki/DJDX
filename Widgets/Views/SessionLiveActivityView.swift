@@ -7,8 +7,7 @@ struct SessionLiveActivityView: View {
 
     var body: some View {
         HStack(spacing: 14.0) {
-            Image(systemName: context.attributes.gameSymbolName)
-                .font(.title2)
+            GameIconImage(assetName: context.attributes.gameIconAssetName, size: 26.0)
                 .foregroundStyle(.tint)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(verbatim: context.state.lastSongTitle ?? context.attributes.gameShortName)
@@ -45,7 +44,7 @@ struct SessionLiveActivity: Widget {
                     Label {
                         Text(verbatim: context.attributes.gameShortName)
                     } icon: {
-                        Image(systemName: context.attributes.gameSymbolName)
+                        GameIconImage(assetName: context.attributes.gameIconAssetName, size: 16.0)
                     }
                     .font(.caption)
                 }
@@ -74,13 +73,26 @@ struct SessionLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                Image(systemName: context.attributes.gameSymbolName)
+                GameIconImage(assetName: context.attributes.gameIconAssetName, size: 18.0)
             } compactTrailing: {
                 Text(verbatim: "\(context.state.playCount)")
                     .monospacedDigit()
             } minimal: {
-                Image(systemName: context.attributes.gameSymbolName)
+                GameIconImage(assetName: context.attributes.gameIconAssetName, size: 18.0)
             }
         }
+    }
+}
+
+struct GameIconImage: View {
+    let assetName: String
+    var size: CGFloat = 24.0
+
+    var body: some View {
+        Image(assetName)
+            .renderingMode(.template)
+            .resizable()
+            .scaledToFit()
+            .frame(width: size, height: size)
     }
 }

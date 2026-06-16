@@ -14,5 +14,5 @@ struct SessionActivityAttributes: ActivityAttributes {
 
     var sessionStart: Date
     var gameShortName: String
-    var gameSymbolName: String
+    var gameIconAssetName: String
 }

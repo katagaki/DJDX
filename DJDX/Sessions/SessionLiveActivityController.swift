@@ -15,7 +15,7 @@ final class SessionLiveActivityController {
         let attributes = SessionActivityAttributes(
             sessionStart: session.startDate,
             gameShortName: session.game.shortName,
-            gameSymbolName: "music.note"
+            gameIconAssetName: "GameIconIIDX"
         )
         let content = ActivityContent(state: contentState(for: session.id), staleDate: nil)
         activity = try? Activity.request(attributes: attributes, content: content)
