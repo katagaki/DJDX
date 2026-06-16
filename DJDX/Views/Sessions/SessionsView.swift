@@ -4,44 +4,51 @@ struct SessionsView: View {
     var store: SessionStore
 
     @State private var isPresentingActive: Bool = false
+    @AppStorage(wrappedValue: false, SessionWorkoutBridge.healthKitEnabledKey) private var healthKitEnabled: Bool
 
     private var pastSessions: [PlaySession] {
         store.sessions.filter { !$0.isActive }
     }
 
     var body: some View {
-        Group {
-            if pastSessions.isEmpty && store.activeSession == nil {
-                ContentUnavailableView(
-                    "Sessions.History.Empty.Title",
-                    systemImage: "figure.dance",
-                    description: Text("Sessions.History.Empty.Message")
-                )
-            } else {
-                List {
-                    if let active = store.activeSession {
-                        Section {
-                            Button {
-                                isPresentingActive = true
-                            } label: {
-                                resumeCard(active)
-                            }
-                            .buttonStyle(.plain)
-                        }
+        List {
+            Section {
+                Toggle(isOn: $healthKitEnabled) {
+                    Label("Sessions.HealthKit.Toggle", systemImage: "heart.text.square")
+                }
+            } footer: {
+                Text("Sessions.HealthKit.Footer")
+            }
+            if let active = store.activeSession {
+                Section {
+                    Button {
+                        isPresentingActive = true
+                    } label: {
+                        resumeCard(active)
                     }
-                    Section("Sessions.History.Title") {
-                        ForEach(pastSessions) { session in
-                            NavigationLink {
-                                SessionDetailView(store: store, session: session)
-                            } label: {
-                                SessionSummaryRow(store: store, session: session)
-                            }
-                        }
-                        .onDelete { offsets in
-                            for offset in offsets { store.deleteSession(pastSessions[offset]) }
-                        }
+                    .buttonStyle(.plain)
+                }
+            }
+            Section("Sessions.History.Title") {
+                if pastSessions.isEmpty {
+                    Text("Sessions.History.Empty.Message")
+                        .foregroundStyle(.secondary)
+                }
+                ForEach(pastSessions) { session in
+                    NavigationLink {
+                        SessionDetailView(store: store, session: session)
+                    } label: {
+                        SessionSummaryRow(store: store, session: session)
                     }
                 }
+                .onDelete { offsets in
+                    for offset in offsets { store.deleteSession(pastSessions[offset]) }
+                }
+            }
+        }
+        .onChange(of: healthKitEnabled) { _, enabled in
+            if enabled {
+                Task { _ = await SessionWorkoutBridge.shared.requestAuthorization() }
             }
         }
         .onAppear {

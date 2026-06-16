@@ -16,6 +16,7 @@ struct DJDXApp: App {
     init() {
         _ = IIDXPlayDataDatabase.shared
         _ = PlaySessionsDatabase.shared
+        _ = SessionWorkoutBridge.shared
         ICloudBackupManager.registerBackgroundTask()
         ICloudBackupManager.scheduleNextBackup()
         SessionOCRBackgroundTask.register()

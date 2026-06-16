@@ -36,6 +36,7 @@ final class SessionStore {
         plays = []
         loadSessions()
         SessionLiveActivityController.shared.start(session)
+        SessionWorkoutBridge.shared.startWorkout(session: session)
         NotificationCenter.default.post(name: .playSessionDidChange, object: session.id)
         return session
     }
@@ -44,6 +45,7 @@ final class SessionStore {
         guard let activeSession else { return }
         db.endSession(id: activeSession.id)
         let endedID = activeSession.id
+        SessionWorkoutBridge.shared.endWorkout(session: activeSession)
         self.activeSession = nil
         plays = []
         loadSessions()

@@ -8,6 +8,7 @@ struct ActiveSessionView: View {
     @State private var isPresentingCamera: Bool = false
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isShowingCameraDeniedAlert: Bool = false
+    @ObservedObject private var workoutBridge = SessionWorkoutBridge.shared
 
     var body: some View {
         NavigationStack {
@@ -65,6 +66,21 @@ struct ActiveSessionView: View {
                             .font(.title2.monospacedDigit().weight(.semibold))
                     }
                     Spacer()
+                    if workoutBridge.isWorkoutActive {
+                        VStack(alignment: .trailing, spacing: 2.0) {
+                            Label(
+                                workoutBridge.heartRate > 0 ? "\(workoutBridge.heartRate)" : "--",
+                                systemImage: "heart.fill"
+                            )
+                            .font(.callout.monospacedDigit().weight(.semibold))
+                            .foregroundStyle(.red)
+                            if workoutBridge.activeCalories > 0 {
+                                Text(verbatim: "\(workoutBridge.activeCalories) kcal")
+                                    .font(.caption2.monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
                     VStack(alignment: .trailing, spacing: 2.0) {
                         Text("Sessions.Plays")
                             .font(.caption2)

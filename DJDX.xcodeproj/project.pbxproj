@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E4449F1F2FE17496003AC8B6 /* DJDX CHARGE.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = E46A65E22C0ACAC400D9544B /* SwiftSoup */; };
 		E46D51B42C284CFE000524B9 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = E46D51B32C284CFE000524B9 /* Collections */; };
 		E474AEC92F4931A40014149D /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E474AEC82F4931A40014149D /* SQLite */; };
@@ -15,6 +16,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		E4449F1D2FE17496003AC8B6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4B123A42BF8E8E400D4A3D1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E4449F142FE17495003AC8B6;
+			remoteInfo = "DJDX CHARGE Watch App";
+		};
 		E47D068E2F53F4E6006081EF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E4B123A42BF8E8E400D4A3D1 /* Project object */;
@@ -39,6 +47,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		E4449F232FE17496003AC8B6 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				E4449F1F2FE17496003AC8B6 /* DJDX CHARGE.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E47D06902F53F4E6006081EF /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -54,6 +73,7 @@
 
 /* Begin PBXFileReference section */
 		AA000001300100000000000D /* DJDXWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DJDXWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DJDX CHARGE.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DJDX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -77,12 +97,20 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AA000001300100000000000E /* Widgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AA00000130010000000000E1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Widgets; sourceTree = "<group>"; };
+		E4449F162FE17495003AC8B6 /* DJDX CHARGE Watch App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "DJDX CHARGE Watch App"; sourceTree = "<group>"; };
 		E4B2630B2E79986D0031A646 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 		E4B2636E2E7998840031A646 /* DJDX */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4B263BC2E7998840031A646 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DJDX; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		AA00000130010000000000F1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E4449F122FE17495003AC8B6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -116,6 +144,7 @@
 				E4B2630B2E79986D0031A646 /* Shared */,
 				E4B2636E2E7998840031A646 /* DJDX */,
 				AA000001300100000000000E /* Widgets */,
+				E4449F162FE17495003AC8B6 /* DJDX CHARGE Watch App */,
 				E49816D22F53F04A00EFFB8B /* Frameworks */,
 				E4B123AD2BF8E8E400D4A3D1 /* Products */,
 			);
@@ -126,6 +155,7 @@
 			children = (
 				E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */,
 				AA000001300100000000000D /* DJDXWidgets.appex */,
+				E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -154,6 +184,28 @@
 			productReference = AA000001300100000000000D /* DJDXWidgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		E4449F142FE17495003AC8B6 /* DJDX CHARGE */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E4449F202FE17496003AC8B6 /* Build configuration list for PBXNativeTarget "DJDX CHARGE" */;
+			buildPhases = (
+				E4449F112FE17495003AC8B6 /* Sources */,
+				E4449F122FE17495003AC8B6 /* Frameworks */,
+				E4449F132FE17495003AC8B6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E4449F162FE17495003AC8B6 /* DJDX CHARGE Watch App */,
+			);
+			name = "DJDX CHARGE";
+			packageProductDependencies = (
+			);
+			productName = "DJDX CHARGE Watch App";
+			productReference = E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */;
+			productType = "com.apple.product-type.application";
+		};
 		E4B123AB2BF8E8E400D4A3D1 /* DJDX */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E4B123BC2BF8E8E500D4A3D1 /* Build configuration list for PBXNativeTarget "DJDX" */;
@@ -163,6 +215,7 @@
 				E4B123AA2BF8E8E400D4A3D1 /* Resources */,
 				E4E3D0DF2BF9D695001942FE /* ShellScript */,
 				E47D06902F53F4E6006081EF /* Embed Foundation Extensions */,
+				E4449F232FE17496003AC8B6 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
@@ -170,6 +223,7 @@
 				E49816D52F53F04A00EFFB8B /* PBXTargetDependency */,
 				E47D068F2F53F4E6006081EF /* PBXTargetDependency */,
 				E47D06922F53F4EC006081EF /* PBXTargetDependency */,
+				E4449F1E2FE17496003AC8B6 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				E4B2630B2E79986D0031A646 /* Shared */,
@@ -193,11 +247,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1540;
+				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					AA000001300100000000000C = {
 						CreatedOnToolsVersion = 16.3;
+					};
+					E4449F142FE17495003AC8B6 = {
+						CreatedOnToolsVersion = 27.0;
 					};
 					E4B123AB2BF8E8E400D4A3D1 = {
 						CreatedOnToolsVersion = 15.4;
@@ -226,12 +283,20 @@
 			targets = (
 				E4B123AB2BF8E8E400D4A3D1 /* DJDX */,
 				AA000001300100000000000C /* DJDXWidgets */,
+				E4449F142FE17495003AC8B6 /* DJDX CHARGE */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		AA00000130010000000000F3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E4449F132FE17495003AC8B6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -276,6 +341,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E4449F112FE17495003AC8B6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E4B123A82BF8E8E400D4A3D1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -286,6 +358,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		E4449F1E2FE17496003AC8B6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E4449F142FE17495003AC8B6 /* DJDX CHARGE */;
+			targetProxy = E4449F1D2FE17496003AC8B6 /* PBXContainerItemProxy */;
+		};
 		E47D068F2F53F4E6006081EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AA000001300100000000000C /* DJDXWidgets */;
@@ -316,7 +393,7 @@
 				INFOPLIST_FILE = Widgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = DJDX;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -347,7 +424,7 @@
 				INFOPLIST_FILE = Widgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = DJDX;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -363,6 +440,70 @@
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E4449F212FE17496003AC8B6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "DJDX CHARGE";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.DJDX;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.6;
+			};
+			name = Debug;
+		};
+		E4449F222FE17496003AC8B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "DJDX CHARGE";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.DJDX;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.6;
 			};
 			name = Release;
 		};
@@ -514,7 +655,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -554,7 +695,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -580,6 +721,15 @@
 			buildConfigurations = (
 				AA00000130010000000000F4 /* Debug */,
 				AA00000130010000000000F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E4449F202FE17496003AC8B6 /* Build configuration list for PBXNativeTarget "DJDX CHARGE" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E4449F212FE17496003AC8B6 /* Debug */,
+				E4449F222FE17496003AC8B6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
