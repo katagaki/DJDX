@@ -9,6 +9,11 @@ struct RecognizedTextBox: Codable, Sendable {
     let height: Double
 }
 
+struct RecognizedTextResult: Codable, Sendable {
+    var numeric: [RecognizedTextBox]
+    var title: [RecognizedTextBox]
+}
+
 final class SessionImageStore: Sendable {
     static let shared = SessionImageStore()
 
@@ -41,17 +46,17 @@ final class SessionImageStore: Sendable {
         return UIImage(data: data)
     }
 
-    func writeRecognizedText(_ boxes: [RecognizedTextBox], id: String) {
-        guard let data = try? JSONEncoder().encode(boxes) else { return }
+    func writeRecognizedText(_ result: RecognizedTextResult, id: String) {
+        guard let data = try? JSONEncoder().encode(result) else { return }
         try? data.write(to: ocrJSONURL(id: id), options: .atomic)
     }
 
-    func recognizedText(id: String) -> [RecognizedTextBox] {
+    func recognizedText(id: String) -> RecognizedTextResult? {
         guard let data = try? Data(contentsOf: ocrJSONURL(id: id)),
-              let boxes = try? JSONDecoder().decode([RecognizedTextBox].self, from: data) else {
-            return []
+              let result = try? JSONDecoder().decode(RecognizedTextResult.self, from: data) else {
+            return nil
         }
-        return boxes
+        return result
     }
 
     func delete(filename: String) {

@@ -1,6 +1,40 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "Sessions.Detail.Annotations.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JP + EN"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日本語＋英語"
+          }
+        }
+      }
+    },
+    "Sessions.Detail.Annotations.Numeric" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EN"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "英語のみ"
+          }
+        }
+      }
+    },
     "Sessions.Detail.RecognizedText" : {
       "extractionState" : "manual",
       "localizations" : {

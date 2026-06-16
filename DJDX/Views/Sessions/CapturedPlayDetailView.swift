@@ -23,7 +23,7 @@ struct CapturedPlayDetailView: View {
                 if let image = SessionImageStore.shared.image(for: play.rawImageFilename) {
                     RecognizedTextImage(
                         image: image,
-                        boxes: SessionImageStore.shared.recognizedText(id: play.id)
+                        result: SessionImageStore.shared.recognizedText(id: play.id)
                     )
                     .frame(maxWidth: .infinity)
                     .clipShape(RoundedRectangle(cornerRadius: 12.0))
@@ -161,9 +161,43 @@ struct CapturedPlayDetailView: View {
     }
 }
 
+enum AnnotationMode: CaseIterable {
+    case none, title, numeric
+
+    var next: AnnotationMode {
+        switch self {
+        case .none: .title
+        case .title: .numeric
+        case .numeric: .none
+        }
+    }
+
+    var label: LocalizedStringKey? {
+        switch self {
+        case .none: nil
+        case .title: "Sessions.Detail.Annotations.Title"
+        case .numeric: "Sessions.Detail.Annotations.Numeric"
+        }
+    }
+
+    var color: Color {
+        self == .title ? .orange : .green
+    }
+}
+
 struct RecognizedTextImage: View {
     let image: UIImage
-    let boxes: [RecognizedTextBox]
+    let result: RecognizedTextResult?
+
+    @State private var mode: AnnotationMode = .numeric
+
+    private var boxes: [RecognizedTextBox] {
+        switch mode {
+        case .none: []
+        case .title: result?.title ?? []
+        case .numeric: result?.numeric ?? []
+        }
+    }
 
     var body: some View {
         Image(uiImage: image)
@@ -178,15 +212,28 @@ struct RecognizedTextImage: View {
                             .font(.system(size: 9.0))
                             .lineLimit(1)
                             .minimumScaleFactor(0.3)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(mode.color)
                             .padding(.horizontal, 1.0)
                             .background(.black.opacity(0.5))
-                            .overlay(Rectangle().stroke(.green.opacity(0.7), lineWidth: 1.0))
+                            .overlay(Rectangle().stroke(mode.color.opacity(0.7), lineWidth: 1.0))
                             .frame(width: frame.width, height: frame.height)
                             .position(x: frame.midX, y: frame.midY)
                     }
                 }
             }
+            .overlay(alignment: .topTrailing) {
+                if let label = mode.label {
+                    Text(label)
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, 6.0)
+                        .padding(.vertical, 2.0)
+                        .background(mode.color.opacity(0.85), in: Capsule())
+                        .foregroundStyle(.black)
+                        .padding(6.0)
+                }
+            }
+            .contentShape(.rect)
+            .onTapGesture { mode = mode.next }
     }
 
     private func fittedRect(imageSize: CGSize, container: CGSize) -> CGRect {

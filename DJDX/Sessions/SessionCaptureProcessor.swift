@@ -59,13 +59,7 @@ actor SessionCaptureProcessor {
                 imageData: imageData, languages: SessionTextRecognizer.titleLanguages
             )
             SessionImageStore.shared.writeRecognizedText(
-                numericLines.map {
-                    RecognizedTextBox(
-                        text: $0.text,
-                        originX: $0.box.minX, originY: $0.box.minY,
-                        width: $0.box.width, height: $0.box.height
-                    )
-                },
+                RecognizedTextResult(numeric: boxes(numericLines), title: boxes(titleLines)),
                 id: playID
             )
             let parse = IIDXResultParser.parse(
@@ -90,6 +84,16 @@ actor SessionCaptureProcessor {
         play.processedAt = .now
         database.updatePlay(play)
         notify(play.id)
+    }
+
+    private func boxes(_ lines: [OCRLine]) -> [RecognizedTextBox] {
+        lines.map {
+            RecognizedTextBox(
+                text: $0.text,
+                originX: $0.box.minX, originY: $0.box.minY,
+                width: $0.box.width, height: $0.box.height
+            )
+        }
     }
 
     private func loadSongCandidates() -> [IIDXSongCandidate] {
