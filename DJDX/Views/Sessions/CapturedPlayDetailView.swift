@@ -57,7 +57,7 @@ struct CapturedPlayDetailView: View {
                 Picker("Shared.Difficulty", selection: $difficulty) {
                     Text(verbatim: "—").tag(0)
                     ForEach(IIDXDifficulty.sortedInts, id: \.self) { value in
-                        Text(verbatim: "☆\(value)").tag(value)
+                        Text(verbatim: "\(value)").tag(value)
                     }
                 }
                 Picker("Shared.PlayType", selection: $playType) {
