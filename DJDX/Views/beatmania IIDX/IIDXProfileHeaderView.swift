@@ -102,11 +102,7 @@ struct IIDXProfileHeaderView: View {
     }
 
     func loadQproImage() -> UIImage? {
-        guard let documentsDirectory = FileManager.default.urls(
-            for: .documentDirectory, in: .userDomainMask
-        ).first else { return nil }
-        let fileURL = documentsDirectory.appendingPathComponent("Qpro.png")
-
+        let fileURL = SharedContainer.imagesURL.appendingPathComponent("Qpro.png")
         if FileManager.default.fileExists(atPath: fileURL.path) {
             return UIImage(contentsOfFile: fileURL.path)
         } else {
@@ -131,11 +127,11 @@ struct IIDXProfileHeaderView: View {
                     let (imageData, response) = try await URLSession.shared.data(for: imageRequest)
 
                     if let httpResponse = response as? HTTPURLResponse,
-                       (200...299).contains(httpResponse.statusCode),
-                       let documentsDirectory = FileManager.default.urls(
-                        for: .documentDirectory, in: .userDomainMask
-                       ).first {
-                        let fileURL = documentsDirectory.appendingPathComponent("Qpro.png")
+                       (200...299).contains(httpResponse.statusCode) {
+                        try? FileManager.default.createDirectory(
+                            at: SharedContainer.imagesURL, withIntermediateDirectories: true
+                        )
+                        let fileURL = SharedContainer.imagesURL.appendingPathComponent("Qpro.png")
                         try? imageData.write(to: fileURL)
                     }
                 }
@@ -187,7 +183,7 @@ struct IIDXProfileHeaderView: View {
     }
 
     func saveRadarData() {
-        let defaults = UserDefaults.standard
+        let defaults = SharedContainer.defaults
         if let spData = spRadarData {
             defaults.set(spData.notes, forKey: "NotesRadar.SP.Notes")
             defaults.set(spData.chord, forKey: "NotesRadar.SP.Chord")
@@ -207,7 +203,7 @@ struct IIDXProfileHeaderView: View {
     }
 
     func loadRadarData() {
-        let defaults = UserDefaults.standard
+        let defaults = SharedContainer.defaults
         if defaults.object(forKey: "NotesRadar.SP.Notes") != nil {
             spRadarData = RadarData(
                 notes: defaults.double(forKey: "NotesRadar.SP.Notes"),
