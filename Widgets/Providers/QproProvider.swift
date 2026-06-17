@@ -12,12 +12,12 @@ struct QproProvider: TimelineProvider {
     }
 
     func getSnapshot(in _: Context, completion: @escaping (QproEntry) -> Void) {
-        let imageData = WidgetDataStore.shared.readQproImage()
+        let imageData = try? Data(contentsOf: SharedContainer.imagesURL.appendingPathComponent("Qpro.png"))
         completion(QproEntry(date: .now, imageData: imageData))
     }
 
     func getTimeline(in _: Context, completion: @escaping (Timeline<QproEntry>) -> Void) {
-        let imageData = WidgetDataStore.shared.readQproImage()
+        let imageData = try? Data(contentsOf: SharedContainer.imagesURL.appendingPathComponent("Qpro.png"))
         let entry = QproEntry(date: .now, imageData: imageData)
         let nextUpdate = Calendar.current.date(byAdding: .hour, value: 4, to: .now)!
         completion(Timeline(entries: [entry], policy: .after(nextUpdate)))

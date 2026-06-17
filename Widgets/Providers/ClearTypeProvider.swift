@@ -15,23 +15,29 @@ struct ClearTypeProvider: AppIntentTimelineProvider {
     }
 
     func snapshot(for configuration: ClearTypeWidgetIntent, in _: Context) async -> ClearTypeEntry {
-        let snapshot = WidgetDataStore.shared.readClearType()
+        let snapshot = WidgetDataReader.shared.clearType(
+            versionRaw: WidgetConfig.iidxVersionRaw,
+            playTypeRaw: WidgetConfig.playTypeRaw
+        )
         return ClearTypeEntry(
             date: .now, configuration: configuration,
-            dataPerDifficulty: snapshot?.dataPerDifficulty,
-            trendData: snapshot?.trendData,
-            playType: snapshot?.playType ?? "single"
+            dataPerDifficulty: snapshot.dataPerDifficulty,
+            trendData: snapshot.trendData,
+            playType: snapshot.playType
         )
     }
 
     func timeline(for configuration: ClearTypeWidgetIntent,
                   in _: Context) async -> Timeline<ClearTypeEntry> {
-        let snapshot = WidgetDataStore.shared.readClearType()
+        let snapshot = WidgetDataReader.shared.clearType(
+            versionRaw: WidgetConfig.iidxVersionRaw,
+            playTypeRaw: WidgetConfig.playTypeRaw
+        )
         let entry = ClearTypeEntry(
             date: .now, configuration: configuration,
-            dataPerDifficulty: snapshot?.dataPerDifficulty,
-            trendData: snapshot?.trendData,
-            playType: snapshot?.playType ?? "single"
+            dataPerDifficulty: snapshot.dataPerDifficulty,
+            trendData: snapshot.trendData,
+            playType: snapshot.playType
         )
         let nextUpdate = Calendar.current.date(byAdding: .hour, value: 4, to: .now)!
         return Timeline(entries: [entry], policy: .after(nextUpdate))

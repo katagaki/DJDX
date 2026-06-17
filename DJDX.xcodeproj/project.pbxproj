@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA0000013001000000000201 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000013001000000000202 /* SQLite */; };
 		E4449F1F2FE17496003AC8B6 /* DJDX CHARGE.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E46A65E32C0ACAC400D9544B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = E46A65E22C0ACAC400D9544B /* SwiftSoup */; };
 		E46D51B42C284CFE000524B9 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = E46D51B32C284CFE000524B9 /* Collections */; };
 		E474AEC92F4931A40014149D /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E474AEC82F4931A40014149D /* SQLite */; };
-		AA0000013001000000000201 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000013001000000000202 /* SQLite */; };
 		E47D068D2F53F4E6006081EF /* DJDX Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA000001300100000000000D /* DJDX Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4E3D0D62BF9A220001942FE /* Komponents */; };
 /* End PBXBuildFile section */
@@ -825,6 +825,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		AA0000013001000000000202 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E474AEC72F4931A40014149D /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
+		};
 		E46A65E22C0ACAC400D9544B /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E46A65E12C0ACAC400D9544B /* XCRemoteSwiftPackageReference "SwiftSoup" */;
@@ -836,11 +841,6 @@
 			productName = Collections;
 		};
 		E474AEC82F4931A40014149D /* SQLite */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E474AEC72F4931A40014149D /* XCRemoteSwiftPackageReference "SQLite.swift" */;
-			productName = SQLite;
-		};
-		AA0000013001000000000202 /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E474AEC72F4931A40014149D /* XCRemoteSwiftPackageReference "SQLite.swift" */;
 			productName = SQLite;

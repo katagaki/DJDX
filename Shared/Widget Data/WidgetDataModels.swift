@@ -24,6 +24,16 @@ enum SharedContainer {
     }
 }
 
+// MARK: - Widget Config (app-group defaults)
+
+enum WidgetConfig {
+    static let versionKey = "Widget.IIDX.Version"
+    static let playTypeKey = "Widget.IIDX.PlayType"
+
+    static var iidxVersionRaw: Int { SharedContainer.defaults.integer(forKey: versionKey) }
+    static var playTypeRaw: String { SharedContainer.defaults.string(forKey: playTypeKey) ?? "single" }
+}
+
 // MARK: - Widget Snapshot Models
 
 struct WidgetRadarData: Codable, Sendable {
