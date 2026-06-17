@@ -14,6 +14,7 @@ struct DJDXApp: App {
     }
 
     init() {
+        DataMigration.runVersion334CleanupIfNeeded()
         _ = IIDXPlayDataDatabase.shared
         _ = PlaySessionsDatabase.shared
         _ = SessionWorkoutBridge.shared
