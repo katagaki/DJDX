@@ -71,9 +71,7 @@ enum ICloudBackupManager {
 
     static func backUp() throws {
         let fileManager = FileManager.default
-        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            throw BackupError.documentsUnavailable
-        }
+        let containerURL = SharedContainer.containerURL
         let backupFolder = try backupFolderURL(in: fileManager)
         try fileManager.createDirectory(at: backupFolder, withIntermediateDirectories: true)
 
@@ -81,7 +79,7 @@ enum ICloudBackupManager {
             .appendingPathComponent("DJDXBackup-\(UUID().uuidString)")
             .appendingPathExtension("zip")
         defer { try? fileManager.removeItem(at: stagingURL) }
-        try ZipArchive.zip(directoryAt: documentsURL, to: stagingURL)
+        try ZipArchive.zip(directoryAt: containerURL, to: stagingURL)
 
         let backupDate = Date.now
         let archiveURL = backupFolder.appendingPathComponent("Data.zip")
@@ -128,11 +126,7 @@ enum ICloudBackupManager {
                 throw BackupError.downloadTimedOut
             }
             onProgress(70)
-            guard let documentsURL = fileManager.urls(
-                for: .documentDirectory, in: .userDomainMask
-            ).first else {
-                throw BackupError.documentsUnavailable
-            }
+            let containerURL = SharedContainer.containerURL
 
             let extractionURL = fileManager.temporaryDirectory
                 .appendingPathComponent("DJDXRestore-\(UUID().uuidString)", isDirectory: true)
@@ -145,19 +139,21 @@ enum ICloudBackupManager {
                 at: extractionURL, includingPropertiesForKeys: [.isDirectoryKey]
             )
             if extractedItems.count == 1,
-               extractedItems[0].lastPathComponent == documentsURL.lastPathComponent,
+               extractedItems[0].lastPathComponent == containerURL.lastPathComponent,
                (try? extractedItems[0].resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true {
                 restoreRootURL = extractedItems[0]
             }
             for item in try fileManager.contentsOfDirectory(
                 at: restoreRootURL, includingPropertiesForKeys: nil
             ) {
-                let destinationURL = documentsURL.appendingPathComponent(item.lastPathComponent)
+                let destinationURL = containerURL.appendingPathComponent(item.lastPathComponent)
                 if fileManager.fileExists(atPath: destinationURL.path) {
                     try fileManager.removeItem(at: destinationURL)
                 }
                 try fileManager.moveItem(at: item, to: destinationURL)
             }
+            // A pre-334 backup has the old flat layout (e.g. Qpro.png at the root, no Images/).
+            DataMigration.moveImages(from: containerURL, to: SharedContainer.imagesURL)
             onProgress(100)
         }.value
     }
