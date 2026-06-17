@@ -26,7 +26,6 @@ struct UnifiedView: View {
     var hasCompletedRestorePrompt: Bool
 
     @State var isPresentingImport: Bool = false
-    @State var isFirstStartCleanupComplete: Bool = false
     @State var isEditingAnalytics: Bool = false
 
     @State var availableBackupDate: Date?
@@ -207,10 +206,6 @@ struct UnifiedView: View {
             handleDeepLink(url)
         }
         .task {
-            if !isFirstStartCleanupComplete {
-                await migrateData()
-                isFirstStartCleanupComplete = true
-            }
             try? Tips.configure([
                 .displayFrequency(.immediate),
                 .datastoreLocation(.applicationDefault)
