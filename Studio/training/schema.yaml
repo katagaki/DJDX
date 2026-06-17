@@ -1,0 +1,105 @@
+# Single source of truth for the DJDX PEAK training pipeline.
+# Every script imports this — change names here, not in scripts.
+
+# ---------------------------------------------------------------------------
+# Object detector: regions of interest on the result screen.
+# Order matters; YOLO class indices follow this list.
+# ---------------------------------------------------------------------------
+detector:
+  classes:
+    - dj_level_now          # large rank glyph (current play)
+    - dj_level_prev         # small rank glyph (previous best)
+    - clear_type_now        # CLEAR / H-CLEAR / FAILED / A-CLEAR text pill
+    - clear_type_prev
+    - score_now             # 4-digit EX score
+    - score_prev
+    - score_delta           # +/-NNNN below score_now
+    - miss_count_now
+    - miss_count_prev
+    - miss_count_delta
+    - pacemaker_aa          # PACEMAKER AA bar score
+    - judge_pgreat          # top row of judgement table (the bright "GREAT")
+    - judge_great
+    - judge_good
+    - judge_bad
+    - judge_poor
+    - song_title
+    - song_artist
+    - difficulty_label      # HYPER / ANOTHER / LEGGENDARIA
+    - notes_count           # SP <N> NOTES
+    - stage_label           # FINAL STAGE RESULT / EXTRA STAGE RESULT
+    - combo_break           # COMBO BREAK NNN
+
+# ---------------------------------------------------------------------------
+# Image classifier #1: DJ level rank glyph.
+# Cropped from dj_level_now / dj_level_prev detections.
+# ---------------------------------------------------------------------------
+rank_classifier:
+  classes: [F, E, D, C, B, A, AA, AAA, MAX]
+
+# ---------------------------------------------------------------------------
+# Image classifier #2: clear-type pill.
+# Cropped from clear_type_now / clear_type_prev detections.
+# ---------------------------------------------------------------------------
+clear_type_classifier:
+  classes:
+    - NO_PLAY
+    - FAILED
+    - ASSIST_CLEAR
+    - EASY_CLEAR
+    - CLEAR
+    - HARD_CLEAR        # rendered "H-CLEAR" on screen
+    - EX_HARD_CLEAR
+    - FULLCOMBO
+
+# ---------------------------------------------------------------------------
+# Training hyperparameters
+# ---------------------------------------------------------------------------
+training:
+  detector:
+    base_weights: yolov8n.pt   # nano: fast, ~3M params, plenty for ~22 classes on 184 imgs
+    image_size: 960            # screens are detail-rich; bump up from 640
+    epochs: 200
+    batch: 8
+    patience: 30               # early stop
+    augmentations:
+      mosaic: 0.5
+      mixup: 0.0
+      hsv_h: 0.015             # photo white-balance varies
+      hsv_s: 0.4
+      hsv_v: 0.4
+      degrees: 5               # phone tilt
+      translate: 0.05
+      scale: 0.2
+      perspective: 0.0005      # mild keystoning from off-angle shots
+      fliplr: 0.0              # never flip — score digits become unreadable
+  rank_classifier:
+    base_weights: yolov8n-cls.pt
+    image_size: 128
+    epochs: 100
+    batch: 32
+  clear_type_classifier:
+    base_weights: yolov8n-cls.pt
+    image_size: 160
+    epochs: 100
+    batch: 32
+
+# ---------------------------------------------------------------------------
+# Dataset split
+# ---------------------------------------------------------------------------
+split:
+  train: 0.80
+  val: 0.15
+  test: 0.05
+  seed: 1729
+
+# ---------------------------------------------------------------------------
+# CoreML export
+# ---------------------------------------------------------------------------
+coreml:
+  # All exports target macOS 14+ / iOS 17+ (ML Program format, FP16 compute).
+  minimum_deployment_target: iOS17
+  compute_precision: float16
+  detector_output_name: DJDXResultDetector
+  rank_output_name: DJDXRankClassifier
+  clear_type_output_name: DJDXClearTypeClassifier
