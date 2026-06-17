@@ -20,14 +20,7 @@ final class SDVXInDatabase: Sendable {
     // MARK: - Initialization
 
     private init() {
-        if let containerURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: SharedContainer.appGroupID
-        ) {
-            databasePath = containerURL.appendingPathComponent("ExD_SDVXIn.db").path
-        } else {
-            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            databasePath = documentsURL.appendingPathComponent("ExD_SDVXIn.db").path
-        }
+        databasePath = SharedContainer.containerURL.appendingPathComponent("ExD_SDVXIn.db").path
         createTablesIfNeeded()
     }
 

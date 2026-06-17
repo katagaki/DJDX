@@ -34,8 +34,7 @@ final class SDVXPlayDataDatabase: Sendable {
     // MARK: - Initialization
 
     init(fileName: String = "PlayDataSDVX.db") {
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        databasePath = documentsURL.appendingPathComponent(fileName).path
+        databasePath = SharedContainer.containerURL.appendingPathComponent(fileName).path
         createTablesIfNeeded()
     }
 
