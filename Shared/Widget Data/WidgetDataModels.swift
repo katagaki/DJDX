@@ -14,6 +14,14 @@ enum SharedContainer {
     static var widgetDataURL: URL {
         containerURL.appendingPathComponent("WidgetData")
     }
+
+    static var imagesURL: URL {
+        containerURL.appendingPathComponent("Images")
+    }
+
+    static var defaults: UserDefaults {
+        UserDefaults(suiteName: appGroupID)!
+    }
 }
 
 // MARK: - Widget Snapshot Models
