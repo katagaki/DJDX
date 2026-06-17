@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "DJDXStudio",
-    platforms: [.macOS(.v14)],
+    platforms: [.macOS("26.0")],
     dependencies: [
         .package(url: "https://github.com/jpsim/Yams.git", from: "5.1.0"),
     ],
