@@ -472,7 +472,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "DJDX CHARGE";
+				INFOPLIST_KEY_CFBundleDisplayName = DJDX;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
@@ -507,7 +507,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "DJDX CHARGE";
+				INFOPLIST_KEY_CFBundleDisplayName = DJDX;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";

@@ -15,12 +15,18 @@ enum SessionTextRecognizer {
     static let numericLanguages = ["en-US", "en"]
 
     static func recognize(imageData: Data, languages: [String]) async throws -> [OCRLine] {
-        try await withCheckedThrowingContinuation { continuation in
-            guard let decoded = decodeImage(from: imageData) else {
-                continuation.resume(throwing: SessionTextRecognizerError.invalidImage)
-                return
-            }
+        guard let decoded = decodeImage(from: imageData) else {
+            throw SessionTextRecognizerError.invalidImage
+        }
+        return try await recognize(cgImage: decoded.image,
+                                   orientation: decoded.orientation,
+                                   languages: languages)
+    }
 
+    static func recognize(cgImage: CGImage,
+                          orientation: CGImagePropertyOrientation = .up,
+                          languages: [String]) async throws -> [OCRLine] {
+        try await withCheckedThrowingContinuation { continuation in
             let request = VNRecognizeTextRequest { request, error in
                 if let error {
                     continuation.resume(throwing: error)
@@ -38,8 +44,8 @@ enum SessionTextRecognizer {
             request.recognitionLanguages = supportedLanguages(languages, request: request)
 
             let handler = VNImageRequestHandler(
-                cgImage: decoded.image,
-                orientation: decoded.orientation,
+                cgImage: cgImage,
+                orientation: orientation,
                 options: [:]
             )
             DispatchQueue.global(qos: .userInitiated).async {

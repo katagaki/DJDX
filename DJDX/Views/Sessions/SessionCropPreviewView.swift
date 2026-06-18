@@ -9,6 +9,7 @@ struct SessionCropPreviewView: View {
     @State private var normalizedCorners: [CGPoint] = []
     @State private var detectedCorners: [CGPoint]?
     @State private var dragIndex: Int?
+    @State private var imageFrameSize: CGSize = .zero
     @State private var isDetecting: Bool = true
     @State private var detectionFailed: Bool = false
     @State private var isApplying: Bool = false
@@ -28,19 +29,14 @@ struct SessionCropPreviewView: View {
 
     var body: some View {
         ZStack {
-            GeometryReader { geo in
-                editor(geo: geo)
-            }
-            .ignoresSafeArea()
-            if isLandscape {
-                landscapeControls
-            } else {
-                topBar
-                bottomBar
-            }
+            editor
+                .padding(.vertical, 24.0)
             detectingOverlay
         }
-        .background(Color.black.ignoresSafeArea())
+        .safeAreaInset(edge: .top, spacing: 0.0) { topControls }
+        .safeAreaInset(edge: .bottom, spacing: 0.0) { bottomControls }
+        .safeAreaInset(edge: .trailing, spacing: 0.0) { trailingControls }
+        .presentationBackground(.black)
         .sensoryFeedback(.selection, trigger: dragIndex)
         .task {
             if image == nil { image = UIImage(data: imageData) }
@@ -51,27 +47,28 @@ struct SessionCropPreviewView: View {
     // MARK: - Editor
 
     @ViewBuilder
-    private func editor(geo: GeometryProxy) -> some View {
+    private var editor: some View {
         if let image {
-            let rect = displayedRect(imageSize: image.size, viewSize: geo.size)
             let viewCorners = normalizedCorners.map {
-                CGPoint(x: rect.minX + $0.x * rect.width, y: rect.minY + $0.y * rect.height)
+                CGPoint(x: $0.x * imageFrameSize.width, y: $0.y * imageFrameSize.height)
             }
-            ZStack {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                if viewCorners.count == 4 {
-                    dimMask(corners: viewCorners)
-                    quadOutline(corners: viewCorners)
-                    cornerHandles(corners: viewCorners, displayedRect: rect)
-                    if let dragIndex {
-                        loupe(at: viewCorners[dragIndex], image: image, displayedRect: rect)
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .overlay {
+                    if viewCorners.count == 4 && imageFrameSize.width > 0.0 {
+                        ZStack {
+                            dimMask(corners: viewCorners)
+                            quadOutline(corners: viewCorners)
+                            cornerHandles(corners: viewCorners, size: imageFrameSize)
+                            if let dragIndex {
+                                loupe(at: viewCorners[dragIndex], image: image, size: imageFrameSize)
+                            }
+                        }
                     }
                 }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .coordinateSpace(.named(cropSpace))
+                .onGeometryChange(for: CGSize.self) { $0.size } action: { imageFrameSize = $0 }
+                .coordinateSpace(.named(cropSpace))
         }
     }
 
@@ -100,7 +97,7 @@ struct SessionCropPreviewView: View {
         .allowsHitTesting(false)
     }
 
-    private func cornerHandles(corners: [CGPoint], displayedRect rect: CGRect) -> some View {
+    private func cornerHandles(corners: [CGPoint], size: CGSize) -> some View {
         ForEach(0..<corners.count, id: \.self) { index in
             handle(isActive: dragIndex == index)
                 .position(corners[index])
@@ -108,7 +105,7 @@ struct SessionCropPreviewView: View {
                     DragGesture(minimumDistance: 0.0, coordinateSpace: .named(cropSpace))
                         .onChanged { value in
                             dragIndex = index
-                            updateCorner(index, to: value.location, displayedRect: rect)
+                            updateCorner(index, to: value.location, size: size)
                         }
                         .onEnded { _ in dragIndex = nil }
                 )
@@ -138,13 +135,12 @@ struct SessionCropPreviewView: View {
         .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isActive)
     }
 
-    private func loupe(at point: CGPoint, image: UIImage, displayedRect rect: CGRect) -> some View {
+    private func loupe(at point: CGPoint, image: UIImage, size: CGSize) -> some View {
         let diameter: CGFloat = 116.0
         let zoom: CGFloat = 2.4
-        let local = CGPoint(x: point.x - rect.minX, y: point.y - rect.minY)
         let placeBelow = point.y < 160.0
         let center = CGPoint(
-            x: min(max(point.x, rect.minX + diameter / 2.0), rect.maxX - diameter / 2.0),
+            x: min(max(point.x, diameter / 2.0), size.width - diameter / 2.0),
             y: placeBelow ? point.y + diameter / 2.0 + 40.0 : point.y - diameter / 2.0 - 40.0
         )
         return Color.black
@@ -152,9 +148,9 @@ struct SessionCropPreviewView: View {
             .overlay(alignment: .topLeading) {
                 Image(uiImage: image)
                     .resizable()
-                    .frame(width: rect.width, height: rect.height)
+                    .frame(width: size.width, height: size.height)
                     .scaleEffect(zoom, anchor: .topLeading)
-                    .offset(x: diameter / 2.0 - local.x * zoom, y: diameter / 2.0 - local.y * zoom)
+                    .offset(x: diameter / 2.0 - point.x * zoom, y: diameter / 2.0 - point.y * zoom)
             }
             .clipShape(Circle())
             .overlay { crosshair }
@@ -174,28 +170,47 @@ struct SessionCropPreviewView: View {
 
     // MARK: - Bars
 
-    private var landscapeControls: some View {
-        ZStack {
-            VStack {
-                instructionPill
-                Spacer()
+    @ViewBuilder
+    private var topControls: some View {
+        instructionPill
+            .padding(.horizontal)
+            .padding(.top, 8.0)
+            .opacity(isDetecting ? 0.0 : 1.0)
+            .animation(.easeIn(duration: 0.2), value: isDetecting)
+    }
+
+    @ViewBuilder
+    private var bottomControls: some View {
+        if !isLandscape {
+            HStack(spacing: 12.0) {
+                backButton
+                resetButton
+                useButton
             }
-            HStack {
-                Spacer()
-                VStack(spacing: 14.0) {
-                    circleControl(systemImage: "chevron.left", prominent: false,
-                                  showsSpinner: false, disabled: isApplying, action: onRetake)
-                    circleControl(systemImage: "arrow.counterclockwise", prominent: false,
-                                  showsSpinner: false, disabled: isApplying, action: resetCorners)
-                    circleControl(systemImage: "checkmark", prominent: true,
-                                  showsSpinner: isApplying, disabled: isApplying || isDetecting, action: applyAndAccept)
-                }
-            }
+            .padding(.horizontal)
+            .padding(.top, 12.0)
+            .padding(.bottom, 8.0)
+            .opacity(isDetecting ? 0.0 : 1.0)
+            .animation(.easeIn(duration: 0.2), value: isDetecting)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 8.0)
-        .opacity(isDetecting ? 0.0 : 1.0)
-        .animation(.easeIn(duration: 0.2), value: isDetecting)
+    }
+
+    @ViewBuilder
+    private var trailingControls: some View {
+        if isLandscape {
+            VStack(spacing: 14.0) {
+                circleControl(systemImage: "chevron.left", prominent: false,
+                              showsSpinner: false, disabled: isApplying, action: onRetake)
+                circleControl(systemImage: "arrow.counterclockwise", prominent: false,
+                              showsSpinner: false, disabled: isApplying, action: resetCorners)
+                circleControl(systemImage: "checkmark", prominent: true,
+                              showsSpinner: isApplying, disabled: isApplying || isDetecting, action: applyAndAccept)
+            }
+            .padding(.trailing)
+            .padding(.vertical, 8.0)
+            .opacity(isDetecting ? 0.0 : 1.0)
+            .animation(.easeIn(duration: 0.2), value: isDetecting)
+        }
     }
 
     @ViewBuilder
@@ -227,21 +242,6 @@ struct SessionCropPreviewView: View {
         }
     }
 
-    private var topBar: some View {
-        VStack(spacing: 10.0) {
-            HStack {
-                Spacer()
-                resetButton
-            }
-            instructionPill
-            Spacer()
-        }
-        .padding(.horizontal)
-        .padding(.top, 8.0)
-        .opacity(isDetecting ? 0.0 : 1.0)
-        .animation(.easeIn(duration: 0.2), value: isDetecting)
-    }
-
     private var instructionPill: some View {
         Text(detectionFailed ? "Sessions.CropPreview.NoScreen" : "Sessions.CropPreview.Instruction")
             .font(.subheadline.weight(.medium))
@@ -265,20 +265,6 @@ struct SessionCropPreviewView: View {
         } else {
             button.buttonStyle(.bordered).controlSize(.large).tint(.white).clipShape(.circle)
         }
-    }
-
-    private var bottomBar: some View {
-        VStack {
-            Spacer()
-            HStack(spacing: 12.0) {
-                backButton
-                useButton
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 8.0)
-        }
-        .opacity(isDetecting ? 0.0 : 1.0)
-        .animation(.easeIn(duration: 0.2), value: isDetecting)
     }
 
     @ViewBuilder
@@ -336,19 +322,10 @@ private extension SessionCropPreviewView {
 
     // MARK: - Geometry
 
-    func displayedRect(imageSize: CGSize, viewSize: CGSize) -> CGRect {
-        let fit = min(viewSize.width / imageSize.width, viewSize.height / imageSize.height)
-        let size = CGSize(width: imageSize.width * fit, height: imageSize.height * fit)
-        return CGRect(
-            x: (viewSize.width - size.width) / 2.0,
-            y: (viewSize.height - size.height) / 2.0,
-            width: size.width, height: size.height
-        )
-    }
-
-    private func updateCorner(_ index: Int, to location: CGPoint, displayedRect rect: CGRect) {
-        let normalizedX = (location.x - rect.minX) / rect.width
-        let normalizedY = (location.y - rect.minY) / rect.height
+    private func updateCorner(_ index: Int, to location: CGPoint, size: CGSize) {
+        guard size.width > 0.0, size.height > 0.0 else { return }
+        let normalizedX = location.x / size.width
+        let normalizedY = location.y / size.height
         normalizedCorners[index] = CGPoint(
             x: min(max(normalizedX, 0.0), 1.0),
             y: min(max(normalizedY, 0.0), 1.0)

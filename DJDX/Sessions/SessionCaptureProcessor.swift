@@ -52,19 +52,9 @@ actor SessionCaptureProcessor {
         }
 
         do {
-            let numericLines = try await SessionTextRecognizer.recognize(
-                imageData: imageData, languages: SessionTextRecognizer.numericLanguages
-            )
-            let titleLines = try await SessionTextRecognizer.recognize(
-                imageData: imageData, languages: SessionTextRecognizer.titleLanguages
-            )
-            SessionImageStore.shared.writeRecognizedText(
-                RecognizedTextResult(numeric: boxes(numericLines), title: boxes(titleLines)),
-                id: playID
-            )
-            let parse = IIDXResultParser.parse(
-                lines: numericLines, titleLines: titleLines, songs: loadSongCandidates()
-            )
+            let regions = try await IIDXResultReader.detect(imageData: imageData)
+            SessionImageStore.shared.writeRecognizedText(recognizedText(from: regions), id: playID)
+            let parse = IIDXResultParser.parse(regions: regions, songs: loadSongCandidates())
             play.apply(parse)
             play.processedAt = .now
             play.parseError = nil
@@ -86,14 +76,20 @@ actor SessionCaptureProcessor {
         notify(play.id)
     }
 
-    private func boxes(_ lines: [OCRLine]) -> [RecognizedTextBox] {
-        lines.map {
+    private static let titleRegionLabels: Set<String> = ["song_title", "song_artist"]
+
+    private func recognizedText(from regions: [DetectedRegion]) -> RecognizedTextResult {
+        func box(_ region: DetectedRegion) -> RecognizedTextBox {
             RecognizedTextBox(
-                text: $0.text,
-                originX: $0.box.minX, originY: $0.box.minY,
-                width: $0.box.width, height: $0.box.height
+                text: region.text.replacingOccurrences(of: "\n", with: " "),
+                originX: region.box.minX, originY: region.box.minY,
+                width: region.box.width, height: region.box.height
             )
         }
+        return RecognizedTextResult(
+            numeric: regions.filter { !Self.titleRegionLabels.contains($0.label) }.map(box),
+            title: regions.filter { Self.titleRegionLabels.contains($0.label) }.map(box)
+        )
     }
 
     private func loadSongCandidates() -> [IIDXSongCandidate] {

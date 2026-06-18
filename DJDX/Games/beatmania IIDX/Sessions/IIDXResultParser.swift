@@ -33,38 +33,35 @@ struct IIDXResultParse: Sendable {
     var confidence: Double = 0.0
 }
 
-// The IIDX result screen shows two value columns per metric: best score (left)
-// and this-play score (right). The current play is always the rightmost value
-// of the expected type on a metric's row, which also skips NEW RECORD badges.
+// The IIDXResultDetector model localizes each result-screen field as its own
+// region; this parser maps the OCR'd text of those regions onto a typed result.
+// Fields use the "_now" (this-play) variants; "_prev"/"_delta" regions are ignored.
 enum IIDXResultParser {
 
     private static let grades = ["AAA", "AA", "A", "B", "C", "D", "E", "F"]
 
-    // Free-text title lookup ignores UI chrome words; matching against the song
-    // DB is position-independent, with a largest-font fallback so the captured
-    // title survives an unrecognized song, an odd angle, or a different crop.
-    private static let titleStopwords: Set<String> = [
-        "RESULT", "STAGE", "JUDGE", "FAST", "SLOW", "COMBO", "BREAK", "NOTES",
-        "PLAYER", "PASELI", "NEWRECORD", "RECORD", "BEST", "SCORE", "TYPE",
-        "DJLEVEL", "LEVEL", "MISSCOUNT", "MISS", "COUNT", "GREAT", "GOOD", "BAD",
-        "POOR", "AMUSEMENT", "EAMUSEMENT", "BEGINNER", "NORMAL", "HYPER",
-        "ANOTHER", "LEGGENDARIA", "NOPLAY", "PERFECT", "PGREAT", "FEAT", "SP", "DP",
-        "テンキー", "アプリ", "画像", "保存", "スコア", "ベスト", "今回", "プレー"
-    ]
-
-    static func parse(lines: [OCRLine],
-                      titleLines: [OCRLine],
+    static func parse(regions: [DetectedRegion],
                       songs: [IIDXSongCandidate]) -> IIDXResultParse {
+        var byLabel: [String: String] = [:]
+        for region in regions {
+            byLabel[region.label] = region.text
+        }
+        func text(_ label: String) -> String? {
+            guard let value = byLabel[label]?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !value.isEmpty else { return nil }
+            return value
+        }
+
         var parse = IIDXResultParse()
         var hits = 0
 
-        parse.playType = detectPlayType(lines: lines)
-        if let (level, difficulty) = detectChart(lines: lines) {
+        parse.playType = detectPlayType(byLabel["difficulty_label"], byLabel["stage_label"])
+        if let (level, difficulty) = detectChart(text("difficulty_label")) {
             parse.level = level
             parse.difficulty = difficulty
         }
 
-        let resolved = resolveTitle(lines: titleLines, songs: songs,
+        let resolved = resolveTitle(titleText: text("song_title"), songs: songs,
                                     level: parse.level,
                                     difficulty: parse.difficulty,
                                     playType: parse.playType)
@@ -79,43 +76,37 @@ enum IIDXResultParser {
             parse.songTitle = rawTitle
         }
 
-        if let label = findLabel(lines, keywords: ["CLEARTYPE", "TYPE"]),
-           let value = rightmostValue(on: label, in: lines, map: clearTypeOf) {
+        if parse.level != .unknown { hits += 1 }
+
+        if let value = text("clear_type_now").flatMap(clearTypeOf) {
             parse.clearType = value
             hits += 1
-        } else {
-            let global = detectClearTypeGlobal(lines)
-            if global != IIDXClearType.noPlay.rawValue {
-                parse.clearType = global
-                hits += 1
-            }
         }
 
-        if let label = findLabel(lines, keywords: ["DJLEVEL", "DJ"]),
-           let value = rightmostValue(on: label, in: lines, map: gradeOf) {
-            parse.djLevel = value
-            hits += 1
-        }
-
-        if let label = findLabel(lines, keywords: ["EXSCORE", "SCORE"]),
-           let value = rightmostValue(on: label, in: lines, map: scoreOf) {
+        let notes = headlineNumber(text("notes_count"))
+        if let value = headlineNumber(text("score_now")) {
             parse.exScore = value
             hits += 1
         }
-
-        if let label = findLabel(lines, keywords: ["MISSCOUNT", "MISS"]),
-           let value = rightmostValue(on: label, in: lines, map: scoreOf) {
+        if let value = headlineNumber(text("miss_count_now")) {
             parse.miss = value
             hits += 1
         }
+        var perfectGreat = headlineNumber(text("judge_pgreat"))
+        var great = headlineNumber(text("judge_great"))
+        reconcileJudges(exScore: parse.exScore, perfectGreat: &perfectGreat, great: &great)
+        if let perfectGreat { parse.perfectGreat = perfectGreat; hits += 1 }
+        if let great { parse.great = great; hits += 1 }
 
-        let (perfectGreat, great) = detectGreats(lines: lines)
-        if let perfectGreat {
-            parse.perfectGreat = perfectGreat
+        // Primary: IIDXRankRecognizer classifies the stylized DJ-level graphic and
+        // writes the grade into the dj_level_now region. Fallback (model absent or
+        // unsure): derive it from the score rate (exScore / max), which is how IIDX
+        // assigns the grade.
+        if let value = text("dj_level_now").flatMap(gradeOf) {
+            parse.djLevel = value
             hits += 1
-        }
-        if let great {
-            parse.great = great
+        } else if let derived = derivedDJLevel(exScore: parse.exScore, notes: notes) {
+            parse.djLevel = derived
             hits += 1
         }
 
@@ -125,8 +116,70 @@ enum IIDXResultParser {
            parse.exScore == 2 * parse.perfectGreat + parse.great {
             bonus = 1.0
         }
-        parse.confidence = min(1.0, (Double(hits) + bonus) / 7.0)
+        parse.confidence = min(1.0, (Double(hits) + bonus) / 8.0)
         return parse
+    }
+
+    // MARK: - Numbers
+
+    // EX score = 2·perfect-great + great. The small judge fonts misread far more
+    // often than the headline score, so recover a missing count from the others.
+    private static func reconcileJudges(exScore: Int, perfectGreat: inout Int?, great: inout Int?) {
+        guard exScore > 0 else { return }
+        if let perfect = perfectGreat, great == nil {
+            let derived = exScore - 2 * perfect
+            if derived >= 0 { great = derived }
+        } else if let good = great, perfectGreat == nil {
+            let remainder = exScore - good
+            if remainder >= 0, remainder % 2 == 0 { perfectGreat = remainder / 2 }
+        }
+    }
+
+    private static func derivedDJLevel(exScore: Int, notes: Int?) -> String? {
+        guard exScore > 0, let notes, notes > 0 else { return nil }
+        let maxScore = notes * 2
+        guard exScore <= maxScore else { return nil }
+        let rate = Double(exScore) / Double(maxScore)
+        switch rate {
+        case (8.0 / 9.0)...: return IIDXDJLevel.djAAA.rawValue
+        case (7.0 / 9.0)...: return IIDXDJLevel.djAA.rawValue
+        case (6.0 / 9.0)...: return IIDXDJLevel.djA.rawValue
+        case (5.0 / 9.0)...: return IIDXDJLevel.djB.rawValue
+        case (4.0 / 9.0)...: return IIDXDJLevel.djC.rawValue
+        case (3.0 / 9.0)...: return IIDXDJLevel.djD.rawValue
+        case (2.0 / 9.0)...: return IIDXDJLevel.djE.rawValue
+        default: return IIDXDJLevel.djF.rawValue
+        }
+    }
+
+    // Headline value of a region: the first line (tallest, see detector ordering)
+    // that yields digits, read leniently through the OCR letter/digit confusions.
+    private static func headlineNumber(_ text: String?) -> Int? {
+        guard let text else { return nil }
+        for line in text.split(whereSeparator: \.isNewline) {
+            if let value = digits(String(line)) { return value }
+        }
+        return nil
+    }
+
+    // Drop spaces (the LED font kerns digits apart), map OCR letter/digit
+    // confusions, then take the longest digit run — this keeps "1 045" → 1045
+    // while discarding trailing words like the "NOTES" in "1174 NOTES".
+    private static func digits(_ text: String) -> Int? {
+        let mapped = text.uppercased()
+            .replacingOccurrences(of: " ", with: "")
+            .map(confusedDigit)
+        var best = "", current = ""
+        for character in mapped {
+            if character.isNumber {
+                current.append(character)
+            } else {
+                if current.count > best.count { best = current }
+                current = ""
+            }
+        }
+        if current.count > best.count { best = current }
+        return best.isEmpty ? nil : Int(best)
     }
 
     // MARK: - Title
@@ -135,21 +188,20 @@ enum IIDXResultParser {
     // first, then fuzzy-match the OCR title within that small set. Filtering makes
     // edit-distance matching safe enough to absorb OCR errors; an unfiltered pool
     // stays strict to avoid false matches, and anything unmatched keeps the raw text.
-    private static func resolveTitle(lines: [OCRLine],
+    private static func resolveTitle(titleText: String?,
                                      songs: [IIDXSongCandidate],
                                      level: IIDXLevel,
                                      difficulty: Int,
                                      playType: IIDXPlayType)
     -> (matched: IIDXSongCandidate?, rawTitle: String?) {
-        guard !songs.isEmpty else {
-            return (nil, rawTitleCandidate(lines))
-        }
+        guard let titleText else { return (nil, nil) }
+        let rawTitle = rawTitleCandidate(titleText)
+        guard !songs.isEmpty else { return (nil, rawTitle) }
 
         let (pool, threshold) = candidatePool(
             songs: songs, level: level, difficulty: difficulty, playType: playType
         )
-
-        let needles = titleNeedles(lines)
+        let needles = titleNeedles(titleText)
 
         for needle in needles {
             if let exact = pool.first(where: { $0.compact == needle }) {
@@ -169,7 +221,7 @@ enum IIDXResultParser {
         if let best {
             return (best.song, nil)
         }
-        return (nil, rawTitleCandidate(lines))
+        return (nil, rawTitle)
     }
 
     // The difficulty number is easily misread (10 -> IO), and it gates the pool,
@@ -193,16 +245,24 @@ enum IIDXResultParser {
         return (songs, 0.15)
     }
 
-    private static func titleNeedles(_ lines: [OCRLine]) -> [String] {
+    private static func titleNeedles(_ text: String) -> [String] {
         var seen = Set<String>()
         var needles: [String] = []
-        for line in lines where isFreeText(line.text) {
-            let needle = line.text.compact
+        let lines = text.split(whereSeparator: \.isNewline).map(String.init) + [text]
+        for line in lines {
+            let needle = line.compact
             if needle.count >= 2, seen.insert(needle).inserted {
                 needles.append(needle)
             }
         }
         return needles
+    }
+
+    private static func rawTitleCandidate(_ text: String) -> String? {
+        let lines = text.split(whereSeparator: \.isNewline)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        return lines.max { $0.count < $1.count } ?? text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private static func editRatio(_ lhs: String, _ rhs: String) -> Double {
@@ -227,40 +287,18 @@ enum IIDXResultParser {
         return previous[rhs.count]
     }
 
-    private static func rawTitleCandidate(_ lines: [OCRLine]) -> String? {
-        let candidates = lines.filter { isFreeText($0.text) }
-        let best = candidates.max { lhs, rhs in
-            if abs(lhs.box.height - rhs.box.height) > 0.005 {
-                return lhs.box.height < rhs.box.height
-            }
-            return lhs.text.count < rhs.text.count
-        }
-        return best?.text.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private static func isFreeText(_ text: String) -> Bool {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.count >= 2 else { return false }
-        let letters = trimmed.unicodeScalars.filter { CharacterSet.letters.contains($0) }
-        guard letters.count >= 2 else { return false }
-        guard intOf(trimmed) == nil, gradeOf(trimmed) == nil, clearTypeOf(trimmed) == nil else {
-            return false
-        }
-        let normalized = normalize(trimmed)
-        return !titleStopwords.contains { normalized.contains($0) }
-    }
-
     // MARK: - Chart / play type
 
-    private static func detectPlayType(lines: [OCRLine]) -> IIDXPlayType {
-        let joined = lines.map { $0.text.uppercased() }.joined(separator: " ")
+    private static func detectPlayType(_ texts: String?...) -> IIDXPlayType {
+        let joined = texts.compactMap { $0 }.joined(separator: " ").uppercased()
         if joined.contains("DOUBLE") || joined.range(of: #"\bDP\b"#, options: .regularExpression) != nil {
             return .double
         }
         return .single
     }
 
-    private static func detectChart(lines: [OCRLine]) -> (IIDXLevel, Int)? {
+    private static func detectChart(_ text: String?) -> (IIDXLevel, Int)? {
+        guard let text else { return nil }
         let labels: [(String, IIDXLevel)] = [
             ("LEGGENDARIA", .leggendaria),
             ("ANOTHER", .another),
@@ -268,89 +306,19 @@ enum IIDXResultParser {
             ("NORMAL", .normal),
             ("BEGINNER", .beginner)
         ]
-        var classLine: OCRLine?
+        let upper = text.uppercased()
         var foundLevel: IIDXLevel = .unknown
-        for line in lines {
-            let upper = line.text.uppercased()
-            for (keyword, level) in labels where upper.contains(keyword) {
-                foundLevel = level
-                classLine = line
-                break
-            }
-            if foundLevel != .unknown { break }
+        for (keyword, level) in labels where upper.contains(keyword) {
+            foundLevel = level
+            break
         }
-        guard foundLevel != .unknown, let classLine else { return nil }
+        guard foundLevel != .unknown else { return nil }
 
         var difficulty = 0
-        for token in tokens(classLine.text) where difficulty == 0 {
+        for token in tokens(text) where difficulty == 0 {
             if let value = difficultyToken(token) { difficulty = value }
         }
-        if difficulty == 0 {
-            var best: (value: Int, deltaX: CGFloat)?
-            for line in lines where onRow(line, label: classLine) && line.box.midX > classLine.box.minX {
-                for token in tokens(line.text) {
-                    guard let value = difficultyToken(token) else { continue }
-                    let deltaX = line.box.midX - classLine.box.maxX
-                    if best == nil || deltaX < best!.deltaX {
-                        best = (value, deltaX)
-                    }
-                }
-            }
-            difficulty = best?.value ?? 0
-        }
         return (foundLevel, difficulty)
-    }
-
-    // MARK: - Judges
-
-    private static func detectGreats(lines: [OCRLine]) -> (Int?, Int?) {
-        var rows: [(midY: CGFloat, value: Int)] = []
-        for line in lines where normalize(line.text).contains("GREAT") {
-            let inline = integers(in: line.text).last
-            if let value = inline ?? rightmostValue(on: line, in: lines, map: scoreOf) {
-                rows.append((line.box.midY, value))
-            }
-        }
-        rows.sort { $0.midY > $1.midY }
-        let perfectGreat = rows.indices.contains(0) ? rows[0].value : nil
-        let great = rows.indices.contains(1) ? rows[1].value : nil
-        return (perfectGreat, great)
-    }
-
-    // MARK: - Row-scoped value lookup
-
-    private static func findLabel(_ lines: [OCRLine], keywords: [String]) -> OCRLine? {
-        let matches = lines.filter { line in
-            let label = normalize(line.text)
-            return keywords.contains { label.contains($0) }
-        }
-        if let exact = matches.first(where: { line in
-            keywords.contains(normalize(line.text))
-        }) {
-            return exact
-        }
-        return matches.first
-    }
-
-    private static func rightmostValue<T>(on label: OCRLine,
-                                          in lines: [OCRLine],
-                                          map: (String) -> T?) -> T? {
-        let maxDeltaX = max(label.box.height * 18.0, 0.42)
-        var best: (midX: CGFloat, value: T)?
-        for line in lines where line.text != label.text {
-            guard onRow(line, label: label) else { continue }
-            guard line.box.midX > label.box.maxX else { continue }
-            guard line.box.midX - label.box.midX < maxDeltaX else { continue }
-            guard let value = map(line.text) else { continue }
-            if best == nil || line.box.midX > best!.midX {
-                best = (line.box.midX, value)
-            }
-        }
-        return best?.value
-    }
-
-    private static func onRow(_ line: OCRLine, label: OCRLine) -> Bool {
-        line.box.maxY > label.box.minY && line.box.minY < label.box.maxY
     }
 
     // MARK: - Value maps
@@ -373,28 +341,11 @@ enum IIDXResultParser {
     }
 
     private static func gradeOf(_ text: String) -> String? {
-        let components = text.uppercased().split(whereSeparator: { $0 == " " || $0 == "\t" })
+        let components = text.uppercased().split(whereSeparator: { $0 == " " || $0 == "\t" || $0 == "\n" })
         for grade in grades where components.contains(where: { $0 == Substring(grade) }) {
             return grade
         }
         return nil
-    }
-
-    private static func intOf(_ text: String) -> Int? {
-        let cleaned = text.uppercased().filter { $0 != " " && $0 != "," && $0 != "+" }
-        guard !cleaned.isEmpty else { return nil }
-        let mapped = String(cleaned.map(confusedDigit))
-        guard mapped.allSatisfy({ $0.isNumber }), let value = Int(mapped) else { return nil }
-        return value
-    }
-
-    // A metric row carries best (old, left) and this-play (new, right) values.
-    // When OCR merges both columns into one line ("999 9999"), split on whitespace
-    // and keep the rightmost number so the new value still wins.
-    private static func scoreOf(_ text: String) -> Int? {
-        text.split(whereSeparator: { $0 == " " || $0 == "\t" })
-            .compactMap { intOf(String($0)) }
-            .last
     }
 
     private static func confusedDigit(_ character: Character) -> Character {
@@ -409,31 +360,10 @@ enum IIDXResultParser {
         }
     }
 
-    private static func detectClearTypeGlobal(_ lines: [OCRLine]) -> String {
-        let joined = lines.map { normalize($0.text) }.joined(separator: " ")
-        let ordered: [(String, IIDXClearType)] = [
-            ("FULLCOMBO", .fullComboClear),
-            ("EXHARD", .exHardClear),
-            ("HARDCLEAR", .hardClear),
-            ("EASYCLEAR", .easyClear),
-            ("ASSIST", .assistClear),
-            ("FAILED", .failed),
-            ("CLEAR", .clear)
-        ]
-        for (keyword, type) in ordered where joined.contains(keyword) {
-            return type.rawValue
-        }
-        return IIDXClearType.noPlay.rawValue
-    }
-
     // MARK: - Text helpers
 
-    private static func integers(in text: String) -> [Int] {
-        text.split(whereSeparator: { !$0.isNumber }).compactMap { Int($0) }
-    }
-
     private static func tokens(_ text: String) -> [String] {
-        text.split(whereSeparator: { $0 == " " || $0 == "\t" }).map(String.init)
+        text.split(whereSeparator: { $0 == " " || $0 == "\t" || $0 == "\n" }).map(String.init)
     }
 
     // Recover a 1-12 difficulty from a token, mapping common OCR letter/digit
@@ -452,5 +382,6 @@ enum IIDXResultParser {
             .replacingOccurrences(of: " ", with: "")
             .replacingOccurrences(of: "-", with: "")
             .replacingOccurrences(of: ":", with: "")
+            .replacingOccurrences(of: "\n", with: "")
     }
 }
