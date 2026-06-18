@@ -2,12 +2,19 @@ import AVFoundation
 import PhotosUI
 import SwiftUI
 
+private struct CropPreviewItem: Identifiable {
+    let id = UUID()
+    let data: Data
+}
+
 struct ActiveSessionView: View {
     var store: SessionStore
 
     @State private var isPresentingCamera: Bool = false
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isShowingCameraDeniedAlert: Bool = false
+    @State private var cropQueue: [Data] = []
+    @State private var currentCropItem: CropPreviewItem? = nil
     @ObservedObject private var workoutBridge = SessionWorkoutBridge.shared
 
     var body: some View {
@@ -16,7 +23,9 @@ struct ActiveSessionView: View {
                 header
                 Divider()
                 playList
-                captureBar
+                    .safeAreaInset(edge: .bottom) {
+                        captureBar
+                    }
             }
             .background {
                 LinearGradient(
@@ -51,7 +60,6 @@ struct ActiveSessionView: View {
             } onCancel: {
                 isPresentingCamera = false
             }
-            .ignoresSafeArea()
         }
         .onChange(of: pickerItems) { _, items in
             guard !items.isEmpty else { return }
@@ -60,6 +68,16 @@ struct ActiveSessionView: View {
         .onReceive(NotificationCenter.default.publisher(for: .capturedPlayDidChange)
             .receive(on: RunLoop.main)) { _ in
             store.refreshPlays()
+        }
+        .fullScreenCover(item: $currentCropItem) { item in
+            SessionCropPreviewView(imageData: item.data) { processedData in
+                store.capture(processedData, source: .picker)
+                currentCropItem = nil
+                showNextCrop()
+            } onRetake: {
+                currentCropItem = nil
+                showNextCrop()
+            }
         }
         .alert("Sessions.Camera.Denied.Title", isPresented: $isShowingCameraDeniedAlert) {
             Button("Shared.OK", role: .cancel) {}
@@ -207,11 +225,19 @@ struct ActiveSessionView: View {
         Task {
             for item in items {
                 if let data = try? await item.loadTransferable(type: Data.self) {
-                    await MainActor.run { store.capture(data, source: .picker) }
+                    await MainActor.run {
+                        cropQueue.append(data)
+                        if currentCropItem == nil { showNextCrop() }
+                    }
                 }
             }
             await MainActor.run { pickerItems = [] }
         }
+    }
+
+    private func showNextCrop() {
+        guard !cropQueue.isEmpty else { return }
+        currentCropItem = CropPreviewItem(data: cropQueue.removeFirst())
     }
 
     private func elapsedString(since start: Date, now: Date) -> String {

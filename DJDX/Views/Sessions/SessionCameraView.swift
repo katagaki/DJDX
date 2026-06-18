@@ -1,7 +1,29 @@
 import AVFoundation
 import SwiftUI
 
-struct SessionCameraView: UIViewControllerRepresentable {
+struct SessionCameraView: View {
+    var onCapture: (Data) -> Void
+    var onCancel: () -> Void
+
+    @State private var capturedData: Data?
+
+    var body: some View {
+        if let capturedData {
+            SessionCropPreviewView(imageData: capturedData) { processedData in
+                onCapture(processedData)
+            } onRetake: {
+                self.capturedData = nil
+            }
+        } else {
+            CameraPreviewView(onCapture: { data in
+                capturedData = data
+            }, onCancel: onCancel)
+            .ignoresSafeArea()
+        }
+    }
+}
+
+private struct CameraPreviewView: UIViewControllerRepresentable {
     var onCapture: (Data) -> Void
     var onCancel: () -> Void
 
@@ -31,9 +53,7 @@ final class CameraCaptureController: UIViewController {
         view.backgroundColor = .black
         configurePreview()
         configureControls()
-        sessionQueue.async { [weak self] in
-            self?.configureSession()
-        }
+        sessionQueue.async { [weak self] in self?.configureSession() }
     }
 
     override func viewWillAppear(_ animated: Bool) {
