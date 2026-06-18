@@ -12,6 +12,8 @@ private enum DragMode: Equatable {
 struct LabelEditorView: View {
     @Environment(AppModel.self) private var model
 
+    var trailingInset: CGFloat = 0
+
     @State private var cgImage: CGImage?
     @State private var pixelSize: CGSize = .zero
     @State private var dragMode: DragMode?
@@ -20,31 +22,93 @@ struct LabelEditorView: View {
     @State private var previewRect: CGRect?
     @FocusState private var focused: Bool
 
+    @State private var zoom: CGFloat = 1
+    @State private var pan: CGSize = .zero
+    @State private var containerSize: CGSize = .zero
+    @GestureState private var gestureZoom: CGFloat = 1
+    @GestureState private var gesturePan: CGSize = .zero
+
+    private var effectiveZoom: CGFloat { Zoom.clamp(zoom * gestureZoom) }
+    private var effectivePan: CGSize {
+        CGSize(width: pan.width + gesturePan.width, height: pan.height + gesturePan.height)
+    }
+
     var body: some View {
         GeometryReader { geo in
-            let geom = EditorGeometry(container: geo.size, imagePixelSize: pixelSize)
+            // Reserve space on the right so the image never sits under the
+            // floating Classes panel; the dark background still fills edge to edge.
+            let area = CGSize(width: max(0, geo.size.width - trailingInset), height: geo.size.height)
+            let geom = EditorGeometry(container: area, imagePixelSize: pixelSize,
+                                      zoom: effectiveZoom, pan: effectivePan)
             ZStack {
                 Color(nsColor: .underPageBackgroundColor)
                 if let cgImage {
                     Image(decorative: cgImage, scale: 1, orientation: .up)
                         .resizable()
                         .frame(width: geom.displaySize.width, height: geom.displaySize.height)
-                        .position(x: geo.size.width / 2, y: geo.size.height / 2)
+                        .position(x: geom.offset.x + geom.displaySize.width / 2,
+                                  y: geom.offset.y + geom.displaySize.height / 2)
                     Canvas { ctx, _ in draw(in: ctx, geom: geom) }
                 } else {
                     ContentUnavailableView("No image", systemImage: "photo")
                 }
             }
             .contentShape(Rectangle())
+            .overlay { ScrollCatcher { applyScroll($0) } }
+            .highPriorityGesture(panGesture)
             .gesture(drag(geom: geom))
+            .simultaneousGesture(magnifyGesture)
             .focusable()
             .focused($focused)
             .focusEffectDisabled()
             .onKeyPress { handleKey($0) }
+            .overlay(alignment: .bottomTrailing) {
+                ZoomControls(zoom: $zoom, pan: $pan).padding(.trailing, trailingInset)
+            }
+            .onChange(of: area) { containerSize = area }
+            .onAppear { containerSize = area }
         }
         .task(id: model.currentImageURL) { await loadImage() }
-        .onChange(of: model.currentImageURL) { previewRect = nil; dragMode = nil }
+        .onChange(of: model.currentImageURL) {
+            previewRect = nil; dragMode = nil; zoom = 1; pan = .zero
+        }
         .onAppear { focused = true }
+    }
+
+    // MARK: - Zoom / pan gestures
+
+    private var magnifyGesture: some Gesture {
+        MagnificationGesture()
+            .updating($gestureZoom) { value, state, _ in state = value }
+            .onEnded { value in
+                zoom = Zoom.clamp(zoom * value)
+                if zoom == 1 { pan = .zero }
+            }
+    }
+
+    // Hold ⌥ Option and drag to pan, leaving plain drag for box editing.
+    private var panGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .modifiers(.option)
+            .updating($gesturePan) { value, state, _ in state = value.translation }
+            .onEnded { value in
+                let raw = CGSize(width: pan.width + value.translation.width,
+                                 height: pan.height + value.translation.height)
+                let display = CGSize(width: pixelFit().width * zoom, height: pixelFit().height * zoom)
+                pan = EditorGeometry.clampPan(raw, container: containerSize, display: display)
+            }
+    }
+
+    private func pixelFit() -> CGSize {
+        EditorGeometry(container: containerSize, imagePixelSize: pixelSize).baseSize
+    }
+
+    private func applyScroll(_ delta: CGSize) {
+        guard zoom > 1 else { return }
+        let base = pixelFit()
+        let display = CGSize(width: base.width * zoom, height: base.height * zoom)
+        let raw = CGSize(width: pan.width + delta.width, height: pan.height + delta.height)
+        pan = EditorGeometry.clampPan(raw, container: containerSize, display: display)
     }
 
     // MARK: - Drawing
@@ -58,8 +122,8 @@ struct LabelEditorView: View {
 
             var tag = box.cls
             if let c = box.conf { tag += String(format: " %.2f", c) }
-            let text = Text(tag).font(.system(size: 11, weight: selected ? .bold : .regular)).foregroundStyle(color)
-            ctx.draw(text, at: CGPoint(x: rect.minX + 4, y: rect.minY + 9), anchor: .leading)
+            ctx.drawTag(tag, color: color, topLeft: CGPoint(x: rect.minX + 1, y: rect.minY + 1),
+                        bold: selected)
 
             if selected {
                 for c in corners(rect) {
@@ -183,9 +247,14 @@ struct LabelEditorView: View {
         default: break
         }
         let ch = press.characters
+        if ch == "=" || ch == "+" { zoom = Zoom.clamp(zoom * Zoom.step); return .handled }
+        if ch == "-" || ch == "_" {
+            zoom = Zoom.clamp(zoom / Zoom.step); if zoom == 1 { pan = .zero }; return .handled
+        }
         if ch == "/" { model.cycleSelectedClass(); return .handled }
-        if let digit = Int(ch), (0...9).contains(digit) {
-            let idx = (digit + 9) % 10   // 1..9 -> 0..8, 0 -> 9
+        // Assign classes by running across the keyboard: number row → top 10
+        // classes, then QWERTY row, then the home row.
+        if ch.count == 1, let idx = Schema.classHotkeyOrder.firstIndex(of: Character(ch.lowercased())) {
             let classes = model.schema.labelClasses
             if idx < classes.count { model.assignClassToSelection(classes[idx]) }
             return .handled

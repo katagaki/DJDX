@@ -13,7 +13,7 @@
 Icon?
 
 # ---- Model input images ----
-data/
+Inputs/
 
 # ---- Python / uv ----
 .venv/
@@ -24,11 +24,28 @@ __pycache__/
 *.egg-info/
 .eggs/
 build/
-dist/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .python-version
+.uv-cache/
+
+# Compiled OCR helper binary (rebuilt from Training/scripts/ocr_helper.swift)
+.cache/
+
+# ---- Generated training artefacts (re-derivable from labels + scripts) ----
+Training/dataset/
+Training/models/
+Training/rank_classifier_data/
+Training/clear_type_data/
+Training/runs/
+*.pt
+
+# ---- Outputs: keep the exported CoreML model, ignore regenerable bits ----
+Outputs/label_preview/
+Outputs/predictions.json
+Outputs/*.app/
+*.mlpackage
 
 # ---- Swift / Xcode ----
 .build/

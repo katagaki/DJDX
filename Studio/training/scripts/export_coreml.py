@@ -67,13 +67,17 @@ def main() -> None:
 
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", choices=["detector", "rank", "clear_type"])
+    ap.add_argument("--detector-name", default=None,
+                    help="override the detector .mlpackage base name "
+                         "(e.g. an evaluation model staged beside production)")
     args = ap.parse_args()
 
     OUTPUT_DIR.mkdir(exist_ok=True)
+    detector_name = args.detector_name or cml["detector_output_name"]
     targets = {
         "detector": (
             MODELS_DIR / "detector" / "weights" / "best.pt",
-            cml["detector_output_name"],
+            detector_name,
             schema["detector"]["classes"],
             schema["training"]["detector"]["image_size"],
         ),

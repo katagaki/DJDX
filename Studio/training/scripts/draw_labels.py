@@ -16,8 +16,8 @@ import argparse
 import json
 from pathlib import Path
 
-from _common import DATA_DIR, LABELS_FILE, OUTPUT_DIR
-from PIL import Image, ImageDraw, ImageFont
+from _common import DATA_DIR, LABELS_FILE, OUTPUT_DIR, load_upright
+from PIL import ImageDraw, ImageFont
 
 PREVIEW_DIR = OUTPUT_DIR / "label_preview"
 OUTLINE_COLOR = "#ff2222"
@@ -53,7 +53,7 @@ def _box_corners(b: dict, iw: int, ih: int) -> list[tuple[int, int]]:
 
 
 def draw_one(image_path: Path, boxes: list[dict], out_path: Path) -> None:
-    im = Image.open(image_path).convert("RGB")
+    im = load_upright(image_path)
     iw, ih = im.size
     draw = ImageDraw.Draw(im)
 

@@ -28,8 +28,8 @@ from _common import (
     RANK_CLS_DIR,
     TRAINING_DIR,
     load_schema,
+    load_upright,
 )
-from PIL import Image
 
 
 def load_labels(path: Path | None) -> dict[str, list[dict]]:
@@ -79,16 +79,16 @@ def emit_classifier_crops(items: list[tuple[str, list[dict]]],
         src = DATA_DIR / name
         if not src.exists():
             continue
-        with Image.open(src) as im:
-            iw, ih = im.size
-            for i, b in enumerate(boxes):
-                if b["cls"] != roi_class:
-                    continue
-                x, y, w, h = _aabb(b)
-                im.crop((
-                    int(x * iw), int(y * ih),
-                    int((x + w) * iw), int((y + h) * ih),
-                )).save(pending / f"{Path(name).stem}__{i}.jpg")
+        im = load_upright(src)
+        iw, ih = im.size
+        for i, b in enumerate(boxes):
+            if b["cls"] != roi_class:
+                continue
+            x, y, w, h = _aabb(b)
+            im.crop((
+                int(x * iw), int(y * ih),
+                int((x + w) * iw), int((y + h) * ih),
+            )).save(pending / f"{Path(name).stem}__{i}.jpg")
 
 
 def main() -> None:
@@ -143,6 +143,8 @@ def main() -> None:
         "test":  items[n_train + n_val:n_train + n_val + n_test],
     }
 
+    from PIL import Image as _Image  # noqa: N813
+
     for split, group in splits.items():
         for name, boxes in group:
             src = DATA_DIR / name
@@ -150,8 +152,15 @@ def main() -> None:
                 print(f"  missing: {name}, skipping")
                 continue
             dst_img = DATASET_DIR / "images" / split / name
-            with contextlib.suppress(FileExistsError):
-                dst_img.symlink_to(src.resolve())
+            # If the photo has a non-trivial EXIF orientation, bake an upright
+            # copy so the trainer sees the same pixels as predict/draw_labels.
+            # Otherwise symlink to save disk.
+            orientation = _Image.open(src).getexif().get(274, 1)
+            if orientation != 1:
+                load_upright(src).save(dst_img, quality=95)
+            else:
+                with contextlib.suppress(FileExistsError):
+                    dst_img.symlink_to(src.resolve())
             label_path = DATASET_DIR / "labels" / split / f"{Path(name).stem}.txt"
             write_yolo_label(label_path, boxes, class_to_id)
         print(f"  {split}: {len(group)} images")

@@ -1,17 +1,18 @@
 import Foundation
 
-// On-disk layout of a project, relative to a root containing data/ and
-// training/. Paths mirror training/scripts/_common.py.
+// On-disk layout, relative to the repo root. The Swift studio app lives at the
+// root; Python training modules live under Training/; inputs/ and outputs/ are
+// shared working dirs. Paths mirror Training/scripts/_common.py.
 struct ProjectPaths: Equatable {
     let root: URL
 
-    var dataDir: URL { root.appending(path: "data", directoryHint: .isDirectory) }
-    var trainingDir: URL { root.appending(path: "training", directoryHint: .isDirectory) }
+    var dataDir: URL { root.appending(path: "Inputs", directoryHint: .isDirectory) }
+    var trainingDir: URL { root.appending(path: "Training", directoryHint: .isDirectory) }
     var schemaFile: URL { trainingDir.appending(path: "schema.yaml") }
     var labelsDir: URL { trainingDir.appending(path: "labels", directoryHint: .isDirectory) }
     var labelsFile: URL { labelsDir.appending(path: "labels.json") }
     var autoSeedFile: URL { labelsDir.appending(path: "auto_seed.json") }
-    var outputDir: URL { trainingDir.appending(path: "output", directoryHint: .isDirectory) }
+    var outputDir: URL { root.appending(path: "Outputs", directoryHint: .isDirectory) }
     var predictionsFile: URL { outputDir.appending(path: "predictions.json") }
     var previewDir: URL { outputDir.appending(path: "label_preview", directoryHint: .isDirectory) }
     var modelsDir: URL { trainingDir.appending(path: "models", directoryHint: .isDirectory) }

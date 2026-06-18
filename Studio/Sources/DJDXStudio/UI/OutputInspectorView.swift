@@ -9,9 +9,21 @@ struct OutputInspectorView: View {
     @State private var source: Source = .labels
     @State private var note: String = ""
 
+    @State private var zoom: CGFloat = 1
+    @State private var pan: CGSize = .zero
+    @State private var containerSize: CGSize = .zero
+    @GestureState private var gestureZoom: CGFloat = 1
+    @GestureState private var gesturePan: CGSize = .zero
+
+    private var effectiveZoom: CGFloat { Zoom.clamp(zoom * gestureZoom) }
+    private var effectivePan: CGSize {
+        CGSize(width: pan.width + gesturePan.width, height: pan.height + gesturePan.height)
+    }
+
     enum Source: String, CaseIterable, Identifiable {
         case labels = "labels.json"
         case predictions = "predictions.json"
+        case coreml = "CoreML (live)"
         var id: String { rawValue }
     }
 
@@ -19,14 +31,16 @@ struct OutputInspectorView: View {
         VStack(spacing: 8) {
             header
             GeometryReader { geo in
-                let geom = EditorGeometry(container: geo.size, imagePixelSize: pixelSize)
+                let geom = EditorGeometry(container: geo.size, imagePixelSize: pixelSize,
+                                          zoom: effectiveZoom, pan: effectivePan)
                 ZStack {
                     Color(nsColor: .underPageBackgroundColor)
                     if let cgImage {
                         Image(decorative: cgImage, scale: 1, orientation: .up)
                             .resizable()
                             .frame(width: geom.displaySize.width, height: geom.displaySize.height)
-                            .position(x: geo.size.width / 2, y: geo.size.height / 2)
+                            .position(x: geom.offset.x + geom.displaySize.width / 2,
+                                      y: geom.offset.y + geom.displaySize.height / 2)
                         Canvas { ctx, _ in
                             for box in boxesToShow {
                                 let rect = geom.rect(for: box)
@@ -34,18 +48,58 @@ struct OutputInspectorView: View {
                                 ctx.stroke(Path(rect), with: .color(color), lineWidth: 2)
                                 var tag = box.cls
                                 if let c = box.conf { tag += String(format: " %.2f", c) }
-                                ctx.draw(Text(tag).font(.system(size: 10)).foregroundStyle(color),
-                                         at: CGPoint(x: rect.minX + 3, y: rect.minY + 8), anchor: .leading)
+                                ctx.drawTag(tag, color: color,
+                                            topLeft: CGPoint(x: rect.minX + 1, y: rect.minY + 1),
+                                            fontSize: 10)
                             }
                         }
                     } else {
                         ContentUnavailableView("No image", systemImage: "photo")
                     }
                 }
+                .contentShape(Rectangle())
+                .overlay { ScrollCatcher { applyScroll($0) } }
+                .gesture(panGesture)
+                .simultaneousGesture(magnifyGesture)
+                .overlay(alignment: .bottomTrailing) {
+                    if cgImage != nil { ZoomControls(zoom: $zoom, pan: $pan) }
+                }
+                .onChange(of: geo.size) { containerSize = geo.size }
+                .onAppear { containerSize = geo.size }
             }
         }
         .padding()
         .task(id: refreshKey) { await refresh() }
+        .onChange(of: model.currentImageURL) { zoom = 1; pan = .zero }
+    }
+
+    private var magnifyGesture: some Gesture {
+        MagnificationGesture()
+            .updating($gestureZoom) { value, state, _ in state = value }
+            .onEnded { value in
+                zoom = Zoom.clamp(zoom * value)
+                if zoom == 1 { pan = .zero }
+            }
+    }
+
+    private var panGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .updating($gesturePan) { value, state, _ in state = value.translation }
+            .onEnded { value in
+                let raw = CGSize(width: pan.width + value.translation.width,
+                                 height: pan.height + value.translation.height)
+                let base = EditorGeometry(container: containerSize, imagePixelSize: pixelSize).baseSize
+                let display = CGSize(width: base.width * zoom, height: base.height * zoom)
+                pan = EditorGeometry.clampPan(raw, container: containerSize, display: display)
+            }
+    }
+
+    private func applyScroll(_ delta: CGSize) {
+        guard zoom > 1 else { return }
+        let base = EditorGeometry(container: containerSize, imagePixelSize: pixelSize).baseSize
+        let display = CGSize(width: base.width * zoom, height: base.height * zoom)
+        let raw = CGSize(width: pan.width + delta.width, height: pan.height + delta.height)
+        pan = EditorGeometry.clampPan(raw, container: containerSize, display: display)
     }
 
     private var refreshKey: String {
@@ -111,8 +165,33 @@ struct OutputInspectorView: View {
                 predictions = boxes
             } else {
                 predictions = []
-                note = "No predictions.json entry for this image (run scripts/predict.py)."
+                note = "No predictions.json entry for this image (run Training/scripts/predict.py)."
             }
+        } else if source == .coreml {
+            await runCoreML(on: url)
+        }
+    }
+
+    private func runCoreML(on url: URL) async {
+        guard let p = model.paths else { predictions = []; return }
+        let modelURL = p.outputDir.appending(path: "DJDXResultDetector.mlpackage")
+        guard FileManager.default.fileExists(atPath: modelURL.path) else {
+            predictions = []
+            note = "Detector model not found — run Export CoreML (export_coreml.py)."
+            return
+        }
+        note = "Running CoreML…"
+        let schema = model.schema
+        do {
+            let boxes = try await Task.detached { () throws -> [Box] in
+                guard let cg = ImageDecoder.load(url) else { return [] }
+                return try CoreMLPipeline.detect(cg, modelURL: modelURL, schema: schema)
+            }.value
+            predictions = boxes
+            note = "CoreML: \(boxes.count) detections"
+        } catch {
+            predictions = []
+            note = "CoreML error: \(error.localizedDescription)"
         }
     }
 

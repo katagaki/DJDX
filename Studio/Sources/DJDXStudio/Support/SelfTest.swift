@@ -49,6 +49,24 @@ enum SelfTest {
             } catch {
                 print("label round-trip FAILED: \(error.localizedDescription)")
             }
+
+            // Live CoreML detector, if the exported model is present.
+            let modelURL = paths.outputDir.appending(path: "DJDXResultDetector.mlpackage")
+            if FileManager.default.fileExists(atPath: modelURL.path) {
+                if let cg = ImageDecoder.load(first) {
+                    do {
+                        let schema = (try? SchemaLoader.load(from: paths.schemaFile)) ?? .placeholder
+                        let dets = try CoreMLPipeline.detect(cg, modelURL: modelURL, schema: schema)
+                        let counts = Dictionary(grouping: dets, by: \.cls).mapValues(\.count)
+                        print("CoreML detect: \(dets.count) boxes")
+                        print("  classes: \(counts.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: ", "))")
+                    } catch {
+                        print("CoreML detect FAILED: \(error.localizedDescription)")
+                    }
+                }
+            } else {
+                print("CoreML detect: skipped (no DJDXResultDetector.mlpackage)")
+            }
         }
         print("selftest done")
     }

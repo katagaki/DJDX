@@ -17,7 +17,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from _common import MODELS_DIR, RANK_CLS_DIR, TRAINING_DIR, load_schema
+from _common import MODELS_DIR, RANK_CLS_DIR, TRAINING_DIR, best_device, load_schema
 from ultralytics import YOLO
 
 
@@ -34,6 +34,8 @@ def main() -> None:
     ap.add_argument("--batch",  type=int)
     ap.add_argument("--imgsz",  type=int)
     ap.add_argument("--data",   type=Path)
+    ap.add_argument("--device", default=best_device(),
+                    help="Training device (e.g. mps, cpu, 0). Defaults to the GPU when available.")
     args = ap.parse_args()
 
     if args.target == "rank":
@@ -57,6 +59,7 @@ def main() -> None:
         epochs=args.epochs or hp["epochs"],
         batch=args.batch or hp["batch"],
         imgsz=args.imgsz or hp["image_size"],
+        device=args.device,
         project=str(MODELS_DIR),
         name=run_name,
         exist_ok=True,

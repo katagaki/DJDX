@@ -7,13 +7,15 @@ cd "$(dirname "$0")/.."
 
 APP_NAME="DJDX PEAK Studio"
 BUILD_DIR=".build/release"
-DIST_DIR=".build/dist"
+# Build intermediates live in .build; the finished .app ships to Outputs/.
+DIST_DIR="Outputs"
 APP="${DIST_DIR}/${APP_NAME}.app"
 
 echo "› swift build -c release"
 swift build -c release
 
 echo "› assembling ${APP}"
+mkdir -p "${DIST_DIR}"
 rm -rf "${APP}"
 mkdir -p "${APP}/Contents/MacOS" "${APP}/Contents/Resources"
 

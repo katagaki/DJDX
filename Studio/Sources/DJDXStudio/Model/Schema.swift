@@ -13,6 +13,14 @@ struct Schema: Sendable, Equatable {
 
     var labelClasses: [String] { detectorClasses + [Self.unlabeledText] }
 
+    // Class-assignment hotkeys run across the keyboard: number row, then QWERTY,
+    // then the home row. Index N in labelClasses maps to character N here.
+    static let classHotkeyOrder = Array("1234567890qwertyuiopasdfghjkl")
+
+    static func hotkey(for index: Int) -> String? {
+        index < classHotkeyOrder.count ? String(classHotkeyOrder[index]) : nil
+    }
+
     static let placeholder = Schema(
         detectorClasses: [], rankClasses: [], clearTypeClasses: [], detectorImageSize: 960
     )

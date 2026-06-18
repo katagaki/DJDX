@@ -58,10 +58,13 @@ clear_type_classifier:
 training:
   detector:
     base_weights: yolov8n.pt   # nano: fast, ~3M params, plenty for ~22 classes on 184 imgs
-    image_size: 960            # screens are detail-rich; bump up from 640
+    image_size: 768            # detector only localises ROIs (reading is downstream), so 768
+                               # is ~36% faster than 960 with negligible detection-accuracy loss
     epochs: 200
-    batch: 8
-    patience: 30               # early stop
+    batch: 16                  # M5 Pro unified memory handles this; better GPU utilisation than 4
+    cache: ram                 # 80 imgs fit in RAM — skip disk reads every epoch
+    workers: 8
+    patience: 20               # early stop — converges fast via transfer learning
     augmentations:
       mosaic: 0.5
       mixup: 0.0

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 
-from _common import DATASET_DIR, MODELS_DIR, load_schema
+from _common import DATASET_DIR, MODELS_DIR, best_device, load_schema
 from ultralytics import YOLO
 
 
@@ -17,6 +17,11 @@ def main() -> None:
     ap.add_argument("--batch",  type=int, default=hp["batch"])
     ap.add_argument("--imgsz",  type=int, default=hp["image_size"])
     ap.add_argument("--weights", default=hp["base_weights"])
+    ap.add_argument("--device", default=best_device(),
+                    help="Training device (e.g. mps, cpu, 0). Defaults to the GPU when available.")
+    ap.add_argument("--cache", default=hp.get("cache", "ram"),
+                    help="Image cache: 'ram', 'disk', or '' to disable. RAM is fastest for small sets.")
+    ap.add_argument("--workers", type=int, default=hp.get("workers", 8))
     ap.add_argument("--resume", action="store_true")
     args = ap.parse_args()
 
@@ -32,6 +37,9 @@ def main() -> None:
         epochs=args.epochs,
         batch=args.batch,
         imgsz=args.imgsz,
+        device=args.device,
+        cache=(args.cache or False),
+        workers=args.workers,
         patience=hp["patience"],
         project=str(MODELS_DIR),
         name="detector",

@@ -16,10 +16,14 @@ struct ClassPaletteView: View {
                             model.assignClassToSelection(cls)
                         } label: {
                             HStack(spacing: 6) {
-                                Text(hotkey(i)).font(.caption.monospaced())
-                                    .frame(width: 14)
                                 Text(cls).lineLimit(1)
                                 Spacer()
+                                if let key = Schema.hotkey(for: i) {
+                                    Text(key.uppercased())
+                                        .font(.caption.monospaced().bold())
+                                        .padding(.horizontal, 5).padding(.vertical, 1)
+                                        .background(.black.opacity(0.18), in: RoundedRectangle(cornerRadius: 4))
+                                }
                             }
                             .padding(.vertical, 4).padding(.horizontal, 8)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -36,9 +40,8 @@ struct ClassPaletteView: View {
                 .padding(.horizontal, 8)
             }
         }
-    }
-
-    private func hotkey(_ i: Int) -> String {
-        i < 10 ? "\((i + 1) % 10)" : " "
+        .padding(.bottom, 8)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }

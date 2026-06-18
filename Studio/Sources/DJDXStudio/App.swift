@@ -6,9 +6,12 @@ struct DJDXStudioApp: App {
 
     init() {
         SelfTest.runIfRequested()
-        let root = ProjectRootStore.load() ?? ProjectRootStore.fallback
         let m = model
-        if ProjectPaths(root: root).looksValid {
+        // Prefer a saved root, but ignore it if it no longer validates (e.g. an
+        // older layout from before the Inputs/Training restructure), then try
+        // the default location.
+        let candidates = [ProjectRootStore.load(), ProjectRootStore.fallback].compactMap { $0 }
+        if let root = candidates.first(where: { ProjectPaths(root: $0).looksValid }) {
             m.configure(root: root)
         }
     }
@@ -31,6 +34,10 @@ struct DJDXStudioApp: App {
             CommandMenu("Image") {
                 Button("Next") { model.next() }.keyboardShortcut(.rightArrow, modifiers: [])
                 Button("Previous") { model.prev() }.keyboardShortcut(.leftArrow, modifiers: [])
+                Divider()
+                Button("Delete Label") { model.deleteSelected() }
+                    .keyboardShortcut(.delete, modifiers: [])
+                    .disabled(model.selectedBoxID == nil)
             }
         }
     }

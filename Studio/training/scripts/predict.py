@@ -17,7 +17,15 @@ import argparse
 import json
 from pathlib import Path
 
-from _common import DATA_DIR, LABELS_FILE, MODELS_DIR, OUTPUT_DIR, iter_images, load_schema
+from _common import (
+    DATA_DIR,
+    LABELS_FILE,
+    MODELS_DIR,
+    OUTPUT_DIR,
+    iter_images,
+    load_schema,
+    load_upright,
+)
 from ultralytics import YOLO
 
 DEFAULT_OUT = OUTPUT_DIR / "predictions.json"
@@ -54,11 +62,97 @@ def dedupe_per_class(boxes: list[dict], iou_threshold: float = 0.4) -> list[dict
     return kept
 
 
+# Mutually exclusive class pairs — these occupy the LEFT vs RIGHT cells of
+# the same result row, so a true _prev and true _now never overlap. If the
+# model predicts both at the same position, one is wrong; keep the higher conf.
+EXCLUSIVE_PAIRS = [
+    ("clear_type_prev", "clear_type_now"),
+    ("score_prev",      "score_now"),
+    ("miss_count_prev", "miss_count_now"),
+    ("dj_level_prev",   "dj_level_now"),
+]
+
+
+# Classes that live in specific regions of the screen. Any detection
+# outside its expected region is almost certainly a false positive from
+# the right-side leaderboard / rival panel / character art.
+_LEFT_TABLE_CLASSES = {
+    "clear_type_prev", "clear_type_now",
+    "dj_level_prev", "dj_level_now",
+    "score_prev", "score_now", "score_delta",
+    "miss_count_prev", "miss_count_now", "miss_count_delta",
+    "pacemaker_aa",
+    "judge_pgreat", "judge_great", "judge_good", "judge_bad", "judge_poor",
+}
+_BOTTOM_INFO_CLASSES = {
+    "song_title", "song_artist", "difficulty_label", "notes_count",
+}
+
+
+def positional_filter(boxes: list[dict]) -> list[dict]:
+    """Drop predictions outside their expected screen region.
+    The right-side leaderboard panel often gets false positives."""
+    out = []
+    for b in boxes:
+        cls = b["cls"]
+        x, y, w = b["x"], b["y"], b["w"]
+        x_end = x + w
+        if cls in _LEFT_TABLE_CLASSES and x_end > 0.60:
+            continue   # result-table classes only on the left half
+        if cls in _BOTTOM_INFO_CLASSES and y < 0.75:
+            continue   # song info / difficulty only in bottom band
+        if cls == "stage_label" and (y > 0.20 or w < 0.10 or x > 0.70):
+            continue   # stage banner: top, wide, left of right-edge
+        out.append(b)
+    return out
+
+
+def enforce_singletons(boxes: list[dict]) -> list[dict]:
+    """Every field on a result screen appears exactly once, so keep only the
+    highest-confidence detection per class. Catches non-overlapping duplicates
+    that NMS can't (e.g. dj_level_prev firing on both row glyphs)."""
+    best: dict[str, dict] = {}
+    for b in boxes:
+        cur = best.get(b["cls"])
+        if cur is None or b.get("conf", 0) > cur.get("conf", 0):
+            best[b["cls"]] = b
+    return list(best.values())
+
+
+def dedupe_cross_class(boxes: list[dict], iou_threshold: float = 0.4) -> list[dict]:
+    """For each mutually-exclusive class pair, if a box of class A overlaps a
+    box of class B by more than ``iou_threshold``, drop the lower-confidence
+    one. Resolves "model can't decide between prev and now at this position"."""
+    drop: set[int] = set()
+    for a_cls, b_cls in EXCLUSIVE_PAIRS:
+        a_idx = [i for i, b in enumerate(boxes) if b["cls"] == a_cls]
+        b_idx = [i for i, b in enumerate(boxes) if b["cls"] == b_cls]
+        for i in a_idx:
+            for j in b_idx:
+                if i in drop or j in drop:
+                    continue
+                if _iou(boxes[i], boxes[j]) > iou_threshold:
+                    loser = i if boxes[i].get("conf", 0) < boxes[j].get("conf", 0) else j
+                    drop.add(loser)
+    return [b for i, b in enumerate(boxes) if i not in drop]
+
+
+EXCLUDE_FILE = LABELS_FILE.parent / "exclude.json"
+
+
+def _excluded() -> set[str]:
+    """Image filenames to skip entirely (outliers, unusable crops)."""
+    if EXCLUDE_FILE.exists():
+        return set(json.loads(EXCLUDE_FILE.read_text()))
+    return set()
+
+
 def _unlabelled(n: int) -> list[Path]:
     labelled = set(json.loads(LABELS_FILE.read_text()).keys()) if LABELS_FILE.exists() else set()
+    skip = labelled | _excluded()
     out = []
     for p in iter_images(DATA_DIR):
-        if p.name in labelled:
+        if p.name in skip:
             continue
         out.append(p)
         if len(out) >= n:
@@ -67,17 +161,18 @@ def _unlabelled(n: int) -> list[Path]:
 
 
 def predict(images: list[Path], weights: Path, conf: float = 0.15,
-            dedupe_iou: float = 0.4) -> dict[str, list[dict]]:
+            dedupe_iou: float = 0.4, singletons: bool = True) -> dict[str, list[dict]]:
     schema = load_schema()
     classes = schema["detector"]["classes"]
     model = YOLO(str(weights))
     results: dict[str, list[dict]] = {}
     for img in images:
-        from PIL import Image
-        with Image.open(img) as im:
-            iw, ih = im.size
+        # Load with EXIF orientation applied so rotated phone photos are
+        # upright; feed the array directly so model + coords agree.
+        im = load_upright(img)
+        iw, ih = im.size
         pred = model.predict(
-            str(img),
+            im,
             imgsz=schema["training"]["detector"]["image_size"],
             conf=conf,
             verbose=False,
@@ -99,8 +194,13 @@ def predict(images: list[Path], weights: Path, conf: float = 0.15,
                 "conf": round(float(score), 3),
             })
         raw = len(boxes)
+        boxes = positional_filter(boxes)
         if dedupe_iou > 0:
             boxes = dedupe_per_class(boxes, iou_threshold=dedupe_iou)
+            boxes = dedupe_cross_class(boxes, iou_threshold=dedupe_iou)
+        if singletons:
+            boxes = enforce_singletons(boxes)
+        boxes.sort(key=lambda b: (round(b["y"], 2), b["x"]))
         results[img.name] = boxes
         suffix = f" (raw: {raw})" if raw != len(boxes) else ""
         print(f"  {img.name}: {len(boxes)} detections{suffix}")
@@ -118,6 +218,8 @@ def main() -> None:
                     help="confidence threshold (default: 0.15, conservative)")
     ap.add_argument("--dedupe-iou", type=float, default=0.4,
                     help="per-class NMS IoU threshold; 0 disables (default: 0.4)")
+    ap.add_argument("--no-singletons", action="store_true",
+                    help="disable keep-top-1-per-class (every field is unique per screen)")
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
     args = ap.parse_args()
 
@@ -135,7 +237,8 @@ def main() -> None:
     if missing:
         raise SystemExit(f"missing images: {[p.name for p in missing]}")
 
-    preds = predict(targets, args.weights, conf=args.conf, dedupe_iou=args.dedupe_iou)
+    preds = predict(targets, args.weights, conf=args.conf, dedupe_iou=args.dedupe_iou,
+                    singletons=not args.no_singletons)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(preds, indent=2))
     print(f"\nWrote {args.out}")

@@ -22,18 +22,9 @@ final class PythonRunner {
         .init(title: "Predict (.pt) next 5", args: ["run", "python", "scripts/predict.py", "--next", "5"]),
     ]
 
-    private static func resolveUV() -> String? {
-        let candidates = [
-            "/opt/homebrew/bin/uv", "/usr/local/bin/uv",
-            "\(NSHomeDirectory())/.local/bin/uv",
-        ]
-        for c in candidates where FileManager.default.isExecutableFile(atPath: c) { return c }
-        return nil
-    }
-
     func run(_ command: Command, trainingDir: URL) {
         guard !isRunning else { return }
-        guard let uv = Self.resolveUV() else {
+        guard let uv = PythonTool.resolveUV() else {
             log += "\n[error] `uv` not found. Install from https://docs.astral.sh/uv/\n"
             return
         }
@@ -89,7 +80,7 @@ struct PythonRunnerView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Python quick-starts")
                 .font(.headline)
-            Text("Runs the existing uv workflow in training/. The app never reimplements training.")
+            Text("Runs the existing uv workflow in Training/. The app never reimplements training.")
                 .font(.caption).foregroundStyle(.secondary)
 
             HStack {
