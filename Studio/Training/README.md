@@ -3,6 +3,10 @@
 Trains the CoreML models that extract structured score information from
 photographs of IIDX result screens.
 
+Inputs (the source photos) live in `../Inputs/` and all generated artefacts
+(`.mlpackage` models, prediction/label previews) land in `../Outputs/`, both
+at the repo root beside the Swift studio app — *not* inside `Training/`.
+
 ## Architecture
 
 A photo of a result screen contains rich, stylised graphics that defeat a
@@ -25,7 +29,7 @@ single end-to-end OCR model. Instead, we use a three-stage pipeline:
    ┌──────────────────────┐
    │ 2b. Image classifier │   YOLOv8n-cls → CoreML
    │     on glyph ROIs    │   rank: F/E/D/C/B/A/AA/AAA/MAX
-   │                      │   clear: FAILED/CLEAR/H-CLEAR/…
+   │                      │   clear: FAILED/CLEAR/H-CLEAR/EX-HARD/…
    └──────────────────────┘
               ▼
  ┌──────────────────────────┐
@@ -35,10 +39,13 @@ single end-to-end OCR model. Instead, we use a three-stage pipeline:
 
 Why split it up?
 
-* The detector only has to *find* boxes, not read them. 22 classes × ~150
+* The detector only has to *find* boxes, not read them. 22 classes × ~180
   training images is comfortably in YOLO's wheelhouse.
 * OCR is solved well by Apple Vision; piggybacking saves us from training
-  a digit reader on tiny stylised IIDX fonts.
+  a digit reader on tiny stylised IIDX fonts. The OCR runs through a tiny
+  Swift helper (`scripts/ocr_helper.swift`) that is compiled once and cached
+  at `.cache/ocr_helper`, so each image is ~0.2 s instead of a fresh
+  `swiftc` compile every call.
 * The rank and clear-type glyphs are highly stylised, so a small dedicated
   classifier on tight crops beats OCR on them.
 
@@ -57,7 +64,7 @@ deployment target) ready to drop into a Swift app.
   },
   "stage": "EXTRA STAGE",
   "dj_level":   { "current": "A",  "previous_best": "B" },
-  "clear_type": { "current": "A-CLEAR", "previous_best": "CLEAR" },
+  "clear_type": { "current": "HARD_CLEAR", "previous_best": "CLEAR" },
   "score":      { "current": 1906, "previous_best": 2031, "delta": -125 },
   "miss_count": { "current": 84,   "previous_best": 79,   "delta": 5 },
   "pacemaker_aa": 2387,
@@ -67,6 +74,11 @@ deployment target) ready to drop into a Swift app.
   "combo_break": 69
 }
 ```
+
+`dj_level` values come from the rank classifier (`F` … `MAX`); `clear_type`
+values from the clear-type classifier (`NO_PLAY`, `FAILED`, `ASSIST_CLEAR`,
+`EASY_CLEAR`, `CLEAR`, `HARD_CLEAR`, `EX_HARD_CLEAR`, `FULLCOMBO`). The
+authoritative lists live in `schema.yaml`.
 
 ## Workflow
 
@@ -85,7 +97,7 @@ Lint with `uv run ruff check scripts/` — configured under `[tool.ruff]` in
 `pyproject.toml`.
 
 ```sh
-cd training
+cd Training
 ./setup.sh                      # = `uv sync`
 ```
 
@@ -107,8 +119,8 @@ source .venv/bin/activate
 uv run python scripts/auto_label.py
 ```
 
-Runs Apple Vision OCR on every image in `../data/` and writes
-`training/labels/auto_seed.json` — a flat
+Runs Apple Vision OCR (via the cached Swift helper) on every image in
+`../Inputs/` and writes `labels/auto_seed.json` — a flat
 `{image_name: [{cls, x, y, w, h}, ...]}` dict. The class assignment is
 intentionally permissive; the labeller is where you fix it.
 
@@ -139,20 +151,29 @@ your work-in-progress from `labels/labels.json`, falling back to
 Saves to `labels/labels.json` — the same file `prepare_dataset.py` reads.
 No export step.
 
+To eyeball labels without opening the labeller, render overlays to
+`../Outputs/label_preview/`:
+
+```sh
+uv run python scripts/draw_labels.py                       # all labelled images
+uv run python scripts/draw_labels.py 235.jpg IMG_0028.jpeg # specific images
+uv run python scripts/draw_labels.py --labels labels/auto_seed.json
+```
+
 ### 3. Build the dataset
 
 ```sh
 uv run python scripts/prepare_dataset.py --emit-classifier-crops
 ```
 
-Writes the YOLO-format dataset to `training/dataset/` and dumps crops for
-the rank and clear-type classifiers under
-`training/rank_classifier_data/_unsorted/` and
-`training/clear_type_data/_unsorted/`.
+Writes the YOLO-format dataset (train/val/test split, ratios from
+`schema.yaml`) to `dataset/` and dumps crops for the rank and clear-type
+classifiers under `rank_classifier_data/_unsorted/` and
+`clear_type_data/_unsorted/`.
 
 Sort each pile by hand into `train/<CLASS>/` and `val/<CLASS>/` subfolders.
-This is the only step that doesn't scale, but it's a one-time ~30-minute
-task across all 184 images.
+This is the only step that doesn't scale, but it's a one-time task across
+the whole image set.
 
 ### 4. Train
 
@@ -162,8 +183,11 @@ uv run python scripts/train_rank_classifier.py --target rank
 uv run python scripts/train_rank_classifier.py --target clear_type
 ```
 
-Each writes to `training/models/<run-name>/weights/best.pt` and dumps loss
-curves + a validation confusion matrix into the same folder.
+Each writes to `models/<run-name>/weights/best.pt` (`detector`,
+`rank_classifier`, `clear_type_classifier`) and dumps loss curves + a
+validation confusion matrix into the same folder. The training device is
+auto-selected — `mps` on Apple Silicon, CUDA where present, else CPU —
+overridable with `--device`.
 
 ### 5. Export to CoreML
 
@@ -171,14 +195,18 @@ curves + a validation confusion matrix into the same folder.
 uv run python scripts/export_coreml.py
 ```
 
-Produces:
+Produces, in `../Outputs/`:
 
 ```
-training/output/
+../Outputs/
     DJDXResultDetector.mlpackage
     DJDXRankClassifier.mlpackage
-    DJDXClearTypeClassifier.mlpackage
+    DJDXClearTypeClassifier.mlpackage   (if trained)
 ```
+
+Pass `--only detector|rank|clear_type` to export a single model, or
+`--detector-name <Name>` to override the detector's base filename (used for
+the staged/eval variants alongside the Studio app in `../Outputs/`).
 
 Class names are baked into each model's `user_defined_metadata["classes_json"]`,
 so the Swift consumer doesn't need a sidecar file.
@@ -186,13 +214,38 @@ so the Swift consumer doesn't need a sidecar file.
 ### 6. Sanity check
 
 ```sh
-uv run python scripts/inference_test.py ../data/IMG_0028.jpeg
+uv run python scripts/inference_test.py ../Inputs/IMG_0028.jpeg
+uv run python scripts/inference_test.py ../Inputs/IMG_0028.jpeg --json out.json
 ```
 
-Prints the structured JSON your Swift app should expect to emit. This script
-is also the reference implementation — the Swift pipeline mirrors it
-1-for-1 (detector → crop → Vision OCR for text ROIs, classifier inference
-for glyph ROIs, assemble).
+Prints (or writes, with `--json`) the structured JSON your Swift app should
+expect to emit. This script is also the reference implementation — the Swift
+pipeline mirrors it 1-for-1 (detector → crop → Vision OCR for text ROIs,
+classifier inference for glyph ROIs, assemble).
+
+## Iterating with the detector (active learning)
+
+Once a detector exists, use it to pre-label new photos instead of drawing
+from scratch:
+
+```sh
+uv run python scripts/predict.py IMG_1081.jpeg IMG_1156.jpeg
+uv run python scripts/predict.py --next 5        # next 5 unlabelled images
+```
+
+This runs the trained detector and writes `../Outputs/predictions.json` in
+the same shape as `labels.json`. Optionally clean it up with heuristics
+(drop spurious miss-deltas, fill in missing judge rows from the evenly-spaced
+column, re-derive song title/artist boxes from OCR):
+
+```sh
+uv run python scripts/autofix.py --all
+uv run python scripts/autofix.py IMG_1081.jpeg   # specific images
+```
+
+Review the result with `draw_labels.py --labels ../Outputs/predictions.json`,
+fold the good boxes into `labels.json` via the labeller, then re-run
+steps 3–5. Each new photo funnelled through this loop improves everything.
 
 ## Files
 
@@ -201,19 +254,27 @@ for glyph ROIs, assemble).
 | `schema.yaml` | Single source of truth: class names, hyperparams, splits. Change here, not in scripts. |
 | `pyproject.toml` / `.python-version` / `setup.sh` | Python env (managed by `uv`). |
 | `uv.lock` | Reproducible dependency lockfile (generated by `uv sync`). |
+| `scripts/_common.py` | Shared paths (Inputs/Outputs), schema loading, EXIF-upright image loading, device pick. |
+| `scripts/_ocr.py` | Apple Vision OCR wrapper — compiles & caches the Swift helper. |
+| `scripts/ocr_helper.swift` | Swift/Vision OCR binary source (compiled to `.cache/ocr_helper`). |
 | `scripts/labeler.py` | Offline native bbox labeller (tkinter, no deps). |
+| `scripts/draw_labels.py` | Render bbox overlays for visual review → `../Outputs/label_preview/`. |
+| `scripts/auto_label.py` | OCR-driven first-pass labelling → `labels/auto_seed.json`. |
+| `scripts/predict.py` | Run the trained detector on images → `../Outputs/predictions.json`. |
+| `scripts/autofix.py` | Heuristic cleanup of `predictions.json` (judge rows, song boxes, …). |
+| `scripts/prepare_dataset.py` | `labels.json` → YOLO format + classifier crops. |
+| `scripts/train_detector.py` | Trains the ROI detector. |
+| `scripts/train_rank_classifier.py` | Trains rank / clear-type classifiers. |
+| `scripts/export_coreml.py` | `.pt` → `.mlpackage` in `../Outputs/`. |
+| `scripts/inference_test.py` | End-to-end pipeline reference. |
 | `labels/auto_seed.json` | OCR-derived seed labels (written by `auto_label.py`). |
 | `labels/labels.json` | Refined labels (the labeller writes here, prepare_dataset reads it). |
+| `labels/exclude.json` | Images to skip when building the dataset. |
+| `../Inputs/` | Source result-screen photos (repo root). |
 | `dataset/` | YOLO-format dataset (generated). |
 | `rank_classifier_data/`, `clear_type_data/` | Classifier crops (generated, then hand-sorted). |
 | `models/` | Training runs (weights, plots). |
-| `output/` | Final `.mlpackage` artefacts. |
-| `scripts/auto_label.py` | OCR-driven first-pass labelling. |
-| `scripts/prepare_dataset.py` | `labels.json` → YOLO format. |
-| `scripts/train_detector.py` | Trains the ROI detector. |
-| `scripts/train_rank_classifier.py` | Trains rank / clear-type classifiers. |
-| `scripts/export_coreml.py` | `.pt` → `.mlpackage`. |
-| `scripts/inference_test.py` | End-to-end pipeline reference. |
+| `../Outputs/` | Final `.mlpackage` artefacts, prediction/label previews, Studio app. |
 
 ## Consuming from Swift
 
@@ -238,7 +299,8 @@ same JSON shape for the same input.
 ## Iterating
 
 * **More data improves everything.** Each new photo should be funnelled
-  through steps 1–3 (auto-label → refine → re-build dataset → retrain).
+  through the loop above (predict / auto-label → refine → re-build dataset →
+  retrain).
 * **Schema changes** (new fields, renamed classes) live in `schema.yaml`.
   Every script picks them up automatically — the labeller too.
 * **Underperforming class?** Look at `models/detector/confusion_matrix.png`.
