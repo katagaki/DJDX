@@ -3,9 +3,25 @@
 Trains the CoreML models that extract structured score information from
 photographs of IIDX result screens.
 
-Inputs (the source photos) live in `../Inputs/` and all generated artefacts
-(`.mlpackage` models, prediction/label previews) land in `../Outputs/`, both
-at the repo root beside the Swift studio app — *not* inside `Training/`.
+Inputs live in `../Inputs/`, split per training target (mirroring the studio
+app's three workspaces), and all generated artefacts (`.mlpackage` models,
+crops, prediction/label previews) land in `../Outputs/`, both at the repo root
+beside the Swift studio app — *not* inside `Training/`.
+
+```
+../Inputs/
+    Results/        full result-screen photos   → DJDXResultDetector  (object detector)
+    DJLevels/       cropped rank glyphs          → DJDXRankClassifier  (image classifier)
+    DigitDetector/  cropped numeric fields       → DJDXDigitsDetector  (per-digit detector)
+```
+
+The three models compose: the **result detector** locates ROIs on a full photo;
+the **rank classifier** reads each `dj_level_*` crop into `F…AAA`; the **digit
+detector** reads every numeric crop digit-by-digit (replacing Apple Vision OCR for
+numbers). DJLevels/DigitDetector crops are produced *by* the result-detector export
+(`--emit-crops-to-outputs` → `../Outputs/crops/{DJLevels,DigitDetector}/`); you copy
+them into the matching `Inputs/` folder and label them in the app's DJ Level /
+DigitDetector modes.
 
 ## Architecture
 
@@ -28,7 +44,7 @@ single end-to-end OCR model. Instead, we use a three-stage pipeline:
    └──────────────────────┘
    ┌──────────────────────┐
    │ 2b. Image classifier │   YOLOv8n-cls → CoreML
-   │     on glyph ROIs    │   rank: F/E/D/C/B/A/AA/AAA/MAX
+   │     on glyph ROIs    │   rank: F/E/D/C/B/A/AA/AAA
    │                      │   clear: FAILED/CLEAR/H-CLEAR/EX-HARD/…
    └──────────────────────┘
               ▼
@@ -75,7 +91,7 @@ deployment target) ready to drop into a Swift app.
 }
 ```
 
-`dj_level` values come from the rank classifier (`F` … `MAX`); `clear_type`
+`dj_level` values come from the rank classifier (`F` … `AAA`); `clear_type`
 values from the clear-type classifier (`NO_PLAY`, `FAILED`, `ASSIST_CLEAR`,
 `EASY_CLEAR`, `CLEAR`, `HARD_CLEAR`, `EX_HARD_CLEAR`, `FULLCOMBO`). The
 authoritative lists live in `schema.yaml`.
@@ -262,19 +278,22 @@ steps 3–5. Each new photo funnelled through this loop improves everything.
 | `scripts/auto_label.py` | OCR-driven first-pass labelling → `labels/auto_seed.json`. |
 | `scripts/predict.py` | Run the trained detector on images → `../Outputs/predictions.json`. |
 | `scripts/autofix.py` | Heuristic cleanup of `predictions.json` (judge rows, song boxes, …). |
-| `scripts/prepare_dataset.py` | `labels.json` → YOLO format + classifier crops. |
-| `scripts/train_detector.py` | Trains the ROI detector. |
+| `scripts/prepare_dataset.py` | `--target {results,scores}`: labels JSON → YOLO dataset. `--emit-crops-to-outputs` slices DJ-level + numeric crops to `../Outputs/crops/`. |
+| `scripts/prepare_djlevel_dataset.py` | `djlevel_labels.json` (per-image rank) → sorted `rank_classifier_data/<split>/<class>/` for the rank trainer. |
+| `scripts/train_detector.py` | `--target {results,digits}`: trains the ROI detector or the per-digit digit detector. |
 | `scripts/train_rank_classifier.py` | Trains rank / clear-type classifiers. |
-| `scripts/export_coreml.py` | `.pt` → `.mlpackage` in `../Outputs/`. |
-| `scripts/inference_test.py` | End-to-end pipeline reference. |
+| `scripts/export_coreml.py` | `.pt` → `.mlpackage` in `../Outputs/`. `--only detector\|rank\|clear_type\|digits`, with `--{detector,rank,digits}-name` overrides for eval variants. |
+| `scripts/inference_test.py` | End-to-end pipeline reference (numbers via the digit reader, OCR fallback). |
 | `labels/auto_seed.json` | OCR-derived seed labels (written by `auto_label.py`). |
-| `labels/labels.json` | Refined labels (the labeller writes here, prepare_dataset reads it). |
+| `labels/labels.json` | Result-detector labels (bbox; the app/labeller writes here). |
+| `labels/djlevel_labels.json` | DJ Level labels (`{name: "AAA"}`, one rank per crop). |
+| `labels/digit_labels.json` | DigitDetector labels (per-digit bbox over `Inputs/DigitDetector/`). |
 | `labels/exclude.json` | Images to skip when building the dataset. |
-| `../Inputs/` | Source result-screen photos (repo root). |
-| `dataset/` | YOLO-format dataset (generated). |
-| `rank_classifier_data/`, `clear_type_data/` | Classifier crops (generated, then hand-sorted). |
+| `../Inputs/{Results,DJLevels,DigitDetector}/` | Source images, split per training target. |
+| `dataset/`, `digit_dataset/` | YOLO datasets for the detector / digit detector (generated). |
+| `rank_classifier_data/`, `clear_type_data/` | Classifier crops (generated, then sorted). |
 | `models/` | Training runs (weights, plots). |
-| `../Outputs/` | Final `.mlpackage` artefacts, prediction/label previews, Studio app. |
+| `../Outputs/` | Final `.mlpackage` artefacts, `crops/`, prediction/label previews, Studio app. |
 
 ## Consuming from Swift
 

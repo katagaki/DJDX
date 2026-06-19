@@ -1,9 +1,9 @@
 """
 Render labelled bboxes onto each image for visual review.
 
-Reads ``training/labels/labels.json`` (or ``--labels <path>``), draws a red
+Reads ``labels/labels.json`` (or ``--labels <path>``), draws a red
 outline + class-name tag above each box, and writes to
-``training/output/label_preview/<image_stem>.jpg``.
+``../Outputs/label_preview/<image_stem>.jpg``.
 
 Usage:
     uv run python scripts/draw_labels.py                     # all labelled images

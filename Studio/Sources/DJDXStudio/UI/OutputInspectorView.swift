@@ -174,18 +174,20 @@ struct OutputInspectorView: View {
 
     private func runCoreML(on url: URL) async {
         guard let p = model.paths else { predictions = []; return }
-        let modelURL = p.outputDir.appending(path: "DJDXResultDetector.mlpackage")
+        let modelURL = p.modelURL(named: model.config.productionModelName)
         guard FileManager.default.fileExists(atPath: modelURL.path) else {
             predictions = []
-            note = "Detector model not found — run Export CoreML (export_coreml.py)."
+            note = "\(model.workspace.title) model not found — run Export CoreML."
             return
         }
         note = "Running CoreML…"
         let schema = model.schema
+        let postProcess = model.config.usesPostProcess
         do {
             let boxes = try await Task.detached { () throws -> [Box] in
                 guard let cg = ImageDecoder.load(url) else { return [] }
-                return try CoreMLPipeline.detect(cg, modelURL: modelURL, schema: schema)
+                return try CoreMLPipeline.detect(
+                    cg, modelURL: modelURL, schema: schema, postProcess: postProcess)
             }.value
             predictions = boxes
             note = "CoreML: \(boxes.count) detections"

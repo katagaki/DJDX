@@ -2,7 +2,8 @@
 Seed labels via Apple Vision OCR so the human only refines bboxes
 instead of drawing every one from scratch.
 
-Writes a single ``training/labels/auto_seed.json`` keyed by image name:
+Reads every image in ``../Inputs/`` and writes a single
+``labels/auto_seed.json`` keyed by image name:
 
     {
       "235.jpg": [

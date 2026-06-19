@@ -62,27 +62,42 @@ struct ContentView: View {
     }
 
     @ViewBuilder private var content: some View {
-        switch mode {
-        case .edit:
-            LabelEditorView(trailingInset: 244)
-                .overlay(alignment: .trailing) {
-                    ClassPaletteView()
-                        .frame(width: 220)
-                        .padding(12)
-                }
-        case .inspect:
-            OutputInspectorView()
-        case .python:
-            PythonRunnerView()
+        if model.config.labelKind == .classification {
+            ClassifierView()
+        } else {
+            switch mode {
+            case .edit:
+                LabelEditorView(trailingInset: 244)
+                    .overlay(alignment: .trailing) {
+                        ClassPaletteView()
+                            .frame(width: 220)
+                            .padding(12)
+                    }
+            case .inspect:
+                OutputInspectorView()
+            case .python:
+                PythonRunnerView()
+            }
         }
     }
 
     @ToolbarContentBuilder private var toolbar: some ToolbarContent {
         ToolbarItem(placement: .navigation) {
-            Picker("Mode", selection: $mode) {
-                ForEach(Mode.allCases) { Text($0.rawValue).tag($0) }
+            Picker("Workspace", selection: Binding(
+                get: { model.workspace },
+                set: { model.switchWorkspace($0) })) {
+                ForEach(Workspace.allCases) { Text($0.title).tag($0) }
             }
             .pickerStyle(.segmented)
+        }
+
+        if model.config.labelKind == .bbox {
+            ToolbarItem(placement: .navigation) {
+                Picker("Mode", selection: $mode) {
+                    ForEach(Mode.allCases) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.segmented)
+            }
         }
 
         // Labelling
@@ -218,7 +233,7 @@ struct ContentView: View {
 
     private func revealModelLocation() {
         guard let p = model.paths else { return }
-        let modelURL = p.outputDir.appending(path: "DJDXResultDetector.mlpackage")
+        let modelURL = p.modelURL(named: model.config.productionModelName)
         let target = FileManager.default.fileExists(atPath: modelURL.path) ? modelURL : p.outputDir
         NSWorkspace.shared.activateFileViewerSelecting([target])
     }

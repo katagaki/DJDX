@@ -6,8 +6,8 @@ Useful both as a sanity check (before exporting to Swift) and as the
 reference implementation Swift code should mirror.
 
 Usage:
-    python scripts/inference_test.py ../data/IMG_0028.jpeg
-    python scripts/inference_test.py ../data/IMG_0028.jpeg --json out.json
+    python scripts/inference_test.py ../Inputs/IMG_0028.jpeg
+    python scripts/inference_test.py ../Inputs/IMG_0028.jpeg --json out.json
 """
 from __future__ import annotations
 
@@ -57,9 +57,13 @@ def run(image_path: Path) -> dict:
     rank_classes = schema["rank_classifier"]["classes"]
     clear_classes = schema["clear_type_classifier"]["classes"]
 
+    digit_classes = schema["digit_detector"]["classes"]
+    digit_imgsz = schema["training"]["digit_detector"]["image_size"]
+
     detector = YOLO(str(MODELS_DIR / "detector" / "weights" / "best.pt"))
     rank_clf = _load_or_none(MODELS_DIR / "rank_classifier" / "weights" / "best.pt")
     clear_clf = _load_or_none(MODELS_DIR / "clear_type_classifier" / "weights" / "best.pt")
+    digit_reader = _load_or_none(MODELS_DIR / "digit_detector" / "weights" / "best.pt")
 
     img = Image.open(image_path).convert("RGB")
     pred = detector.predict(
@@ -86,6 +90,34 @@ def run(image_path: Path) -> dict:
     def first_int(name: str) -> int | None:
         return parse_int(first_text(name))
 
+    def read_number(name: str) -> int | None:
+        """Read a numeric ROI with the digit detector: detect each glyph, order
+        left-to-right, join. Honours minus/plus glyphs for deltas."""
+        crops = rois.get(name, [])
+        if not crops or digit_reader is None:
+            return None
+        out = digit_reader.predict(crops[0], imgsz=digit_imgsz, verbose=False)[0]
+        glyphs = sorted(
+            (((x1 + x2) / 2, digit_classes[int(cid)])
+             for (x1, _y1, x2, _y2), cid in zip(
+                 out.boxes.xyxy.tolist(), out.boxes.cls.tolist(), strict=True)),
+            key=lambda g: g[0],
+        )
+        digits, sign = "", 1
+        for _x, c in glyphs:
+            if c == "minus":
+                sign = -1
+            elif c == "plus":
+                sign = 1
+            elif c.isdigit():
+                digits += c
+        return sign * int(digits) if digits else None
+
+    def number(name: str) -> int | None:
+        """Prefer the trained digit reader; fall back to OCR when it's absent."""
+        n = read_number(name)
+        return n if n is not None else first_int(name)
+
     def classify(crop_name: str, clf, classes) -> str | None:
         crops = rois.get(crop_name, [])
         if not crops or clf is None:
@@ -99,7 +131,7 @@ def run(image_path: Path) -> dict:
             "title": first_text("song_title"),
             "artist": first_text("song_artist"),
             "difficulty": first_text("difficulty_label"),
-            "notes": first_int("notes_count"),
+            "notes": number("notes_count"),
         },
         "stage": first_text("stage_label"),
         "dj_level": {
@@ -111,24 +143,24 @@ def run(image_path: Path) -> dict:
             "previous_best": classify("clear_type_prev", clear_clf, clear_classes),
         },
         "score": {
-            "current": first_int("score_now"),
-            "previous_best": first_int("score_prev"),
-            "delta": parse_int(first_text("score_delta")),
+            "current": number("score_now"),
+            "previous_best": number("score_prev"),
+            "delta": number("score_delta"),
         },
         "miss_count": {
-            "current": first_int("miss_count_now"),
-            "previous_best": first_int("miss_count_prev"),
-            "delta": parse_int(first_text("miss_count_delta")),
+            "current": number("miss_count_now"),
+            "previous_best": number("miss_count_prev"),
+            "delta": number("miss_count_delta"),
         },
-        "pacemaker_aa": first_int("pacemaker_aa"),
+        "pacemaker_aa": number("pacemaker_aa"),
         "judgement": {
-            "pgreat": first_int("judge_pgreat"),
-            "great":  first_int("judge_great"),
-            "good":   first_int("judge_good"),
-            "bad":    first_int("judge_bad"),
-            "poor":   first_int("judge_poor"),
+            "pgreat": number("judge_pgreat"),
+            "great":  number("judge_great"),
+            "good":   number("judge_good"),
+            "bad":    number("judge_bad"),
+            "poor":   number("judge_poor"),
         },
-        "combo_break": first_int("combo_break"),
+        "combo_break": number("combo_break"),
     }
 
 

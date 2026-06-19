@@ -11,13 +11,29 @@ import yaml
 TRAINING_DIR = Path(__file__).resolve().parents[1]   # the Training/ folder
 REPO_ROOT = TRAINING_DIR.parent                       # repo root (studio app lives here)
 DATA_DIR = REPO_ROOT / "Inputs"
+# Inputs are split per training target (mirrors the app's workspaces):
+#   Results/       full result-screen photos → result detector
+#   DJLevels/      cropped rank glyphs        → rank classifier
+#   DigitDetector/ cropped numeric fields     → digit detector
+RESULTS_DIR = DATA_DIR / "Results"
+DJLEVELS_DIR = DATA_DIR / "DJLevels"
+DIGIT_DIR = DATA_DIR / "DigitDetector"
+
 OUTPUT_DIR = REPO_ROOT / "Outputs"
+# Result-detector export dumps reader-training crops here; the user then copies
+# them into the matching Inputs/ subfolder to label in DJ Level / DigitDetector mode.
+CROPS_OUT_DIR = OUTPUT_DIR / "crops"
+
 LABELS_DIR = TRAINING_DIR / "labels"
-LABELS_FILE = LABELS_DIR / "labels.json"          # canonical, edited by labeler.py
-AUTO_SEED_FILE = LABELS_DIR / "auto_seed.json"     # OCR-derived seeds
-DATASET_DIR = TRAINING_DIR / "dataset"
+LABELS_FILE = LABELS_DIR / "labels.json"            # result detector (bbox)
+AUTO_SEED_FILE = LABELS_DIR / "auto_seed.json"       # OCR-derived seeds
+DJLEVEL_LABELS_FILE = LABELS_DIR / "djlevel_labels.json"  # DJ level ({name: "AAA"})
+DIGIT_LABELS_FILE = LABELS_DIR / "digit_labels.json"      # digit detector (per-digit bbox)
+
+DATASET_DIR = TRAINING_DIR / "dataset"              # result detector YOLO dataset
+DIGIT_DATASET_DIR = TRAINING_DIR / "digit_dataset"  # digit detector YOLO dataset
 MODELS_DIR = TRAINING_DIR / "models"
-RANK_CLS_DIR = TRAINING_DIR / "rank_classifier_data"
+RANK_CLS_DIR = TRAINING_DIR / "rank_classifier_data"  # rank classifier sorted crops
 SCHEMA_PATH = TRAINING_DIR / "schema.yaml"
 
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".heic"}
@@ -28,7 +44,7 @@ def load_schema() -> dict:
         return yaml.safe_load(f)
 
 
-def iter_images(root: Path = DATA_DIR) -> Iterable[Path]:
+def iter_images(root: Path = RESULTS_DIR) -> Iterable[Path]:
     for p in sorted(root.iterdir()):
         if p.suffix.lower() in IMAGE_SUFFIXES:
             yield p

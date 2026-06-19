@@ -27,6 +27,13 @@ enum ClassColor {
         "stage_label": "#fee440",
         "combo_break": "#ff70a6",
         "unlabeled_text": "#999999",
+        // DJ Level rank classes (DJLevels workspace).
+        "F": "#ff595e", "E": "#ff924c", "D": "#ffca3a", "C": "#c5ca30",
+        "B": "#8ac926", "A": "#52a675", "AA": "#1982c4", "AAA": "#6a4c93",
+        // Digit-detector digit classes (DigitDetector workspace).
+        "0": "#ff595e", "1": "#ff924c", "2": "#ffca3a", "3": "#c5ca30",
+        "4": "#8ac926", "5": "#52a675", "6": "#1982c4", "7": "#4267ac",
+        "8": "#6a4c93", "9": "#b5179e", "minus": "#4cc9f0", "plus": "#80ed99",
     ]
 
     static func hex(for cls: String) -> String { palette[cls] ?? "#cccccc" }

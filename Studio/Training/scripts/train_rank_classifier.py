@@ -4,9 +4,9 @@ Train the DJ-level rank classifier (and, optionally, the clear-type classifier).
 Expected input layout (produced by prepare_dataset.py --emit-classifier-crops,
 then sorted into class subfolders by hand):
 
-    training/rank_classifier_data/
-        train/{F,E,D,C,B,A,AA,AAA,MAX}/*.jpg
-        val/{F,E,D,C,B,A,AA,AAA,MAX}/*.jpg
+    rank_classifier_data/
+        train/{F,E,D,C,B,A,AA,AAA}/*.jpg
+        val/{F,E,D,C,B,A,AA,AAA}/*.jpg
 
 ultralytics' YOLOv8-cls handles the train/val split if you only provide one
 folder per class — it'll auto-split — but we recommend explicit train/val

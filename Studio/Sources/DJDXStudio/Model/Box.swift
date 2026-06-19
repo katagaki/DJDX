@@ -53,3 +53,22 @@ struct LabelSet: Codable, Sendable {
         try container.encode(byImage)
     }
 }
+
+// {image_name: "AAA", ...} — DJ Level's per-image single-class labels, the shape
+// scripts/prepare_djlevel_dataset.py reads. In memory the app keeps these as a
+// single full-frame Box so the editor/undo/status code stays uniform; conversion
+// happens at the load/save boundary (see AppModel).
+struct ClassificationLabelSet: Codable, Sendable {
+    var byImage: [String: String]
+
+    init(byImage: [String: String] = [:]) { self.byImage = byImage }
+
+    init(from decoder: Decoder) throws {
+        byImage = try decoder.singleValueContainer().decode([String: String].self)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(byImage)
+    }
+}

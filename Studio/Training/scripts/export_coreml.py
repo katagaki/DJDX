@@ -2,7 +2,7 @@
 Export trained YOLO weights → CoreML .mlpackage, attaching the schema
 class names so a Swift consumer can decode predictions without a side file.
 
-Outputs land in training/output/:
+Outputs land in ../Outputs/:
     DJDXResultDetector.mlpackage
     DJDXRankClassifier.mlpackage
     DJDXClearTypeClassifier.mlpackage  (if trained)
@@ -66,42 +66,57 @@ def main() -> None:
     cml = schema["coreml"]
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", choices=["detector", "rank", "clear_type"])
+    ap.add_argument("--only", choices=["detector", "rank", "clear_type", "digits"])
     ap.add_argument("--detector-name", default=None,
                     help="override the detector .mlpackage base name "
                          "(e.g. an evaluation model staged beside production)")
+    ap.add_argument("--rank-name", default=None,
+                    help="override the rank-classifier .mlpackage base name")
+    ap.add_argument("--digits-name", default=None,
+                    help="override the digit-detector .mlpackage base name")
     args = ap.parse_args()
 
     OUTPUT_DIR.mkdir(exist_ok=True)
     detector_name = args.detector_name or cml["detector_output_name"]
+    # (weights, output base name, classes, imgsz, is_detector)
     targets = {
         "detector": (
             MODELS_DIR / "detector" / "weights" / "best.pt",
             detector_name,
             schema["detector"]["classes"],
             schema["training"]["detector"]["image_size"],
+            True,
         ),
         "rank": (
             MODELS_DIR / "rank_classifier" / "weights" / "best.pt",
-            cml["rank_output_name"],
+            args.rank_name or cml["rank_output_name"],
             schema["rank_classifier"]["classes"],
             schema["training"]["rank_classifier"]["image_size"],
+            False,
         ),
         "clear_type": (
             MODELS_DIR / "clear_type_classifier" / "weights" / "best.pt",
             cml["clear_type_output_name"],
             schema["clear_type_classifier"]["classes"],
             schema["training"]["clear_type_classifier"]["image_size"],
+            False,
+        ),
+        "digits": (
+            MODELS_DIR / "digit_detector" / "weights" / "best.pt",
+            args.digits_name or cml["digit_output_name"],
+            schema["digit_detector"]["classes"],
+            schema["training"]["digit_detector"]["image_size"],
+            True,
         ),
     }
 
-    for key, (weights, name, classes, imgsz) in targets.items():
+    for key, (weights, name, classes, imgsz, is_detector) in targets.items():
         if args.only and args.only != key:
             continue
         if not weights.exists():
             print(f"  skip {key}: {weights} not found")
             continue
-        _export(weights, name, classes, imgsz, cml, is_detector=(key == "detector"))
+        _export(weights, name, classes, imgsz, cml, is_detector=is_detector)
 
 
 if __name__ == "__main__":

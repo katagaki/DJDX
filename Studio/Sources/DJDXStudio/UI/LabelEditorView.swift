@@ -252,11 +252,10 @@ struct LabelEditorView: View {
             zoom = Zoom.clamp(zoom / Zoom.step); if zoom == 1 { pan = .zero }; return .handled
         }
         if ch == "/" { model.cycleSelectedClass(); return .handled }
-        // Assign classes by running across the keyboard: number row → top 10
-        // classes, then QWERTY row, then the home row.
-        if ch.count == 1, let idx = Schema.classHotkeyOrder.firstIndex(of: Character(ch.lowercased())) {
-            let classes = model.schema.labelClasses
-            if idx < classes.count { model.assignClassToSelection(classes[idx]) }
+        // Assign by class hotkey (DigitDetector digits read literally, "1"→"1";
+        // other workspaces run across the keyboard number/QWERTY/home rows).
+        if let cls = model.hotkeys.classForKey[ch.lowercased()] {
+            model.assignClassToSelection(cls)
             return .handled
         }
         return .ignored

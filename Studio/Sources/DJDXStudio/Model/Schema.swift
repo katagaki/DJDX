@@ -7,23 +7,27 @@ struct Schema: Sendable, Equatable {
     var detectorClasses: [String]
     var rankClasses: [String]
     var clearTypeClasses: [String]
+    var digitClasses: [String]
     var detectorImageSize: Int
 
     static let unlabeledText = "unlabeled_text"
 
-    var labelClasses: [String] { detectorClasses + [Self.unlabeledText] }
-
-    // Class-assignment hotkeys run across the keyboard: number row, then QWERTY,
-    // then the home row. Index N in labelClasses maps to character N here.
+    // Fallback hotkey pool for classes that aren't their own key: number row,
+    // then QWERTY, then the home row (see AppModel.hotkeys).
     static let classHotkeyOrder = Array("1234567890qwertyuiopasdfghjkl")
 
-    static func hotkey(for index: Int) -> String? {
-        index < classHotkeyOrder.count ? String(classHotkeyOrder[index]) : nil
-    }
-
     static let placeholder = Schema(
-        detectorClasses: [], rankClasses: [], clearTypeClasses: [], detectorImageSize: 960
+        detectorClasses: [], rankClasses: [], clearTypeClasses: [],
+        digitClasses: [], detectorImageSize: 960
     )
+
+    func classes(for source: ClassSource) -> [String] {
+        switch source {
+        case .detector: detectorClasses
+        case .rank: rankClasses
+        case .digit: digitClasses
+        }
+    }
 }
 
 enum SchemaLoader {
@@ -52,7 +56,13 @@ enum SchemaLoader {
                   let list = sec["classes"] as? [Any] else {
                 throw LoadError.malformed("missing \(section).classes")
             }
-            return list.compactMap { ($0 as? String)?.trimmingCharacters(in: .whitespaces) }
+            // Digit classes (digit_detector) may parse as Int if left unquoted in
+            // YAML; coerce so both "0" and 0 land as the string "0".
+            return list.compactMap { item -> String? in
+                if let s = item as? String { return s.trimmingCharacters(in: .whitespaces) }
+                if let i = item as? Int { return String(i) }
+                return nil
+            }
         }
 
         let imageSize = ((root["training"] as? [String: Any])?["detector"] as? [String: Any])?["image_size"] as? Int
@@ -61,6 +71,7 @@ enum SchemaLoader {
             detectorClasses: try classes("detector"),
             rankClasses: try classes("rank_classifier"),
             clearTypeClasses: try classes("clear_type_classifier"),
+            digitClasses: try classes("digit_detector"),
             detectorImageSize: imageSize ?? 960
         )
     }

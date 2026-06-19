@@ -28,7 +28,7 @@ enum SelfTest {
             print("schema load FAILED: \(error.localizedDescription)")
         }
 
-        let images = SupportedImage.list(in: paths.dataDir)
+        let images = SupportedImage.list(in: paths.dataDir(.resultDetector))
         print("images: \(images.count)")
 
         if let first = images.first {

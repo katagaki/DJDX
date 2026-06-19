@@ -39,9 +39,12 @@ enum CoreMLPipeline {
         return vn
     }
 
-    // Run the detector and return post-processed boxes (normalised, top-left).
+    // Run a detector and return boxes (normalised, top-left). `postProcess`
+    // applies the Result-Detector-specific NMS / positional filters — leave it
+    // OFF for other detectors (e.g. the score reader) whose digit boxes those
+    // class-name-keyed filters would wrongly drop.
     static func detect(_ cgImage: CGImage, modelURL: URL, schema: Schema,
-                       confidence: Double = 0.15) throws -> [Box] {
+                       confidence: Double = 0.15, postProcess: Bool = true) throws -> [Box] {
         let model = try loadDetector(at: modelURL)
         let request = VNCoreMLRequest(model: model)
         request.imageCropAndScaleOption = .scaleFill   // matches training letterbox-free 768²
@@ -65,7 +68,39 @@ enum CoreMLPipeline {
                 conf: conf
             ))
         }
-        return DetectionPostProcess.apply(boxes)
+        return postProcess ? DetectionPostProcess.apply(boxes) : boxes
+    }
+
+    // Run an image classifier (e.g. the DJ-level rank classifier) and return the
+    // top class + confidence. `classes` is used only as a fallback if the model
+    // emits a raw probability vector instead of named VNClassificationObservations.
+    static func classify(_ cgImage: CGImage, modelURL: URL,
+                         classes: [String]) throws -> (label: String, confidence: Double) {
+        let model = try loadDetector(at: modelURL)
+        let request = VNCoreMLRequest(model: model)
+        request.imageCropAndScaleOption = .scaleFill
+
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        try handler.perform([request])
+
+        if let top = (request.results as? [VNClassificationObservation])?
+            .max(by: { $0.confidence < $1.confidence }) {
+            return (top.identifier, Double(top.confidence))
+        }
+        // Fallback: a raw probability MultiArray → argmax over the schema classes.
+        if let feat = (request.results as? [VNCoreMLFeatureValueObservation])?.first,
+           let arr = feat.featureValue.multiArrayValue {
+            var bestIndex = 0
+            var bestValue = -Double.infinity
+            for i in 0..<arr.count where arr[i].doubleValue > bestValue {
+                bestValue = arr[i].doubleValue
+                bestIndex = i
+            }
+            if classes.indices.contains(bestIndex) {
+                return (classes[bestIndex], bestValue)
+            }
+        }
+        throw PipelineError(message: "Classifier returned no result for \(modelURL.lastPathComponent)")
     }
 }
 

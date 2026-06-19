@@ -1,18 +1,34 @@
-"""Train the YOLOv8 ROI detector on the prepared dataset."""
+"""Train a YOLOv8 detector on a prepared dataset.
+
+Two targets share this script (same machinery, different dataset + hyperparams):
+    --target results   dataset/        → models/detector        (ROI detector)
+    --target digits    digit_dataset/  → models/digit_detector  (per-digit reader)
+"""
 from __future__ import annotations
 
 import argparse
 
-from _common import DATASET_DIR, MODELS_DIR, best_device, load_schema
+from _common import DATASET_DIR, DIGIT_DATASET_DIR, MODELS_DIR, best_device, load_schema
 from ultralytics import YOLO
+
+# dataset dir, schema hyperparam key, run name (under models/).
+TARGETS = {
+    "results": (DATASET_DIR, "detector", "detector"),
+    "digits": (DIGIT_DATASET_DIR, "digit_detector", "digit_detector"),
+}
 
 
 def main() -> None:
+    pre = argparse.ArgumentParser(add_help=False)
+    pre.add_argument("--target", choices=list(TARGETS), default="results")
+    known, _ = pre.parse_known_args()
+    dataset_dir, hp_key, run_name = TARGETS[known.target]
+
     schema = load_schema()
-    hp = schema["training"]["detector"]
+    hp = schema["training"][hp_key]
     aug = hp["augmentations"]
 
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(parents=[pre])
     ap.add_argument("--epochs", type=int, default=hp["epochs"])
     ap.add_argument("--batch",  type=int, default=hp["batch"])
     ap.add_argument("--imgsz",  type=int, default=hp["image_size"])
@@ -25,10 +41,10 @@ def main() -> None:
     ap.add_argument("--resume", action="store_true")
     args = ap.parse_args()
 
-    dataset_yaml = DATASET_DIR / "dataset.yaml"
+    dataset_yaml = dataset_dir / "dataset.yaml"
     if not dataset_yaml.exists():
         raise SystemExit(
-            f"Expected {dataset_yaml}; run prepare_dataset.py first."
+            f"Expected {dataset_yaml}; run prepare_dataset.py --target {known.target} first."
         )
 
     model = YOLO(args.weights)
@@ -42,7 +58,7 @@ def main() -> None:
         workers=args.workers,
         patience=hp["patience"],
         project=str(MODELS_DIR),
-        name="detector",
+        name=run_name,
         exist_ok=True,
         resume=args.resume,
         # augmentations
@@ -61,7 +77,7 @@ def main() -> None:
         save=True,
     )
 
-    print(f"\nBest weights: {MODELS_DIR / 'detector' / 'weights' / 'best.pt'}")
+    print(f"\nBest weights: {MODELS_DIR / run_name / 'weights' / 'best.pt'}")
 
 
 if __name__ == "__main__":

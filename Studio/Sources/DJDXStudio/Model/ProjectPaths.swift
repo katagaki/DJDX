@@ -6,20 +6,29 @@ import Foundation
 struct ProjectPaths: Equatable {
     let root: URL
 
-    var dataDir: URL { root.appending(path: "Inputs", directoryHint: .isDirectory) }
+    var inputsDir: URL { root.appending(path: "Inputs", directoryHint: .isDirectory) }
     var trainingDir: URL { root.appending(path: "Training", directoryHint: .isDirectory) }
     var schemaFile: URL { trainingDir.appending(path: "schema.yaml") }
     var labelsDir: URL { trainingDir.appending(path: "labels", directoryHint: .isDirectory) }
-    var labelsFile: URL { labelsDir.appending(path: "labels.json") }
     var autoSeedFile: URL { labelsDir.appending(path: "auto_seed.json") }
     var outputDir: URL { root.appending(path: "Outputs", directoryHint: .isDirectory) }
     var predictionsFile: URL { outputDir.appending(path: "predictions.json") }
     var previewDir: URL { outputDir.appending(path: "label_preview", directoryHint: .isDirectory) }
     var modelsDir: URL { trainingDir.appending(path: "models", directoryHint: .isDirectory) }
 
+    // Per-workspace working dirs/files.
+    func dataDir(_ c: WorkspaceConfig) -> URL {
+        inputsDir.appending(path: c.inputSubdir, directoryHint: .isDirectory)
+    }
+    func labelsFile(_ c: WorkspaceConfig) -> URL { labelsDir.appending(path: c.labelsFileName) }
+    func evalSubsetFile(_ c: WorkspaceConfig) -> URL {
+        labelsDir.appending(path: c.evalSubsetFileName)
+    }
+    func modelURL(named name: String) -> URL { outputDir.appending(path: name) }
+
     var looksValid: Bool {
         let fm = FileManager.default
-        return fm.fileExists(atPath: dataDir.path) && fm.fileExists(atPath: schemaFile.path)
+        return fm.fileExists(atPath: inputsDir.path) && fm.fileExists(atPath: schemaFile.path)
     }
 }
 

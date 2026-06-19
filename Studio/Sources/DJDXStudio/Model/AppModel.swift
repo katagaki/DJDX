@@ -9,14 +9,53 @@ final class AppModel {
     private(set) var images: [URL] = []
     private(set) var labels: [String: [Box]] = [:]
 
+    // Active workspace (Result Detector / DJ Level / DigitDetector). Drives data dir,
+    // label file + codec, class set, model names, and the build pipeline.
+    private(set) var config: WorkspaceConfig = .resultDetector
+    var workspace: Workspace { config.workspace }
+
+    // Classes for the active workspace's palette/hotkeys. The "unlabeled_text"
+    // sink only exists for the Result Detector.
+    var labelClasses: [String] {
+        let base = schema.classes(for: config.classSource)
+        return config.appendUnlabeled ? base + [Schema.unlabeledText] : base
+    }
+
+    // Hotkey assignment for the active workspace. When the workspace uses literal
+    // hotkeys (DigitDetector), a single-character class name is its own key so
+    // "1"→"1", "9"→"9"; everything else takes the next free key from the
+    // keyboard-order pool (the historical number/QWERTY/home-row run).
+    struct Hotkeys {
+        var keyForClass: [String: String] = [:]
+        var classForKey: [String: String] = [:]
+    }
+
+    var hotkeys: Hotkeys {
+        var map = Hotkeys()
+        var used = Set<Character>()
+        func bind(_ cls: String, _ ch: Character) {
+            used.insert(ch)
+            map.keyForClass[cls] = String(ch)
+            map.classForKey[String(ch)] = cls
+        }
+        if config.literalHotkeys {
+            for cls in labelClasses where cls.count == 1 {
+                if let ch = cls.lowercased().first, !used.contains(ch) { bind(cls, ch) }
+            }
+        }
+        var pool = Schema.classHotkeyOrder.makeIterator()
+        for cls in labelClasses where map.keyForClass[cls] == nil {
+            while let ch = pool.next() {
+                if !used.contains(ch) { bind(cls, ch); break }
+            }
+        }
+        return map
+    }
+
     var currentIndex: Int = 0
     var currentClass: String?
     var selectedBoxID: UUID?
     var selection: Set<URL> = []
-
-    static let productionModelName = "DJDXResultDetector.mlpackage"
-    static let evalModelName = "DJDXResultDetector-eval.mlpackage"
-    static let evalDetectorBaseName = "DJDXResultDetector-eval"
 
     private(set) var status: String = ""
     private(set) var loadError: String?
@@ -48,6 +87,16 @@ final class AppModel {
         reload()
     }
 
+    // Switch the active workspace, persisting the outgoing one's labels first so
+    // nothing is lost. reload() resets index/selection/undo for the new set.
+    func switchWorkspace(_ w: Workspace) {
+        guard w != config.workspace else { return }
+        autosave()
+        config = .config(for: w)
+        currentIndex = 0
+        reload()
+    }
+
     func reload() {
         guard let p = paths else { return }
         loadError = nil
@@ -57,10 +106,9 @@ final class AppModel {
             loadError = error.localizedDescription
             schema = .placeholder
         }
-        currentClass = schema.labelClasses.first
-        images = SupportedImage.list(in: p.dataDir)
-        let set = LabelStore.load(labelsFile: p.labelsFile, autoSeedFile: p.autoSeedFile)
-        labels = set.byImage
+        currentClass = labelClasses.first
+        images = SupportedImage.list(in: p.dataDir(config))
+        labels = loadLabels(p)
         for url in images where labels[url.lastPathComponent] == nil {
             labels[url.lastPathComponent] = []
         }
@@ -69,9 +117,27 @@ final class AppModel {
         selection.removeAll()
         undoStacks.removeAll()
         if images.isEmpty {
-            setStatus("No \(SupportedImage.extensions.sorted().joined(separator: "/")) images in \(p.dataDir.path)")
+            setStatus("No \(SupportedImage.extensions.sorted().joined(separator: "/")) images in Inputs/\(config.inputSubdir)/")
         } else {
-            setStatus("Loaded \(images.count) images, \(labels.values.reduce(0) { $0 + $1.count }) boxes")
+            let unit = config.labelKind == .classification ? "tags" : "boxes"
+            setStatus("Loaded \(images.count) images, \(labels.values.reduce(0) { $0 + $1.count }) \(unit)")
+        }
+    }
+
+    // Read the active workspace's labels into the uniform [name: [Box]] form.
+    // Classification labels become a single full-frame box per image.
+    private func loadLabels(_ p: ProjectPaths) -> [String: [Box]] {
+        let file = p.labelsFile(config)
+        switch config.labelKind {
+        case .classification:
+            let set = LabelStore.loadClassification(file) ?? ClassificationLabelSet()
+            return set.byImage.mapValues { [Box(cls: $0, x: 0, y: 0, w: 1, h: 1)] }
+        case .bbox:
+            // Only the Result Detector has an OCR auto-seed to fall back to.
+            if config.workspace == .resultDetector {
+                return LabelStore.load(labelsFile: file, autoSeedFile: p.autoSeedFile).byImage
+            }
+            return (LabelStore.loadFile(file) ?? LabelSet()).byImage
         }
     }
 
@@ -152,9 +218,20 @@ final class AppModel {
         updateBox(b, pushUndo: true)
     }
 
+    // DJ Level (classification): the whole crop carries one class, stored as a
+    // single full-frame box so the rest of the model stays box-shaped.
+    var currentTag: String? { currentBoxes.first?.cls }
+
+    func tagCurrent(_ cls: String, advance: Bool = true) {
+        currentClass = cls
+        setBoxes([Box(cls: cls, x: 0, y: 0, w: 1, h: 1)])
+        selectedBoxID = nil
+        if advance { next() }
+    }
+
     func cycleSelectedClass() {
         guard let box = selectedBox else { return }
-        let classes = schema.labelClasses
+        let classes = labelClasses
         let i = classes.firstIndex(of: box.cls) ?? -1
         var b = box
         b.cls = classes[(i + 1) % classes.count]
@@ -185,8 +262,8 @@ final class AppModel {
     func save() {
         guard let p = paths else { return }
         do {
-            try LabelStore.save(LabelSet(byImage: labels), to: p.labelsFile)
-            setStatus("Saved → \(p.labelsFile.lastPathComponent)")
+            try persistLabels(to: p.labelsFile(config))
+            setStatus("Saved → \(config.labelsFileName)")
         } catch {
             setStatus("Save failed: \(error.localizedDescription)")
         }
@@ -194,7 +271,19 @@ final class AppModel {
 
     private func autosave() {
         guard let p = paths else { return }
-        try? LabelStore.save(LabelSet(byImage: labels), to: p.labelsFile)
+        try? persistLabels(to: p.labelsFile(config))
+    }
+
+    // Persist in the active workspace's on-disk shape. Classification writes
+    // {name: class}, dropping unlabelled images; bbox writes {name: [box]}.
+    private func persistLabels(to url: URL) throws {
+        switch config.labelKind {
+        case .classification:
+            let byImage = labels.compactMapValues { $0.first?.cls }
+            try LabelStore.saveClassification(ClassificationLabelSet(byImage: byImage), to: url)
+        case .bbox:
+            try LabelStore.save(LabelSet(byImage: labels), to: url)
+        }
     }
 
     // Load labels from an arbitrary labels.json (replaces the working set).
@@ -213,29 +302,26 @@ final class AppModel {
         setStatus("Loaded \(total) boxes from \(url.lastPathComponent)")
     }
 
-    // Wipe every label, in memory and on disk. Destructive; gate behind a prompt.
+    // Wipe every label for the active workspace, in memory and on disk.
+    // Destructive; gate behind a prompt.
     func clearAllData() {
         guard let p = paths else { return }
         for key in labels.keys { labels[key] = [] }
-        try? FileManager.default.removeItem(at: p.labelsFile)
+        try? FileManager.default.removeItem(at: p.labelsFile(config))
         undoStacks.removeAll()
         selectedBoxID = nil
-        setStatus("Cleared all labels and deleted \(p.labelsFile.lastPathComponent)")
+        setStatus("Cleared all \(workspace.title) labels and deleted \(config.labelsFileName)")
     }
 
     // MARK: - CoreML model build
 
-    // Train on every label, then export the detector into the *evaluation* slot
-    // beside production. Promote it once the labels look good.
+    // Train on every label of the active workspace, then export into the
+    // *evaluation* slot beside production. Promote it once it looks good.
     func exportCoreMLModel() {
         guard let p = paths else { return }
         save()
-        runPipeline([
-            ("Preparing dataset", ["run", "python", "scripts/prepare_dataset.py", "--emit-classifier-crops"]),
-            ("Training detector", ["run", "python", "scripts/train_detector.py"]),
-            ("Exporting CoreML", ["run", "python", "scripts/export_coreml.py",
-                                  "--detector-name", Self.evalDetectorBaseName]),
-        ], cwd: p.trainingDir, success: "Evaluation model exported → Outputs/")
+        runPipeline(config.exportSteps, cwd: p.trainingDir,
+                    success: "\(workspace.title) evaluation model exported → Outputs/")
     }
 
     // Train a quick evaluation model on just the selected images' labels.
@@ -248,39 +334,44 @@ final class AppModel {
             let name = url.lastPathComponent
             subset[name] = labels[name] ?? []
         }
-        let subsetFile = p.labelsDir.appending(path: "_eval_subset.json")
         do {
-            try LabelStore.save(LabelSet(byImage: subset), to: subsetFile)
+            try stageSubset(subset, to: p.evalSubsetFile(config))
         } catch {
             setStatus("Could not stage selection: \(error.localizedDescription)")
             return
         }
-        runPipeline([
-            ("Preparing dataset", ["run", "python", "scripts/prepare_dataset.py",
-                                   "--labels", "labels/_eval_subset.json"]),
-            ("Training detector", ["run", "python", "scripts/train_detector.py"]),
-            ("Exporting CoreML", ["run", "python", "scripts/export_coreml.py",
-                                  "--only", "detector", "--detector-name", Self.evalDetectorBaseName]),
-        ], cwd: p.trainingDir, success: "Evaluation model created from \(urls.count) images → Outputs/")
+        runPipeline(config.evalSteps, cwd: p.trainingDir,
+                    success: "\(workspace.title) evaluation model from \(urls.count) images → Outputs/")
+    }
+
+    // Write a selection subset in the active workspace's on-disk shape.
+    private func stageSubset(_ subset: [String: [Box]], to url: URL) throws {
+        switch config.labelKind {
+        case .classification:
+            try LabelStore.saveClassification(
+                ClassificationLabelSet(byImage: subset.compactMapValues { $0.first?.cls }), to: url)
+        case .bbox:
+            try LabelStore.save(LabelSet(byImage: subset), to: url)
+        }
     }
 
     // Copy the evaluation model over the production one, so it backs
     // "Label current" / "Auto label all". Keeps the eval model for further work.
     func promoteEvalToProduction() {
         guard let p = paths, let eval = evalModelURL else { return }
-        let prod = p.outputDir.appending(path: Self.productionModelName)
+        let prod = p.modelURL(named: config.productionModelName)
         let fm = FileManager.default
         do {
             if fm.fileExists(atPath: prod.path) { try fm.removeItem(at: prod) }
             try fm.copyItem(at: eval, to: prod)
             CoreMLPipeline.invalidateCache()
-            setStatus("Promoted evaluation model → production")
+            setStatus("Promoted \(workspace.title) evaluation model → production")
         } catch {
             setStatus("Promote failed: \(error.localizedDescription)")
         }
     }
 
-    private func runPipeline(_ steps: [(String, [String])], cwd: URL, success: String) {
+    private func runPipeline(_ steps: [PipelineStep], cwd: URL, success: String) {
         guard !isBuildingModel else { return }
         guard let uv = PythonTool.resolveUV() else {
             setStatus("`uv` not found — install from docs.astral.sh/uv")
@@ -289,14 +380,14 @@ final class AppModel {
         isBuildingModel = true
         setStatus("Building CoreML model… this can take several minutes")
         Task {
-            for (label, args) in steps {
-                setStatus("\(label)…")
-                let code = await PythonTool.run(uv, args: args, cwd: cwd) { chunk in
-                    Task { @MainActor in self.reportBuild(label, chunk) }
+            for step in steps {
+                setStatus("\(step.label)…")
+                let code = await PythonTool.run(uv, args: step.args, cwd: cwd) { chunk in
+                    Task { @MainActor in self.reportBuild(step.label, chunk) }
                 }
                 if code != 0 {
                     isBuildingModel = false
-                    setStatus("Model build failed during “\(label)” (exit \(code))")
+                    setStatus("Model build failed during “\(step.label)” (exit \(code))")
                     return
                 }
             }
@@ -314,52 +405,69 @@ final class AppModel {
 
     // MARK: - Auto-label
 
-    // Prefer the trained CoreML detector; fall back to the rough Vision-OCR
-    // heuristic only when the exported model isn't present.
-    private var detectorModelURL: URL? {
+    // The active workspace's production / evaluation model in Outputs/, if present.
+    private var productionModelURL: URL? {
         guard let p = paths else { return nil }
-        let u = p.outputDir.appending(path: Self.productionModelName)
+        let u = p.modelURL(named: config.productionModelName)
         return FileManager.default.fileExists(atPath: u.path) ? u : nil
     }
 
     var evalModelURL: URL? {
         guard let p = paths else { return nil }
-        let u = p.outputDir.appending(path: Self.evalModelName)
+        let u = p.modelURL(named: config.evalModelName)
         return FileManager.default.fileExists(atPath: u.path) ? u : nil
     }
     var hasEvalModel: Bool { evalModelURL != nil }
-    var hasProductionModel: Bool { detectorModelURL != nil }
+    var hasProductionModel: Bool { productionModelURL != nil }
+
+    // Only the Result Detector has a Vision-OCR fallback for unmodelled images.
+    private var allowsOCRFallback: Bool { config.workspace == .resultDetector }
 
     var selectedImages: [URL] { images.filter { selection.contains($0) } }
 
-    private nonisolated static func label(_ url: URL, model: URL?, schema: Schema) async -> [Box] {
+    // Run the active workspace's model on one image → labels in the uniform box
+    // form. Classification yields a single full-frame box; bbox yields detections
+    // (with the Result-Detector post-process / OCR fallback when enabled).
+    private nonisolated static func infer(
+        _ url: URL, model: URL?, kind: LabelKind, postProcess: Bool,
+        classes: [String], schema: Schema, allowOCR: Bool
+    ) async -> [Box] {
         await Task.detached {
-            if let model, let cg = ImageDecoder.load(url),
-               let boxes = try? CoreMLPipeline.detect(cg, modelURL: model, schema: schema),
-               !boxes.isEmpty {
-                return boxes
+            func ocr() -> [Box] { allowOCR ? AutoLabel.boxes(from: OCR.recognize(url: url)) : [] }
+            guard let model, let cg = ImageDecoder.load(url) else { return ocr() }
+            switch kind {
+            case .classification:
+                if let result = try? CoreMLPipeline.classify(cg, modelURL: model, classes: classes) {
+                    return [Box(cls: result.label, x: 0, y: 0, w: 1, h: 1, conf: result.confidence)]
+                }
+                return []   // no OCR equivalent for a glyph classifier
+            case .bbox:
+                if let boxes = try? CoreMLPipeline.detect(
+                    cg, modelURL: model, schema: schema, postProcess: postProcess), !boxes.isEmpty {
+                    return boxes
+                }
+                return ocr()
             }
-            return AutoLabel.boxes(from: OCR.recognize(url: url))
         }.value
     }
 
-    // Detect with a specific model, no OCR fallback — so eval output reflects
-    // the model alone.
-    private nonisolated static func detectOnly(_ url: URL, model: URL, schema: Schema) async -> [Box] {
-        await Task.detached {
-            guard let cg = ImageDecoder.load(url) else { return [] }
-            return (try? CoreMLPipeline.detect(cg, modelURL: model, schema: schema)) ?? []
-        }.value
+    private func infer(_ url: URL, model: URL?, allowOCR: Bool) async -> [Box] {
+        await Self.infer(url, model: model, kind: config.labelKind,
+                         postProcess: config.usesPostProcess, classes: labelClasses,
+                         schema: schema, allowOCR: allowOCR)
     }
+
+    private var labelNoun: String { config.labelKind == .classification ? "tags" : "boxes" }
 
     func labelSelectionUsingEvalModel() async {
         await labelSelection(with: evalModelURL, named: "eval")
     }
 
     func labelSelectionUsingProductionModel() async {
-        await labelSelection(with: detectorModelURL, named: "production")
+        await labelSelection(with: productionModelURL, named: "production")
     }
 
+    // Re-label with a specific model, no OCR fallback — output reflects the model alone.
     private func labelSelection(with model: URL?, named: String) async {
         guard let model, !isAutoLabeling else { return }
         let urls = selectedImages
@@ -367,7 +475,7 @@ final class AppModel {
         isAutoLabeling = true
         for (i, url) in urls.enumerated() {
             setStatus("Labelling \(i + 1)/\(urls.count) (\(named))…")
-            labels[url.lastPathComponent] = await Self.detectOnly(url, model: model, schema: schema)
+            labels[url.lastPathComponent] = await infer(url, model: model, allowOCR: false)
         }
         save()
         selectedBoxID = nil
@@ -377,25 +485,33 @@ final class AppModel {
 
     func autoLabelCurrent() async {
         guard let url = currentImageURL, !isAutoLabeling else { return }
+        let model = productionModelURL
+        guard model != nil || allowsOCRFallback else {
+            setStatus("No \(workspace.title) model yet — export one first")
+            return
+        }
         isAutoLabeling = true
-        let usingModel = detectorModelURL != nil
-        setStatus(usingModel ? "Detecting…" : "OCR…")
-        let boxes = await Self.label(url, model: detectorModelURL, schema: schema)
+        setStatus(model != nil ? "Inferring…" : "OCR…")
+        let boxes = await infer(url, model: model, allowOCR: allowsOCRFallback)
         setBoxes(boxes)
         selectedBoxID = nil
         isAutoLabeling = false
-        setStatus("Labelled \(boxes.count) boxes \(usingModel ? "(model)" : "(OCR)")")
+        setStatus("Labelled \(boxes.count) \(labelNoun) \(model != nil ? "(model)" : "(OCR)")")
     }
 
     func autoLabelAll() async {
         guard !isAutoLabeling, !images.isEmpty else { return }
+        let model = productionModelURL
+        guard model != nil || allowsOCRFallback else {
+            setStatus("No \(workspace.title) model yet — export one first")
+            return
+        }
         isAutoLabeling = true
-        let model = detectorModelURL
         let usingModel = model != nil
         let urls = images
         for (i, url) in urls.enumerated() {
-            setStatus("\(usingModel ? "Detecting" : "OCR") \(i + 1)/\(urls.count)…")
-            labels[url.lastPathComponent] = await Self.label(url, model: model, schema: schema)
+            setStatus("\(usingModel ? "Inferring" : "OCR") \(i + 1)/\(urls.count)…")
+            labels[url.lastPathComponent] = await infer(url, model: model, allowOCR: allowsOCRFallback)
         }
         save()
         isAutoLabeling = false

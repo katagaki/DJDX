@@ -35,6 +35,7 @@ build/
 
 # ---- Generated training artefacts (re-derivable from labels + scripts) ----
 Training/dataset/
+Training/digit_dataset/
 Training/models/
 Training/rank_classifier_data/
 Training/clear_type_data/
@@ -43,6 +44,7 @@ Training/runs/
 
 # ---- Outputs: keep the exported CoreML model, ignore regenerable bits ----
 Outputs/label_preview/
+Outputs/crops/
 Outputs/predictions.json
 Outputs/*.app/
 *.mlpackage

@@ -9,16 +9,17 @@ struct ClassPaletteView: View {
                 .font(.caption).foregroundStyle(.secondary)
                 .padding(.horizontal, 8).padding(.top, 8)
 
+            let hotkeys = model.hotkeys
             ScrollView {
                 VStack(spacing: 2) {
-                    ForEach(Array(model.schema.labelClasses.enumerated()), id: \.element) { i, cls in
+                    ForEach(model.labelClasses, id: \.self) { cls in
                         Button {
                             model.assignClassToSelection(cls)
                         } label: {
                             HStack(spacing: 6) {
                                 Text(cls).lineLimit(1)
                                 Spacer()
-                                if let key = Schema.hotkey(for: i) {
+                                if let key = hotkeys.keyForClass[cls] {
                                     Text(key.uppercased())
                                         .font(.caption.monospaced().bold())
                                         .padding(.horizontal, 5).padding(.vertical, 1)

@@ -35,7 +35,7 @@ detector:
 # Cropped from dj_level_now / dj_level_prev detections.
 # ---------------------------------------------------------------------------
 rank_classifier:
-  classes: [F, E, D, C, B, A, AA, AAA, MAX]
+  classes: [F, E, D, C, B, A, AA, AAA]
 
 # ---------------------------------------------------------------------------
 # Image classifier #2: clear-type pill.
@@ -51,6 +51,15 @@ clear_type_classifier:
     - HARD_CLEAR        # rendered "H-CLEAR" on screen
     - EX_HARD_CLEAR
     - FULLCOMBO
+
+# ---------------------------------------------------------------------------
+# Object detector #2 (DigitDetector): per-digit reader for numeric fields.
+# Cropped from every numeric detection (score_*, miss_count_*, judge_*,
+# pacemaker_aa, notes_count, combo_break). Each crop is a multi-digit number;
+# detect each glyph, then read left-to-right. Quoted so YAML keeps them strings.
+# ---------------------------------------------------------------------------
+digit_detector:
+  classes: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "minus", "plus"]
 
 # ---------------------------------------------------------------------------
 # Training hyperparameters
@@ -86,6 +95,25 @@ training:
     image_size: 160
     epochs: 100
     batch: 32
+  digit_detector:
+    base_weights: yolov8n.pt   # same YOLO detector machinery as the result detector
+    image_size: 320            # digit crops are small / aspect-varied; 320 is plenty
+    epochs: 200
+    batch: 32
+    cache: ram
+    workers: 8
+    patience: 20
+    augmentations:
+      mosaic: 0.0              # numbers are read as a sequence — don't stitch crops
+      mixup: 0.0
+      hsv_h: 0.015
+      hsv_s: 0.4
+      hsv_v: 0.4
+      degrees: 3
+      translate: 0.05
+      scale: 0.1
+      perspective: 0.0
+      fliplr: 0.0              # never flip — digits become unreadable
 
 # ---------------------------------------------------------------------------
 # Dataset split
@@ -106,3 +134,4 @@ coreml:
   detector_output_name: DJDXResultDetector
   rank_output_name: DJDXRankClassifier
   clear_type_output_name: DJDXClearTypeClassifier
+  digit_output_name: DJDXDigitsDetector

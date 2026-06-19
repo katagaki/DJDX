@@ -10,11 +10,11 @@ format ``prepare_dataset.py`` expects, so it slots into the existing flow:
     uv run python scripts/prepare_dataset.py   # → YOLO dataset
 
 On launch it loads, in priority order:
-    training/labels/labels.json       (your work in progress)
-    training/labels/auto_seed.json    (OCR seeds from auto_label.py)
+    labels/labels.json       (your work in progress)
+    labels/auto_seed.json    (OCR seeds from auto_label.py)
     (nothing — start from scratch)
 
-Saving always writes ``training/labels/labels.json`` in the flat shape:
+Saving always writes ``labels/labels.json`` in the flat shape:
 
     {"235.jpg": [{"cls": "score_now", "x": 0.21, "y": 0.49, ...}, ...]}
 
@@ -42,8 +42,7 @@ from pathlib import Path
 from _common import AUTO_SEED_FILE, DATA_DIR, LABELS_FILE, iter_images, load_schema
 from PIL import Image, ImageTk
 
-# Color palette mirrors training/labels/label_studio_config.xml so saved labels
-# look identical between this tool and LS, if you ever flip to LS later.
+# Per-class outline colours for the bbox overlay (one stable colour per class).
 CLASS_COLORS = {
     "dj_level_now":      "#ff595e",
     "dj_level_prev":     "#ff924c",

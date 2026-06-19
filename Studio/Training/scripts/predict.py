@@ -7,9 +7,9 @@ Usage:
     uv run python scripts/predict.py --next 5            # next 5 unlabelled images
     uv run python scripts/predict.py --out /tmp/pred.json IMG_1081.jpeg
 
-By default writes ``training/output/predictions.json``. Then:
+By default writes ``../Outputs/predictions.json``. Then:
 
-    uv run python scripts/draw_labels.py --labels output/predictions.json
+    uv run python scripts/draw_labels.py --labels ../Outputs/predictions.json
 """
 from __future__ import annotations
 
@@ -209,7 +209,7 @@ def predict(images: list[Path], weights: Path, conf: float = 0.15,
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("images", nargs="*", help="image filenames in ../data/")
+    ap.add_argument("images", nargs="*", help="image filenames in ../Inputs/")
     ap.add_argument("--next", type=int, default=0,
                     help="run on the next N images NOT in labels.json")
     ap.add_argument("--weights", type=Path,
