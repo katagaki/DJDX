@@ -7,13 +7,13 @@ import Vision
 // on the numeric field crops the result detector already isolates, sorts the digit
 // boxes left-to-right, and assembles the value.
 //
-// Inert until IIDXDigitDetector.mlpackage is added to the target — the model is
+// Inert until IIDXDigitsDetector.mlpackage is added to the target — the model is
 // loaded by bundle name at runtime, so the build never depends on its presence and
-// the pipeline transparently falls back to Vision OCR while it is absent. The model
-// must label its classes "0"…"9" (the class index also doubles as the digit value).
+// the pipeline transparently falls back to Vision OCR while it is absent. Digit
+// classes are "0"…"9"; any non-digit class (e.g. "minus"/"plus") is ignored.
 enum IIDXDigitRecognizer {
 
-    static let modelName = "IIDXDigitDetector"
+    static let modelName = "IIDXDigitsDetector"
     static let confidenceThreshold: Float = 0.25
 
     nonisolated(unsafe) private static let vnModel: VNCoreMLModel? = {
