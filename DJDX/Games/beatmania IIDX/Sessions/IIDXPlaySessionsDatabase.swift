@@ -165,7 +165,7 @@ final class IIDXPlaySessionsDatabase: Sendable {
 
     func deleteSession(id: String) {
         for play in plays(forSession: id) {
-            SessionImageStore.shared.delete(filename: play.rawImageFilename)
+            IIDXSessionImageStore.shared.delete(filename: play.rawImageFilename)
         }
         guard let database = try? getWriteConnection() else { return }
         try? database.run(Self.playTable.filter(Self.pSessionID == id).delete())
@@ -235,7 +235,7 @@ final class IIDXPlaySessionsDatabase: Sendable {
 
     func deletePlay(id: String) {
         if let play = play(id: id) {
-            SessionImageStore.shared.delete(filename: play.rawImageFilename)
+            IIDXSessionImageStore.shared.delete(filename: play.rawImageFilename)
         }
         guard let database = try? getWriteConnection() else { return }
         try? database.run(Self.playTable.filter(Self.pID == id).delete())

@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct SessionsView: View {
-    var store: SessionStore
+    var store: IIDXSessionStore
 
     @State private var isPresentingActive: Bool = false
     @State private var isPresentingExternalDataSources: Bool = false
-    @AppStorage(wrappedValue: false, SessionWorkoutBridge.healthKitEnabledKey) private var healthKitEnabled: Bool
+    @AppStorage(wrappedValue: false, IIDXSessionWorkoutBridge.healthKitEnabledKey) private var healthKitEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") private var isBemaniWikiEnabled: Bool
 
     private var pastSessions: [IIDXPlaySession] {
@@ -64,7 +64,7 @@ struct SessionsView: View {
         }
         .onChange(of: healthKitEnabled) { _, enabled in
             if enabled {
-                Task { _ = await SessionWorkoutBridge.shared.requestAuthorization() }
+                Task { _ = await IIDXSessionWorkoutBridge.shared.requestAuthorization() }
             }
         }
         .onAppear {
@@ -128,7 +128,7 @@ struct SessionsView: View {
 }
 
 struct SessionSummaryRow: View {
-    var store: SessionStore
+    var store: IIDXSessionStore
     var session: IIDXPlaySession
 
     var body: some View {

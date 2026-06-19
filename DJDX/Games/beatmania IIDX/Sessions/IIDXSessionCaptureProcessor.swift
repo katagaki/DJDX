@@ -1,8 +1,8 @@
 import Foundation
 import SQLite
 
-actor SessionCaptureProcessor {
-    static let shared = SessionCaptureProcessor()
+actor IIDXSessionCaptureProcessor {
+    static let shared = IIDXSessionCaptureProcessor()
 
     static let acceptableConfidence = 0.6
 
@@ -32,13 +32,13 @@ actor SessionCaptureProcessor {
     private func drain() async {
         guard !isDraining, !queue.isEmpty else { return }
         isDraining = true
-        await SessionBackgroundActivity.shared.begin()
+        await IIDXSessionBackgroundActivity.shared.begin()
         while !queue.isEmpty {
             let playID = queue.removeFirst()
             await process(playID)
         }
         isDraining = false
-        await SessionBackgroundActivity.shared.end()
+        await IIDXSessionBackgroundActivity.shared.end()
     }
 
     private func process(_ playID: String) async {
@@ -46,14 +46,14 @@ actor SessionCaptureProcessor {
         database.updatePlayState(id: playID, state: .processing)
         notify(playID)
 
-        guard let imageData = SessionImageStore.shared.data(for: play.rawImageFilename) else {
+        guard let imageData = IIDXSessionImageStore.shared.data(for: play.rawImageFilename) else {
             fail(play, message: "Image unavailable")
             return
         }
 
         do {
             let regions = try await IIDXResultReader.detect(imageData: imageData)
-            SessionImageStore.shared.writeRecognizedText(recognizedText(from: regions), id: playID)
+            IIDXSessionImageStore.shared.writeRecognizedText(recognizedText(from: regions), id: playID)
             let parse = IIDXResultParser.parse(regions: regions, songs: loadSongCandidates())
             play.apply(parse)
             play.processedAt = .now
@@ -65,7 +65,7 @@ actor SessionCaptureProcessor {
         } catch {
             fail(play, message: error.localizedDescription)
         }
-        await SessionLiveActivityController.shared.refresh(sessionID: play.sessionID)
+        await IIDXSessionLiveActivityController.shared.refresh(sessionID: play.sessionID)
     }
 
     private func fail(_ play: IIDXCapturedPlay, message: String) {

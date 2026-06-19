@@ -3,7 +3,7 @@ import Observation
 
 @MainActor
 @Observable
-final class SessionStore {
+final class IIDXSessionStore {
 
     var activeSession: IIDXPlaySession?
     var plays: [IIDXCapturedPlay] = []
@@ -36,8 +36,8 @@ final class SessionStore {
         activeSession = session
         plays = []
         loadSessions()
-        SessionLiveActivityController.shared.start(session)
-        SessionWorkoutBridge.shared.startWorkout(session: session)
+        IIDXSessionLiveActivityController.shared.start(session)
+        IIDXSessionWorkoutBridge.shared.startWorkout(session: session)
         NotificationCenter.default.post(name: .playSessionDidChange, object: session.id)
         return session
     }
@@ -46,11 +46,11 @@ final class SessionStore {
         guard let activeSession else { return }
         database.endSession(id: activeSession.id)
         let endedID = activeSession.id
-        SessionWorkoutBridge.shared.endWorkout(session: activeSession)
+        IIDXSessionWorkoutBridge.shared.endWorkout(session: activeSession)
         self.activeSession = nil
         plays = []
         loadSessions()
-        SessionLiveActivityController.shared.end()
+        IIDXSessionLiveActivityController.shared.end()
         NotificationCenter.default.post(name: .playSessionDidChange, object: endedID)
     }
 
@@ -58,7 +58,7 @@ final class SessionStore {
         guard let activeSession else { return }
         let id = UUID().uuidString
         let captureDate = Date()
-        let filename = SessionImageStore.shared.write(imageData, id: id)
+        let filename = IIDXSessionImageStore.shared.write(imageData, id: id)
         let play = IIDXCapturedPlay(
             id: id,
             sessionID: activeSession.id,
@@ -69,8 +69,8 @@ final class SessionStore {
         )
         database.insertPlay(play)
         refreshPlays()
-        SessionLiveActivityController.shared.refresh(sessionID: activeSession.id)
-        Task { await SessionCaptureProcessor.shared.submit(id) }
+        IIDXSessionLiveActivityController.shared.refresh(sessionID: activeSession.id)
+        Task { await IIDXSessionCaptureProcessor.shared.submit(id) }
         snapshotHeartRate(playID: id, at: captureDate)
     }
 
@@ -80,7 +80,7 @@ final class SessionStore {
 
     private func snapshotHeartRate(playID: String, at date: Date) {
         Task {
-            guard let range = await SessionWorkoutBridge.shared.heartRateRange(ending: date) else { return }
+            guard let range = await IIDXSessionWorkoutBridge.shared.heartRateRange(ending: date) else { return }
             database.updatePlayHeartRate(id: playID, min: range.min, max: range.max)
             refreshPlays()
             NotificationCenter.default.post(name: .capturedPlayDidChange, object: playID)
@@ -88,7 +88,7 @@ final class SessionStore {
     }
 
     func reprocess(_ play: IIDXCapturedPlay) {
-        Task { await SessionCaptureProcessor.shared.reprocess(play.id) }
+        Task { await IIDXSessionCaptureProcessor.shared.reprocess(play.id) }
     }
 
     func saveCorrected(_ play: IIDXCapturedPlay) {

@@ -4,8 +4,8 @@ import HealthKit
 import WatchConnectivity
 
 @MainActor
-final class SessionWorkoutBridge: NSObject, ObservableObject {
-    static let shared = SessionWorkoutBridge()
+final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
+    static let shared = IIDXSessionWorkoutBridge()
 
     static let healthKitEnabledKey = "Sessions.HealthKitEnabled"
 
@@ -113,7 +113,7 @@ final class SessionWorkoutBridge: NSObject, ObservableObject {
         guard sessionID == activeSessionID else { return }
         if let heartRate { self.heartRate = heartRate }
         if let activeCalories { self.activeCalories = activeCalories }
-        SessionLiveActivityController.shared.updateMetrics(
+        IIDXSessionLiveActivityController.shared.updateMetrics(
             sessionID: sessionID,
             heartRate: self.heartRate > 0 ? self.heartRate : nil,
             activeCalories: self.activeCalories > 0 ? self.activeCalories : nil
@@ -152,7 +152,7 @@ final class SessionWorkoutBridge: NSObject, ObservableObject {
     }
 }
 
-extension SessionWorkoutBridge: WCSessionDelegate {
+extension IIDXSessionWorkoutBridge: WCSessionDelegate {
     nonisolated func session(_ session: WCSession,
                              activationDidCompleteWith activationState: WCSessionActivationState,
                              error: Error?) {}

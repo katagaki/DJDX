@@ -90,13 +90,13 @@ enum IIDXResultReader {
             return await IIDXRankRecognizer.classify(cgImage: crop) ?? ""
         }
         if titleLabels.contains(detection.label) {
-            return await ocrText(crop, languages: SessionTextRecognizer.titleLanguages)
+            return await ocrText(crop, languages: IIDXSessionTextRecognizer.titleLanguages)
         }
         if digitLabels.contains(detection.label),
            let value = await IIDXDigitRecognizer.recognize(cgImage: crop) {
             return String(value)
         }
-        return await ocrText(crop, languages: SessionTextRecognizer.numericLanguages)
+        return await ocrText(crop, languages: IIDXSessionTextRecognizer.numericLanguages)
     }
 
     // MARK: - Vision
@@ -144,7 +144,7 @@ enum IIDXResultReader {
     // MARK: - Per-region OCR
 
     private static func ocrText(_ crop: CGImage, languages: [String]) async -> String {
-        let lines = (try? await SessionTextRecognizer.recognize(cgImage: crop, languages: languages)) ?? []
+        let lines = (try? await IIDXSessionTextRecognizer.recognize(cgImage: crop, languages: languages)) ?? []
         // Headline value first: a field's own value is rendered larger than any
         // neighbouring delta/column that bleeds into the crop.
         return lines

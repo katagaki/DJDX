@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CapturedPlayDetailView: View {
-    var store: SessionStore
+    var store: IIDXSessionStore
     var play: IIDXCapturedPlay
 
     @Environment(\.dismiss) private var dismiss
@@ -23,10 +23,10 @@ struct CapturedPlayDetailView: View {
     var body: some View {
         Form {
             Section {
-                if let image = SessionImageStore.shared.image(for: play.rawImageFilename) {
+                if let image = IIDXSessionImageStore.shared.image(for: play.rawImageFilename) {
                     RecognizedTextImage(
                         image: image,
-                        result: SessionImageStore.shared.recognizedText(id: play.id)
+                        result: IIDXSessionImageStore.shared.recognizedText(id: play.id)
                     )
                     .frame(maxWidth: .infinity)
                     .clipShape(RoundedRectangle(cornerRadius: 12.0))

@@ -283,7 +283,7 @@ private extension SessionCropPreviewView {
 
     private func runDetection() async {
         let detected = await Task.detached(priority: .userInitiated) {
-            ScreenCropDetector.detect(in: imageData)
+            IIDXScreenCropDetector.detect(in: imageData)
         }.value
         await MainActor.run {
             if let detected {
@@ -302,7 +302,7 @@ private extension SessionCropPreviewView {
         }
     }
 
-    private func viewCorners(from screen: ScreenCropDetector.Screen) -> [CGPoint] {
+    private func viewCorners(from screen: IIDXScreenCropDetector.Screen) -> [CGPoint] {
         [
             CGPoint(x: screen.topLeft.x, y: 1.0 - screen.topLeft.y),
             CGPoint(x: screen.topRight.x, y: 1.0 - screen.topRight.y),
@@ -317,13 +317,13 @@ private extension SessionCropPreviewView {
         let corners = normalizedCorners
         let data = imageData
         Task.detached(priority: .userInitiated) {
-            let screen = ScreenCropDetector.Screen(
+            let screen = IIDXScreenCropDetector.Screen(
                 topLeft: CGPoint(x: corners[0].x, y: 1.0 - corners[0].y),
                 topRight: CGPoint(x: corners[1].x, y: 1.0 - corners[1].y),
                 bottomRight: CGPoint(x: corners[2].x, y: 1.0 - corners[2].y),
                 bottomLeft: CGPoint(x: corners[3].x, y: 1.0 - corners[3].y)
             )
-            let corrected = ScreenCropDetector.perspectiveCorrect(imageData: data, screen: screen)
+            let corrected = IIDXScreenCropDetector.perspectiveCorrect(imageData: data, screen: screen)
             await MainActor.run { onAccept(corrected ?? data) }
         }
     }

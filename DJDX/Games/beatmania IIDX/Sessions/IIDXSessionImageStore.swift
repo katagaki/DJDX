@@ -14,8 +14,8 @@ struct RecognizedTextResult: Codable, Sendable {
     var title: [RecognizedTextBox]
 }
 
-final class SessionImageStore: Sendable {
-    static let shared = SessionImageStore()
+final class IIDXSessionImageStore: Sendable {
+    static let shared = IIDXSessionImageStore()
 
     private let directory: URL
 

@@ -1,8 +1,8 @@
 import UIKit
 
 @MainActor
-final class SessionBackgroundActivity {
-    static let shared = SessionBackgroundActivity()
+final class IIDXSessionBackgroundActivity {
+    static let shared = IIDXSessionBackgroundActivity()
 
     private var taskID: UIBackgroundTaskIdentifier = .invalid
     private var count = 0

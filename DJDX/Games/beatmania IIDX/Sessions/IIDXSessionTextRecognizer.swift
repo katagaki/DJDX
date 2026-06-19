@@ -2,11 +2,11 @@ import Foundation
 import ImageIO
 import Vision
 
-enum SessionTextRecognizerError: Error {
+enum IIDXSessionTextRecognizerError: Error {
     case invalidImage
 }
 
-enum SessionTextRecognizer {
+enum IIDXSessionTextRecognizer {
 
     // Numbers on the result screen get misread as kanji/kana when Japanese is a
     // recognition language, so callers run two passes: this set for the song
@@ -16,7 +16,7 @@ enum SessionTextRecognizer {
 
     static func recognize(imageData: Data, languages: [String]) async throws -> [OCRLine] {
         guard let decoded = decodeImage(from: imageData) else {
-            throw SessionTextRecognizerError.invalidImage
+            throw IIDXSessionTextRecognizerError.invalidImage
         }
         return try await recognize(cgImage: decoded.image,
                                    orientation: decoded.orientation,

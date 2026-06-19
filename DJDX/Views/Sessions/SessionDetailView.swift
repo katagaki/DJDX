@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SessionDetailView: View {
-    var store: SessionStore
+    var store: IIDXSessionStore
     var session: IIDXPlaySession
 
     @State private var plays: [IIDXCapturedPlay] = []

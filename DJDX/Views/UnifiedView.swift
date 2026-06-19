@@ -39,7 +39,7 @@ struct UnifiedView: View {
     @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
     @State var polarisChordAnalyticsModel = PolarisChordAnalyticsModel()
     @State var ddrAnalyticsModel = DDRAnalyticsModel()
-    @State var sessionStore = SessionStore()
+    @State var sessionStore = IIDXSessionStore()
 
     @Namespace var analyticsNamespace
     @Namespace var sdvxAnalyticsNamespace

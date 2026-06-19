@@ -8,14 +8,14 @@ private struct CropPreviewItem: Identifiable {
 }
 
 struct ActiveSessionView: View {
-    var store: SessionStore
+    var store: IIDXSessionStore
 
     @State private var isPresentingCamera: Bool = false
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isShowingCameraDeniedAlert: Bool = false
     @State private var cropQueue: [Data] = []
     @State private var currentCropItem: CropPreviewItem? = nil
-    @ObservedObject private var workoutBridge = SessionWorkoutBridge.shared
+    @ObservedObject private var workoutBridge = IIDXSessionWorkoutBridge.shared
 
     var body: some View {
         NavigationStack {

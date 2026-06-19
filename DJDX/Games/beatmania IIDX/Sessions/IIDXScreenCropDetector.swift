@@ -2,7 +2,7 @@ import CoreImage
 import UIKit
 import Vision
 
-enum ScreenCropDetector {
+enum IIDXScreenCropDetector {
 
     struct Screen {
         var topLeft: CGPoint

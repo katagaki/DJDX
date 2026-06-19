@@ -1,7 +1,7 @@
 import BackgroundTasks
 import Foundation
 
-enum SessionOCRBackgroundTask {
+enum IIDXSessionOCRBackgroundTask {
 
     static let identifier = "com.tsubuzaki.DJDX.sessionOCR"
 
@@ -25,7 +25,7 @@ enum SessionOCRBackgroundTask {
     private static func handle(_ task: BGTask) {
         nonisolated(unsafe) let unsafeTask = task
         let work = Task {
-            await SessionCaptureProcessor.shared.recover()
+            await IIDXSessionCaptureProcessor.shared.recover()
             scheduleIfNeeded()
             unsafeTask.setTaskCompleted(success: true)
         }

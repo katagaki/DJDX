@@ -2,8 +2,8 @@ import ActivityKit
 import Foundation
 
 @MainActor
-final class SessionLiveActivityController {
-    static let shared = SessionLiveActivityController()
+final class IIDXSessionLiveActivityController {
+    static let shared = IIDXSessionLiveActivityController()
 
     private var activity: Activity<SessionActivityAttributes>?
     private var sessionID: String?
