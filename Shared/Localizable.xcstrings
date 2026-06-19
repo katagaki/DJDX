@@ -1,110 +1,8 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
-    "ViewTitle.Sessions.Beta" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sessions (Beta)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション（ベータ）"
-          }
-        }
-      }
-    },
-    "Sessions.Detail.Annotations.Title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JP + EN"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日本語＋英語"
-          }
-        }
-      }
-    },
-    "Sessions.Detail.Annotations.Numeric" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "EN"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "英語のみ"
-          }
-        }
-      }
-    },
-    "Sessions.Detail.RecognizedText" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recognized Text"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "認識されたテキスト"
-          }
-        }
-      }
-    },
-    "Sessions.Detail.ShowText" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show recognized text"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "認識テキストを表示"
-          }
-        }
-      }
-    },
-    "Shared.Delete" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "削除"
-          }
-        }
-      }
-    },
     "" : {
-
+      "shouldTranslate" : false
     },
     " " : {
       "shouldTranslate" : false
@@ -2812,8 +2710,191 @@
         }
       }
     },
+    "Onboarding.Continue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "はじめる"
+          }
+        }
+      }
+    },
+    "Onboarding.Feature.ExternalData.Blurb" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enrich your library with song details, chart info, and notes radar data from external sources."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "さまざまな外部データソースの楽曲情報や譜面データを取り込んでライブラリーを充実させます。"
+          }
+        }
+      }
+    },
+    "Onboarding.Feature.ExternalData.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "External Data Sources"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外部データソース"
+          }
+        }
+      }
+    },
+    "Onboarding.Feature.MultipleGames.Blurb" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Track beatmania IIDX, SOUND VOLTEX, ポラリスコード, and DanceDanceRevolution scores all in one place."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "beatmania IIDX、SOUND VOLTEX、ポラリスコード、DanceDanceRevolutionのプレーデータを1つのアプリでまとめて管理できます。"
+          }
+        }
+      }
+    },
+    "Onboarding.Feature.MultipleGames.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Multiple Game Support"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複数タイトル対応"
+          }
+        }
+      }
+    },
+    "Onboarding.Feature.Sessions.Blurb" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capture the result screen and DJDX records your beatmania IIDX 1P scores automatically."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リザルト画面の写真を撮るだけで、beatmania IIDXの1Pプレーのスコアを自動で読み取ります。"
+          }
+        }
+      }
+    },
+    "Onboarding.Feature.Sessions.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sessions (Beta)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション（ベータ）"
+          }
+        }
+      }
+    },
+    "Onboarding.Feature.WebImport.Blurb" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to your KONAMI account and bring your scores in directly from e-amusement — no manual entry required."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KONAMI IDでログインすれば、e-amusementからスコアを直接取り込み。手入力は必要ありません。"
+          }
+        }
+      }
+    },
+    "Onboarding.Feature.WebImport.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web Import"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブインポート"
+          }
+        }
+      }
+    },
+    "Onboarding.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@へようこそ"
+          }
+        }
+      }
+    },
     "Rank" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rank"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ランク"
+          }
+        }
+      }
     },
     "Scores.CustomizeDisplay" : {
       "extractionState" : "manual",
@@ -3356,6 +3437,40 @@
         }
       }
     },
+    "Sessions.Detail.Annotations.Numeric" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EN"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "英語のみ"
+          }
+        }
+      }
+    },
+    "Sessions.Detail.Annotations.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JP + EN"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日本語＋英語"
+          }
+        }
+      }
+    },
     "Sessions.Detail.Bad" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3611,6 +3726,23 @@
         }
       }
     },
+    "Sessions.Detail.RecognizedText" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recognized Text"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "認識されたテキスト"
+          }
+        }
+      }
+    },
     "Sessions.Detail.Reprocess" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3641,6 +3773,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リザルト"
+          }
+        }
+      }
+    },
+    "Sessions.Detail.ShowText" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show recognized text"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "認識テキストを表示"
           }
         }
       }
@@ -4274,6 +4423,23 @@
         }
       }
     },
+    "Shared.Delete" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
+          }
+        }
+      }
+    },
     "Shared.Difficulty" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4531,23 +4697,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ノーツレーダー"
-          }
-        }
-      }
-    },
-    "Shared.IIDX.Qpro" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Qpro"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "クプロ"
           }
         }
       }
@@ -5749,6 +5898,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッション"
+          }
+        }
+      }
+    },
+    "ViewTitle.Sessions.Beta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sessions (Beta)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション（ベータ）"
           }
         }
       }

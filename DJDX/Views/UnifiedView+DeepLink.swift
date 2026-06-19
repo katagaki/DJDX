@@ -43,6 +43,9 @@ extension UnifiedView {
             appMode = .sessions
             sessionStore.requestCapture()
 
+        case "reonboard":
+            isPresentingOnboarding = true
+
         default:
             break
         }

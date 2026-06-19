@@ -24,8 +24,10 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
     @AppStorage(wrappedValue: false, ICloudBackupManager.restorePromptCompletedKey)
     var hasCompletedRestorePrompt: Bool
+    @AppStorage(wrappedValue: "", "Onboarding.LastSeenVersion") var lastSeenOnboardingVersion: String
 
     @State var isPresentingImport: Bool = false
+    @State var isPresentingOnboarding: Bool = false
     @State var isEditingAnalytics: Bool = false
 
     @State var availableBackupDate: Date?
@@ -197,6 +199,12 @@ struct UnifiedView: View {
             .presentationDetents([.large])
             .interactiveDismissDisabled()
         }
+        .sheet(isPresented: $isPresentingOnboarding) {
+            OnboardingView {
+                lastSeenOnboardingVersion = OnboardingView.appVersion
+                isPresentingOnboarding = false
+            }
+        }
         .fullScreenCover(isPresented: $migrationProgress.isShowing) {
             ProgressCard(
                 title: migrationProgress.title,
@@ -220,11 +228,17 @@ struct UnifiedView: View {
                 .datastoreLocation(.applicationDefault)
             ])
             launchCount += 1
-            if launchCount > 2 && !hasReviewBeenPrompted {
+            if OnboardingView.shouldShow(
+                currentVersion: OnboardingView.appVersion,
+                lastSeenVersion: lastSeenOnboardingVersion
+            ) {
+                isPresentingOnboarding = true
+            }
+            if launchCount > 2 && !hasReviewBeenPrompted && !isPresentingOnboarding {
                 requestReview()
                 hasReviewBeenPrompted = true
             }
-            if !hasCompletedRestorePrompt {
+            if !hasCompletedRestorePrompt && !isPresentingOnboarding {
                 if await hasExistingPlayData() {
                     hasCompletedRestorePrompt = true
                 } else {
