@@ -15,7 +15,7 @@ enum SessionOCRBackgroundTask {
     }
 
     static func scheduleIfNeeded() {
-        guard !PlaySessionsDatabase.shared.incompletePlays().isEmpty else { return }
+        guard !IIDXPlaySessionsDatabase.shared.incompletePlays().isEmpty else { return }
         let request = BGProcessingTaskRequest(identifier: identifier)
         request.requiresNetworkConnectivity = false
         request.requiresExternalPower = false

@@ -16,7 +16,7 @@ struct DJDXApp: App {
     init() {
         DataMigration.runVersion334CleanupIfNeeded()
         _ = IIDXPlayDataDatabase.shared
-        _ = PlaySessionsDatabase.shared
+        _ = IIDXPlaySessionsDatabase.shared
         _ = SessionWorkoutBridge.shared
         ICloudBackupManager.registerBackgroundTask()
         ICloudBackupManager.scheduleNextBackup()

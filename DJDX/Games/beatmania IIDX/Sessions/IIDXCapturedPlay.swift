@@ -1,12 +1,12 @@
 import Foundation
 
-final class CapturedPlay: Identifiable, @unchecked Sendable {
+final class IIDXCapturedPlay: Identifiable, @unchecked Sendable {
     var id: String = UUID().uuidString
     var sessionID: String = ""
     var captureDate: Date = .now
-    var source: CapturedPlaySource = .camera
+    var source: IIDXCapturedPlaySource = .camera
     var rawImageFilename: String = ""
-    var state: CapturedPlayState = .pending
+    var state: IIDXCapturedPlayState = .pending
 
     var songTitle: String?
     var matchedSongID: Int64?
@@ -33,9 +33,9 @@ final class CapturedPlay: Identifiable, @unchecked Sendable {
     init(id: String = UUID().uuidString,
          sessionID: String,
          captureDate: Date = .now,
-         source: CapturedPlaySource,
+         source: IIDXCapturedPlaySource,
          rawImageFilename: String,
-         state: CapturedPlayState = .pending) {
+         state: IIDXCapturedPlayState = .pending) {
         self.id = id
         self.sessionID = sessionID
         self.captureDate = captureDate

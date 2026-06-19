@@ -3,13 +3,13 @@ import SQLite
 
 // swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
-final class PlaySessionsDatabase: Sendable {
+final class IIDXPlaySessionsDatabase: Sendable {
 
-    static let shared = PlaySessionsDatabase()
+    static let shared = IIDXPlaySessionsDatabase()
 
     let databasePath: String
 
-    // MARK: - PlaySession Table
+    // MARK: - IIDXPlaySession Table
 
     static let sessionTable = Table("PlaySession")
     static let sID = SQLite.Expression<String>("id")
@@ -22,7 +22,7 @@ final class PlaySessionsDatabase: Sendable {
     static let sLiveActivityID = SQLite.Expression<String?>("liveActivityID")
     static let sNotes = SQLite.Expression<String?>("notes")
 
-    // MARK: - CapturedPlay Table
+    // MARK: - IIDXCapturedPlay Table
 
     static let playTable = Table("CapturedPlay")
     static let pID = SQLite.Expression<String>("id")
@@ -88,9 +88,9 @@ final class PlaySessionsDatabase: Sendable {
                 table.column(Self.pID, primaryKey: true)
                 table.column(Self.pSessionID)
                 table.column(Self.pCaptureDate)
-                table.column(Self.pSource, defaultValue: CapturedPlaySource.camera.rawValue)
+                table.column(Self.pSource, defaultValue: IIDXCapturedPlaySource.camera.rawValue)
                 table.column(Self.pRawImageFilename, defaultValue: "")
-                table.column(Self.pState, defaultValue: CapturedPlayState.pending.rawValue)
+                table.column(Self.pState, defaultValue: IIDXCapturedPlayState.pending.rawValue)
                 table.column(Self.pSongTitle)
                 table.column(Self.pMatchedSongID)
                 table.column(Self.pLevel, defaultValue: "")
@@ -129,7 +129,7 @@ final class PlaySessionsDatabase: Sendable {
 
     // MARK: - Session CRUD
 
-    func createSession(_ session: PlaySession) {
+    func createSession(_ session: IIDXPlaySession) {
         guard let database = try? getWriteConnection() else { return }
         try? database.run(Self.sessionTable.insert(or: .replace,
             Self.sID <- session.id,
@@ -144,7 +144,7 @@ final class PlaySessionsDatabase: Sendable {
         ))
     }
 
-    func updateSession(_ session: PlaySession) {
+    func updateSession(_ session: IIDXPlaySession) {
         guard let database = try? getWriteConnection() else { return }
         try? database.run(Self.sessionTable.filter(Self.sID == session.id).update(
             Self.sEndDate <- session.endDate?.timeIntervalSince1970,
@@ -172,7 +172,7 @@ final class PlaySessionsDatabase: Sendable {
         try? database.run(Self.sessionTable.filter(Self.sID == id).delete())
     }
 
-    func activeSession() -> PlaySession? {
+    func activeSession() -> IIDXPlaySession? {
         guard let database = try? getReadConnection() else { return nil }
         let query = Self.sessionTable.filter(Self.sEndDate == nil)
             .order(Self.sStartDate.desc).limit(1)
@@ -180,14 +180,14 @@ final class PlaySessionsDatabase: Sendable {
         return Self.session(from: row)
     }
 
-    func allSessions() -> [PlaySession] {
+    func allSessions() -> [IIDXPlaySession] {
         guard let database = try? getReadConnection() else { return [] }
         let query = Self.sessionTable.order(Self.sStartDate.desc)
         guard let rows = try? database.prepare(query) else { return [] }
         return rows.map { Self.session(from: $0) }
     }
 
-    func session(id: String) -> PlaySession? {
+    func session(id: String) -> IIDXPlaySession? {
         guard let database = try? getReadConnection() else { return nil }
         guard let row = try? database.pluck(Self.sessionTable.filter(Self.sID == id)) else { return nil }
         return Self.session(from: row)
@@ -195,39 +195,39 @@ final class PlaySessionsDatabase: Sendable {
 
     // MARK: - Play CRUD
 
-    func insertPlay(_ play: CapturedPlay) {
+    func insertPlay(_ play: IIDXCapturedPlay) {
         guard let database = try? getWriteConnection() else { return }
         try? database.run(Self.playTable.insert(or: .replace, setters(for: play)))
     }
 
-    func updatePlay(_ play: CapturedPlay) {
+    func updatePlay(_ play: IIDXCapturedPlay) {
         guard let database = try? getWriteConnection() else { return }
         try? database.run(Self.playTable.filter(Self.pID == play.id).update(setters(for: play)))
     }
 
-    func updatePlayState(id: String, state: CapturedPlayState) {
+    func updatePlayState(id: String, state: IIDXCapturedPlayState) {
         guard let database = try? getWriteConnection() else { return }
         try? database.run(Self.playTable.filter(Self.pID == id).update(Self.pState <- state.rawValue))
     }
 
-    func plays(forSession sessionID: String) -> [CapturedPlay] {
+    func plays(forSession sessionID: String) -> [IIDXCapturedPlay] {
         guard let database = try? getReadConnection() else { return [] }
         let query = Self.playTable.filter(Self.pSessionID == sessionID).order(Self.pCaptureDate.asc)
         guard let rows = try? database.prepare(query) else { return [] }
         return rows.map { Self.play(from: $0) }
     }
 
-    func play(id: String) -> CapturedPlay? {
+    func play(id: String) -> IIDXCapturedPlay? {
         guard let database = try? getReadConnection() else { return nil }
         guard let row = try? database.pluck(Self.playTable.filter(Self.pID == id)) else { return nil }
         return Self.play(from: row)
     }
 
-    func incompletePlays() -> [CapturedPlay] {
+    func incompletePlays() -> [IIDXCapturedPlay] {
         guard let database = try? getReadConnection() else { return [] }
         let query = Self.playTable.filter(
-            Self.pState == CapturedPlayState.pending.rawValue ||
-            Self.pState == CapturedPlayState.processing.rawValue
+            Self.pState == IIDXCapturedPlayState.pending.rawValue ||
+            Self.pState == IIDXCapturedPlayState.processing.rawValue
         ).order(Self.pCaptureDate.asc)
         guard let rows = try? database.prepare(query) else { return [] }
         return rows.map { Self.play(from: $0) }
@@ -243,7 +243,7 @@ final class PlaySessionsDatabase: Sendable {
 
     // MARK: - Row mapping
 
-    private func setters(for play: CapturedPlay) -> [Setter] {
+    private func setters(for play: IIDXCapturedPlay) -> [Setter] {
         [
             Self.pID <- play.id,
             Self.pSessionID <- play.sessionID,
@@ -282,8 +282,8 @@ final class PlaySessionsDatabase: Sendable {
         ))
     }
 
-    private static func session(from row: Row) -> PlaySession {
-        PlaySession(
+    private static func session(from row: Row) -> IIDXPlaySession {
+        IIDXPlaySession(
             id: row[sID],
             game: Game(rawValue: row[sGame]) ?? .iidxArcade,
             startDate: Date(timeIntervalSince1970: row[sStartDate]),
@@ -296,14 +296,14 @@ final class PlaySessionsDatabase: Sendable {
         )
     }
 
-    private static func play(from row: Row) -> CapturedPlay {
-        let play = CapturedPlay(
+    private static func play(from row: Row) -> IIDXCapturedPlay {
+        let play = IIDXCapturedPlay(
             id: row[pID],
             sessionID: row[pSessionID],
             captureDate: Date(timeIntervalSince1970: row[pCaptureDate]),
-            source: CapturedPlaySource(rawValue: row[pSource]) ?? .camera,
+            source: IIDXCapturedPlaySource(rawValue: row[pSource]) ?? .camera,
             rawImageFilename: row[pRawImageFilename],
-            state: CapturedPlayState(rawValue: row[pState]) ?? .pending
+            state: IIDXCapturedPlayState(rawValue: row[pState]) ?? .pending
         )
         play.songTitle = row[pSongTitle]
         play.matchedSongID = row[pMatchedSongID]

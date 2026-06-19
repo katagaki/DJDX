@@ -2,9 +2,9 @@ import SwiftUI
 
 struct SessionDetailView: View {
     var store: SessionStore
-    var session: PlaySession
+    var session: IIDXPlaySession
 
-    @State private var plays: [CapturedPlay] = []
+    @State private var plays: [IIDXCapturedPlay] = []
     @State private var isSummaryExpanded: Bool = true
     @State private var isDJLevelExpanded: Bool = true
     @State private var isClearTypeExpanded: Bool = true
@@ -125,7 +125,7 @@ struct SessionDetailView: View {
         }
     }
 
-    private func deletePlay(_ play: CapturedPlay) {
+    private func deletePlay(_ play: IIDXCapturedPlay) {
         store.deletePlay(play)
         plays = store.plays(for: session)
     }

@@ -14,7 +14,7 @@ final class SessionWorkoutBridge: NSObject, ObservableObject {
     @Published var isWorkoutActive: Bool = false
 
     private let healthStore = HKHealthStore()
-    private let database = PlaySessionsDatabase.shared
+    private let database = IIDXPlaySessionsDatabase.shared
     private var activeSessionID: String?
     private var workoutStart: Date?
 
@@ -76,7 +76,7 @@ final class SessionWorkoutBridge: NSObject, ObservableObject {
         }
     }
 
-    func startWorkout(session: PlaySession) {
+    func startWorkout(session: IIDXPlaySession) {
         guard isEnabled else { return }
         activeSessionID = session.id
         workoutStart = session.startDate
@@ -86,7 +86,7 @@ final class SessionWorkoutBridge: NSObject, ObservableObject {
         send(["command": "start", "sessionID": session.id])
     }
 
-    func endWorkout(session: PlaySession) {
+    func endWorkout(session: IIDXPlaySession) {
         guard isEnabled, activeSessionID == session.id else { return }
         send(["command": "end", "sessionID": session.id])
         if !WCSession.default.isPaired {
@@ -127,7 +127,7 @@ final class SessionWorkoutBridge: NSObject, ObservableObject {
         database.updateSession(session)
     }
 
-    private func saveFallbackWorkout(for session: PlaySession) {
+    private func saveFallbackWorkout(for session: IIDXPlaySession) {
         guard let start = workoutStart else { return }
         let end = Date()
         let configuration = HKWorkoutConfiguration()

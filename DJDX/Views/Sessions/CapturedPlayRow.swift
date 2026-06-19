@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CapturedPlayRow: View {
-    var play: CapturedPlay
+    var play: IIDXCapturedPlay
 
     @Namespace private var namespace
 

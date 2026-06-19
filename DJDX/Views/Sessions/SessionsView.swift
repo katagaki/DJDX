@@ -8,7 +8,7 @@ struct SessionsView: View {
     @AppStorage(wrappedValue: false, SessionWorkoutBridge.healthKitEnabledKey) private var healthKitEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") private var isBemaniWikiEnabled: Bool
 
-    private var pastSessions: [PlaySession] {
+    private var pastSessions: [IIDXPlaySession] {
         store.sessions.filter { !$0.isActive }
     }
 
@@ -107,7 +107,7 @@ struct SessionsView: View {
         .padding(.vertical, 4.0)
     }
 
-    private func resumeCard(_ session: PlaySession) -> some View {
+    private func resumeCard(_ session: IIDXPlaySession) -> some View {
         HStack {
             Image(systemName: "record.circle")
                 .foregroundStyle(.red)
@@ -129,7 +129,7 @@ struct SessionsView: View {
 
 struct SessionSummaryRow: View {
     var store: SessionStore
-    var session: PlaySession
+    var session: IIDXPlaySession
 
     var body: some View {
         HStack {

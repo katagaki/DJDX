@@ -1,6 +1,6 @@
 import Foundation
 
-enum CapturedPlayState: String, Codable {
+enum IIDXCapturedPlayState: String, Codable {
     case pending
     case processing
     case done
@@ -15,7 +15,7 @@ enum CapturedPlayState: String, Codable {
     }
 }
 
-enum CapturedPlaySource: String, Codable {
+enum IIDXCapturedPlaySource: String, Codable {
     case camera
     case picker
 }

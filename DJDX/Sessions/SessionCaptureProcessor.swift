@@ -6,7 +6,7 @@ actor SessionCaptureProcessor {
 
     static let acceptableConfidence = 0.6
 
-    private let database = PlaySessionsDatabase.shared
+    private let database = IIDXPlaySessionsDatabase.shared
     private var songCandidates: [IIDXSongCandidate]?
     private var queue: [String] = []
     private var isDraining = false
@@ -68,7 +68,7 @@ actor SessionCaptureProcessor {
         await SessionLiveActivityController.shared.refresh(sessionID: play.sessionID)
     }
 
-    private func fail(_ play: CapturedPlay, message: String) {
+    private func fail(_ play: IIDXCapturedPlay, message: String) {
         play.state = .failed
         play.parseError = message
         play.processedAt = .now

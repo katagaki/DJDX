@@ -5,12 +5,12 @@ import Observation
 @Observable
 final class SessionStore {
 
-    var activeSession: PlaySession?
-    var plays: [CapturedPlay] = []
-    var sessions: [PlaySession] = []
+    var activeSession: IIDXPlaySession?
+    var plays: [IIDXCapturedPlay] = []
+    var sessions: [IIDXPlaySession] = []
     var pendingCaptureRequest: Bool = false
 
-    private let database = PlaySessionsDatabase.shared
+    private let database = IIDXPlaySessionsDatabase.shared
 
     func bootstrap() {
         activeSession = database.activeSession()
@@ -30,8 +30,8 @@ final class SessionStore {
     }
 
     @discardableResult
-    func startSession() -> PlaySession {
-        let session = PlaySession(game: .iidxArcade)
+    func startSession() -> IIDXPlaySession {
+        let session = IIDXPlaySession(game: .iidxArcade)
         database.createSession(session)
         activeSession = session
         plays = []
@@ -54,12 +54,12 @@ final class SessionStore {
         NotificationCenter.default.post(name: .playSessionDidChange, object: endedID)
     }
 
-    func capture(_ imageData: Data, source: CapturedPlaySource) {
+    func capture(_ imageData: Data, source: IIDXCapturedPlaySource) {
         guard let activeSession else { return }
         let id = UUID().uuidString
         let captureDate = Date()
         let filename = SessionImageStore.shared.write(imageData, id: id)
-        let play = CapturedPlay(
+        let play = IIDXCapturedPlay(
             id: id,
             sessionID: activeSession.id,
             captureDate: captureDate,
@@ -87,29 +87,29 @@ final class SessionStore {
         }
     }
 
-    func reprocess(_ play: CapturedPlay) {
+    func reprocess(_ play: IIDXCapturedPlay) {
         Task { await SessionCaptureProcessor.shared.reprocess(play.id) }
     }
 
-    func saveCorrected(_ play: CapturedPlay) {
+    func saveCorrected(_ play: IIDXCapturedPlay) {
         play.state = .done
         database.updatePlay(play)
         refreshPlays()
         NotificationCenter.default.post(name: .capturedPlayDidChange, object: play.id)
     }
 
-    func deletePlay(_ play: CapturedPlay) {
+    func deletePlay(_ play: IIDXCapturedPlay) {
         database.deletePlay(id: play.id)
         refreshPlays()
     }
 
-    func deleteSession(_ session: PlaySession) {
+    func deleteSession(_ session: IIDXPlaySession) {
         database.deleteSession(id: session.id)
         if activeSession?.id == session.id { activeSession = nil; plays = [] }
         loadSessions()
     }
 
-    func plays(for session: PlaySession) -> [CapturedPlay] {
+    func plays(for session: IIDXPlaySession) -> [IIDXCapturedPlay] {
         database.plays(forSession: session.id)
     }
 }

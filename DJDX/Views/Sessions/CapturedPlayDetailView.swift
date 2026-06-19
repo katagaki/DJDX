@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CapturedPlayDetailView: View {
     var store: SessionStore
-    var play: CapturedPlay
+    var play: IIDXCapturedPlay
 
     @Environment(\.dismiss) private var dismiss
 

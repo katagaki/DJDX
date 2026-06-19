@@ -7,9 +7,9 @@ final class SessionLiveActivityController {
 
     private var activity: Activity<SessionActivityAttributes>?
     private var sessionID: String?
-    private let database = PlaySessionsDatabase.shared
+    private let database = IIDXPlaySessionsDatabase.shared
 
-    func start(_ session: PlaySession) {
+    func start(_ session: IIDXPlaySession) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         end()
         let attributes = SessionActivityAttributes(
@@ -99,7 +99,7 @@ final class SessionLiveActivityController {
         )
     }
 
-    private static func summary(_ play: CapturedPlay) -> String? {
+    private static func summary(_ play: IIDXCapturedPlay) -> String? {
         var parts: [String] = []
         if play.clearType != IIDXClearType.noPlay.rawValue {
             parts.append(IIDXClearType.abbreviation(for: play.clearType))
@@ -113,7 +113,7 @@ final class SessionLiveActivityController {
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
-    private static func best(_ plays: [CapturedPlay]) -> String? {
+    private static func best(_ plays: [IIDXCapturedPlay]) -> String? {
         let levels = plays
             .map { IIDXDJLevel(rawValue: $0.djLevel) ?? .none }
             .filter { $0 != .none }

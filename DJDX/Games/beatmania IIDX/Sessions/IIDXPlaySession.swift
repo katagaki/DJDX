@@ -1,6 +1,6 @@
 import Foundation
 
-final class PlaySession: Identifiable, @unchecked Sendable {
+final class IIDXPlaySession: Identifiable, @unchecked Sendable {
     var id: String = UUID().uuidString
     var game: Game = .iidxArcade
     var startDate: Date = .now
