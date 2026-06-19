@@ -2,19 +2,12 @@ import AVFoundation
 import PhotosUI
 import SwiftUI
 
-private struct CropPreviewItem: Identifiable {
-    let id = UUID()
-    let data: Data
-}
-
 struct ActiveSessionView: View {
     var store: IIDXSessionStore
 
     @State private var isPresentingCamera: Bool = false
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isShowingCameraDeniedAlert: Bool = false
-    @State private var cropQueue: [Data] = []
-    @State private var currentCropItem: CropPreviewItem? = nil
     @ObservedObject private var workoutBridge = IIDXSessionWorkoutBridge.shared
 
     var body: some View {
@@ -72,16 +65,6 @@ struct ActiveSessionView: View {
         .onAppear(perform: consumePendingCaptureRequest)
         .onChange(of: store.pendingCaptureRequest) { _, _ in
             consumePendingCaptureRequest()
-        }
-        .fullScreenCover(item: $currentCropItem) { item in
-            SessionCropPreviewView(imageData: item.data) { processedData in
-                store.capture(processedData, source: .picker)
-                currentCropItem = nil
-                showNextCrop()
-            } onRetake: {
-                currentCropItem = nil
-                showNextCrop()
-            }
         }
         .alert("Sessions.Camera.Denied.Title", isPresented: $isShowingCameraDeniedAlert) {
             Button("Shared.OK", role: .cancel) {}
@@ -242,18 +225,12 @@ struct ActiveSessionView: View {
             for item in items {
                 if let data = try? await item.loadTransferable(type: Data.self) {
                     await MainActor.run {
-                        cropQueue.append(data)
-                        if currentCropItem == nil { showNextCrop() }
+                        store.capture(data, source: .picker)
                     }
                 }
             }
             await MainActor.run { pickerItems = [] }
         }
-    }
-
-    private func showNextCrop() {
-        guard !cropQueue.isEmpty else { return }
-        currentCropItem = CropPreviewItem(data: cropQueue.removeFirst())
     }
 
     private func elapsedString(since start: Date, now: Date) -> String {
