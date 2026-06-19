@@ -12,19 +12,19 @@ struct NotesRadarProvider: AppIntentTimelineProvider {
     }
 
     func snapshot(for configuration: NotesRadarWidgetIntent, in _: Context) async -> NotesRadarEntry {
-        let snapshot = WidgetDataStore.shared.readRadar()
+        let snapshot = WidgetDataReader.shared.radar()
         return NotesRadarEntry(
             date: .now, configuration: configuration,
-            radarData: snapshot?.spData
+            radarData: snapshot.spData
         )
     }
 
     func timeline(for configuration: NotesRadarWidgetIntent,
                   in _: Context) async -> Timeline<NotesRadarEntry> {
-        let snapshot = WidgetDataStore.shared.readRadar()
+        let snapshot = WidgetDataReader.shared.radar()
         let entry = NotesRadarEntry(
             date: .now, configuration: configuration,
-            radarData: snapshot?.spData
+            radarData: snapshot.spData
         )
         let nextUpdate = Calendar.current.date(byAdding: .hour, value: 4, to: .now)!
         return Timeline(entries: [entry], policy: .after(nextUpdate))

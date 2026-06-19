@@ -17,8 +17,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AA000001300100000000000C"
-               BuildableName = "DJDXWidgets.appex"
-               BlueprintName = "DJDXWidgets"
+               BuildableName = "DJDX Widgets.appex"
+               BlueprintName = "DJDX Widgets"
                ReferencedContainer = "container:DJDX.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -63,8 +63,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AA000001300100000000000C"
-            BuildableName = "DJDXWidgets.appex"
-            BlueprintName = "DJDXWidgets"
+            BuildableName = "DJDX Widgets.appex"
+            BlueprintName = "DJDX Widgets"
             ReferencedContainer = "container:DJDX.xcodeproj">
          </BuildableReference>
       </RemoteRunnable>

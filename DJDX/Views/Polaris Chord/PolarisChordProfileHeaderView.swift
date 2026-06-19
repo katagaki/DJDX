@@ -203,10 +203,7 @@ https://eacache.s.konaminet.jp/game/polarischord/\(polarisChordVersion.slug)/img
     }
 
     func imageFileURL(named fileName: String) -> URL? {
-        guard let documentsDirectory = FileManager.default.urls(
-            for: .documentDirectory, in: .userDomainMask
-        ).first else { return nil }
-        return documentsDirectory.appendingPathComponent(fileName)
+        SharedContainer.imagesURL.appendingPathComponent(fileName)
     }
 
     func loadCachedImage(named fileName: String) -> UIImage? {
@@ -217,6 +214,7 @@ https://eacache.s.konaminet.jp/game/polarischord/\(polarisChordVersion.slug)/img
 
     func saveImage(_ imageData: Data, named fileName: String) {
         guard let fileURL = imageFileURL(named: fileName) else { return }
+        try? FileManager.default.createDirectory(at: SharedContainer.imagesURL, withIntermediateDirectories: true)
         try? imageData.write(to: fileURL)
     }
 }

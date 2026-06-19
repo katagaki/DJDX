@@ -14,9 +14,19 @@ struct DJDXApp: App {
     }
 
     init() {
+        DataMigration.runVersion334CleanupIfNeeded()
         _ = IIDXPlayDataDatabase.shared
+        _ = IIDXPlaySessionsDatabase.shared
+        _ = IIDXSessionWorkoutBridge.shared
         ICloudBackupManager.registerBackgroundTask()
         ICloudBackupManager.scheduleNextBackup()
+        IIDXSessionOCRBackgroundTask.register()
+        Task {
+            await IIDXSessionCaptureProcessor.shared.recover()
+        }
+        Task { @MainActor in
+            IIDXSessionLiveActivityController.shared.reconcile()
+        }
         Task {
             let playTypeRaw = UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter") ?? "single"
             let playType = IIDXPlayType(rawValue: playTypeRaw) ?? .single

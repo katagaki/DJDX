@@ -34,8 +34,7 @@ final class DDRPlayDataDatabase: Sendable {
     // MARK: - Initialization
 
     init(fileName: String = "PlayDataDDR.db") {
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        databasePath = documentsURL.appendingPathComponent(fileName).path
+        databasePath = SharedContainer.containerURL.appendingPathComponent(fileName).path
         createTablesIfNeeded()
     }
 

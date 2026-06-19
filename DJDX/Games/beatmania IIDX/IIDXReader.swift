@@ -390,6 +390,35 @@ actor IIDXReader {
         return (try? database.prepare(query).map { Self.song(from: $0) }) ?? []
     }
 
+    func matchBEMANIWikiSong(title: String, playType: IIDXPlayType) -> IIDXSong? {
+        let needle = title.compact
+        guard needle.count >= 2 else { return nil }
+        let songs = fetchAllSongs()
+        guard !songs.isEmpty else { return nil }
+
+        func hasNotes(_ song: IIDXSong) -> Bool {
+            (playType == .single ? song.spNoteCount : song.dpNoteCount) != nil
+        }
+
+        if let exact = songs.first(where: { $0.titleCompact() == needle && hasNotes($0) })
+            ?? songs.first(where: { $0.titleCompact() == needle }) {
+            return exact
+        }
+
+        var best: (song: IIDXSong, ratio: Double)?
+        for song in songs {
+            let candidate = song.titleCompact()
+            guard candidate.count >= 2 else { continue }
+            let ratio = needle.editRatio(to: candidate)
+            guard ratio <= 0.2 else { continue }
+            if best == nil || ratio < best!.ratio
+                || (ratio == best!.ratio && hasNotes(song) && !hasNotes(best!.song)) {
+                best = (song, ratio)
+            }
+        }
+        return best?.song
+    }
+
     // MARK: BM2DX Notes Radar
 
     func fetchChartRadarData(title: String, playType: IIDXPlayType, difficulty: Int) -> ChartRadarData? {

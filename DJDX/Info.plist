@@ -5,6 +5,7 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.tsubuzaki.DJDX.iCloudBackup</string>
+		<string>com.tsubuzaki.DJDX.sessionOCR</string>
 	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
@@ -17,28 +18,34 @@
 			</array>
 		</dict>
 	</array>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>573.jp</key>
 			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
 				<true/>
 			</dict>
 			<key>konami.net</key>
 			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
 				<true/>
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>DJDX uses the camera to capture your result screens during a session.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>DJDX reads your workout, heart rate, and active energy to summarize your play sessions.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>DJDX saves your play sessions as workouts in the Health app.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSUbiquitousContainers</key>
 	<dict>
 		<key>iCloud.com.tsubuzaki.DJDX</key>

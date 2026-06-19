@@ -37,6 +37,12 @@ extension UnifiedView {
                 selectedGame = target
             }
 
+        case "session":
+            guard value(for: "action")?.lowercased() == "capture" else { return }
+            navigationManager.popToRoot()
+            appMode = .sessions
+            sessionStore.requestCapture()
+
         default:
             break
         }

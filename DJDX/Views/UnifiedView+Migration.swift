@@ -19,14 +19,4 @@ extension UnifiedView {
     }
 #endif
 
-    func migrateData() async {
-        let bemaniWikiMigrationKey = "Internal.BEMANIWikiMigratedToSeparateDB"
-        if !UserDefaults.standard.bool(forKey: bemaniWikiMigrationKey) {
-            UIApplication.shared.isIdleTimerDisabled = true
-            let migrationImporter = IIDXImporter()
-            await migrationImporter.migrateBEMANIWikiDataIfNeeded()
-            UserDefaults.standard.set(true, forKey: bemaniWikiMigrationKey)
-            UIApplication.shared.isIdleTimerDisabled = false
-        }
-    }
 }

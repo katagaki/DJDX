@@ -72,13 +72,13 @@ struct MoreMenu: View {
                     isPresentingICloudBackup = true
                 }
                 Menu("More.ManageData.DeleteOrReset", systemImage: "trash") {
-                    Button("More.ManageData.ResetLayout", systemImage: "arrow.counterclockwise", role: .destructive) {
+                    Button("More.ManageData.ResetLayout", systemImage: "arrow.counterclockwise") {
                         isConfirmingResetLayout = true
                     }
-                    Button("More.ManageData.DeleteWebData", image: .globeSlash, role: .destructive) {
+                    Button("More.ManageData.DeleteWebData", image: .globeSlash) {
                         isConfirmingWebDataDelete = true
                     }
-                    Button("More.ManageData.DeleteScoreData", systemImage: "trash", role: .destructive) {
+                    Button("More.ManageData.DeleteScoreData", systemImage: "trash") {
                         beginScoreDataDelete()
                     }
                 }
