@@ -7,18 +7,13 @@ struct SessionCropPreviewView: View {
 
     @State private var image: UIImage?
     @State private var normalizedCorners: [CGPoint] = []
-    @State private var detectedCorners: [CGPoint]?
     @State private var dragIndex: Int?
     @State private var imageFrameSize: CGSize = .zero
     @State private var isDetecting: Bool = true
     @State private var detectionFailed: Bool = false
     @State private var isApplying: Bool = false
 
-    @Environment(\.verticalSizeClass) private var verticalSizeClass
-
     private let cropSpace = "cropSpace"
-
-    private var isLandscape: Bool { verticalSizeClass == .compact }
 
     private var defaultCorners: [CGPoint] {
         [
@@ -35,7 +30,6 @@ struct SessionCropPreviewView: View {
         }
         .safeAreaInset(edge: .top, spacing: 0.0) { topControls }
         .safeAreaInset(edge: .bottom, spacing: 0.0) { bottomControls }
-        .safeAreaInset(edge: .trailing, spacing: 0.0) { trailingControls }
         .presentationBackground(.black)
         .sensoryFeedback(.selection, trigger: dragIndex)
         .task {
@@ -172,74 +166,31 @@ struct SessionCropPreviewView: View {
 
     @ViewBuilder
     private var topControls: some View {
-        instructionPill
-            .padding(.horizontal)
-            .padding(.top, 8.0)
-            .opacity(isDetecting ? 0.0 : 1.0)
-            .animation(.easeIn(duration: 0.2), value: isDetecting)
+        ZStack {
+            instructionPill
+            HStack {
+                backButton
+                Spacer()
+            }
+        }
+        .padding(.horizontal)
+        .padding(.top, 8.0)
+        .opacity(isDetecting ? 0.0 : 1.0)
+        .animation(.easeIn(duration: 0.2), value: isDetecting)
     }
 
     @ViewBuilder
     private var bottomControls: some View {
-        if !isLandscape {
-            HStack(spacing: 12.0) {
-                backButton
-                resetButton
-                useButton
-            }
-            .padding(.horizontal)
-            .padding(.top, 12.0)
-            .padding(.bottom, 8.0)
-            .opacity(isDetecting ? 0.0 : 1.0)
-            .animation(.easeIn(duration: 0.2), value: isDetecting)
+        HStack {
+            skipButton
+            Spacer()
+            doneButton
         }
-    }
-
-    @ViewBuilder
-    private var trailingControls: some View {
-        if isLandscape {
-            VStack(spacing: 14.0) {
-                circleControl(systemImage: "chevron.left", prominent: false,
-                              showsSpinner: false, disabled: isApplying, action: onRetake)
-                circleControl(systemImage: "arrow.counterclockwise", prominent: false,
-                              showsSpinner: false, disabled: isApplying, action: resetCorners)
-                circleControl(systemImage: "checkmark", prominent: true,
-                              showsSpinner: isApplying, disabled: isApplying || isDetecting, action: applyAndAccept)
-            }
-            .padding(.trailing)
-            .padding(.vertical, 8.0)
-            .opacity(isDetecting ? 0.0 : 1.0)
-            .animation(.easeIn(duration: 0.2), value: isDetecting)
-        }
-    }
-
-    @ViewBuilder
-    private func circleControl(systemImage: String, prominent: Bool, showsSpinner: Bool,
-                               disabled: Bool, action: @escaping () -> Void) -> some View {
-        let button = Button(action: action) {
-            Group {
-                if showsSpinner {
-                    ProgressView().tint(.white)
-                } else {
-                    Image(systemName: systemImage).font(.title3.weight(.semibold))
-                }
-            }
-            .frame(width: 30.0, height: 30.0)
-        }
-        .disabled(disabled)
-        if #available(iOS 26.0, *) {
-            if prominent {
-                button.buttonStyle(.glassProminent).controlSize(.large).clipShape(.circle)
-            } else {
-                button.buttonStyle(.glass).controlSize(.large).clipShape(.circle)
-            }
-        } else {
-            if prominent {
-                button.buttonStyle(.borderedProminent).controlSize(.large).clipShape(.circle)
-            } else {
-                button.buttonStyle(.bordered).controlSize(.large).tint(.white).clipShape(.circle)
-            }
-        }
+        .padding(.horizontal)
+        .padding(.top, 12.0)
+        .padding(.bottom, 8.0)
+        .opacity(isDetecting ? 0.0 : 1.0)
+        .animation(.easeIn(duration: 0.2), value: isDetecting)
     }
 
     private var instructionPill: some View {
@@ -253,25 +204,9 @@ struct SessionCropPreviewView: View {
     }
 
     @ViewBuilder
-    private var resetButton: some View {
-        let button = Button(action: resetCorners) {
-            Image(systemName: "arrow.counterclockwise")
-                .font(.body.weight(.semibold))
-                .frame(width: 24.0, height: 24.0)
-        }
-        .disabled(isApplying)
-        if #available(iOS 26.0, *) {
-            button.buttonStyle(.glass).controlSize(.large).clipShape(.circle)
-        } else {
-            button.buttonStyle(.bordered).controlSize(.large).tint(.white).clipShape(.circle)
-        }
-    }
-
-    @ViewBuilder
     private var backButton: some View {
         let button = Button(action: onRetake) {
             Label("Sessions.CropPreview.Back", systemImage: "chevron.left")
-                .frame(maxWidth: .infinity)
         }
         .disabled(isApplying)
         if #available(iOS 26.0, *) {
@@ -282,16 +217,28 @@ struct SessionCropPreviewView: View {
     }
 
     @ViewBuilder
-    private var useButton: some View {
+    private var skipButton: some View {
+        let button = Button { onAccept(imageData) } label: {
+            Label("Sessions.CropPreview.Skip", systemImage: "rectangle.dashed")
+        }
+        .disabled(isApplying)
+        if #available(iOS 26.0, *) {
+            button.buttonStyle(.glass).controlSize(.large)
+        } else {
+            button.buttonStyle(.bordered).controlSize(.large).tint(.white)
+        }
+    }
+
+    @ViewBuilder
+    private var doneButton: some View {
         let button = Button(action: applyAndAccept) {
             Group {
                 if isApplying {
                     ProgressView().tint(.white)
                 } else {
-                    Label("Sessions.CropPreview.Use", systemImage: "checkmark")
+                    Label("Sessions.CropPreview.Done", systemImage: "checkmark")
                 }
             }
-            .frame(maxWidth: .infinity)
         }
         .disabled(isApplying || isDetecting)
         if #available(iOS 26.0, *) {
@@ -332,12 +279,6 @@ private extension SessionCropPreviewView {
         )
     }
 
-    private func resetCorners() {
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-            normalizedCorners = detectedCorners ?? defaultCorners
-        }
-    }
-
     // MARK: - Detection & correction
 
     private func runDetection() async {
@@ -347,13 +288,11 @@ private extension SessionCropPreviewView {
         await MainActor.run {
             if let detected {
                 let corners = viewCorners(from: detected)
-                detectedCorners = corners
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
                     normalizedCorners = corners
                     isDetecting = false
                 }
             } else {
-                detectedCorners = nil
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
                     normalizedCorners = defaultCorners
                     detectionFailed = true

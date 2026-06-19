@@ -16,6 +16,9 @@ final class CapturedPlay: Identifiable, @unchecked Sendable {
     var exScore: Int = 0
     var perfectGreat: Int = 0
     var great: Int = 0
+    var good: Int = 0
+    var bad: Int = 0
+    var poor: Int = 0
     var miss: Int = 0
     var clearType: String = IIDXClearType.noPlay.rawValue
     var djLevel: String = IIDXDJLevel.none.rawValue
@@ -24,6 +27,8 @@ final class CapturedPlay: Identifiable, @unchecked Sendable {
     var parseError: String?
     var processedAt: Date?
     var gaugeData: Data?
+    var minHeartRate: Int?
+    var maxHeartRate: Int?
 
     init(id: String = UUID().uuidString,
          sessionID: String,
@@ -61,6 +66,9 @@ final class CapturedPlay: Identifiable, @unchecked Sendable {
         exScore = parse.exScore
         perfectGreat = parse.perfectGreat
         great = parse.great
+        good = parse.good
+        bad = parse.bad
+        poor = parse.poor
         miss = parse.miss
         clearType = parse.clearType
         djLevel = parse.djLevel

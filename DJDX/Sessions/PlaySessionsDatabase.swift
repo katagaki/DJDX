@@ -39,6 +39,9 @@ final class PlaySessionsDatabase: Sendable {
     static let pExScore = SQLite.Expression<Int>("exScore")
     static let pPerfectGreat = SQLite.Expression<Int>("perfectGreat")
     static let pGreat = SQLite.Expression<Int>("great")
+    static let pGood = SQLite.Expression<Int>("good")
+    static let pBad = SQLite.Expression<Int>("bad")
+    static let pPoor = SQLite.Expression<Int>("poor")
     static let pMiss = SQLite.Expression<Int>("miss")
     static let pClearType = SQLite.Expression<String>("clearType")
     static let pDJLevel = SQLite.Expression<String>("djLevel")
@@ -46,6 +49,8 @@ final class PlaySessionsDatabase: Sendable {
     static let pParseError = SQLite.Expression<String?>("parseError")
     static let pProcessedAt = SQLite.Expression<Double?>("processedAt")
     static let pGaugeData = SQLite.Expression<Blob?>("gaugeData")
+    static let pMinHeartRate = SQLite.Expression<Int?>("minHeartRate")
+    static let pMaxHeartRate = SQLite.Expression<Int?>("maxHeartRate")
 
     // MARK: - Initialization
 
@@ -94,6 +99,9 @@ final class PlaySessionsDatabase: Sendable {
                 table.column(Self.pExScore, defaultValue: 0)
                 table.column(Self.pPerfectGreat, defaultValue: 0)
                 table.column(Self.pGreat, defaultValue: 0)
+                table.column(Self.pGood, defaultValue: 0)
+                table.column(Self.pBad, defaultValue: 0)
+                table.column(Self.pPoor, defaultValue: 0)
                 table.column(Self.pMiss, defaultValue: 0)
                 table.column(Self.pClearType, defaultValue: IIDXClearType.noPlay.rawValue)
                 table.column(Self.pDJLevel, defaultValue: IIDXDJLevel.none.rawValue)
@@ -101,7 +109,15 @@ final class PlaySessionsDatabase: Sendable {
                 table.column(Self.pParseError)
                 table.column(Self.pProcessedAt)
                 table.column(Self.pGaugeData)
+                table.column(Self.pMinHeartRate)
+                table.column(Self.pMaxHeartRate)
             })
+
+            try? database.run(Self.playTable.addColumn(Self.pMinHeartRate))
+            try? database.run(Self.playTable.addColumn(Self.pMaxHeartRate))
+            try? database.run(Self.playTable.addColumn(Self.pGood, defaultValue: 0))
+            try? database.run(Self.playTable.addColumn(Self.pBad, defaultValue: 0))
+            try? database.run(Self.playTable.addColumn(Self.pPoor, defaultValue: 0))
 
             try database.run(Self.playTable.createIndex(Self.pSessionID, ifNotExists: true))
             try database.run(Self.playTable.createIndex(Self.pState, ifNotExists: true))
@@ -243,14 +259,27 @@ final class PlaySessionsDatabase: Sendable {
             Self.pExScore <- play.exScore,
             Self.pPerfectGreat <- play.perfectGreat,
             Self.pGreat <- play.great,
+            Self.pGood <- play.good,
+            Self.pBad <- play.bad,
+            Self.pPoor <- play.poor,
             Self.pMiss <- play.miss,
             Self.pClearType <- play.clearType,
             Self.pDJLevel <- play.djLevel,
             Self.pOCRConfidence <- play.ocrConfidence,
             Self.pParseError <- play.parseError,
             Self.pProcessedAt <- play.processedAt?.timeIntervalSince1970,
-            Self.pGaugeData <- play.gaugeData.map { Blob(bytes: [UInt8]($0)) }
+            Self.pGaugeData <- play.gaugeData.map { Blob(bytes: [UInt8]($0)) },
+            Self.pMinHeartRate <- play.minHeartRate,
+            Self.pMaxHeartRate <- play.maxHeartRate
         ]
+    }
+
+    func updatePlayHeartRate(id: String, min: Int, max: Int) {
+        guard let database = try? getWriteConnection() else { return }
+        try? database.run(Self.playTable.filter(Self.pID == id).update(
+            Self.pMinHeartRate <- min,
+            Self.pMaxHeartRate <- max
+        ))
     }
 
     private static func session(from row: Row) -> PlaySession {
@@ -284,6 +313,9 @@ final class PlaySessionsDatabase: Sendable {
         play.exScore = row[pExScore]
         play.perfectGreat = row[pPerfectGreat]
         play.great = row[pGreat]
+        play.good = row[pGood]
+        play.bad = row[pBad]
+        play.poor = row[pPoor]
         play.miss = row[pMiss]
         play.clearType = row[pClearType]
         play.djLevel = row[pDJLevel]
@@ -291,6 +323,8 @@ final class PlaySessionsDatabase: Sendable {
         play.parseError = row[pParseError]
         play.processedAt = row[pProcessedAt].map { Date(timeIntervalSince1970: $0) }
         play.gaugeData = row[pGaugeData].map { Data($0.bytes) }
+        play.minHeartRate = row[pMinHeartRate]
+        play.maxHeartRate = row[pMaxHeartRate]
         return play
     }
 }

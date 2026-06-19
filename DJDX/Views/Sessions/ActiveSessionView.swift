@@ -69,6 +69,10 @@ struct ActiveSessionView: View {
             .receive(on: RunLoop.main)) { _ in
             store.refreshPlays()
         }
+        .onAppear(perform: consumePendingCaptureRequest)
+        .onChange(of: store.pendingCaptureRequest) { _, _ in
+            consumePendingCaptureRequest()
+        }
         .fullScreenCover(item: $currentCropItem) { item in
             SessionCropPreviewView(imageData: item.data) { processedData in
                 store.capture(processedData, source: .picker)
@@ -148,25 +152,31 @@ struct ActiveSessionView: View {
             )
             .frame(maxHeight: .infinity)
         } else {
-            ScrollView {
-                LazyVStack(spacing: 0.0) {
-                    ForEach(store.plays.reversed()) { play in
-                        NavigationLink {
-                            CapturedPlayDetailView(store: store, play: play)
-                        } label: {
-                            CapturedPlayRow(play: play)
-                                .contentShape(.rect)
+            List {
+                ForEach(store.plays.reversed()) { play in
+                    NavigationLink {
+                        CapturedPlayDetailView(store: store, play: play)
+                    } label: {
+                        CapturedPlayRow(play: play)
+                            .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+                    .swipeActions(edge: .trailing) {
+                        Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                            store.deletePlay(play)
                         }
-                        .buttonStyle(.plain)
-                        .contextMenu {
-                            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                                store.deletePlay(play)
-                            }
+                    }
+                    .contextMenu {
+                        Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                            store.deletePlay(play)
                         }
-                        Divider()
                     }
                 }
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
         }
     }
 
@@ -195,7 +205,7 @@ struct ActiveSessionView: View {
 
     @ViewBuilder
     private var importButton: some View {
-        let picker = PhotosPicker(selection: $pickerItems, maxSelectionCount: 0, matching: .images) {
+        let picker = PhotosPicker(selection: $pickerItems, maxSelectionCount: 1, matching: .images) {
             Label("Sessions.Import", systemImage: "photo.on.rectangle")
                 .frame(maxWidth: .infinity)
         }
@@ -204,6 +214,12 @@ struct ActiveSessionView: View {
         } else {
             picker.buttonStyle(.bordered).controlSize(.large)
         }
+    }
+
+    private func consumePendingCaptureRequest() {
+        guard store.pendingCaptureRequest else { return }
+        store.pendingCaptureRequest = false
+        requestCameraThenPresent()
     }
 
     private func requestCameraThenPresent() {

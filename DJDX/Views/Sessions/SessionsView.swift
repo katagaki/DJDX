@@ -74,6 +74,9 @@ struct SessionsView: View {
         .onChange(of: store.activeSession?.id) { _, newValue in
             isPresentingActive = newValue != nil
         }
+        .onChange(of: store.pendingCaptureRequest) { _, pending in
+            if pending, store.activeSession != nil { isPresentingActive = true }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .playSessionDidChange)
             .receive(on: RunLoop.main)) { _ in
             store.loadSessions()

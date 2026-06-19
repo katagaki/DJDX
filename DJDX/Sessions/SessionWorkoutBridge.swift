@@ -47,6 +47,35 @@ final class SessionWorkoutBridge: NSObject, ObservableObject {
         }
     }
 
+    func heartRateRange(ending date: Date, window: TimeInterval = 60.0) async -> (min: Int, max: Int)? {
+        guard isEnabled, HKHealthStore.isHealthDataAvailable() else { return nil }
+        let heartRateType = HKQuantityType(.heartRate)
+        let predicate = HKQuery.predicateForSamples(
+            withStart: date.addingTimeInterval(-window),
+            end: date,
+            options: [.strictStartDate, .strictEndDate]
+        )
+        let unit = HKUnit.count().unitDivided(by: .minute())
+        return await withCheckedContinuation { continuation in
+            let query = HKStatisticsQuery(
+                quantityType: heartRateType,
+                quantitySamplePredicate: predicate,
+                options: [.discreteMin, .discreteMax]
+            ) { _, statistics, _ in
+                guard let statistics,
+                      let minQuantity = statistics.minimumQuantity(),
+                      let maxQuantity = statistics.maximumQuantity() else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                let min = Int(minQuantity.doubleValue(for: unit).rounded())
+                let max = Int(maxQuantity.doubleValue(for: unit).rounded())
+                continuation.resume(returning: (min, max))
+            }
+            healthStore.execute(query)
+        }
+    }
+
     func startWorkout(session: PlaySession) {
         guard isEnabled else { return }
         activeSessionID = session.id

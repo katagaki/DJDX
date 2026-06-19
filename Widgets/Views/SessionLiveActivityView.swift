@@ -5,10 +5,11 @@ import WidgetKit
 struct SessionLiveActivityView: View {
     let context: ActivityViewContext<SessionActivityAttributes>
 
+    static let captureURL = URL(string: "djdx://session?action=capture")!
+
     var body: some View {
         HStack(spacing: 14.0) {
             GameIconImage(assetName: context.attributes.gameIconAssetName, size: 26.0)
-                .foregroundStyle(.tint)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(verbatim: context.state.lastSongTitle ?? context.attributes.gameShortName)
                     .font(.headline)
@@ -28,9 +29,24 @@ struct SessionLiveActivityView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
+            CaptureButton()
         }
         .padding()
-        .activityBackgroundTint(Color.black.opacity(0.4))
+        .activityBackgroundTint(.clear)
+    }
+}
+
+struct CaptureButton: View {
+    var size: CGFloat = 22.0
+
+    var body: some View {
+        Link(destination: SessionLiveActivityView.captureURL) {
+            Image(systemName: "camera.fill")
+                .font(.system(size: size * 0.6, weight: .semibold))
+                .foregroundStyle(.primary)
+                .frame(width: size + 18.0, height: size + 18.0)
+                .background(.thinMaterial, in: Circle())
+        }
     }
 }
 
@@ -70,6 +86,7 @@ struct SessionLiveActivity: Widget {
                         Spacer()
                         Text(verbatim: "\(context.state.playCount)")
                             .font(.title3.monospacedDigit().weight(.bold))
+                        CaptureButton(size: 18.0)
                     }
                 }
             } compactLeading: {
@@ -93,6 +110,7 @@ struct GameIconImage: View {
             .renderingMode(.template)
             .resizable()
             .scaledToFit()
+            .foregroundStyle(.primary)
             .frame(width: size, height: size)
     }
 }

@@ -8,6 +8,7 @@ final class SessionStore {
     var activeSession: PlaySession?
     var plays: [CapturedPlay] = []
     var sessions: [PlaySession] = []
+    var pendingCaptureRequest: Bool = false
 
     private let database = PlaySessionsDatabase.shared
 
@@ -56,10 +57,12 @@ final class SessionStore {
     func capture(_ imageData: Data, source: CapturedPlaySource) {
         guard let activeSession else { return }
         let id = UUID().uuidString
+        let captureDate = Date()
         let filename = SessionImageStore.shared.write(imageData, id: id)
         let play = CapturedPlay(
             id: id,
             sessionID: activeSession.id,
+            captureDate: captureDate,
             source: source,
             rawImageFilename: filename,
             state: .pending
@@ -68,6 +71,20 @@ final class SessionStore {
         refreshPlays()
         SessionLiveActivityController.shared.refresh(sessionID: activeSession.id)
         Task { await SessionCaptureProcessor.shared.submit(id) }
+        snapshotHeartRate(playID: id, at: captureDate)
+    }
+
+    func requestCapture() {
+        pendingCaptureRequest = true
+    }
+
+    private func snapshotHeartRate(playID: String, at date: Date) {
+        Task {
+            guard let range = await SessionWorkoutBridge.shared.heartRateRange(ending: date) else { return }
+            database.updatePlayHeartRate(id: playID, min: range.min, max: range.max)
+            refreshPlays()
+            NotificationCenter.default.post(name: .capturedPlayDidChange, object: playID)
+        }
     }
 
     func reprocess(_ play: CapturedPlay) {

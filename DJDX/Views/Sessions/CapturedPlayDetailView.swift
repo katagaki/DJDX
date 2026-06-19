@@ -13,7 +13,9 @@ struct CapturedPlayDetailView: View {
     @State private var exScore: Int = 0
     @State private var perfectGreat: Int = 0
     @State private var great: Int = 0
-    @State private var miss: Int = 0
+    @State private var good: Int = 0
+    @State private var bad: Int = 0
+    @State private var poor: Int = 0
     @State private var clearType: IIDXClearType = .noPlay
     @State private var djLevel: IIDXDJLevel = .none
     @State private var hasLoaded: Bool = false
@@ -38,6 +40,11 @@ struct CapturedPlayDetailView: View {
                 }
                 LabeledContent("Sessions.Detail.Confidence") {
                     Text(play.ocrConfidence, format: .percent.precision(.fractionLength(0)))
+                }
+                if let minHR = play.minHeartRate, let maxHR = play.maxHeartRate {
+                    LabeledContent("Sessions.Detail.HeartRate") {
+                        Text(verbatim: "\(minHR)–\(maxHR) BPM")
+                    }
                 }
                 if let parseError = play.parseError {
                     LabeledContent("Sessions.Detail.Error") {
@@ -81,7 +88,9 @@ struct CapturedPlayDetailView: View {
                 numberRow("Sessions.Detail.ExScore", value: $exScore)
                 numberRow("Sessions.Detail.PGreat", value: $perfectGreat)
                 numberRow("Sessions.Detail.Great", value: $great)
-                numberRow("Sessions.Detail.Miss", value: $miss)
+                numberRow("Sessions.Detail.Good", value: $good)
+                numberRow("Sessions.Detail.Bad", value: $bad)
+                numberRow("Sessions.Detail.Poor", value: $poor)
             }
 
             Section {
@@ -102,7 +111,7 @@ struct CapturedPlayDetailView: View {
 
     private var fields: [AnyHashable] {
         [songTitle, level, difficulty, playType, exScore,
-         perfectGreat, great, miss, clearType, djLevel]
+         perfectGreat, great, good, bad, poor, clearType, djLevel]
     }
 
     private func numberRow(_ titleKey: LocalizedStringKey, value: Binding<Int>) -> some View {
@@ -142,7 +151,9 @@ struct CapturedPlayDetailView: View {
         exScore = play.exScore
         perfectGreat = play.perfectGreat
         great = play.great
-        miss = play.miss
+        good = play.good
+        bad = play.bad
+        poor = play.poor
         clearType = IIDXClearType(rawValue: play.clearType) ?? .noPlay
         djLevel = IIDXDJLevel(rawValue: play.djLevel) ?? .none
         DispatchQueue.main.async { hasLoaded = true }
@@ -156,7 +167,10 @@ struct CapturedPlayDetailView: View {
         play.exScore = exScore
         play.perfectGreat = perfectGreat
         play.great = great
-        play.miss = miss
+        play.good = good
+        play.bad = bad
+        play.poor = poor
+        play.miss = bad + poor
         play.clearType = clearType.rawValue
         play.djLevel = djLevel.rawValue
         store.saveCorrected(play)

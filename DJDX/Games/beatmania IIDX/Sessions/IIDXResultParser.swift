@@ -27,6 +27,9 @@ struct IIDXResultParse: Sendable {
     var exScore: Int = 0
     var perfectGreat: Int = 0
     var great: Int = 0
+    var good: Int = 0
+    var bad: Int = 0
+    var poor: Int = 0
     var miss: Int = 0
     var clearType: String = IIDXClearType.noPlay.rawValue
     var djLevel: String = IIDXDJLevel.none.rawValue
@@ -97,6 +100,9 @@ enum IIDXResultParser {
         reconcileJudges(exScore: parse.exScore, perfectGreat: &perfectGreat, great: &great)
         if let perfectGreat { parse.perfectGreat = perfectGreat; hits += 1 }
         if let great { parse.great = great; hits += 1 }
+        if let value = headlineNumber(text("judge_good")) { parse.good = value }
+        if let value = headlineNumber(text("judge_bad")) { parse.bad = value }
+        if let value = headlineNumber(text("judge_poor")) { parse.poor = value }
 
         // Primary: IIDXRankRecognizer classifies the stylized DJ-level graphic and
         // writes the grade into the dj_level_now region. Fallback (model absent or

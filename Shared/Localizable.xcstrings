@@ -3169,6 +3169,23 @@
         }
       }
     },
+    "Sessions.CropPreview.Done" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        }
+      }
+    },
     "Sessions.CropPreview.Instruction" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3199,6 +3216,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "画面が見つかりません。四隅を合わせてください"
+          }
+        }
+      }
+    },
+    "Sessions.CropPreview.Skip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スキップ"
           }
         }
       }
@@ -3267,6 +3301,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "曲名が正しく表示されない場合があります"
+          }
+        }
+      }
+    },
+    "Sessions.Detail.Bad" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bad"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BAD"
           }
         }
       }
@@ -3407,6 +3458,23 @@
         }
       }
     },
+    "Sessions.Detail.Good" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Good"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GOOD"
+          }
+        }
+      }
+    },
     "Sessions.Detail.Great" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3420,6 +3488,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GREAT"
+          }
+        }
+      }
+    },
+    "Sessions.Detail.HeartRate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heart Rate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心拍数"
           }
         }
       }
@@ -3454,6 +3539,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "P-GREAT"
+          }
+        }
+      }
+    },
+    "Sessions.Detail.Poor" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poor"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "POOR"
           }
         }
       }
