@@ -3084,6 +3084,57 @@
         }
       }
     },
+    "Sessions.Beta.Badge" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BETA"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ベータ"
+          }
+        }
+      }
+    },
+    "Sessions.Beta.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only the 1P side is supported for now."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在は1P側のみ対応しています。"
+          }
+        }
+      }
+    },
+    "Sessions.Beta.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sessions"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション"
+          }
+        }
+      }
+    },
     "Sessions.Camera.Denied.Message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3782,13 +3833,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When on, DJDX records each session as a workout and shows heart rate from a paired Apple Watch."
+            "value" : "When on, DJDX records each session as a workout. Heart rate is shown only when an Apple Watch is connected."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オンにすると、各セッションをワークアウトとして記録し、ペアリングされたApple Watchの心拍数を表示します。"
+            "value" : "オンにすると、各セッションをワークアウトとして記録します。心拍数はApple Watchを接続している場合のみ表示されます。"
           }
         }
       }
@@ -4073,6 +4124,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "不明な曲"
+          }
+        }
+      }
+    },
+    "Sessions.Welcome.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a session while you play, then snap result screens with your camera to log your scores. Heart rate is recorded only when an Apple Watch is connected."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレー中にセッションを開始し、カメラでリザルト画面を撮影するとスコアを記録できます。心拍数はApple Watchを接続している場合のみ記録されます。"
           }
         }
       }

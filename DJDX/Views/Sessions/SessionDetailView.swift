@@ -11,8 +11,8 @@ struct SessionDetailView: View {
     @State private var isPlaysExpanded: Bool = true
 
     var body: some View {
-        List {
-            Group {
+        ScrollView {
+            LazyVStack(spacing: 20.0) {
                 summarySection
                 breakdownSection(
                     title: "Sessions.Detail.DJLevelBreakdown",
@@ -24,15 +24,11 @@ struct SessionDetailView: View {
                     isExpanded: $isClearTypeExpanded,
                     items: clearTypeItems
                 )
+                playsSection
             }
-            .listRowInsets(EdgeInsets(top: 10.0, leading: 0.0, bottom: 10.0, trailing: 0.0))
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
-            playsSection
+            .padding(.vertical, 8.0)
         }
-        .listStyle(.plain)
         .scrollContentBackground(.hidden)
-        .environment(\.defaultMinListRowHeight, 0.0)
         .background {
             LinearGradient(
                 colors: [.backgroundGradientTop, .backgroundGradientBottom],
@@ -77,51 +73,49 @@ struct SessionDetailView: View {
         }
     }
 
-    @ViewBuilder
     private var playsSection: some View {
-        AnalyticsSectionHeader(
-            title: "Sessions.History.Plays",
-            isCollapsible: true,
-            isExpanded: isPlaysExpanded
-        ) {
-            withAnimation(.smooth.speed(2.0)) { isPlaysExpanded.toggle() }
-        }
-        .listRowInsets(EdgeInsets(top: 10.0, leading: 0.0, bottom: 10.0, trailing: 0.0))
-        .listRowSeparator(.hidden)
-        .listRowBackground(Color.clear)
-
-        if isPlaysExpanded {
-            if plays.isEmpty {
-                Text("Sessions.Empty.Title")
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 24.0)
-                    .listRowInsets(EdgeInsets())
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-            } else {
-                ForEach(plays.reversed()) { play in
-                    NavigationLink {
-                        CapturedPlayDetailView(store: store, play: play)
-                    } label: {
-                        CapturedPlayRow(play: play)
-                            .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
-                    .swipeActions(edge: .trailing) {
-                        Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                            deletePlay(play)
-                        }
-                    }
-                    .contextMenu {
-                        Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                            deletePlay(play)
+        VStack(spacing: 12.0) {
+            AnalyticsSectionHeader(
+                title: "Sessions.History.Plays",
+                isCollapsible: true,
+                isExpanded: isPlaysExpanded
+            ) {
+                withAnimation(.smooth.speed(2.0)) { isPlaysExpanded.toggle() }
+            }
+            if isPlaysExpanded {
+                if plays.isEmpty {
+                    Text("Sessions.Empty.Title")
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 24.0)
+                } else {
+                    VStack(spacing: 0.0) {
+                        ForEach(plays.reversed()) { play in
+                            NavigationLink {
+                                playDestination(for: play)
+                            } label: {
+                                CapturedPlayRow(play: play)
+                                    .contentShape(.rect)
+                            }
+                            .buttonStyle(.plain)
+                            .contextMenu {
+                                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                                    deletePlay(play)
+                                }
+                            }
                         }
                     }
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func playDestination(for play: IIDXCapturedPlay) -> some View {
+        if play.isFullyConfident {
+            CapturedPlayScoreView(store: store, play: play)
+        } else {
+            CapturedPlayDetailView(store: store, play: play)
         }
     }
 

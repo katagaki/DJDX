@@ -92,21 +92,7 @@ struct UnifiedView: View {
                     ToolbarSpacer(.fixed, placement: .topBarLeading)
                 }
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    if appMode == .sessions {
-                        Button {
-                            if sessionStore.activeSession == nil {
-                                sessionStore.startSession()
-                            } else {
-                                sessionStore.endSession()
-                            }
-                        } label: {
-                            if sessionStore.activeSession == nil {
-                                Label("Sessions.Start", systemImage: "play.fill")
-                            } else {
-                                Label("Sessions.End", systemImage: "stop.fill")
-                            }
-                        }
-                    } else {
+                    if appMode == .imports {
                         Button("Shared.Import", systemImage: "arrow.down.circle.dotted") {
                             isPresentingImport = true
                         }
@@ -132,6 +118,29 @@ struct UnifiedView: View {
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     MoreMenu()
+                }
+                if appMode == .sessions {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Spacer()
+                        Button {
+                            if sessionStore.activeSession == nil {
+                                sessionStore.startSession()
+                            } else {
+                                sessionStore.endSession()
+                            }
+                        } label: {
+                            if sessionStore.activeSession == nil {
+                                Label("Sessions.Start", systemImage: "play.fill")
+                            } else {
+                                Label("Sessions.End", systemImage: "stop.fill")
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .labelsVisibility(.visible)
+                        .labelStyle(.titleAndIcon)
+                        .tint(sessionStore.activeSession == nil ? .accent : .red)
+                        Spacer()
+                    }
                 }
             }
             .navigationDestination(for: MorePath.self) { viewPath in

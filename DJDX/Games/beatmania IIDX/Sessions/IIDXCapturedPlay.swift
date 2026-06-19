@@ -44,6 +44,10 @@ final class IIDXCapturedPlay: Identifiable, @unchecked Sendable {
         self.state = state
     }
 
+    var isFullyConfident: Bool {
+        state == .done && ocrConfidence >= 1.0
+    }
+
     func levelScore() -> IIDXLevelScore {
         IIDXLevelScore(
             level: level,
