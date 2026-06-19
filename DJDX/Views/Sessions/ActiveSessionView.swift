@@ -135,30 +135,24 @@ struct ActiveSessionView: View {
             )
             .frame(maxHeight: .infinity)
         } else {
-            List {
-                ForEach(store.plays.reversed()) { play in
-                    NavigationLink {
-                        CapturedPlayDetailView(store: store, play: play)
-                    } label: {
-                        CapturedPlayRow(play: play)
-                            .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
-                    .swipeActions(edge: .trailing) {
-                        Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                            store.deletePlay(play)
+            ScrollView {
+                LazyVStack(spacing: 0.0) {
+                    ForEach(store.plays.reversed()) { play in
+                        NavigationLink {
+                            CapturedPlayDetailView(store: store, play: play)
+                        } label: {
+                            CapturedPlayRow(play: play)
+                                .contentShape(.rect)
                         }
-                    }
-                    .contextMenu {
-                        Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                            store.deletePlay(play)
+                        .buttonStyle(.plain)
+                        .contextMenu {
+                            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                                store.deletePlay(play)
+                            }
                         }
                     }
                 }
             }
-            .listStyle(.plain)
             .scrollContentBackground(.hidden)
         }
     }
