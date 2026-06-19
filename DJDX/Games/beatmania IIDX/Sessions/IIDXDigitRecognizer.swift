@@ -56,7 +56,10 @@ enum IIDXDigitRecognizer {
                     }
                 continuation.resume(returning: results)
             }
-            request.imageCropAndScaleOption = .scaleFill
+            // Letterbox (preserve aspect): the model trains on letterboxed crops,
+            // and numeric fields are extreme-aspect strips that .scaleFill would
+            // stretch into unreadable rows of "1"s.
+            request.imageCropAndScaleOption = .scaleFit
             let handler = VNImageRequestHandler(cgImage: image, orientation: .up, options: [:])
             DispatchQueue.global(qos: .userInitiated).async {
                 do {
