@@ -235,14 +235,14 @@ private struct CapturedPlayDestination: View {
 
     var body: some View {
         Group {
-            if showsScore ?? play.isFullyConfident {
+            if showsScore ?? play.isReviewed {
                 CapturedPlayScoreView(store: store, play: play)
             } else {
                 CapturedPlayDetailView(store: store, play: play)
             }
         }
         .onAppear {
-            if showsScore == nil { showsScore = play.isFullyConfident }
+            if showsScore == nil { showsScore = play.isReviewed }
         }
     }
 }
