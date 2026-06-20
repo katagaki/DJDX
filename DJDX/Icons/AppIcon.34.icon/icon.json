@@ -1,0 +1,95 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.09804,0.02745,0.14902,1.00000",
+      "display-p3:0.01569,0.00000,0.02745,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "blend-mode" : "plus-lighter",
+      "layers" : [
+        {
+          "image-name" : "DJDX.021.png",
+          "name" : "DJDX.021"
+        }
+      ],
+      "name" : "Keys",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blur-material" : null,
+      "layers" : [
+        {
+          "fill" : {
+            "linear-gradient" : [
+              "extended-gray:0.45683,1.00000",
+              "gray:0.04286,1.00000"
+            ]
+          },
+          "image-name" : "DJDX.020.png",
+          "name" : "DJDX.020"
+        }
+      ],
+      "name" : "Cab",
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "34Top.png",
+          "name" : "34Top"
+        }
+      ],
+      "name" : "Number",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "34Bottom.png",
+          "name" : "34Bottom"
+        }
+      ],
+      "name" : "Accessory",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

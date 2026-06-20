@@ -1,8 +1,8 @@
 {
   "fill" : {
     "linear-gradient" : [
-      "display-p3:0.83529,0.92157,0.30196,1.00000",
-      "display-p3:0.38039,0.64706,0.41961,1.00000"
+      "display-p3:0.21321,0.00000,0.36719,1.00000",
+      "display-p3:0.06405,0.00000,0.10980,1.00000"
     ]
   },
   "groups" : [
@@ -39,8 +39,8 @@
               "appearance" : "dark",
               "value" : {
                 "linear-gradient" : [
-                  "display-p3:0.83529,0.92157,0.30196,1.00000",
-                  "srgb:0.38039,0.64706,0.41961,1.00000"
+                  "display-p3:0.82696,0.58472,1.00000,1.00000",
+                  "srgb:0.42588,0.06959,0.68038,1.00000"
                 ],
                 "orientation" : {
                   "start" : {
@@ -89,38 +89,6 @@
       }
     },
     {
-      "blur-material" : 0.42,
-      "hidden" : false,
-      "layers" : [
-        {
-          "fill" : {
-            "solid" : "display-p3:0.26608,0.57142,0.32801,1.00000"
-          },
-          "image-name" : "DJDX.028.png",
-          "name" : "DJDX.028"
-        }
-      ],
-      "name" : "Disc BG",
-      "opacity-specializations" : [
-        {
-          "appearance" : "dark",
-          "value" : 0.4
-        },
-        {
-          "appearance" : "tinted",
-          "value" : 0
-        }
-      ],
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0
-      },
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0.78
-      }
-    },
-    {
       "blend-mode-specializations" : [
         {
           "appearance" : "tinted",
@@ -133,18 +101,22 @@
         {
           "fill-specializations" : [
             {
-              "value" : {
-                "solid" : "display-p3:0.80846,0.89822,0.71447,1.00000"
-              }
+              "value" : "automatic"
             },
             {
               "appearance" : "dark",
-              "value" : {
-                "solid" : "display-p3:0.86814,0.97614,0.33011,1.00000"
-              }
+              "value" : "automatic"
             }
           ],
-          "image-name" : "DJDX.026.png",
+          "image-name-specializations" : [
+            {
+              "value" : "DJDX.026.png"
+            },
+            {
+              "idiom" : "square",
+              "value" : "DJDX.026.png"
+            }
+          ],
           "name" : "DJDX.026"
         }
       ],
@@ -180,13 +152,13 @@
           "fill-specializations" : [
             {
               "value" : {
-                "solid" : "srgb:0.00000,0.64706,0.09516,1.00000"
+                "solid" : "display-p3:0.69141,0.57471,0.93896,1.00000"
               }
             },
             {
               "appearance" : "dark",
               "value" : {
-                "solid" : "srgb:0.44636,0.64706,0.47587,1.00000"
+                "solid" : "srgb:0.36043,0.19163,0.48100,1.00000"
               }
             }
           ],

@@ -13,7 +13,7 @@ struct IIDXImportView: View {
     @State var importProgress = ProgressReporter()
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var importPlayType: IIDXPlayType
-    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var importPath = NavigationPath()
     @State var importGroups: [ImportGroup] = []

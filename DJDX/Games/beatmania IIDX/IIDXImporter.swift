@@ -18,7 +18,7 @@ actor IIDXImporter {
             url: Bundle.main.url(forResource: "SampleData", withExtension: "csv"),
             to: importToDate,
             for: playType,
-            from: .sparkleShower,
+            from: .zinrai,
             continuation: continuation
         )
         continuation.finish()
