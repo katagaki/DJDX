@@ -203,6 +203,7 @@ struct UnifiedView: View {
             OnboardingView {
                 lastSeenOnboardingVersion = OnboardingView.appVersion
                 isPresentingOnboarding = false
+                ImportMovedTip.isOnboardingComplete = true
             }
         }
         .fullScreenCover(isPresented: $migrationProgress.isShowing) {
@@ -233,6 +234,8 @@ struct UnifiedView: View {
                 lastSeenVersion: lastSeenOnboardingVersion
             ) {
                 isPresentingOnboarding = true
+            } else {
+                ImportMovedTip.isOnboardingComplete = true
             }
             if launchCount > 2 && !hasReviewBeenPrompted && !isPresentingOnboarding {
                 requestReview()
