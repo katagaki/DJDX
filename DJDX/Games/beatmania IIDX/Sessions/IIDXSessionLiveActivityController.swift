@@ -65,6 +65,17 @@ final class IIDXSessionLiveActivityController {
         Task { await target.update(content) }
     }
 
+    func pushSessionInfoToWatch(sessionID: String) {
+        let state = contentState(for: sessionID)
+        IIDXSessionWorkoutBridge.shared.pushSessionInfo(
+            sessionID: sessionID,
+            playCount: state.playCount,
+            lastSongTitle: state.lastSongTitle,
+            lastResultSummary: state.lastResultSummary,
+            bestThisSession: state.bestThisSession
+        )
+    }
+
     func updateMetrics(sessionID: String, heartRate: Int?, activeCalories: Int?) {
         guard sessionID == self.sessionID, let activity else { return }
         var state = contentState(for: sessionID)

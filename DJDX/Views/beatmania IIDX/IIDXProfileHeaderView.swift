@@ -177,6 +177,7 @@ struct IIDXProfileHeaderView: View {
             saveProfileData()
             await WidgetDataPublisher.shared.publishRadar()
             await WidgetDataPublisher.shared.publishQpro()
+            IIDXSessionWorkoutBridge.shared.syncProfileToWatch()
         } catch {
             return
         }

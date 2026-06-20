@@ -38,6 +38,7 @@ final class IIDXSessionStore {
         loadSessions()
         IIDXSessionLiveActivityController.shared.start(session)
         IIDXSessionWorkoutBridge.shared.startWorkout(session: session)
+        IIDXSessionLiveActivityController.shared.pushSessionInfoToWatch(sessionID: session.id)
         NotificationCenter.default.post(name: .playSessionDidChange, object: session.id)
         return session
     }
@@ -70,6 +71,7 @@ final class IIDXSessionStore {
         database.insertPlay(play)
         refreshPlays()
         IIDXSessionLiveActivityController.shared.refresh(sessionID: activeSession.id)
+        IIDXSessionLiveActivityController.shared.pushSessionInfoToWatch(sessionID: activeSession.id)
         Task { await IIDXSessionCaptureProcessor.shared.submit(id) }
         snapshotHeartRate(playID: id, at: captureDate)
     }

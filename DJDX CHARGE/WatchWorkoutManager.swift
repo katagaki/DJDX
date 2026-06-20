@@ -10,6 +10,18 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     @Published var activeCalories: Int = 0
     @Published var startDate: Date?
 
+    @Published var playCount: Int = 0
+    @Published var lastSongTitle: String?
+    @Published var lastResultSummary: String?
+    @Published var bestThisSession: String?
+
+    @Published var qproImageData: Data?
+    @Published var djName: String?
+    @Published var spRank: String?
+    @Published var dpRank: String?
+    @Published var spRadar: WatchRadarData?
+    @Published var dpRadar: WatchRadarData?
+
     private let healthStore = HKHealthStore()
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
@@ -87,6 +99,36 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         heartRate = 0
         activeCalories = 0
         startDate = nil
+        resetSessionInfo()
+    }
+
+    private func resetSessionInfo() {
+        playCount = 0
+        lastSongTitle = nil
+        lastResultSummary = nil
+        bestThisSession = nil
+    }
+
+    fileprivate func applySessionInfo(_ message: [String: Any]) {
+        if let playCount = message["playCount"] as? Int { self.playCount = playCount }
+        lastSongTitle = message["lastSongTitle"] as? String
+        lastResultSummary = message["lastResultSummary"] as? String
+        bestThisSession = message["bestThisSession"] as? String
+    }
+
+    fileprivate func applyProfile(_ context: [String: Any]) {
+        if let djName = context["djName"] as? String { self.djName = djName }
+        if let spRank = context["spRank"] as? String { self.spRank = spRank }
+        if let dpRank = context["dpRank"] as? String { self.dpRank = dpRank }
+        if let values = context["spRadar"] as? [Double] { spRadar = WatchRadarData(values: values) }
+        if let values = context["dpRadar"] as? [Double] { dpRadar = WatchRadarData(values: values) }
+        if let qpro = context["qpro"] as? Data { qproImageData = qpro }
+    }
+
+    fileprivate func requestProfile() {
+        let connectivity = WCSession.default
+        guard connectivity.activationState == .activated, connectivity.isReachable else { return }
+        connectivity.sendMessage(["command": "requestProfile"], replyHandler: nil, errorHandler: nil)
     }
 
     fileprivate func ingest(heartRate: Int?, activeCalories: Int?) {
@@ -157,7 +199,21 @@ extension WatchWorkoutManager: HKLiveWorkoutBuilderDelegate {
 extension WatchWorkoutManager: WCSessionDelegate {
     nonisolated func session(_ session: WCSession,
                              activationDidCompleteWith activationState: WCSessionActivationState,
-                             error: Error?) {}
+                             error: Error?) {
+        guard activationState == .activated else { return }
+        let context = session.receivedApplicationContext
+        nonisolated(unsafe) let manager = self
+        Task { @MainActor in
+            if !context.isEmpty { manager.applyProfile(context) }
+            manager.requestProfile()
+        }
+    }
+
+    nonisolated func session(_ session: WCSession,
+                             didReceiveApplicationContext applicationContext: [String: Any]) {
+        nonisolated(unsafe) let manager = self
+        Task { @MainActor in manager.applyProfile(applicationContext) }
+    }
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         route(message)
@@ -168,9 +224,14 @@ extension WatchWorkoutManager: WCSessionDelegate {
     }
 
     private nonisolated func route(_ message: [String: Any]) {
-        guard let command = message["command"] as? String else { return }
-        let sessionID = message["sessionID"] as? String ?? ""
         nonisolated(unsafe) let manager = self
-        Task { @MainActor in manager.handleCommand(command, sessionID: sessionID) }
+        if let command = message["command"] as? String {
+            let sessionID = message["sessionID"] as? String ?? ""
+            Task { @MainActor in manager.handleCommand(command, sessionID: sessionID) }
+            return
+        }
+        if message["sessionInfo"] != nil {
+            Task { @MainActor in manager.applySessionInfo(message) }
+        }
     }
 }

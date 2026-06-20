@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import HealthKit
+import UIKit
 import WatchConnectivity
 
 @MainActor
@@ -109,6 +110,65 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         }
     }
 
+    func pushSessionInfo(
+        sessionID: String,
+        playCount: Int,
+        lastSongTitle: String?,
+        lastResultSummary: String?,
+        bestThisSession: String?
+    ) {
+        guard isWorkoutActive, sessionID == activeSessionID else { return }
+        var payload: [String: Any] = ["sessionInfo": true, "sessionID": sessionID, "playCount": playCount]
+        if let lastSongTitle { payload["lastSongTitle"] = lastSongTitle }
+        if let lastResultSummary { payload["lastResultSummary"] = lastResultSummary }
+        if let bestThisSession { payload["bestThisSession"] = bestThisSession }
+        send(payload)
+    }
+
+    func syncProfileToWatch() {
+        let connectivity = WCSession.default
+        guard connectivity.activationState == .activated else { return }
+        var context: [String: Any] = [:]
+        let standard = UserDefaults.standard
+        if let djName = standard.string(forKey: "Profile.IIDX.DJName") { context["djName"] = djName }
+        if let spRank = standard.string(forKey: "Profile.IIDX.SPRank") { context["spRank"] = spRank }
+        if let dpRank = standard.string(forKey: "Profile.IIDX.DPRank") { context["dpRank"] = dpRank }
+        let shared = SharedContainer.defaults
+        if let spRadar = radarValues(prefix: "NotesRadar.SP", defaults: shared) { context["spRadar"] = spRadar }
+        if let dpRadar = radarValues(prefix: "NotesRadar.DP", defaults: shared) { context["dpRadar"] = dpRadar }
+        if let qpro = watchQproImageData() { context["qpro"] = qpro }
+        guard !context.isEmpty else { return }
+        context["ts"] = Date.now.timeIntervalSince1970
+        try? connectivity.updateApplicationContext(context)
+    }
+
+    private func radarValues(prefix: String, defaults: UserDefaults) -> [Double]? {
+        guard defaults.object(forKey: "\(prefix).Notes") != nil else { return nil }
+        return [
+            defaults.double(forKey: "\(prefix).Notes"),
+            defaults.double(forKey: "\(prefix).Chord"),
+            defaults.double(forKey: "\(prefix).Peak"),
+            defaults.double(forKey: "\(prefix).Charge"),
+            defaults.double(forKey: "\(prefix).Scratch"),
+            defaults.double(forKey: "\(prefix).Soflan")
+        ]
+    }
+
+    private func watchQproImageData() -> Data? {
+        let fileURL = SharedContainer.imagesURL.appendingPathComponent("Qpro.png")
+        guard let image = UIImage(contentsOfFile: fileURL.path) else { return nil }
+        let maxDimension: CGFloat = 240.0
+        let scale = min(1.0, maxDimension / max(image.size.width, image.size.height))
+        guard scale < 1.0 else { return image.pngData() }
+        let newSize = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1.0
+        let resized = UIGraphicsImageRenderer(size: newSize, format: format).image { _ in
+            image.draw(in: CGRect(origin: .zero, size: newSize))
+        }
+        return resized.pngData()
+    }
+
     fileprivate func ingestMetrics(heartRate: Int?, activeCalories: Int?, sessionID: String) {
         guard sessionID == activeSessionID else { return }
         if let heartRate { self.heartRate = heartRate }
@@ -155,7 +215,11 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
 extension IIDXSessionWorkoutBridge: WCSessionDelegate {
     nonisolated func session(_ session: WCSession,
                              activationDidCompleteWith activationState: WCSessionActivationState,
-                             error: Error?) {}
+                             error: Error?) {
+        guard activationState == .activated else { return }
+        nonisolated(unsafe) let bridge = self
+        Task { @MainActor in bridge.syncProfileToWatch() }
+    }
 
     nonisolated func sessionDidBecomeInactive(_ session: WCSession) {}
 
@@ -174,6 +238,12 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
     private nonisolated func route(_ message: [String: Any]) {
         let sessionID = message["sessionID"] as? String ?? ""
         nonisolated(unsafe) let bridge = self
+        if let command = message["command"] as? String {
+            if command == "requestProfile" {
+                Task { @MainActor in bridge.syncProfileToWatch() }
+            }
+            return
+        }
         if let uuid = message["workoutUUID"] as? String {
             Task { @MainActor in bridge.storeWorkoutUUID(uuid, sessionID: sessionID) }
             return

@@ -66,6 +66,7 @@ actor IIDXSessionCaptureProcessor {
             fail(play, message: error.localizedDescription)
         }
         await IIDXSessionLiveActivityController.shared.refresh(sessionID: play.sessionID)
+        await IIDXSessionLiveActivityController.shared.pushSessionInfoToWatch(sessionID: play.sessionID)
     }
 
     private func fail(_ play: IIDXCapturedPlay, message: String) {

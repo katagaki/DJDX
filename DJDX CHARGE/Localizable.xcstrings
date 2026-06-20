@@ -1,6 +1,23 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "Watch.Idle.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a session on your iPhone to begin a workout."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhoneでセッションを開始するとワークアウトが始まります。"
+          }
+        }
+      }
+    },
     "Watch.Idle.Title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -18,19 +35,36 @@
         }
       }
     },
-    "Watch.Idle.Message" : {
+    "Watch.Session.Best" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start a session on your iPhone to begin a workout."
+            "value" : "Best"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iPhoneでセッションを開始するとワークアウトが始まります。"
+            "value" : "ベスト"
+          }
+        }
+      }
+    },
+    "Watch.Session.Plays" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plays"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレー数"
           }
         }
       }
