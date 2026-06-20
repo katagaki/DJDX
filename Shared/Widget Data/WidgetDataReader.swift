@@ -178,7 +178,6 @@ final class WidgetDataReader: Sendable {
         let score: SQLite.Expression<Int>
     }
 
-    // swiftlint:disable:next function_body_length
     private func aggregatedCounts(
         for importGroupIDs: [String],
         playTypeRaw: String

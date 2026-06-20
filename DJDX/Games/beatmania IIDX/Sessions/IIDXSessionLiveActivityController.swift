@@ -30,7 +30,9 @@ final class IIDXSessionLiveActivityController {
         let activeSession = database.activeSession()
         var adopted: Activity<SessionActivityAttributes>?
         for existing in Activity<SessionActivityAttributes>.activities {
-            if let activeSession, existing.attributes.sessionID == activeSession.id {
+            if let activeSession,
+               existing.attributes.sessionID == activeSession.id,
+               existing.activityState == .active {
                 adopted = existing
             } else {
                 endActivity(existing, sessionID: existing.attributes.sessionID)
@@ -47,7 +49,7 @@ final class IIDXSessionLiveActivityController {
             activity = adopted
             sessionID = activeSession.id
             refresh(sessionID: activeSession.id)
-        } else if activity == nil {
+        } else {
             start(activeSession)
         }
     }
@@ -102,12 +104,27 @@ final class IIDXSessionLiveActivityController {
         return SessionActivityAttributes.ContentState(
             playCount: plays.count,
             lastSongTitle: last?.songTitle,
+            lastDJLevel: last.flatMap(Self.djLevel),
+            lastClearType: last.flatMap(Self.clearType),
+            lastScore: last.flatMap(Self.score),
             lastResultSummary: last.flatMap(Self.summary),
             bestThisSession: Self.best(plays),
             heartRate: nil,
             activeCalories: nil,
             isProcessing: isProcessing
         )
+    }
+
+    private static func djLevel(_ play: IIDXCapturedPlay) -> String? {
+        play.djLevel != IIDXDJLevel.none.rawValue ? play.djLevel : nil
+    }
+
+    private static func clearType(_ play: IIDXCapturedPlay) -> String? {
+        play.clearType != IIDXClearType.noPlay.rawValue ? play.clearType : nil
+    }
+
+    private static func score(_ play: IIDXCapturedPlay) -> Int? {
+        play.exScore > 0 ? play.exScore : nil
     }
 
     private static func summary(_ play: IIDXCapturedPlay) -> String? {

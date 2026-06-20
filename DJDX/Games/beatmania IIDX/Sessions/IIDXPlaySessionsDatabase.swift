@@ -1,7 +1,6 @@
 import Foundation
 import SQLite
 
-// swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
 final class IIDXPlaySessionsDatabase: Sendable {
 
@@ -328,4 +327,3 @@ final class IIDXPlaySessionsDatabase: Sendable {
         return play
     }
 }
-// swiftlint:enable file_length

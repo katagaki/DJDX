@@ -5,6 +5,9 @@ struct SessionActivityAttributes: ActivityAttributes {
     struct ContentState: Codable, Hashable {
         var playCount: Int
         var lastSongTitle: String?
+        var lastDJLevel: String?
+        var lastClearType: String?
+        var lastScore: Int?
         var lastResultSummary: String?
         var bestThisSession: String?
         var heartRate: Int?

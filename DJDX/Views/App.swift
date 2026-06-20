@@ -6,9 +6,16 @@ struct DJDXApp: App {
 
     @StateObject var navigationManager = NavigationManager()
 
+    @Environment(\.scenePhase) private var scenePhase
+
     var body: some Scene {
         WindowGroup {
             UnifiedView()
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .active {
+                        IIDXSessionLiveActivityController.shared.reconcile()
+                    }
+                }
         }
         .environmentObject(navigationManager)
     }
