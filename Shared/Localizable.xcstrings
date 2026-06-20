@@ -3165,40 +3165,6 @@
         }
       }
     },
-    "Sessions.Beta.Badge" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "BETA"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ベータ"
-          }
-        }
-      }
-    },
-    "Sessions.Beta.Message" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Only the 1P side is supported for now."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在は1P側のみ対応しています。"
-          }
-        }
-      }
-    },
     "Sessions.Beta.Title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3211,7 +3177,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッション"
+            "value" : "セッションについて"
           }
         }
       }
@@ -3409,13 +3375,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Without BEMANIWiki 2nd data, song names may be inaccurate or may not appear. Enable it under External Data Sources for the best results."
+            "value" : "When BEMANIWiki 2nd is turned off, song names may be inaccurate or may not appear."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BEMANIWiki 2ndのデータがないと、曲名が正しく取得できなかったり、表示されないことがあります。外部データソースから有効にすることをおすすめします。"
+            "value" : "BEMANIWiki 2ndをオフにしていると、曲名が正しく取得できなかったり、表示されないことがあります。"
           }
         }
       }
@@ -4283,13 +4249,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start a session while you play, then snap result screens with your camera to log your scores. Heart rate is recorded only when an Apple Watch is connected."
+            "value" : "Start a session while you play, then snap result screens with your camera to log your scores. Scores are read using machine learning, so be sure to verify the results."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "プレー中にセッションを開始し、カメラでリザルト画面を撮影するとスコアを記録できます。心拍数はApple Watchを接続している場合のみ記録されます。"
+            "value" : "プレー中にセッションを開始し、カメラでリザルト画面を撮影するとスコアを記録できます。スコアの読み取りには機械学習を使用しているため、結果を必ず確認してください。"
           }
         }
       }

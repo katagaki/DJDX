@@ -110,13 +110,8 @@ struct SessionDetailView: View {
         }
     }
 
-    @ViewBuilder
     private func playDestination(for play: IIDXCapturedPlay) -> some View {
-        if play.isFullyConfident {
-            CapturedPlayScoreView(store: store, play: play)
-        } else {
-            CapturedPlayDetailView(store: store, play: play)
-        }
+        CapturedPlayDestination(store: store, play: play)
     }
 
     private func deletePlay(_ play: IIDXCapturedPlay) {
@@ -229,6 +224,26 @@ struct SessionDetailView: View {
     private var durationText: String {
         let minutes = Int(session.duration / 60.0)
         return String(localized: "Sessions.Duration.\(minutes)")
+    }
+}
+
+private struct CapturedPlayDestination: View {
+    var store: IIDXSessionStore
+    var play: IIDXCapturedPlay
+
+    @State private var showsScore: Bool?
+
+    var body: some View {
+        Group {
+            if showsScore ?? play.isFullyConfident {
+                CapturedPlayScoreView(store: store, play: play)
+            } else {
+                CapturedPlayDetailView(store: store, play: play)
+            }
+        }
+        .onAppear {
+            if showsScore == nil { showsScore = play.isFullyConfident }
+        }
     }
 }
 

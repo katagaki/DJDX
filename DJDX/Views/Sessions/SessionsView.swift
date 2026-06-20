@@ -16,12 +16,6 @@ struct SessionsView: View {
         List {
             Section {
                 betaNotice
-                    .listRowBackground(
-                        RoundedRectangle(cornerRadius: 10.0, style: .continuous)
-                            .fill(.accent.opacity(0.12))
-                    )
-            } footer: {
-                Text("Sessions.Welcome.Message")
             }
             if !isBemaniWikiEnabled {
                 Section {
@@ -30,10 +24,22 @@ struct SessionsView: View {
             }
             Section {
                 Toggle(isOn: $healthKitEnabled) {
-                    Label("Sessions.HealthKit.Toggle", systemImage: "heart.text.square")
+                    HStack(alignment: .top, spacing: 12.0) {
+                        Image(systemName: "heart.fill")
+                            .font(.system(size: 18.0, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 36.0, height: 36.0)
+                            .background(.pink, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
+                        VStack(alignment: .leading, spacing: 3.0) {
+                            Text("Sessions.HealthKit.Toggle")
+                                .font(.subheadline.weight(.semibold))
+                            Text("Sessions.HealthKit.Footer")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
                 }
-            } footer: {
-                Text("Sessions.HealthKit.Footer")
             }
             if let active = store.activeSession {
                 Section {
@@ -62,6 +68,8 @@ struct SessionsView: View {
                 }
             }
         }
+        .listSectionSpacing(.compact)
+        .contentMargins(.top, 8.0, for: .scrollContent)
         .scrollContentBackground(.hidden)
         .background {
             LinearGradient(
@@ -101,24 +109,16 @@ struct SessionsView: View {
     }
 
     private var betaNotice: some View {
-        HStack(spacing: 12.0) {
-            Image(systemName: "figure.walk")
+        HStack(alignment: .top, spacing: 12.0) {
+            Image(systemName: "info.circle.fill")
                 .font(.system(size: 18.0, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: 36.0, height: 36.0)
                 .background(.accent, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
             VStack(alignment: .leading, spacing: 3.0) {
-                HStack(spacing: 6.0) {
-                    Text("Sessions.Beta.Title")
-                        .font(.subheadline.weight(.semibold))
-                    Text("Sessions.Beta.Badge")
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(.accent)
-                        .padding(.horizontal, 6.0)
-                        .padding(.vertical, 2.0)
-                        .background(.accent.opacity(0.18), in: Capsule())
-                }
-                Text("Sessions.Beta.Message")
+                Text("Sessions.Beta.Title")
+                    .font(.subheadline.weight(.semibold))
+                Text("Sessions.Welcome.Message")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -129,20 +129,27 @@ struct SessionsView: View {
     }
 
     private var bemaniWikiWarning: some View {
-        VStack(alignment: .leading, spacing: 8.0) {
-            HStack(spacing: 8.0) {
-                Image(systemName: "exclamationmark.triangle.fill")
+        HStack(alignment: .top, spacing: 12.0) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 18.0, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 36.0, height: 36.0)
+                .background(.orange, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
+            VStack(alignment: .leading, spacing: 3.0) {
                 Text("Sessions.DataSource.Warning.Title")
+                    .font(.subheadline.weight(.semibold))
+                Text("Sessions.DataSource.Warning.Message")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button("Sessions.DataSource.Warning.Action") {
+                    isPresentingExternalDataSources = true
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.orange)
+                .buttonStyle(.plain)
             }
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(.orange)
-            Text("Sessions.DataSource.Warning.Message")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Button("Sessions.DataSource.Warning.Action") {
-                isPresentingExternalDataSources = true
-            }
-            .font(.subheadline.weight(.semibold))
+            Spacer(minLength: 0.0)
         }
         .padding(.vertical, 4.0)
     }
