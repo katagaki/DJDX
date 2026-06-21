@@ -85,6 +85,25 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         heartRate = 0
         activeCalories = 0
         send(["command": "start", "sessionID": session.id])
+        launchWatchApp()
+    }
+
+    private func launchWatchApp() {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+        let connectivity = WCSession.default
+        guard connectivity.activationState == .activated,
+              connectivity.isPaired,
+              connectivity.isWatchAppInstalled,
+              !connectivity.isReachable else { return }
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .fitnessGaming
+        configuration.locationType = .indoor
+        healthStore.startWatchApp(with: configuration) { _, _ in }
+    }
+
+    fileprivate func resendStartIfActive() {
+        guard isWorkoutActive, let activeSessionID else { return }
+        send(["command": "start", "sessionID": activeSessionID])
     }
 
     func endWorkout(session: IIDXPlaySession) {
@@ -247,7 +266,10 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
         if let command = message["command"] as? String {
             switch command {
             case "requestProfile":
-                Task { @MainActor in bridge.syncProfileToWatch() }
+                Task { @MainActor in
+                    bridge.syncProfileToWatch()
+                    bridge.resendStartIfActive()
+                }
             case "startSession":
                 Task { @MainActor in
                     NotificationCenter.default.post(name: .startSessionRequested, object: nil)
