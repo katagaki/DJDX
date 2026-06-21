@@ -3,11 +3,41 @@ import SwiftUI
 import WidgetKit
 
 struct SessionLiveActivityView: View {
+    @Environment(\.activityFamily) private var activityFamily
     let context: ActivityViewContext<SessionActivityAttributes>
 
     static let captureURL = URL(string: "djdx://session?action=capture")!
 
     var body: some View {
+        if activityFamily == .small {
+            watchBody
+        } else {
+            phoneBody
+        }
+    }
+
+    private var watchBody: some View {
+        VStack(alignment: .leading, spacing: 6.0) {
+            Text(context.attributes.sessionStart, style: .timer)
+                .font(.system(size: 28.0, weight: .bold).monospacedDigit())
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+            VStack(alignment: .leading, spacing: 3.0) {
+                if let heartRate = context.state.heartRate {
+                    Label("\(heartRate)", systemImage: "heart.fill")
+                }
+                if let activeCalories = context.state.activeCalories {
+                    Label("\(activeCalories)", systemImage: "flame.fill")
+                }
+                Label("\(context.state.playCount)", systemImage: "opticaldisc")
+            }
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var phoneBody: some View {
         VStack(spacing: 10.0) {
             HStack(spacing: 14.0) {
                 GameIconImage(assetName: context.attributes.gameIconAssetName, size: 36.0)
@@ -279,6 +309,7 @@ struct SessionLiveActivity: Widget {
                 GameIconImage(assetName: context.attributes.gameIconAssetName, size: 18.0)
             }
         }
+        .supplementalActivityFamilies([.small])
     }
 }
 
