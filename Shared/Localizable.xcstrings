@@ -4095,6 +4095,91 @@
         }
       }
     },
+    "Sessions.Photos.Denied.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow adding photos in Settings to save result screens."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リザルト画面を保存するには、設定で写真への追加を許可してください。"
+          }
+        }
+      }
+    },
+    "Sessions.Photos.Denied.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos Access Needed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真へのアクセスが必要です"
+          }
+        }
+      }
+    },
+    "Sessions.Photos.Failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t save to Photos."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真に保存できませんでした。"
+          }
+        }
+      }
+    },
+    "Sessions.Photos.Save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Photos"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真に保存"
+          }
+        }
+      }
+    },
+    "Sessions.Photos.Saved" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved to Photos"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真に保存しました"
+          }
+        }
+      }
+    },
     "Sessions.PlayCount.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
