@@ -122,6 +122,7 @@ struct ProfileView: View {
             }
             Spacer(minLength: 0.0)
         }
+        .padding(.horizontal, 6.0)
     }
 
     private var idlePlaceholder: some View {
