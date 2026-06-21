@@ -75,6 +75,13 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         }
     }
 
+    func requestEndSession() {
+        if let sessionID {
+            sendToPhone(["command": "endSession", "sessionID": sessionID])
+        }
+        endWorkout()
+    }
+
     func endWorkout() {
         guard let session, let builder else { return }
         isRunning = false

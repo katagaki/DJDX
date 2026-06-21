@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WorkoutView: View {
     @EnvironmentObject private var workoutManager: WatchWorkoutManager
+    @State private var isConfirmingStop: Bool = false
 
     var body: some View {
         ScrollView {
@@ -57,8 +58,27 @@ struct WorkoutView: View {
                     }
                     .font(.caption2)
                 }
+
+                Button(role: .destructive) {
+                    isConfirmingStop = true
+                } label: {
+                    Label("Watch.Session.Stop", systemImage: "stop.fill")
+                        .frame(maxWidth: .infinity)
+                }
+                .tint(.red)
+                .padding(.top, 6.0)
             }
             .padding()
+        }
+        .confirmationDialog(
+            "Watch.Session.Stop.Confirm",
+            isPresented: $isConfirmingStop,
+            titleVisibility: .visible
+        ) {
+            Button("Watch.Session.Stop", role: .destructive) {
+                workoutManager.requestEndSession()
+            }
+            Button("Watch.Shared.Cancel", role: .cancel) {}
         }
     }
 }

@@ -245,8 +245,15 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
         let sessionID = message["sessionID"] as? String ?? ""
         nonisolated(unsafe) let bridge = self
         if let command = message["command"] as? String {
-            if command == "requestProfile" {
+            switch command {
+            case "requestProfile":
                 Task { @MainActor in bridge.syncProfileToWatch() }
+            case "endSession":
+                Task { @MainActor in
+                    NotificationCenter.default.post(name: .endSessionRequested, object: sessionID)
+                }
+            default:
+                break
             }
             return
         }
