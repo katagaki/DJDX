@@ -8,7 +8,9 @@ struct WorkoutView: View {
             VStack(spacing: 10.0) {
                 if let startDate = workoutManager.startDate {
                     Text(startDate, style: .timer)
-                        .font(.system(.title2, design: .rounded).monospacedDigit())
+                        .font(.system(size: 40.0, weight: .semibold, design: .rounded).monospacedDigit())
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
                 }
 
                 HStack(spacing: 14.0) {
