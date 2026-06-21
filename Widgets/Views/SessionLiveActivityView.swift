@@ -8,29 +8,56 @@ struct SessionLiveActivityView: View {
     static let captureURL = URL(string: "djdx://session?action=capture")!
 
     var body: some View {
-        HStack(spacing: 14.0) {
-            GameIconImage(assetName: context.attributes.gameIconAssetName, size: 36.0)
-            SessionResultLabel(
-                title: context.state.lastSongTitle ?? context.attributes.gameShortName,
-                rank: context.state.lastDJLevel,
-                clearType: context.state.lastClearType,
-                score: context.state.lastScore,
-                detailLayout: .stacked,
-                titleSpacing: 7.0,
-                titleSize: 20.0
-            )
-            Spacer()
-            VStack(alignment: .trailing, spacing: 2.0) {
-                Text(verbatim: "\(context.state.playCount)")
-                    .font(.system(size: 22.0, weight: .bold).monospacedDigit())
-                Text("Sessions.Plays")
-                    .font(.system(size: 11.0))
-                    .foregroundStyle(.secondary)
+        VStack(spacing: 10.0) {
+            HStack(spacing: 14.0) {
+                GameIconImage(assetName: context.attributes.gameIconAssetName, size: 36.0)
+                SessionResultLabel(
+                    title: context.state.lastSongTitle ?? context.attributes.gameShortName,
+                    rank: context.state.lastDJLevel,
+                    clearType: context.state.lastClearType,
+                    score: context.state.lastScore,
+                    detailLayout: .stacked,
+                    titleSpacing: 7.0,
+                    titleSize: 20.0
+                )
+                Spacer()
+                VStack(alignment: .trailing, spacing: 2.0) {
+                    Text(verbatim: "\(context.state.playCount)")
+                        .font(.system(size: 22.0, weight: .bold).monospacedDigit())
+                    Text("Sessions.Plays")
+                        .font(.system(size: 11.0))
+                        .foregroundStyle(.secondary)
+                }
+                CaptureButton(size: 36.0)
             }
-            CaptureButton(size: 36.0)
+            metrics
         }
         .padding()
         .activityBackgroundTint(.clear)
+    }
+
+    private var metrics: some View {
+        HStack(spacing: 14.0) {
+            Label {
+                Text(context.attributes.sessionStart, style: .timer)
+                    .monospacedDigit()
+            } icon: {
+                Image(systemName: "stopwatch")
+            }
+            if let heartRate = context.state.heartRate {
+                Label("\(heartRate)", systemImage: "heart.fill")
+                    .monospacedDigit()
+                    .foregroundStyle(.red)
+            }
+            if let activeCalories = context.state.activeCalories {
+                Label("\(activeCalories)", systemImage: "flame.fill")
+                    .monospacedDigit()
+                    .foregroundStyle(.orange)
+            }
+            Spacer()
+        }
+        .font(.system(size: 13.0, weight: .medium))
+        .foregroundStyle(.secondary)
     }
 }
 
