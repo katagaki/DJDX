@@ -85,10 +85,12 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     func pauseWorkout() {
         session?.pause()
+        applyPaused(true, at: Date())
     }
 
     func resumeWorkout() {
         session?.resume()
+        applyPaused(false, at: Date())
     }
 
     fileprivate func setPaused(_ paused: Bool) {
@@ -115,19 +117,23 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     fileprivate func handleWorkoutState(_ state: HKWorkoutSessionState, date: Date) {
         switch state {
-        case .paused:
+        case .paused: applyPaused(true, at: date)
+        case .running: applyPaused(false, at: date)
+        default: break
+        }
+    }
+
+    private func applyPaused(_ paused: Bool, at date: Date) {
+        if paused {
             guard isRunning, !isPaused, let startDate else { return }
             pausedElapsed = max(0, date.timeIntervalSince(startDate))
             isPaused = true
-            sendWorkoutState()
-        case .running:
+        } else {
             guard isPaused else { return }
             startDate = date.addingTimeInterval(-pausedElapsed)
             isPaused = false
-            sendWorkoutState()
-        default:
-            break
         }
+        sendWorkoutState()
     }
 
     private func sendWorkoutState() {
