@@ -6,9 +6,11 @@ import WatchConnectivity
 @MainActor
 final class WatchWorkoutManager: NSObject, ObservableObject {
     @Published var isRunning = false
+    @Published var isPaused = false
     @Published var heartRate: Int = 0
     @Published var activeCalories: Int = 0
     @Published var startDate: Date?
+    @Published private(set) var pausedElapsed: TimeInterval = 0
 
     @Published var playCount: Int = 0
     @Published var lastSongTitle: String?
@@ -93,6 +95,21 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         endWorkout()
     }
 
+    fileprivate func handleWorkoutState(_ state: HKWorkoutSessionState, date: Date) {
+        switch state {
+        case .paused:
+            guard isRunning, !isPaused, let startDate else { return }
+            pausedElapsed = max(0, date.timeIntervalSince(startDate))
+            isPaused = true
+        case .running:
+            guard isPaused else { return }
+            startDate = date.addingTimeInterval(-pausedElapsed)
+            isPaused = false
+        default:
+            break
+        }
+    }
+
     func endWorkout() {
         guard isRunning else { return }
         isRunning = false
@@ -124,6 +141,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         heartRate = 0
         activeCalories = 0
         startDate = nil
+        isPaused = false
+        pausedElapsed = 0
         resetSessionInfo()
     }
 
@@ -195,7 +214,10 @@ extension WatchWorkoutManager: HKWorkoutSessionDelegate {
     nonisolated func workoutSession(_ workoutSession: HKWorkoutSession,
                                     didChangeTo toState: HKWorkoutSessionState,
                                     from fromState: HKWorkoutSessionState,
-                                    date: Date) {}
+                                    date: Date) {
+        nonisolated(unsafe) let manager = self
+        Task { @MainActor in manager.handleWorkoutState(toState, date: date) }
+    }
 
     nonisolated func workoutSession(_ workoutSession: HKWorkoutSession,
                                     didFailWithError error: Error) {}

@@ -52,6 +52,23 @@
         }
       }
     },
+    "Watch.Session.Paused" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一時停止中"
+          }
+        }
+      }
+    },
     "Watch.Session.Plays" : {
       "extractionState" : "manual",
       "localizations" : {
