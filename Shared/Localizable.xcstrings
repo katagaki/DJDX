@@ -3216,6 +3216,23 @@
         }
       }
     },
+    "Sessions.Camera.Guide" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fit the result screen inside the frame"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リザルト画面を枠内に収めてください"
+          }
+        }
+      }
+    },
     "Sessions.Capture" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4078,6 +4095,142 @@
         }
       }
     },
+    "Sessions.Pause" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一時停止"
+          }
+        }
+      }
+    },
+    "Sessions.Photos.Denied.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow adding photos in Settings to save result screens."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リザルト画面を保存するには、設定で写真への追加を許可してください。"
+          }
+        }
+      }
+    },
+    "Sessions.Photos.Denied.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos Access Needed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真へのアクセスが必要です"
+          }
+        }
+      }
+    },
+    "Sessions.Photos.ExportAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export All to Photos"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて写真に書き出す"
+          }
+        }
+      }
+    },
+    "Sessions.Photos.ExportAll.Confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export all captured photos to Photos?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撮影したすべての写真を写真に書き出しますか？"
+          }
+        }
+      }
+    },
+    "Sessions.Photos.Failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t save to Photos."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真に保存できませんでした。"
+          }
+        }
+      }
+    },
+    "Sessions.Photos.Save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Photos"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真に保存"
+          }
+        }
+      }
+    },
+    "Sessions.Photos.Saved" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved to Photos"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真に保存しました"
+          }
+        }
+      }
+    },
     "Sessions.PlayCount.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4120,6 +4273,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレー数"
+          }
+        }
+      }
+    },
+    "Sessions.Resume" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再開"
           }
         }
       }
@@ -6088,6 +6258,22 @@
         }
       }
     },
+    "Widget.Name.SessionStart" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Session"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションを開始"
+          }
+        }
+      }
+    },
     "Widget.Name.Tower" : {
       "localizations" : {
         "en" : {
@@ -6164,6 +6350,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アプリを開いてクプロを読み込んでください"
+          }
+        }
+      }
+    },
+    "Widget.SessionStart.Action" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Session"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションを開始"
+          }
+        }
+      }
+    },
+    "Widget.SessionStart.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quickly start a play session."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレーセッションをすぐに開始します。"
           }
         }
       }

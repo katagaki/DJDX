@@ -8,10 +8,16 @@ final class IIDXSessionLiveActivityController {
     private var activity: Activity<SessionActivityAttributes>?
     private var sessionID: String?
     private let database = IIDXPlaySessionsDatabase.shared
+    private var latestHeartRate: Int?
+    private var latestActiveCalories: Int?
+    private var isPaused: Bool = false
+    private var pausedElapsed: TimeInterval?
+    private var runningStart: Date?
 
     func start(_ session: IIDXPlaySession) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         end()
+        resetTransientState()
         let attributes = SessionActivityAttributes(
             sessionID: session.id,
             sessionStart: session.startDate,
@@ -73,6 +79,9 @@ final class IIDXSessionLiveActivityController {
             sessionID: sessionID,
             playCount: state.playCount,
             lastSongTitle: state.lastSongTitle,
+            lastDJLevel: state.lastDJLevel,
+            lastClearType: state.lastClearType,
+            lastScore: state.lastScore,
             lastResultSummary: state.lastResultSummary,
             bestThisSession: state.bestThisSession
         )
@@ -80,12 +89,29 @@ final class IIDXSessionLiveActivityController {
 
     func updateMetrics(sessionID: String, heartRate: Int?, activeCalories: Int?) {
         guard sessionID == self.sessionID, let activity else { return }
-        var state = contentState(for: sessionID)
-        state.heartRate = heartRate
-        state.activeCalories = activeCalories
-        let content = ActivityContent(state: state, staleDate: nil)
+        latestHeartRate = heartRate
+        latestActiveCalories = activeCalories
+        let content = ActivityContent(state: contentState(for: sessionID), staleDate: nil)
         nonisolated(unsafe) let target = activity
         Task { await target.update(content) }
+    }
+
+    func updatePauseState(sessionID: String, isPaused: Bool, pausedElapsed: TimeInterval?, runningStart: Date?) {
+        guard sessionID == self.sessionID, let activity else { return }
+        self.isPaused = isPaused
+        self.pausedElapsed = pausedElapsed
+        self.runningStart = runningStart
+        let content = ActivityContent(state: contentState(for: sessionID), staleDate: nil)
+        nonisolated(unsafe) let target = activity
+        Task { await target.update(content) }
+    }
+
+    private func resetTransientState() {
+        latestHeartRate = nil
+        latestActiveCalories = nil
+        isPaused = false
+        pausedElapsed = nil
+        runningStart = nil
     }
 
     func end() {
@@ -109,8 +135,11 @@ final class IIDXSessionLiveActivityController {
             lastScore: last.flatMap(Self.score),
             lastResultSummary: last.flatMap(Self.summary),
             bestThisSession: Self.best(plays),
-            heartRate: nil,
-            activeCalories: nil,
+            heartRate: latestHeartRate,
+            activeCalories: latestActiveCalories,
+            isPaused: isPaused,
+            pausedElapsed: pausedElapsed,
+            runningStart: runningStart,
             isProcessing: isProcessing
         )
     }

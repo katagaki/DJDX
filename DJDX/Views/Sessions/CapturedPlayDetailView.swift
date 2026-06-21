@@ -24,6 +24,7 @@ struct CapturedPlayDetailView: View {
     @State private var songSuggestions: [IIDXSong] = []
     @State private var searchTask: Task<Void, Never>?
     @State private var capturedImage: UIImage?
+    @State private var photoAlert: PhotoAlert?
     @FocusState private var songFieldFocused: Bool
 
     private let reader = IIDXReader()
@@ -96,10 +97,37 @@ struct CapturedPlayDetailView: View {
                     store.reprocess(play)
                     dismiss()
                 }
+                if let capturedImage {
+                    Button("Sessions.Photos.Save", systemImage: "square.and.arrow.down") {
+                        saveToPhotos(capturedImage)
+                    }
+                }
             }
         }
         .navigationTitle("Sessions.Detail.Title")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if let capturedImage {
+                ShareLink(
+                    item: Image(uiImage: capturedImage),
+                    preview: SharePreview("Sessions.Detail.Title", image: Image(uiImage: capturedImage))
+                )
+            }
+        }
+        .alert(item: $photoAlert) { alert in
+            switch alert {
+            case .saved:
+                return Alert(title: Text("Sessions.Photos.Saved"), dismissButton: .default(Text("Shared.OK")))
+            case .failed:
+                return Alert(title: Text("Sessions.Photos.Failed"), dismissButton: .default(Text("Shared.OK")))
+            case .denied:
+                return Alert(
+                    title: Text("Sessions.Photos.Denied.Title"),
+                    message: Text("Sessions.Photos.Denied.Message"),
+                    dismissButton: .default(Text("Shared.OK"))
+                )
+            }
+        }
         .onAppear(perform: loadFields)
         .task {
             if capturedImage == nil {
@@ -220,6 +248,16 @@ struct CapturedPlayDetailView: View {
         DispatchQueue.main.async { hasLoaded = true }
     }
 
+    private func saveToPhotos(_ image: UIImage) {
+        Task {
+            switch await SessionPhotoExporter.save([image]) {
+            case .saved: photoAlert = .saved
+            case .denied: photoAlert = .denied
+            case .failed: photoAlert = .failed
+            }
+        }
+    }
+
     private func save() {
         play.songTitle = songTitle.isEmpty ? nil : songTitle
         play.level = level
@@ -241,6 +279,11 @@ struct CapturedPlayDetailView: View {
 private struct SongEntry: Sendable {
     let song: IIDXSong
     let compact: String
+}
+
+private enum PhotoAlert: Int, Identifiable {
+    case saved, denied, failed
+    var id: Int { rawValue }
 }
 
 struct RecognizedTextImage: View {

@@ -61,7 +61,9 @@ enum IIDXResultParser {
         parse.playType = detectPlayType(byLabel["difficulty_label"], byLabel["stage_label"])
         if let (level, difficulty) = detectChart(text("difficulty_label")) {
             parse.level = level
-            parse.difficulty = difficulty
+            parse.difficulty = plausibleDifficulty(
+                difficulty, level: level, playType: parse.playType, songs: songs
+            ) ? difficulty : 0
         }
 
         let resolved = resolveTitle(titleText: text("song_title"), songs: songs,
@@ -104,15 +106,16 @@ enum IIDXResultParser {
         if let value = headlineNumber(text("judge_bad")) { parse.bad = value }
         if let value = headlineNumber(text("judge_poor")) { parse.poor = value }
 
-        // Primary: IIDXRankRecognizer classifies the stylized DJ-level graphic and
-        // writes the grade into the dj_level_now region. Fallback (model absent or
-        // unsure): derive it from the score rate (exScore / max), which is how IIDX
-        // assigns the grade.
-        if let value = text("dj_level_now").flatMap(gradeOf) {
-            parse.djLevel = value
-            hits += 1
-        } else if let derived = derivedDJLevel(exScore: parse.exScore, notes: notes) {
+        // The DJ grade is defined by the score rate (exScore / max), so derive it
+        // directly whenever the notes count is known — that is authoritative and
+        // avoids the rank classifier's occasional misreads (e.g. a spurious "F").
+        // Fall back to IIDXRankRecognizer's classification of the dj_level_now
+        // graphic only when the notes count is missing.
+        if let derived = derivedDJLevel(exScore: parse.exScore, notes: notes) {
             parse.djLevel = derived
+            hits += 1
+        } else if let value = text("dj_level_now").flatMap(gradeOf) {
+            parse.djLevel = value
             hits += 1
         }
 
@@ -301,6 +304,24 @@ enum IIDXResultParser {
             return .double
         }
         return .single
+    }
+
+    // A dropped digit reads "11" as "1", which then mis-gates the candidate pool
+    // and blocks the DB difficulty correction. Reject a difficulty below the
+    // lowest that actually exists for this level + play type in the song DB; the
+    // title match then recovers the real value. Unknown DB (no songs) stays lenient.
+    private static func plausibleDifficulty(
+        _ difficulty: Int,
+        level: IIDXLevel,
+        playType: IIDXPlayType,
+        songs: [IIDXSongCandidate]
+    ) -> Bool {
+        guard difficulty > 0 else { return false }
+        let existing = songs.lazy
+            .filter { $0.playType == playType }
+            .compactMap { $0.difficulties[level] }
+        guard let minimum = existing.min() else { return true }
+        return difficulty >= minimum
     }
 
     private static func detectChart(_ text: String?) -> (IIDXLevel, Int)? {

@@ -67,6 +67,7 @@ struct ProfileView: View {
         if hasProfile {
             ScrollView {
                 VStack(spacing: 12.0) {
+                    startButton
                     profileHeader
                     if let radar = selectedRadar {
                         WatchRadarChartView(data: radar)
@@ -82,41 +83,65 @@ struct ProfileView: View {
     }
 
     @ViewBuilder
+    private var startButton: some View {
+        let button = Button {
+            workoutManager.requestStartSession()
+        } label: {
+            Label("Watch.Session.Start", systemImage: "play.fill")
+                .frame(maxWidth: .infinity)
+        }
+        .tint(.accentColor)
+        if #available(watchOS 26.0, *) {
+            button.buttonStyle(.glass)
+        } else {
+            button.buttonStyle(.bordered)
+        }
+    }
+
+    @ViewBuilder
     private var profileHeader: some View {
-        VStack(spacing: 6.0) {
+        HStack(spacing: 10.0) {
             if let data = workoutManager.qproImageData, let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxHeight: 96.0)
+                    .frame(maxHeight: 56.0)
             }
-            if let djName = workoutManager.djName {
-                Text(verbatim: djName)
-                    .font(.headline)
-                    .lineLimit(1)
+            VStack(alignment: .leading, spacing: 2.0) {
+                if let djName = workoutManager.djName {
+                    Text(verbatim: djName)
+                        .font(.headline)
+                        .lineLimit(1)
+                }
+                if let selectedRank {
+                    Text(verbatim: bothRadars ? selectedRank : "\(effectiveType.label)  ·  \(selectedRank)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
             }
-            if let selectedRank {
-                Text(verbatim: bothRadars ? selectedRank : "\(effectiveType.label)  ·  \(selectedRank)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
+            Spacer(minLength: 0.0)
         }
+        .padding(.horizontal, 6.0)
     }
 
     private var idlePlaceholder: some View {
-        VStack(spacing: 8.0) {
-            Image(systemName: "figure.dance")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Watch.Idle.Title")
-                .font(.headline)
-            Text("Watch.Idle.Message")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+        ScrollView {
+            VStack(spacing: 8.0) {
+                Image(systemName: "figure.dance")
+                    .imageScale(.large)
+                    .foregroundStyle(.tint)
+                Text("Watch.Idle.Title")
+                    .font(.headline)
+                Text("Watch.Idle.Message")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                startButton
+                    .padding(.top, 4.0)
+            }
+            .padding()
         }
-        .padding()
     }
 
     private func togglePlayType() {

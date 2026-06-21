@@ -13,6 +13,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     @Published var heartRate: Int = 0
     @Published var activeCalories: Int = 0
     @Published var isWorkoutActive: Bool = false
+    @Published var isPaused: Bool = false
 
     private let healthStore = HKHealthStore()
     private let database = IIDXPlaySessionsDatabase.shared
@@ -21,6 +22,13 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
 
     var isEnabled: Bool {
         UserDefaults.standard.bool(forKey: Self.healthKitEnabledKey)
+    }
+
+    private var isWatchAvailable: Bool {
+        WCSession.isSupported()
+            && WCSession.default.activationState == .activated
+            && WCSession.default.isPaired
+            && WCSession.default.isWatchAppInstalled
     }
 
     override private init() {
@@ -78,22 +86,48 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     func startWorkout(session: IIDXPlaySession) {
-        guard isEnabled else { return }
+        guard isEnabled || isWatchAvailable else { return }
         activeSessionID = session.id
         workoutStart = session.startDate
         isWorkoutActive = true
+        isPaused = false
         heartRate = 0
         activeCalories = 0
         send(["command": "start", "sessionID": session.id])
+        launchWatchApp()
+    }
+
+    func setWorkoutPaused(_ paused: Bool) {
+        guard isWorkoutActive, let activeSessionID else { return }
+        send(["command": "setPaused", "sessionID": activeSessionID, "paused": paused])
+    }
+
+    private func launchWatchApp() {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+        let connectivity = WCSession.default
+        guard connectivity.activationState == .activated,
+              connectivity.isPaired,
+              connectivity.isWatchAppInstalled,
+              !connectivity.isReachable else { return }
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .fitnessGaming
+        configuration.locationType = .indoor
+        healthStore.startWatchApp(with: configuration) { _, _ in }
+    }
+
+    fileprivate func resendStartIfActive() {
+        guard isWorkoutActive, let activeSessionID else { return }
+        send(["command": "start", "sessionID": activeSessionID])
     }
 
     func endWorkout(session: IIDXPlaySession) {
-        guard isEnabled, activeSessionID == session.id else { return }
+        guard activeSessionID == session.id else { return }
         send(["command": "end", "sessionID": session.id])
         if !WCSession.default.isPaired {
             saveFallbackWorkout(for: session)
         }
         isWorkoutActive = false
+        isPaused = false
         activeSessionID = nil
         workoutStart = nil
         heartRate = 0
@@ -114,12 +148,18 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         sessionID: String,
         playCount: Int,
         lastSongTitle: String?,
+        lastDJLevel: String?,
+        lastClearType: String?,
+        lastScore: Int?,
         lastResultSummary: String?,
         bestThisSession: String?
     ) {
         guard isWorkoutActive, sessionID == activeSessionID else { return }
         var payload: [String: Any] = ["sessionInfo": true, "sessionID": sessionID, "playCount": playCount]
         if let lastSongTitle { payload["lastSongTitle"] = lastSongTitle }
+        if let lastDJLevel { payload["lastDJLevel"] = lastDJLevel }
+        if let lastClearType { payload["lastClearType"] = lastClearType }
+        if let lastScore { payload["lastScore"] = lastScore }
         if let lastResultSummary { payload["lastResultSummary"] = lastResultSummary }
         if let bestThisSession { payload["bestThisSession"] = bestThisSession }
         send(payload)
@@ -169,7 +209,16 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         return resized.pngData()
     }
 
+    private func adoptSessionIfNeeded(_ sessionID: String) {
+        guard activeSessionID == nil,
+              let session = database.session(id: sessionID), session.isActive else { return }
+        activeSessionID = sessionID
+        workoutStart = session.startDate
+        isWorkoutActive = true
+    }
+
     fileprivate func ingestMetrics(heartRate: Int?, activeCalories: Int?, sessionID: String) {
+        adoptSessionIfNeeded(sessionID)
         guard sessionID == activeSessionID else { return }
         if let heartRate { self.heartRate = heartRate }
         if let activeCalories { self.activeCalories = activeCalories }
@@ -179,6 +228,18 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
             activeCalories: self.activeCalories > 0 ? self.activeCalories : nil
         )
         NotificationCenter.default.post(name: .playSessionDidChange, object: sessionID)
+    }
+
+    fileprivate func applyWorkoutState(sessionID: String, paused: Bool, elapsed: Double?, start: Double?) {
+        adoptSessionIfNeeded(sessionID)
+        let runningStart = start.map { Date(timeIntervalSince1970: $0) }
+        isPaused = paused
+        IIDXSessionLiveActivityController.shared.updatePauseState(
+            sessionID: sessionID,
+            isPaused: paused,
+            pausedElapsed: elapsed,
+            runningStart: runningStart
+        )
     }
 
     fileprivate func storeWorkoutUUID(_ uuid: String, sessionID: String) {
@@ -191,7 +252,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         guard let start = workoutStart else { return }
         let end = Date()
         let configuration = HKWorkoutConfiguration()
-        configuration.activityType = .cardioDance
+        configuration.activityType = .fitnessGaming
         configuration.locationType = .indoor
         let builder = HKWorkoutBuilder(
             healthStore: healthStore,
@@ -239,8 +300,30 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
         let sessionID = message["sessionID"] as? String ?? ""
         nonisolated(unsafe) let bridge = self
         if let command = message["command"] as? String {
-            if command == "requestProfile" {
-                Task { @MainActor in bridge.syncProfileToWatch() }
+            switch command {
+            case "requestProfile":
+                Task { @MainActor in
+                    bridge.syncProfileToWatch()
+                    bridge.resendStartIfActive()
+                }
+            case "startSession":
+                let requestedID = sessionID.isEmpty ? nil : sessionID
+                Task { @MainActor in
+                    NotificationCenter.default.post(name: .startSessionRequested, object: requestedID)
+                }
+            case "endSession":
+                Task { @MainActor in
+                    NotificationCenter.default.post(name: .endSessionRequested, object: sessionID)
+                }
+            case "workoutState":
+                let paused = message["paused"] as? Bool ?? false
+                let elapsed = message["elapsed"] as? Double
+                let start = message["start"] as? Double
+                Task { @MainActor in
+                    bridge.applyWorkoutState(sessionID: sessionID, paused: paused, elapsed: elapsed, start: start)
+                }
+            default:
+                break
             }
             return
         }

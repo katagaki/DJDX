@@ -1,87 +1,87 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
-    "CFBundleName" : {
-      "comment" : "Bundle name",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJDX"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJDX"
-          }
-        }
-      }
-    },
-    "NSCameraUsageDescription" : {
+    "Watch.Widget.Description" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDX uses the camera to capture your result screens during a session."
+            "value" : "Quickly start a play session."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッション中にリザルト画面を撮影するためにカメラを使用します。"
+            "value" : "プレーセッションをすぐに開始します。"
           }
         }
       }
     },
-    "NSHealthShareUsageDescription" : {
+    "Watch.Widget.Name" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDX reads your workout, heart rate, and active energy to summarize your play sessions."
+            "value" : "Start Session"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "プレーセッションをまとめるために、ワークアウト・心拍数・アクティブエネルギーを読み出します。"
+            "value" : "セッションを開始"
           }
         }
       }
     },
-    "NSHealthUpdateUsageDescription" : {
+    "Watch.Widget.Radar" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDX saves your play sessions as workouts in the Health app."
+            "value" : "NOTES RADAR"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "プレーセッションをワークアウトとしてヘルスケアに保存します。"
+            "value" : "ノーツレーダー"
           }
         }
       }
     },
-    "NSPhotoLibraryAddUsageDescription" : {
+    "Watch.Widget.Start" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDX saves your captured result screens to Photos."
+            "value" : "Start"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "撮影したリザルト画面を写真に保存します。"
+            "value" : "開始"
+          }
+        }
+      }
+    },
+    "Watch.Widget.StartSession" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Session"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションを開始"
           }
         }
       }

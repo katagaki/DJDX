@@ -13,6 +13,9 @@
 		E46D51B42C284CFE000524B9 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = E46D51B32C284CFE000524B9 /* Collections */; };
 		E474AEC92F4931A40014149D /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E474AEC82F4931A40014149D /* SQLite */; };
 		E47D068D2F53F4E6006081EF /* DJDX Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA000001300100000000000D /* DJDX Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E4BF6DA82FE821DD00D0E9D0 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4BF6DA72FE821DD00D0E9D0 /* WidgetKit.framework */; };
+		E4BF6DAA2FE821DD00D0E9D0 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4BF6DA92FE821DD00D0E9D0 /* SwiftUI.framework */; };
+		E4BF6DB72FE821DE00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4E3D0D62BF9A220001942FE /* Komponents */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +48,13 @@
 			remoteGlobalIDString = AA000001300100000000000C;
 			remoteInfo = DJDXWidgets;
 		};
+		E4BF6DB52FE821DE00D0E9D0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4B123A42BF8E8E400D4A3D1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E4BF6DA52FE821DC00D0E9D0;
+			remoteInfo = "DJDX CHARGE WidgetsExtension";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -70,12 +80,26 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E4BF6DB82FE821DE00D0E9D0 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E4BF6DB72FE821DE00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		AA000001300100000000000D /* DJDX Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "DJDX Widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DJDX CHARGE.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DJDX.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "DJDX CHARGE WidgetsExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4BF6DA72FE821DD00D0E9D0 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		E4BF6DA92FE821DD00D0E9D0 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -83,13 +107,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-			);
-			target = AA000001300100000000000C /* DJDX Widgets */;
-		};
-		E4449F382FE18674003AC8B6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				AppIcon.icon,
 			);
 			target = AA000001300100000000000C /* DJDX Widgets */;
 		};
@@ -108,13 +125,28 @@
 			);
 			target = E4B123AB2BF8E8E400D4A3D1 /* DJDX */;
 		};
+		E4BF6DBC2FE821DE00D0E9D0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension */;
+		};
+		E4BF6DBF2FE8223700D0E9D0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppIcon.icon,
+			);
+			target = E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AA000001300100000000000E /* Widgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AA00000130010000000000E1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Widgets; sourceTree = "<group>"; };
 		E4449F162FE17495003AC8B6 /* DJDX CHARGE */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "DJDX CHARGE"; sourceTree = "<group>"; };
-		E4B2630B2E79986D0031A646 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4449F382FE18674003AC8B6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, E4449F392FE18674003AC8B6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
+		E4B2630B2E79986D0031A646 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4449F392FE18674003AC8B6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, E4BF6DBF2FE8223700D0E9D0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 		E4B2636E2E7998840031A646 /* DJDX */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4B263BC2E7998840031A646 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DJDX; sourceTree = "<group>"; };
+		E4BF6DAB2FE821DD00D0E9D0 /* DJDX CHARGE Widgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4BF6DBC2FE821DE00D0E9D0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "DJDX CHARGE Widgets"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,12 +176,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E4BF6DA32FE821DC00D0E9D0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E4BF6DAA2FE821DD00D0E9D0 /* SwiftUI.framework in Frameworks */,
+				E4BF6DA82FE821DD00D0E9D0 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		E49816D22F53F04A00EFFB8B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E4BF6DA72FE821DD00D0E9D0 /* WidgetKit.framework */,
+				E4BF6DA92FE821DD00D0E9D0 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -161,6 +204,7 @@
 				E4B2636E2E7998840031A646 /* DJDX */,
 				AA000001300100000000000E /* Widgets */,
 				E4449F162FE17495003AC8B6 /* DJDX CHARGE */,
+				E4BF6DAB2FE821DD00D0E9D0 /* DJDX CHARGE Widgets */,
 				E49816D22F53F04A00EFFB8B /* Frameworks */,
 				E4B123AD2BF8E8E400D4A3D1 /* Products */,
 			);
@@ -172,6 +216,7 @@
 				E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */,
 				AA000001300100000000000D /* DJDX Widgets.appex */,
 				E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */,
+				E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -210,10 +255,12 @@
 				E4449F112FE17495003AC8B6 /* Sources */,
 				E4449F122FE17495003AC8B6 /* Frameworks */,
 				E4449F132FE17495003AC8B6 /* Resources */,
+				E4BF6DB82FE821DE00D0E9D0 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E4BF6DB62FE821DE00D0E9D0 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				E4449F162FE17495003AC8B6 /* DJDX CHARGE */,
@@ -259,6 +306,28 @@
 			productReference = E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E4BF6DBB2FE821DE00D0E9D0 /* Build configuration list for PBXNativeTarget "DJDX CHARGE WidgetsExtension" */;
+			buildPhases = (
+				E4BF6DA22FE821DC00D0E9D0 /* Sources */,
+				E4BF6DA32FE821DC00D0E9D0 /* Frameworks */,
+				E4BF6DA42FE821DC00D0E9D0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E4BF6DAB2FE821DD00D0E9D0 /* DJDX CHARGE Widgets */,
+			);
+			name = "DJDX CHARGE WidgetsExtension";
+			packageProductDependencies = (
+			);
+			productName = "DJDX CHARGE WidgetsExtension";
+			productReference = E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -277,6 +346,9 @@
 					};
 					E4B123AB2BF8E8E400D4A3D1 = {
 						CreatedOnToolsVersion = 15.4;
+					};
+					E4BF6DA52FE821DC00D0E9D0 = {
+						CreatedOnToolsVersion = 27.0;
 					};
 				};
 			};
@@ -303,6 +375,7 @@
 				E4B123AB2BF8E8E400D4A3D1 /* DJDX */,
 				AA000001300100000000000C /* DJDX Widgets */,
 				E4449F142FE17495003AC8B6 /* DJDX CHARGE */,
+				E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -323,6 +396,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		E4B123AA2BF8E8E400D4A3D1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E4BF6DA42FE821DC00D0E9D0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -374,6 +454,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E4BF6DA22FE821DC00D0E9D0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -396,6 +483,11 @@
 			isa = PBXTargetDependency;
 			target = AA000001300100000000000C /* DJDX Widgets */;
 			targetProxy = E49816D42F53F04A00EFFB8B /* PBXContainerItemProxy */;
+		};
+		E4BF6DB62FE821DE00D0E9D0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension */;
+			targetProxy = E4BF6DB52FE821DE00D0E9D0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -748,6 +840,72 @@
 			};
 			name = Release;
 		};
+		E4BF6DB92FE821DE00D0E9D0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = "DJDX CHARGE Widgets/Entitlements.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "DJDX CHARGE Widgets/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "DJDX CHARGE Widgets";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tsubuzaki.DJDX.watchkitapp.DJDX-CHARGE-Widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.6;
+			};
+			name = Debug;
+		};
+		E4BF6DBA2FE821DE00D0E9D0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = "DJDX CHARGE Widgets/Entitlements.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "DJDX CHARGE Widgets/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "DJDX CHARGE Widgets";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tsubuzaki.DJDX.watchkitapp.DJDX-CHARGE-Widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.6;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -783,6 +941,15 @@
 			buildConfigurations = (
 				E4B123BD2BF8E8E500D4A3D1 /* Debug */,
 				E4B123BE2BF8E8E500D4A3D1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E4BF6DBB2FE821DE00D0E9D0 /* Build configuration list for PBXNativeTarget "DJDX CHARGE WidgetsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E4BF6DB92FE821DE00D0E9D0 /* Debug */,
+				E4BF6DBA2FE821DE00D0E9D0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

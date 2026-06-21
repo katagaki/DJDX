@@ -3,34 +3,119 @@ import SwiftUI
 import WidgetKit
 
 struct SessionLiveActivityView: View {
+    @Environment(\.activityFamily) private var activityFamily
     let context: ActivityViewContext<SessionActivityAttributes>
 
-    static let captureURL = URL(string: "djdx://session?action=capture")!
+    static let captureURL = URL(string: "djdx://session/capture")!
 
     var body: some View {
-        HStack(spacing: 14.0) {
-            GameIconImage(assetName: context.attributes.gameIconAssetName, size: 36.0)
-            SessionResultLabel(
-                title: context.state.lastSongTitle ?? context.attributes.gameShortName,
-                rank: context.state.lastDJLevel,
-                clearType: context.state.lastClearType,
-                score: context.state.lastScore,
-                detailLayout: .stacked,
-                titleSpacing: 7.0,
-                titleSize: 20.0
-            )
-            Spacer()
-            VStack(alignment: .trailing, spacing: 2.0) {
-                Text(verbatim: "\(context.state.playCount)")
-                    .font(.system(size: 22.0, weight: .bold).monospacedDigit())
-                Text("Sessions.Plays")
-                    .font(.system(size: 11.0))
-                    .foregroundStyle(.secondary)
-            }
-            CaptureButton()
+        if activityFamily == .small {
+            watchBody
+        } else {
+            phoneBody
         }
-        .padding()
+    }
+
+    private var timerStart: Date {
+        context.state.runningStart ?? context.attributes.sessionStart
+    }
+
+    private var timeText: Text {
+        if context.state.isPaused, let elapsed = context.state.pausedElapsed {
+            return Text(verbatim: Self.formattedElapsed(elapsed))
+        }
+        return Text(timerStart, style: .timer)
+    }
+
+    private static func formattedElapsed(_ interval: TimeInterval) -> String {
+        let total = Int(max(0, interval))
+        let hours = total / 3600
+        let minutes = (total % 3600) / 60
+        let seconds = total % 60
+        if hours > 0 {
+            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+        }
+        return String(format: "%d:%02d", minutes, seconds)
+    }
+
+    private var watchBody: some View {
+        VStack(alignment: .leading, spacing: 6.0) {
+            HStack(spacing: 6.0) {
+                if context.state.isPaused {
+                    Image(systemName: "pause.fill")
+                        .foregroundStyle(.orange)
+                }
+                timeText
+            }
+            .font(.system(size: 28.0, weight: .bold).monospacedDigit())
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            VStack(alignment: .leading, spacing: 3.0) {
+                if let heartRate = context.state.heartRate {
+                    Label("\(heartRate)", systemImage: "heart.fill")
+                }
+                if let activeCalories = context.state.activeCalories {
+                    Label("\(activeCalories)", systemImage: "flame.fill")
+                }
+                Label("\(context.state.playCount)", systemImage: "opticaldisc")
+            }
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 14.0)
+        .padding(.vertical, 10.0)
+    }
+
+    private var phoneBody: some View {
+        VStack(spacing: 0) {
+            metricsBar
+            HStack(spacing: 14.0) {
+                GameIconImage(assetName: context.attributes.gameIconAssetName, size: 36.0)
+                SessionResultLabel(
+                    title: context.state.lastSongTitle ?? context.attributes.gameShortName,
+                    rank: context.state.lastDJLevel,
+                    clearType: context.state.lastClearType,
+                    score: context.state.lastScore,
+                    detailLayout: .stacked,
+                    titleSpacing: 7.0,
+                    titleSize: 20.0
+                )
+                Spacer()
+                CaptureButton(size: 36.0)
+            }
+            .padding()
+        }
         .activityBackgroundTint(.clear)
+    }
+
+    private var metricsBar: some View {
+        HStack(spacing: 12.0) {
+            Label {
+                timeText
+                    .monospacedDigit()
+            } icon: {
+                Image(systemName: context.state.isPaused ? "pause.fill" : "stopwatch")
+            }
+            if let heartRate = context.state.heartRate {
+                Label("\(heartRate)", systemImage: "heart.fill")
+                    .monospacedDigit()
+            }
+            if let activeCalories = context.state.activeCalories {
+                Label("\(activeCalories)", systemImage: "flame.fill")
+                    .monospacedDigit()
+            }
+            Spacer()
+            Label("\(context.state.playCount)", systemImage: "opticaldisc")
+                .monospacedDigit()
+        }
+        .font(.system(size: 13.0, weight: .semibold))
+        .fontDesign(.rounded)
+        .foregroundStyle(.primary)
+        .padding(.horizontal)
+        .padding(.vertical, 8.0)
+        .frame(maxWidth: .infinity)
+        .background(Color("AccentColor").opacity(0.5))
     }
 }
 
@@ -234,11 +319,6 @@ struct SessionLiveActivity: Widget {
                             detailSize: 11.0
                         )
                         Spacer()
-                        if let heartRate = context.state.heartRate {
-                            Label("\(heartRate)", systemImage: "heart.fill")
-                                .font(.system(size: 12.0))
-                                .foregroundStyle(.red)
-                        }
                         if let rank = context.state.lastDJLevel {
                             RankText(rank: rank, size: 22.0)
                         }
@@ -256,6 +336,7 @@ struct SessionLiveActivity: Widget {
                 GameIconImage(assetName: context.attributes.gameIconAssetName, size: 18.0)
             }
         }
+        .supplementalActivityFamilies([.small])
     }
 }
 

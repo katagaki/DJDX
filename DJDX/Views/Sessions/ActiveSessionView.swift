@@ -8,6 +8,8 @@ struct ActiveSessionView: View {
     @State private var isPresentingCamera: Bool = false
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isShowingCameraDeniedAlert: Bool = false
+    @State private var photoAlert: PhotoExportAlert?
+    @State private var isConfirmingExport: Bool = false
     @ObservedObject private var workoutBridge = IIDXSessionWorkoutBridge.shared
 
     var body: some View {
@@ -31,6 +33,23 @@ struct ActiveSessionView: View {
             .navigationTitle("Sessions.Active.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                if !store.plays.isEmpty {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Sessions.Photos.ExportAll", systemImage: "square.and.arrow.up.on.square") {
+                            isConfirmingExport = true
+                        }
+                    }
+                }
+                if workoutBridge.isWorkoutActive {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            workoutBridge.setWorkoutPaused(!workoutBridge.isPaused)
+                        } label: {
+                            Image(systemName: workoutBridge.isPaused ? "play.fill" : "pause.fill")
+                        }
+                        .accessibilityLabel(workoutBridge.isPaused ? "Sessions.Resume" : "Sessions.Pause")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if #available(iOS 26.0, *) {
                         Button(role: .close) {
@@ -71,6 +90,40 @@ struct ActiveSessionView: View {
         } message: {
             Text("Sessions.Camera.Denied.Message")
         }
+        .alert("Sessions.Photos.ExportAll.Confirm", isPresented: $isConfirmingExport) {
+            Button("Sessions.Photos.ExportAll") {
+                exportAllToPhotos()
+            }
+            Button("Shared.Cancel", role: .cancel) {}
+        }
+        .alert(item: $photoAlert) { alert in
+            switch alert {
+            case .saved:
+                return Alert(title: Text("Sessions.Photos.Saved"), dismissButton: .default(Text("Shared.OK")))
+            case .failed:
+                return Alert(title: Text("Sessions.Photos.Failed"), dismissButton: .default(Text("Shared.OK")))
+            case .denied:
+                return Alert(
+                    title: Text("Sessions.Photos.Denied.Title"),
+                    message: Text("Sessions.Photos.Denied.Message"),
+                    dismissButton: .default(Text("Shared.OK"))
+                )
+            }
+        }
+    }
+
+    private func exportAllToPhotos() {
+        let filenames = store.plays.map(\.rawImageFilename)
+        Task {
+            let images: [UIImage] = await Task.detached {
+                filenames.compactMap { IIDXSessionImageStore.shared.image(for: $0) }
+            }.value
+            switch await SessionPhotoExporter.save(images) {
+            case .saved: photoAlert = .saved
+            case .denied: photoAlert = .denied
+            case .failed: photoAlert = .failed
+            }
+        }
     }
 
     private var numberFont: Font {
@@ -100,6 +153,7 @@ struct ActiveSessionView: View {
                             HStack(spacing: 6.0) {
                                 Image(systemName: "heart.fill")
                                     .font(.title3)
+                                    .heartbeat(isActive: workoutBridge.heartRate > 0)
                                 Text(verbatim: workoutBridge.heartRate > 0 ? "\(workoutBridge.heartRate)" : "--")
                                     .font(numberFont)
                             }
@@ -225,6 +279,11 @@ struct ActiveSessionView: View {
             }
             await MainActor.run { pickerItems = [] }
         }
+    }
+
+    private enum PhotoExportAlert: Int, Identifiable {
+        case saved, denied, failed
+        var id: Int { rawValue }
     }
 
     private func elapsedString(since start: Date, now: Date) -> String {
