@@ -27,7 +27,7 @@ struct SessionLiveActivityView: View {
                     .font(.system(size: 11.0))
                     .foregroundStyle(.secondary)
             }
-            CaptureButton()
+            CaptureButton(size: 36.0)
         }
         .padding()
         .activityBackgroundTint(.clear)
