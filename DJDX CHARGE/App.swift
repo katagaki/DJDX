@@ -8,6 +8,11 @@ struct DJDXChargeWatchApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(workoutManager)
+                .onOpenURL { url in
+                    if url.host == "start" {
+                        workoutManager.requestStartSession()
+                    }
+                }
         }
     }
 }
