@@ -8,20 +8,23 @@ struct WorkoutView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10.0) {
                 if let startDate = workoutManager.startDate {
-                    Group {
-                        if workoutManager.isPaused {
-                            Text(verbatim: elapsedString(workoutManager.pausedElapsed))
-                        } else {
-                            Text(startDate, style: .timer)
+                    HStack(spacing: 6.0) {
+                        Group {
+                            if workoutManager.isPaused {
+                                Text(verbatim: elapsedString(workoutManager.pausedElapsed))
+                            } else {
+                                Text(startDate, style: .timer)
+                            }
                         }
-                    }
-                    .font(.system(size: 40.0, weight: .bold, design: .rounded).monospacedDigit())
-                    .minimumScaleFactor(0.6)
-                    .lineLimit(1)
-                    if workoutManager.isPaused {
-                        Label("Watch.Session.Paused", systemImage: "pause.fill")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(.orange)
+                        .font(.system(size: 40.0, weight: .bold, design: .rounded).monospacedDigit())
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
+                        if workoutManager.isPaused {
+                            Spacer(minLength: 4.0)
+                            Image(systemName: "pause.fill")
+                                .font(.title3)
+                                .foregroundStyle(.orange)
+                        }
                     }
                 }
 
