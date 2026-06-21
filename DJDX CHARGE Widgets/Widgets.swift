@@ -22,7 +22,7 @@ struct SessionStartProvider: TimelineProvider {
 struct SessionStartComplicationView: View {
     @Environment(\.widgetFamily) private var family
 
-    private static let startURL = URL(string: "djdx://start")!
+    private static let startURL = URL(string: "djdx://session/start")!
 
     var body: some View {
         content

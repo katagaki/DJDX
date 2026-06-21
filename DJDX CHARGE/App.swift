@@ -9,8 +9,20 @@ struct DJDXChargeWatchApp: App {
             ContentView()
                 .environmentObject(workoutManager)
                 .onOpenURL { url in
-                    if url.host == "start" {
+                    guard url.host == "session" else { return }
+                    switch url.lastPathComponent.lowercased() {
+                    case "start":
                         workoutManager.requestStartSession()
+                    case "stop":
+                        workoutManager.requestEndSession()
+                    case "pause":
+                        if workoutManager.isPaused {
+                            workoutManager.resumeWorkout()
+                        } else {
+                            workoutManager.pauseWorkout()
+                        }
+                    default:
+                        break
                     }
                 }
         }

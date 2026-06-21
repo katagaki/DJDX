@@ -36,7 +36,7 @@ struct SessionStartProvider: TimelineProvider {
 struct SessionStartWidgetView: View {
     @Environment(\.widgetFamily) private var family
 
-    private static let startURL = URL(string: "djdx://session?action=start")!
+    private static let startURL = URL(string: "djdx://session/start")!
 
     var body: some View {
         content

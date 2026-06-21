@@ -6,7 +6,7 @@ struct SessionLiveActivityView: View {
     @Environment(\.activityFamily) private var activityFamily
     let context: ActivityViewContext<SessionActivityAttributes>
 
-    static let captureURL = URL(string: "djdx://session?action=capture")!
+    static let captureURL = URL(string: "djdx://session/capture")!
 
     var body: some View {
         if activityFamily == .small {
@@ -66,7 +66,7 @@ struct SessionLiveActivityView: View {
     }
 
     private var phoneBody: some View {
-        VStack(spacing: 10.0) {
+        VStack {
             HStack(spacing: 14.0) {
                 GameIconImage(assetName: context.attributes.gameIconAssetName, size: 36.0)
                 SessionResultLabel(
@@ -81,9 +81,9 @@ struct SessionLiveActivityView: View {
                 Spacer()
                 CaptureButton(size: 36.0)
             }
+            .padding()
             metricsBar
         }
-        .padding()
         .activityBackgroundTint(.clear)
     }
 
@@ -112,11 +112,12 @@ struct SessionLiveActivityView: View {
             }
         }
         .font(.system(size: 13.0, weight: .semibold))
+        .fontDesign(.rounded)
         .foregroundStyle(.primary)
-        .padding(.horizontal, 14.0)
+        .padding(.horizontal)
         .padding(.vertical, 9.0)
         .frame(maxWidth: .infinity)
-        .background(Color("AccentColor").opacity(0.5), in: Capsule())
+        .background(Color("AccentColor").opacity(0.5))
     }
 }
 
