@@ -7,6 +7,7 @@ import WatchConnectivity
 final class WatchWorkoutManager: NSObject, ObservableObject {
     @Published var isRunning = false
     @Published var isPaused = false
+    @Published private(set) var isCollecting = false
     @Published var heartRate: Int = 0
     @Published var activeCalories: Int = 0
     @Published var startDate: Date?
@@ -76,9 +77,18 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
             self.builder = builder
             session.startActivity(with: start)
             builder.beginCollection(withStart: start) { _, _ in }
+            isCollecting = true
         } catch {
             return
         }
+    }
+
+    func pauseWorkout() {
+        session?.pause()
+    }
+
+    func resumeWorkout() {
+        session?.resume()
     }
 
     func requestStartSession() {
@@ -155,6 +165,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         activeCalories = 0
         startDate = nil
         isPaused = false
+        isCollecting = false
         pausedElapsed = 0
         resetSessionInfo()
     }

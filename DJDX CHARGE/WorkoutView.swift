@@ -70,6 +70,10 @@ struct WorkoutView: View {
                     .font(.caption2)
                 }
 
+                if workoutManager.isCollecting {
+                    pauseButton
+                        .padding(.top, 6.0)
+                }
                 stopButton
                     .padding(.top, 6.0)
             }
@@ -96,6 +100,29 @@ struct WorkoutView: View {
             return String(format: "%d:%02d:%02d", hours, minutes, seconds)
         }
         return String(format: "%02d:%02d", minutes, seconds)
+    }
+
+    @ViewBuilder
+    private var pauseButton: some View {
+        let button = Button {
+            if workoutManager.isPaused {
+                workoutManager.resumeWorkout()
+            } else {
+                workoutManager.pauseWorkout()
+            }
+        } label: {
+            Label(
+                workoutManager.isPaused ? "Watch.Session.Resume" : "Watch.Session.Pause",
+                systemImage: workoutManager.isPaused ? "play.fill" : "pause.fill"
+            )
+            .frame(maxWidth: .infinity)
+        }
+        .tint(workoutManager.isPaused ? .green : .orange)
+        if #available(watchOS 26.0, *) {
+            button.buttonStyle(.glass)
+        } else {
+            button.buttonStyle(.bordered)
+        }
     }
 
     @ViewBuilder
