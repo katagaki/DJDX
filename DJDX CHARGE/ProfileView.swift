@@ -100,24 +100,27 @@ struct ProfileView: View {
 
     @ViewBuilder
     private var profileHeader: some View {
-        VStack(spacing: 6.0) {
+        HStack(spacing: 10.0) {
             if let data = workoutManager.qproImageData, let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxHeight: 96.0)
+                    .frame(maxHeight: 56.0)
             }
-            if let djName = workoutManager.djName {
-                Text(verbatim: djName)
-                    .font(.headline)
-                    .lineLimit(1)
+            VStack(alignment: .leading, spacing: 2.0) {
+                if let djName = workoutManager.djName {
+                    Text(verbatim: djName)
+                        .font(.headline)
+                        .lineLimit(1)
+                }
+                if let selectedRank {
+                    Text(verbatim: bothRadars ? selectedRank : "\(effectiveType.label)  ·  \(selectedRank)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
             }
-            if let selectedRank {
-                Text(verbatim: bothRadars ? selectedRank : "\(effectiveType.label)  ·  \(selectedRank)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
+            Spacer(minLength: 0.0)
         }
     }
 
