@@ -84,20 +84,32 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     func pauseWorkout() {
-        session?.pause()
-        applyPaused(true, at: Date())
+        requestPause(true)
     }
 
     func resumeWorkout() {
-        session?.resume()
-        applyPaused(false, at: Date())
+        requestPause(false)
     }
 
     fileprivate func setPaused(_ paused: Bool) {
-        if paused {
-            pauseWorkout()
-        } else {
-            resumeWorkout()
+        requestPause(paused)
+    }
+
+    // Only issue transitions that are valid from the session's current state —
+    // HealthKit errors on pause-while-paused / resume-while-running. When the
+    // session is already in the requested state, just reconcile our flag to it.
+    private func requestPause(_ paused: Bool) {
+        guard let session else { return }
+        let date = Date()
+        switch (paused, session.state) {
+        case (true, .running):
+            session.pause()
+            applyPaused(true, at: date)
+        case (false, .paused):
+            session.resume()
+            applyPaused(false, at: date)
+        default:
+            applyPaused(session.state == .paused, at: date)
         }
     }
 
