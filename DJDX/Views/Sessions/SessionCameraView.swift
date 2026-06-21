@@ -26,6 +26,8 @@ final class SessionCameraViewController: UIViewController {
     private let previewLayer = AVCaptureVideoPreviewLayer()
     private let topGradient = CAGradientLayer()
     private let bottomGradient = CAGradientLayer()
+    private let guideLayer = CAShapeLayer()
+    private let hintLabel = UILabel()
     private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
     private var captureDelegate: PhotoCaptureDelegate?
 
@@ -46,6 +48,15 @@ final class SessionCameraViewController: UIViewController {
         bottomGradient.colors = [UIColor.clear.cgColor, UIColor.black.withAlphaComponent(0.6).cgColor]
         view.layer.addSublayer(topGradient)
         view.layer.addSublayer(bottomGradient)
+        guideLayer.fillColor = UIColor.clear.cgColor
+        guideLayer.strokeColor = UIColor.white.withAlphaComponent(0.9).cgColor
+        guideLayer.lineWidth = 3
+        guideLayer.lineCap = .round
+        guideLayer.shadowColor = UIColor.black.cgColor
+        guideLayer.shadowOpacity = 0.4
+        guideLayer.shadowRadius = 3
+        guideLayer.shadowOffset = .zero
+        view.layer.addSublayer(guideLayer)
         configureControls()
         sessionQueue.async { [weak self] in self?.configureSession() }
     }
@@ -54,6 +65,7 @@ final class SessionCameraViewController: UIViewController {
         super.viewWillAppear(animated)
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         shutterHaptic.prepare()
+        startGuidePulse()
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationDidChange),
                                                name: UIDevice.orientationDidChangeNotification, object: nil)
         sessionQueue.async { [weak self] in
@@ -66,6 +78,7 @@ final class SessionCameraViewController: UIViewController {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
         UIDevice.current.endGeneratingDeviceOrientationNotifications()
+        guideLayer.removeAnimation(forKey: "pulse")
         sessionQueue.async { [weak self] in
             guard let self, self.session.isRunning else { return }
             self.session.stopRunning()
@@ -76,6 +89,18 @@ final class SessionCameraViewController: UIViewController {
         applyPreviewRotation()
     }
 
+    private func startGuidePulse() {
+        guideLayer.removeAnimation(forKey: "pulse")
+        let pulse = CABasicAnimation(keyPath: "opacity")
+        pulse.fromValue = 1.0
+        pulse.toValue = 0.35
+        pulse.duration = 1.1
+        pulse.autoreverses = true
+        pulse.repeatCount = .infinity
+        pulse.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        guideLayer.add(pulse, forKey: "pulse")
+    }
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         CATransaction.begin()
@@ -84,9 +109,49 @@ final class SessionCameraViewController: UIViewController {
         let fade: CGFloat = 160
         topGradient.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: fade)
         bottomGradient.frame = CGRect(x: 0, y: view.bounds.height - fade, width: view.bounds.width, height: fade)
+        guideLayer.frame = view.bounds
+        guideLayer.path = cornerBracketPath(in: guideRect()).cgPath
         CATransaction.commit()
         applyPreviewRotation()
         applyShutterPlacement()
+    }
+
+    private func guideRect() -> CGRect {
+        let landscape = view.bounds.width > view.bounds.height
+        let horizontalInset: CGFloat = landscape ? 140 : 28
+        let verticalInset: CGFloat = landscape ? 56 : 150
+        return view.bounds.insetBy(dx: horizontalInset, dy: verticalInset)
+    }
+
+    private func cornerBracketPath(in rect: CGRect, length: CGFloat = 30, radius: CGFloat = 14) -> UIBezierPath {
+        let path = UIBezierPath()
+        let minX = rect.minX, minY = rect.minY, maxX = rect.maxX, maxY = rect.maxY
+
+        path.move(to: CGPoint(x: minX, y: minY + radius + length))
+        path.addLine(to: CGPoint(x: minX, y: minY + radius))
+        path.addArc(withCenter: CGPoint(x: minX + radius, y: minY + radius),
+                    radius: radius, startAngle: .pi, endAngle: .pi * 1.5, clockwise: true)
+        path.addLine(to: CGPoint(x: minX + radius + length, y: minY))
+
+        path.move(to: CGPoint(x: maxX - radius - length, y: minY))
+        path.addLine(to: CGPoint(x: maxX - radius, y: minY))
+        path.addArc(withCenter: CGPoint(x: maxX - radius, y: minY + radius),
+                    radius: radius, startAngle: .pi * 1.5, endAngle: 0, clockwise: true)
+        path.addLine(to: CGPoint(x: maxX, y: minY + radius + length))
+
+        path.move(to: CGPoint(x: maxX, y: maxY - radius - length))
+        path.addLine(to: CGPoint(x: maxX, y: maxY - radius))
+        path.addArc(withCenter: CGPoint(x: maxX - radius, y: maxY - radius),
+                    radius: radius, startAngle: 0, endAngle: .pi * 0.5, clockwise: true)
+        path.addLine(to: CGPoint(x: maxX - radius - length, y: maxY))
+
+        path.move(to: CGPoint(x: minX + radius + length, y: maxY))
+        path.addLine(to: CGPoint(x: minX + radius, y: maxY))
+        path.addArc(withCenter: CGPoint(x: minX + radius, y: maxY - radius),
+                    radius: radius, startAngle: .pi * 0.5, endAngle: .pi, clockwise: true)
+        path.addLine(to: CGPoint(x: minX, y: maxY - radius - length))
+
+        return path
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -163,8 +228,18 @@ final class SessionCameraViewController: UIViewController {
         cancelButton.accessibilityLabel = NSLocalizedString("Shared.Cancel", comment: "")
         cancelButton.addTarget(self, action: #selector(cancel), for: .touchUpInside)
 
+        hintLabel.translatesAutoresizingMaskIntoConstraints = false
+        hintLabel.text = NSLocalizedString("Sessions.Camera.Guide", comment: "")
+        hintLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        hintLabel.textColor = .white
+        hintLabel.textAlignment = .center
+        hintLabel.numberOfLines = 2
+        hintLabel.shadowColor = UIColor.black.withAlphaComponent(0.6)
+        hintLabel.shadowOffset = CGSize(width: 0, height: 1)
+
         view.addSubview(shutterButton)
         view.addSubview(cancelButton)
+        view.addSubview(hintLabel)
 
         NSLayoutConstraint.activate([
             shutterButton.widthAnchor.constraint(equalToConstant: 80),
@@ -173,7 +248,11 @@ final class SessionCameraViewController: UIViewController {
             cancelButton.widthAnchor.constraint(equalToConstant: 48),
             cancelButton.heightAnchor.constraint(equalToConstant: 48),
             cancelButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            cancelButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20)
+            cancelButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+
+            hintLabel.centerYAnchor.constraint(equalTo: cancelButton.centerYAnchor),
+            hintLabel.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 12),
+            hintLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)
         ])
 
         portraitShutterConstraints = [

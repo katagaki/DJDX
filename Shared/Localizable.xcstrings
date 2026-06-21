@@ -3216,6 +3216,23 @@
         }
       }
     },
+    "Sessions.Camera.Guide" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fit the result screen inside the frame"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リザルト画面を枠内に収めてください"
+          }
+        }
+      }
+    },
     "Sessions.Capture" : {
       "extractionState" : "manual",
       "localizations" : {
