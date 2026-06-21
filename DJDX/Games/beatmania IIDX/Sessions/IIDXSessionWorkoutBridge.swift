@@ -271,8 +271,9 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
                     bridge.resendStartIfActive()
                 }
             case "startSession":
+                let requestedID = sessionID.isEmpty ? nil : sessionID
                 Task { @MainActor in
-                    NotificationCenter.default.post(name: .startSessionRequested, object: nil)
+                    NotificationCenter.default.post(name: .startSessionRequested, object: requestedID)
                 }
             case "endSession":
                 Task { @MainActor in

@@ -38,18 +38,26 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         }
     }
 
-    func requestAuthorizationAndStart(sessionID: String) {
+    func activateSession(sessionID: String) {
+        guard !isRunning else { return }
+        self.sessionID = sessionID
+        startDate = Date()
+        isRunning = true
+        requestAuthorizationAndStartWorkout()
+    }
+
+    private func requestAuthorizationAndStartWorkout() {
         let share: Set = [HKQuantityType.workoutType()]
         let read: Set = [HKQuantityType(.heartRate), HKQuantityType(.activeEnergyBurned)]
         nonisolated(unsafe) let manager = self
         healthStore.requestAuthorization(toShare: share, read: read) { success, _ in
             guard success else { return }
-            Task { @MainActor in manager.startWorkout(sessionID: sessionID) }
+            Task { @MainActor in manager.beginWorkoutCollection() }
         }
     }
 
-    private func startWorkout(sessionID: String) {
-        guard session == nil else { return }
+    private func beginWorkoutCollection() {
+        guard isRunning, session == nil, let start = startDate else { return }
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .fitnessGaming
         configuration.locationType = .indoor
@@ -64,12 +72,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
             builder.delegate = self
             self.session = session
             self.builder = builder
-            self.sessionID = sessionID
-            let start = Date()
-            startDate = start
             session.startActivity(with: start)
             builder.beginCollection(withStart: start) { _, _ in }
-            isRunning = true
         } catch {
             return
         }
@@ -77,7 +81,9 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     func requestStartSession() {
         guard !isRunning else { return }
-        sendToPhone(["command": "startSession"])
+        let sessionID = UUID().uuidString
+        sendToPhone(["command": "startSession", "sessionID": sessionID])
+        activateSession(sessionID: sessionID)
     }
 
     func requestEndSession() {
@@ -88,9 +94,13 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     func endWorkout() {
-        guard let session, let builder else { return }
+        guard isRunning else { return }
         isRunning = false
         let sid = sessionID
+        guard let session, let builder else {
+            finishUp(workoutUUID: nil, sessionID: sid)
+            return
+        }
         nonisolated(unsafe) let liveSession = session
         nonisolated(unsafe) let liveBuilder = builder
         nonisolated(unsafe) let manager = self
@@ -165,7 +175,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     fileprivate func handleCommand(_ command: String, sessionID: String) {
         switch command {
-        case "start": requestAuthorizationAndStart(sessionID: sessionID)
+        case "start": activateSession(sessionID: sessionID)
         case "end": endWorkout()
         default: break
         }

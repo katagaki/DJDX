@@ -224,10 +224,10 @@ struct UnifiedView: View {
             handleDeepLink(url)
         }
         .onReceive(NotificationCenter.default.publisher(for: .startSessionRequested)
-            .receive(on: RunLoop.main)) { _ in
+            .receive(on: RunLoop.main)) { notification in
             if sessionStore.activeSession == nil {
                 appMode = .sessions
-                sessionStore.startSession()
+                sessionStore.startSession(id: notification.object as? String)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .endSessionRequested)
