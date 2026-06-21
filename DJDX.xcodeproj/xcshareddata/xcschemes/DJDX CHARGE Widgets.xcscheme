@@ -73,11 +73,19 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
+            BlueprintIdentifier = "E4BF6DA52FE821DC00D0E9D0"
+            BuildableName = "DJDX CHARGE WidgetsExtension.appex"
+            ReferencedContainer = "container:DJDX.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4449F142FE17495003AC8B6"
             BuildableName = "DJDX CHARGE.app"
             ReferencedContainer = "container:DJDX.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "_XCWidgetKind"
