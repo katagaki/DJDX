@@ -21,23 +21,16 @@ struct SessionLiveActivityView: View {
                     titleSize: 20.0
                 )
                 Spacer()
-                VStack(alignment: .trailing, spacing: 2.0) {
-                    Text(verbatim: "\(context.state.playCount)")
-                        .font(.system(size: 22.0, weight: .bold).monospacedDigit())
-                    Text("Sessions.Plays")
-                        .font(.system(size: 11.0))
-                        .foregroundStyle(.secondary)
-                }
                 CaptureButton(size: 36.0)
             }
-            metrics
+            metricsBar
         }
         .padding()
         .activityBackgroundTint(.clear)
     }
 
-    private var metrics: some View {
-        HStack(spacing: 14.0) {
+    private var metricsBar: some View {
+        HStack(spacing: 12.0) {
             Label {
                 Text(context.attributes.sessionStart, style: .timer)
                     .monospacedDigit()
@@ -47,17 +40,25 @@ struct SessionLiveActivityView: View {
             if let heartRate = context.state.heartRate {
                 Label("\(heartRate)", systemImage: "heart.fill")
                     .monospacedDigit()
-                    .foregroundStyle(.red)
             }
             if let activeCalories = context.state.activeCalories {
                 Label("\(activeCalories)", systemImage: "flame.fill")
                     .monospacedDigit()
-                    .foregroundStyle(.orange)
             }
             Spacer()
+            HStack(spacing: 4.0) {
+                Text(verbatim: "\(context.state.playCount)")
+                    .fontWeight(.bold)
+                    .monospacedDigit()
+                Text("Sessions.Plays")
+            }
         }
-        .font(.system(size: 13.0, weight: .medium))
-        .foregroundStyle(.secondary)
+        .font(.system(size: 13.0, weight: .semibold))
+        .foregroundStyle(.primary)
+        .padding(.horizontal, 14.0)
+        .padding(.vertical, 9.0)
+        .frame(maxWidth: .infinity)
+        .background(Color("AccentColor").opacity(0.5), in: Capsule())
     }
 }
 
