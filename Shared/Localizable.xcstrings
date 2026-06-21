@@ -4095,6 +4095,23 @@
         }
       }
     },
+    "Sessions.Pause" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一時停止"
+          }
+        }
+      }
+    },
     "Sessions.Photos.Denied.Message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4256,6 +4273,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレー数"
+          }
+        }
+      }
+    },
+    "Sessions.Resume" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再開"
           }
         }
       }

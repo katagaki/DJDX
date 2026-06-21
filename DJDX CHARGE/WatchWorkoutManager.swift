@@ -91,6 +91,14 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         session?.resume()
     }
 
+    fileprivate func setPaused(_ paused: Bool) {
+        if paused {
+            pauseWorkout()
+        } else {
+            resumeWorkout()
+        }
+    }
+
     func requestStartSession() {
         guard !isRunning else { return }
         let sessionID = UUID().uuidString
@@ -303,6 +311,11 @@ extension WatchWorkoutManager: WCSessionDelegate {
     private nonisolated func route(_ message: [String: Any]) {
         nonisolated(unsafe) let manager = self
         if let command = message["command"] as? String {
+            if command == "setPaused" {
+                let paused = message["paused"] as? Bool ?? false
+                Task { @MainActor in manager.setPaused(paused) }
+                return
+            }
             let sessionID = message["sessionID"] as? String ?? ""
             Task { @MainActor in manager.handleCommand(command, sessionID: sessionID) }
             return

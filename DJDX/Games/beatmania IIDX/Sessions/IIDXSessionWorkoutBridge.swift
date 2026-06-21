@@ -13,6 +13,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     @Published var heartRate: Int = 0
     @Published var activeCalories: Int = 0
     @Published var isWorkoutActive: Bool = false
+    @Published var isPaused: Bool = false
 
     private let healthStore = HKHealthStore()
     private let database = IIDXPlaySessionsDatabase.shared
@@ -82,10 +83,16 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         activeSessionID = session.id
         workoutStart = session.startDate
         isWorkoutActive = true
+        isPaused = false
         heartRate = 0
         activeCalories = 0
         send(["command": "start", "sessionID": session.id])
         launchWatchApp()
+    }
+
+    func setWorkoutPaused(_ paused: Bool) {
+        guard isWorkoutActive, let activeSessionID else { return }
+        send(["command": "setPaused", "sessionID": activeSessionID, "paused": paused])
     }
 
     private func launchWatchApp() {
@@ -113,6 +120,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
             saveFallbackWorkout(for: session)
         }
         isWorkoutActive = false
+        isPaused = false
         activeSessionID = nil
         workoutStart = nil
         heartRate = 0
@@ -208,6 +216,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
 
     fileprivate func applyWorkoutState(sessionID: String, paused: Bool, elapsed: Double?, start: Double?) {
         let runningStart = start.map { Date(timeIntervalSince1970: $0) }
+        isPaused = paused
         IIDXSessionLiveActivityController.shared.updatePauseState(
             sessionID: sessionID,
             isPaused: paused,

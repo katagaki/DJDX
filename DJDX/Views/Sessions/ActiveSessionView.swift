@@ -40,6 +40,16 @@ struct ActiveSessionView: View {
                         }
                     }
                 }
+                if workoutBridge.isWorkoutActive {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            workoutBridge.setWorkoutPaused(!workoutBridge.isPaused)
+                        } label: {
+                            Image(systemName: workoutBridge.isPaused ? "play.fill" : "pause.fill")
+                        }
+                        .accessibilityLabel(workoutBridge.isPaused ? "Sessions.Resume" : "Sessions.Pause")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if #available(iOS 26.0, *) {
                         Button(role: .close) {
