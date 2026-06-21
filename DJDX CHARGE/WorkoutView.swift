@@ -6,7 +6,7 @@ struct WorkoutView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 10.0) {
+            VStack(alignment: .leading, spacing: 10.0) {
                 if let startDate = workoutManager.startDate {
                     Group {
                         if workoutManager.isPaused {
@@ -15,7 +15,7 @@ struct WorkoutView: View {
                             Text(startDate, style: .timer)
                         }
                     }
-                    .font(.system(size: 40.0, weight: .semibold, design: .rounded).monospacedDigit())
+                    .font(.system(size: 40.0, weight: .bold, design: .rounded).monospacedDigit())
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
                     if workoutManager.isPaused {
@@ -25,30 +25,31 @@ struct WorkoutView: View {
                     }
                 }
 
-                HStack(spacing: 14.0) {
-                    HStack(spacing: 4.0) {
+                VStack(alignment: .leading, spacing: 6.0) {
+                    Label {
+                        Text(verbatim: workoutManager.heartRate > 0 ? "\(workoutManager.heartRate)" : "--")
+                            .monospacedDigit()
+                    } icon: {
                         Image(systemName: "heart.fill")
                             .foregroundStyle(.red)
                             .heartbeat(isActive: workoutManager.heartRate > 0)
-                        Text(verbatim: workoutManager.heartRate > 0 ? "\(workoutManager.heartRate)" : "--")
-                            .font(.body.monospacedDigit())
                     }
-                    HStack(spacing: 4.0) {
-                        Image(systemName: "flame.fill").foregroundStyle(.orange)
+                    Label {
                         Text(verbatim: "\(workoutManager.activeCalories)")
-                            .font(.body.monospacedDigit())
+                            .monospacedDigit()
+                    } icon: {
+                        Image(systemName: "flame.fill")
+                            .foregroundStyle(.orange)
+                    }
+                    Label {
+                        Text(verbatim: "\(workoutManager.playCount)")
+                            .monospacedDigit()
+                    } icon: {
+                        Image(systemName: "opticaldisc")
+                            .foregroundStyle(.secondary)
                     }
                 }
-
-                Divider()
-
-                VStack(spacing: 2.0) {
-                    Text(verbatim: "\(workoutManager.playCount)")
-                        .font(.system(.title, design: .rounded).weight(.bold).monospacedDigit())
-                    Text("Watch.Session.Plays")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
+                .font(.title3.weight(.semibold))
 
                 if let lastSongTitle = workoutManager.lastSongTitle {
                     WatchSessionResultLabel(
