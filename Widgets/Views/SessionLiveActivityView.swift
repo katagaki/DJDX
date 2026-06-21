@@ -35,7 +35,7 @@ struct SessionLiveActivityView: View {
         if hours > 0 {
             return String(format: "%d:%02d:%02d", hours, minutes, seconds)
         }
-        return String(format: "%02d:%02d", minutes, seconds)
+        return String(format: "%d:%02d", minutes, seconds)
     }
 
     private var watchBody: some View {
@@ -66,7 +66,8 @@ struct SessionLiveActivityView: View {
     }
 
     private var phoneBody: some View {
-        VStack {
+        VStack(spacing: 0) {
+            metricsBar
             HStack(spacing: 14.0) {
                 GameIconImage(assetName: context.attributes.gameIconAssetName, size: 36.0)
                 SessionResultLabel(
@@ -82,7 +83,6 @@ struct SessionLiveActivityView: View {
                 CaptureButton(size: 36.0)
             }
             .padding()
-            metricsBar
         }
         .activityBackgroundTint(.clear)
     }
@@ -115,7 +115,7 @@ struct SessionLiveActivityView: View {
         .fontDesign(.rounded)
         .foregroundStyle(.primary)
         .padding(.horizontal)
-        .padding(.vertical, 9.0)
+        .padding(.vertical, 8.0)
         .frame(maxWidth: .infinity)
         .background(Color("AccentColor").opacity(0.5))
     }
