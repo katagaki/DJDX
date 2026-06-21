@@ -100,6 +100,7 @@ struct ActiveSessionView: View {
                             HStack(spacing: 6.0) {
                                 Image(systemName: "heart.fill")
                                     .font(.title3)
+                                    .heartbeat(isActive: workoutBridge.heartRate > 0)
                                 Text(verbatim: workoutBridge.heartRate > 0 ? "\(workoutBridge.heartRate)" : "--")
                                     .font(numberFont)
                             }

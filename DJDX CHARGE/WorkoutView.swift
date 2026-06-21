@@ -15,7 +15,9 @@ struct WorkoutView: View {
 
                 HStack(spacing: 14.0) {
                     HStack(spacing: 4.0) {
-                        Image(systemName: "heart.fill").foregroundStyle(.red)
+                        Image(systemName: "heart.fill")
+                            .foregroundStyle(.red)
+                            .heartbeat(isActive: workoutManager.heartRate > 0)
                         Text(verbatim: workoutManager.heartRate > 0 ? "\(workoutManager.heartRate)" : "--")
                             .font(.body.monospacedDigit())
                     }
