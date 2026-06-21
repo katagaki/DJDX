@@ -59,14 +59,8 @@ struct WorkoutView: View {
                     .font(.caption2)
                 }
 
-                Button(role: .destructive) {
-                    isConfirmingStop = true
-                } label: {
-                    Label("Watch.Session.Stop", systemImage: "stop.fill")
-                        .frame(maxWidth: .infinity)
-                }
-                .tint(.red)
-                .padding(.top, 6.0)
+                stopButton
+                    .padding(.top, 6.0)
             }
             .padding()
         }
@@ -79,6 +73,22 @@ struct WorkoutView: View {
                 workoutManager.requestEndSession()
             }
             Button("Watch.Shared.Cancel", role: .cancel) {}
+        }
+    }
+
+    @ViewBuilder
+    private var stopButton: some View {
+        let button = Button(role: .destructive) {
+            isConfirmingStop = true
+        } label: {
+            Label("Watch.Session.Stop", systemImage: "stop.fill")
+                .frame(maxWidth: .infinity)
+        }
+        .tint(.red)
+        if #available(watchOS 26.0, *) {
+            button.buttonStyle(.glass)
+        } else {
+            button.buttonStyle(.bordered)
         }
     }
 }
