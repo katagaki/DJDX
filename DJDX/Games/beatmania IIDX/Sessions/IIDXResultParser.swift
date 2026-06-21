@@ -61,7 +61,9 @@ enum IIDXResultParser {
         parse.playType = detectPlayType(byLabel["difficulty_label"], byLabel["stage_label"])
         if let (level, difficulty) = detectChart(text("difficulty_label")) {
             parse.level = level
-            parse.difficulty = difficulty
+            parse.difficulty = plausibleDifficulty(
+                difficulty, level: level, playType: parse.playType, songs: songs
+            ) ? difficulty : 0
         }
 
         let resolved = resolveTitle(titleText: text("song_title"), songs: songs,
@@ -302,6 +304,24 @@ enum IIDXResultParser {
             return .double
         }
         return .single
+    }
+
+    // A dropped digit reads "11" as "1", which then mis-gates the candidate pool
+    // and blocks the DB difficulty correction. Reject a difficulty below the
+    // lowest that actually exists for this level + play type in the song DB; the
+    // title match then recovers the real value. Unknown DB (no songs) stays lenient.
+    private static func plausibleDifficulty(
+        _ difficulty: Int,
+        level: IIDXLevel,
+        playType: IIDXPlayType,
+        songs: [IIDXSongCandidate]
+    ) -> Bool {
+        guard difficulty > 0 else { return false }
+        let existing = songs.lazy
+            .filter { $0.playType == playType }
+            .compactMap { $0.difficulties[level] }
+        guard let minimum = existing.min() else { return true }
+        return difficulty >= minimum
     }
 
     private static func detectChart(_ text: String?) -> (IIDXLevel, Int)? {
