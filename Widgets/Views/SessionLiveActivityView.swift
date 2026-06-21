@@ -234,11 +234,6 @@ struct SessionLiveActivity: Widget {
                             detailSize: 11.0
                         )
                         Spacer()
-                        if let heartRate = context.state.heartRate {
-                            Label("\(heartRate)", systemImage: "heart.fill")
-                                .font(.system(size: 12.0))
-                                .foregroundStyle(.red)
-                        }
                         if let rank = context.state.lastDJLevel {
                             RankText(rank: rank, size: 22.0)
                         }
