@@ -35,6 +35,23 @@
         }
       }
     },
+    "Watch.Widget.Radar" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NOTES RADAR"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ノーツレーダー"
+          }
+        }
+      }
+    },
     "Watch.Widget.Start" : {
       "extractionState" : "manual",
       "localizations" : {

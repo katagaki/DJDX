@@ -2,6 +2,7 @@ import Combine
 import Foundation
 import HealthKit
 import WatchConnectivity
+import WidgetKit
 
 @MainActor
 final class WatchWorkoutManager: NSObject, ObservableObject {
@@ -223,6 +224,23 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         if let values = context["spRadar"] as? [Double] { spRadar = WatchRadarData(values: values) }
         if let values = context["dpRadar"] as? [Double] { dpRadar = WatchRadarData(values: values) }
         if let qpro = context["qpro"] as? Data { qproImageData = qpro }
+        persistComplicationRadar(context)
+    }
+
+    private func persistComplicationRadar(_ context: [String: Any]) {
+        guard let shared = UserDefaults(suiteName: "group.com.tsubuzaki.DJDX") else { return }
+        var changed = false
+        if let sp = context["spRadar"] as? [Double] {
+            shared.set(sp, forKey: "Watch.Complication.RadarSP")
+            changed = true
+        }
+        if let dp = context["dpRadar"] as? [Double] {
+            shared.set(dp, forKey: "Watch.Complication.RadarDP")
+            changed = true
+        }
+        if changed {
+            WidgetCenter.shared.reloadAllTimelines()
+        }
     }
 
     fileprivate func requestProfile() {

@@ -3,6 +3,10 @@ import WidgetKit
 
 struct SessionStartEntry: TimelineEntry {
     let date: Date
+    var radarSP: [Double]?
+    var radarDP: [Double]?
+
+    var radar: [Double]? { radarSP ?? radarDP }
 }
 
 struct SessionStartProvider: TimelineProvider {
@@ -11,16 +15,32 @@ struct SessionStartProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SessionStartEntry) -> Void) {
-        completion(SessionStartEntry(date: Date(timeIntervalSince1970: 0)))
+        completion(currentEntry())
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<SessionStartEntry>) -> Void) {
-        completion(Timeline(entries: [SessionStartEntry(date: Date(timeIntervalSince1970: 0))], policy: .never))
+        completion(Timeline(entries: [currentEntry()], policy: .never))
+    }
+
+    private func currentEntry() -> SessionStartEntry {
+        let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.DJDX")
+        return SessionStartEntry(
+            date: Date(timeIntervalSince1970: 0),
+            radarSP: radar(defaults, "Watch.Complication.RadarSP"),
+            radarDP: radar(defaults, "Watch.Complication.RadarDP")
+        )
+    }
+
+    private func radar(_ defaults: UserDefaults?, _ key: String) -> [Double]? {
+        guard let raw = defaults?.array(forKey: key) else { return nil }
+        let values = raw.compactMap { ($0 as? NSNumber)?.doubleValue }
+        return values.count == 6 && values.contains(where: { $0 > 0 }) ? values : nil
     }
 }
 
 struct SessionStartComplicationView: View {
     @Environment(\.widgetFamily) private var family
+    let entry: SessionStartEntry
 
     private static let startURL = URL(string: "djdx://session/start")!
 
@@ -37,15 +57,13 @@ struct SessionStartComplicationView: View {
         case .accessoryCorner:
             Image(systemName: "play.fill")
                 .font(.title3)
+                .foregroundStyle(.accent)
                 .widgetLabel("Watch.Widget.Start")
         case .accessoryRectangular:
-            HStack(spacing: 6.0) {
-                Image(systemName: "figure.dance")
-                    .font(.title3)
-                    .foregroundStyle(.accent)
-                Text("Watch.Widget.StartSession")
-                    .font(.headline)
-                    .lineLimit(1)
+            if let values = entry.radar {
+                radarContent(values)
+            } else {
+                startContent
             }
         default:
             ZStack {
@@ -56,14 +74,40 @@ struct SessionStartComplicationView: View {
             }
         }
     }
+
+    private var startContent: some View {
+        HStack(spacing: 6.0) {
+            Image(systemName: "figure.dance")
+                .font(.title3)
+                .foregroundStyle(.accent)
+            Text("Watch.Widget.StartSession")
+                .font(.headline)
+                .lineLimit(1)
+        }
+    }
+
+    private func radarContent(_ values: [Double]) -> some View {
+        HStack(spacing: 8.0) {
+            ComplicationRadarView(values: values)
+                .aspectRatio(1.0, contentMode: .fit)
+            VStack(alignment: .leading, spacing: 1.0) {
+                Text("Watch.Widget.Radar")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Text(verbatim: String(format: "%.0f", values.reduce(0, +)))
+                    .font(.headline.monospacedDigit())
+            }
+            Spacer(minLength: 0.0)
+        }
+    }
 }
 
 struct SessionStartComplication: Widget {
     let kind: String = "SessionStartComplication"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: SessionStartProvider()) { _ in
-            SessionStartComplicationView()
+        StaticConfiguration(kind: kind, provider: SessionStartProvider()) { entry in
+            SessionStartComplicationView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Watch.Widget.Name")
