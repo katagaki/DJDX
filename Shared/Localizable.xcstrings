@@ -4129,6 +4129,23 @@
         }
       }
     },
+    "Sessions.Photos.ExportAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export All to Photos"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて写真に書き出す"
+          }
+        }
+      }
+    },
     "Sessions.Photos.Failed" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -8,6 +8,7 @@ struct ActiveSessionView: View {
     @State private var isPresentingCamera: Bool = false
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isShowingCameraDeniedAlert: Bool = false
+    @State private var photoAlert: PhotoExportAlert?
     @ObservedObject private var workoutBridge = IIDXSessionWorkoutBridge.shared
 
     var body: some View {
@@ -31,6 +32,13 @@ struct ActiveSessionView: View {
             .navigationTitle("Sessions.Active.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                if !store.plays.isEmpty {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Sessions.Photos.ExportAll", systemImage: "square.and.arrow.up.on.square") {
+                            exportAllToPhotos()
+                        }
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if #available(iOS 26.0, *) {
                         Button(role: .close) {
@@ -70,6 +78,34 @@ struct ActiveSessionView: View {
             Button("Shared.OK", role: .cancel) {}
         } message: {
             Text("Sessions.Camera.Denied.Message")
+        }
+        .alert(item: $photoAlert) { alert in
+            switch alert {
+            case .saved:
+                return Alert(title: Text("Sessions.Photos.Saved"), dismissButton: .default(Text("Shared.OK")))
+            case .failed:
+                return Alert(title: Text("Sessions.Photos.Failed"), dismissButton: .default(Text("Shared.OK")))
+            case .denied:
+                return Alert(
+                    title: Text("Sessions.Photos.Denied.Title"),
+                    message: Text("Sessions.Photos.Denied.Message"),
+                    dismissButton: .default(Text("Shared.OK"))
+                )
+            }
+        }
+    }
+
+    private func exportAllToPhotos() {
+        let filenames = store.plays.map(\.rawImageFilename)
+        Task {
+            let images: [UIImage] = await Task.detached {
+                filenames.compactMap { IIDXSessionImageStore.shared.image(for: $0) }
+            }.value
+            switch await SessionPhotoExporter.save(images) {
+            case .saved: photoAlert = .saved
+            case .denied: photoAlert = .denied
+            case .failed: photoAlert = .failed
+            }
         }
     }
 
@@ -226,6 +262,11 @@ struct ActiveSessionView: View {
             }
             await MainActor.run { pickerItems = [] }
         }
+    }
+
+    private enum PhotoExportAlert: Int, Identifiable {
+        case saved, denied, failed
+        var id: Int { rawValue }
     }
 
     private func elapsedString(since start: Date, now: Date) -> String {
