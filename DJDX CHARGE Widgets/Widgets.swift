@@ -42,6 +42,7 @@ struct SessionStartComplicationView: View {
             HStack(spacing: 6.0) {
                 Image(systemName: "figure.dance")
                     .font(.title3)
+                    .foregroundStyle(.accent)
                 Text("Watch.Widget.StartSession")
                     .font(.headline)
                     .lineLimit(1)
@@ -51,6 +52,7 @@ struct SessionStartComplicationView: View {
                 AccessoryWidgetBackground()
                 Image(systemName: "play.fill")
                     .font(.title2)
+                    .foregroundStyle(.accent)
             }
         }
     }
