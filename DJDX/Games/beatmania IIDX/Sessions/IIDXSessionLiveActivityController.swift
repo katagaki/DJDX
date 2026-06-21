@@ -73,6 +73,9 @@ final class IIDXSessionLiveActivityController {
             sessionID: sessionID,
             playCount: state.playCount,
             lastSongTitle: state.lastSongTitle,
+            lastDJLevel: state.lastDJLevel,
+            lastClearType: state.lastClearType,
+            lastScore: state.lastScore,
             lastResultSummary: state.lastResultSummary,
             bestThisSession: state.bestThisSession
         )

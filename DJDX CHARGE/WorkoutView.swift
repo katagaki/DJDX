@@ -39,19 +39,13 @@ struct WorkoutView: View {
                 }
 
                 if let lastSongTitle = workoutManager.lastSongTitle {
-                    VStack(spacing: 1.0) {
-                        Text(verbatim: lastSongTitle)
-                            .font(.footnote.weight(.semibold))
-                            .lineLimit(2)
-                            .multilineTextAlignment(.center)
-                        if let summary = workoutManager.lastResultSummary {
-                            Text(verbatim: summary)
-                                .font(.caption2.monospacedDigit())
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
+                    WatchSessionResultLabel(
+                        title: lastSongTitle,
+                        rank: workoutManager.lastDJLevel,
+                        clearType: workoutManager.lastClearType,
+                        score: workoutManager.lastScore,
+                        fallbackSummary: workoutManager.lastResultSummary
+                    )
                 }
 
                 if let best = workoutManager.bestThisSession {

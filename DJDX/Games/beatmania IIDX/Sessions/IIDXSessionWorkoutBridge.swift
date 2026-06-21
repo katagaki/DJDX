@@ -114,12 +114,18 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         sessionID: String,
         playCount: Int,
         lastSongTitle: String?,
+        lastDJLevel: String?,
+        lastClearType: String?,
+        lastScore: Int?,
         lastResultSummary: String?,
         bestThisSession: String?
     ) {
         guard isWorkoutActive, sessionID == activeSessionID else { return }
         var payload: [String: Any] = ["sessionInfo": true, "sessionID": sessionID, "playCount": playCount]
         if let lastSongTitle { payload["lastSongTitle"] = lastSongTitle }
+        if let lastDJLevel { payload["lastDJLevel"] = lastDJLevel }
+        if let lastClearType { payload["lastClearType"] = lastClearType }
+        if let lastScore { payload["lastScore"] = lastScore }
         if let lastResultSummary { payload["lastResultSummary"] = lastResultSummary }
         if let bestThisSession { payload["bestThisSession"] = bestThisSession }
         send(payload)

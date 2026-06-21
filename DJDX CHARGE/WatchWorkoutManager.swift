@@ -12,6 +12,9 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     @Published var playCount: Int = 0
     @Published var lastSongTitle: String?
+    @Published var lastDJLevel: String?
+    @Published var lastClearType: String?
+    @Published var lastScore: Int?
     @Published var lastResultSummary: String?
     @Published var bestThisSession: String?
 
@@ -105,6 +108,9 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     private func resetSessionInfo() {
         playCount = 0
         lastSongTitle = nil
+        lastDJLevel = nil
+        lastClearType = nil
+        lastScore = nil
         lastResultSummary = nil
         bestThisSession = nil
     }
@@ -112,6 +118,9 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     fileprivate func applySessionInfo(_ message: [String: Any]) {
         if let playCount = message["playCount"] as? Int { self.playCount = playCount }
         lastSongTitle = message["lastSongTitle"] as? String
+        lastDJLevel = message["lastDJLevel"] as? String
+        lastClearType = message["lastClearType"] as? String
+        lastScore = message["lastScore"] as? Int
         lastResultSummary = message["lastResultSummary"] as? String
         bestThisSession = message["bestThisSession"] as? String
     }
