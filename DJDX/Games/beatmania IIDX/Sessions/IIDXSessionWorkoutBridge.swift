@@ -206,6 +206,16 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         NotificationCenter.default.post(name: .playSessionDidChange, object: sessionID)
     }
 
+    fileprivate func applyWorkoutState(sessionID: String, paused: Bool, elapsed: Double?, start: Double?) {
+        let runningStart = start.map { Date(timeIntervalSince1970: $0) }
+        IIDXSessionLiveActivityController.shared.updatePauseState(
+            sessionID: sessionID,
+            isPaused: paused,
+            pausedElapsed: elapsed,
+            runningStart: runningStart
+        )
+    }
+
     fileprivate func storeWorkoutUUID(_ uuid: String, sessionID: String) {
         guard let session = database.session(id: sessionID) else { return }
         session.workoutUUID = uuid
@@ -278,6 +288,13 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
             case "endSession":
                 Task { @MainActor in
                     NotificationCenter.default.post(name: .endSessionRequested, object: sessionID)
+                }
+            case "workoutState":
+                let paused = message["paused"] as? Bool ?? false
+                let elapsed = message["elapsed"] as? Double
+                let start = message["start"] as? Double
+                Task { @MainActor in
+                    bridge.applyWorkoutState(sessionID: sessionID, paused: paused, elapsed: elapsed, start: start)
                 }
             default:
                 break

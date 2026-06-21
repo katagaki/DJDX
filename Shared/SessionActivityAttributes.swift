@@ -12,6 +12,9 @@ struct SessionActivityAttributes: ActivityAttributes {
         var bestThisSession: String?
         var heartRate: Int?
         var activeCalories: Int?
+        var isPaused: Bool = false
+        var pausedElapsed: TimeInterval?
+        var runningStart: Date?
         var isProcessing: Bool
     }
 

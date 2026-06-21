@@ -101,13 +101,26 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
             guard isRunning, !isPaused, let startDate else { return }
             pausedElapsed = max(0, date.timeIntervalSince(startDate))
             isPaused = true
+            sendWorkoutState()
         case .running:
             guard isPaused else { return }
             startDate = date.addingTimeInterval(-pausedElapsed)
             isPaused = false
+            sendWorkoutState()
         default:
             break
         }
+    }
+
+    private func sendWorkoutState() {
+        guard let sessionID else { return }
+        var payload: [String: Any] = ["command": "workoutState", "sessionID": sessionID, "paused": isPaused]
+        if isPaused {
+            payload["elapsed"] = pausedElapsed
+        } else if let startDate {
+            payload["start"] = startDate.timeIntervalSince1970
+        }
+        sendToPhone(payload)
     }
 
     func endWorkout() {

@@ -16,12 +16,40 @@ struct SessionLiveActivityView: View {
         }
     }
 
+    private var timerStart: Date {
+        context.state.runningStart ?? context.attributes.sessionStart
+    }
+
+    private var timeText: Text {
+        if context.state.isPaused, let elapsed = context.state.pausedElapsed {
+            return Text(verbatim: Self.formattedElapsed(elapsed))
+        }
+        return Text(timerStart, style: .timer)
+    }
+
+    private static func formattedElapsed(_ interval: TimeInterval) -> String {
+        let total = Int(max(0, interval))
+        let hours = total / 3600
+        let minutes = (total % 3600) / 60
+        let seconds = total % 60
+        if hours > 0 {
+            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+        }
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+
     private var watchBody: some View {
         VStack(alignment: .leading, spacing: 6.0) {
-            Text(context.attributes.sessionStart, style: .timer)
-                .font(.system(size: 28.0, weight: .bold).monospacedDigit())
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
+            HStack(spacing: 6.0) {
+                if context.state.isPaused {
+                    Image(systemName: "pause.fill")
+                        .foregroundStyle(.orange)
+                }
+                timeText
+            }
+            .font(.system(size: 28.0, weight: .bold).monospacedDigit())
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
             VStack(alignment: .leading, spacing: 3.0) {
                 if let heartRate = context.state.heartRate {
                     Label("\(heartRate)", systemImage: "heart.fill")
@@ -62,10 +90,10 @@ struct SessionLiveActivityView: View {
     private var metricsBar: some View {
         HStack(spacing: 12.0) {
             Label {
-                Text(context.attributes.sessionStart, style: .timer)
+                timeText
                     .monospacedDigit()
             } icon: {
-                Image(systemName: "stopwatch")
+                Image(systemName: context.state.isPaused ? "pause.fill" : "stopwatch")
             }
             if let heartRate = context.state.heartRate {
                 Label("\(heartRate)", systemImage: "heart.fill")
