@@ -9,6 +9,7 @@ struct ActiveSessionView: View {
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isShowingCameraDeniedAlert: Bool = false
     @State private var photoAlert: PhotoExportAlert?
+    @State private var isConfirmingExport: Bool = false
     @ObservedObject private var workoutBridge = IIDXSessionWorkoutBridge.shared
 
     var body: some View {
@@ -35,7 +36,7 @@ struct ActiveSessionView: View {
                 if !store.plays.isEmpty {
                     ToolbarItem(placement: .topBarLeading) {
                         Button("Sessions.Photos.ExportAll", systemImage: "square.and.arrow.up.on.square") {
-                            exportAllToPhotos()
+                            isConfirmingExport = true
                         }
                     }
                 }
@@ -78,6 +79,16 @@ struct ActiveSessionView: View {
             Button("Shared.OK", role: .cancel) {}
         } message: {
             Text("Sessions.Camera.Denied.Message")
+        }
+        .confirmationDialog(
+            "Sessions.Photos.ExportAll.Confirm",
+            isPresented: $isConfirmingExport,
+            titleVisibility: .visible
+        ) {
+            Button("Sessions.Photos.ExportAll") {
+                exportAllToPhotos()
+            }
+            Button("Shared.Cancel", role: .cancel) {}
         }
         .alert(item: $photoAlert) { alert in
             switch alert {

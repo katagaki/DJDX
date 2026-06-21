@@ -4146,6 +4146,23 @@
         }
       }
     },
+    "Sessions.Photos.ExportAll.Confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export all captured photos to Photos?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撮影したすべての写真を写真に書き出しますか？"
+          }
+        }
+      }
+    },
     "Sessions.Photos.Failed" : {
       "extractionState" : "manual",
       "localizations" : {
