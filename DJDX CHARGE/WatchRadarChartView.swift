@@ -39,6 +39,7 @@ struct WatchRadarPoint {
     let angle: Double
     let color: Color
     let value: Double
+    let alignment: Alignment
 }
 
 struct WatchRadarAxesShape: Shape {
@@ -139,17 +140,23 @@ struct WatchRadarChartView: View {
     private var points: [WatchRadarPoint] {
         [
             WatchRadarPoint(label: "NOTES", angle: -.pi / 2,
-                            color: .init(red: 1.0, green: 64 / 255, blue: 235 / 255), value: data.notes),
+                            color: .init(red: 1.0, green: 64 / 255, blue: 235 / 255), value: data.notes,
+                            alignment: .bottom),
             WatchRadarPoint(label: "CHORD", angle: 7 * .pi / 6,
-                            color: .init(red: 133 / 255, green: 225 / 255, blue: 0 / 255), value: data.chord),
+                            color: .init(red: 133 / 255, green: 225 / 255, blue: 0 / 255), value: data.chord,
+                            alignment: .bottomTrailing),
             WatchRadarPoint(label: "CHARGE", angle: 5 * .pi / 6,
-                            color: .init(red: 137 / 255, green: 87 / 255, blue: 221 / 255), value: data.charge),
+                            color: .init(red: 137 / 255, green: 87 / 255, blue: 221 / 255), value: data.charge,
+                            alignment: .topTrailing),
             WatchRadarPoint(label: "SOF-LAN", angle: .pi / 2,
-                            color: .init(red: 0 / 255, green: 134 / 255, blue: 229 / 255), value: data.soflan),
+                            color: .init(red: 0 / 255, green: 134 / 255, blue: 229 / 255), value: data.soflan,
+                            alignment: .top),
             WatchRadarPoint(label: "SCRATCH", angle: .pi / 6,
-                            color: .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255), value: data.scratch),
+                            color: .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255), value: data.scratch,
+                            alignment: .topLeading),
             WatchRadarPoint(label: "PEAK", angle: -.pi / 6,
-                            color: .init(red: 1.0, green: 108 / 255, blue: 0 / 255), value: data.peak)
+                            color: .init(red: 1.0, green: 108 / 255, blue: 0 / 255), value: data.peak,
+                            alignment: .bottomLeading)
         ]
     }
 
@@ -166,7 +173,7 @@ struct WatchRadarChartView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let padding: CGFloat = showLabels ? 40.0 : 8.0
+            let padding: CGFloat = showLabels ? 52.0 : 8.0
             let size = min(geometry.size.width - padding, geometry.size.height - padding)
             let circleScale = benchmarkValue / maxValue
             let circleSize = size * CGFloat(circleScale)
@@ -196,11 +203,16 @@ struct WatchRadarChartView: View {
                         let point = points[index]
                         let tipX = center.x + radius * CGFloat(cos(point.angle))
                         let tipY = center.y + radius * CGFloat(sin(point.angle))
-                        Text(point.label)
-                            .font(.system(size: labelFontSize, weight: .black))
-                            .fontWidth(.expanded)
-                            .foregroundStyle(point.color)
-                            .fixedSize()
+                        Color.clear
+                            .frame(width: 0, height: 0)
+                            .overlay(
+                                Text(point.label)
+                                    .font(.system(size: labelFontSize, weight: .black))
+                                    .fontWidth(.expanded)
+                                    .foregroundStyle(point.color)
+                                    .fixedSize(),
+                                alignment: point.alignment
+                            )
                             .position(x: tipX, y: tipY)
                     }
                 }

@@ -40,6 +40,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>DJDX uses the camera to capture your result screens during a session.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>DJDX saves your captured result screens to Photos.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>DJDX reads your workout, heart rate, and active energy to summarize your play sessions.</string>
 	<key>NSHealthUpdateUsageDescription</key>

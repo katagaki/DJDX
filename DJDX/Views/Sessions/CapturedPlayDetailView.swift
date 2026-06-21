@@ -20,10 +20,19 @@ struct CapturedPlayDetailView: View {
     @State private var djLevel: IIDXDJLevel = .none
     @State private var hasLoaded: Bool = false
 
+    @State private var songIndex: [SongEntry] = []
+    @State private var songSuggestions: [IIDXSong] = []
+    @State private var searchTask: Task<Void, Never>?
+    @State private var capturedImage: UIImage?
+    @State private var photoAlert: PhotoAlert?
+    @FocusState private var songFieldFocused: Bool
+
+    private let reader = IIDXReader()
+
     var body: some View {
         Form {
             Section {
-                if let image = IIDXSessionImageStore.shared.image(for: play.rawImageFilename) {
+                if let image = capturedImage {
                     RecognizedTextImage(image: image)
                         .frame(maxWidth: .infinity)
                         .clipShape(RoundedRectangle(cornerRadius: 12.0))
@@ -33,6 +42,20 @@ struct CapturedPlayDetailView: View {
 
             Section("Sessions.Detail.Chart") {
                 TextField("Sessions.Detail.Song", text: $songTitle)
+                    .focused($songFieldFocused)
+                if songFieldFocused {
+                    ForEach(songSuggestions, id: \.title) { song in
+                        Button {
+                            songTitle = song.title
+                            songSuggestions = []
+                            songFieldFocused = false
+                        } label: {
+                            Label(song.title, systemImage: "music.note")
+                                .foregroundStyle(.primary)
+                                .lineLimit(1)
+                        }
+                    }
+                }
                 Picker("Shared.Level", selection: $level) {
                     ForEach(IIDXLevel.sorted, id: \.self) { value in
                         Text(verbatim: levelName(value)).tag(value)
@@ -74,15 +97,115 @@ struct CapturedPlayDetailView: View {
                     store.reprocess(play)
                     dismiss()
                 }
+                if let capturedImage {
+                    Button("Sessions.Photos.Save", systemImage: "square.and.arrow.down") {
+                        saveToPhotos(capturedImage)
+                    }
+                }
             }
         }
         .navigationTitle("Sessions.Detail.Title")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if let capturedImage {
+                ShareLink(
+                    item: Image(uiImage: capturedImage),
+                    preview: SharePreview("Sessions.Detail.Title", image: Image(uiImage: capturedImage))
+                )
+            }
+        }
+        .alert(item: $photoAlert) { alert in
+            switch alert {
+            case .saved:
+                return Alert(title: Text("Sessions.Photos.Saved"), dismissButton: .default(Text("Shared.OK")))
+            case .failed:
+                return Alert(title: Text("Sessions.Photos.Failed"), dismissButton: .default(Text("Shared.OK")))
+            case .denied:
+                return Alert(
+                    title: Text("Sessions.Photos.Denied.Title"),
+                    message: Text("Sessions.Photos.Denied.Message"),
+                    dismissButton: .default(Text("Shared.OK"))
+                )
+            }
+        }
         .onAppear(perform: loadFields)
+        .task {
+            if capturedImage == nil {
+                let filename = play.rawImageFilename
+                capturedImage = await Task.detached {
+                    IIDXSessionImageStore.shared.image(for: filename)
+                }.value
+            }
+            if songIndex.isEmpty {
+                let songs = await reader.fetchAllSongs()
+                songIndex = songs.map { SongEntry(song: $0, compact: $0.titleCompact()) }
+            }
+        }
         .onChange(of: fields) {
             guard hasLoaded else { return }
             save()
         }
+        .onChange(of: songTitle) { scheduleSuggestions() }
+        .onChange(of: playType) { scheduleSuggestions() }
+        .onChange(of: songFieldFocused) {
+            if songFieldFocused {
+                scheduleSuggestions()
+            } else {
+                searchTask?.cancel()
+                songSuggestions = []
+            }
+        }
+    }
+
+    private func scheduleSuggestions() {
+        searchTask?.cancel()
+        let needle = songTitle.compact
+        guard songFieldFocused, !songIndex.isEmpty, needle.count >= 2 else {
+            songSuggestions = []
+            return
+        }
+        let index = songIndex
+        let playType = playType
+        searchTask = Task {
+            try? await Task.sleep(for: .milliseconds(150))
+            if Task.isCancelled { return }
+            let results = await Task.detached {
+                Self.rank(needle: needle, playType: playType, index: index)
+            }.value
+            if Task.isCancelled { return }
+            songSuggestions = results
+        }
+    }
+
+    private nonisolated static func rank(
+        needle: String, playType: IIDXPlayType, index: [SongEntry]
+    ) -> [IIDXSong] {
+        if index.contains(where: { $0.compact == needle }) { return [] }
+
+        func hasNotes(_ song: IIDXSong) -> Bool {
+            (playType == .single ? song.spNoteCount : song.dpNoteCount) != nil
+        }
+
+        let ranked = index.compactMap { entry -> (song: IIDXSong, score: Double)? in
+            let candidate = entry.compact
+            guard candidate.count >= 2 else { return nil }
+            if candidate.contains(needle) {
+                return (entry.song, Double(candidate.count - needle.count) / Double(candidate.count))
+            }
+            let longest = max(candidate.count, needle.count)
+            guard Double(abs(candidate.count - needle.count)) / Double(longest) <= 0.4 else { return nil }
+            let ratio = needle.editRatio(to: candidate)
+            guard ratio <= 0.4 else { return nil }
+            return (entry.song, 1.0 + ratio)
+        }
+        .sorted { lhs, rhs in
+            if lhs.score != rhs.score { return lhs.score < rhs.score }
+            let lhsNotes = hasNotes(lhs.song), rhsNotes = hasNotes(rhs.song)
+            if lhsNotes != rhsNotes { return lhsNotes }
+            return lhs.song.title.count < rhs.song.title.count
+        }
+
+        return ranked.prefix(6).map(\.song)
     }
 
     private var fields: [AnyHashable] {
@@ -125,6 +248,16 @@ struct CapturedPlayDetailView: View {
         DispatchQueue.main.async { hasLoaded = true }
     }
 
+    private func saveToPhotos(_ image: UIImage) {
+        Task {
+            switch await SessionPhotoExporter.save([image]) {
+            case .saved: photoAlert = .saved
+            case .denied: photoAlert = .denied
+            case .failed: photoAlert = .failed
+            }
+        }
+    }
+
     private func save() {
         play.songTitle = songTitle.isEmpty ? nil : songTitle
         play.level = level
@@ -141,6 +274,16 @@ struct CapturedPlayDetailView: View {
         play.djLevel = djLevel.rawValue
         store.saveCorrected(play)
     }
+}
+
+private struct SongEntry: Sendable {
+    let song: IIDXSong
+    let compact: String
+}
+
+private enum PhotoAlert: Int, Identifiable {
+    case saved, denied, failed
+    var id: Int { rawValue }
 }
 
 struct RecognizedTextImage: View {

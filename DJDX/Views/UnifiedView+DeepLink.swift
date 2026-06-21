@@ -38,10 +38,23 @@ extension UnifiedView {
             }
 
         case "session":
-            guard value(for: "action")?.lowercased() == "capture" else { return }
-            navigationManager.popToRoot()
-            appMode = .sessions
-            sessionStore.requestCapture()
+            switch url.lastPathComponent.lowercased() {
+            case "start":
+                navigationManager.popToRoot()
+                appMode = .sessions
+                if sessionStore.activeSession == nil { sessionStore.startSession() }
+            case "capture":
+                navigationManager.popToRoot()
+                appMode = .sessions
+                sessionStore.requestCapture()
+            case "stop":
+                if sessionStore.activeSession != nil { sessionStore.endSession() }
+            case "pause":
+                let bridge = IIDXSessionWorkoutBridge.shared
+                if bridge.isWorkoutActive { bridge.setWorkoutPaused(!bridge.isPaused) }
+            default:
+                return
+            }
 
         case "reonboard":
             isPresentingOnboarding = true

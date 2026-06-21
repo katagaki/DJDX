@@ -30,8 +30,8 @@ final class IIDXSessionStore {
     }
 
     @discardableResult
-    func startSession() -> IIDXPlaySession {
-        let session = IIDXPlaySession(game: .iidxArcade)
+    func startSession(id: String? = nil) -> IIDXPlaySession {
+        let session = IIDXPlaySession(id: id ?? UUID().uuidString, game: .iidxArcade)
         database.createSession(session)
         activeSession = session
         plays = []
