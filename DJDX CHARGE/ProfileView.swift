@@ -67,6 +67,7 @@ struct ProfileView: View {
         if hasProfile {
             ScrollView {
                 VStack(spacing: 12.0) {
+                    startButton
                     profileHeader
                     if let radar = selectedRadar {
                         WatchRadarChartView(data: radar)
@@ -79,6 +80,17 @@ struct ProfileView: View {
         } else {
             idlePlaceholder
         }
+    }
+
+    private var startButton: some View {
+        Button {
+            workoutManager.requestStartSession()
+        } label: {
+            Label("Watch.Session.Start", systemImage: "play.fill")
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(.accentColor)
     }
 
     @ViewBuilder
@@ -105,18 +117,22 @@ struct ProfileView: View {
     }
 
     private var idlePlaceholder: some View {
-        VStack(spacing: 8.0) {
-            Image(systemName: "figure.dance")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Watch.Idle.Title")
-                .font(.headline)
-            Text("Watch.Idle.Message")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+        ScrollView {
+            VStack(spacing: 8.0) {
+                Image(systemName: "figure.dance")
+                    .imageScale(.large)
+                    .foregroundStyle(.tint)
+                Text("Watch.Idle.Title")
+                    .font(.headline)
+                Text("Watch.Idle.Message")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                startButton
+                    .padding(.top, 4.0)
+            }
+            .padding()
         }
-        .padding()
     }
 
     private func togglePlayType() {

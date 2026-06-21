@@ -248,6 +248,10 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
             switch command {
             case "requestProfile":
                 Task { @MainActor in bridge.syncProfileToWatch() }
+            case "startSession":
+                Task { @MainActor in
+                    NotificationCenter.default.post(name: .startSessionRequested, object: nil)
+                }
             case "endSession":
                 Task { @MainActor in
                     NotificationCenter.default.post(name: .endSessionRequested, object: sessionID)
