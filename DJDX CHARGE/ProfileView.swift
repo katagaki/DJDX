@@ -82,15 +82,20 @@ struct ProfileView: View {
         }
     }
 
+    @ViewBuilder
     private var startButton: some View {
-        Button {
+        let button = Button {
             workoutManager.requestStartSession()
         } label: {
             Label("Watch.Session.Start", systemImage: "play.fill")
                 .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.borderedProminent)
         .tint(.accentColor)
+        if #available(watchOS 26.0, *) {
+            button.buttonStyle(.glass)
+        } else {
+            button.buttonStyle(.bordered)
+        }
     }
 
     @ViewBuilder
