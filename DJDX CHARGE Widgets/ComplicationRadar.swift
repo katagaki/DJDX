@@ -56,15 +56,34 @@ struct ComplicationRadarAxes: Shape {
 struct ComplicationRadarView: View {
     let values: [Double]
     private let maxValue: Double = 130.0
+    private let benchmarkValue: Double = 100.0
+
+    private var color: Color {
+        let sum = values.reduce(0, +)
+        if sum > 800.0 { return .green
+        } else if sum > 600.0 { return .purple
+        } else if sum > 400.0 { return .red
+        } else if sum > 200.0 { return .yellow
+        } else { return .cyan }
+    }
 
     var body: some View {
-        ZStack {
-            ComplicationRadarAxes()
-                .stroke(.secondary.opacity(0.4), style: StrokeStyle(lineWidth: 0.5, dash: [2]))
-            ComplicationRadarShape(values: values, maxValue: maxValue)
-                .fill(.tint.opacity(0.4))
-            ComplicationRadarShape(values: values, maxValue: maxValue)
-                .stroke(.tint, lineWidth: 1.5)
+        GeometryReader { geometry in
+            let size = min(geometry.size.width, geometry.size.height)
+            let circleSize = size * CGFloat(benchmarkValue / maxValue)
+            ZStack {
+                Circle()
+                    .fill(.gray.opacity(0.3))
+                    .stroke(.gray.opacity(0.5), lineWidth: 0.5)
+                    .frame(width: circleSize, height: circleSize)
+                ComplicationRadarAxes()
+                    .stroke(.secondary.opacity(0.4), style: StrokeStyle(lineWidth: 0.5, dash: [2]))
+                ComplicationRadarShape(values: values, maxValue: maxValue)
+                    .fill(color.opacity(0.4))
+                ComplicationRadarShape(values: values, maxValue: maxValue)
+                    .stroke(color, lineWidth: 1.5)
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .padding(2.0)
     }

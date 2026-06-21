@@ -46,7 +46,6 @@ struct SessionStartComplicationView: View {
 
     var body: some View {
         content
-            .widgetURL(Self.startURL)
     }
 
     @ViewBuilder
@@ -54,16 +53,19 @@ struct SessionStartComplicationView: View {
         switch family {
         case .accessoryInline:
             Label("Watch.Widget.Start", systemImage: "play.fill")
+                .widgetURL(Self.startURL)
         case .accessoryCorner:
             Image(systemName: "play.fill")
                 .font(.title3)
                 .foregroundStyle(.accent)
                 .widgetLabel("Watch.Widget.Start")
+                .widgetURL(Self.startURL)
         case .accessoryRectangular:
             if let values = entry.radar {
                 radarContent(values)
             } else {
                 startContent
+                    .widgetURL(Self.startURL)
             }
         default:
             ZStack {
@@ -72,6 +74,7 @@ struct SessionStartComplicationView: View {
                     .font(.title2)
                     .foregroundStyle(.accent)
             }
+            .widgetURL(Self.startURL)
         }
     }
 
@@ -86,18 +89,34 @@ struct SessionStartComplicationView: View {
         }
     }
 
+    private static let radarLabels = ["NOTES", "CHORD", "PEAK", "CHARGE", "SCRATCH", "SOF-LAN"]
+    private static let radarColors: [Color] = [
+        .init(red: 1.0, green: 64 / 255, blue: 235 / 255),
+        .init(red: 133 / 255, green: 225 / 255, blue: 0 / 255),
+        .init(red: 1.0, green: 108 / 255, blue: 0 / 255),
+        .init(red: 137 / 255, green: 87 / 255, blue: 221 / 255),
+        .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255),
+        .init(red: 0 / 255, green: 134 / 255, blue: 229 / 255)
+    ]
+
     private func radarContent(_ values: [Double]) -> some View {
-        HStack(spacing: 8.0) {
+        HStack(spacing: 6.0) {
             ComplicationRadarView(values: values)
                 .aspectRatio(1.0, contentMode: .fit)
-            VStack(alignment: .leading, spacing: 1.0) {
-                Text("Watch.Widget.Radar")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                Text(verbatim: String(format: "%.0f", values.reduce(0, +)))
-                    .font(.headline.monospacedDigit())
+            VStack(spacing: 0.0) {
+                ForEach(Array(Self.radarLabels.enumerated()), id: \.offset) { index, label in
+                    HStack(spacing: 2.0) {
+                        Text(verbatim: label)
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(Self.radarColors[index])
+                        Spacer(minLength: 2.0)
+                        Text(verbatim: String(format: "%.2f", index < values.count ? values[index] : 0))
+                            .font(.system(size: 9, weight: .semibold).monospacedDigit())
+                    }
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                }
             }
-            Spacer(minLength: 0.0)
         }
     }
 }
