@@ -31,6 +31,7 @@ final class SessionCameraViewController: UIViewController {
 
     private let shutterButton = UIButton(type: .custom)
     private let cancelButton = UIButton(type: .system)
+    private let shutterHaptic = UIImpactFeedbackGenerator(style: .rigid)
     private var portraitShutterConstraints: [NSLayoutConstraint] = []
     private var landscapeShutterConstraints: [NSLayoutConstraint] = []
     private var isLandscapeLayout: Bool?
@@ -52,6 +53,7 @@ final class SessionCameraViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+        shutterHaptic.prepare()
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationDidChange),
                                                name: UIDevice.orientationDidChangeNotification, object: nil)
         sessionQueue.async { [weak self] in
@@ -206,6 +208,7 @@ final class SessionCameraViewController: UIViewController {
 
     @objc private func capture() {
         shutterButton.isEnabled = false
+        shutterHaptic.impactOccurred()
         let settings: AVCapturePhotoSettings
         if photoOutput.availablePhotoCodecTypes.contains(.jpeg) {
             settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg])
