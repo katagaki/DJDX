@@ -90,11 +90,7 @@ struct ActiveSessionView: View {
         } message: {
             Text("Sessions.Camera.Denied.Message")
         }
-        .confirmationDialog(
-            "Sessions.Photos.ExportAll.Confirm",
-            isPresented: $isConfirmingExport,
-            titleVisibility: .visible
-        ) {
+        .alert("Sessions.Photos.ExportAll.Confirm", isPresented: $isConfirmingExport) {
             Button("Sessions.Photos.ExportAll") {
                 exportAllToPhotos()
             }
