@@ -24,6 +24,13 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         UserDefaults.standard.bool(forKey: Self.healthKitEnabledKey)
     }
 
+    private var isWatchAvailable: Bool {
+        WCSession.isSupported()
+            && WCSession.default.activationState == .activated
+            && WCSession.default.isPaired
+            && WCSession.default.isWatchAppInstalled
+    }
+
     override private init() {
         super.init()
         if WCSession.isSupported() {
@@ -79,7 +86,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     func startWorkout(session: IIDXPlaySession) {
-        guard isEnabled else { return }
+        guard isEnabled || isWatchAvailable else { return }
         activeSessionID = session.id
         workoutStart = session.startDate
         isWorkoutActive = true
@@ -114,7 +121,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     func endWorkout(session: IIDXPlaySession) {
-        guard isEnabled, activeSessionID == session.id else { return }
+        guard activeSessionID == session.id else { return }
         send(["command": "end", "sessionID": session.id])
         if !WCSession.default.isPaired {
             saveFallbackWorkout(for: session)
