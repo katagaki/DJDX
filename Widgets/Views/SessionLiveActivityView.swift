@@ -63,6 +63,8 @@ struct SessionLiveActivityView: View {
             .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 14.0)
+        .padding(.vertical, 10.0)
     }
 
     private var phoneBody: some View {
@@ -104,12 +106,8 @@ struct SessionLiveActivityView: View {
                     .monospacedDigit()
             }
             Spacer()
-            HStack(spacing: 4.0) {
-                Text(verbatim: "\(context.state.playCount)")
-                    .fontWeight(.bold)
-                    .monospacedDigit()
-                Text("Sessions.Plays")
-            }
+            Label("\(context.state.playCount)", systemImage: "opticaldisc")
+                .monospacedDigit()
         }
         .font(.system(size: 13.0, weight: .semibold))
         .fontDesign(.rounded)
