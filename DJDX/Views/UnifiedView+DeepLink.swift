@@ -38,10 +38,15 @@ extension UnifiedView {
             }
 
         case "session":
-            guard value(for: "action")?.lowercased() == "capture" else { return }
+            let action = value(for: "action")?.lowercased()
+            guard action == "capture" || action == "start" else { return }
             navigationManager.popToRoot()
             appMode = .sessions
-            sessionStore.requestCapture()
+            if action == "start" {
+                if sessionStore.activeSession == nil { sessionStore.startSession() }
+            } else {
+                sessionStore.requestCapture()
+            }
 
         case "reonboard":
             isPresentingOnboarding = true

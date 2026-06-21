@@ -6207,6 +6207,22 @@
         }
       }
     },
+    "Widget.Name.SessionStart" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Session"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションを開始"
+          }
+        }
+      }
+    },
     "Widget.Name.Tower" : {
       "localizations" : {
         "en" : {
@@ -6283,6 +6299,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アプリを開いてクプロを読み込んでください"
+          }
+        }
+      }
+    },
+    "Widget.SessionStart.Action" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Session"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションを開始"
+          }
+        }
+      }
+    },
+    "Widget.SessionStart.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quickly start a play session."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレーセッションをすぐに開始します。"
           }
         }
       }

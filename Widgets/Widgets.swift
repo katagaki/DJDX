@@ -9,6 +9,7 @@ struct DJDXWidgetBundle: WidgetBundle {
         ClearTypeWidget()
         DJLevelWidget()
         TowerWidget()
+        SessionStartWidget()
         SessionLiveActivity()
     }
 }
