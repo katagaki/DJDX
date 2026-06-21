@@ -202,7 +202,16 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         return resized.pngData()
     }
 
+    private func adoptSessionIfNeeded(_ sessionID: String) {
+        guard activeSessionID == nil,
+              let session = database.session(id: sessionID), session.isActive else { return }
+        activeSessionID = sessionID
+        workoutStart = session.startDate
+        isWorkoutActive = true
+    }
+
     fileprivate func ingestMetrics(heartRate: Int?, activeCalories: Int?, sessionID: String) {
+        adoptSessionIfNeeded(sessionID)
         guard sessionID == activeSessionID else { return }
         if let heartRate { self.heartRate = heartRate }
         if let activeCalories { self.activeCalories = activeCalories }
@@ -215,6 +224,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     fileprivate func applyWorkoutState(sessionID: String, paused: Bool, elapsed: Double?, start: Double?) {
+        adoptSessionIfNeeded(sessionID)
         let runningStart = start.map { Date(timeIntervalSince1970: $0) }
         isPaused = paused
         IIDXSessionLiveActivityController.shared.updatePauseState(
