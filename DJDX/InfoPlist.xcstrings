@@ -5,9 +5,15 @@
       "comment" : "Bundle name",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX"
+          }
+        },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "DJDX"
           }
         }
@@ -60,6 +66,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレーセッションをワークアウトとしてヘルスケアに保存します。"
+          }
+        }
+      }
+    },
+    "NSPhotoLibraryAddUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX saves your captured result screens to Photos."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撮影したリザルト画面を写真に保存します。"
           }
         }
       }
