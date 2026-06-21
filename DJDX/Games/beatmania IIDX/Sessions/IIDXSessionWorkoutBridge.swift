@@ -191,7 +191,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         guard let start = workoutStart else { return }
         let end = Date()
         let configuration = HKWorkoutConfiguration()
-        configuration.activityType = .cardioDance
+        configuration.activityType = .fitnessGaming
         configuration.locationType = .indoor
         let builder = HKWorkoutBuilder(
             healthStore: healthStore,

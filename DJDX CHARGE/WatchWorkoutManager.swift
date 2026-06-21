@@ -48,7 +48,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     private func startWorkout(sessionID: String) {
         guard session == nil else { return }
         let configuration = HKWorkoutConfiguration()
-        configuration.activityType = .cardioDance
+        configuration.activityType = .fitnessGaming
         configuration.locationType = .indoor
         do {
             let session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
