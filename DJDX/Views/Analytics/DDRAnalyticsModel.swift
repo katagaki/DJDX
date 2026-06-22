@@ -8,6 +8,7 @@ final class DDRAnalyticsModel {
     var clearTypePerDifficulty: [DDRDifficulty: OrderedDictionary<String, Int>] = [:]
     var rankPerDifficulty: [DDRDifficulty: OrderedDictionary<String, Int>] = [:]
     var clearTypePerLevel: [Int: OrderedDictionary<String, Int>] = [:]
+    var rankPerLevel: [Int: OrderedDictionary<String, Int>] = [:]
 
     var totalCharts: Int = 0
 
@@ -23,6 +24,7 @@ final class DDRAnalyticsModel {
         var clearByDiff: [DDRDifficulty: OrderedDictionary<String, Int>] = [:]
         var rankByDiff: [DDRDifficulty: OrderedDictionary<String, Int>] = [:]
         var clearByLevel: [Int: OrderedDictionary<String, Int>] = [:]
+        var rankByLevel: [Int: OrderedDictionary<String, Int>] = [:]
 
         let clearKeys = DDRSongRecord.clearLampOrder
         let breakdownKeys = DDRSongRecord.clearBreakdownOrder
@@ -50,6 +52,10 @@ final class DDRAnalyticsModel {
             }
             if rankKeys.contains(record.rank) {
                 rankByDiff[difficulty]?[record.rank]? += 1
+                if record.level > 0 {
+                    if rankByLevel[record.level] == nil { rankByLevel[record.level] = emptyRankCounts() }
+                    rankByLevel[record.level]?[record.rank]? += 1
+                }
             }
 
             if record.level > 0, let clearBucket {
@@ -64,6 +70,7 @@ final class DDRAnalyticsModel {
             self.clearTypePerDifficulty = clearByDiff
             self.rankPerDifficulty = rankByDiff
             self.clearTypePerLevel = clearByLevel
+            self.rankPerLevel = rankByLevel
             self.totalCharts = chartCount
             self.dataState = .presenting
         }
