@@ -6,7 +6,7 @@ struct DDRScoreRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 8.0) {
-            record.difficultyEnum.color
+            DDRSongRecord.clearColor(for: record.clearKind)
                 .frame(width: 10.0)
                 .frame(maxHeight: .infinity)
                 .conditionalShadow(.black.opacity(0.2), radius: 1.0, x: 2.0)
