@@ -81,12 +81,12 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
 
     static func clearColor(for clearKind: String) -> Color {
         switch clearKind {
-        case "marv": Color(red: 0.45, green: 0.85, blue: 1.0)
-        case "perf": Color(red: 1.0, green: 0.82, blue: 0.0)
+        case "marv": .primary
+        case "perf": .yellow
         case "great": .green
-        case "good": Color(red: 0.2, green: 0.55, blue: 1.0)
+        case "good": .blue
         case "li4clear": .red
-        case "clear": Color(red: 0.0, green: 0.8, blue: 0.5)
+        case "clear": .cyan
         case "assist": .purple
         case "fail": .gray
         case noClearKey: .gray
@@ -97,12 +97,13 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
     static func rankColor(forStem stem: String) -> Color {
         let letter = stem.split(separator: "_").first.map(String.init) ?? stem
         switch letter {
-        case "aaa": return Color(red: 1.0, green: 0.82, blue: 0.0)
-        case "aa": return .orange
-        case "a": return Color(red: 1.0, green: 0.55, blue: 0.2)
-        case "b": return .green
-        case "c": return .blue
-        case "d": return .purple
+        case "aaa": return .yellow
+        case "aa": return .gray
+        case "a": return .red
+        case "b": return .red
+        case "c": return .yellow
+        case "d": return .blue
+        case "e": return .black
         default: return .gray
         }
     }
