@@ -7,16 +7,19 @@ struct SessionDetailView: View {
 
     @State private var plays: [IIDXCapturedPlay] = []
     @State private var isSummaryExpanded: Bool = true
+    @State private var isHeartRateExpanded: Bool = true
     @State private var isDJLevelExpanded: Bool = true
     @State private var isClearTypeExpanded: Bool = true
     @State private var isPlaysExpanded: Bool = true
     @State private var isConfirmingExport: Bool = false
+    @State private var fileExport: SessionFileExportRequest?
     @State private var photoAlert: PhotoExportAlert?
 
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 20.0) {
                 summarySection
+                heartRateSection
                 breakdownSection(
                     title: "Sessions.Detail.DJLevelBreakdown",
                     isExpanded: $isDJLevelExpanded,
@@ -40,12 +43,12 @@ struct SessionDetailView: View {
             )
             .ignoresSafeArea()
         }
-        .navigationTitle("Sessions.Detail.Title")
+        .navigationTitle(Text(session.startDate, format: .dateTime.year().month().day()))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if !plays.isEmpty {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Sessions.Photos.ExportAll", systemImage: "square.and.arrow.up.on.square") {
+                    Button("Sessions.Export.All", systemImage: "square.and.arrow.up.on.square") {
                         isConfirmingExport = true
                     }
                 }
@@ -56,11 +59,24 @@ struct SessionDetailView: View {
             .receive(on: RunLoop.main)) { _ in
             plays = store.plays(for: session)
         }
-        .alert("Sessions.Photos.ExportAll.Confirm", isPresented: $isConfirmingExport) {
-            Button("Sessions.Photos.ExportAll") {
+        .confirmationDialog(
+            "Sessions.Export.All.Confirm",
+            isPresented: $isConfirmingExport,
+            titleVisibility: .visible
+        ) {
+            Button("Sessions.Photos.Save") {
                 exportAllToPhotos()
             }
+            Button("Sessions.Files.Save") {
+                exportAllToFiles()
+            }
             Button("Shared.Cancel", role: .cancel) {}
+        }
+        .sheet(item: $fileExport) { request in
+            SessionDocumentExporter(urls: request.urls) {
+                fileExport = nil
+            }
+            .ignoresSafeArea()
         }
         .alert(item: $photoAlert) { alert in
             switch alert {
@@ -92,6 +108,16 @@ struct SessionDetailView: View {
         }
     }
 
+    private func exportAllToFiles() {
+        let filenames = plays.map(\.rawImageFilename)
+        let urls = SessionFileExporter.exportURLs(for: filenames, date: session.startDate)
+        guard !urls.isEmpty else {
+            photoAlert = .failed
+            return
+        }
+        fileExport = SessionFileExportRequest(urls: urls)
+    }
+
     private enum PhotoExportAlert: Int, Identifiable {
         case saved, denied, failed
         var id: Int { rawValue }
@@ -115,13 +141,50 @@ struct SessionDetailView: View {
                     summaryRow("Sessions.Elapsed") {
                         Text(verbatim: durationText)
                     }
-                    Divider()
-                    summaryRow("Sessions.Plays") {
-                        Text(verbatim: "\(plays.count)")
+                    if let averageHeartRate {
+                        Divider()
+                        summaryRow("Sessions.Detail.AverageHeartRate") {
+                            Text(verbatim: "\(averageHeartRate)")
+                        }
                     }
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var heartRateSection: some View {
+        let points = heartRatePoints
+        if !points.isEmpty {
+            VStack(spacing: 12.0) {
+                AnalyticsSectionHeader(
+                    title: "Sessions.Detail.HeartRate",
+                    isCollapsible: true,
+                    isExpanded: isHeartRateExpanded
+                ) {
+                    withAnimation(.smooth.speed(2.0)) { isHeartRateExpanded.toggle() }
+                }
+                if isHeartRateExpanded {
+                    SessionHeartRateGraph(session: session, points: points)
+                        .padding(.horizontal)
+                }
+            }
+        }
+    }
+
+    private var heartRatePoints: [SessionHeartRatePoint] {
+        plays.compactMap { play in
+            guard let min = play.minHeartRate, let max = play.maxHeartRate else { return nil }
+            return SessionHeartRatePoint(id: play.id, date: play.captureDate, min: min, max: max)
+        }
+        .sorted { $0.date < $1.date }
+    }
+
+    private var averageHeartRate: Int? {
+        let points = heartRatePoints
+        guard !points.isEmpty else { return nil }
+        let total = points.reduce(0.0) { $0 + $1.mid }
+        return Int((total / Double(points.count)).rounded())
     }
 
     private var playsSection: some View {

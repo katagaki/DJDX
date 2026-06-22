@@ -30,16 +30,72 @@ struct CapturedPlayDetailView: View {
     private let reader = IIDXReader()
 
     var body: some View {
-        Form {
-            Section {
-                if let image = capturedImage {
-                    RecognizedTextImage(image: image)
-                        .frame(maxWidth: .infinity)
-                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                        .listRowInsets(EdgeInsets())
-                }
+        GeometryReader { proxy in
+            responsiveLayout(in: proxy)
+        }
+        .background {
+            LinearGradient(
+                colors: [.backgroundGradientTop, .backgroundGradientBottom],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        }
+        .navigationTitle("Sessions.Detail.Title")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if let capturedImage {
+                ShareLink(
+                    item: Image(uiImage: capturedImage),
+                    preview: SharePreview("Sessions.Detail.Title", image: Image(uiImage: capturedImage))
+                )
             }
+        }
+        .alert(item: $photoAlert) { alert in
+            switch alert {
+            case .saved:
+                return Alert(title: Text("Sessions.Photos.Saved"), dismissButton: .default(Text("Shared.OK")))
+            case .failed:
+                return Alert(title: Text("Sessions.Photos.Failed"), dismissButton: .default(Text("Shared.OK")))
+            case .denied:
+                return Alert(
+                    title: Text("Sessions.Photos.Denied.Title"),
+                    message: Text("Sessions.Photos.Denied.Message"),
+                    dismissButton: .default(Text("Shared.OK"))
+                )
+            }
+        }
+        .onAppear(perform: loadFields)
+        .task {
+            if capturedImage == nil {
+                let filename = play.rawImageFilename
+                capturedImage = await Task.detached {
+                    IIDXSessionImageStore.shared.image(for: filename)
+                }.value
+            }
+            if songIndex.isEmpty {
+                let songs = await reader.fetchAllSongs()
+                songIndex = songs.map { SongEntry(song: $0, compact: $0.titleCompact()) }
+            }
+        }
+        .onChange(of: fields) {
+            guard hasLoaded else { return }
+            save()
+        }
+        .onChange(of: songTitle) { scheduleSuggestions() }
+        .onChange(of: playType) { scheduleSuggestions() }
+        .onChange(of: songFieldFocused) {
+            if songFieldFocused {
+                scheduleSuggestions()
+            } else {
+                searchTask?.cancel()
+                songSuggestions = []
+            }
+        }
+    }
 
+    private var editorForm: some View {
+        Form {
             Section("Sessions.Detail.Chart") {
                 TextField("Sessions.Detail.Song", text: $songTitle)
                     .focused($songFieldFocused)
@@ -104,56 +160,45 @@ struct CapturedPlayDetailView: View {
                 }
             }
         }
-        .navigationTitle("Sessions.Detail.Title")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            if let capturedImage {
-                ShareLink(
-                    item: Image(uiImage: capturedImage),
-                    preview: SharePreview("Sessions.Detail.Title", image: Image(uiImage: capturedImage))
-                )
+        .scrollContentBackground(.hidden)
+        .scrollDismissesKeyboard(.immediately)
+    }
+
+    @ViewBuilder
+    private func responsiveLayout(in proxy: GeometryProxy) -> some View {
+        if proxy.size.width > proxy.size.height {
+            HStack(spacing: 0.0) {
+                dockedImage(in: proxy, landscape: true)
+                editorForm
+            }
+        } else {
+            VStack(spacing: 0.0) {
+                dockedImage(in: proxy, landscape: false)
+                editorForm
             }
         }
-        .alert(item: $photoAlert) { alert in
-            switch alert {
-            case .saved:
-                return Alert(title: Text("Sessions.Photos.Saved"), dismissButton: .default(Text("Shared.OK")))
-            case .failed:
-                return Alert(title: Text("Sessions.Photos.Failed"), dismissButton: .default(Text("Shared.OK")))
-            case .denied:
-                return Alert(
-                    title: Text("Sessions.Photos.Denied.Title"),
-                    message: Text("Sessions.Photos.Denied.Message"),
-                    dismissButton: .default(Text("Shared.OK"))
-                )
-            }
-        }
-        .onAppear(perform: loadFields)
-        .task {
-            if capturedImage == nil {
-                let filename = play.rawImageFilename
-                capturedImage = await Task.detached {
-                    IIDXSessionImageStore.shared.image(for: filename)
-                }.value
-            }
-            if songIndex.isEmpty {
-                let songs = await reader.fetchAllSongs()
-                songIndex = songs.map { SongEntry(song: $0, compact: $0.titleCompact()) }
-            }
-        }
-        .onChange(of: fields) {
-            guard hasLoaded else { return }
-            save()
-        }
-        .onChange(of: songTitle) { scheduleSuggestions() }
-        .onChange(of: playType) { scheduleSuggestions() }
-        .onChange(of: songFieldFocused) {
-            if songFieldFocused {
-                scheduleSuggestions()
+    }
+
+    @ViewBuilder
+    private func dockedImage(in proxy: GeometryProxy, landscape: Bool) -> some View {
+        if let capturedImage {
+            if landscape {
+                RecognizedTextImage(image: capturedImage)
+                    .frame(maxHeight: .infinity)
+                    .frame(width: min(
+                        proxy.size.height * capturedImage.size.width / capturedImage.size.height,
+                        proxy.size.width / 2.0
+                    ))
             } else {
-                searchTask?.cancel()
-                songSuggestions = []
+                RecognizedTextImage(image: capturedImage)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: min(
+                        proxy.size.width * capturedImage.size.height / capturedImage.size.width,
+                        proxy.size.height / 2.0
+                    ))
             }
+            Divider()
+                .ignoresSafeArea()
         }
     }
 

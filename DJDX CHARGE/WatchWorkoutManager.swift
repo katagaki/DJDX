@@ -20,7 +20,6 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     @Published var lastClearType: String?
     @Published var lastScore: Int?
     @Published var lastResultSummary: String?
-    @Published var bestThisSession: String?
 
     @Published var qproImageData: Data?
     @Published var djName: String?
@@ -233,7 +232,6 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         lastClearType = nil
         lastScore = nil
         lastResultSummary = nil
-        bestThisSession = nil
     }
 
     fileprivate func applySessionInfo(_ message: [String: Any]) {
@@ -243,7 +241,6 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         lastClearType = message["lastClearType"] as? String
         lastScore = message["lastScore"] as? Int
         lastResultSummary = message["lastResultSummary"] as? String
-        bestThisSession = message["bestThisSession"] as? String
     }
 
     fileprivate func applyProfile(_ context: [String: Any]) {

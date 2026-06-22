@@ -35,23 +35,6 @@
         }
       }
     },
-    "Watch.Session.Best" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Best"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ベスト"
-          }
-        }
-      }
-    },
     "Watch.Session.Pause" : {
       "extractionState" : "manual",
       "localizations" : {

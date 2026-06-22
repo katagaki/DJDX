@@ -2540,23 +2540,6 @@
         }
       }
     },
-    "More.ManageData.ClearAnalyticsCache" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear Analytics Cache"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アナリティクスキャッシュをクリア"
-          }
-        }
-      }
-    },
     "More.ManageData.Backup" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2570,6 +2553,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バックアップ"
+          }
+        }
+      }
+    },
+    "More.ManageData.ClearAnalyticsCache" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Analytics Cache"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アナリティクスキャッシュをクリア"
           }
         }
       }
@@ -3335,6 +3335,40 @@
         }
       }
     },
+    "Sessions.Camera.Guide.ScoreBox" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコア"
+          }
+        }
+      }
+    },
+    "Sessions.Camera.Guide.SongTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "曲名"
+          }
+        }
+      }
+    },
     "Sessions.Camera.Unavailable.Message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3586,6 +3620,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日本語＋英語"
+          }
+        }
+      }
+    },
+    "Sessions.Detail.AverageHeartRate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Average Heart Rate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均心拍数"
           }
         }
       }
@@ -4095,6 +4146,57 @@
         }
       }
     },
+    "Sessions.Export.All" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて書き出す"
+          }
+        }
+      }
+    },
+    "Sessions.Export.All.Confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export all captured photos?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撮影したすべての写真を書き出しますか？"
+          }
+        }
+      }
+    },
+    "Sessions.Files.Save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルに保存"
+          }
+        }
+      }
+    },
     "Sessions.HealthKit.Footer" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4278,40 +4380,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "写真へのアクセスが必要です"
-          }
-        }
-      }
-    },
-    "Sessions.Photos.ExportAll" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export All to Photos"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべて写真に書き出す"
-          }
-        }
-      }
-    },
-    "Sessions.Photos.ExportAll.Confirm" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export all captured photos to Photos?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "撮影したすべての写真を写真に書き出しますか？"
           }
         }
       }

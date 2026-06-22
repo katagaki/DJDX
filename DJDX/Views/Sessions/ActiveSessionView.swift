@@ -11,6 +11,7 @@ struct ActiveSessionView: View {
     @State private var isShowingCameraUnavailableAlert: Bool = false
     @State private var photoAlert: PhotoExportAlert?
     @State private var isConfirmingExport: Bool = false
+    @State private var fileExport: SessionFileExportRequest?
     @ObservedObject private var workoutBridge = IIDXSessionWorkoutBridge.shared
 
     var body: some View {
@@ -36,7 +37,7 @@ struct ActiveSessionView: View {
             .toolbar {
                 if !store.plays.isEmpty {
                     ToolbarItem(placement: .topBarLeading) {
-                        Button("Sessions.Photos.ExportAll", systemImage: "square.and.arrow.up.on.square") {
+                        Button("Sessions.Export.All", systemImage: "square.and.arrow.up.on.square") {
                             isConfirmingExport = true
                         }
                     }
@@ -99,11 +100,24 @@ struct ActiveSessionView: View {
         } message: {
             Text("Sessions.Camera.Unavailable.Message")
         }
-        .alert("Sessions.Photos.ExportAll.Confirm", isPresented: $isConfirmingExport) {
-            Button("Sessions.Photos.ExportAll") {
+        .confirmationDialog(
+            "Sessions.Export.All.Confirm",
+            isPresented: $isConfirmingExport,
+            titleVisibility: .visible
+        ) {
+            Button("Sessions.Photos.Save") {
                 exportAllToPhotos()
             }
+            Button("Sessions.Files.Save") {
+                exportAllToFiles()
+            }
             Button("Shared.Cancel", role: .cancel) {}
+        }
+        .sheet(item: $fileExport) { request in
+            SessionDocumentExporter(urls: request.urls) {
+                fileExport = nil
+            }
+            .ignoresSafeArea()
         }
         .alert(item: $photoAlert) { alert in
             switch alert {
@@ -133,6 +147,17 @@ struct ActiveSessionView: View {
             case .failed: photoAlert = .failed
             }
         }
+    }
+
+    private func exportAllToFiles() {
+        let filenames = store.plays.map(\.rawImageFilename)
+        let date = store.activeSession?.startDate ?? .now
+        let urls = SessionFileExporter.exportURLs(for: filenames, date: date)
+        guard !urls.isEmpty else {
+            photoAlert = .failed
+            return
+        }
+        fileExport = SessionFileExportRequest(urls: urls)
     }
 
     private var numberFont: Font {

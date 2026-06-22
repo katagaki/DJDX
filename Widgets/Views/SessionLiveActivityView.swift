@@ -90,24 +90,26 @@ struct SessionLiveActivityView: View {
     }
 
     private var metricsBar: some View {
-        HStack(spacing: 12.0) {
-            Label {
+        HStack(spacing: 0.0) {
+            metricCell(icon: context.state.isPaused ? "pause.fill" : "stopwatch") {
                 timeText
-                    .monospacedDigit()
-            } icon: {
-                Image(systemName: context.state.isPaused ? "pause.fill" : "stopwatch")
             }
-            if let heartRate = context.state.heartRate {
-                Label("\(heartRate)", systemImage: "heart.fill")
-                    .monospacedDigit()
+            Spacer(minLength: 12.0)
+            HStack(spacing: 10.0) {
+                if let heartRate = context.state.heartRate {
+                    metricCell(icon: "heart.fill") {
+                        Text(verbatim: "\(heartRate)")
+                    }
+                }
+                if let activeCalories = context.state.activeCalories {
+                    metricCell(icon: "flame.fill") {
+                        Text(verbatim: "\(activeCalories)")
+                    }
+                }
+                metricCell(icon: "opticaldisc") {
+                    Text(verbatim: "\(context.state.playCount)")
+                }
             }
-            if let activeCalories = context.state.activeCalories {
-                Label("\(activeCalories)", systemImage: "flame.fill")
-                    .monospacedDigit()
-            }
-            Spacer()
-            Label("\(context.state.playCount)", systemImage: "opticaldisc")
-                .monospacedDigit()
         }
         .font(.system(size: 13.0, weight: .semibold))
         .fontDesign(.rounded)
@@ -116,6 +118,17 @@ struct SessionLiveActivityView: View {
         .padding(.vertical, 8.0)
         .frame(maxWidth: .infinity)
         .background(Color("AccentColor").opacity(0.5))
+    }
+
+    private func metricCell(icon: String, @ViewBuilder value: () -> some View) -> some View {
+        HStack(spacing: 5.0) {
+            Image(systemName: icon)
+                .frame(width: 18.0)
+            value()
+                .monospacedDigit()
+                .frame(width: 38.0, alignment: .leading)
+        }
+        .lineLimit(1)
     }
 }
 

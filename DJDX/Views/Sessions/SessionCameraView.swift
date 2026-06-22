@@ -36,10 +36,24 @@ final class SessionCameraViewController: UIViewController {
 
     private let shutterButton = UIButton(type: .custom)
     private let cancelButton = UIButton(type: .system)
+    private let playerSideControl = UISegmentedControl(items: ["1P", "2P"])
     private let shutterHaptic = UIImpactFeedbackGenerator(style: .rigid)
     private var portraitShutterConstraints: [NSLayoutConstraint] = []
     private var landscapeShutterConstraints: [NSLayoutConstraint] = []
+    private var portraitPlayerConstraints: [NSLayoutConstraint] = []
+    private var landscapePlayerConstraints: [NSLayoutConstraint] = []
     private var isLandscapeLayout: Bool?
+
+    private let scoreRegionLayer = CAShapeLayer()
+    private let titleRegionLayer = CAShapeLayer()
+    private let scoreRegionLabel = UILabel()
+    private let titleRegionLabel = UILabel()
+    private let scoreRegionColor = UIColor.systemTeal
+    private let titleRegionColor = UIColor.systemYellow
+    private let scoreRegion = CGRect(x: 0.03, y: 0.04, width: 0.45, height: 0.92)
+    private let titleRegion = CGRect(x: 0.54, y: 0.82, width: 0.44, height: 0.16)
+    private let playerSideDefaultsKey = "Sessions.Camera.IsPlayer2"
+    private var isPlayer2 = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -60,6 +74,10 @@ final class SessionCameraViewController: UIViewController {
         guideLayer.shadowRadius = 3
         guideLayer.shadowOffset = .zero
         view.layer.addSublayer(guideLayer)
+        configureRegionLayer(scoreRegionLayer, color: scoreRegionColor)
+        configureRegionLayer(titleRegionLayer, color: titleRegionColor)
+        view.layer.addSublayer(scoreRegionLayer)
+        view.layer.addSublayer(titleRegionLayer)
         configureControls()
         sessionQueue.async { [weak self] in self?.configureSession() }
     }
@@ -115,15 +133,25 @@ final class SessionCameraViewController: UIViewController {
         guideLayer.frame = view.bounds
         guideLayer.path = cornerBracketPath(in: guideRect()).cgPath
         CATransaction.commit()
+        updateRegionGuides()
+        positionHintLabel(in: guideRect())
         applyPreviewRotation()
         applyShutterPlacement()
     }
 
     private func guideRect() -> CGRect {
+        let safe = view.bounds.inset(by: view.safeAreaInsets)
         let landscape = view.bounds.width > view.bounds.height
-        let horizontalInset: CGFloat = landscape ? 140 : 28
-        let verticalInset: CGFloat = landscape ? 56 : 150
-        return view.bounds.insetBy(dx: horizontalInset, dy: verticalInset)
+        let available = landscape
+            ? CGRect(x: safe.minX + 16, y: safe.minY + 12, width: safe.width - 40, height: safe.height - 24)
+            : CGRect(x: safe.minX + 16, y: safe.minY + 72, width: safe.width - 32, height: safe.height - 188)
+        let aspect: CGFloat = 4.0 / 3.0
+        var size = CGSize(width: available.width, height: available.width / aspect)
+        if size.height > available.height {
+            size = CGSize(width: available.height * aspect, height: available.height)
+        }
+        return CGRect(x: available.midX - size.width / 2, y: available.midY - size.height / 2,
+                      width: size.width, height: size.height)
     }
 
     private func cornerBracketPath(in rect: CGRect, length: CGFloat = 30, radius: CGFloat = 14) -> UIBezierPath {
@@ -176,8 +204,11 @@ final class SessionCameraViewController: UIViewController {
         let landscape = view.bounds.width > view.bounds.height
         if isLandscapeLayout == landscape { return }
         isLandscapeLayout = landscape
-        NSLayoutConstraint.deactivate(portraitShutterConstraints + landscapeShutterConstraints)
-        NSLayoutConstraint.activate(landscape ? landscapeShutterConstraints : portraitShutterConstraints)
+        NSLayoutConstraint.deactivate(portraitShutterConstraints + landscapeShutterConstraints +
+                                      portraitPlayerConstraints + landscapePlayerConstraints)
+        NSLayoutConstraint.activate(landscape
+                                    ? landscapeShutterConstraints + landscapePlayerConstraints
+                                    : portraitShutterConstraints + portraitPlayerConstraints)
     }
 
     private func configureSession() {
@@ -234,7 +265,6 @@ final class SessionCameraViewController: UIViewController {
         cancelButton.accessibilityLabel = NSLocalizedString("Shared.Cancel", comment: "")
         cancelButton.addTarget(self, action: #selector(cancel), for: .touchUpInside)
 
-        hintLabel.translatesAutoresizingMaskIntoConstraints = false
         hintLabel.text = NSLocalizedString("Sessions.Camera.Guide", comment: "")
         hintLabel.font = .systemFont(ofSize: 15, weight: .semibold)
         hintLabel.textColor = .white
@@ -243,9 +273,28 @@ final class SessionCameraViewController: UIViewController {
         hintLabel.shadowColor = UIColor.black.withAlphaComponent(0.6)
         hintLabel.shadowOffset = CGSize(width: 0, height: 1)
 
+        playerSideControl.translatesAutoresizingMaskIntoConstraints = false
+        isPlayer2 = UserDefaults.standard.bool(forKey: playerSideDefaultsKey)
+        playerSideControl.selectedSegmentIndex = isPlayer2 ? 1 : 0
+        playerSideControl.selectedSegmentTintColor = .white
+        playerSideControl.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        playerSideControl.setTitleTextAttributes(
+            [.foregroundColor: UIColor.white, .font: UIFont.systemFont(ofSize: 14, weight: .semibold)], for: .normal)
+        playerSideControl.setTitleTextAttributes(
+            [.foregroundColor: UIColor.black, .font: UIFont.systemFont(ofSize: 14, weight: .semibold)], for: .selected)
+        playerSideControl.addTarget(self, action: #selector(playerSideChanged), for: .valueChanged)
+
+        configureRegionLabel(scoreRegionLabel, text: NSLocalizedString("Sessions.Camera.Guide.ScoreBox", comment: ""),
+                             color: scoreRegionColor)
+        configureRegionLabel(titleRegionLabel, text: NSLocalizedString("Sessions.Camera.Guide.SongTitle", comment: ""),
+                             color: titleRegionColor)
+
+        view.addSubview(scoreRegionLabel)
+        view.addSubview(titleRegionLabel)
         view.addSubview(shutterButton)
         view.addSubview(cancelButton)
         view.addSubview(hintLabel)
+        view.addSubview(playerSideControl)
 
         NSLayoutConstraint.activate([
             shutterButton.widthAnchor.constraint(equalToConstant: 80),
@@ -254,11 +303,7 @@ final class SessionCameraViewController: UIViewController {
             cancelButton.widthAnchor.constraint(equalToConstant: 48),
             cancelButton.heightAnchor.constraint(equalToConstant: 48),
             cancelButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            cancelButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-
-            hintLabel.centerYAnchor.constraint(equalTo: cancelButton.centerYAnchor),
-            hintLabel.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 12),
-            hintLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)
+            cancelButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20)
         ])
 
         portraitShutterConstraints = [
@@ -268,6 +313,14 @@ final class SessionCameraViewController: UIViewController {
         landscapeShutterConstraints = [
             shutterButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             shutterButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24)
+        ]
+        portraitPlayerConstraints = [
+            playerSideControl.centerYAnchor.constraint(equalTo: shutterButton.centerYAnchor),
+            playerSideControl.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20)
+        ]
+        landscapePlayerConstraints = [
+            playerSideControl.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -22),
+            playerSideControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ]
     }
 
@@ -318,6 +371,12 @@ final class SessionCameraViewController: UIViewController {
         onCancel?()
     }
 
+    @objc private func playerSideChanged() {
+        isPlayer2 = playerSideControl.selectedSegmentIndex == 1
+        UserDefaults.standard.set(isPlayer2, forKey: playerSideDefaultsKey)
+        updateRegionGuides()
+    }
+
     private func handleCaptured(_ data: Data?) {
         captureDelegate = nil
         if let data {
@@ -325,6 +384,67 @@ final class SessionCameraViewController: UIViewController {
         } else {
             shutterButton.isEnabled = true
         }
+    }
+}
+
+extension SessionCameraViewController {
+    private func configureRegionLayer(_ layer: CAShapeLayer, color: UIColor) {
+        layer.fillColor = color.withAlphaComponent(0.10).cgColor
+        layer.strokeColor = color.withAlphaComponent(0.95).cgColor
+        layer.lineWidth = 2
+        layer.lineJoin = .round
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.35
+        layer.shadowRadius = 2
+        layer.shadowOffset = .zero
+    }
+
+    private func configureRegionLabel(_ label: UILabel, text: String, color: UIColor) {
+        label.text = text
+        label.font = .systemFont(ofSize: 11, weight: .bold)
+        label.textColor = .white
+        label.textAlignment = .center
+        label.backgroundColor = color.withAlphaComponent(0.92)
+        label.clipsToBounds = true
+    }
+
+    func updateRegionGuides() {
+        let guide = guideRect()
+        let scoreRect = denormalize(scoreRegion, in: guide)
+        let titleRect = denormalize(titleRegion, in: guide)
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        scoreRegionLayer.frame = view.bounds
+        titleRegionLayer.frame = view.bounds
+        scoreRegionLayer.path = UIBezierPath(roundedRect: scoreRect, cornerRadius: 10).cgPath
+        titleRegionLayer.path = UIBezierPath(roundedRect: titleRect, cornerRadius: 8).cgPath
+        CATransaction.commit()
+        positionRegionLabel(scoreRegionLabel, in: scoreRect)
+        positionRegionLabel(titleRegionLabel, in: titleRect)
+    }
+
+    private func denormalize(_ region: CGRect, in rect: CGRect) -> CGRect {
+        let originX = isPlayer2 ? (1 - region.minX - region.width) : region.minX
+        return CGRect(x: rect.minX + originX * rect.width,
+                      y: rect.minY + region.minY * rect.height,
+                      width: region.width * rect.width,
+                      height: region.height * rect.height)
+    }
+
+    func positionHintLabel(in guide: CGRect) {
+        let maxWidth = guide.width - 24
+        let size = hintLabel.sizeThatFits(CGSize(width: maxWidth, height: .greatestFiniteMagnitude))
+        let width = min(size.width, maxWidth)
+        hintLabel.frame = CGRect(x: guide.midX - width / 2, y: guide.minY + 24, width: width, height: size.height)
+    }
+
+    private func positionRegionLabel(_ label: UILabel, in rect: CGRect) {
+        let textSize = label.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude,
+                                                 height: CGFloat.greatestFiniteMagnitude))
+        let width = textSize.width + 16
+        let height = textSize.height + 7
+        label.frame = CGRect(x: rect.minX + 6, y: rect.minY + 6, width: width, height: height)
+        label.layer.cornerRadius = height / 2
     }
 }
 

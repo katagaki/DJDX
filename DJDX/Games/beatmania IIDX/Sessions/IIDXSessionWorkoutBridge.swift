@@ -90,6 +90,33 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         }
     }
 
+    func heartRateSamples(from start: Date, to end: Date) async -> [(date: Date, bpm: Int)] {
+        guard isEnabled, HKHealthStore.isHealthDataAvailable(), end > start else { return [] }
+        let heartRateType = HKQuantityType(.heartRate)
+        let predicate = HKQuery.predicateForSamples(
+            withStart: start,
+            end: end,
+            options: [.strictStartDate, .strictEndDate]
+        )
+        let unit = HKUnit.count().unitDivided(by: .minute())
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
+        return await withCheckedContinuation { continuation in
+            let query = HKSampleQuery(
+                sampleType: heartRateType,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [sort]
+            ) { _, samples, _ in
+                let quantitySamples = (samples as? [HKQuantitySample]) ?? []
+                let result = quantitySamples.map { sample in
+                    (date: sample.startDate, bpm: Int(sample.quantity.doubleValue(for: unit).rounded()))
+                }
+                continuation.resume(returning: result)
+            }
+            healthStore.execute(query)
+        }
+    }
+
     func startWorkout(session: IIDXPlaySession) {
         activeSessionID = session.id
         workoutStart = session.startDate
@@ -205,8 +232,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         lastDJLevel: String?,
         lastClearType: String?,
         lastScore: Int?,
-        lastResultSummary: String?,
-        bestThisSession: String?
+        lastResultSummary: String?
     ) {
         guard isWorkoutActive, sessionID == activeSessionID else { return }
         var payload: [String: Any] = ["sessionInfo": true, "sessionID": sessionID, "playCount": playCount]
@@ -215,7 +241,6 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         if let lastClearType { payload["lastClearType"] = lastClearType }
         if let lastScore { payload["lastScore"] = lastScore }
         if let lastResultSummary { payload["lastResultSummary"] = lastResultSummary }
-        if let bestThisSession { payload["bestThisSession"] = bestThisSession }
         send(payload)
     }
 

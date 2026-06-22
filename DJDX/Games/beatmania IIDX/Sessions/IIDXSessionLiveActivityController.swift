@@ -87,8 +87,7 @@ final class IIDXSessionLiveActivityController {
             lastDJLevel: state.lastDJLevel,
             lastClearType: state.lastClearType,
             lastScore: state.lastScore,
-            lastResultSummary: state.lastResultSummary,
-            bestThisSession: state.bestThisSession
+            lastResultSummary: state.lastResultSummary
         )
     }
 
