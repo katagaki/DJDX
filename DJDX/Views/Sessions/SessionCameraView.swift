@@ -5,11 +5,13 @@ import UIKit
 struct SessionCameraView: UIViewControllerRepresentable {
     var onCapture: (Data) -> Void
     var onCancel: () -> Void
+    var onUnavailable: () -> Void = {}
 
     func makeUIViewController(context: Context) -> SessionCameraViewController {
         let controller = SessionCameraViewController()
         controller.onCapture = onCapture
         controller.onCancel = onCancel
+        controller.onUnavailable = onUnavailable
         return controller
     }
 
@@ -19,6 +21,7 @@ struct SessionCameraView: UIViewControllerRepresentable {
 final class SessionCameraViewController: UIViewController {
     var onCapture: ((Data) -> Void)?
     var onCancel: (() -> Void)?
+    var onUnavailable: (() -> Void)?
 
     private let session = AVCaptureSession()
     private let photoOutput = AVCapturePhotoOutput()
@@ -185,6 +188,7 @@ final class SessionCameraViewController: UIViewController {
               session.canAddInput(input),
               session.canAddOutput(photoOutput) else {
             session.commitConfiguration()
+            DispatchQueue.main.async { [weak self] in self?.onUnavailable?() }
             return
         }
         session.addInput(input)
@@ -197,12 +201,14 @@ final class SessionCameraViewController: UIViewController {
             self.rotationCoordinator = AVCaptureDevice.RotationCoordinator(
                 device: device, previewLayer: self.previewLayer
             )
+            self.shutterButton.isEnabled = true
             self.view.setNeedsLayout()
         }
     }
 
     private func configureControls() {
         shutterButton.translatesAutoresizingMaskIntoConstraints = false
+        shutterButton.isEnabled = false
         if #available(iOS 26.0, *) {
             var shutterConfig = UIButton.Configuration.clearGlass()
             shutterConfig.cornerStyle = .fixed

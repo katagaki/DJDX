@@ -8,6 +8,7 @@ struct DetectedRegion: Sendable {
     let text: String
     let box: CGRect
     let confidence: Float
+    var recognitionFailed: Bool = false
 }
 
 enum IIDXResultReaderError: Error {
@@ -73,28 +74,29 @@ enum IIDXResultReader {
 
         var regions: [DetectedRegion] = []
         for detection in detections {
-            let text = await read(detection, in: image)
+            let (text, failed) = await read(detection, in: image)
             regions.append(DetectedRegion(
                 label: detection.label,
                 text: text,
                 box: detection.box,
-                confidence: detection.confidence
+                confidence: detection.confidence,
+                recognitionFailed: failed
             ))
         }
         return regions
     }
 
-    private static func read(_ detection: RawDetection, in image: CGImage) async -> String {
-        guard let crop = crop(detection.box, from: image) else { return "" }
+    private static func read(_ detection: RawDetection, in image: CGImage) async -> (text: String, failed: Bool) {
+        guard let crop = crop(detection.box, from: image) else { return ("", false) }
         if detection.label == "dj_level_now" {
-            return await IIDXRankRecognizer.classify(cgImage: crop) ?? ""
+            return (await IIDXRankRecognizer.classify(cgImage: crop) ?? "", false)
         }
         if titleLabels.contains(detection.label) {
             return await ocrText(crop, languages: IIDXSessionTextRecognizer.titleLanguages)
         }
         if digitLabels.contains(detection.label),
            let value = await IIDXDigitRecognizer.recognize(cgImage: crop) {
-            return String(value)
+            return (String(value), false)
         }
         return await ocrText(crop, languages: IIDXSessionTextRecognizer.numericLanguages)
     }
@@ -143,15 +145,21 @@ enum IIDXResultReader {
 
     // MARK: - Per-region OCR
 
-    private static func ocrText(_ crop: CGImage, languages: [String]) async -> String {
-        let lines = (try? await IIDXSessionTextRecognizer.recognize(cgImage: crop, languages: languages)) ?? []
+    private static func ocrText(_ crop: CGImage, languages: [String]) async -> (text: String, failed: Bool) {
+        let lines: [OCRLine]
+        do {
+            lines = try await IIDXSessionTextRecognizer.recognize(cgImage: crop, languages: languages)
+        } catch {
+            return ("", true)
+        }
         // Headline value first: a field's own value is rendered larger than any
         // neighbouring delta/column that bleeds into the crop.
-        return lines
+        let text = lines
             .sorted { $0.box.height > $1.box.height }
             .map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
             .joined(separator: "\n")
+        return (text, false)
     }
 
     private static func crop(_ box: CGRect, from image: CGImage) -> CGImage? {

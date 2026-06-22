@@ -100,19 +100,18 @@ struct ScoreFilterSheet: View {
                                               countLabel: LocalizedStringResource("Shared.Filter.Count.Levels"))
                     }
                     DisclosureGroup {
-                        ForEach(IIDXDifficulty.sorted, id: \.self) { difficulty in
-                            SelectableRow(
-                                isSelected: difficultiesToShow.contains(difficulty)
-                            ) {
-                                Text("LEVEL \(difficulty.rawValue)")
-                            } action: {
+                        FilterLevelGrid(
+                            items: IIDXDifficulty.sorted,
+                            selection: difficultiesToShow,
+                            title: { String($0.rawValue) },
+                            onToggle: { difficulty in
                                 if difficultiesToShow.contains(difficulty) {
                                     difficultiesToShow.remove(difficulty)
                                 } else {
                                     difficultiesToShow.insert(difficulty)
                                 }
                             }
-                        }
+                        )
                     } label: {
                         FilterDisclosureLabel(.sharedDifficulty, count: difficultiesToShow.count,
                                               countLabel: LocalizedStringResource("Shared.Filter.Count.Difficulties"))

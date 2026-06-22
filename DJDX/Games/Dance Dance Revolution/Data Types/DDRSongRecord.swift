@@ -45,7 +45,7 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
     }
 
     static let clearLampOrder: [String] = [
-        "marv", "perf", "great", "good", "life4", "clear", "assist", "fail"
+        "marv", "perf", "great", "good", "li4clear", "clear", "assist", "fail"
     ]
 
     static let noClearKey = "noclear"
@@ -85,7 +85,7 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
         case "perf": Color(red: 1.0, green: 0.82, blue: 0.0)
         case "great": .green
         case "good": Color(red: 0.2, green: 0.55, blue: 1.0)
-        case "life4": .red
+        case "li4clear": .red
         case "clear": Color(red: 0.0, green: 0.8, blue: 0.5)
         case "assist": .purple
         case "fail": .gray
@@ -109,10 +109,6 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
 
     var clearDisplay: String {
         clearKind.uppercased()
-    }
-
-    var levelText: String {
-        level > 0 ? String(level) : "?"
     }
 
     func titleCompact() -> String {

@@ -15,6 +15,7 @@ struct UnifiedView: View {
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
     @AppStorage(wrappedValue: DDRPlayStyle.single, "Global.DDR.Style") var ddrStyleToShow: DDRPlayStyle
+    @AppStorage(wrappedValue: false, "ExternalData.DDR.Enabled") var isDDRExternalDataEnabled: Bool
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: true, "More.General.ShowProfileHeader") var showProfileHeader: Bool
     @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
@@ -231,8 +232,10 @@ struct UnifiedView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .endSessionRequested)
-            .receive(on: RunLoop.main)) { _ in
-            if sessionStore.activeSession != nil {
+            .receive(on: RunLoop.main)) { notification in
+            let requestedID = notification.object as? String
+            if let active = sessionStore.activeSession,
+               requestedID == nil || requestedID == active.id {
                 sessionStore.endSession()
             }
         }

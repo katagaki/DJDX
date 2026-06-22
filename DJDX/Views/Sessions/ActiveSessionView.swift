@@ -8,6 +8,7 @@ struct ActiveSessionView: View {
     @State private var isPresentingCamera: Bool = false
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isShowingCameraDeniedAlert: Bool = false
+    @State private var isShowingCameraUnavailableAlert: Bool = false
     @State private var photoAlert: PhotoExportAlert?
     @State private var isConfirmingExport: Bool = false
     @ObservedObject private var workoutBridge = IIDXSessionWorkoutBridge.shared
@@ -40,7 +41,7 @@ struct ActiveSessionView: View {
                         }
                     }
                 }
-                if workoutBridge.isWorkoutActive {
+                if workoutBridge.isSessionActive {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             workoutBridge.setWorkoutPaused(!workoutBridge.isPaused)
@@ -71,6 +72,9 @@ struct ActiveSessionView: View {
                 isPresentingCamera = false
             } onCancel: {
                 isPresentingCamera = false
+            } onUnavailable: {
+                isPresentingCamera = false
+                isShowingCameraUnavailableAlert = true
             }
         }
         .onChange(of: pickerItems) { _, items in
@@ -89,6 +93,11 @@ struct ActiveSessionView: View {
             Button("Shared.OK", role: .cancel) {}
         } message: {
             Text("Sessions.Camera.Denied.Message")
+        }
+        .alert("Sessions.Camera.Unavailable.Title", isPresented: $isShowingCameraUnavailableAlert) {
+            Button("Shared.OK", role: .cancel) {}
+        } message: {
+            Text("Sessions.Camera.Unavailable.Message")
         }
         .alert("Sessions.Photos.ExportAll.Confirm", isPresented: $isConfirmingExport) {
             Button("Sessions.Photos.ExportAll") {
@@ -141,7 +150,7 @@ struct ActiveSessionView: View {
                         Text("Sessions.Elapsed")
                             .font(.body)
                             .foregroundStyle(.secondary)
-                        Text(verbatim: elapsedString(since: session.startDate, now: context.date))
+                        Text(verbatim: elapsedString(for: session, now: context.date))
                             .font(numberFont)
                     }
                     Spacer()
@@ -286,8 +295,15 @@ struct ActiveSessionView: View {
         var id: Int { rawValue }
     }
 
-    private func elapsedString(since start: Date, now: Date) -> String {
-        let interval = Int(max(0, now.timeIntervalSince(start)))
+    private func elapsedString(for session: IIDXPlaySession, now: Date) -> String {
+        let elapsed: TimeInterval
+        if workoutBridge.isPaused {
+            elapsed = workoutBridge.pausedElapsed ?? 0
+        } else {
+            let anchor = workoutBridge.runningStart ?? session.startDate
+            elapsed = now.timeIntervalSince(anchor)
+        }
+        let interval = Int(max(0, elapsed))
         let hours = interval / 3600
         let minutes = (interval % 3600) / 60
         let seconds = interval % 60
