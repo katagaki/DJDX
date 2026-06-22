@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct SessionDetailView: View {
     var store: IIDXSessionStore
@@ -9,6 +10,8 @@ struct SessionDetailView: View {
     @State private var isDJLevelExpanded: Bool = true
     @State private var isClearTypeExpanded: Bool = true
     @State private var isPlaysExpanded: Bool = true
+    @State private var isConfirmingExport: Bool = false
+    @State private var photoAlert: PhotoExportAlert?
 
     var body: some View {
         ScrollView {
@@ -39,11 +42,59 @@ struct SessionDetailView: View {
         }
         .navigationTitle("Sessions.Detail.Title")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if !plays.isEmpty {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Sessions.Photos.ExportAll", systemImage: "square.and.arrow.up.on.square") {
+                        isConfirmingExport = true
+                    }
+                }
+            }
+        }
         .onAppear { plays = store.plays(for: session) }
         .onReceive(NotificationCenter.default.publisher(for: .capturedPlayDidChange)
             .receive(on: RunLoop.main)) { _ in
             plays = store.plays(for: session)
         }
+        .alert("Sessions.Photos.ExportAll.Confirm", isPresented: $isConfirmingExport) {
+            Button("Sessions.Photos.ExportAll") {
+                exportAllToPhotos()
+            }
+            Button("Shared.Cancel", role: .cancel) {}
+        }
+        .alert(item: $photoAlert) { alert in
+            switch alert {
+            case .saved:
+                return Alert(title: Text("Sessions.Photos.Saved"), dismissButton: .default(Text("Shared.OK")))
+            case .failed:
+                return Alert(title: Text("Sessions.Photos.Failed"), dismissButton: .default(Text("Shared.OK")))
+            case .denied:
+                return Alert(
+                    title: Text("Sessions.Photos.Denied.Title"),
+                    message: Text("Sessions.Photos.Denied.Message"),
+                    dismissButton: .default(Text("Shared.OK"))
+                )
+            }
+        }
+    }
+
+    private func exportAllToPhotos() {
+        let filenames = plays.map(\.rawImageFilename)
+        Task {
+            let images: [UIImage] = await Task.detached {
+                filenames.compactMap { IIDXSessionImageStore.shared.image(for: $0) }
+            }.value
+            switch await SessionPhotoExporter.save(images) {
+            case .saved: photoAlert = .saved
+            case .denied: photoAlert = .denied
+            case .failed: photoAlert = .failed
+            }
+        }
+    }
+
+    private enum PhotoExportAlert: Int, Identifiable {
+        case saved, denied, failed
+        var id: Int { rawValue }
     }
 
     private var summarySection: some View {

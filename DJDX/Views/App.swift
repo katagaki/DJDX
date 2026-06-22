@@ -14,6 +14,7 @@ struct DJDXApp: App {
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {
                         IIDXSessionLiveActivityController.shared.reconcile()
+                        IIDXSessionWorkoutBridge.shared.reconcileActiveSession()
                     }
                 }
         }
@@ -33,6 +34,7 @@ struct DJDXApp: App {
         }
         Task { @MainActor in
             IIDXSessionLiveActivityController.shared.reconcile()
+            IIDXSessionWorkoutBridge.shared.reconcileActiveSession()
         }
         Task {
             let playTypeRaw = UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter") ?? "single"

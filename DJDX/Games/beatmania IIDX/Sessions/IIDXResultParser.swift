@@ -97,35 +97,38 @@ enum IIDXResultParser {
             parse.miss = value
             hits += 1
         }
-        var perfectGreat = headlineNumber(text("judge_pgreat"))
-        var great = headlineNumber(text("judge_great"))
-        reconcileJudges(exScore: parse.exScore, perfectGreat: &perfectGreat, great: &great)
+        let pgRead = headlineNumber(text("judge_pgreat"))
+        let greatRead = headlineNumber(text("judge_great"))
+        var perfectGreat = pgRead
+        var great = greatRead
+        reconcileJudges(exScore: parse.exScore, notes: notes, perfectGreat: &perfectGreat, great: &great)
         if let perfectGreat { parse.perfectGreat = perfectGreat; hits += 1 }
         if let great { parse.great = great; hits += 1 }
         if let value = headlineNumber(text("judge_good")) { parse.good = value }
         if let value = headlineNumber(text("judge_bad")) { parse.bad = value }
         if let value = headlineNumber(text("judge_poor")) { parse.poor = value }
 
-        // The DJ grade is defined by the score rate (exScore / max), so derive it
-        // directly whenever the notes count is known — that is authoritative and
-        // avoids the rank classifier's occasional misreads (e.g. a spurious "F").
-        // Fall back to IIDXRankRecognizer's classification of the dj_level_now
-        // graphic only when the notes count is missing.
-        if let derived = derivedDJLevel(exScore: parse.exScore, notes: notes) {
+        let classifiedDJLevel = text("dj_level_now").flatMap(gradeOf)
+        var djLevelConflict = false
+        if let notes, notesArePlausible(notes: notes, parse: parse),
+           let derived = derivedDJLevel(exScore: parse.exScore, notes: notes) {
             parse.djLevel = derived
             hits += 1
-        } else if let value = text("dj_level_now").flatMap(gradeOf) {
-            parse.djLevel = value
+            if let classifiedDJLevel, gradeDistance(classifiedDJLevel, derived) > 1 {
+                djLevelConflict = true
+            }
+        } else if let classifiedDJLevel {
+            parse.djLevel = classifiedDJLevel
             hits += 1
         }
 
         var bonus = 0.0
-        if parse.exScore > 0,
-           parse.perfectGreat > 0 || parse.great > 0,
+        if parse.exScore > 0, pgRead != nil, greatRead != nil,
            parse.exScore == 2 * parse.perfectGreat + parse.great {
             bonus = 1.0
         }
         parse.confidence = min(1.0, (Double(hits) + bonus) / 8.0)
+        if djLevelConflict { parse.confidence = min(parse.confidence, 0.5) }
         return parse
     }
 
@@ -133,15 +136,38 @@ enum IIDXResultParser {
 
     // EX score = 2·perfect-great + great. The small judge fonts misread far more
     // often than the headline score, so recover a missing count from the others.
-    private static func reconcileJudges(exScore: Int, perfectGreat: inout Int?, great: inout Int?) {
+    private static func reconcileJudges(exScore: Int, notes: Int?,
+                                        perfectGreat: inout Int?, great: inout Int?) {
         guard exScore > 0 else { return }
         if let perfect = perfectGreat, great == nil {
             let derived = exScore - 2 * perfect
-            if derived >= 0 { great = derived }
+            if derived >= 0, isWithinNotes(perfect + derived, notes: notes) { great = derived }
         } else if let good = great, perfectGreat == nil {
             let remainder = exScore - good
-            if remainder >= 0, remainder % 2 == 0 { perfectGreat = remainder / 2 }
+            if remainder >= 0, remainder % 2 == 0 {
+                let perfect = remainder / 2
+                if isWithinNotes(perfect + good, notes: notes) { perfectGreat = perfect }
+            }
         }
+    }
+
+    private static func isWithinNotes(_ total: Int, notes: Int?) -> Bool {
+        guard let notes else { return true }
+        return total <= notes
+    }
+
+    private static func notesArePlausible(notes: Int, parse: IIDXResultParse) -> Bool {
+        guard notes > 0 else { return false }
+        let judged = parse.perfectGreat + parse.great + parse.good + parse.bad + parse.poor
+        return notes >= judged
+    }
+
+    private static func gradeDistance(_ lhs: String, _ rhs: String) -> Int {
+        guard let left = IIDXDJLevel(rawValue: lhs).flatMap({ IIDXDJLevel.sorted.firstIndex(of: $0) }),
+              let right = IIDXDJLevel(rawValue: rhs).flatMap({ IIDXDJLevel.sorted.firstIndex(of: $0) }) else {
+            return 0
+        }
+        return abs(left - right)
     }
 
     private static func derivedDJLevel(exScore: Int, notes: Int?) -> String? {

@@ -44,14 +44,16 @@ extension UnifiedView {
                 appMode = .sessions
                 if sessionStore.activeSession == nil { sessionStore.startSession() }
             case "capture":
-                navigationManager.popToRoot()
-                appMode = .sessions
-                sessionStore.requestCapture()
+                if sessionStore.activeSession != nil {
+                    navigationManager.popToRoot()
+                    appMode = .sessions
+                    sessionStore.requestCapture()
+                }
             case "stop":
                 if sessionStore.activeSession != nil { sessionStore.endSession() }
             case "pause":
                 let bridge = IIDXSessionWorkoutBridge.shared
-                if bridge.isWorkoutActive { bridge.setWorkoutPaused(!bridge.isPaused) }
+                if bridge.isSessionActive { bridge.setWorkoutPaused(!bridge.isPaused) }
             default:
                 return
             }

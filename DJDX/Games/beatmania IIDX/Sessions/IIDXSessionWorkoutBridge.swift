@@ -14,15 +14,20 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     @Published var activeCalories: Int = 0
     @Published var isWorkoutActive: Bool = false
     @Published var isPaused: Bool = false
+    @Published private(set) var runningStart: Date?
+    @Published private(set) var pausedElapsed: TimeInterval?
 
     private let healthStore = HKHealthStore()
     private let database = IIDXPlaySessionsDatabase.shared
     private var activeSessionID: String?
     private var workoutStart: Date?
+    private var watchWorkoutConfirmed = false
 
     var isEnabled: Bool {
         UserDefaults.standard.bool(forKey: Self.healthKitEnabledKey)
     }
+
+    var isSessionActive: Bool { activeSessionID != nil }
 
     private var isWatchAvailable: Bool {
         WCSession.isSupported()
@@ -86,20 +91,58 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     func startWorkout(session: IIDXPlaySession) {
-        guard isEnabled || isWatchAvailable else { return }
         activeSessionID = session.id
         workoutStart = session.startDate
-        isWorkoutActive = true
+        runningStart = session.startDate
+        pausedElapsed = nil
         isPaused = false
+        watchWorkoutConfirmed = false
         heartRate = 0
         activeCalories = 0
-        send(["command": "start", "sessionID": session.id])
-        launchWatchApp()
+        let hasWorkout = isEnabled || isWatchAvailable
+        isWorkoutActive = hasWorkout
+        if hasWorkout {
+            send(["command": "start", "sessionID": session.id])
+            launchWatchApp()
+        }
     }
 
     func setWorkoutPaused(_ paused: Bool) {
-        guard isWorkoutActive, let activeSessionID else { return }
-        send(["command": "setPaused", "sessionID": activeSessionID, "paused": paused])
+        guard let activeSessionID else { return }
+        let now = Date()
+        if paused {
+            guard !isPaused else { return }
+            let anchor = runningStart ?? workoutStart ?? now
+            pausedElapsed = max(0, now.timeIntervalSince(anchor))
+            isPaused = true
+        } else {
+            guard isPaused else { return }
+            runningStart = now.addingTimeInterval(-(pausedElapsed ?? 0))
+            pausedElapsed = nil
+            isPaused = false
+        }
+        IIDXSessionLiveActivityController.shared.updatePauseState(
+            sessionID: activeSessionID,
+            isPaused: isPaused,
+            pausedElapsed: isPaused ? pausedElapsed : nil,
+            runningStart: isPaused ? nil : runningStart
+        )
+        if isWorkoutActive {
+            send(["command": "setPaused", "sessionID": activeSessionID, "paused": paused])
+        }
+    }
+
+    func reconcileActiveSession() {
+        guard let session = database.activeSession(), session.isActive else { return }
+        if activeSessionID == nil {
+            activeSessionID = session.id
+            workoutStart = session.startDate
+            runningStart = runningStart ?? session.startDate
+            isWorkoutActive = isEnabled || isWatchAvailable
+        }
+        if isWorkoutActive {
+            send(["command": "requestWorkoutState", "sessionID": session.id])
+        }
     }
 
     private func launchWatchApp() {
@@ -112,7 +155,11 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .fitnessGaming
         configuration.locationType = .indoor
-        healthStore.startWatchApp(with: configuration) { _, _ in }
+        healthStore.startWatchApp(with: configuration) { success, error in
+            if !success {
+                debugPrint("Failed to launch Watch app for session: \(String(describing: error))")
+            }
+        }
     }
 
     fileprivate func resendStartIfActive() {
@@ -122,14 +169,19 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
 
     func endWorkout(session: IIDXPlaySession) {
         guard activeSessionID == session.id else { return }
-        send(["command": "end", "sessionID": session.id])
-        if !WCSession.default.isPaired {
+        if isWorkoutActive {
+            send(["command": "end", "sessionID": session.id])
+        }
+        if isEnabled, !watchWorkoutConfirmed {
             saveFallbackWorkout(for: session)
         }
         isWorkoutActive = false
         isPaused = false
         activeSessionID = nil
         workoutStart = nil
+        runningStart = nil
+        pausedElapsed = nil
+        watchWorkoutConfirmed = false
         heartRate = 0
         activeCalories = 0
     }
@@ -138,7 +190,9 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         let connectivity = WCSession.default
         guard connectivity.activationState == .activated else { return }
         if connectivity.isReachable {
-            connectivity.sendMessage(payload, replyHandler: nil, errorHandler: nil)
+            connectivity.sendMessage(payload, replyHandler: nil) { _ in
+                connectivity.transferUserInfo(payload)
+            }
         } else {
             connectivity.transferUserInfo(payload)
         }
@@ -168,17 +222,17 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     func syncProfileToWatch() {
         let connectivity = WCSession.default
         guard connectivity.activationState == .activated else { return }
-        var context: [String: Any] = [:]
         let standard = UserDefaults.standard
-        if let djName = standard.string(forKey: "Profile.IIDX.DJName") { context["djName"] = djName }
-        if let spRank = standard.string(forKey: "Profile.IIDX.SPRank") { context["spRank"] = spRank }
-        if let dpRank = standard.string(forKey: "Profile.IIDX.DPRank") { context["dpRank"] = dpRank }
         let shared = SharedContainer.defaults
-        if let spRadar = radarValues(prefix: "NotesRadar.SP", defaults: shared) { context["spRadar"] = spRadar }
-        if let dpRadar = radarValues(prefix: "NotesRadar.DP", defaults: shared) { context["dpRadar"] = dpRadar }
-        if let qpro = watchQproImageData() { context["qpro"] = qpro }
-        guard !context.isEmpty else { return }
-        context["ts"] = Date.now.timeIntervalSince1970
+        let context: [String: Any] = [
+            "djName": standard.string(forKey: "Profile.IIDX.DJName") ?? "",
+            "spRank": standard.string(forKey: "Profile.IIDX.SPRank") ?? "",
+            "dpRank": standard.string(forKey: "Profile.IIDX.DPRank") ?? "",
+            "spRadar": radarValues(prefix: "NotesRadar.SP", defaults: shared) ?? [],
+            "dpRadar": radarValues(prefix: "NotesRadar.DP", defaults: shared) ?? [],
+            "qpro": watchQproImageData() ?? Data(),
+            "ts": Date.now.timeIntervalSince1970
+        ]
         try? connectivity.updateApplicationContext(context)
     }
 
@@ -214,12 +268,14 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
               let session = database.session(id: sessionID), session.isActive else { return }
         activeSessionID = sessionID
         workoutStart = session.startDate
+        runningStart = runningStart ?? session.startDate
         isWorkoutActive = true
     }
 
     fileprivate func ingestMetrics(heartRate: Int?, activeCalories: Int?, sessionID: String) {
         adoptSessionIfNeeded(sessionID)
         guard sessionID == activeSessionID else { return }
+        watchWorkoutConfirmed = true
         if let heartRate { self.heartRate = heartRate }
         if let activeCalories { self.activeCalories = activeCalories }
         IIDXSessionLiveActivityController.shared.updateMetrics(
@@ -232,17 +288,25 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
 
     fileprivate func applyWorkoutState(sessionID: String, paused: Bool, elapsed: Double?, start: Double?) {
         adoptSessionIfNeeded(sessionID)
-        let runningStart = start.map { Date(timeIntervalSince1970: $0) }
+        guard sessionID == activeSessionID else { return }
+        watchWorkoutConfirmed = true
         isPaused = paused
+        if paused {
+            if let elapsed { pausedElapsed = elapsed }
+        } else {
+            if let start { runningStart = Date(timeIntervalSince1970: start) }
+            pausedElapsed = nil
+        }
         IIDXSessionLiveActivityController.shared.updatePauseState(
             sessionID: sessionID,
             isPaused: paused,
-            pausedElapsed: elapsed,
-            runningStart: runningStart
+            pausedElapsed: paused ? pausedElapsed : nil,
+            runningStart: paused ? nil : runningStart
         )
     }
 
     fileprivate func storeWorkoutUUID(_ uuid: String, sessionID: String) {
+        if sessionID == activeSessionID { watchWorkoutConfirmed = true }
         guard let session = database.session(id: sessionID) else { return }
         session.workoutUUID = uuid
         database.updateSession(session)
@@ -309,7 +373,13 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
             case "startSession":
                 let requestedID = sessionID.isEmpty ? nil : sessionID
                 Task { @MainActor in
-                    NotificationCenter.default.post(name: .startSessionRequested, object: requestedID)
+                    if let active = bridge.database.activeSession(), active.isActive,
+                       active.id != requestedID {
+                        bridge.reconcileActiveSession()
+                        bridge.send(["command": "adoptSession", "sessionID": active.id])
+                    } else {
+                        NotificationCenter.default.post(name: .startSessionRequested, object: requestedID)
+                    }
                 }
             case "endSession":
                 Task { @MainActor in

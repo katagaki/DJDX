@@ -3233,6 +3233,40 @@
         }
       }
     },
+    "Sessions.Camera.Unavailable.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The camera could not be started. Close other apps that may be using the camera, then try again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カメラを起動できませんでした。カメラを使用している他のアプリを終了してから、もう一度お試しください。"
+          }
+        }
+      }
+    },
+    "Sessions.Camera.Unavailable.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera Unavailable"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カメラを使用できません"
+          }
+        }
+      }
+    },
     "Sessions.Capture" : {
       "extractionState" : "manual",
       "localizations" : {

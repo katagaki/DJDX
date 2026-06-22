@@ -25,7 +25,12 @@ final class IIDXSessionLiveActivityController {
             gameIconAssetName: "GameIconIIDX"
         )
         let content = ActivityContent(state: contentState(for: session.id), staleDate: nil)
-        activity = try? Activity.request(attributes: attributes, content: content)
+        guard let activity = try? Activity.request(attributes: attributes, content: content) else {
+            self.activity = nil
+            sessionID = nil
+            return
+        }
+        self.activity = activity
         sessionID = session.id
     }
 

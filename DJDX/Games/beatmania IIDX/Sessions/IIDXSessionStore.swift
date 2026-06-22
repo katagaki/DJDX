@@ -45,7 +45,7 @@ final class IIDXSessionStore {
 
     func endSession() {
         guard let activeSession else { return }
-        database.endSession(id: activeSession.id)
+        guard database.endSession(id: activeSession.id) else { return }
         let endedID = activeSession.id
         IIDXSessionWorkoutBridge.shared.endWorkout(session: activeSession)
         self.activeSession = nil

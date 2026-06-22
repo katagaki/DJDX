@@ -58,7 +58,10 @@ actor IIDXSessionCaptureProcessor {
             play.apply(parse)
             play.processedAt = .now
             play.parseError = nil
-            let acceptable = parse.matchedSongID != nil && parse.confidence >= Self.acceptableConfidence
+            let recognitionFailed = regions.contains { $0.recognitionFailed }
+            let acceptable = parse.matchedSongID != nil
+                && parse.confidence >= Self.acceptableConfidence
+                && !recognitionFailed
             play.state = acceptable ? .done : .needsReview
             database.updatePlay(play)
             notify(playID)

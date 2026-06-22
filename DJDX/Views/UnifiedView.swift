@@ -231,8 +231,10 @@ struct UnifiedView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .endSessionRequested)
-            .receive(on: RunLoop.main)) { _ in
-            if sessionStore.activeSession != nil {
+            .receive(on: RunLoop.main)) { notification in
+            let requestedID = notification.object as? String
+            if let active = sessionStore.activeSession,
+               requestedID == nil || requestedID == active.id {
                 sessionStore.endSession()
             }
         }

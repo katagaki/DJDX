@@ -55,8 +55,13 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         let read: Set = [HKQuantityType(.heartRate), HKQuantityType(.activeEnergyBurned)]
         nonisolated(unsafe) let manager = self
         healthStore.requestAuthorization(toShare: share, read: read) { success, _ in
-            guard success else { return }
-            Task { @MainActor in manager.beginWorkoutCollection() }
+            Task { @MainActor in
+                if success {
+                    manager.beginWorkoutCollection()
+                } else {
+                    manager.failWorkoutStart()
+                }
+            }
         }
     }
 
@@ -80,8 +85,24 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
             builder.beginCollection(withStart: start) { _, _ in }
             isCollecting = true
         } catch {
-            return
+            failWorkoutStart()
         }
+    }
+
+    private func failWorkoutStart() {
+        guard isRunning else { return }
+        if let sessionID {
+            sendToPhone(["command": "endSession", "sessionID": sessionID])
+        }
+        session = nil
+        builder = nil
+        sessionID = nil
+        isRunning = false
+        isPaused = false
+        isCollecting = false
+        startDate = nil
+        pausedElapsed = 0
+        resetSessionInfo()
     }
 
     func pauseWorkout() {
@@ -92,8 +113,16 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         requestPause(false)
     }
 
-    fileprivate func setPaused(_ paused: Bool) {
+    fileprivate func setPaused(_ paused: Bool, sessionID: String) {
+        guard sessionID.isEmpty || sessionID == self.sessionID else { return }
         requestPause(paused)
+    }
+
+    fileprivate func adoptSession(_ newID: String) {
+        guard isRunning, !newID.isEmpty, newID != sessionID else { return }
+        sessionID = newID
+        sendWorkoutState()
+        ingest(heartRate: nil, activeCalories: nil)
     }
 
     // Only issue transitions that are valid from the session's current state —
@@ -218,12 +247,16 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     fileprivate func applyProfile(_ context: [String: Any]) {
-        if let djName = context["djName"] as? String { self.djName = djName }
-        if let spRank = context["spRank"] as? String { self.spRank = spRank }
-        if let dpRank = context["dpRank"] as? String { self.dpRank = dpRank }
-        if let values = context["spRadar"] as? [Double] { spRadar = WatchRadarData(values: values) }
-        if let values = context["dpRadar"] as? [Double] { dpRadar = WatchRadarData(values: values) }
-        if let qpro = context["qpro"] as? Data { qproImageData = qpro }
+        if let djName = context["djName"] as? String { self.djName = djName.isEmpty ? nil : djName }
+        if let spRank = context["spRank"] as? String { self.spRank = spRank.isEmpty ? nil : spRank }
+        if let dpRank = context["dpRank"] as? String { self.dpRank = dpRank.isEmpty ? nil : dpRank }
+        if let values = context["spRadar"] as? [Double] {
+            spRadar = values.isEmpty ? nil : WatchRadarData(values: values)
+        }
+        if let values = context["dpRadar"] as? [Double] {
+            dpRadar = values.isEmpty ? nil : WatchRadarData(values: values)
+        }
+        if let qpro = context["qpro"] as? Data { qproImageData = qpro.isEmpty ? nil : qpro }
         persistComplicationRadar(context)
     }
 
@@ -231,11 +264,13 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         guard let shared = UserDefaults(suiteName: "group.com.tsubuzaki.DJDX") else { return }
         var changed = false
         if let sp = context["spRadar"] as? [Double] {
-            shared.set(sp, forKey: "Watch.Complication.RadarSP")
+            if sp.isEmpty { shared.removeObject(forKey: "Watch.Complication.RadarSP") }
+            else { shared.set(sp, forKey: "Watch.Complication.RadarSP") }
             changed = true
         }
         if let dp = context["dpRadar"] as? [Double] {
-            shared.set(dp, forKey: "Watch.Complication.RadarDP")
+            if dp.isEmpty { shared.removeObject(forKey: "Watch.Complication.RadarDP") }
+            else { shared.set(dp, forKey: "Watch.Complication.RadarDP") }
             changed = true
         }
         if changed {
@@ -264,14 +299,19 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         switch command {
         case "start": activateSession(sessionID: sessionID)
         case "end": endWorkout()
+        case "adoptSession": adoptSession(sessionID)
+        case "requestWorkoutState": if isRunning { sendWorkoutState() }
         default: break
         }
     }
 
     private func sendToPhone(_ payload: [String: Any]) {
         let connectivity = WCSession.default
+        guard connectivity.activationState == .activated else { return }
         if connectivity.isReachable {
-            connectivity.sendMessage(payload, replyHandler: nil, errorHandler: nil)
+            connectivity.sendMessage(payload, replyHandler: nil) { _ in
+                connectivity.transferUserInfo(payload)
+            }
         } else {
             connectivity.transferUserInfo(payload)
         }
@@ -288,7 +328,10 @@ extension WatchWorkoutManager: HKWorkoutSessionDelegate {
     }
 
     nonisolated func workoutSession(_ workoutSession: HKWorkoutSession,
-                                    didFailWithError error: Error) {}
+                                    didFailWithError error: Error) {
+        nonisolated(unsafe) let manager = self
+        Task { @MainActor in manager.requestEndSession() }
+    }
 }
 
 extension WatchWorkoutManager: HKLiveWorkoutBuilderDelegate {
@@ -347,12 +390,12 @@ extension WatchWorkoutManager: WCSessionDelegate {
     private nonisolated func route(_ message: [String: Any]) {
         nonisolated(unsafe) let manager = self
         if let command = message["command"] as? String {
+            let sessionID = message["sessionID"] as? String ?? ""
             if command == "setPaused" {
                 let paused = message["paused"] as? Bool ?? false
-                Task { @MainActor in manager.setPaused(paused) }
+                Task { @MainActor in manager.setPaused(paused, sessionID: sessionID) }
                 return
             }
-            let sessionID = message["sessionID"] as? String ?? ""
             Task { @MainActor in manager.handleCommand(command, sessionID: sessionID) }
             return
         }
