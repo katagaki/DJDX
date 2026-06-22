@@ -43,6 +43,8 @@ struct SDVXScoreFilterSheet: View {
                             title: { String(format: "%.1f", $0) },
                             onToggle: { toggle($0, in: $levelBucketsToShow) }
                         )
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
                     } label: {
                         SDVXFilterDisclosureLabel("Shared.Sort.Difficulty", count: levelBucketsToShow.count)
                     }

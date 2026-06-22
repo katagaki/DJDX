@@ -26,7 +26,5 @@ struct FilterLevelGrid<Element: Hashable>: View {
                 .buttonStyle(.plain)
             }
         }
-        .listRowInsets(EdgeInsets())
-        .listRowBackground(Color.clear)
     }
 }
