@@ -1444,6 +1444,57 @@
     "Date" : {
       "shouldTranslate" : false
     },
+    "DDR.DataSource.Warning.Action" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Data Sources"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外部データソースを開く"
+          }
+        }
+      }
+    },
+    "DDR.DataSource.Warning.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When BEMANIWiki data is turned off, chart levels are not downloaded and won't appear."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEMANIWikiデータをオフにしていると、譜面のレベルが取得されず、表示されません。"
+          }
+        }
+      }
+    },
+    "DDR.DataSource.Warning.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Levels May Not Appear"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レベルが表示されない場合があります"
+          }
+        }
+      }
+    },
     "Default" : {
       "extractionState" : "manual",
       "localizations" : {
