@@ -44,14 +44,13 @@ struct DDRScoreFilterSheet: View {
                     } label: {
                         DDRFilterDisclosureLabel("Shared.Level", count: difficultiesToShow.count)
                     }
-                    DisclosureGroup {
+                    FilterLevelDisclosure {
                         FilterLevelGrid(
                             items: availableLevels,
                             selection: levelsToShow,
                             title: { String($0) },
                             onToggle: { toggle($0, in: $levelsToShow) }
                         )
-                        .listRowInsets(EdgeInsets())
                     } label: {
                         DDRFilterDisclosureLabel("Shared.Sort.Difficulty", count: levelsToShow.count)
                     }

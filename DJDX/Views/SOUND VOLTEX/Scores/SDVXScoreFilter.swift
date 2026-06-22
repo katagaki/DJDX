@@ -36,14 +36,13 @@ struct SDVXScoreFilterSheet: View {
                     } label: {
                         SDVXFilterDisclosureLabel("Shared.Level", count: difficultiesToShow.count)
                     }
-                    DisclosureGroup {
+                    FilterLevelDisclosure {
                         FilterLevelGrid(
                             items: availableLevelBuckets,
                             selection: levelBucketsToShow,
                             title: { String(format: "%.1f", $0) },
                             onToggle: { toggle($0, in: $levelBucketsToShow) }
                         )
-                        .listRowInsets(EdgeInsets())
                     } label: {
                         SDVXFilterDisclosureLabel("Shared.Sort.Difficulty", count: levelBucketsToShow.count)
                     }

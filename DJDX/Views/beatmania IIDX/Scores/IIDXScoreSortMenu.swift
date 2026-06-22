@@ -99,7 +99,7 @@ struct ScoreFilterSheet: View {
                         FilterDisclosureLabel(.sharedLevel, count: levelsToShow.count,
                                               countLabel: LocalizedStringResource("Shared.Filter.Count.Levels"))
                     }
-                    DisclosureGroup {
+                    FilterLevelDisclosure {
                         FilterLevelGrid(
                             items: IIDXDifficulty.sorted,
                             selection: difficultiesToShow,
@@ -112,7 +112,6 @@ struct ScoreFilterSheet: View {
                                 }
                             }
                         )
-                        .listRowInsets(EdgeInsets())
                     } label: {
                         FilterDisclosureLabel(.sharedDifficulty, count: difficultiesToShow.count,
                                               countLabel: LocalizedStringResource("Shared.Filter.Count.Difficulties"))

@@ -35,14 +35,13 @@ struct PolarisChordScoreFilterSheet: View {
                     } label: {
                         PolarisChordFilterDisclosureLabel("Shared.Level", count: difficultiesToShow.count)
                     }
-                    DisclosureGroup {
+                    FilterLevelDisclosure {
                         FilterLevelGrid(
                             items: availableLevels,
                             selection: levelsToShow,
                             title: { $0 },
                             onToggle: { toggle($0, in: $levelsToShow) }
                         )
-                        .listRowInsets(EdgeInsets())
                     } label: {
                         PolarisChordFilterDisclosureLabel("Shared.Sort.Difficulty", count: levelsToShow.count)
                     }
