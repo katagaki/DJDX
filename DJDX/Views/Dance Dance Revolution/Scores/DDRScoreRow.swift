@@ -53,10 +53,12 @@ struct DDRScoreRow: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                     .foregroundStyle(record.difficultyEnum.color)
-                Text(verbatim: record.levelText)
-                    .font(.system(size: 18.0).weight(.heavy))
-                    .fontWidth(.condensed)
-                    .monospacedDigit()
+                if record.level > 0 {
+                    Text(verbatim: String(record.level))
+                        .font(.system(size: 18.0).weight(.heavy))
+                        .fontWidth(.condensed)
+                        .monospacedDigit()
+                }
             }
             .padding([.top, .bottom], 6.0)
             .frame(width: 78.0, alignment: .center)

@@ -111,10 +111,6 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
         clearKind.uppercased()
     }
 
-    var levelText: String {
-        level > 0 ? String(level) : "?"
-    }
-
     func titleCompact() -> String {
         title.ddrCompact
     }
