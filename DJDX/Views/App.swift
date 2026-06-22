@@ -4,6 +4,8 @@ import WidgetKit
 @main
 struct DJDXApp: App {
 
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     @StateObject var navigationManager = NavigationManager()
 
     @Environment(\.scenePhase) private var scenePhase

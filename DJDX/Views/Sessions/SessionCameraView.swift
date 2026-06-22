@@ -55,6 +55,9 @@ final class SessionCameraViewController: UIViewController {
     private let playerSideDefaultsKey = "Sessions.Camera.IsPlayer2"
     private var isPlayer2 = false
 
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .landscape }
+    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation { .landscapeRight }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
@@ -84,6 +87,7 @@ final class SessionCameraViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        AppDelegate.orientationLock = .landscape
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         shutterHaptic.prepare()
         startGuidePulse()
@@ -95,8 +99,15 @@ final class SessionCameraViewController: UIViewController {
         }
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setNeedsUpdateOfSupportedInterfaceOrientations()
+        requestInterfaceOrientation(.landscapeRight)
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        AppDelegate.orientationLock = .allButUpsideDown
         NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
         UIDevice.current.endGeneratingDeviceOrientationNotifications()
         guideLayer.removeAnimation(forKey: "pulse")
@@ -190,6 +201,14 @@ final class SessionCameraViewController: UIViewController {
         coordinator.animate(alongsideTransition: nil) { [weak self] _ in
             self?.applyPreviewRotation()
         }
+    }
+
+    private func requestInterfaceOrientation(_ orientation: UIInterfaceOrientationMask) {
+        let scene = view.window?.windowScene
+            ?? UIApplication.shared.connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .first { $0.activationState == .foregroundActive }
+        scene?.requestGeometryUpdate(.iOS(interfaceOrientations: orientation))
     }
 
     private func applyPreviewRotation() {
