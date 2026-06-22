@@ -165,8 +165,14 @@ struct SessionDetailView: View {
                     withAnimation(.smooth.speed(2.0)) { isHeartRateExpanded.toggle() }
                 }
                 if isHeartRateExpanded {
-                    SessionHeartRateGraph(session: session, points: points)
-                        .padding(.horizontal)
+                    NavigationLink {
+                        SessionHeartRateDetailView(session: session, plays: plays)
+                    } label: {
+                        SessionHeartRateGraph(session: session, points: points)
+                            .padding(.horizontal)
+                            .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }

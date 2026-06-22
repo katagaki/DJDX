@@ -18,6 +18,7 @@ struct SessionHeartRateSample: Identifiable {
 struct SessionHeartRateGraph: View {
     let session: IIDXPlaySession
     let points: [SessionHeartRatePoint]
+    var height: CGFloat = 180.0
 
     @State private var samples: [SessionHeartRateSample] = []
 
@@ -37,7 +38,7 @@ struct SessionHeartRateGraph: View {
                 lineChart
             }
         }
-        .frame(height: 180.0)
+        .frame(height: height)
         .task {
             let raw = await IIDXSessionWorkoutBridge.shared.heartRateSamples(
                 from: session.startDate,
