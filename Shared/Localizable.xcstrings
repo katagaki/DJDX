@@ -1318,6 +1318,57 @@
         }
       }
     },
+    "Backup.Export" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Data…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データを書き出す…"
+          }
+        }
+      }
+    },
+    "Backup.Export.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save or share a ZIP file containing all of your data."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのデータを含むZIPファイルを保存・共有できます。"
+          }
+        }
+      }
+    },
+    "Backup.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップ"
+          }
+        }
+      }
+    },
     "Calendar.BackToToday" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1665,23 +1716,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バックアップを復元中"
-          }
-        }
-      }
-    },
-    "ICloudBackup.Title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud Backup"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloudバックアップ"
           }
         }
       }
@@ -2519,6 +2553,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アナリティクスキャッシュをクリア"
+          }
+        }
+      }
+    },
+    "More.ManageData.Backup" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップ"
           }
         }
       }

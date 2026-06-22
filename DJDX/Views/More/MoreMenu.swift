@@ -68,7 +68,7 @@ struct MoreMenu: View {
                 }
             }
             Section("More.ManageData.Header") {
-                Button("More.ManageData.ICloudBackup", systemImage: "icloud") {
+                Button("More.ManageData.Backup", systemImage: "icloud") {
                     isPresentingICloudBackup = true
                 }
                 Menu("More.ManageData.DeleteOrReset", systemImage: "trash") {

@@ -98,6 +98,24 @@ enum ICloudBackupManager {
         UserDefaults.standard.set(true, forKey: restorePromptCompletedKey)
     }
 
+    // MARK: Export
+
+    static func exportArchive() async -> URL? {
+        await Task.detached(priority: .userInitiated) { () -> URL? in
+            do {
+                let fileManager = FileManager.default
+                let exportDirectory = fileManager.temporaryDirectory
+                    .appendingPathComponent("Export-\(UUID().uuidString)", isDirectory: true)
+                try fileManager.createDirectory(at: exportDirectory, withIntermediateDirectories: true)
+                let archiveURL = exportDirectory.appendingPathComponent("DJDX Backup.zip")
+                try ZipArchive.zip(directoryAt: SharedContainer.containerURL, to: archiveURL)
+                return archiveURL
+            } catch {
+                return nil
+            }
+        }.value
+    }
+
     // MARK: Restore
 
     static func existingBackupDate() async -> Date? {
