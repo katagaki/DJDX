@@ -113,7 +113,6 @@ struct ScoreFilterSheet: View {
                             }
                         )
                         .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
                     } label: {
                         FilterDisclosureLabel(.sharedDifficulty, count: difficultiesToShow.count,
                                               countLabel: LocalizedStringResource("Shared.Filter.Count.Difficulties"))

@@ -52,7 +52,6 @@ struct DDRScoreFilterSheet: View {
                             onToggle: { toggle($0, in: $levelsToShow) }
                         )
                         .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
                     } label: {
                         DDRFilterDisclosureLabel("Shared.Sort.Difficulty", count: levelsToShow.count)
                     }
