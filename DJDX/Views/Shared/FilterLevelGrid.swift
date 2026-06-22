@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 struct FilterLevelGrid<Element: Hashable>: View {
 
@@ -22,7 +21,7 @@ struct FilterLevelGrid<Element: Hashable>: View {
                         .foregroundStyle(isSelected ? Color.white : Color.primary)
                         .frame(maxWidth: .infinity)
                         .frame(height: 44.0)
-                        .background(isSelected ? Color.accentColor : Color(uiColor: .secondarySystemGroupedBackground))
+                        .background(isSelected ? Color.accentColor : Color.clear)
                 }
                 .buttonStyle(.plain)
             }
