@@ -37,13 +37,13 @@ final class SessionCameraViewController: UIViewController {
     private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
     private var captureDelegate: PhotoCaptureDelegate?
 
-    private let contentView = UIView()
+    private let overlayView = UIView()
     private let shutterButton = UIButton(type: .custom)
     private let cancelButton = UIButton(type: .system)
     private let optionsButton = UIButton(type: .system)
     private let playerSideControl = UISegmentedControl(items: ["1P", "2P"])
     private let shutterHaptic = UIImpactFeedbackGenerator(style: .rigid)
-    private var contentAngle: CGFloat = .pi / 2
+    private var overlayAngle: CGFloat = .pi / 2
 
     private let scoreRegionLayer = CAShapeLayer()
     private let titleRegionLayer = CAShapeLayer()
@@ -56,21 +56,19 @@ final class SessionCameraViewController: UIViewController {
     private let playerSideDefaultsKey = "Sessions.Camera.IsPlayer2"
     private var isPlayer2 = false
 
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .portrait }
-    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation { .portrait }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
-        contentView.backgroundColor = .clear
-        view.addSubview(contentView)
         previewLayer.session = session
         previewLayer.videoGravity = .resizeAspect
-        contentView.layer.addSublayer(previewLayer)
+        view.layer.addSublayer(previewLayer)
         topGradient.colors = [UIColor.black.withAlphaComponent(0.6).cgColor, UIColor.clear.cgColor]
         bottomGradient.colors = [UIColor.clear.cgColor, UIColor.black.withAlphaComponent(0.6).cgColor]
-        contentView.layer.addSublayer(topGradient)
-        contentView.layer.addSublayer(bottomGradient)
+        view.layer.addSublayer(topGradient)
+        view.layer.addSublayer(bottomGradient)
+        overlayView.backgroundColor = .clear
+        overlayView.isUserInteractionEnabled = false
+        view.addSubview(overlayView)
         guideLayer.fillColor = UIColor.clear.cgColor
         guideLayer.strokeColor = UIColor.white.withAlphaComponent(0.9).cgColor
         guideLayer.lineWidth = 3
@@ -79,18 +77,17 @@ final class SessionCameraViewController: UIViewController {
         guideLayer.shadowOpacity = 0.4
         guideLayer.shadowRadius = 3
         guideLayer.shadowOffset = .zero
-        contentView.layer.addSublayer(guideLayer)
+        overlayView.layer.addSublayer(guideLayer)
         configureRegionLayer(scoreRegionLayer, color: scoreRegionColor)
         configureRegionLayer(titleRegionLayer, color: titleRegionColor)
-        contentView.layer.addSublayer(scoreRegionLayer)
-        contentView.layer.addSublayer(titleRegionLayer)
+        overlayView.layer.addSublayer(scoreRegionLayer)
+        overlayView.layer.addSublayer(titleRegionLayer)
         configureControls()
         sessionQueue.async { [weak self] in self?.configureSession() }
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        AppDelegate.orientationLock = .portrait
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         shutterHaptic.prepare()
         startGuidePulse()
@@ -104,14 +101,12 @@ final class SessionCameraViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        updateContentTransform()
         if autoDetectEnabled { liveProbe.start() }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         liveProbe.stop()
-        AppDelegate.orientationLock = .allButUpsideDown
         NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
         UIDevice.current.endGeneratingDeviceOrientationNotifications()
         guideLayer.removeAnimation(forKey: "pulse")
@@ -122,22 +117,16 @@ final class SessionCameraViewController: UIViewController {
     }
 
     @objc private func deviceOrientationDidChange() {
-        updateContentTransform()
         applyPreviewRotation()
         applyVideoOutputRotation()
     }
 
-    private func updateContentTransform() {
-        let angle: CGFloat
-        switch UIDevice.current.orientation {
-        case .landscapeLeft: angle = .pi / 2
-        case .landscapeRight: angle = -.pi / 2
-        default: return
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+            self?.applyPreviewRotation()
+            self?.applyVideoOutputRotation()
         }
-        guard angle != contentAngle else { return }
-        contentAngle = angle
-        contentView.transform = CGAffineTransform(rotationAngle: angle)
-        layoutContent()
     }
 
     private func startGuidePulse() {
@@ -154,56 +143,73 @@ final class SessionCameraViewController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        contentView.bounds = CGRect(x: 0, y: 0, width: view.bounds.height, height: view.bounds.width)
-        contentView.center = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
-        contentView.transform = CGAffineTransform(rotationAngle: contentAngle)
-        layoutContent()
-    }
-
-    private func layoutContent() {
-        let bounds = contentView.bounds
+        let bounds = view.bounds
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         previewLayer.frame = bounds
         let fade: CGFloat = 160
         topGradient.frame = CGRect(x: 0, y: 0, width: bounds.width, height: fade)
         bottomGradient.frame = CGRect(x: 0, y: bounds.height - fade, width: bounds.width, height: fade)
-        guideLayer.frame = bounds
-        guideLayer.path = cornerBracketPath(in: guideRect()).cgPath
         CATransaction.commit()
-        updateRegionGuides()
-        positionHintLabel(in: guideRect())
+
+        let isPortrait = bounds.height > bounds.width
+        overlayAngle = isPortrait ? .pi / 2 : 0
+        overlayView.bounds = isPortrait
+            ? CGRect(x: 0, y: 0, width: bounds.height, height: bounds.width)
+            : bounds
+        overlayView.center = CGPoint(x: bounds.midX, y: bounds.midY)
+        overlayView.transform = CGAffineTransform(rotationAngle: overlayAngle)
+
+        layoutOverlay()
         layoutControls()
         applyPreviewRotation()
         applyVideoOutputRotation()
     }
 
-    private func layoutControls() {
-        let bounds = contentView.bounds
-        let insets = contentSafeInsets()
-        cancelButton.frame = CGRect(x: insets.left + 20, y: insets.top + 20, width: 48, height: 48)
-        let shutter: CGFloat = 80
-        shutterButton.frame = CGRect(x: bounds.width - insets.right - 24 - shutter,
-                                     y: bounds.midY - shutter / 2, width: shutter, height: shutter)
-        let options: CGFloat = 48
-        optionsButton.frame = CGRect(x: shutterButton.frame.midX - options / 2, y: insets.top + 20,
-                                     width: options, height: options)
-        let player = playerSideControl.intrinsicContentSize
-        playerSideControl.frame = CGRect(x: bounds.width - insets.right - 22 - player.width,
-                                         y: bounds.height - insets.bottom - 20 - player.height,
-                                         width: player.width, height: player.height)
+    private func layoutOverlay() {
+        let bounds = overlayView.bounds
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        guideLayer.frame = bounds
+        guideLayer.path = cornerBracketPath(in: guideRect()).cgPath
+        CATransaction.commit()
+        updateRegionGuides()
+        positionHintLabel(in: guideRect())
     }
 
-    private func contentSafeInsets() -> UIEdgeInsets {
+    private func layoutControls() {
+        let bounds = view.bounds
         let safe = view.safeAreaInsets
-        if contentAngle > 0 {
-            return UIEdgeInsets(top: safe.right, left: safe.top, bottom: safe.left, right: safe.bottom)
+        let landscape = bounds.width > bounds.height
+
+        cancelButton.frame = CGRect(x: safe.left + 20, y: safe.top + 20, width: 48, height: 48)
+        optionsButton.frame = CGRect(x: bounds.width - safe.right - 20 - 48, y: safe.top + 20, width: 48, height: 48)
+
+        let shutter: CGFloat = 80
+        let player = playerSideControl.intrinsicContentSize
+        if landscape {
+            shutterButton.frame = CGRect(x: bounds.width - safe.right - 24 - shutter,
+                                         y: bounds.midY - shutter / 2, width: shutter, height: shutter)
+            playerSideControl.frame = CGRect(x: bounds.width - safe.right - 22 - player.width,
+                                             y: bounds.height - safe.bottom - 20 - player.height,
+                                             width: player.width, height: player.height)
+        } else {
+            shutterButton.frame = CGRect(x: bounds.midX - shutter / 2,
+                                         y: bounds.height - safe.bottom - 24 - shutter,
+                                         width: shutter, height: shutter)
+            playerSideControl.frame = CGRect(x: safe.left + 20, y: shutterButton.frame.midY - player.height / 2,
+                                             width: player.width, height: player.height)
         }
-        return UIEdgeInsets(top: safe.left, left: safe.bottom, bottom: safe.right, right: safe.top)
+    }
+
+    private func overlaySafeInsets() -> UIEdgeInsets {
+        let safe = view.safeAreaInsets
+        if overlayAngle == 0 { return safe }
+        return UIEdgeInsets(top: safe.right, left: safe.top, bottom: safe.left, right: safe.bottom)
     }
 
     private func guideRect() -> CGRect {
-        let safe = contentView.bounds.inset(by: contentSafeInsets())
+        let safe = overlayView.bounds.inset(by: overlaySafeInsets())
         let available = CGRect(x: safe.minX + 16, y: safe.minY + 12, width: safe.width - 40, height: safe.height - 24)
         let aspect: CGFloat = 4.0 / 3.0
         var size = CGSize(width: available.width, height: available.width / aspect)
@@ -212,37 +218,6 @@ final class SessionCameraViewController: UIViewController {
         }
         return CGRect(x: available.midX - size.width / 2, y: available.midY - size.height / 2,
                       width: size.width, height: size.height)
-    }
-
-    private func cornerBracketPath(in rect: CGRect, length: CGFloat = 30, radius: CGFloat = 14) -> UIBezierPath {
-        let path = UIBezierPath()
-        let minX = rect.minX, minY = rect.minY, maxX = rect.maxX, maxY = rect.maxY
-
-        path.move(to: CGPoint(x: minX, y: minY + radius + length))
-        path.addLine(to: CGPoint(x: minX, y: minY + radius))
-        path.addArc(withCenter: CGPoint(x: minX + radius, y: minY + radius),
-                    radius: radius, startAngle: .pi, endAngle: .pi * 1.5, clockwise: true)
-        path.addLine(to: CGPoint(x: minX + radius + length, y: minY))
-
-        path.move(to: CGPoint(x: maxX - radius - length, y: minY))
-        path.addLine(to: CGPoint(x: maxX - radius, y: minY))
-        path.addArc(withCenter: CGPoint(x: maxX - radius, y: minY + radius),
-                    radius: radius, startAngle: .pi * 1.5, endAngle: 0, clockwise: true)
-        path.addLine(to: CGPoint(x: maxX, y: minY + radius + length))
-
-        path.move(to: CGPoint(x: maxX, y: maxY - radius - length))
-        path.addLine(to: CGPoint(x: maxX, y: maxY - radius))
-        path.addArc(withCenter: CGPoint(x: maxX - radius, y: maxY - radius),
-                    radius: radius, startAngle: 0, endAngle: .pi * 0.5, clockwise: true)
-        path.addLine(to: CGPoint(x: maxX - radius - length, y: maxY))
-
-        path.move(to: CGPoint(x: minX + radius + length, y: maxY))
-        path.addLine(to: CGPoint(x: minX + radius, y: maxY))
-        path.addArc(withCenter: CGPoint(x: minX + radius, y: maxY - radius),
-                    radius: radius, startAngle: .pi * 0.5, endAngle: .pi, clockwise: true)
-        path.addLine(to: CGPoint(x: minX, y: maxY - radius - length))
-
-        return path
     }
 
     private func applyPreviewRotation() {
@@ -335,12 +310,12 @@ final class SessionCameraViewController: UIViewController {
         configureRegionLabel(titleRegionLabel, text: NSLocalizedString("Sessions.Camera.Guide.SongTitle", comment: ""),
                              color: titleRegionColor)
 
-        contentView.addSubview(scoreRegionLabel)
-        contentView.addSubview(titleRegionLabel)
-        contentView.addSubview(shutterButton)
-        contentView.addSubview(cancelButton)
-        contentView.addSubview(hintLabel)
-        contentView.addSubview(playerSideControl)
+        overlayView.addSubview(scoreRegionLabel)
+        overlayView.addSubview(titleRegionLabel)
+        overlayView.addSubview(hintLabel)
+        view.addSubview(shutterButton)
+        view.addSubview(cancelButton)
+        view.addSubview(playerSideControl)
 
         configureOptionsButton()
     }
@@ -376,8 +351,7 @@ final class SessionCameraViewController: UIViewController {
         }
         if let coordinator = rotationCoordinator,
            let connection = photoOutput.connection(with: .video) {
-            var angle = coordinator.videoRotationAngleForHorizonLevelCapture + contentAngle * 180 / .pi
-            angle = (angle.truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
+            let angle = coordinator.videoRotationAngleForHorizonLevelCapture
             if connection.isVideoRotationAngleSupported(angle) {
                 connection.videoRotationAngle = angle
             }
@@ -425,7 +399,7 @@ extension SessionCameraViewController {
         optionsButton.showsMenuAsPrimaryAction = true
         optionsButton.menu = buildOptionsMenu()
         optionsButton.accessibilityLabel = NSLocalizedString("Sessions.Camera.Options", comment: "")
-        contentView.addSubview(optionsButton)
+        view.addSubview(optionsButton)
     }
 
     private func buildOptionsMenu() -> UIMenu {
@@ -449,6 +423,37 @@ extension SessionCameraViewController {
         if connection.isVideoRotationAngleSupported(angle) {
             connection.videoRotationAngle = angle
         }
+    }
+
+    func cornerBracketPath(in rect: CGRect, length: CGFloat = 30, radius: CGFloat = 14) -> UIBezierPath {
+        let path = UIBezierPath()
+        let minX = rect.minX, minY = rect.minY, maxX = rect.maxX, maxY = rect.maxY
+
+        path.move(to: CGPoint(x: minX, y: minY + radius + length))
+        path.addLine(to: CGPoint(x: minX, y: minY + radius))
+        path.addArc(withCenter: CGPoint(x: minX + radius, y: minY + radius),
+                    radius: radius, startAngle: .pi, endAngle: .pi * 1.5, clockwise: true)
+        path.addLine(to: CGPoint(x: minX + radius + length, y: minY))
+
+        path.move(to: CGPoint(x: maxX - radius - length, y: minY))
+        path.addLine(to: CGPoint(x: maxX - radius, y: minY))
+        path.addArc(withCenter: CGPoint(x: maxX - radius, y: minY + radius),
+                    radius: radius, startAngle: .pi * 1.5, endAngle: 0, clockwise: true)
+        path.addLine(to: CGPoint(x: maxX, y: minY + radius + length))
+
+        path.move(to: CGPoint(x: maxX, y: maxY - radius - length))
+        path.addLine(to: CGPoint(x: maxX, y: maxY - radius))
+        path.addArc(withCenter: CGPoint(x: maxX - radius, y: maxY - radius),
+                    radius: radius, startAngle: 0, endAngle: .pi * 0.5, clockwise: true)
+        path.addLine(to: CGPoint(x: maxX - radius - length, y: maxY))
+
+        path.move(to: CGPoint(x: minX + radius + length, y: maxY))
+        path.addLine(to: CGPoint(x: minX + radius, y: maxY))
+        path.addArc(withCenter: CGPoint(x: minX + radius, y: maxY - radius),
+                    radius: radius, startAngle: .pi * 0.5, endAngle: .pi, clockwise: true)
+        path.addLine(to: CGPoint(x: minX, y: maxY - radius - length))
+
+        return path
     }
 
     private func configureRegionLayer(_ layer: CAShapeLayer, color: UIColor) {
@@ -477,8 +482,8 @@ extension SessionCameraViewController {
         let titleRect = denormalize(titleRegion, in: guide)
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        scoreRegionLayer.frame = contentView.bounds
-        titleRegionLayer.frame = contentView.bounds
+        scoreRegionLayer.frame = overlayView.bounds
+        titleRegionLayer.frame = overlayView.bounds
         scoreRegionLayer.path = UIBezierPath(roundedRect: scoreRect, cornerRadius: 10).cgPath
         titleRegionLayer.path = UIBezierPath(roundedRect: titleRect, cornerRadius: 8).cgPath
         CATransaction.commit()
