@@ -16,6 +16,9 @@ import argparse
 import json
 from pathlib import Path
 
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))  # Training/scripts: shared _common/_ocr
 from _common import DATA_DIR, LABELS_FILE, OUTPUT_DIR, load_upright
 from PIL import ImageDraw, ImageFont
 

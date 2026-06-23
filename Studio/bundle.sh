@@ -3,7 +3,7 @@
 # CLI-only; no Xcode project. See SWIFT_DEVTOOL_PLAN.md §4.1.
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")"   # repo root (this script lives at the root)
 
 APP_NAME="DJDX PEAK Studio"
 BUILD_DIR=".build/release"

@@ -7,7 +7,7 @@
 # ---------------------------------------------------------------------------
 detector:
   classes:
-    - dj_level_now          # large rank glyph (current play)
+    - dj_level_now          # current-play rank glyph in the score table (right column)
     - dj_level_prev         # small rank glyph (previous best)
     - clear_type_now        # CLEAR / H-CLEAR / FAILED / A-CLEAR text pill
     - clear_type_prev
@@ -66,14 +66,19 @@ digit_detector:
 # ---------------------------------------------------------------------------
 training:
   detector:
-    base_weights: yolov8n.pt   # nano: fast, ~3M params, plenty for ~22 classes on 184 imgs
-    image_size: 768            # detector only localises ROIs (reading is downstream), so 768
-                               # is ~36% faster than 960 with negligible detection-accuracy loss
+    base_weights: yolov9t.pt   # YOLOv9-tiny (~2.1M): its GELAN/PGI backbone localises the tiny
+                               # score-table dj_level_now glyph better than yolov8n (AP50 0.50 vs
+                               # 0.42). Standard Detect head → exports to the same CoreML NMS
+                               # pipeline the Swift app consumes (unlike the end2end v10/v26 heads).
+    image_size: 1280           # 1280 (was 768): the score-table dj_level_now glyph is tiny and
+                               # sits right above its "+NNNN" subtitle; 768 caps its AP50 ~0.36,
+                               # 1280 reaches ~0.50 (v9t). Export + inference must match this size.
     epochs: 200
-    batch: 16                  # M5 Pro unified memory handles this; better GPU utilisation than 4
+    batch: 4                   # yolov9t @1280 with PGI aux branches needs a small batch on MPS
+                               # (~8 GB at b4; b8+ OOMs the ~30 GB unified-memory limit)
     cache: ram                 # 80 imgs fit in RAM — skip disk reads every epoch
     workers: 8
-    patience: 20               # early stop — converges fast via transfer learning
+    patience: 40               # v9t's best epoch was late (~159); give the small glyph room to converge
     augmentations:
       mosaic: 0.5
       mixup: 0.0

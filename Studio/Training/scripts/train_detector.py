@@ -38,6 +38,8 @@ def main() -> None:
     ap.add_argument("--cache", default=hp.get("cache", "ram"),
                     help="Image cache: 'ram', 'disk', or '' to disable. RAM is fastest for small sets.")
     ap.add_argument("--workers", type=int, default=hp.get("workers", 8))
+    ap.add_argument("--patience", type=int, default=hp["patience"])
+    ap.add_argument("--name", default=run_name, help="run name under models/")
     ap.add_argument("--resume", action="store_true")
     args = ap.parse_args()
 
@@ -56,9 +58,9 @@ def main() -> None:
         device=args.device,
         cache=(args.cache or False),
         workers=args.workers,
-        patience=hp["patience"],
+        patience=args.patience,
         project=str(MODELS_DIR),
-        name=run_name,
+        name=args.name,
         exist_ok=True,
         resume=args.resume,
         # augmentations

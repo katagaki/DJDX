@@ -19,6 +19,9 @@ from __future__ import annotations
 import argparse
 import json
 
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))  # Training/scripts: shared _common/_ocr
 from _common import DATA_DIR, OUTPUT_DIR
 from _ocr import ocr_images
 

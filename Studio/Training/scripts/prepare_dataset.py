@@ -31,6 +31,7 @@ from pathlib import Path
 
 from _common import (
     AUTO_SEED_FILE,
+    CLEAR_CLS_DIR,
     CROPS_OUT_DIR,
     DATASET_DIR,
     DIGIT_DATASET_DIR,
@@ -39,7 +40,6 @@ from _common import (
     LABELS_FILE,
     RANK_CLS_DIR,
     RESULTS_DIR,
-    TRAINING_DIR,
     load_schema,
     load_upright,
 )
@@ -277,10 +277,9 @@ def main() -> None:
         print("\nEmitting rank crops → rank_classifier_data/_unsorted/")
         emit_classifier_crops(items, "dj_level_now", RANK_CLS_DIR, data_dir)
         emit_classifier_crops(items, "dj_level_prev", RANK_CLS_DIR, data_dir)
-        print("\nEmitting clear-type crops → clear_type_data/_unsorted/")
-        clear_root = TRAINING_DIR / "clear_type_data"
-        emit_classifier_crops(items, "clear_type_now", clear_root, data_dir)
-        emit_classifier_crops(items, "clear_type_prev", clear_root, data_dir)
+        print("\nEmitting clear-type crops → ../Outputs/clear_type_data/_unsorted/")
+        emit_classifier_crops(items, "clear_type_now", CLEAR_CLS_DIR, data_dir)
+        emit_classifier_crops(items, "clear_type_prev", CLEAR_CLS_DIR, data_dir)
         print(
             "\nNext: move each crop into a subfolder named after its class\n"
             "      (F/E/D/C/B/A/AA/AAA for rank,\n"

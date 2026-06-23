@@ -14,7 +14,7 @@ struct ProjectPaths: Equatable {
     var outputDir: URL { root.appending(path: "Outputs", directoryHint: .isDirectory) }
     var predictionsFile: URL { outputDir.appending(path: "predictions.json") }
     var previewDir: URL { outputDir.appending(path: "label_preview", directoryHint: .isDirectory) }
-    var modelsDir: URL { trainingDir.appending(path: "models", directoryHint: .isDirectory) }
+    var modelsDir: URL { outputDir.appending(path: "models", directoryHint: .isDirectory) }
 
     // Per-workspace working dirs/files.
     func dataDir(_ c: WorkspaceConfig) -> URL {

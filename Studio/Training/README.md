@@ -33,7 +33,7 @@ single end-to-end OCR model. Instead, we use a three-stage pipeline:
      │
      ▼
  ┌──────────────────────────┐
- │ 1. Object detector       │   YOLOv8n → CoreML
+ │ 1. Object detector       │   YOLOv9t @1280 → CoreML
  │    Finds ROIs:           │   22 classes (score_now, dj_level_now, …)
  │    score, rank, song, …  │
  └────────────┬─────────────┘

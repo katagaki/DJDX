@@ -40,6 +40,9 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, os.path.dirname(__file__))
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))  # Training/scripts: shared _common/_ocr
 from _common import DIGIT_DIR, DIGIT_LABELS_FILE, load_schema  # noqa: E402
 
 CLASS_FOR = {"+": "plus", "-": "minus", **{str(d): str(d) for d in range(10)}}

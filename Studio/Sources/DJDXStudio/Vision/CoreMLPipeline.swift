@@ -47,7 +47,9 @@ enum CoreMLPipeline {
                        confidence: Double = 0.15, postProcess: Bool = true) throws -> [Box] {
         let model = try loadDetector(at: modelURL)
         let request = VNCoreMLRequest(model: model)
-        request.imageCropAndScaleOption = .scaleFill   // matches training letterbox-free 768²
+        request.imageCropAndScaleOption = .scaleFill   // matches training letterbox-free square
+                                                        // input (1280² for the v9t result detector);
+                                                        // Vision scales to the model's declared size
 
         let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
         try handler.perform([request])

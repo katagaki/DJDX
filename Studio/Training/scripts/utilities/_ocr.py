@@ -13,9 +13,12 @@ import subprocess
 import sys
 from pathlib import Path
 
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))  # Training/scripts: shared _common/_ocr
 from _common import TRAINING_DIR
 
-_HELPER_SRC = TRAINING_DIR / "scripts" / "ocr_helper.swift"
+_HELPER_SRC = _Path(__file__).resolve().parent / "ocr_helper.swift"  # beside this module
 _HELPER_BIN = TRAINING_DIR / ".cache" / "ocr_helper"
 
 

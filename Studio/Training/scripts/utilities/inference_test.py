@@ -18,6 +18,9 @@ import sys
 import tempfile
 from pathlib import Path
 
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))  # Training/scripts: shared _common/_ocr
 from _common import MODELS_DIR, load_schema
 from _ocr import ocr_image
 from PIL import Image

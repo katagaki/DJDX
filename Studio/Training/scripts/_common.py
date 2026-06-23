@@ -30,10 +30,13 @@ AUTO_SEED_FILE = LABELS_DIR / "auto_seed.json"       # OCR-derived seeds
 DJLEVEL_LABELS_FILE = LABELS_DIR / "djlevel_labels.json"  # DJ level ({name: "AAA"})
 DIGIT_LABELS_FILE = LABELS_DIR / "digit_labels.json"      # digit detector (per-digit bbox)
 
-DATASET_DIR = TRAINING_DIR / "dataset"              # result detector YOLO dataset
-DIGIT_DATASET_DIR = TRAINING_DIR / "digit_dataset"  # digit detector YOLO dataset
-MODELS_DIR = TRAINING_DIR / "models"
-RANK_CLS_DIR = TRAINING_DIR / "rank_classifier_data"  # rank classifier sorted crops
+# All generated/derived artefacts live under Outputs/ (re-derivable from labels +
+# scripts); Training/ holds only source: scripts, schema.yaml, and hand labels/.
+DATASET_DIR = OUTPUT_DIR / "dataset"               # result detector YOLO dataset
+DIGIT_DATASET_DIR = OUTPUT_DIR / "digit_dataset"   # digit detector YOLO dataset
+MODELS_DIR = OUTPUT_DIR / "models"                 # YOLO training runs (weights, plots)
+RANK_CLS_DIR = OUTPUT_DIR / "rank_classifier_data"   # rank classifier crops
+CLEAR_CLS_DIR = OUTPUT_DIR / "clear_type_data"       # clear-type classifier crops
 SCHEMA_PATH = TRAINING_DIR / "schema.yaml"
 
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".heic"}

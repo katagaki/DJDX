@@ -17,7 +17,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from _common import MODELS_DIR, RANK_CLS_DIR, TRAINING_DIR, best_device, load_schema
+from _common import CLEAR_CLS_DIR, MODELS_DIR, RANK_CLS_DIR, best_device, load_schema
 from ultralytics import YOLO
 
 
@@ -44,7 +44,7 @@ def main() -> None:
         run_name = "rank_classifier"
     else:
         hp = schema["training"]["clear_type_classifier"]
-        data_dir = args.data or (TRAINING_DIR / "clear_type_data")
+        data_dir = args.data or CLEAR_CLS_DIR
         run_name = "clear_type_classifier"
 
     if not data_dir.exists():

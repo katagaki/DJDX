@@ -39,6 +39,9 @@ import sys
 import tkinter as tk
 from pathlib import Path
 
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))  # Training/scripts: shared _common/_ocr
 from _common import AUTO_SEED_FILE, DATA_DIR, LABELS_FILE, iter_images, load_schema
 from PIL import Image, ImageTk
 
