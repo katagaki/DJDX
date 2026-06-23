@@ -1,0 +1,12 @@
+{
+  "MLModelVersionStringKey" : "--",
+  "MLModelDescriptionKey" : "DJDXResultDetector: IIDX result-screen extraction. Trained from training\/schema.yaml.",
+  "MLModelCreatorDefinedKey" : {
+    "Confidence threshold" : "0.25",
+    "classes_json" : "[\"dj_level_now\", \"dj_level_prev\", \"clear_type_now\", \"clear_type_prev\", \"score_now\", \"score_prev\", \"score_delta\", \"miss_count_now\", \"miss_count_prev\", \"miss_count_delta\", \"pacemaker_aa\", \"judge_pgreat\", \"judge_great\", \"judge_good\", \"judge_bad\", \"judge_poor\", \"song_title\", \"song_artist\", \"difficulty_label\", \"notes_count\", \"stage_label\", \"combo_break\"]",
+    "IoU threshold" : "0.7",
+    "schema_version" : "1"
+  },
+  "MLModelAuthorKey" : "DJDX PEAK training pipeline",
+  "MLModelLicenseKey" : "AGPL-3.0 License (https:\/\/ultralytics.com\/license)"
+}
