@@ -29,13 +29,6 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
 
     var isSessionActive: Bool { activeSessionID != nil }
 
-    private var isWatchAvailable: Bool {
-        WCSession.isSupported()
-            && WCSession.default.activationState == .activated
-            && WCSession.default.isPaired
-            && WCSession.default.isWatchAppInstalled
-    }
-
     override private init() {
         super.init()
         if WCSession.isSupported() {
@@ -126,9 +119,8 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         watchWorkoutConfirmed = false
         heartRate = 0
         activeCalories = 0
-        let hasWorkout = isEnabled || isWatchAvailable
-        isWorkoutActive = hasWorkout
-        if hasWorkout {
+        isWorkoutActive = isEnabled
+        if isEnabled {
             send(["command": "start", "sessionID": session.id])
             launchWatchApp()
         }
@@ -165,7 +157,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
             activeSessionID = session.id
             workoutStart = session.startDate
             runningStart = runningStart ?? session.startDate
-            isWorkoutActive = isEnabled || isWatchAvailable
+            isWorkoutActive = isEnabled
         }
         if isWorkoutActive {
             send(["command": "requestWorkoutState", "sessionID": session.id])
@@ -256,6 +248,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
             "spRadar": radarValues(prefix: "NotesRadar.SP", defaults: shared) ?? [],
             "dpRadar": radarValues(prefix: "NotesRadar.DP", defaults: shared) ?? [],
             "qpro": watchQproImageData() ?? Data(),
+            "healthKitEnabled": isEnabled,
             "ts": Date.now.timeIntervalSince1970
         ]
         try? connectivity.updateApplicationContext(context)

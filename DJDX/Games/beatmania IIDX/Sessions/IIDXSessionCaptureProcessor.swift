@@ -107,7 +107,7 @@ actor IIDXSessionCaptureProcessor {
         NotificationCenter.default.post(name: .capturedPlayDidChange, object: playID)
     }
 
-    private static func fetchSongCandidates() -> [IIDXSongCandidate] {
+    static func fetchSongCandidates() -> [IIDXSongCandidate] {
         let columns = IIDXPlayDataDatabase.self
         guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection(),
               let rows = try? database.prepare(columns.songRecordTable.order(columns.srID.desc)) else {

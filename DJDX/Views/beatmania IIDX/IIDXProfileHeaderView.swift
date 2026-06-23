@@ -227,7 +227,7 @@ struct IIDXProfileHeaderView: View {
         }
     }
 
-    func parseProfileData(from document: Document) throws {
+    func parseProfileData(from document: SwiftSoup.Document) throws {
         for row in try document.select("div.dj-profile table tr") {
             let cells = try row.select("td")
             if cells.size() == 2, try cells.get(0).text() == "DJ NAME" {

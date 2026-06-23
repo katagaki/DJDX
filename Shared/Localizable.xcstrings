@@ -3284,6 +3284,23 @@
         }
       }
     },
+    "Sessions.Camera.AutoDetect" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically Detect Results"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動的にリザルトを検出"
+          }
+        }
+      }
+    },
     "Sessions.Camera.Denied.Message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3365,6 +3382,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "曲名"
+          }
+        }
+      }
+    },
+    "Sessions.Camera.Options" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オプション"
           }
         }
       }

@@ -51,6 +51,19 @@ struct SessionDetailView: View {
                     Button("Sessions.Export.All", systemImage: "square.and.arrow.up.on.square") {
                         isConfirmingExport = true
                     }
+                    .confirmationDialog(
+                        "Sessions.Export.All.Confirm",
+                        isPresented: $isConfirmingExport,
+                        titleVisibility: .visible
+                    ) {
+                        Button("Sessions.Photos.Save") {
+                            exportAllToPhotos()
+                        }
+                        Button("Sessions.Files.Save") {
+                            exportAllToFiles()
+                        }
+                        Button("Shared.Cancel", role: .cancel) {}
+                    }
                 }
             }
         }
@@ -58,19 +71,6 @@ struct SessionDetailView: View {
         .onReceive(NotificationCenter.default.publisher(for: .capturedPlayDidChange)
             .receive(on: RunLoop.main)) { _ in
             plays = store.plays(for: session)
-        }
-        .confirmationDialog(
-            "Sessions.Export.All.Confirm",
-            isPresented: $isConfirmingExport,
-            titleVisibility: .visible
-        ) {
-            Button("Sessions.Photos.Save") {
-                exportAllToPhotos()
-            }
-            Button("Sessions.Files.Save") {
-                exportAllToFiles()
-            }
-            Button("Shared.Cancel", role: .cancel) {}
         }
         .sheet(item: $fileExport) { request in
             SessionDocumentExporter(urls: request.urls) {

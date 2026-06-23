@@ -27,6 +27,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     @Published var dpRank: String?
     @Published var spRadar: WatchRadarData?
     @Published var dpRadar: WatchRadarData?
+    @Published var healthKitEnabled: Bool = false
 
     private let healthStore = HKHealthStore()
     private var session: HKWorkoutSession?
@@ -143,7 +144,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     func requestStartSession() {
-        guard !isRunning else { return }
+        guard healthKitEnabled, !isRunning else { return }
         let sessionID = UUID().uuidString
         sendToPhone(["command": "startSession", "sessionID": sessionID])
         activateSession(sessionID: sessionID)
@@ -244,6 +245,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     fileprivate func applyProfile(_ context: [String: Any]) {
+        if let enabled = context["healthKitEnabled"] as? Bool { healthKitEnabled = enabled }
         if let djName = context["djName"] as? String { self.djName = djName.isEmpty ? nil : djName }
         if let spRank = context["spRank"] as? String { self.spRank = spRank.isEmpty ? nil : spRank }
         if let dpRank = context["dpRank"] as? String { self.dpRank = dpRank.isEmpty ? nil : dpRank }

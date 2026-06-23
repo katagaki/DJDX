@@ -64,11 +64,21 @@ enum IIDXResultReader {
         return try? VNCoreMLModel(for: detector.model)
     }()
 
+    static func prewarm() {
+        _ = vnModel
+        IIDXDigitRecognizer.prewarm()
+        IIDXRankRecognizer.prewarm()
+    }
+
     static func detect(imageData: Data) async throws -> [DetectedRegion] {
-        guard let vnModel else { throw IIDXResultReaderError.modelUnavailable }
         guard let image = uprightCGImage(from: imageData, maxDimension: maxDimension) else {
             throw IIDXResultReaderError.invalidImage
         }
+        return try await detect(cgImage: image)
+    }
+
+    static func detect(cgImage image: CGImage) async throws -> [DetectedRegion] {
+        guard let vnModel else { throw IIDXResultReaderError.modelUnavailable }
 
         let detections = bestPerLabel(try await runDetection(vnModel: vnModel, image: image))
 

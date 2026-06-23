@@ -67,7 +67,9 @@ struct ProfileView: View {
         if hasProfile {
             ScrollView {
                 VStack(spacing: 12.0) {
-                    startButton
+                    if workoutManager.healthKitEnabled {
+                        startButton
+                    }
                     profileHeader
                     if let radar = selectedRadar {
                         WatchRadarChartView(data: radar)

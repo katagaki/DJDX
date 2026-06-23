@@ -26,6 +26,10 @@ enum IIDXDigitRecognizer {
 
     static var isAvailable: Bool { vnModel != nil }
 
+    static func prewarm() {
+        _ = vnModel
+    }
+
     static func recognize(cgImage: CGImage) async -> Int? {
         guard let vnModel else { return nil }
         let digits = ((try? await run(vnModel: vnModel, image: cgImage)) ?? [])

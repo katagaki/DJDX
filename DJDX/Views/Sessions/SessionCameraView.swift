@@ -25,7 +25,10 @@ final class SessionCameraViewController: UIViewController {
 
     private let session = AVCaptureSession()
     private let photoOutput = AVCapturePhotoOutput()
+    private let videoDataOutput = AVCaptureVideoDataOutput()
+    private let liveProbe = LiveResultProbe()
     private let sessionQueue = DispatchQueue(label: "com.tsubuzaki.DJDX.SessionCamera")
+    private let videoQueue = DispatchQueue(label: "com.tsubuzaki.DJDX.SessionCamera.Video")
     private let previewLayer = AVCaptureVideoPreviewLayer()
     private let topGradient = CAGradientLayer()
     private let bottomGradient = CAGradientLayer()
@@ -34,15 +37,13 @@ final class SessionCameraViewController: UIViewController {
     private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
     private var captureDelegate: PhotoCaptureDelegate?
 
+    private let contentView = UIView()
     private let shutterButton = UIButton(type: .custom)
     private let cancelButton = UIButton(type: .system)
+    private let optionsButton = UIButton(type: .system)
     private let playerSideControl = UISegmentedControl(items: ["1P", "2P"])
     private let shutterHaptic = UIImpactFeedbackGenerator(style: .rigid)
-    private var portraitShutterConstraints: [NSLayoutConstraint] = []
-    private var landscapeShutterConstraints: [NSLayoutConstraint] = []
-    private var portraitPlayerConstraints: [NSLayoutConstraint] = []
-    private var landscapePlayerConstraints: [NSLayoutConstraint] = []
-    private var isLandscapeLayout: Bool?
+    private var contentAngle: CGFloat = .pi / 2
 
     private let scoreRegionLayer = CAShapeLayer()
     private let titleRegionLayer = CAShapeLayer()
@@ -55,19 +56,21 @@ final class SessionCameraViewController: UIViewController {
     private let playerSideDefaultsKey = "Sessions.Camera.IsPlayer2"
     private var isPlayer2 = false
 
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .landscape }
-    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation { .landscapeRight }
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .portrait }
+    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation { .portrait }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
+        contentView.backgroundColor = .clear
+        view.addSubview(contentView)
         previewLayer.session = session
         previewLayer.videoGravity = .resizeAspect
-        view.layer.addSublayer(previewLayer)
+        contentView.layer.addSublayer(previewLayer)
         topGradient.colors = [UIColor.black.withAlphaComponent(0.6).cgColor, UIColor.clear.cgColor]
         bottomGradient.colors = [UIColor.clear.cgColor, UIColor.black.withAlphaComponent(0.6).cgColor]
-        view.layer.addSublayer(topGradient)
-        view.layer.addSublayer(bottomGradient)
+        contentView.layer.addSublayer(topGradient)
+        contentView.layer.addSublayer(bottomGradient)
         guideLayer.fillColor = UIColor.clear.cgColor
         guideLayer.strokeColor = UIColor.white.withAlphaComponent(0.9).cgColor
         guideLayer.lineWidth = 3
@@ -76,18 +79,18 @@ final class SessionCameraViewController: UIViewController {
         guideLayer.shadowOpacity = 0.4
         guideLayer.shadowRadius = 3
         guideLayer.shadowOffset = .zero
-        view.layer.addSublayer(guideLayer)
+        contentView.layer.addSublayer(guideLayer)
         configureRegionLayer(scoreRegionLayer, color: scoreRegionColor)
         configureRegionLayer(titleRegionLayer, color: titleRegionColor)
-        view.layer.addSublayer(scoreRegionLayer)
-        view.layer.addSublayer(titleRegionLayer)
+        contentView.layer.addSublayer(scoreRegionLayer)
+        contentView.layer.addSublayer(titleRegionLayer)
         configureControls()
         sessionQueue.async { [weak self] in self?.configureSession() }
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        AppDelegate.orientationLock = .landscape
+        AppDelegate.orientationLock = .portrait
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         shutterHaptic.prepare()
         startGuidePulse()
@@ -101,12 +104,13 @@ final class SessionCameraViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        setNeedsUpdateOfSupportedInterfaceOrientations()
-        requestInterfaceOrientation(.landscapeRight)
+        updateContentTransform()
+        if autoDetectEnabled { liveProbe.start() }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        liveProbe.stop()
         AppDelegate.orientationLock = .allButUpsideDown
         NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
         UIDevice.current.endGeneratingDeviceOrientationNotifications()
@@ -118,7 +122,22 @@ final class SessionCameraViewController: UIViewController {
     }
 
     @objc private func deviceOrientationDidChange() {
+        updateContentTransform()
         applyPreviewRotation()
+        applyVideoOutputRotation()
+    }
+
+    private func updateContentTransform() {
+        let angle: CGFloat
+        switch UIDevice.current.orientation {
+        case .landscapeLeft: angle = .pi / 2
+        case .landscapeRight: angle = -.pi / 2
+        default: return
+        }
+        guard angle != contentAngle else { return }
+        contentAngle = angle
+        contentView.transform = CGAffineTransform(rotationAngle: angle)
+        layoutContent()
     }
 
     private func startGuidePulse() {
@@ -135,27 +154,57 @@ final class SessionCameraViewController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        contentView.bounds = CGRect(x: 0, y: 0, width: view.bounds.height, height: view.bounds.width)
+        contentView.center = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
+        contentView.transform = CGAffineTransform(rotationAngle: contentAngle)
+        layoutContent()
+    }
+
+    private func layoutContent() {
+        let bounds = contentView.bounds
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        previewLayer.frame = view.bounds
+        previewLayer.frame = bounds
         let fade: CGFloat = 160
-        topGradient.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: fade)
-        bottomGradient.frame = CGRect(x: 0, y: view.bounds.height - fade, width: view.bounds.width, height: fade)
-        guideLayer.frame = view.bounds
+        topGradient.frame = CGRect(x: 0, y: 0, width: bounds.width, height: fade)
+        bottomGradient.frame = CGRect(x: 0, y: bounds.height - fade, width: bounds.width, height: fade)
+        guideLayer.frame = bounds
         guideLayer.path = cornerBracketPath(in: guideRect()).cgPath
         CATransaction.commit()
         updateRegionGuides()
         positionHintLabel(in: guideRect())
+        layoutControls()
         applyPreviewRotation()
-        applyShutterPlacement()
+        applyVideoOutputRotation()
+    }
+
+    private func layoutControls() {
+        let bounds = contentView.bounds
+        let insets = contentSafeInsets()
+        cancelButton.frame = CGRect(x: insets.left + 20, y: insets.top + 20, width: 48, height: 48)
+        let shutter: CGFloat = 80
+        shutterButton.frame = CGRect(x: bounds.width - insets.right - 24 - shutter,
+                                     y: bounds.midY - shutter / 2, width: shutter, height: shutter)
+        let options: CGFloat = 48
+        optionsButton.frame = CGRect(x: shutterButton.frame.midX - options / 2, y: insets.top + 20,
+                                     width: options, height: options)
+        let player = playerSideControl.intrinsicContentSize
+        playerSideControl.frame = CGRect(x: bounds.width - insets.right - 22 - player.width,
+                                         y: bounds.height - insets.bottom - 20 - player.height,
+                                         width: player.width, height: player.height)
+    }
+
+    private func contentSafeInsets() -> UIEdgeInsets {
+        let safe = view.safeAreaInsets
+        if contentAngle > 0 {
+            return UIEdgeInsets(top: safe.right, left: safe.top, bottom: safe.left, right: safe.bottom)
+        }
+        return UIEdgeInsets(top: safe.left, left: safe.bottom, bottom: safe.right, right: safe.top)
     }
 
     private func guideRect() -> CGRect {
-        let safe = view.bounds.inset(by: view.safeAreaInsets)
-        let landscape = view.bounds.width > view.bounds.height
-        let available = landscape
-            ? CGRect(x: safe.minX + 16, y: safe.minY + 12, width: safe.width - 40, height: safe.height - 24)
-            : CGRect(x: safe.minX + 16, y: safe.minY + 72, width: safe.width - 32, height: safe.height - 188)
+        let safe = contentView.bounds.inset(by: contentSafeInsets())
+        let available = CGRect(x: safe.minX + 16, y: safe.minY + 12, width: safe.width - 40, height: safe.height - 24)
         let aspect: CGFloat = 4.0 / 3.0
         var size = CGSize(width: available.width, height: available.width / aspect)
         if size.height > available.height {
@@ -196,38 +245,12 @@ final class SessionCameraViewController: UIViewController {
         return path
     }
 
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        coordinator.animate(alongsideTransition: nil) { [weak self] _ in
-            self?.applyPreviewRotation()
-        }
-    }
-
-    private func requestInterfaceOrientation(_ orientation: UIInterfaceOrientationMask) {
-        let scene = view.window?.windowScene
-            ?? UIApplication.shared.connectedScenes
-                .compactMap { $0 as? UIWindowScene }
-                .first { $0.activationState == .foregroundActive }
-        scene?.requestGeometryUpdate(.iOS(interfaceOrientations: orientation))
-    }
-
     private func applyPreviewRotation() {
         guard let coordinator = rotationCoordinator, let connection = previewLayer.connection else { return }
         let angle = coordinator.videoRotationAngleForHorizonLevelPreview
         if connection.isVideoRotationAngleSupported(angle) {
             connection.videoRotationAngle = angle
         }
-    }
-
-    private func applyShutterPlacement() {
-        let landscape = view.bounds.width > view.bounds.height
-        if isLandscapeLayout == landscape { return }
-        isLandscapeLayout = landscape
-        NSLayoutConstraint.deactivate(portraitShutterConstraints + landscapeShutterConstraints +
-                                      portraitPlayerConstraints + landscapePlayerConstraints)
-        NSLayoutConstraint.activate(landscape
-                                    ? landscapeShutterConstraints + landscapePlayerConstraints
-                                    : portraitShutterConstraints + portraitPlayerConstraints)
     }
 
     private func configureSession() {
@@ -243,6 +266,12 @@ final class SessionCameraViewController: UIViewController {
         }
         session.addInput(input)
         session.addOutput(photoOutput)
+        videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
+        videoDataOutput.alwaysDiscardsLateVideoFrames = true
+        videoDataOutput.setSampleBufferDelegate(liveProbe, queue: videoQueue)
+        if session.canAddOutput(videoDataOutput) {
+            session.addOutput(videoDataOutput)
+        }
         session.commitConfiguration()
         session.startRunning()
 
@@ -251,13 +280,13 @@ final class SessionCameraViewController: UIViewController {
             self.rotationCoordinator = AVCaptureDevice.RotationCoordinator(
                 device: device, previewLayer: self.previewLayer
             )
+            self.applyVideoOutputRotation()
             self.shutterButton.isEnabled = true
             self.view.setNeedsLayout()
         }
     }
 
     private func configureControls() {
-        shutterButton.translatesAutoresizingMaskIntoConstraints = false
         shutterButton.isEnabled = false
         if #available(iOS 26.0, *) {
             var shutterConfig = UIButton.Configuration.clearGlass()
@@ -274,7 +303,6 @@ final class SessionCameraViewController: UIViewController {
         }
         shutterButton.addTarget(self, action: #selector(capture), for: .touchUpInside)
 
-        cancelButton.translatesAutoresizingMaskIntoConstraints = false
         var cancelConfig = glassButtonConfiguration()
         cancelConfig.image = UIImage(systemName: "xmark",
                                      withConfiguration: UIImage.SymbolConfiguration(pointSize: 16, weight: .semibold))
@@ -292,7 +320,6 @@ final class SessionCameraViewController: UIViewController {
         hintLabel.shadowColor = UIColor.black.withAlphaComponent(0.6)
         hintLabel.shadowOffset = CGSize(width: 0, height: 1)
 
-        playerSideControl.translatesAutoresizingMaskIntoConstraints = false
         isPlayer2 = UserDefaults.standard.bool(forKey: playerSideDefaultsKey)
         playerSideControl.selectedSegmentIndex = isPlayer2 ? 1 : 0
         playerSideControl.selectedSegmentTintColor = .white
@@ -308,39 +335,14 @@ final class SessionCameraViewController: UIViewController {
         configureRegionLabel(titleRegionLabel, text: NSLocalizedString("Sessions.Camera.Guide.SongTitle", comment: ""),
                              color: titleRegionColor)
 
-        view.addSubview(scoreRegionLabel)
-        view.addSubview(titleRegionLabel)
-        view.addSubview(shutterButton)
-        view.addSubview(cancelButton)
-        view.addSubview(hintLabel)
-        view.addSubview(playerSideControl)
+        contentView.addSubview(scoreRegionLabel)
+        contentView.addSubview(titleRegionLabel)
+        contentView.addSubview(shutterButton)
+        contentView.addSubview(cancelButton)
+        contentView.addSubview(hintLabel)
+        contentView.addSubview(playerSideControl)
 
-        NSLayoutConstraint.activate([
-            shutterButton.widthAnchor.constraint(equalToConstant: 80),
-            shutterButton.heightAnchor.constraint(equalToConstant: 80),
-
-            cancelButton.widthAnchor.constraint(equalToConstant: 48),
-            cancelButton.heightAnchor.constraint(equalToConstant: 48),
-            cancelButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            cancelButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20)
-        ])
-
-        portraitShutterConstraints = [
-            shutterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            shutterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24)
-        ]
-        landscapeShutterConstraints = [
-            shutterButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            shutterButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24)
-        ]
-        portraitPlayerConstraints = [
-            playerSideControl.centerYAnchor.constraint(equalTo: shutterButton.centerYAnchor),
-            playerSideControl.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20)
-        ]
-        landscapePlayerConstraints = [
-            playerSideControl.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -22),
-            playerSideControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
-        ]
+        configureOptionsButton()
     }
 
     private func circleImage(diameter: CGFloat) -> UIImage {
@@ -374,7 +376,8 @@ final class SessionCameraViewController: UIViewController {
         }
         if let coordinator = rotationCoordinator,
            let connection = photoOutput.connection(with: .video) {
-            let angle = coordinator.videoRotationAngleForHorizonLevelCapture
+            var angle = coordinator.videoRotationAngleForHorizonLevelCapture + contentAngle * 180 / .pi
+            angle = (angle.truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
             if connection.isVideoRotationAngleSupported(angle) {
                 connection.videoRotationAngle = angle
             }
@@ -407,6 +410,47 @@ final class SessionCameraViewController: UIViewController {
 }
 
 extension SessionCameraViewController {
+    private var autoDetectEnabled: Bool {
+        get { UserDefaults.standard.object(forKey: "Sessions.Camera.AutoDetect") as? Bool ?? true }
+        set { UserDefaults.standard.set(newValue, forKey: "Sessions.Camera.AutoDetect") }
+    }
+
+    func configureOptionsButton() {
+        var config = glassButtonConfiguration()
+        config.image = UIImage(systemName: "ellipsis",
+                               withConfiguration: UIImage.SymbolConfiguration(pointSize: 16, weight: .semibold))
+        config.cornerStyle = .fixed
+        config.background.cornerRadius = 24
+        optionsButton.configuration = config
+        optionsButton.showsMenuAsPrimaryAction = true
+        optionsButton.menu = buildOptionsMenu()
+        optionsButton.accessibilityLabel = NSLocalizedString("Sessions.Camera.Options", comment: "")
+        contentView.addSubview(optionsButton)
+    }
+
+    private func buildOptionsMenu() -> UIMenu {
+        let title = NSLocalizedString("Sessions.Camera.AutoDetect", comment: "")
+        let toggle = UIAction(title: title, state: autoDetectEnabled ? .on : .off) { [weak self] _ in
+            self?.toggleAutoDetect()
+        }
+        return UIMenu(children: [toggle])
+    }
+
+    private func toggleAutoDetect() {
+        autoDetectEnabled.toggle()
+        optionsButton.menu = buildOptionsMenu()
+        if autoDetectEnabled { liveProbe.start() } else { liveProbe.stop() }
+    }
+
+    func applyVideoOutputRotation() {
+        guard let coordinator = rotationCoordinator,
+              let connection = videoDataOutput.connection(with: .video) else { return }
+        let angle = coordinator.videoRotationAngleForHorizonLevelCapture
+        if connection.isVideoRotationAngleSupported(angle) {
+            connection.videoRotationAngle = angle
+        }
+    }
+
     private func configureRegionLayer(_ layer: CAShapeLayer, color: UIColor) {
         layer.fillColor = color.withAlphaComponent(0.10).cgColor
         layer.strokeColor = color.withAlphaComponent(0.95).cgColor
@@ -433,8 +477,8 @@ extension SessionCameraViewController {
         let titleRect = denormalize(titleRegion, in: guide)
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        scoreRegionLayer.frame = view.bounds
-        titleRegionLayer.frame = view.bounds
+        scoreRegionLayer.frame = contentView.bounds
+        titleRegionLayer.frame = contentView.bounds
         scoreRegionLayer.path = UIBezierPath(roundedRect: scoreRect, cornerRadius: 10).cgPath
         titleRegionLayer.path = UIBezierPath(roundedRect: titleRect, cornerRadius: 8).cgPath
         CATransaction.commit()
