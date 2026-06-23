@@ -42,6 +42,9 @@ def _export(weights: Path, target_name: str, classes: list[str], imgsz: int,
     # the package directory as its package_path, so save(same_path) errors out.
     mlmodel = ct.models.MLModel(str(exported_path))
     mlmodel.author = "DJDX PEAK training pipeline"
+    # Weights derive from Ultralytics YOLO, which is AGPL-3.0; the exported
+    # CoreML model inherits that license and must declare it.
+    mlmodel.license = "AGPL-3.0 License (https://ultralytics.com/license)"
     mlmodel.short_description = (
         f"{target_name}: IIDX result-screen extraction. "
         f"Trained from training/schema.yaml."

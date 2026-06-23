@@ -282,7 +282,8 @@ steps 3–5. Each new photo funnelled through this loop improves everything.
 | `scripts/prepare_djlevel_dataset.py` | `djlevel_labels.json` (per-image rank) → sorted `rank_classifier_data/<split>/<class>/` for the rank trainer. |
 | `scripts/train_detector.py` | `--target {results,digits}`: trains the ROI detector or the per-digit digit detector. |
 | `scripts/train_rank_classifier.py` | Trains rank / clear-type classifiers. |
-| `scripts/export_coreml.py` | `.pt` → `.mlpackage` in `../Outputs/`. `--only detector\|rank\|clear_type\|digits`, with `--{detector,rank,digits}-name` overrides for eval variants. |
+| `scripts/export_coreml.py` | `.pt` → `.mlpackage` in `../Outputs/`. `--only detector\|rank\|clear_type\|digits`, with `--{detector,rank,digits}-name` overrides for eval variants. Stamps the AGPL-3.0 license (weights derive from Ultralytics YOLO). |
+| `scripts/promote_coreml.py` | Promote a staged `-eval` `.mlpackage` to its production name. `--eval-name`/`--prod-name`; re-stamps the model description (drops the `-eval` suffix) and preserves the license. The Studio "Promote Model" button calls this. |
 | `scripts/inference_test.py` | End-to-end pipeline reference (numbers via the digit reader, OCR fallback). |
 | `labels/auto_seed.json` | OCR-derived seed labels (written by `auto_label.py`). |
 | `labels/labels.json` | Result-detector labels (bbox; the app/labeller writes here). |

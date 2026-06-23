@@ -355,19 +355,35 @@ final class AppModel {
         }
     }
 
-    // Copy the evaluation model over the production one, so it backs
-    // "Label current" / "Auto label all". Keeps the eval model for further work.
+    // Re-save the evaluation model into the production slot so it backs
+    // "Label current" / "Auto label all". Goes through promote_coreml.py rather
+    // than a plain file copy so the embedded CoreML description (MLModelDescription)
+    // is re-stamped to drop the "-eval" staging suffix; the AGPL-3.0 license and
+    // class metadata are preserved. Keeps the eval model for further work.
     func promoteEvalToProduction() {
-        guard let p = paths, let eval = evalModelURL else { return }
-        let prod = p.modelURL(named: config.productionModelName)
-        let fm = FileManager.default
-        do {
-            if fm.fileExists(atPath: prod.path) { try fm.removeItem(at: prod) }
-            try fm.copyItem(at: eval, to: prod)
-            CoreMLPipeline.invalidateCache()
-            setStatus("Promoted \(workspace.title) evaluation model → production")
-        } catch {
-            setStatus("Promote failed: \(error.localizedDescription)")
+        guard let p = paths, hasEvalModel else { return }
+        guard !isBuildingModel else { return }
+        guard let uv = PythonTool.resolveUV() else {
+            setStatus("`uv` not found — install from docs.astral.sh/uv")
+            return
+        }
+        let evalBase = (config.evalModelName as NSString).deletingPathExtension
+        let prodBase = (config.productionModelName as NSString).deletingPathExtension
+        let args = ["run", "python", "scripts/promote_coreml.py",
+                    "--eval-name", evalBase, "--prod-name", prodBase]
+        isBuildingModel = true
+        setStatus("Promoting \(workspace.title) evaluation model → production…")
+        Task {
+            let code = await PythonTool.run(uv, args: args, cwd: p.trainingDir) { chunk in
+                Task { @MainActor in self.reportBuild("Promote", chunk) }
+            }
+            isBuildingModel = false
+            if code == 0 {
+                CoreMLPipeline.invalidateCache()
+                setStatus("Promoted \(workspace.title) evaluation model → production")
+            } else {
+                setStatus("Promote failed (exit \(code))")
+            }
         }
     }
 
