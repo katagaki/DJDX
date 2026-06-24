@@ -51,8 +51,10 @@ actor IIDXSessionCaptureProcessor {
             return
         }
 
+        let staged = IIDXLiveResultAccumulator.shared.takeStaged(for: playID)
         do {
-            let regions = try await IIDXResultReader.detect(imageData: imageData)
+            let photoRegions = try await IIDXResultReader.detect(imageData: imageData)
+            let regions = merge(photoRegions, staged: staged)
             IIDXSessionImageStore.shared.writeRecognizedText(recognizedText(from: regions), id: playID)
             let parse = IIDXResultParser.parse(regions: regions, songs: loadSongCandidates())
             play.apply(parse)
@@ -78,6 +80,32 @@ actor IIDXSessionCaptureProcessor {
         play.processedAt = .now
         database.updatePlay(play)
         notify(play.id)
+    }
+
+    private func merge(_ photo: [DetectedRegion], staged: [DetectedRegion]) -> [DetectedRegion] {
+        guard !staged.isEmpty else { return photo }
+        let songs = loadSongCandidates()
+        let photoIdentity = IIDXLiveResultAccumulator.identityKey(
+            IIDXResultParser.parse(regions: photo, songs: songs)
+        )
+        let stagedIdentity = IIDXLiveResultAccumulator.identityKey(
+            IIDXResultParser.parse(regions: staged, songs: songs)
+        )
+        if let photoIdentity, let stagedIdentity, photoIdentity != stagedIdentity {
+            return photo
+        }
+        var byLabel: [String: DetectedRegion] = [:]
+        for region in photo { byLabel[region.label] = region }
+        for region in staged {
+            guard let existing = byLabel[region.label] else {
+                byLabel[region.label] = region
+                continue
+            }
+            if IIDXLiveResultAccumulator.score(region) > IIDXLiveResultAccumulator.score(existing) {
+                byLabel[region.label] = region
+            }
+        }
+        return Array(byLabel.values)
     }
 
     private static let titleRegionLabels: Set<String> = ["song_title", "song_artist"]

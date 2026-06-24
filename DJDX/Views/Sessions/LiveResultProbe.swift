@@ -2,10 +2,6 @@ import AVFoundation
 import CoreImage
 import QuartzCore
 
-// Phase-0 measurement spike: taps live camera frames and runs the existing
-// detect + parse pipeline on a self-clocked loop (next inference starts when the
-// previous finishes, always on the newest frame), logging timing, frame
-// resolution and per-region OCR to the console. Throwaway — drives no UI/state.
 final class LiveResultProbe: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, @unchecked Sendable {
 
     private let lock = NSLock()
@@ -32,6 +28,7 @@ final class LiveResultProbe: NSObject, AVCaptureVideoDataOutputSampleBufferDeleg
     func stop() {
         running = false
         lock.lock(); latest = nil; lock.unlock()
+        IIDXLiveResultAccumulator.shared.clearLive()
         print("🎥 [LiveProbe] stop")
     }
 
@@ -49,10 +46,8 @@ final class LiveResultProbe: NSObject, AVCaptureVideoDataOutputSampleBufferDeleg
             let started = CACurrentMediaTime()
             do {
                 let regions = try await IIDXResultReader.detect(cgImage: image)
-                let detectMs = (CACurrentMediaTime() - started) * 1000
                 let parse = IIDXResultParser.parse(regions: regions, songs: songs)
-                let totalMs = (CACurrentMediaTime() - started) * 1000
-                report(image: image, regions: regions, parse: parse, detectMs: detectMs, totalMs: totalMs)
+                IIDXLiveResultAccumulator.shared.ingest(regions: regions, parse: parse, at: started)
             } catch {
                 print("🎥 [LiveProbe] detect error: \(error)")
             }
@@ -67,30 +62,5 @@ final class LiveResultProbe: NSObject, AVCaptureVideoDataOutputSampleBufferDeleg
     private func cgImage(from buffer: CVPixelBuffer) -> CGImage? {
         let ciImage = CIImage(cvPixelBuffer: buffer)
         return ciContext.createCGImage(ciImage, from: ciImage.extent)
-    }
-
-    private func report(image: CGImage,
-                        regions: [DetectedRegion],
-                        parse: IIDXResultParse,
-                        detectMs: Double,
-                        totalMs: Double) {
-        let song = parse.matchedSongID != nil ? "✓" : "✗"
-        let detect = String(format: "%.0f", detectMs)
-        let total = String(format: "%.0f", totalMs)
-        let conf = String(format: "%.2f", parse.confidence)
-        var summary = "🎥 [LiveProbe] \(image.width)x\(image.height)"
-        summary += " detect=\(detect)ms total=\(total)ms regions=\(regions.count) conf=\(conf)"
-        summary += " song=\(song) \"\(parse.songTitle ?? "—")\" \(parse.level)♦\(parse.difficulty) \(parse.playType)"
-        summary += " EX=\(parse.exScore) miss=\(parse.miss) PG=\(parse.perfectGreat) GR=\(parse.great)"
-        summary += " clr=\(parse.clearType) dj=\(parse.djLevel)"
-        let dump = regions
-            .sorted { $0.label < $1.label }
-            .map { region in
-                let text = region.text.replacingOccurrences(of: "\n", with: "⏎")
-                return "\(region.label)=\"\(text)\"\(region.recognitionFailed ? "‼️" : "")"
-            }
-            .joined(separator: " ")
-        print(summary)
-        print("🎥 [LiveProbe]   \(dump)")
     }
 }

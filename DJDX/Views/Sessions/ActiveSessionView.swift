@@ -68,8 +68,8 @@ struct ActiveSessionView: View {
         }
         .interactiveDismissDisabled()
         .fullScreenCover(isPresented: $isPresentingCamera) {
-            SessionCameraView { data in
-                store.capture(data, source: .camera)
+            SessionCameraView { data, staged in
+                store.capture(data, source: .camera, staged: staged)
                 isPresentingCamera = false
             } onCancel: {
                 isPresentingCamera = false

@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 
 struct SessionCameraView: UIViewControllerRepresentable {
-    var onCapture: (Data) -> Void
+    var onCapture: (Data, [DetectedRegion]) -> Void
     var onCancel: () -> Void
     var onUnavailable: () -> Void = {}
 
@@ -19,7 +19,7 @@ struct SessionCameraView: UIViewControllerRepresentable {
 }
 
 final class SessionCameraViewController: UIViewController {
-    var onCapture: ((Data) -> Void)?
+    var onCapture: ((Data, [DetectedRegion]) -> Void)?
     var onCancel: (() -> Void)?
     var onUnavailable: (() -> Void)?
 
@@ -376,7 +376,8 @@ final class SessionCameraViewController: UIViewController {
     private func handleCaptured(_ data: Data?) {
         captureDelegate = nil
         if let data {
-            onCapture?(data)
+            let staged = autoDetectEnabled ? IIDXLiveResultAccumulator.shared.snapshot() : []
+            onCapture?(data, staged)
         } else {
             shutterButton.isEnabled = true
         }
