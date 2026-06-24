@@ -98,8 +98,18 @@ struct ExternalDataReloader {
         iidxSongs.append(contentsOf: await songsForLatestVersion(version: version))
         progress(1, 2)
         iidxSongs.append(contentsOf: await songsForExistingVersions(version: version))
+        let levels = await levelsForLatestVersion(version: version)
+        for song in iidxSongs {
+            if let entry = levels[song.title.compact] {
+                song.spLevels = entry.single
+                song.dpLevels = entry.double
+            }
+        }
         progress(2, 2)
         await importer.insertSongs(iidxSongs)
+        await Task.detached(priority: .utility) {
+            IIDXSessionCaptureProcessor.backfillDifficultiesFromBEMANIWiki()
+        }.value
         return await IIDXReader().bemaniWikiSongCount()
     }
 
@@ -249,5 +259,46 @@ struct ExternalDataReloader {
         let count = await DDRMetadataImporter().reloadBemaniWikiData()
         progress(1, 1)
         return count
+    }
+}
+
+@MainActor
+extension ExternalDataReloader {
+
+    static func levelsForLatestVersion(version: IIDXVersion) async -> [String: IIDXSongLevels] {
+        do {
+            var levels: [String: IIDXSongLevels] = [:]
+            let (data, _) = try await URLSession.shared.data(from: version.bemaniWikiLatestVersionPageURL())
+            if let htmlString = String(bytes: data, encoding: .utf8),
+               let htmlDocument = try? SwiftSoup.parse(htmlString),
+               let htmlDocumentBody = htmlDocument.body(),
+               let documentContents = try? htmlDocumentBody.select("#contents").first(),
+               let documentBody = try? documentContents.select("#body").first() {
+                let indexOfHeader = documentBody.children().firstIndex { element in
+                    (element.tag().getName() == "h3" || element.tag().getName() == "h4") &&
+                    (try? element.text().contains("総ノーツ数")) ?? false
+                }
+                let scope = indexOfHeader.map {
+                    Elements(Array(documentBody.children()[0..<$0]))
+                } ?? documentBody.children()
+                if let tables = try? scope.select("div.ie5") {
+                    for table in tables {
+                        guard let tableRows = try? table.select("tr") else { continue }
+                        for tableRow in tableRows {
+                            guard let tableRowColumns = try? tableRow.select("td"),
+                                  tableRowColumns.count == 13 else { continue }
+                            let columnData = tableRowColumns.compactMap { try? $0.text() }
+                            if let parsed = IIDXSong.parseLevelRow(columnData) {
+                                levels[parsed.compactTitle] = parsed.levels
+                            }
+                        }
+                    }
+                }
+            }
+            return levels
+        } catch {
+            debugPrint(error.localizedDescription)
+            return [:]
+        }
     }
 }

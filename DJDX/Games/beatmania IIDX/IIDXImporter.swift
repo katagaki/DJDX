@@ -282,7 +282,16 @@ actor IIDXImporter {
             col.songDPLeggendariaNoteCount <- song.dpNoteCount?.leggendariaNoteCount,
             col.songTime <- song.time,
             col.songMovie <- song.movie,
-            col.songLayer <- song.layer
+            col.songLayer <- song.layer,
+            col.songSPBeginnerLevel <- song.spLevels[.beginner],
+            col.songSPNormalLevel <- song.spLevels[.normal],
+            col.songSPHyperLevel <- song.spLevels[.hyper],
+            col.songSPAnotherLevel <- song.spLevels[.another],
+            col.songSPLeggendariaLevel <- song.spLevels[.leggendaria],
+            col.songDPNormalLevel <- song.dpLevels[.normal],
+            col.songDPHyperLevel <- song.dpLevels[.hyper],
+            col.songDPAnotherLevel <- song.dpLevels[.another],
+            col.songDPLeggendariaLevel <- song.dpLevels[.leggendaria]
         ))
     }
 

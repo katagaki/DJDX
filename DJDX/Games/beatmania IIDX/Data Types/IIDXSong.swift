@@ -7,6 +7,8 @@ final class IIDXSong: Equatable, @unchecked Sendable {
     var time: String = ""
     var movie: String = ""
     var layer: String = ""
+    var spLevels: [IIDXLevel: Int] = [:]
+    var dpLevels: [IIDXLevel: Int] = [:]
 
     init() {}
 
@@ -57,6 +59,40 @@ final class IIDXSong: Equatable, @unchecked Sendable {
         return title.compact
     }
 
+    // The BEMANIWiki new-song list carries a level table whose row is
+    // [SP B/N/H/A/L, DP N/H/A/L, BPM, GENRE, TITLE, ARTIST]; chart-type prefixes
+    // like [CN]/[BSS] wrap the numeric level and are stripped here.
+    static func parseLevelRow(_ columnData: [String]) -> (compactTitle: String, levels: IIDXSongLevels)? {
+        guard columnData.count == 13 else { return nil }
+        let title = columnData[11]
+        guard !title.isEmpty else { return nil }
+        func level(_ raw: String) -> Int? {
+            let stripped = raw.replacingOccurrences(
+                of: "\\[[^\\]]*\\]", with: "", options: .regularExpression
+            )
+            guard let value = Int(stripped.trimmingCharacters(in: .whitespaces)),
+                  (1...12).contains(value) else { return nil }
+            return value
+        }
+        var single: [IIDXLevel: Int] = [:]
+        let singlePairs: [(IIDXLevel, String)] = [
+            (.beginner, columnData[0]), (.normal, columnData[1]), (.hyper, columnData[2]),
+            (.another, columnData[3]), (.leggendaria, columnData[4])
+        ]
+        for (chartLevel, raw) in singlePairs {
+            if let value = level(raw) { single[chartLevel] = value }
+        }
+        var double: [IIDXLevel: Int] = [:]
+        let doublePairs: [(IIDXLevel, String)] = [
+            (.normal, columnData[5]), (.hyper, columnData[6]),
+            (.another, columnData[7]), (.leggendaria, columnData[8])
+        ]
+        for (chartLevel, raw) in doublePairs {
+            if let value = level(raw) { double[chartLevel] = value }
+        }
+        return (title.compact, IIDXSongLevels(single: single, double: double))
+    }
+
     static func == (lhs: IIDXSong, rhs: IIDXSong) -> Bool {
         return lhs.title == rhs.title
     }
@@ -64,6 +100,11 @@ final class IIDXSong: Equatable, @unchecked Sendable {
     static func == (lhs: IIDXSong, rhs: IIDXSongRecord) -> Bool {
         return lhs.title == rhs.title
     }
+}
+
+struct IIDXSongLevels: Sendable {
+    var single: [IIDXLevel: Int]
+    var double: [IIDXLevel: Int]
 }
 
 struct IIDXNoteCount: Codable, Equatable {
