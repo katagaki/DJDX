@@ -3369,6 +3369,23 @@
         }
       }
     },
+    "Sessions.Camera.ShowStagedResults" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Staged Results"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検出中のリザルトを表示"
+          }
+        }
+      }
+    },
     "Sessions.Camera.Unavailable.Message" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -55,6 +55,9 @@ final class SessionCameraViewController: UIViewController {
     private var isPlayer2 = false
     private let guidePerspective: CGFloat = 0.08
 
+    private let stagedOverlay = StagedResultsOverlayView()
+    private var stagedTimer: Timer?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
@@ -82,6 +85,7 @@ final class SessionCameraViewController: UIViewController {
         overlayView.layer.addSublayer(scoreRegionLayer)
         overlayView.layer.addSublayer(titleRegionLayer)
         configureControls()
+        configureStagedOverlay()
         sessionQueue.async { [weak self] in self?.configureSession() }
     }
 
@@ -101,11 +105,13 @@ final class SessionCameraViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if autoDetectEnabled { liveProbe.start() }
+        startStagedTimer()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         liveProbe.stop()
+        stopStagedTimer()
         NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
         UIDevice.current.endGeneratingDeviceOrientationNotifications()
         guideLayer.removeAnimation(forKey: "pulse")
@@ -382,6 +388,11 @@ extension SessionCameraViewController {
         set { UserDefaults.standard.set(newValue, forKey: "Sessions.Camera.AutoDetect") }
     }
 
+    private var showStagedResults: Bool {
+        get { UserDefaults.standard.bool(forKey: "Sessions.Camera.ShowStagedResults") }
+        set { UserDefaults.standard.set(newValue, forKey: "Sessions.Camera.ShowStagedResults") }
+    }
+
     func configureOptionsButton() {
         var config = glassButtonConfiguration()
         config.image = UIImage(systemName: "ellipsis",
@@ -396,17 +407,55 @@ extension SessionCameraViewController {
     }
 
     private func buildOptionsMenu() -> UIMenu {
-        let title = NSLocalizedString("Sessions.Camera.AutoDetect", comment: "")
-        let toggle = UIAction(title: title, state: autoDetectEnabled ? .on : .off) { [weak self] _ in
+        let autoTitle = NSLocalizedString("Sessions.Camera.AutoDetect", comment: "")
+        let autoToggle = UIAction(title: autoTitle, state: autoDetectEnabled ? .on : .off) { [weak self] _ in
             self?.toggleAutoDetect()
         }
-        return UIMenu(children: [toggle])
+        let stagedTitle = NSLocalizedString("Sessions.Camera.ShowStagedResults", comment: "")
+        let stagedToggle = UIAction(title: stagedTitle, state: showStagedResults ? .on : .off) { [weak self] _ in
+            self?.toggleStagedResults()
+        }
+        return UIMenu(children: [autoToggle, stagedToggle])
     }
 
     private func toggleAutoDetect() {
         autoDetectEnabled.toggle()
         optionsButton.menu = buildOptionsMenu()
         if autoDetectEnabled { liveProbe.start() } else { liveProbe.stop() }
+    }
+
+    private func toggleStagedResults() {
+        showStagedResults.toggle()
+        optionsButton.menu = buildOptionsMenu()
+        if showStagedResults { startStagedTimer() } else { stopStagedTimer() }
+    }
+
+    func configureStagedOverlay() {
+        stagedOverlay.translatesAutoresizingMaskIntoConstraints = false
+        stagedOverlay.isHidden = true
+        view.addSubview(stagedOverlay)
+        NSLayoutConstraint.activate([
+            stagedOverlay.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 78.0),
+            stagedOverlay.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stagedOverlay.widthAnchor.constraint(lessThanOrEqualToConstant: 280.0)
+        ])
+    }
+
+    func startStagedTimer() {
+        stagedTimer?.invalidate()
+        guard showStagedResults else {
+            stagedOverlay.isHidden = true
+            return
+        }
+        stagedTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
+            self?.stagedOverlay.update(with: IIDXLiveResultAccumulator.shared.snapshot())
+        }
+    }
+
+    func stopStagedTimer() {
+        stagedTimer?.invalidate()
+        stagedTimer = nil
+        stagedOverlay.isHidden = true
     }
 
     func applyVideoOutputRotation() {
