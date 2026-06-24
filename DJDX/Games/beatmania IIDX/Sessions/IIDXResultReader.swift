@@ -64,10 +64,33 @@ enum IIDXResultReader {
         return try? VNCoreMLModel(for: detector.model)
     }()
 
-    static func prewarm() {
-        _ = vnModel
-        IIDXDigitRecognizer.prewarm()
-        IIDXRankRecognizer.prewarm()
+    // Loading the model is cheap; the real first-use cost is GPU/Vision pipeline
+    // compilation, which only happens on the first prediction. Run one throwaway
+    // prediction per model (and the text recognizer) so the first capture is fast.
+    static func prewarm() async {
+        guard let image = warmupImage() else { return }
+        _ = try? await detect(cgImage: image)
+        _ = await IIDXDigitRecognizer.recognize(cgImage: image)
+        _ = await IIDXRankRecognizer.classify(cgImage: image)
+        _ = try? await IIDXSessionTextRecognizer.recognize(
+            cgImage: image, languages: IIDXSessionTextRecognizer.numericLanguages
+        )
+    }
+
+    private static func warmupImage() -> CGImage? {
+        let dimension = 64
+        guard let context = CGContext(
+            data: nil,
+            width: dimension,
+            height: dimension,
+            bitsPerComponent: 8,
+            bytesPerRow: dimension * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return nil }
+        context.setFillColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+        context.fill(CGRect(x: 0, y: 0, width: dimension, height: dimension))
+        return context.makeImage()
     }
 
     static func detect(imageData: Data) async throws -> [DetectedRegion] {

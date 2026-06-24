@@ -24,10 +24,6 @@ enum IIDXRankRecognizer {
 
     static var isAvailable: Bool { vnModel != nil }
 
-    static func prewarm() {
-        _ = vnModel
-    }
-
     static func classify(cgImage: CGImage) async -> String? {
         guard let vnModel else { return nil }
         guard let prediction = try? await run(vnModel: vnModel, image: cgImage),

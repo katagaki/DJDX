@@ -87,7 +87,7 @@ struct ActiveSessionView: View {
             store.refreshPlays()
         }
         .onAppear {
-            Task.detached(priority: .utility) { IIDXResultReader.prewarm() }
+            Task.detached(priority: .userInitiated) { await IIDXResultReader.prewarm() }
             consumePendingCaptureRequest()
         }
         .onChange(of: store.pendingCaptureRequest) { _, _ in
