@@ -141,12 +141,6 @@ struct SessionDetailView: View {
                     summaryRow("Sessions.Elapsed") {
                         Text(verbatim: durationText)
                     }
-                    if let averageHeartRate {
-                        Divider()
-                        summaryRow("Sessions.Detail.AverageHeartRate") {
-                            Text(verbatim: "\(averageHeartRate)")
-                        }
-                    }
                 }
             }
         }
@@ -184,13 +178,6 @@ struct SessionDetailView: View {
             return SessionHeartRatePoint(id: play.id, date: play.captureDate, min: min, max: max)
         }
         .sorted { $0.date < $1.date }
-    }
-
-    private var averageHeartRate: Int? {
-        let points = heartRatePoints
-        guard !points.isEmpty else { return nil }
-        let total = points.reduce(0.0) { $0 + $1.mid }
-        return Int((total / Double(points.count)).rounded())
     }
 
     private var playsSection: some View {

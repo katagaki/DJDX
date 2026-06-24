@@ -11,6 +11,7 @@ struct SessionHeartRateDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20.0) {
+                overviewSection
                 graphSection
                 breakdownSection
             }
@@ -35,6 +36,18 @@ struct SessionHeartRateDetailView: View {
             withAnimation(.smooth) {
                 samples = raw.map { SessionHeartRateSample(date: $0.date, bpm: $0.bpm) }
             }
+        }
+    }
+
+    @ViewBuilder
+    private var overviewSection: some View {
+        if let stats = overviewStats {
+            HStack(spacing: 0.0) {
+                statColumn("Sessions.HeartRate.Average", value: stats.average)
+                statColumn("Sessions.HeartRate.Minimum", value: stats.minimum)
+                statColumn("Sessions.HeartRate.Maximum", value: stats.maximum)
+            }
+            .padding(.horizontal)
         }
     }
 
@@ -102,6 +115,23 @@ struct SessionHeartRateDetailView: View {
         .sorted { $0.date < $1.date }
     }
 
+    private var overviewStats: HeartRateOverview? {
+        if !samples.isEmpty {
+            let bpms = samples.map(\.bpm)
+            let average = Int((Double(bpms.reduce(0, +)) / Double(bpms.count)).rounded())
+            return HeartRateOverview(average: average, minimum: bpms.min() ?? average, maximum: bpms.max() ?? average)
+        }
+        let snapshots = points
+        guard !snapshots.isEmpty else { return nil }
+        let mids = snapshots.map(\.mid)
+        let average = Int((mids.reduce(0.0, +) / Double(mids.count)).rounded())
+        return HeartRateOverview(
+            average: average,
+            minimum: snapshots.map(\.min).min() ?? average,
+            maximum: snapshots.map(\.max).max() ?? average
+        )
+    }
+
     private var chartStats: [ChartHeartRate] {
         plays
             .sorted { $0.captureDate < $1.captureDate }
@@ -122,6 +152,12 @@ struct SessionHeartRateDetailView: View {
                 )
             }
     }
+}
+
+private struct HeartRateOverview {
+    let average: Int
+    let minimum: Int
+    let maximum: Int
 }
 
 private struct ChartHeartRate: Identifiable {
