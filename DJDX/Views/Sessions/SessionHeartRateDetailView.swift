@@ -39,11 +39,8 @@ struct SessionHeartRateDetailView: View {
     }
 
     private var graphSection: some View {
-        VStack(spacing: 12.0) {
-            AnalyticsSectionHeader(title: "Sessions.Detail.HeartRate")
-            SessionHeartRateGraph(session: session, points: points, height: 280.0)
-                .padding(.horizontal)
-        }
+        SessionHeartRateGraph(session: session, points: points, height: 280.0)
+            .padding(.horizontal)
     }
 
     @ViewBuilder
