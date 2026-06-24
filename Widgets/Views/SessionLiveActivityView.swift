@@ -223,7 +223,7 @@ struct SessionResultLabel: View {
         case "ASSIST CLEAR": return "A-CLEAR"
         case "HARD CLEAR": return "H-CLEAR"
         case "EX HARD CLEAR": return "EXH-CLEAR"
-        case "FAILED": return "FAIL"
+        case "FAILED": return "FAILED"
         default: return clearType
         }
     }
