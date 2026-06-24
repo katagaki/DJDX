@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About Sessions — Image Detection Pipeline</title>
+<style>
+  :root {
+    --ktui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", system-ui, sans-serif;
+    --ktui-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+    --ktui-bg: #ffffff;
+    --ktui-layer-01: #f4f4f4;
+    --ktui-layer-02: #ffffff;
+    --ktui-border-subtle: #e0e0e0;
+    --ktui-border-strong: #8d8d8d;
+    --ktui-text-primary: #161616;
+    --ktui-text-secondary: #525252;
+    --ktui-text-helper: #6f6f6f;
+    --ktui-node-bg: #ffffff;
+
+    --ktui-accent: #0f62fe;
+    --ktui-accent-bg: #edf5ff;
+    --ktui-model: #8a3ffc;
+    --ktui-model-bg: #f6f2ff;
+    --ktui-ocr: #007d79;
+    --ktui-ocr-bg: #d9fbfb;
+    --ktui-success: #24a148;
+    --ktui-success-bg: #defbe6;
+    --ktui-warning: #b28600;
+    --ktui-warning-mark: #f1c21b;
+    --ktui-warning-bg: #fcf4d6;
+    --ktui-danger: #da1e28;
+    --ktui-danger-bg: #fff1f1;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ktui-bg: #161616;
+      --ktui-layer-01: #262626;
+      --ktui-layer-02: #262626;
+      --ktui-border-subtle: #393939;
+      --ktui-border-strong: #6f6f6f;
+      --ktui-text-primary: #f4f4f4;
+      --ktui-text-secondary: #c6c6c6;
+      --ktui-text-helper: #a8a8a8;
+      --ktui-node-bg: #262626;
+
+      --ktui-accent: #4589ff;
+      --ktui-accent-bg: #1d273b;
+      --ktui-model: #be95ff;
+      --ktui-model-bg: #2a2336;
+      --ktui-ocr: #3ddbd9;
+      --ktui-ocr-bg: #1c2b2b;
+      --ktui-success: #42be65;
+      --ktui-success-bg: #16241c;
+      --ktui-warning: #f1c21b;
+      --ktui-warning-mark: #f1c21b;
+      --ktui-warning-bg: #2a2517;
+      --ktui-danger: #fa4d56;
+      --ktui-danger-bg: #2d1b1d;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--ktui-bg);
+    color: var(--ktui-text-primary);
+    font-family: var(--ktui-font);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0);
+    white-space: nowrap; border: 0;
+  }
+
+  /* Shell header */
+  .ktui-shell {
+    height: 48px;
+    background: #161616;
+    border-bottom: 1px solid #393939;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .ktui-shell .brand {
+    color: #ffffff;
+    font-size: 14px;
+    letter-spacing: .01em;
+  }
+  .ktui-shell .brand b { font-weight: 600; }
+  .ktui-shell .brand .sep {
+    color: #6f6f6f;
+    margin: 0 10px;
+  }
+  .ktui-shell .brand .ctx { color: #c6c6c6; }
+
+  main {
+    max-width: 992px;
+    margin: 0 auto;
+    padding: 48px 16px 80px;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--ktui-accent);
+    margin: 0 0 12px;
+  }
+
+  h1 {
+    font-size: 34px;
+    line-height: 1.18;
+    font-weight: 300;
+    margin: 0 0 16px;
+    letter-spacing: -.01em;
+  }
+
+  .lede {
+    font-size: 17px;
+    color: var(--ktui-text-secondary);
+    max-width: 70ch;
+    margin: 0 0 8px;
+  }
+
+  h2 {
+    font-size: 22px;
+    font-weight: 400;
+    margin: 56px 0 8px;
+    padding-top: 24px;
+    border-top: 1px solid var(--ktui-border-subtle);
+  }
+  h2 .num {
+    color: var(--ktui-text-helper);
+    font-variant-numeric: tabular-nums;
+    margin-right: 12px;
+  }
+  .section-sub {
+    color: var(--ktui-text-secondary);
+    margin: 0 0 24px;
+    max-width: 72ch;
+  }
+
+  p { max-width: 74ch; }
+
+  code, .mono {
+    font-family: var(--ktui-mono);
+    font-size: .9em;
+  }
+  p code, td code, li code {
+    background: var(--ktui-layer-01);
+    border: 1px solid var(--ktui-border-subtle);
+    padding: .08em .4em;
+    color: var(--ktui-text-primary);
+  }
+
+  /* Figure / diagram */
+  .ktui-figure {
+    margin: 32px 0 12px;
+    border: 1px solid var(--ktui-border-subtle);
+    background: var(--ktui-layer-02);
+    overflow-x: auto;
+  }
+  .ktui-figure svg {
+    display: block;
+    width: 100%;
+    min-width: 860px;
+    height: auto;
+  }
+  figcaption {
+    font-size: 13px;
+    color: var(--ktui-text-helper);
+    margin: 0 0 40px;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin: 0 0 8px;
+    padding: 14px 16px;
+    background: var(--ktui-layer-01);
+    border: 1px solid var(--ktui-border-subtle);
+    border-top: none;
+  }
+  .legend .item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ktui-text-secondary);
+  }
+  .legend .swatch {
+    width: 12px; height: 12px;
+    flex: 0 0 auto;
+    display: inline-block;
+  }
+  .sw-proc { background: var(--ktui-accent); }
+  .sw-model { background: var(--ktui-model); }
+  .sw-ocr { background: var(--ktui-ocr); }
+  .sw-done { background: var(--ktui-success); }
+  .sw-review { background: var(--ktui-warning-mark); }
+  .sw-failed { background: var(--ktui-danger); }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    padding: 2px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .tag-model { background: var(--ktui-model-bg); color: var(--ktui-model); }
+  .tag-ocr { background: var(--ktui-ocr-bg); color: var(--ktui-ocr); }
+  .tag-proc { background: var(--ktui-accent-bg); color: var(--ktui-accent); }
+  .tag-req { background: var(--ktui-layer-01); color: var(--ktui-text-secondary); border: 1px solid var(--ktui-border-subtle); }
+
+  /* Data table */
+  .table-wrap { overflow-x: auto; margin: 8px 0 4px; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 640px;
+    font-size: 14px;
+  }
+  caption { text-align: left; }
+  thead th {
+    background: var(--ktui-layer-01);
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    color: var(--ktui-text-secondary);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--ktui-border-strong);
+  }
+  tbody td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--ktui-border-subtle);
+    vertical-align: top;
+    color: var(--ktui-text-secondary);
+  }
+  tbody td:first-child { color: var(--ktui-text-primary); }
+  tbody tr:hover td { background: var(--ktui-layer-01); }
+  td .mono { color: var(--ktui-text-primary); }
+
+  /* Step list */
+  .steps { list-style: none; counter-reset: s; padding: 0; margin: 8px 0; max-width: 80ch; }
+  .steps > li {
+    counter-increment: s;
+    position: relative;
+    padding: 14px 0 14px 52px;
+    border-bottom: 1px solid var(--ktui-border-subtle);
+  }
+  .steps > li::before {
+    content: counter(s);
+    position: absolute;
+    left: 0; top: 12px;
+    width: 32px; height: 32px;
+    background: var(--ktui-accent-bg);
+    color: var(--ktui-accent);
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .steps .st-title { font-weight: 600; color: var(--ktui-text-primary); }
+  .steps .st-body { color: var(--ktui-text-secondary); margin-top: 2px; }
+
+  /* State cards */
+  .states {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--ktui-border-subtle);
+    border: 1px solid var(--ktui-border-subtle);
+    margin: 8px 0;
+  }
+  .state {
+    background: var(--ktui-layer-02);
+    padding: 18px 18px 20px;
+    border-left: 4px solid var(--ktui-border-strong);
+  }
+  .state.done { border-left-color: var(--ktui-success); }
+  .state.review { border-left-color: var(--ktui-warning-mark); }
+  .state.failed { border-left-color: var(--ktui-danger); }
+  .state .name { font-family: var(--ktui-mono); font-size: 15px; font-weight: 600; }
+  .state .desc { color: var(--ktui-text-secondary); font-size: 14px; margin-top: 6px; }
+
+  /* Diagram-scoped SVG styling */
+  .ktui-diagram text { font-family: var(--ktui-font); }
+  .ktui-diagram .n { fill: var(--ktui-node-bg); stroke: var(--ktui-border-subtle); stroke-width: 1; }
+  .ktui-diagram .n.model { fill: var(--ktui-model-bg); }
+  .ktui-diagram .n.ocr { fill: var(--ktui-ocr-bg); }
+  .ktui-diagram .n.dev { stroke-dasharray: 4 3; fill: var(--ktui-layer-01); }
+  .ktui-diagram .bar { stroke: none; }
+  .ktui-diagram .bar.proc { fill: var(--ktui-accent); }
+  .ktui-diagram .bar.model { fill: var(--ktui-model); }
+  .ktui-diagram .bar.ocr { fill: var(--ktui-ocr); }
+  .ktui-diagram .bar.done { fill: var(--ktui-success); }
+  .ktui-diagram .bar.review { fill: var(--ktui-warning-mark); }
+  .ktui-diagram .bar.failed { fill: var(--ktui-danger); }
+  .ktui-diagram .bar.dev { fill: var(--ktui-border-strong); }
+  .ktui-diagram .eyebrow-t { font-size: 10px; font-weight: 600; letter-spacing: .06em; }
+  .ktui-diagram .eyebrow-t.proc { fill: var(--ktui-accent); }
+  .ktui-diagram .eyebrow-t.model { fill: var(--ktui-model); }
+  .ktui-diagram .eyebrow-t.ocr { fill: var(--ktui-ocr); }
+  .ktui-diagram .eyebrow-t.muted { fill: var(--ktui-text-helper); }
+  .ktui-diagram .title-t { font-size: 14.5px; font-weight: 600; fill: var(--ktui-text-primary); }
+  .ktui-diagram .title-t.mono { font-family: var(--ktui-mono); font-size: 13.5px; }
+  .ktui-diagram .sub-t { font-size: 11.5px; fill: var(--ktui-text-secondary); }
+  .ktui-diagram .sub-t.mono { font-family: var(--ktui-mono); font-size: 10.5px; }
+  .ktui-diagram .edge { stroke: var(--ktui-border-strong); stroke-width: 1.5; fill: none; }
+  .ktui-diagram .edge.dash { stroke-dasharray: 5 4; }
+  .ktui-diagram .arrowhead { fill: var(--ktui-border-strong); }
+  .ktui-diagram .edge-label { font-size: 10.5px; fill: var(--ktui-text-helper); }
+</style>
+</head>
+<body>
+
+<header class="ktui-shell">
+  <span class="brand"><b>ktui</b><span class="sep">/</span><span class="ctx">DJDX · Sessions</span></span>
+</header>
+
+<main>
+  <p class="eyebrow">Documentation · Sessions</p>
+  <h1>Image detection pipeline</h1>
+  <p class="lede">
+    A Sessions capture turns a photo of a beatmania&nbsp;IIDX result screen into a typed,
+    matched play record. It runs in three stages — localize the on-screen regions with a
+    Core&nbsp;ML object detector, read each region with the model best suited to its content,
+    then parse the text into a structured result and match it against the song database.
+  </p>
+
+  <!-- ============================ DIAGRAM ============================ -->
+  <figure>
+    <div class="ktui-figure">
+      <svg class="ktui-diagram" viewBox="0 0 1000 1170" role="img"
+           aria-labelledby="diagTitle diagDesc" preserveAspectRatio="xMidYMid meet">
+        <title id="diagTitle">Sessions image detection pipeline</title>
+        <desc id="diagDesc">
+          A captured result-screen photo is stored, queued by the capture processor, and
+          normalized by the result reader. Stage one runs the IIDXResultDetector Core ML model
+          to localize result regions. Stage two crops each region and routes it: dj_level to the
+          IIDXRankClassifier model, numeric fields to the IIDXDigitsDetector model, and title and
+          residual text to the Vision OCR text recognizer. Stage three parses the regions with
+          IIDXResultParser, producing a play state of done, needsReview, or failed.
+        </desc>
+
+        <defs>
+          <marker id="ktuiArrow" viewBox="0 0 10 10" markerWidth="7" markerHeight="7"
+                  refX="8.5" refY="5" orient="auto-start-reverse">
+            <path class="arrowhead" d="M1 1 L9 5 L1 9 Z"/>
+          </marker>
+        </defs>
+
+        <!-- ===== Edges (drawn first, under nodes) ===== -->
+        <g>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 82 L500 122"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 186 L500 226"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 290 L500 330"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 394 L500 438"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 508 L500 552"/>
+          <!-- fan-out to stage 2 -->
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 610 L149 650"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 610 L383 650"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 610 L617 650"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 610 L851 650"/>
+          <!-- fan-in to collect -->
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M149 766 L500 808"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M383 766 L500 808"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M617 766 L500 808"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M851 766 L500 808"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 866 L500 912"/>
+          <!-- fan-out to states -->
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 1000 L200 1048"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 1000 L500 1048"/>
+          <path class="edge" marker-end="url(#ktuiArrow)" d="M500 1000 L800 1048"/>
+          <!-- dev probe tap -->
+          <path class="edge dash" marker-end="url(#ktuiArrow)" d="M252 362 L280 362"/>
+          <text class="edge-label" x="50" y="410">live frames · logs only</text>
+        </g>
+
+        <!-- ===== N1 Capture ===== -->
+        <g>
+          <rect class="n" x="280" y="24" width="440" height="58"/>
+          <rect class="bar proc" x="280" y="24" width="6" height="58"/>
+          <text class="eyebrow-t proc" x="300" y="42">CAPTURE</text>
+          <text class="title-t" x="300" y="61">Camera capture</text>
+          <text class="sub-t mono" x="300" y="76">SessionCameraView → IIDXSessionStore.capture</text>
+        </g>
+
+        <!-- ===== Dev probe (left of reader) ===== -->
+        <g>
+          <rect class="n dev" x="40" y="326" width="212" height="72"/>
+          <rect class="bar dev" x="40" y="326" width="6" height="72"/>
+          <text class="eyebrow-t muted" x="58" y="346">DEV PROBE</text>
+          <text class="title-t mono" x="58" y="365">LiveResultProbe</text>
+          <text class="sub-t" x="58" y="382">self-clocked loop,</text>
+          <text class="sub-t" x="58" y="394">no persistence</text>
+        </g>
+
+        <!-- ===== N2 Persist ===== -->
+        <g>
+          <rect class="n" x="280" y="122" width="440" height="64"/>
+          <rect class="bar proc" x="280" y="122" width="6" height="64"/>
+          <text class="eyebrow-t proc" x="300" y="141">PERSIST · state: pending</text>
+          <text class="title-t" x="300" y="160">Image store + play record</text>
+          <text class="sub-t mono" x="300" y="176">IIDXSessionImageStore · HEIC on disk</text>
+        </g>
+
+        <!-- ===== N3 Queue ===== -->
+        <g>
+          <rect class="n" x="280" y="226" width="440" height="64"/>
+          <rect class="bar proc" x="280" y="226" width="6" height="64"/>
+          <text class="eyebrow-t proc" x="300" y="245">QUEUE · state: processing</text>
+          <text class="title-t" x="300" y="264">Capture processor</text>
+          <text class="sub-t mono" x="300" y="280">IIDXSessionCaptureProcessor · actor, serial drain</text>
+        </g>
+
+        <!-- ===== N4 Preprocess ===== -->
+        <g>
+          <rect class="n" x="280" y="330" width="440" height="64"/>
+          <rect class="bar proc" x="280" y="330" width="6" height="64"/>
+          <text class="eyebrow-t proc" x="300" y="349">PREPROCESS</text>
+          <text class="title-t" x="300" y="368">Result reader</text>
+          <text class="sub-t mono" x="300" y="384">IIDXResultReader · upright + downscale ≤ 2048 px</text>
+        </g>
+
+        <!-- ===== N5 Stage 1 detector (model) ===== -->
+        <g>
+          <rect class="n model" x="280" y="438" width="440" height="70"/>
+          <rect class="bar model" x="280" y="438" width="6" height="70"/>
+          <text class="eyebrow-t model" x="300" y="457">STAGE 1 · LOCALIZE · CORE ML MODEL</text>
+          <text class="title-t mono" x="300" y="477">IIDXResultDetector</text>
+          <text class="sub-t" x="300" y="494">Object detector · 22 region classes</text>
+          <text class="sub-t" x="300" y="503" opacity="0"> </text>
+          <text class="sub-t" x="510" y="477">best per label →</text>
+        </g>
+
+        <!-- ===== N6 Stage 2 router ===== -->
+        <g>
+          <rect class="n" x="280" y="552" width="440" height="58"/>
+          <rect class="bar proc" x="280" y="552" width="6" height="58"/>
+          <text class="eyebrow-t proc" x="300" y="572">STAGE 2 · READ</text>
+          <text class="title-t" x="300" y="591">Crop + route each region by label</text>
+          <text class="sub-t" x="300" y="605">one padded crop per detected region</text>
+        </g>
+
+        <!-- ===== Stage 2 columns ===== -->
+        <!-- C1 Rank classifier -->
+        <g>
+          <rect class="n model" x="40" y="650" width="218" height="116"/>
+          <rect class="bar model" x="40" y="650" width="6" height="116"/>
+          <text class="eyebrow-t model" x="58" y="670">CORE ML MODEL</text>
+          <text class="title-t mono" x="58" y="689">IIDXRankClassifier</text>
+          <text class="sub-t" x="58" y="708">DJ level · A–AAA</text>
+          <text class="sub-t mono" x="58" y="724">dj_level_now</text>
+          <text class="sub-t" x="58" y="745">optional →</text>
+          <text class="sub-t" x="58" y="758">derive from score rate</text>
+        </g>
+        <!-- C2 Digits detector -->
+        <g>
+          <rect class="n model" x="274" y="650" width="218" height="116"/>
+          <rect class="bar model" x="274" y="650" width="6" height="116"/>
+          <text class="eyebrow-t model" x="292" y="670">CORE ML MODEL</text>
+          <text class="title-t mono" x="292" y="689">IIDXDigitsDetector</text>
+          <text class="sub-t" x="292" y="708">0–9 LED digit font</text>
+          <text class="sub-t mono" x="292" y="724">score · miss · judges</text>
+          <text class="sub-t" x="292" y="745">optional →</text>
+          <text class="sub-t" x="292" y="758">Vision OCR fallback</text>
+        </g>
+        <!-- C3 Title OCR -->
+        <g>
+          <rect class="n ocr" x="508" y="650" width="218" height="116"/>
+          <rect class="bar ocr" x="508" y="650" width="6" height="116"/>
+          <text class="eyebrow-t ocr" x="526" y="670">VISION OCR</text>
+          <text class="title-t" x="526" y="689">Text — title</text>
+          <text class="sub-t" x="526" y="708">Languages: ja + en</text>
+          <text class="sub-t mono" x="526" y="724">song_title</text>
+          <text class="sub-t mono" x="526" y="740">song_artist</text>
+        </g>
+        <!-- C4 Numeric OCR -->
+        <g>
+          <rect class="n ocr" x="742" y="650" width="218" height="116"/>
+          <rect class="bar ocr" x="742" y="650" width="6" height="116"/>
+          <text class="eyebrow-t ocr" x="760" y="670">VISION OCR</text>
+          <text class="title-t" x="760" y="689">Text — numeric</text>
+          <text class="sub-t" x="760" y="708">Language: en</text>
+          <text class="sub-t mono" x="760" y="724">clear_type · difficulty</text>
+          <text class="sub-t mono" x="760" y="740">stage_label</text>
+        </g>
+
+        <!-- ===== N7 Collect ===== -->
+        <g>
+          <rect class="n" x="280" y="808" width="440" height="58"/>
+          <rect class="bar proc" x="280" y="808" width="6" height="58"/>
+          <text class="eyebrow-t proc" x="300" y="828">COLLECT</text>
+          <text class="title-t mono" x="300" y="847">[DetectedRegion]</text>
+          <text class="sub-t" x="300" y="861">label · text · box · confidence · recognitionFailed</text>
+        </g>
+
+        <!-- ===== N8 Stage 3 parser ===== -->
+        <g>
+          <rect class="n" x="240" y="912" width="520" height="88"/>
+          <rect class="bar proc" x="240" y="912" width="6" height="88"/>
+          <text class="eyebrow-t proc" x="260" y="932">STAGE 3 · PARSE</text>
+          <text class="title-t mono" x="260" y="952">IIDXResultParser</text>
+          <text class="sub-t" x="260" y="970">chart + play type · title fuzzy-match vs song DB</text>
+          <text class="sub-t" x="260" y="987">judge reconcile · DJ-level derive · confidence score</text>
+        </g>
+
+        <!-- ===== Outcome states ===== -->
+        <g>
+          <rect class="n" x="60" y="1048" width="280" height="64"/>
+          <rect class="bar done" x="60" y="1048" width="6" height="64"/>
+          <text class="eyebrow-t muted" x="80" y="1070">PLAY STATE</text>
+          <text class="title-t mono" x="80" y="1091">done</text>
+          <text class="sub-t" x="80" y="1106">matched · conf ≥ 0.6 · clean</text>
+        </g>
+        <g>
+          <rect class="n" x="360" y="1048" width="280" height="64"/>
+          <rect class="bar review" x="360" y="1048" width="6" height="64"/>
+          <text class="eyebrow-t muted" x="380" y="1070">PLAY STATE</text>
+          <text class="title-t mono" x="380" y="1091">needsReview</text>
+          <text class="sub-t" x="380" y="1106">low confidence or no match</text>
+        </g>
+        <g>
+          <rect class="n" x="660" y="1048" width="280" height="64"/>
+          <rect class="bar failed" x="660" y="1048" width="6" height="64"/>
+          <text class="eyebrow-t muted" x="680" y="1070">PLAY STATE</text>
+          <text class="title-t mono" x="680" y="1091">failed</text>
+          <text class="sub-t" x="680" y="1106">image missing or detect threw</text>
+        </g>
+      </svg>
+    </div>
+    <div class="legend" aria-hidden="true">
+      <span class="item"><span class="swatch sw-proc"></span> Process step</span>
+      <span class="item"><span class="swatch sw-model"></span> Core ML model</span>
+      <span class="item"><span class="swatch sw-ocr"></span> Vision OCR</span>
+      <span class="item"><span class="swatch sw-done"></span> done</span>
+      <span class="item"><span class="swatch sw-review"></span> needsReview</span>
+      <span class="item"><span class="swatch sw-failed"></span> failed</span>
+    </div>
+    <figcaption>
+      Solid arrows follow the persistent capture path. The dashed branch is the development
+      probe, which taps the same detect-and-parse core on live camera frames without writing
+      to the store.
+    </figcaption>
+  </figure>
+
+  <!-- ============================ FLOW ============================ -->
+  <h2><span class="num">01</span>How a capture flows</h2>
+  <p class="section-sub">
+    Capture and recognition are decoupled: the photo is persisted immediately, and an actor
+    drains the work queue one play at a time so a backlog can survive app suspension and be
+    recovered by a background task.
+  </p>
+  <ol class="steps">
+    <li>
+      <div class="st-title">Capture &amp; persist</div>
+      <div class="st-body">
+        <span class="mono">IIDXSessionStore.capture</span> writes the HEIC image via
+        <span class="mono">IIDXSessionImageStore</span>, inserts a play in state
+        <span class="mono">pending</span>, and submits its id to the processor.
+      </div>
+    </li>
+    <li>
+      <div class="st-title">Queue &amp; drain</div>
+      <div class="st-body">
+        <span class="mono">IIDXSessionCaptureProcessor</span> (an actor) appends to a serial
+        queue and processes each play under a background activity, marking it
+        <span class="mono">processing</span>.
+      </div>
+    </li>
+    <li>
+      <div class="st-title">Read regions</div>
+      <div class="st-body">
+        <span class="mono">IIDXResultReader.detect</span> uprights and downscales the image
+        (≤&nbsp;2048&nbsp;px), runs the detector, and reads each region — returning
+        <span class="mono">[DetectedRegion]</span>.
+      </div>
+    </li>
+    <li>
+      <div class="st-title">Parse &amp; match</div>
+      <div class="st-body">
+        <span class="mono">IIDXResultParser.parse</span> turns the regions into an
+        <span class="mono">IIDXResultParse</span>, fuzzy-matching the title against song
+        candidates loaded from the play-data database.
+      </div>
+    </li>
+    <li>
+      <div class="st-title">Commit state</div>
+      <div class="st-body">
+        The play is updated to <span class="mono">done</span>,
+        <span class="mono">needsReview</span>, or <span class="mono">failed</span>; recognized
+        text is cached as JSON and the Live Activity / watch are refreshed.
+      </div>
+    </li>
+  </ol>
+
+  <!-- ============================ STAGE 2 ROUTING ============================ -->
+  <h2><span class="num">02</span>Stage&nbsp;2 — region routing</h2>
+  <p class="section-sub">
+    The detector localizes a region; what reads it depends on the region's content. Pure-number
+    fields and the stylized DJ-level graphic go to dedicated models that Vision OCR cannot read;
+    everything else stays on OCR. <span class="mono">_prev</span> and
+    <span class="mono">_delta</span> variants are detected but ignored by the parser, which uses
+    the <span class="mono">_now</span> values.
+  </p>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">Region label to reader routing</caption>
+      <thead>
+        <tr><th scope="col">Region label(s)</th><th scope="col">Reader</th><th scope="col">Crop mode</th><th scope="col">On miss</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>dj_level_now</code></td>
+          <td><span class="tag tag-model">IIDXRankClassifier</span></td>
+          <td><code>centerCrop</code></td>
+          <td>Derive from score rate</td>
+        </tr>
+        <tr>
+          <td><code>score_now</code>, <code>miss_count_now</code>, <code>judge_pgreat</code>…<code>poor</code>, <code>notes_count</code>, <code>combo_break</code></td>
+          <td><span class="tag tag-model">IIDXDigitsDetector</span></td>
+          <td><code>scaleFit</code></td>
+          <td>Vision OCR (en)</td>
+        </tr>
+        <tr>
+          <td><code>song_title</code>, <code>song_artist</code></td>
+          <td><span class="tag tag-ocr">Vision OCR</span></td>
+          <td>—</td>
+          <td>Marked <code>recognitionFailed</code></td>
+        </tr>
+        <tr>
+          <td><code>clear_type_now</code>, <code>difficulty_label</code>, <code>stage_label</code>, others</td>
+          <td><span class="tag tag-ocr">Vision OCR</span></td>
+          <td>—</td>
+          <td>Marked <code>recognitionFailed</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============================ MODELS ============================ -->
+  <h2><span class="num">03</span>Models</h2>
+  <p class="section-sub">
+    Three Core ML models plus the system Vision text recognizer. The result detector is the
+    pipeline core and ships with the app; the digit and rank models are loaded by bundle name at
+    runtime, so the build never depends on their presence and the pipeline degrades gracefully
+    when one is absent. All three were exported from the DJDX&nbsp;PEAK training pipeline.
+  </p>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">Models used by the pipeline</caption>
+      <thead>
+        <tr>
+          <th scope="col">Model</th>
+          <th scope="col">Kind</th>
+          <th scope="col">Reads</th>
+          <th scope="col">Output classes</th>
+          <th scope="col">Availability</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="mono">IIDXResultDetector</span><br><span class="tag tag-model">Core ML model</span></td>
+          <td>Object detector (Vision)</td>
+          <td>The whole result screen</td>
+          <td>22 region classes — <code>song_title</code>, <code>score_now</code>, <code>dj_level_now</code>, … (conf 0.25, IoU 0.7)</td>
+          <td><span class="tag tag-req">Bundled · required</span></td>
+        </tr>
+        <tr>
+          <td><span class="mono">IIDXDigitsDetector</span><br><span class="tag tag-model">Core ML model</span></td>
+          <td>Object detector (Vision)</td>
+          <td>Numeric field crops (LED font)</td>
+          <td><code>0</code>–<code>9</code>; <code>minus</code> / <code>plus</code> ignored. Boxes sorted left→right, assembled into an integer</td>
+          <td><span class="tag tag-req">Optional · runtime</span></td>
+        </tr>
+        <tr>
+          <td><span class="mono">IIDXRankClassifier</span><br><span class="tag tag-model">Core ML model</span></td>
+          <td>Image classifier (Vision)</td>
+          <td>The <code>dj_level_now</code> crop</td>
+          <td><code>A</code>, <code>AA</code>, <code>AAA</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code>, <code>F</code> (conf ≥ 0.5, 128×128)</td>
+          <td><span class="tag tag-req">Optional · runtime</span></td>
+        </tr>
+        <tr>
+          <td><span class="mono">VNRecognizeTextRequest</span><br><span class="tag tag-ocr">Vision OCR</span></td>
+          <td>System text recognizer</td>
+          <td>Title &amp; residual text crops</td>
+          <td>Free text — accurate level, language correction off, language-filtered per field</td>
+          <td><span class="tag tag-req">Built-in · no file</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============================ STATES ============================ -->
+  <h2><span class="num">04</span>Outcome states</h2>
+  <p class="section-sub">
+    A play is acceptable only when a song matched, the parser's confidence reached the threshold
+    (<span class="mono">acceptableConfidence = 0.6</span>), and no region was flagged
+    <span class="mono">recognitionFailed</span>. Confidence is
+    <span class="mono">min(1, (hits + bonus) / 8)</span>, where a hit is a field read with a
+    plausible value and the bonus rewards an internally consistent EX score
+    (<span class="mono">EX = 2·PGreat + Great</span>).
+  </p>
+  <div class="states">
+    <div class="state done">
+      <div class="name">done</div>
+      <div class="desc">Song matched, confidence ≥ 0.6, and every region read cleanly.</div>
+    </div>
+    <div class="state review">
+      <div class="name">needsReview</div>
+      <div class="desc">Parsed, but unmatched, below threshold, or a region failed recognition. Surfaced for manual confirmation or reprocessing.</div>
+    </div>
+    <div class="state failed">
+      <div class="name">failed</div>
+      <div class="desc">The image was unavailable or detection threw; the error is stored on the play.</div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>
