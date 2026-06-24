@@ -183,14 +183,14 @@ struct CapturedPlayDetailView: View {
     private func dockedImage(in proxy: GeometryProxy, landscape: Bool) -> some View {
         if let capturedImage {
             if landscape {
-                RecognizedTextImage(image: capturedImage)
+                DetectorOverlayImage(image: capturedImage, imageFilename: play.rawImageFilename)
                     .frame(maxHeight: .infinity)
                     .frame(width: min(
                         proxy.size.height * capturedImage.size.width / capturedImage.size.height,
                         proxy.size.width / 2.0
                     ))
             } else {
-                RecognizedTextImage(image: capturedImage)
+                DetectorOverlayImage(image: capturedImage, imageFilename: play.rawImageFilename)
                     .frame(maxWidth: .infinity)
                     .frame(height: min(
                         proxy.size.width * capturedImage.size.height / capturedImage.size.width,
@@ -329,14 +329,4 @@ private struct SongEntry: Sendable {
 private enum PhotoAlert: Int, Identifiable {
     case saved, denied, failed
     var id: Int { rawValue }
-}
-
-struct RecognizedTextImage: View {
-    let image: UIImage
-
-    var body: some View {
-        Image(uiImage: image)
-            .resizable()
-            .scaledToFit()
-    }
 }

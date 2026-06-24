@@ -33,7 +33,7 @@ enum IIDXResultReader {
 
     // Pure-number fields routed to the digit model when it is available; the rest
     // (clear_type, difficulty_label, stage_label, dj_level) stay on Vision OCR.
-    private static let digitLabels: Set<String> = [
+    static let digitLabels: Set<String> = [
         "score_now", "score_prev", "score_delta",
         "miss_count_now", "miss_count_prev", "miss_count_delta",
         "judge_pgreat", "judge_great", "judge_good", "judge_bad", "judge_poor",
