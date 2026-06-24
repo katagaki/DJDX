@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 import Observation
 
 @MainActor
@@ -61,6 +62,7 @@ final class AppModel {
     private(set) var loadError: String?
     var isAutoLabeling = false
     var isBuildingModel = false
+    var isExportingCrops = false
 
     private var undoStacks: [String: [[Box]]] = [:]
     private let undoDepth = 30
@@ -77,6 +79,26 @@ final class AppModel {
     }
 
     func labelCount(for url: URL) -> Int { labels[url.lastPathComponent]?.count ?? 0 }
+
+    // Sidebar summaries. DJ Level (classification) keeps its rank in a single
+    // full-frame box; the DigitDetector keeps one box per glyph, read
+    // left-to-right by ascending x. Both read live from `labels`.
+    func classificationTag(for url: URL) -> String? {
+        labels[url.lastPathComponent]?.first?.cls
+    }
+
+    func digitReading(for url: URL) -> String {
+        let boxes = labels[url.lastPathComponent] ?? []
+        return boxes.sorted { $0.x < $1.x }.map(Self.digitGlyph).joined()
+    }
+
+    private static func digitGlyph(_ box: Box) -> String {
+        switch box.cls {
+        case "plus": return "+"
+        case "minus": return "-"
+        default: return box.cls   // "0"…"9"
+        }
+    }
 
     // MARK: - Loading
 
@@ -112,6 +134,13 @@ final class AppModel {
         for url in images where labels[url.lastPathComponent] == nil {
             labels[url.lastPathComponent] = []
         }
+        // DJ Level: group the list by rank (F→AAA, unlabeled last) so a mislabel
+        // jumps out — a glyph sitting in the wrong rank group is obvious. Sorted
+        // once on entry (re-entering the workspace re-sorts) so rows stay put
+        // while labelling. Other workspaces keep filename order.
+        if config.workspace == .djLevel {
+            images.sort(by: rankThenName)
+        }
         currentIndex = min(currentIndex, max(images.count - 1, 0))
         selectedBoxID = nil
         selection.removeAll()
@@ -139,6 +168,22 @@ final class AppModel {
             }
             return (LabelStore.loadFile(file) ?? LabelSet()).byImage
         }
+    }
+
+    // Sort key for the DJ Level list: position in the schema's rank list
+    // (F=0 … AAA=last), with unlabeled/unknown crops sorted after every rank.
+    private func rankSortIndex(for url: URL) -> Int {
+        guard let tag = labels[url.lastPathComponent]?.first?.cls,
+              let i = schema.rankClasses.firstIndex(of: tag) else {
+            return schema.rankClasses.count
+        }
+        return i
+    }
+
+    private func rankThenName(_ a: URL, _ b: URL) -> Bool {
+        let ra = rankSortIndex(for: a), rb = rankSortIndex(for: b)
+        if ra != rb { return ra < rb }
+        return a.lastPathComponent.localizedStandardCompare(b.lastPathComponent) == .orderedAscending
     }
 
     // MARK: - Navigation
@@ -417,6 +462,45 @@ final class AppModel {
         let line = chunk.split(whereSeparator: \.isNewline).last.map(String.init) ?? chunk
         let trimmed = line.trimmingCharacters(in: .whitespaces)
         if !trimmed.isEmpty { status = "\(label): \(trimmed)" }
+    }
+
+    // MARK: - Reader crops
+
+    // Slice the DJ-level glyphs and numeric fields out of the labelled result
+    // screens into Outputs/crops/{DJLevels,DigitDetector}/, ready to be moved
+    // into Inputs/DJLevels and Inputs/DigitDetector and labelled in those
+    // workspaces. Always reads the saved Result Detector labels regardless of
+    // the active workspace; flushes in-flight edits first when it owns them.
+    // The native equivalent of prepare_dataset.py --emit-crops-to-outputs.
+    @discardableResult
+    func exportReaderCrops() async -> Bool {
+        guard let p = paths, !isExportingCrops else { return false }
+        if config.workspace == .resultDetector { save() }
+        let cfg = WorkspaceConfig.resultDetector
+        guard let set = LabelStore.loadFile(p.labelsFile(cfg)) else {
+            setStatus("No \(cfg.labelsFileName) yet — label some result screens first")
+            return false
+        }
+        let byImage = set.byImage
+        let resultsDir = p.dataDir(cfg)
+        let cropsDir = p.cropsDir
+        isExportingCrops = true
+        setStatus("Cropping DJ Level + digit regions…")
+        let outcome = await Task.detached {
+            CropExport.exportReaderCrops(labels: byImage, resultsDir: resultsDir, cropsDir: cropsDir)
+        }.value
+        isExportingCrops = false
+        switch outcome {
+        case .success(let s):
+            let missing = s.missingImages > 0 ? " · \(s.missingImages) photos missing" : ""
+            setStatus("Cropped \(s.djLevels) DJ Level + \(s.digits) digit regions from "
+                      + "\(s.images) screens → Outputs/crops/\(missing)")
+            NSWorkspace.shared.activateFileViewerSelecting([cropsDir])
+            return true
+        case .failure(let why):
+            setStatus("Crop failed: \(why)")
+            return false
+        }
     }
 
     // MARK: - Auto-label

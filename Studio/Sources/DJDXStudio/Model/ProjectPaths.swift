@@ -15,6 +15,9 @@ struct ProjectPaths: Equatable {
     var predictionsFile: URL { outputDir.appending(path: "predictions.json") }
     var previewDir: URL { outputDir.appending(path: "label_preview", directoryHint: .isDirectory) }
     var modelsDir: URL { outputDir.appending(path: "models", directoryHint: .isDirectory) }
+    // Reader-training crops sliced from Result Detector labels; the user moves
+    // crops/DJLevels and crops/DigitDetector into the matching Inputs/ subfolders.
+    var cropsDir: URL { outputDir.appending(path: "crops", directoryHint: .isDirectory) }
 
     // Per-workspace working dirs/files.
     func dataDir(_ c: WorkspaceConfig) -> URL {

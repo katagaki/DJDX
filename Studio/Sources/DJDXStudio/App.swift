@@ -39,6 +39,13 @@ struct DJDXStudioApp: App {
                     .keyboardShortcut(.delete, modifiers: [])
                     .disabled(model.selectedBoxID == nil)
             }
+            CommandMenu("Dataset") {
+                Button("Crop DJ Level + Digits to Outputs") {
+                    Task { await model.exportReaderCrops() }
+                }
+                .keyboardShortcut("k", modifiers: [.command, .shift])
+                .disabled(model.isExportingCrops || model.paths == nil)
+            }
         }
     }
 }

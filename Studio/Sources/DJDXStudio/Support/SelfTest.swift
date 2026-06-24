@@ -68,6 +68,26 @@ enum SelfTest {
                 print("CoreML detect: skipped (no DJDXResultDetector.mlpackage)")
             }
         }
+
+        // Reader-crop emission: slice DJ-level + numeric regions from the saved
+        // Result Detector labels into a temp dir (so the real Outputs/crops is
+        // untouched) and report counts. Mirrors prepare_dataset.py's emit.
+        if let set = LabelStore.loadFile(paths.labelsFile(.resultDetector)) {
+            let tmp = FileManager.default.temporaryDirectory
+                .appending(path: "djdx_selftest_crops", directoryHint: .isDirectory)
+            switch CropExport.exportReaderCrops(
+                labels: set.byImage, resultsDir: paths.dataDir(.resultDetector), cropsDir: tmp) {
+            case .success(let s):
+                print("reader crops: \(s.djLevels) DJ-level, \(s.digits) digit, "
+                      + "from \(s.images) screens (\(s.missingImages) missing)")
+            case .failure(let why):
+                print("reader crops: \(why)")
+            }
+            try? FileManager.default.removeItem(at: tmp)
+        } else {
+            print("reader crops: skipped (no \(WorkspaceConfig.resultDetector.labelsFileName))")
+        }
+
         print("selftest done")
     }
 }

@@ -160,7 +160,17 @@ struct ContentView: View {
             .disabled(model.paths == nil)
             .help("Reveal the exported model in Finder")
 
-            if model.isBuildingModel { ProgressView().controlSize(.small) }
+            Button {
+                Task { await model.exportReaderCrops() }
+            } label: { Label("Crop DJ Level + digits", systemImage: "scissors") }
+            .disabled(model.isExportingCrops || model.paths == nil)
+            .help("Slice the dj_level + numeric regions out of the saved Result Detector "
+                  + "labels into Outputs/crops/{DJLevels,DigitDetector}/, ready to move "
+                  + "into Inputs and label")
+
+            if model.isBuildingModel || model.isExportingCrops {
+                ProgressView().controlSize(.small)
+            }
         }
 
         ToolbarSpacer(.fixed)
