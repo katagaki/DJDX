@@ -3352,40 +3352,6 @@
         }
       }
     },
-    "Sessions.Camera.Guide.ScoreBox" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Score"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スコア"
-          }
-        }
-      }
-    },
-    "Sessions.Camera.Guide.SongTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Title"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "曲名"
-          }
-        }
-      }
-    },
     "Sessions.Camera.Options" : {
       "extractionState" : "manual",
       "localizations" : {

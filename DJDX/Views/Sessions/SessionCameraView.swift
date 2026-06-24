@@ -47,14 +47,13 @@ final class SessionCameraViewController: UIViewController {
 
     private let scoreRegionLayer = CAShapeLayer()
     private let titleRegionLayer = CAShapeLayer()
-    private let scoreRegionLabel = UILabel()
-    private let titleRegionLabel = UILabel()
     private let scoreRegionColor = UIColor.systemTeal
     private let titleRegionColor = UIColor.systemYellow
-    private let scoreRegion = CGRect(x: 0.03, y: 0.04, width: 0.45, height: 0.92)
+    private let scoreRegion = CGRect(x: 0.03, y: 0.04, width: 0.45, height: 0.94)
     private let titleRegion = CGRect(x: 0.54, y: 0.82, width: 0.44, height: 0.16)
     private let playerSideDefaultsKey = "Sessions.Camera.IsPlayer2"
     private var isPlayer2 = false
+    private let guidePerspective: CGFloat = 0.08
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -171,7 +170,7 @@ final class SessionCameraViewController: UIViewController {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         guideLayer.frame = bounds
-        guideLayer.path = cornerBracketPath(in: guideRect()).cgPath
+        guideLayer.path = cornerBracketPath(corners: guideCorners()).cgPath
         CATransaction.commit()
         updateRegionGuides()
         positionHintLabel(in: guideRect())
@@ -305,13 +304,6 @@ final class SessionCameraViewController: UIViewController {
             [.foregroundColor: UIColor.black, .font: UIFont.systemFont(ofSize: 14, weight: .semibold)], for: .selected)
         playerSideControl.addTarget(self, action: #selector(playerSideChanged), for: .valueChanged)
 
-        configureRegionLabel(scoreRegionLabel, text: NSLocalizedString("Sessions.Camera.Guide.ScoreBox", comment: ""),
-                             color: scoreRegionColor)
-        configureRegionLabel(titleRegionLabel, text: NSLocalizedString("Sessions.Camera.Guide.SongTitle", comment: ""),
-                             color: titleRegionColor)
-
-        overlayView.addSubview(scoreRegionLabel)
-        overlayView.addSubview(titleRegionLabel)
         overlayView.addSubview(hintLabel)
         view.addSubview(shutterButton)
         view.addSubview(cancelButton)
@@ -370,7 +362,7 @@ final class SessionCameraViewController: UIViewController {
     @objc private func playerSideChanged() {
         isPlayer2 = playerSideControl.selectedSegmentIndex == 1
         UserDefaults.standard.set(isPlayer2, forKey: playerSideDefaultsKey)
-        updateRegionGuides()
+        layoutOverlay()
     }
 
     private func handleCaptured(_ data: Data?) {
@@ -426,35 +418,95 @@ extension SessionCameraViewController {
         }
     }
 
-    func cornerBracketPath(in rect: CGRect, length: CGFloat = 30, radius: CGFloat = 14) -> UIBezierPath {
+    func guideCorners() -> Corners {
+        let rect = guideRect()
+        let inset = rect.height * guidePerspective
+        if isPlayer2 {
+            return Corners(topLeft: CGPoint(x: rect.minX, y: rect.minY + inset),
+                           topRight: CGPoint(x: rect.maxX, y: rect.minY),
+                           bottomRight: CGPoint(x: rect.maxX, y: rect.maxY),
+                           bottomLeft: CGPoint(x: rect.minX, y: rect.maxY - inset))
+        }
+        return Corners(topLeft: CGPoint(x: rect.minX, y: rect.minY),
+                       topRight: CGPoint(x: rect.maxX, y: rect.minY + inset),
+                       bottomRight: CGPoint(x: rect.maxX, y: rect.maxY - inset),
+                       bottomLeft: CGPoint(x: rect.minX, y: rect.maxY))
+    }
+
+    func cornerBracketPath(corners: Corners, length: CGFloat = 30, radius: CGFloat = 14) -> UIBezierPath {
         let path = UIBezierPath()
-        let minX = rect.minX, minY = rect.minY, maxX = rect.maxX, maxY = rect.maxY
-
-        path.move(to: CGPoint(x: minX, y: minY + radius + length))
-        path.addLine(to: CGPoint(x: minX, y: minY + radius))
-        path.addArc(withCenter: CGPoint(x: minX + radius, y: minY + radius),
-                    radius: radius, startAngle: .pi, endAngle: .pi * 1.5, clockwise: true)
-        path.addLine(to: CGPoint(x: minX + radius + length, y: minY))
-
-        path.move(to: CGPoint(x: maxX - radius - length, y: minY))
-        path.addLine(to: CGPoint(x: maxX - radius, y: minY))
-        path.addArc(withCenter: CGPoint(x: maxX - radius, y: minY + radius),
-                    radius: radius, startAngle: .pi * 1.5, endAngle: 0, clockwise: true)
-        path.addLine(to: CGPoint(x: maxX, y: minY + radius + length))
-
-        path.move(to: CGPoint(x: maxX, y: maxY - radius - length))
-        path.addLine(to: CGPoint(x: maxX, y: maxY - radius))
-        path.addArc(withCenter: CGPoint(x: maxX - radius, y: maxY - radius),
-                    radius: radius, startAngle: 0, endAngle: .pi * 0.5, clockwise: true)
-        path.addLine(to: CGPoint(x: maxX - radius - length, y: maxY))
-
-        path.move(to: CGPoint(x: minX + radius + length, y: maxY))
-        path.addLine(to: CGPoint(x: minX + radius, y: maxY))
-        path.addArc(withCenter: CGPoint(x: minX + radius, y: maxY - radius),
-                    radius: radius, startAngle: .pi * 0.5, endAngle: .pi, clockwise: true)
-        path.addLine(to: CGPoint(x: minX, y: maxY - radius - length))
-
+        path.append(bracket(at: corners.topLeft, toward: corners.topRight,
+                            and: corners.bottomLeft, length: length, radius: radius))
+        path.append(bracket(at: corners.topRight, toward: corners.bottomRight,
+                            and: corners.topLeft, length: length, radius: radius))
+        path.append(bracket(at: corners.bottomRight, toward: corners.bottomLeft,
+                            and: corners.topRight, length: length, radius: radius))
+        path.append(bracket(at: corners.bottomLeft, toward: corners.topLeft,
+                            and: corners.bottomRight, length: length, radius: radius))
         return path
+    }
+
+    private func bracket(at corner: CGPoint, toward first: CGPoint, and second: CGPoint,
+                         length: CGFloat, radius: CGFloat) -> UIBezierPath {
+        let dirFirst = unitVector(from: corner, to: first)
+        let dirSecond = unitVector(from: corner, to: second)
+        let path = UIBezierPath()
+        path.move(to: along(corner, dirFirst, radius + length))
+        path.addLine(to: along(corner, dirFirst, radius))
+        path.addQuadCurve(to: along(corner, dirSecond, radius), controlPoint: corner)
+        path.addLine(to: along(corner, dirSecond, radius + length))
+        return path
+    }
+
+    private func quadPath(_ corners: Corners, cornerRadius radius: CGFloat) -> UIBezierPath {
+        let points = [corners.topLeft, corners.topRight, corners.bottomRight, corners.bottomLeft]
+        let path = UIBezierPath()
+        let count = points.count
+        for index in 0..<count {
+            let curr = points[index]
+            let prev = points[(index + count - 1) % count]
+            let next = points[(index + 1) % count]
+            let dirPrev = unitVector(from: curr, to: prev)
+            let dirNext = unitVector(from: curr, to: next)
+            let clamped = min(radius, min(distance(curr, prev), distance(curr, next)) / 2)
+            let start = along(curr, dirPrev, clamped)
+            if index == 0 { path.move(to: start) } else { path.addLine(to: start) }
+            path.addQuadCurve(to: along(curr, dirNext, clamped), controlPoint: curr)
+        }
+        path.close()
+        return path
+    }
+
+    private func regionQuad(_ region: CGRect, in corners: Corners) -> Corners {
+        let uMin = isPlayer2 ? (1 - region.minX - region.width) : region.minX
+        let uMax = uMin + region.width
+        let vMin = region.minY
+        let vMax = region.minY + region.height
+        return Corners(topLeft: bilerp(uMin, vMin, corners), topRight: bilerp(uMax, vMin, corners),
+                       bottomRight: bilerp(uMax, vMax, corners), bottomLeft: bilerp(uMin, vMax, corners))
+    }
+
+    private func bilerp(_ uPos: CGFloat, _ vPos: CGFloat, _ corners: Corners) -> CGPoint {
+        lerp(lerp(corners.topLeft, corners.topRight, uPos),
+             lerp(corners.bottomLeft, corners.bottomRight, uPos), vPos)
+    }
+
+    private func lerp(_ start: CGPoint, _ end: CGPoint, _ fraction: CGFloat) -> CGPoint {
+        CGPoint(x: start.x + (end.x - start.x) * fraction, y: start.y + (end.y - start.y) * fraction)
+    }
+
+    private func unitVector(from start: CGPoint, to end: CGPoint) -> CGPoint {
+        let deltaX = end.x - start.x, deltaY = end.y - start.y
+        let len = max((deltaX * deltaX + deltaY * deltaY).squareRoot(), 0.0001)
+        return CGPoint(x: deltaX / len, y: deltaY / len)
+    }
+
+    private func along(_ origin: CGPoint, _ dir: CGPoint, _ dist: CGFloat) -> CGPoint {
+        CGPoint(x: origin.x + dir.x * dist, y: origin.y + dir.y * dist)
+    }
+
+    private func distance(_ start: CGPoint, _ end: CGPoint) -> CGFloat {
+        ((start.x - end.x) * (start.x - end.x) + (start.y - end.y) * (start.y - end.y)).squareRoot()
     }
 
     private func configureRegionLayer(_ layer: CAShapeLayer, color: UIColor) {
@@ -468,36 +520,17 @@ extension SessionCameraViewController {
         layer.shadowOffset = .zero
     }
 
-    private func configureRegionLabel(_ label: UILabel, text: String, color: UIColor) {
-        label.text = text
-        label.font = .systemFont(ofSize: 11, weight: .bold)
-        label.textColor = .white
-        label.textAlignment = .center
-        label.backgroundColor = color.withAlphaComponent(0.92)
-        label.clipsToBounds = true
-    }
-
     func updateRegionGuides() {
-        let guide = guideRect()
-        let scoreRect = denormalize(scoreRegion, in: guide)
-        let titleRect = denormalize(titleRegion, in: guide)
+        let corners = guideCorners()
+        let scoreQuad = regionQuad(scoreRegion, in: corners)
+        let titleQuad = regionQuad(titleRegion, in: corners)
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         scoreRegionLayer.frame = overlayView.bounds
         titleRegionLayer.frame = overlayView.bounds
-        scoreRegionLayer.path = UIBezierPath(roundedRect: scoreRect, cornerRadius: 10).cgPath
-        titleRegionLayer.path = UIBezierPath(roundedRect: titleRect, cornerRadius: 8).cgPath
+        scoreRegionLayer.path = quadPath(scoreQuad, cornerRadius: 10).cgPath
+        titleRegionLayer.path = quadPath(titleQuad, cornerRadius: 8).cgPath
         CATransaction.commit()
-        positionRegionLabel(scoreRegionLabel, in: scoreRect)
-        positionRegionLabel(titleRegionLabel, in: titleRect)
-    }
-
-    private func denormalize(_ region: CGRect, in rect: CGRect) -> CGRect {
-        let originX = isPlayer2 ? (1 - region.minX - region.width) : region.minX
-        return CGRect(x: rect.minX + originX * rect.width,
-                      y: rect.minY + region.minY * rect.height,
-                      width: region.width * rect.width,
-                      height: region.height * rect.height)
     }
 
     func positionHintLabel(in guide: CGRect) {
@@ -507,14 +540,13 @@ extension SessionCameraViewController {
         hintLabel.frame = CGRect(x: guide.midX - width / 2, y: guide.minY + 24, width: width, height: size.height)
     }
 
-    private func positionRegionLabel(_ label: UILabel, in rect: CGRect) {
-        let textSize = label.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude,
-                                                 height: CGFloat.greatestFiniteMagnitude))
-        let width = textSize.width + 16
-        let height = textSize.height + 7
-        label.frame = CGRect(x: rect.minX + 6, y: rect.minY + 6, width: width, height: height)
-        label.layer.cornerRadius = height / 2
-    }
+}
+
+struct Corners {
+    var topLeft: CGPoint
+    var topRight: CGPoint
+    var bottomRight: CGPoint
+    var bottomLeft: CGPoint
 }
 
 private final class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate {
