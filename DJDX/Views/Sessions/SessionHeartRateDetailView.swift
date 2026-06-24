@@ -5,6 +5,7 @@ struct SessionHeartRateDetailView: View {
     let plays: [IIDXCapturedPlay]
 
     @State private var samples: [SessionHeartRateSample] = []
+    @State private var selectedDate: Date?
 
     private let window: TimeInterval = 90.0
 
@@ -52,26 +53,41 @@ struct SessionHeartRateDetailView: View {
     }
 
     private var graphSection: some View {
-        SessionHeartRateGraph(session: session, points: points, height: 280.0)
-            .padding(.horizontal)
+        SessionHeartRateGraph(
+            session: session,
+            points: points,
+            height: 280.0,
+            isInteractive: true,
+            selectedDate: $selectedDate
+        )
+        .padding(.horizontal)
     }
 
     @ViewBuilder
     private var breakdownSection: some View {
         let stats = chartStats
         if !stats.isEmpty {
+            let visible = collapsed(stats)
             VStack(spacing: 12.0) {
                 AnalyticsSectionHeader(title: "Sessions.HeartRate.ByChart")
                 VStack(spacing: 0.0) {
-                    ForEach(stats) { stat in
+                    ForEach(visible) { stat in
                         chartRow(stat)
-                        if stat.id != stats.last?.id {
+                        if stat.id != visible.last?.id {
                             Divider()
                         }
                     }
                 }
             }
         }
+    }
+
+    private func collapsed(_ stats: [ChartHeartRate]) -> [ChartHeartRate] {
+        guard let selectedDate else { return stats }
+        guard let nearest = stats.min(by: {
+            abs($0.date.timeIntervalSince(selectedDate)) < abs($1.date.timeIntervalSince(selectedDate))
+        }) else { return stats }
+        return [nearest]
     }
 
     private func chartRow(_ stat: ChartHeartRate) -> some View {
