@@ -59,8 +59,10 @@ enum IIDXResultParser {
         var hits = 0
 
         parse.playType = detectPlayType(byLabel["difficulty_label"], byLabel["stage_label"])
+        var ocrDifficulty = 0
         if let (level, difficulty) = detectChart(text("difficulty_label")) {
             parse.level = level
+            ocrDifficulty = difficulty
             parse.difficulty = plausibleDifficulty(
                 difficulty, level: level, playType: parse.playType, songs: songs
             ) ? difficulty : 0
@@ -79,6 +81,15 @@ enum IIDXResultParser {
             hits += 1
         } else if let rawTitle = resolved.rawTitle {
             parse.songTitle = rawTitle
+        }
+
+        // ANOTHER/LEGGENDARIA charts are effectively never level 1; OCR frequently
+        // drops the leading digit of "11". Correct it, but only when neither the
+        // wiki nor imported data already knows this chart's level.
+        if ocrDifficulty == 1,
+           parse.level == .another || parse.level == .leggendaria,
+           resolved.matched?.difficulties[parse.level] == nil {
+            parse.difficulty = 11
         }
 
         if parse.level != .unknown { hits += 1 }
