@@ -96,6 +96,8 @@ final class SessionCameraViewController: UIViewController {
         startGuidePulse()
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationDidChange),
                                                name: UIDevice.orientationDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(powerStateDidChange),
+                                               name: .NSProcessInfoPowerStateDidChange, object: nil)
         sessionQueue.async { [weak self] in
             guard let self, !self.session.isRunning else { return }
             self.session.startRunning()
@@ -104,8 +106,7 @@ final class SessionCameraViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if autoDetectEnabled { liveProbe.start() }
-        startStagedTimer()
+        applyLiveDetectionState()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -113,6 +114,7 @@ final class SessionCameraViewController: UIViewController {
         liveProbe.stop()
         stopStagedTimer()
         NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .NSProcessInfoPowerStateDidChange, object: nil)
         UIDevice.current.endGeneratingDeviceOrientationNotifications()
         guideLayer.removeAnimation(forKey: "pulse")
         sessionQueue.async { [weak self] in
@@ -385,12 +387,15 @@ final class SessionCameraViewController: UIViewController {
 }
 
 extension SessionCameraViewController {
-    private var autoDetectEnabled: Bool {
-        get {
-            DeviceCapability.supportsLiveDetection
-                && (UserDefaults.standard.object(forKey: "Sessions.Camera.AutoDetect") as? Bool ?? true)
-        }
+    private var autoDetectPreference: Bool {
+        get { UserDefaults.standard.object(forKey: "Sessions.Camera.AutoDetect") as? Bool ?? true }
         set { UserDefaults.standard.set(newValue, forKey: "Sessions.Camera.AutoDetect") }
+    }
+
+    private var autoDetectEnabled: Bool {
+        DeviceCapability.supportsLiveDetection
+            && !ProcessInfo.processInfo.isLowPowerModeEnabled
+            && autoDetectPreference
     }
 
     private var showStagedResults: Bool {
@@ -414,7 +419,7 @@ extension SessionCameraViewController {
 
     private func buildOptionsMenu() -> UIMenu {
         let autoTitle = NSLocalizedString("Sessions.Camera.AutoDetect", comment: "")
-        let autoToggle = UIAction(title: autoTitle, state: autoDetectEnabled ? .on : .off) { [weak self] _ in
+        let autoToggle = UIAction(title: autoTitle, state: autoDetectPreference ? .on : .off) { [weak self] _ in
             self?.toggleAutoDetect()
         }
         let stagedTitle = NSLocalizedString("Sessions.Camera.ShowStagedResults", comment: "")
@@ -425,9 +430,27 @@ extension SessionCameraViewController {
     }
 
     private func toggleAutoDetect() {
-        autoDetectEnabled.toggle()
+        autoDetectPreference.toggle()
         optionsButton.menu = buildOptionsMenu()
-        if autoDetectEnabled { liveProbe.start() } else { liveProbe.stop() }
+        applyLiveDetectionState()
+    }
+
+    private func applyLiveDetectionState() {
+        if autoDetectEnabled {
+            liveProbe.start()
+            startStagedTimer()
+        } else {
+            liveProbe.stop()
+            stopStagedTimer()
+        }
+    }
+
+    @objc func powerStateDidChange() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.applyLiveDetectionState()
+            self.optionsButton.menu = self.buildOptionsMenu()
+        }
     }
 
     private func toggleStagedResults() {
