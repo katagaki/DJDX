@@ -56,7 +56,9 @@ actor IIDXSessionCaptureProcessor {
             let photoRegions = try await IIDXResultReader.detect(imageData: imageData)
             let regions = merge(photoRegions, staged: staged)
             IIDXSessionImageStore.shared.writeRecognizedText(recognizedText(from: regions), id: playID)
-            let parse = IIDXResultParser.parse(regions: regions, songs: loadSongCandidates())
+            let parse = IIDXResultParser.heal(
+                IIDXResultParser.parse(regions: regions, songs: loadSongCandidates())
+            )
             play.apply(parse)
             play.processedAt = .now
             play.parseError = nil

@@ -449,3 +449,28 @@ enum IIDXResultParser {
             .replacingOccurrences(of: "\n", with: "")
     }
 }
+
+extension IIDXResultParser {
+
+    // Re-analysis self-heal: EX score, the perfect-great/great split, and the miss
+    // count are arithmetically linked (EX = 2·PGREAT + GREAT, MISS = BAD + POOR),
+    // so recover whichever value the OCR dropped from the ones it did read.
+    static func heal(_ parse: IIDXResultParse) -> IIDXResultParse {
+        var healed = parse
+        let perfectGreat = healed.perfectGreat
+        let great = healed.great
+        if healed.exScore == 0, perfectGreat + great > 0 {
+            healed.exScore = 2 * perfectGreat + great
+        } else if healed.exScore > 0, great == 0, perfectGreat > 0,
+                  healed.exScore - 2 * perfectGreat >= 0 {
+            healed.great = healed.exScore - 2 * perfectGreat
+        } else if healed.exScore > 0, perfectGreat == 0, great > 0,
+                  healed.exScore - great >= 0, (healed.exScore - great) % 2 == 0 {
+            healed.perfectGreat = (healed.exScore - great) / 2
+        }
+        if healed.miss == 0, healed.bad + healed.poor > 0 {
+            healed.miss = healed.bad + healed.poor
+        }
+        return healed
+    }
+}
