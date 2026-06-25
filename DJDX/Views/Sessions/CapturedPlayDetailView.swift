@@ -4,8 +4,6 @@ struct CapturedPlayDetailView: View {
     var store: IIDXSessionStore
     var play: IIDXCapturedPlay
 
-    @Environment(\.dismiss) private var dismiss
-
     @State private var songTitle: String = ""
     @State private var level: IIDXLevel = .unknown
     @State private var difficulty: Int = 0
@@ -24,7 +22,7 @@ struct CapturedPlayDetailView: View {
     @State private var songSuggestions: [IIDXSong] = []
     @State private var searchTask: Task<Void, Never>?
     @State private var capturedImage: UIImage?
-    @State private var photoAlert: PhotoAlert?
+    @State private var isReanalyzing: Bool = false
     @FocusState private var songFieldFocused: Bool
 
     private let reader = IIDXReader()
@@ -44,26 +42,31 @@ struct CapturedPlayDetailView: View {
         .navigationTitle("Sessions.Detail.Title")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: reanalyze) {
+                    if isReanalyzing {
+                        ProgressView()
+                    } else {
+                        Label("Sessions.Detail.Reprocess", systemImage: "arrow.clockwise")
+                    }
+                }
+                .disabled(isReanalyzing)
+            }
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            }
             if let capturedImage {
-                ShareLink(
-                    item: Image(uiImage: capturedImage),
-                    preview: SharePreview("Sessions.Detail.Title", image: Image(uiImage: capturedImage))
-                )
+                ToolbarItem(placement: .topBarTrailing) {
+                    ShareLink(
+                        item: Image(uiImage: capturedImage),
+                        preview: SharePreview("Sessions.Detail.Title", image: Image(uiImage: capturedImage))
+                    )
+                }
             }
         }
-        .alert(item: $photoAlert) { alert in
-            switch alert {
-            case .saved:
-                return Alert(title: Text("Sessions.Photos.Saved"), dismissButton: .default(Text("Shared.OK")))
-            case .failed:
-                return Alert(title: Text("Sessions.Photos.Failed"), dismissButton: .default(Text("Shared.OK")))
-            case .denied:
-                return Alert(
-                    title: Text("Sessions.Photos.Denied.Title"),
-                    message: Text("Sessions.Photos.Denied.Message"),
-                    dismissButton: .default(Text("Shared.OK"))
-                )
-            }
+        .onReceive(NotificationCenter.default.publisher(for: .capturedPlayDidChange)
+            .receive(on: RunLoop.main)) { note in
+            reanalyzeDidUpdate(note.object as? String)
         }
         .onAppear(perform: loadFields)
         .task {
@@ -147,21 +150,10 @@ struct CapturedPlayDetailView: View {
                 numberRow("Sessions.Detail.Bad", value: $bad)
                 numberRow("Sessions.Detail.Poor", value: $poor)
             }
-
-            Section {
-                Button("Sessions.Detail.Reprocess", systemImage: "arrow.clockwise") {
-                    store.reprocess(play)
-                    dismiss()
-                }
-                if let capturedImage {
-                    Button("Sessions.Photos.Save", systemImage: "square.and.arrow.down") {
-                        saveToPhotos(capturedImage)
-                    }
-                }
-            }
         }
         .scrollContentBackground(.hidden)
         .scrollDismissesKeyboard(.immediately)
+        .disabled(isReanalyzing)
     }
 
     @ViewBuilder
@@ -293,14 +285,22 @@ struct CapturedPlayDetailView: View {
         DispatchQueue.main.async { hasLoaded = true }
     }
 
-    private func saveToPhotos(_ image: UIImage) {
-        Task {
-            switch await SessionPhotoExporter.save([image]) {
-            case .saved: photoAlert = .saved
-            case .denied: photoAlert = .denied
-            case .failed: photoAlert = .failed
-            }
-        }
+    private func reanalyze() {
+        guard !isReanalyzing else { return }
+        songFieldFocused = false
+        searchTask?.cancel()
+        songSuggestions = []
+        hasLoaded = false
+        isReanalyzing = true
+        store.reprocess(play)
+    }
+
+    private func reanalyzeDidUpdate(_ changedID: String?) {
+        guard isReanalyzing, changedID == play.id,
+              let fresh = store.play(id: play.id), fresh.state.isTerminal else { return }
+        play.adopt(from: fresh)
+        loadFields()
+        isReanalyzing = false
     }
 
     private func save() {
@@ -324,9 +324,4 @@ struct CapturedPlayDetailView: View {
 private struct SongEntry: Sendable {
     let song: IIDXSong
     let compact: String
-}
-
-private enum PhotoAlert: Int, Identifiable {
-    case saved, denied, failed
-    var id: Int { rawValue }
 }

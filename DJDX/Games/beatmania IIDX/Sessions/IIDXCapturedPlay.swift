@@ -72,6 +72,27 @@ final class IIDXCapturedPlay: Identifiable, @unchecked Sendable {
         )
     }
 
+    func adopt(from other: IIDXCapturedPlay) {
+        songTitle = other.songTitle
+        matchedSongID = other.matchedSongID
+        level = other.level
+        difficulty = other.difficulty
+        playType = other.playType
+        exScore = other.exScore
+        perfectGreat = other.perfectGreat
+        great = other.great
+        good = other.good
+        bad = other.bad
+        poor = other.poor
+        miss = other.miss
+        clearType = other.clearType
+        djLevel = other.djLevel
+        ocrConfidence = other.ocrConfidence
+        parseError = other.parseError
+        processedAt = other.processedAt
+        state = other.state
+    }
+
     func apply(_ parse: IIDXResultParse) {
         songTitle = parse.songTitle
         matchedSongID = parse.matchedSongID

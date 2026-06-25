@@ -115,4 +115,8 @@ final class IIDXSessionStore {
     func plays(for session: IIDXPlaySession) -> [IIDXCapturedPlay] {
         database.plays(forSession: session.id)
     }
+
+    func play(id: String) -> IIDXCapturedPlay? {
+        database.play(id: id)
+    }
 }
