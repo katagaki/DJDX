@@ -2,11 +2,7 @@ import Foundation
 
 enum DeviceCapability {
 
-    // Live result detection runs a continuous Core ML pipeline on camera frames,
-    // which only stays cool and battery-friendly from A15 onward (iPhone 13 / SE 3).
-    // It is disabled on A14 and older; those devices keep manual-shutter capture.
-    // iPhone identifiers are iPhoneN,M where N >= 14 means A15 or newer. iPads have
-    // no A15, so only Apple-silicon (M-series, >= 8 GB) iPads qualify.
+    // A15+ iPhones are iPhone14,x and up; iPads need Apple silicon (>= 8 GB).
     static let supportsLiveDetection: Bool = {
         let identifier = modelIdentifier
         if identifier.hasPrefix("iPhone") {

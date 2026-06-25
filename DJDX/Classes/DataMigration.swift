@@ -50,9 +50,6 @@ enum DataMigration {
         UserDefaults.standard.set(true, forKey: version334CleanupKey)
     }
 
-    // Adds the per-chart level columns to an existing BEMANIWiki database so the
-    // next data reload can populate them (fresh installs already have them). Plays
-    // are backfilled from those levels during the reload itself.
     static func runBEMANIWikiLevelsMigrationIfNeeded() {
         guard !UserDefaults.standard.bool(forKey: bemaniWikiLevelsKey) else { return }
         if let database = try? BEMANIWikiDatabase.shared.getWriteConnection() {

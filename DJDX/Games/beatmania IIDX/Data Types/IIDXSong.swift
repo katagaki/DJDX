@@ -59,9 +59,6 @@ final class IIDXSong: Equatable, @unchecked Sendable {
         return title.compact
     }
 
-    // The BEMANIWiki new-song list carries a level table whose row is
-    // [SP B/N/H/A/L, DP N/H/A/L, BPM, GENRE, TITLE, ARTIST]; chart-type prefixes
-    // like [CN]/[BSS] wrap the numeric level and are stripped here.
     static func parseLevelRow(_ columnData: [String]) -> (compactTitle: String, levels: IIDXSongLevels)? {
         guard columnData.count == 13 else { return nil }
         let title = columnData[11]

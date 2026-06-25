@@ -137,9 +137,6 @@ actor IIDXSessionCaptureProcessor {
         NotificationCenter.default.post(name: .capturedPlayDidChange, object: playID)
     }
 
-    // Imported score records carry the user's own chart difficulties; BEMANIWiki
-    // levels fill the gaps (and add songs never imported) so the parser can resolve
-    // a chart's level from its difficulty name without relying on OCR.
     static func fetchSongCandidates() -> [IIDXSongCandidate] {
         var byKey: [String: IIDXSongCandidate] = [:]
         for candidate in fetchScoreSongCandidates() {
@@ -247,8 +244,6 @@ extension IIDXSessionCaptureProcessor {
         )
     }
 
-    // Fill a chart's level on already-captured plays that have none, using the
-    // freshly-loaded BEMANIWiki levels. Never overwrites an existing value.
     static func backfillDifficultiesFromBEMANIWiki() {
         let candidates = fetchBEMANIWikiCandidates()
         guard !candidates.isEmpty else { return }
