@@ -48,6 +48,19 @@ final class IIDXCapturedPlay: Identifiable, @unchecked Sendable {
         state == .done
     }
 
+    // Every result field is present and sensible — used to decide whether the
+    // read-only score view can be shown instead of the editor.
+    var hasConfidentResult: Bool {
+        matchedSongID != nil
+            && level != .unknown
+            && difficulty > 0
+            && exScore > 0
+            && perfectGreat + great > 0
+            && clearType != IIDXClearType.unknown.rawValue
+            && clearType != IIDXClearType.noPlay.rawValue
+            && djLevel != IIDXDJLevel.none.rawValue
+    }
+
     func levelScore() -> IIDXLevelScore {
         IIDXLevelScore(
             level: level,
