@@ -219,21 +219,23 @@ extension IIDXSessionCaptureProcessor {
             let title = row[col.songTitle]
             guard !title.isEmpty else { continue }
             let identifier = row[col.songID]
-            let single: [(IIDXLevel, Int?)] = [
-                (.beginner, row[col.songSPBeginnerLevel]), (.normal, row[col.songSPNormalLevel]),
-                (.hyper, row[col.songSPHyperLevel]), (.another, row[col.songSPAnotherLevel]),
-                (.leggendaria, row[col.songSPLeggendariaLevel])
+            let singleLevels: [(IIDXLevel, SQLite.Expression<Int?>)] = [
+                (.beginner, col.songSPBeginnerLevel), (.normal, col.songSPNormalLevel),
+                (.hyper, col.songSPHyperLevel), (.another, col.songSPAnotherLevel),
+                (.leggendaria, col.songSPLeggendariaLevel)
             ]
-            let double: [(IIDXLevel, Int?)] = [
-                (.normal, row[col.songDPNormalLevel]), (.hyper, row[col.songDPHyperLevel]),
-                (.another, row[col.songDPAnotherLevel]), (.leggendaria, row[col.songDPLeggendariaLevel])
+            let doubleLevels: [(IIDXLevel, SQLite.Expression<Int?>)] = [
+                (.normal, col.songDPNormalLevel), (.hyper, col.songDPHyperLevel),
+                (.another, col.songDPAnotherLevel), (.leggendaria, col.songDPLeggendariaLevel)
             ]
             if let candidate = makeCandidate(id: identifier, title: title, playType: .single,
-                                             levels: single, noteCounts: bemaniWikiNoteCounts(row, double: false)) {
+                                             difficulties: levelInts(row, singleLevels),
+                                             noteCounts: bemaniWikiNoteCounts(row, double: false)) {
                 candidates.append(candidate)
             }
             if let candidate = makeCandidate(id: identifier, title: title, playType: .double,
-                                             levels: double, noteCounts: bemaniWikiNoteCounts(row, double: true)) {
+                                             difficulties: levelInts(row, doubleLevels),
+                                             noteCounts: bemaniWikiNoteCounts(row, double: true)) {
                 candidates.append(candidate)
             }
         }
@@ -242,9 +244,8 @@ extension IIDXSessionCaptureProcessor {
 
     private static func makeCandidate(
         id: Int64, title: String, playType: IIDXPlayType,
-        levels: [(IIDXLevel, Int?)], noteCounts: [IIDXLevel: Int]
+        difficulties: [IIDXLevel: Int], noteCounts: [IIDXLevel: Int]
     ) -> IIDXSongCandidate? {
-        let difficulties = levelMap(levels)
         guard !difficulties.isEmpty else { return nil }
         return IIDXSongCandidate(
             id: id, title: title, compact: title.compact, playType: playType,
@@ -252,40 +253,42 @@ extension IIDXSessionCaptureProcessor {
         )
     }
 
-    private static func levelMap(_ pairs: [(IIDXLevel, Int?)]) -> [IIDXLevel: Int] {
+    private static func levelInts(
+        _ row: Row, _ columns: [(IIDXLevel, SQLite.Expression<Int?>)]
+    ) -> [IIDXLevel: Int] {
         var result: [IIDXLevel: Int] = [:]
-        for (level, value) in pairs {
-            if let value, value > 0 { result[level] = value }
+        for (level, column) in columns {
+            if let value = (try? row.get(column)) ?? nil, value > 0 { result[level] = value }
         }
         return result
     }
 
     private static func scoreNoteCounts(_ row: Row, double: Bool) -> [IIDXLevel: Int] {
         let col = IIDXPlayDataDatabase.self
-        let pairs: [(IIDXLevel, Int?)] = double ? [
-            (.beginner, row[col.songDPBeginnerNoteCount]), (.normal, row[col.songDPNormalNoteCount]),
-            (.hyper, row[col.songDPHyperNoteCount]), (.another, row[col.songDPAnotherNoteCount]),
-            (.leggendaria, row[col.songDPLeggendariaNoteCount])
+        let columns: [(IIDXLevel, SQLite.Expression<Int?>)] = double ? [
+            (.beginner, col.songDPBeginnerNoteCount), (.normal, col.songDPNormalNoteCount),
+            (.hyper, col.songDPHyperNoteCount), (.another, col.songDPAnotherNoteCount),
+            (.leggendaria, col.songDPLeggendariaNoteCount)
         ] : [
-            (.beginner, row[col.songSPBeginnerNoteCount]), (.normal, row[col.songSPNormalNoteCount]),
-            (.hyper, row[col.songSPHyperNoteCount]), (.another, row[col.songSPAnotherNoteCount]),
-            (.leggendaria, row[col.songSPLeggendariaNoteCount])
+            (.beginner, col.songSPBeginnerNoteCount), (.normal, col.songSPNormalNoteCount),
+            (.hyper, col.songSPHyperNoteCount), (.another, col.songSPAnotherNoteCount),
+            (.leggendaria, col.songSPLeggendariaNoteCount)
         ]
-        return levelMap(pairs)
+        return levelInts(row, columns)
     }
 
     private static func bemaniWikiNoteCounts(_ row: Row, double: Bool) -> [IIDXLevel: Int] {
         let col = BEMANIWikiDatabase.self
-        let pairs: [(IIDXLevel, Int?)] = double ? [
-            (.beginner, row[col.songDPBeginnerNoteCount]), (.normal, row[col.songDPNormalNoteCount]),
-            (.hyper, row[col.songDPHyperNoteCount]), (.another, row[col.songDPAnotherNoteCount]),
-            (.leggendaria, row[col.songDPLeggendariaNoteCount])
+        let columns: [(IIDXLevel, SQLite.Expression<Int?>)] = double ? [
+            (.beginner, col.songDPBeginnerNoteCount), (.normal, col.songDPNormalNoteCount),
+            (.hyper, col.songDPHyperNoteCount), (.another, col.songDPAnotherNoteCount),
+            (.leggendaria, col.songDPLeggendariaNoteCount)
         ] : [
-            (.beginner, row[col.songSPBeginnerNoteCount]), (.normal, row[col.songSPNormalNoteCount]),
-            (.hyper, row[col.songSPHyperNoteCount]), (.another, row[col.songSPAnotherNoteCount]),
-            (.leggendaria, row[col.songSPLeggendariaNoteCount])
+            (.beginner, col.songSPBeginnerNoteCount), (.normal, col.songSPNormalNoteCount),
+            (.hyper, col.songSPHyperNoteCount), (.another, col.songSPAnotherNoteCount),
+            (.leggendaria, col.songSPLeggendariaNoteCount)
         ]
-        return levelMap(pairs)
+        return levelInts(row, columns)
     }
 
     static func backfillDifficultiesFromBEMANIWiki() {
