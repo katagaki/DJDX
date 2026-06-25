@@ -12,6 +12,17 @@ struct IIDXSongCandidate: Sendable {
     let compact: String
     let playType: IIDXPlayType
     let difficulties: [IIDXLevel: Int]
+    let noteCounts: [IIDXLevel: Int]
+
+    init(id: Int64, title: String, compact: String, playType: IIDXPlayType,
+         difficulties: [IIDXLevel: Int], noteCounts: [IIDXLevel: Int] = [:]) {
+        self.id = id
+        self.title = title
+        self.compact = compact
+        self.playType = playType
+        self.difficulties = difficulties
+        self.noteCounts = noteCounts
+    }
 
     func matchesChart(level: IIDXLevel, difficulty: Int, playType: IIDXPlayType) -> Bool {
         self.playType == playType && difficulties[level] == difficulty
@@ -99,7 +110,10 @@ enum IIDXResultParser {
             hits += 1
         }
 
-        let notes = headlineNumber(text("notes_count"))
+        // The matched chart's note count is authoritative; the on-screen notes_count
+        // OCR is only a fallback. A reliable note count makes the score-rate DJ-level
+        // derivation trustworthy and bounds the judge reconciliation correctly.
+        let notes = resolved.matched?.noteCounts[parse.level] ?? headlineNumber(text("notes_count"))
         if let value = headlineNumber(text("score_now")) {
             parse.exScore = value
             hits += 1
@@ -119,19 +133,17 @@ enum IIDXResultParser {
         if let value = headlineNumber(text("judge_bad")) { parse.bad = value }
         if let value = headlineNumber(text("judge_poor")) { parse.poor = value }
 
-        let classifiedDJLevel = text("dj_level_now").flatMap(gradeOf)
-        var djLevelConflict = false
-        if let notes, notesArePlausible(notes: notes, parse: parse),
-           let derived = derivedDJLevel(exScore: parse.exScore, notes: notes) {
-            parse.djLevel = derived
-            hits += 1
-            if let classifiedDJLevel, gradeDistance(classifiedDJLevel, derived) > 1 {
-                djLevelConflict = true
-            }
-        } else if let classifiedDJLevel {
-            parse.djLevel = classifiedDJLevel
+        // The dedicated rank classifier reads the on-screen DJ-level graphic
+        // directly, so trust it first; fall back to the score-rate derivation only
+        // when the classifier abstains. A >1-grade disagreement flags low confidence.
+        let classified = text("dj_level_now").flatMap(gradeOf)
+        let derived = derivedGrade(exScore: parse.exScore, notes: notes, parse: parse)
+        let djResolution = resolveDJLevel(classified: classified, derived: derived)
+        if let grade = djResolution.grade {
+            parse.djLevel = grade
             hits += 1
         }
+        let djLevelConflict = djResolution.conflict
 
         var bonus = 0.0
         if parse.exScore > 0, pgRead != nil, greatRead != nil,
@@ -179,6 +191,18 @@ enum IIDXResultParser {
             return 0
         }
         return abs(left - right)
+    }
+
+    private static func derivedGrade(exScore: Int, notes: Int?, parse: IIDXResultParse) -> String? {
+        guard let notes, notesArePlausible(notes: notes, parse: parse) else { return nil }
+        return derivedDJLevel(exScore: exScore, notes: notes)
+    }
+
+    private static func resolveDJLevel(classified: String?, derived: String?)
+    -> (grade: String?, conflict: Bool) {
+        guard let classified else { return (derived, false) }
+        let conflict = derived.map { gradeDistance(classified, $0) > 1 } ?? false
+        return (classified, conflict)
     }
 
     private static func derivedDJLevel(exScore: Int, notes: Int?) -> String? {

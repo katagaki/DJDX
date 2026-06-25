@@ -148,13 +148,18 @@ actor IIDXSessionCaptureProcessor {
                 byKey[key] = candidate
                 continue
             }
-            var merged = existing.difficulties
-            for (level, value) in candidate.difficulties where merged[level] == nil {
-                merged[level] = value
+            var mergedDifficulties = existing.difficulties
+            for (level, value) in candidate.difficulties where mergedDifficulties[level] == nil {
+                mergedDifficulties[level] = value
+            }
+            var mergedNoteCounts = existing.noteCounts
+            for (level, value) in candidate.noteCounts where mergedNoteCounts[level] == nil {
+                mergedNoteCounts[level] = value
             }
             byKey[key] = IIDXSongCandidate(
                 id: existing.id, title: existing.title, compact: existing.compact,
-                playType: existing.playType, difficulties: merged
+                playType: existing.playType, difficulties: mergedDifficulties,
+                noteCounts: mergedNoteCounts
             )
         }
         return Array(byKey.values)
@@ -179,6 +184,7 @@ extension IIDXSessionCaptureProcessor {
             let playTypeRaw = row[columns.srPlayType]
             let key = title.compact + "|" + playTypeRaw
             guard !title.isEmpty, seen.insert(key).inserted else { continue }
+            let playType = IIDXPlayType(rawValue: playTypeRaw) ?? .single
             var difficulties: [IIDXLevel: Int] = [:]
             let pairs: [(IIDXLevel, Int)] = [
                 (.beginner, row[columns.srBeginnerDifficulty]),
@@ -194,8 +200,9 @@ extension IIDXSessionCaptureProcessor {
                 id: row[columns.srID],
                 title: title,
                 compact: title.compact,
-                playType: IIDXPlayType(rawValue: playTypeRaw) ?? .single,
-                difficulties: difficulties
+                playType: playType,
+                difficulties: difficulties,
+                noteCounts: scoreNoteCounts(row, double: playType == .double)
             ))
         }
         return candidates
@@ -221,10 +228,12 @@ extension IIDXSessionCaptureProcessor {
                 (.normal, row[col.songDPNormalLevel]), (.hyper, row[col.songDPHyperLevel]),
                 (.another, row[col.songDPAnotherLevel]), (.leggendaria, row[col.songDPLeggendariaLevel])
             ]
-            if let candidate = makeCandidate(id: identifier, title: title, playType: .single, levels: single) {
+            if let candidate = makeCandidate(id: identifier, title: title, playType: .single,
+                                             levels: single, noteCounts: bemaniWikiNoteCounts(row, double: false)) {
                 candidates.append(candidate)
             }
-            if let candidate = makeCandidate(id: identifier, title: title, playType: .double, levels: double) {
+            if let candidate = makeCandidate(id: identifier, title: title, playType: .double,
+                                             levels: double, noteCounts: bemaniWikiNoteCounts(row, double: true)) {
                 candidates.append(candidate)
             }
         }
@@ -232,16 +241,51 @@ extension IIDXSessionCaptureProcessor {
     }
 
     private static func makeCandidate(
-        id: Int64, title: String, playType: IIDXPlayType, levels: [(IIDXLevel, Int?)]
+        id: Int64, title: String, playType: IIDXPlayType,
+        levels: [(IIDXLevel, Int?)], noteCounts: [IIDXLevel: Int]
     ) -> IIDXSongCandidate? {
-        var difficulties: [IIDXLevel: Int] = [:]
-        for (level, value) in levels {
-            if let value, value > 0 { difficulties[level] = value }
-        }
+        let difficulties = levelMap(levels)
         guard !difficulties.isEmpty else { return nil }
         return IIDXSongCandidate(
-            id: id, title: title, compact: title.compact, playType: playType, difficulties: difficulties
+            id: id, title: title, compact: title.compact, playType: playType,
+            difficulties: difficulties, noteCounts: noteCounts
         )
+    }
+
+    private static func levelMap(_ pairs: [(IIDXLevel, Int?)]) -> [IIDXLevel: Int] {
+        var result: [IIDXLevel: Int] = [:]
+        for (level, value) in pairs {
+            if let value, value > 0 { result[level] = value }
+        }
+        return result
+    }
+
+    private static func scoreNoteCounts(_ row: Row, double: Bool) -> [IIDXLevel: Int] {
+        let col = IIDXPlayDataDatabase.self
+        let pairs: [(IIDXLevel, Int?)] = double ? [
+            (.beginner, row[col.songDPBeginnerNoteCount]), (.normal, row[col.songDPNormalNoteCount]),
+            (.hyper, row[col.songDPHyperNoteCount]), (.another, row[col.songDPAnotherNoteCount]),
+            (.leggendaria, row[col.songDPLeggendariaNoteCount])
+        ] : [
+            (.beginner, row[col.songSPBeginnerNoteCount]), (.normal, row[col.songSPNormalNoteCount]),
+            (.hyper, row[col.songSPHyperNoteCount]), (.another, row[col.songSPAnotherNoteCount]),
+            (.leggendaria, row[col.songSPLeggendariaNoteCount])
+        ]
+        return levelMap(pairs)
+    }
+
+    private static func bemaniWikiNoteCounts(_ row: Row, double: Bool) -> [IIDXLevel: Int] {
+        let col = BEMANIWikiDatabase.self
+        let pairs: [(IIDXLevel, Int?)] = double ? [
+            (.beginner, row[col.songDPBeginnerNoteCount]), (.normal, row[col.songDPNormalNoteCount]),
+            (.hyper, row[col.songDPHyperNoteCount]), (.another, row[col.songDPAnotherNoteCount]),
+            (.leggendaria, row[col.songDPLeggendariaNoteCount])
+        ] : [
+            (.beginner, row[col.songSPBeginnerNoteCount]), (.normal, row[col.songSPNormalNoteCount]),
+            (.hyper, row[col.songSPHyperNoteCount]), (.another, row[col.songSPAnotherNoteCount]),
+            (.leggendaria, row[col.songSPLeggendariaNoteCount])
+        ]
+        return levelMap(pairs)
     }
 
     static func backfillDifficultiesFromBEMANIWiki() {
