@@ -246,11 +246,13 @@ final class SessionCameraViewController: UIViewController {
         }
         session.addInput(input)
         session.addOutput(photoOutput)
-        videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
-        videoDataOutput.alwaysDiscardsLateVideoFrames = true
-        videoDataOutput.setSampleBufferDelegate(liveProbe, queue: videoQueue)
-        if session.canAddOutput(videoDataOutput) {
-            session.addOutput(videoDataOutput)
+        if DeviceCapability.supportsLiveDetection {
+            videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
+            videoDataOutput.alwaysDiscardsLateVideoFrames = true
+            videoDataOutput.setSampleBufferDelegate(liveProbe, queue: videoQueue)
+            if session.canAddOutput(videoDataOutput) {
+                session.addOutput(videoDataOutput)
+            }
         }
         session.commitConfiguration()
         session.startRunning()
@@ -384,7 +386,10 @@ final class SessionCameraViewController: UIViewController {
 
 extension SessionCameraViewController {
     private var autoDetectEnabled: Bool {
-        get { UserDefaults.standard.object(forKey: "Sessions.Camera.AutoDetect") as? Bool ?? true }
+        get {
+            DeviceCapability.supportsLiveDetection
+                && (UserDefaults.standard.object(forKey: "Sessions.Camera.AutoDetect") as? Bool ?? true)
+        }
         set { UserDefaults.standard.set(newValue, forKey: "Sessions.Camera.AutoDetect") }
     }
 
@@ -403,6 +408,7 @@ extension SessionCameraViewController {
         optionsButton.showsMenuAsPrimaryAction = true
         optionsButton.menu = buildOptionsMenu()
         optionsButton.accessibilityLabel = NSLocalizedString("Sessions.Camera.Options", comment: "")
+        optionsButton.isHidden = !DeviceCapability.supportsLiveDetection
         view.addSubview(optionsButton)
     }
 
