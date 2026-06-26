@@ -32,7 +32,6 @@ final class SessionCameraViewController: UIViewController {
     private let previewLayer = AVCaptureVideoPreviewLayer()
     private let topGradient = CAGradientLayer()
     private let bottomGradient = CAGradientLayer()
-    private let guideLayer = CAShapeLayer()
     private let hintLabel = UILabel()
     private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
     private var captureDelegate: PhotoCaptureDelegate?
@@ -50,10 +49,10 @@ final class SessionCameraViewController: UIViewController {
     private let scoreRegionColor = UIColor.systemTeal
     private let titleRegionColor = UIColor.systemYellow
     private let scoreRegion = CGRect(x: 0.03, y: 0.04, width: 0.45, height: 0.94)
-    private let titleRegion = CGRect(x: 0.54, y: 0.82, width: 0.44, height: 0.16)
+    private let titleRegion = CGRect(x: 0.50, y: 0.82, width: 0.29, height: 0.16)
     private let playerSideDefaultsKey = "Sessions.Camera.IsPlayer2"
     private var isPlayer2 = false
-    private let guidePerspective: CGFloat = 0.08
+    private let guidePerspective: CGFloat = 0.14
 
     private let stagedOverlay = StagedResultsOverlayView()
     private var stagedTimer: Timer?
@@ -71,15 +70,6 @@ final class SessionCameraViewController: UIViewController {
         overlayView.backgroundColor = .clear
         overlayView.isUserInteractionEnabled = false
         view.addSubview(overlayView)
-        guideLayer.fillColor = UIColor.clear.cgColor
-        guideLayer.strokeColor = UIColor.white.withAlphaComponent(0.9).cgColor
-        guideLayer.lineWidth = 3
-        guideLayer.lineCap = .round
-        guideLayer.shadowColor = UIColor.black.cgColor
-        guideLayer.shadowOpacity = 0.4
-        guideLayer.shadowRadius = 3
-        guideLayer.shadowOffset = .zero
-        overlayView.layer.addSublayer(guideLayer)
         configureRegionLayer(scoreRegionLayer, color: scoreRegionColor)
         configureRegionLayer(titleRegionLayer, color: titleRegionColor)
         overlayView.layer.addSublayer(scoreRegionLayer)
@@ -93,7 +83,6 @@ final class SessionCameraViewController: UIViewController {
         super.viewWillAppear(animated)
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         shutterHaptic.prepare()
-        startGuidePulse()
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationDidChange),
                                                name: UIDevice.orientationDidChangeNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(powerStateDidChange),
@@ -116,7 +105,6 @@ final class SessionCameraViewController: UIViewController {
         NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: .NSProcessInfoPowerStateDidChange, object: nil)
         UIDevice.current.endGeneratingDeviceOrientationNotifications()
-        guideLayer.removeAnimation(forKey: "pulse")
         sessionQueue.async { [weak self] in
             guard let self, self.session.isRunning else { return }
             self.session.stopRunning()
@@ -134,18 +122,6 @@ final class SessionCameraViewController: UIViewController {
             self?.applyPreviewRotation()
             self?.applyVideoOutputRotation()
         }
-    }
-
-    private func startGuidePulse() {
-        guideLayer.removeAnimation(forKey: "pulse")
-        let pulse = CABasicAnimation(keyPath: "opacity")
-        pulse.fromValue = 1.0
-        pulse.toValue = 0.35
-        pulse.duration = 1.1
-        pulse.autoreverses = true
-        pulse.repeatCount = .infinity
-        pulse.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        guideLayer.add(pulse, forKey: "pulse")
     }
 
     override func viewDidLayoutSubviews() {
@@ -174,12 +150,6 @@ final class SessionCameraViewController: UIViewController {
     }
 
     private func layoutOverlay() {
-        let bounds = overlayView.bounds
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        guideLayer.frame = bounds
-        guideLayer.path = cornerBracketPath(corners: guideCorners()).cgPath
-        CATransaction.commit()
         updateRegionGuides()
         positionHintLabel(in: guideRect())
     }
@@ -509,31 +479,6 @@ extension SessionCameraViewController {
                        topRight: CGPoint(x: rect.maxX, y: rect.minY + inset),
                        bottomRight: CGPoint(x: rect.maxX, y: rect.maxY - inset),
                        bottomLeft: CGPoint(x: rect.minX, y: rect.maxY))
-    }
-
-    func cornerBracketPath(corners: Corners, length: CGFloat = 30, radius: CGFloat = 14) -> UIBezierPath {
-        let path = UIBezierPath()
-        path.append(bracket(at: corners.topLeft, toward: corners.topRight,
-                            and: corners.bottomLeft, length: length, radius: radius))
-        path.append(bracket(at: corners.topRight, toward: corners.bottomRight,
-                            and: corners.topLeft, length: length, radius: radius))
-        path.append(bracket(at: corners.bottomRight, toward: corners.bottomLeft,
-                            and: corners.topRight, length: length, radius: radius))
-        path.append(bracket(at: corners.bottomLeft, toward: corners.topLeft,
-                            and: corners.bottomRight, length: length, radius: radius))
-        return path
-    }
-
-    private func bracket(at corner: CGPoint, toward first: CGPoint, and second: CGPoint,
-                         length: CGFloat, radius: CGFloat) -> UIBezierPath {
-        let dirFirst = unitVector(from: corner, to: first)
-        let dirSecond = unitVector(from: corner, to: second)
-        let path = UIBezierPath()
-        path.move(to: along(corner, dirFirst, radius + length))
-        path.addLine(to: along(corner, dirFirst, radius))
-        path.addQuadCurve(to: along(corner, dirSecond, radius), controlPoint: corner)
-        path.addLine(to: along(corner, dirSecond, radius + length))
-        return path
     }
 
     private func quadPath(_ corners: Corners, cornerRadius radius: CGFloat) -> UIBezierPath {
