@@ -115,7 +115,7 @@ enum IIDXResultParser {
         // derivation trustworthy and bounds the judge reconciliation correctly.
         let notes = resolved.matched?.noteCounts[parse.level] ?? headlineNumber(text("notes_count"))
         if let value = headlineNumber(text("score_now")) {
-            parse.exScore = value
+            parse.exScore = sanitizedScore(value)
             hits += 1
         }
         if let value = headlineNumber(text("miss_count_now")) {
@@ -156,6 +156,13 @@ enum IIDXResultParser {
     }
 
     // MARK: - Numbers
+
+    // A 5-digit EX score is impossible (max is notes·2, well under 10000); the LED
+    // font commonly appends a spurious trailing "1", so 13991 -> 1399.
+    private static func sanitizedScore(_ value: Int) -> Int {
+        guard (10000...99999).contains(value), value % 10 == 1 else { return value }
+        return value / 10
+    }
 
     // EX score = 2·perfect-great + great. The small judge fonts misread far more
     // often than the headline score, so recover a missing count from the others.

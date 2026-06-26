@@ -1,8 +1,9 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
-    "CFBundleName" : {
-      "comment" : "Bundle name",
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -12,7 +13,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "new",
             "value" : "DJDX"
           }
         },
@@ -24,31 +25,33 @@
         }
       }
     },
-    "NSCameraUsageDescription" : {
-      "extractionState" : "manual",
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDX uses the camera to capture your result screens during a session."
+            "value" : "DJDX CHARGE"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション中にリザルト画面を撮影するためにカメラを使用します。"
+            "state" : "new",
+            "value" : "DJDX CHARGE"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDX 會在遊玩過程中使用相機拍攝成績畫面。"
+            "value" : "DJDX CHARGE"
           }
         }
       }
     },
     "NSHealthShareUsageDescription" : {
-      "extractionState" : "manual",
+      "comment" : "Privacy - Health Share Usage Description",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -58,8 +61,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "プレーセッションをまとめるために、ワークアウト・心拍数・アクティブエネルギーを読み出します。"
+            "state" : "new",
+            "value" : "DJDX reads your workout, heart rate, and active energy to summarize your play sessions."
           }
         },
         "zh-Hant" : {
@@ -71,7 +74,8 @@
       }
     },
     "NSHealthUpdateUsageDescription" : {
-      "extractionState" : "manual",
+      "comment" : "Privacy - Health Update Usage Description",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -81,37 +85,14 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "プレーセッションをワークアウトとしてヘルスケアに保存します。"
+            "state" : "new",
+            "value" : "DJDX saves your play sessions as workouts in the Health app."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDX 會將你的遊玩記錄以體能訓練形式儲存到「健康」App。"
-          }
-        }
-      }
-    },
-    "NSPhotoLibraryAddUsageDescription" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJDX saves your captured result screens to Photos."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "撮影したリザルト画面を写真に保存します。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DJDX 會將拍攝的成績畫面儲存到「照片」。"
+            "value" : "DJDX 會將你的遊玩記錄以體能訓練的形式儲存到「健康」App。"
           }
         }
       }

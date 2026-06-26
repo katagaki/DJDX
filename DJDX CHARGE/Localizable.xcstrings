@@ -15,6 +15,12 @@
             "state" : "translated",
             "value" : "セッションを開始するとワークアウトが始まります。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始遊玩即可啟動體能訓練。"
+          }
         }
       }
     },
@@ -31,6 +37,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "準備完了"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "準備就緒"
           }
         }
       }
@@ -49,6 +61,12 @@
             "state" : "translated",
             "value" : "一時停止"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暫停"
+          }
         }
       }
     },
@@ -65,6 +83,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一時停止中"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已暫停"
           }
         }
       }
@@ -83,6 +107,12 @@
             "state" : "translated",
             "value" : "プレー数"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩次數"
+          }
         }
       }
     },
@@ -99,6 +129,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再開"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "繼續"
           }
         }
       }
@@ -117,6 +153,12 @@
             "state" : "translated",
             "value" : "セッションを開始"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始遊玩"
+          }
         }
       }
     },
@@ -133,6 +175,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッションを終了"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "結束遊玩"
           }
         }
       }
@@ -151,6 +199,12 @@
             "state" : "translated",
             "value" : "このセッションを終了しますか？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要結束這次遊玩嗎？"
+          }
         }
       }
     },
@@ -168,9 +222,15 @@
             "state" : "translated",
             "value" : "キャンセル"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.3"
 }

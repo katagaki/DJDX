@@ -254,6 +254,7 @@ struct IIDXImportView: View {
                     .foregroundStyle(.white)
                     .adaptiveClipShape()
                 }
+                .menuOrder(.fixed)
             }
         }
         .padding(12.0)

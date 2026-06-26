@@ -51,11 +51,15 @@ struct UnifiedView: View {
     @Namespace var towerNamespace
     @Namespace var importNamespace
 
+    var isSessionsMode: Bool {
+        appMode == .sessions && selectedGame.supportsSessions
+    }
+
     var body: some View {
         @Bindable var migrationProgress = migrationProgress
         NavigationStack(path: $navigationManager.path) {
             ZStack {
-                if appMode == .sessions {
+                if isSessionsMode {
                     SessionsView(store: sessionStore)
                 } else if selectedGame == .soundVoltex {
                     SDVXScoresView(isEditingAnalytics: $isEditingAnalytics) {
@@ -75,27 +79,29 @@ struct UnifiedView: View {
                     }
                 }
             }
-            .navigationTitle(appMode == .sessions ? "ViewTitle.Sessions" : "ViewTitle.Scores")
+            .navigationTitle(isSessionsMode ? "ViewTitle.Sessions" : "ViewTitle.Scores")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .principal) {
                     gameMenu
                 }
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    Menu {
-                        Picker("ViewTitle.Mode", selection: $appMode) {
-                            Label("ViewTitle.Scores", systemImage: "music.note.list").tag(AppMode.imports)
-                            Label("ViewTitle.Sessions.Beta", systemImage: "figure.walk").tag(AppMode.sessions)
+                    if selectedGame.supportsSessions {
+                        Menu {
+                            Picker("ViewTitle.Mode", selection: $appMode) {
+                                Label("ViewTitle.Scores", systemImage: "music.note.list").tag(AppMode.imports)
+                                Label("ViewTitle.Sessions.Beta", systemImage: "figure.walk").tag(AppMode.sessions)
+                            }
+                        } label: {
+                            Image(systemName: appMode == .sessions ? "figure.walk" : "music.note.list")
                         }
-                    } label: {
-                        Image(systemName: appMode == .sessions ? "figure.walk" : "music.note.list")
                     }
                 }
                 if #available(iOS 26.0, *) {
                     ToolbarSpacer(.fixed, placement: .topBarLeading)
                 }
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    if appMode == .imports {
+                    if !isSessionsMode {
                         Button("Shared.Import", systemImage: "arrow.down.circle.dotted") {
                             isPresentingImport = true
                         }
@@ -103,7 +109,7 @@ struct UnifiedView: View {
                         .automaticSheetMatchedTransitionSource(id: "Import", in: importNamespace)
                     }
                 }
-                if appMode == .imports {
+                if !isSessionsMode {
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         Button {
                             withAnimation(.smooth.speed(2.0)) { isEditingAnalytics.toggle() }
@@ -122,7 +128,7 @@ struct UnifiedView: View {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     MoreMenu()
                 }
-                if appMode == .sessions {
+                if isSessionsMode {
                     ToolbarItemGroup(placement: .bottomBar) {
                         Spacer()
                         Button {
@@ -223,6 +229,11 @@ struct UnifiedView: View {
             }
 #endif
             handleDeepLink(url)
+        }
+        .onChange(of: selectedGame) { _, newValue in
+            if !newValue.supportsSessions {
+                appMode = .imports
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .startSessionRequested)
             .receive(on: RunLoop.main)) { notification in

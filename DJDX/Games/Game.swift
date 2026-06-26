@@ -56,6 +56,10 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
 
     var supportsPlayType: Bool { isIIDXFamily }
 
+    var supportsSessions: Bool {
+        self == .iidxArcade
+    }
+
     var supportsTower: Bool {
         switch self {
         case .iidxArcade: true
