@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>About Sessions — Image Detection Pipeline</title>
+<title>Sessions - Image Pipeline</title>
 <style>
   :root {
     --ktui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", system-ui, sans-serif;
@@ -337,15 +337,14 @@
 <body>
 
 <header class="ktui-shell">
-  <span class="brand"><b>ktui</b><span class="sep">/</span><span class="ctx">DJDX · Sessions</span></span>
+  <span class="brand">Sessions - Image Pipeline</span>
 </header>
 
 <main>
-  <p class="eyebrow">Documentation · Sessions</p>
   <h1>Image detection pipeline</h1>
   <p class="lede">
     A Sessions capture turns a photo of a beatmania&nbsp;IIDX result screen into a typed,
-    matched play record. It runs in three stages — localize the on-screen regions with a
+    matched play record. It runs in three stages - localize the on-screen regions with a
     Core&nbsp;ML object detector, read each region with the model best suited to its content,
     then parse the text into a structured result and match it against the song database.
   </p>
@@ -493,7 +492,7 @@
           <rect class="n ocr" x="508" y="650" width="218" height="116"/>
           <rect class="bar ocr" x="508" y="650" width="6" height="116"/>
           <text class="eyebrow-t ocr" x="526" y="670">VISION OCR</text>
-          <text class="title-t" x="526" y="689">Text — title</text>
+          <text class="title-t" x="526" y="689">Text - title</text>
           <text class="sub-t" x="526" y="708">Languages: ja + en</text>
           <text class="sub-t mono" x="526" y="724">song_title</text>
           <text class="sub-t mono" x="526" y="740">song_artist</text>
@@ -503,7 +502,7 @@
           <rect class="n ocr" x="742" y="650" width="218" height="116"/>
           <rect class="bar ocr" x="742" y="650" width="6" height="116"/>
           <text class="eyebrow-t ocr" x="760" y="670">VISION OCR</text>
-          <text class="title-t" x="760" y="689">Text — numeric</text>
+          <text class="title-t" x="760" y="689">Text - numeric</text>
           <text class="sub-t" x="760" y="708">Language: en</text>
           <text class="sub-t mono" x="760" y="724">clear_type · difficulty</text>
           <text class="sub-t mono" x="760" y="740">stage_label</text>
@@ -595,7 +594,7 @@
       <div class="st-title">Read regions</div>
       <div class="st-body">
         <span class="mono">IIDXResultReader.detect</span> uprights and downscales the image
-        (≤&nbsp;2048&nbsp;px), runs the detector, and reads each region — returning
+        (≤&nbsp;2048&nbsp;px), runs the detector, and reads each region - returning
         <span class="mono">[DetectedRegion]</span>.
       </div>
     </li>
@@ -618,7 +617,7 @@
   </ol>
 
   <!-- ============================ STAGE 2 ROUTING ============================ -->
-  <h2><span class="num">02</span>Stage&nbsp;2 — region routing</h2>
+  <h2><span class="num">02</span>Stage&nbsp;2 - region routing</h2>
   <p class="section-sub">
     The detector localizes a region; what reads it depends on the region's content. Pure-number
     fields and the stylized DJ-level graphic go to dedicated models that Vision OCR cannot read;
@@ -648,13 +647,13 @@
         <tr>
           <td><code>song_title</code>, <code>song_artist</code></td>
           <td><span class="tag tag-ocr">Vision OCR</span></td>
-          <td>—</td>
+          <td>-</td>
           <td>Marked <code>recognitionFailed</code></td>
         </tr>
         <tr>
           <td><code>clear_type_now</code>, <code>difficulty_label</code>, <code>stage_label</code>, others</td>
           <td><span class="tag tag-ocr">Vision OCR</span></td>
-          <td>—</td>
+          <td>-</td>
           <td>Marked <code>recognitionFailed</code></td>
         </tr>
       </tbody>
@@ -686,7 +685,7 @@
           <td><span class="mono">IIDXResultDetector</span><br><span class="tag tag-model">Core ML model</span></td>
           <td>Object detector (Vision)</td>
           <td>The whole result screen</td>
-          <td>22 region classes — <code>song_title</code>, <code>score_now</code>, <code>dj_level_now</code>, … (conf 0.25, IoU 0.7)</td>
+          <td>22 region classes - <code>song_title</code>, <code>score_now</code>, <code>dj_level_now</code>, … (conf 0.25, IoU 0.7)</td>
           <td><span class="tag tag-req">Bundled · required</span></td>
         </tr>
         <tr>
@@ -707,7 +706,7 @@
           <td><span class="mono">VNRecognizeTextRequest</span><br><span class="tag tag-ocr">Vision OCR</span></td>
           <td>System text recognizer</td>
           <td>Title &amp; residual text crops</td>
-          <td>Free text — accurate level, language correction off, language-filtered per field</td>
+          <td>Free text - accurate level, language correction off, language-filtered per field</td>
           <td><span class="tag tag-req">Built-in · no file</span></td>
         </tr>
       </tbody>
