@@ -208,7 +208,7 @@ struct PolarisChordGradeBreakdownDetailView: View {
                         .frame(height: 140.0)
                         .listRowBackground(Color.clear)
                     } header: {
-                        Text(verbatim: difficulty.abbreviation)
+                        Text(verbatim: difficulty.rawValue)
                             .foregroundStyle(difficulty.color)
                     }
                 }
