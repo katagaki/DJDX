@@ -115,11 +115,11 @@ extension IIDXScoresView {
         case .clearType:
             let order = IIDXClearType.sortedStrings
             entries.sort { lhs, rhs in
-                let li = order.firstIndex(of: lhs.score.clearType)
-                let ri = order.firstIndex(of: rhs.score.clearType)
-                if li == ri { return lhs.songRecord.title < rhs.songRecord.title }
-                guard let li, let ri else { return li != nil }
-                return isAscending ? li < ri : li > ri
+                let lhsIndex = order.firstIndex(of: lhs.score.clearType)
+                let rhsIndex = order.firstIndex(of: rhs.score.clearType)
+                if lhsIndex == rhsIndex { return lhs.songRecord.title < rhs.songRecord.title }
+                guard let lhsIndex, let rhsIndex else { return lhsIndex != nil }
+                return isAscending ? lhsIndex < rhsIndex : lhsIndex > rhsIndex
             }
         case .djLevel:
             let order = IIDXDJLevel.sorted

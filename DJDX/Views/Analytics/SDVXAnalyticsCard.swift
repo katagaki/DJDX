@@ -18,8 +18,6 @@ enum SDVXAnalyticsCard: String, Codable, Hashable, CaseIterable {
 
     static var defaultOrder: [SDVXAnalyticsCard] { allCases }
 
-    /// Cards shown by default. The grade cards are offered down to A, but only
-    /// the top grades (down to AAA) are visible until the user opts the rest in.
     static var defaultVisible: Set<SDVXAnalyticsCard> {
         [
             .clearBreakdown, .gradeBreakdown,

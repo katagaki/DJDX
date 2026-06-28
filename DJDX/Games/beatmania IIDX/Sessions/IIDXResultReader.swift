@@ -22,17 +22,12 @@ private struct RawDetection: Sendable {
     let box: CGRect
 }
 
-// The IIDXResultDetector Core ML model is an object detector: every class is a
-// region on the result screen (song_title, score_now, dj_level_now, ...), not a
-// value. Vision localizes each region, then per-region OCR reads the text.
 enum IIDXResultReader {
 
     static let maxDimension: CGFloat = 2048.0
 
     private static let titleLabels: Set<String> = ["song_title", "song_artist"]
 
-    // Pure-number fields routed to the digit model when it is available; the rest
-    // (clear_type, difficulty_label, stage_label, dj_level) stay on Vision OCR.
     static let digitLabels: Set<String> = [
         "score_now", "score_prev", "score_delta",
         "miss_count_now", "miss_count_prev", "miss_count_delta",
@@ -40,8 +35,6 @@ enum IIDXResultReader {
         "notes_count", "combo_break"
     ]
 
-    // Index order matches the model's "classes" metadata; used to recover a class
-    // name when Vision reports a label as its numeric index rather than its name.
     private static let classNames = [
         "dj_level_now", "dj_level_prev", "clear_type_now", "clear_type_prev",
         "score_now", "score_prev", "score_delta", "miss_count_now", "miss_count_prev",
@@ -64,9 +57,6 @@ enum IIDXResultReader {
         return try? VNCoreMLModel(for: detector.model)
     }()
 
-    // Loading the model is cheap; the real first-use cost is GPU/Vision pipeline
-    // compilation, which only happens on the first prediction. Run one throwaway
-    // prediction per model (and the text recognizer) so the first capture is fast.
     static func prewarm() async {
         guard let image = warmupImage() else { return }
         _ = try? await detect(cgImage: image)
@@ -185,8 +175,6 @@ enum IIDXResultReader {
         } catch {
             return ("", true)
         }
-        // Headline value first: a field's own value is rendered larger than any
-        // neighbouring delta/column that bleeds into the crop.
         let text = lines
             .sorted { $0.box.height > $1.box.height }
             .map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }

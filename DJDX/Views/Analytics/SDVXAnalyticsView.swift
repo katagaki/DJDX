@@ -23,8 +23,6 @@ struct SDVXAnalyticsView: View {
     @AppStorage(wrappedValue: Data(), "Analytics.SDVX.VisibleCards") var visibleCardsData: Data
     @State var visibleCards: Set<SDVXAnalyticsCard> = SDVXAnalyticsCard.defaultVisible
 
-    // Persisted store; `isOverviewCollapsed` mirrors it so a global `withAnimation`
-    // can drive the collapse (animating @AppStorage directly does not work).
     @AppStorage(wrappedValue: false, "Analytics.SDVX.OverviewCollapsed") var isOverviewCollapsedStored: Bool
     @State var isOverviewCollapsed: Bool = false
 

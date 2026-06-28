@@ -34,9 +34,6 @@ final class IIDXSessionLiveActivityController {
         sessionID = session.id
     }
 
-    // Cold-launch recovery: if a session is still active, adopt a Live Activity
-    // that the system kept alive, or start a fresh one if it was removed (e.g.
-    // force quit). Any activity for an already-ended session is cleaned up.
     func reconcile() {
         let activeSession = database.activeSession()
         var adopted: Activity<SessionActivityAttributes>?

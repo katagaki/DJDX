@@ -28,8 +28,6 @@ final class SDVXAnalyticsModel {
         SDVXClearType.ultimateChain.rawValue,
         SDVXClearType.perfectUltimateChain.rawValue
     ]
-    // Grades surfaced as "new grade" cards, offered down to A (the view defaults
-    // to showing only the top grades, down to AAA).
     nonisolated static let trackedGrades: [String] = [
         SDVXGrade.s.rawValue,
         SDVXGrade.aaaPlus.rawValue,
@@ -44,8 +42,6 @@ final class SDVXAnalyticsModel {
 
     let fetcher = SDVXReader()
 
-    // VOLFORCE per chart: floor(level * grade_coef * clear_coef * 2) / 100, summed over best 50.
-    // Score-based single-chart force ~= level * 2 * (score / 10_000_000) as an approximation.
     private func chartForce(_ record: SDVXSongRecord) -> Double {
         let levelValue = Double(record.level) ?? 0.0
         guard levelValue > 0, record.highScore > 0 else { return 0.0 }

@@ -1,8 +1,5 @@
 import Foundation
 
-// The SDVX CSV is one row per chart (song + difficulty), unlike the IIDX CSV
-// which is one row per song. Each SDVXSongRecord therefore carries a single
-// chart's score.
 final class SDVXSongRecord: Equatable, Hashable, @unchecked Sendable {
     var title: String = ""
     var difficulty: String = SDVXDifficulty.novice.rawValue

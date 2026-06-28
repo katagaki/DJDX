@@ -47,8 +47,6 @@ struct IIDXScoresView<Header: View>: View {
     @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
 
-    // Persisted store; `isScoreDataExpanded` mirrors it so a global `withAnimation`
-    // can drive the collapse (animating @AppStorage directly does not work).
     var isScoreDataExpandedKey: String = "ScoresView.ScoreDataExpanded"
     @State var isScoreDataExpanded: Bool
 
@@ -113,8 +111,6 @@ struct IIDXScoresView<Header: View>: View {
                     isTimeTravelling = false
                 }
             } else {
-                // Not time travelling: only show the popover. Selecting a non-today
-                // date is what turns the feature on (see onChange of playDataDate).
                 isShowingDatePopover = true
             }
         } label: {

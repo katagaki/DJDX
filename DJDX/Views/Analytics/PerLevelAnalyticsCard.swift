@@ -7,8 +7,6 @@ struct PerLevelSegment: Identifiable {
     let count: Int
 }
 
-// A full-width per-level card: title and subtitle over a faint trend chart,
-// with an optional segmented makeup bar and a top-counts row for static cards.
 struct PerLevelAnalyticsCard<TrendChart: View>: View {
 
     let difficulty: Int

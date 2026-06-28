@@ -22,8 +22,6 @@ struct PolarisChordScoresView<Header: View>: View {
     @AppStorage(wrappedValue: [], "PolarisChordScoresView.GradeFilters")
     var gradesToShow: Set<PolarisChordGrade>
 
-    // Persisted store; `isScoreDataExpanded` mirrors it so a global `withAnimation`
-    // can drive the collapse (animating @AppStorage directly does not work).
     var isScoreDataExpandedKey: String = "PolarisChordScoresView.ScoreDataExpanded"
     @State var isScoreDataExpanded: Bool
 

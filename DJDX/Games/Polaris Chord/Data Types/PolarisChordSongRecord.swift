@@ -1,7 +1,5 @@
 import Foundation
 
-// Polaris Chord has no CSV export; each record is built from a chart in the
-// json/pdata_getdata.html API response. Stored via SQLite, like SDVXSongRecord.
 final class PolarisChordSongRecord: Equatable, Hashable, @unchecked Sendable {
     var title: String = ""
     var musicID: String = ""

@@ -1,8 +1,5 @@
 import SwiftUI
 
-// The zoom transition forces sheets fullscreen on iOS 18, overriding their
-// detents, so it is only applied on iOS 26+ where it coexists with detents.
-
 struct AutomaticSheetMatchedTransitionSource: ViewModifier {
 
     var id: AnyHashable

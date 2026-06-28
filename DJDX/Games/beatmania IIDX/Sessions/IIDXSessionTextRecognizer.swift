@@ -8,9 +8,6 @@ enum IIDXSessionTextRecognizerError: Error {
 
 enum IIDXSessionTextRecognizer {
 
-    // Numbers on the result screen get misread as kanji/kana when Japanese is a
-    // recognition language, so callers run two passes: this set for the song
-    // title, and an English-only set for the scores.
     static let titleLanguages = ["ja-JP", "ja", "en-US", "en"]
     static let numericLanguages = ["en-US", "en"]
 

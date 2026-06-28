@@ -289,8 +289,6 @@ struct IIDXScoreSection: View {
         // Get import group IDs for this song's records
         let importGroupIDs = await fetcher.songRecordImportGroupIDs(for: songTitle)
 
-        // Build a lookup of song record to import group ID
-        // Since records are returned in order, match by index
         var recordImportGroups: [(IIDXSongRecord, String)] = []
         for (index, record) in songRecordsForSong.enumerated() where index < importGroupIDs.count {
             recordImportGroups.append((record, importGroupIDs[index]))

@@ -25,8 +25,6 @@ struct PolarisChordAnalyticsView: View {
     @AppStorage(wrappedValue: Data(), "Analytics.PolarisChord.VisibleCards") var visibleCardsData: Data
     @State var visibleCards: Set<PolarisChordAnalyticsCard> = PolarisChordAnalyticsCard.defaultVisible
 
-    // Persisted store; `isOverviewCollapsed` mirrors it so a global `withAnimation`
-    // can drive the collapse (animating @AppStorage directly does not work).
     @AppStorage(wrappedValue: false, "Analytics.PolarisChord.OverviewCollapsed") var isOverviewCollapsedStored: Bool
     @State var isOverviewCollapsed: Bool = false
 

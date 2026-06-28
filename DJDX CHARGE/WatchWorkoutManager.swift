@@ -125,9 +125,6 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         ingest(heartRate: nil, activeCalories: nil)
     }
 
-    // Only issue transitions that are valid from the session's current state —
-    // HealthKit errors on pause-while-paused / resume-while-running. When the
-    // session is already in the requested state, just reconcile our flag to it.
     private func requestPause(_ paused: Bool) {
         guard let session else { return }
         let date = Date()

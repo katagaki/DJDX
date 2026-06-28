@@ -47,9 +47,6 @@ struct IIDXResultParse: Sendable {
     var confidence: Double = 0.0
 }
 
-// The IIDXResultDetector model localizes each result-screen field as its own
-// region; this parser maps the OCR'd text of those regions onto a typed result.
-// Fields use the "_now" (this-play) variants; "_prev"/"_delta" regions are ignored.
 enum IIDXResultParser {
 
     private static let grades = ["AAA", "AA", "A", "B", "C", "D", "E", "F"]
@@ -94,9 +91,6 @@ enum IIDXResultParser {
             parse.songTitle = rawTitle
         }
 
-        // ANOTHER/LEGGENDARIA charts are effectively never level 1; OCR frequently
-        // drops the leading digit of "11". Correct it, but only when neither the
-        // wiki nor imported data already knows this chart's level.
         if ocrDifficulty == 1,
            parse.level == .another || parse.level == .leggendaria,
            resolved.matched?.difficulties[parse.level] == nil {
@@ -110,9 +104,6 @@ enum IIDXResultParser {
             hits += 1
         }
 
-        // The matched chart's note count is authoritative; the on-screen notes_count
-        // OCR is only a fallback. A reliable note count makes the score-rate DJ-level
-        // derivation trustworthy and bounds the judge reconciliation correctly.
         let notes = resolved.matched?.noteCounts[parse.level] ?? headlineNumber(text("notes_count"))
         if let value = headlineNumber(text("score_now")) {
             parse.exScore = sanitizedScore(value)
@@ -133,9 +124,6 @@ enum IIDXResultParser {
         if let value = headlineNumber(text("judge_bad")) { parse.bad = value }
         if let value = headlineNumber(text("judge_poor")) { parse.poor = value }
 
-        // The dedicated rank classifier reads the on-screen DJ-level graphic
-        // directly, so trust it first; fall back to the score-rate derivation only
-        // when the classifier abstains. A >1-grade disagreement flags low confidence.
         let classified = text("dj_level_now").flatMap(gradeOf)
         let derived = derivedGrade(exScore: parse.exScore, notes: notes, parse: parse)
         let djResolution = resolveDJLevel(classified: classified, derived: derived)
@@ -157,15 +145,11 @@ enum IIDXResultParser {
 
     // MARK: - Numbers
 
-    // A 5-digit EX score is impossible (max is notes·2, well under 10000); the LED
-    // font commonly appends a spurious trailing "1", so 13991 -> 1399.
     private static func sanitizedScore(_ value: Int) -> Int {
         guard (10000...99999).contains(value), value % 10 == 1 else { return value }
         return value / 10
     }
 
-    // EX score = 2·perfect-great + great. The small judge fonts misread far more
-    // often than the headline score, so recover a missing count from the others.
     private static func reconcileJudges(exScore: Int, notes: Int?,
                                         perfectGreat: inout Int?, great: inout Int?) {
         guard exScore > 0 else { return }
@@ -229,8 +213,6 @@ enum IIDXResultParser {
         }
     }
 
-    // Headline value of a region: the first line (tallest, see detector ordering)
-    // that yields digits, read leniently through the OCR letter/digit confusions.
     private static func headlineNumber(_ text: String?) -> Int? {
         guard let text else { return nil }
         for line in text.split(whereSeparator: \.isNewline) {
@@ -239,9 +221,6 @@ enum IIDXResultParser {
         return nil
     }
 
-    // Drop spaces (the LED font kerns digits apart), map OCR letter/digit
-    // confusions, then take the longest digit run — this keeps "1 045" → 1045
-    // while discarding trailing words like the "NOTES" in "1174 NOTES".
     private static func digits(_ text: String) -> Int? {
         let mapped = text.uppercased()
             .replacingOccurrences(of: " ", with: "")
@@ -261,10 +240,6 @@ enum IIDXResultParser {
 
     // MARK: - Title
 
-    // Narrow the song pool by the parsed chart (play type + level + difficulty)
-    // first, then fuzzy-match the OCR title within that small set. Filtering makes
-    // edit-distance matching safe enough to absorb OCR errors; an unfiltered pool
-    // stays strict to avoid false matches, and anything unmatched keeps the raw text.
     private static func resolveTitle(titleText: String?,
                                      songs: [IIDXSongCandidate],
                                      level: IIDXLevel,
@@ -301,8 +276,6 @@ enum IIDXResultParser {
         return (nil, rawTitle)
     }
 
-    // The difficulty number is easily misread (10 -> IO), and it gates the pool,
-    // so tolerate an off-by-one before falling back to the whole level category.
     private static func candidatePool(
         songs: [IIDXSongCandidate],
         level: IIDXLevel,
@@ -374,10 +347,6 @@ enum IIDXResultParser {
         return .single
     }
 
-    // A dropped digit reads "11" as "1", which then mis-gates the candidate pool
-    // and blocks the DB difficulty correction. Reject a difficulty below the
-    // lowest that actually exists for this level + play type in the song DB; the
-    // title match then recovers the real value. Unknown DB (no songs) stays lenient.
     private static func plausibleDifficulty(
         _ difficulty: Int,
         level: IIDXLevel,
@@ -461,9 +430,6 @@ enum IIDXResultParser {
         text.split(whereSeparator: { $0 == " " || $0 == "\t" || $0 == "\n" }).map(String.init)
     }
 
-    // Recover a 1-12 difficulty from a token, mapping common OCR letter/digit
-    // confusions (I/L -> 1, O/Q -> 0, S -> 5, B -> 8, ...). Rejects tokens that
-    // still contain non-digits after mapping, so "SP"/"NOTES" never become numbers.
     private static func difficultyToken(_ text: String) -> Int? {
         let cleaned = text.uppercased().filter { $0.isLetter || $0.isNumber }
         guard !cleaned.isEmpty, cleaned.count <= 3 else { return nil }
@@ -483,9 +449,6 @@ enum IIDXResultParser {
 
 extension IIDXResultParser {
 
-    // Re-analysis self-heal: EX score, the perfect-great/great split, and the miss
-    // count are arithmetically linked (EX = 2·PGREAT + GREAT, MISS = BAD + POOR),
-    // so recover whichever value the OCR dropped from the ones it did read.
     static func heal(_ parse: IIDXResultParse) -> IIDXResultParse {
         var healed = parse
         let perfectGreat = healed.perfectGreat

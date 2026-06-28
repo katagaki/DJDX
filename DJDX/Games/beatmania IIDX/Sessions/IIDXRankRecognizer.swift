@@ -2,13 +2,6 @@ import CoreGraphics
 import CoreML
 import Vision
 
-// Image classifier for the stylized DJ-level graphic (AAA/AA/A/B/C/D/E/F) that OCR
-// cannot read. It runs on the dj_level_now crop the result reader isolates; the
-// class labels map 1:1 to IIDXDJLevel raw values. Uses .centerCrop — .scaleFill
-// stretches "AA" into "AAA".
-//
-// Loaded by bundle name at runtime, so the build never depends on the model file;
-// when it is absent or unsure, the parser falls back to score-rate derivation.
 enum IIDXRankRecognizer {
 
     static let modelName = "IIDXRankClassifier"
