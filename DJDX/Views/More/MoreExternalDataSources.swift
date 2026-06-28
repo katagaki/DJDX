@@ -46,6 +46,9 @@ struct MoreExternalDataSources: View {
         }
         .navigationTitle("More.ExternalData.Header")
         .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: [isTextageEnabled, isSDVXInEnabled, isBemaniWikiEnabled, isBM2DXEnabled, isDDREnabled]) { _, _ in
+            NotificationCenter.default.post(name: .externalDataChanged, object: nil)
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if #available(iOS 26.0, *) {
@@ -169,6 +172,7 @@ struct MoreExternalDataSources: View {
                             await reload()
                             reloadingSource = nil
                             completed.wrappedValue = true
+                            NotificationCenter.default.post(name: .externalDataChanged, object: nil)
                         }
                     }
                     .disabled(reloadingSource != nil)

@@ -328,6 +328,10 @@ struct IIDXScoresView<Header: View>: View {
                 dataState = .initializing
                 reloadDisplay()
             }
+            .onReceive(NotificationCenter.default.publisher(for: .externalDataChanged)) { _ in
+                dataState = .initializing
+                reloadDisplay()
+            }
             .navigationDestination(for: ScoresPath.self) { viewPath in
                 switch viewPath {
                 case .scoreViewer(let songRecord, let initialLevel):
