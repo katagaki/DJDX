@@ -1,5 +1,6 @@
 import SwiftUI
 
+// swiftlint:disable:next type_body_length
 struct IIDXScoresView<Header: View>: View {
 
     @EnvironmentObject var navigationManager: NavigationManager

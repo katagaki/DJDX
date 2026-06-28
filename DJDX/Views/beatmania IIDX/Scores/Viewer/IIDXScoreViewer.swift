@@ -191,8 +191,8 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
     }
 
     private func radarKey(_ playType: IIDXPlayType, _ difficulty: Int) -> String {
-        let pt = playType == .single ? "SP" : "DP"
-        return "\(pt)-\(difficulty)"
+        let playTypePrefix = playType == .single ? "SP" : "DP"
+        return "\(playTypePrefix)-\(difficulty)"
     }
 
     private func loadRadarData() async {

@@ -89,7 +89,7 @@ extension IIDXScoresView {
         var id: String { "\(songRecord.title)_\(level.rawValue)" }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func levelEntries(from records: [IIDXSongRecord]) -> [SongLevelEntry] {
         let difficultyRawValues = Set(difficultiesToShow.map(\.rawValue))
         var entries = records.flatMap { record in
@@ -124,18 +124,18 @@ extension IIDXScoresView {
         case .djLevel:
             let order = IIDXDJLevel.sorted
             entries.sort { lhs, rhs in
-                let li = order.firstIndex(of: IIDXDJLevel(rawValue: lhs.score.djLevel) ?? .none)
-                let ri = order.firstIndex(of: IIDXDJLevel(rawValue: rhs.score.djLevel) ?? .none)
-                if li == ri { return lhs.songRecord.title < rhs.songRecord.title }
-                guard let li, let ri else { return li != nil }
-                return isAscending ? li < ri : li > ri
+                let leftIndex = order.firstIndex(of: IIDXDJLevel(rawValue: lhs.score.djLevel) ?? .none)
+                let rightIndex = order.firstIndex(of: IIDXDJLevel(rawValue: rhs.score.djLevel) ?? .none)
+                if leftIndex == rightIndex { return lhs.songRecord.title < rhs.songRecord.title }
+                guard let leftIndex, let rightIndex else { return leftIndex != nil }
+                return isAscending ? leftIndex < rightIndex : leftIndex > rightIndex
             }
         case .scoreRate:
             entries.sort { lhs, rhs in
-                let lr = songRecordClearRates[lhs.songRecord]?[lhs.level] ?? 0
-                let rr = songRecordClearRates[rhs.songRecord]?[rhs.level] ?? 0
-                if lr == rr { return lhs.songRecord.title < rhs.songRecord.title }
-                return isAscending ? lr < rr : lr > rr
+                let leftRate = songRecordClearRates[lhs.songRecord]?[lhs.level] ?? 0
+                let rightRate = songRecordClearRates[rhs.songRecord]?[rhs.level] ?? 0
+                if leftRate == rightRate { return lhs.songRecord.title < rhs.songRecord.title }
+                return isAscending ? leftRate < rightRate : leftRate > rightRate
             }
         case .score:
             entries.sort { lhs, rhs in

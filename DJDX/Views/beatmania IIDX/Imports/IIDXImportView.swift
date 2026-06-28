@@ -1,6 +1,7 @@
 import Komponents
 import SwiftUI
 
+// swiftlint:disable:next type_body_length
 struct IIDXImportView: View {
 
     @Environment(\.openURL) var openURL

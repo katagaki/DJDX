@@ -1,6 +1,7 @@
 import SwiftUI
 import UIKit
 
+// swiftlint:disable:next type_body_length
 struct SessionDetailView: View {
     var store: IIDXSessionStore
     var session: IIDXPlaySession

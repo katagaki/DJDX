@@ -112,6 +112,7 @@ final class SDVXAnalyticsModel {
     }
 
     // Compares the latest two import groups for the version and computes what improved.
+    // swiftlint:disable:next large_tuple
     private func computeLastPlay(version: SDVXVersion) async -> (
         clears: [String: [SDVXNewClearEntry]],
         highScores: [SDVXNewHighScoreEntry],
@@ -130,6 +131,7 @@ final class SDVXAnalyticsModel {
     nonisolated static func computeNewEntries(
         latestRecords: [SDVXSongRecord],
         previousRecords: [SDVXSongRecord]
+    // swiftlint:disable:next large_tuple
     ) -> (
         clears: [String: [SDVXNewClearEntry]],
         highScores: [SDVXNewHighScoreEntry],

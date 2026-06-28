@@ -2,6 +2,7 @@ import Charts
 import Komponents
 import SwiftUI
 
+// swiftlint:disable:next type_body_length
 struct IIDXScoreSection: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
@@ -149,6 +150,7 @@ struct IIDXScoreSection: View {
     }
 
     @ViewBuilder
+    // swiftlint:disable:next function_body_length
     func historyChart() -> some View {
         Chart {
             ForEach(scoreHistory.sorted(by: { $0.key < $1.key }), id: \.key) { date, score in

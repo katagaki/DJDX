@@ -2,6 +2,7 @@ import Foundation
 import Compression
 
 extension Data {
+    // swiftlint:disable:next function_body_length cyclomatic_complexity
     func gunzip() -> Data? {
         guard count > 2 else { return nil }
 

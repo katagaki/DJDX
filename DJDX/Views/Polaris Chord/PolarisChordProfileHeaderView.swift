@@ -99,7 +99,7 @@ struct PolarisChordProfileHeaderView: View {
         var request = URLRequest(url: polarisChordVersion.playDataEndpointURL())
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.httpBody = "service_kind=profile&pdata_kind=profile".data(using: .utf8)
+        request.httpBody = Data("service_kind=profile&pdata_kind=profile".utf8)
         do {
             let (data, _) = try await URLSession.shared.data(for: request)
             guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],

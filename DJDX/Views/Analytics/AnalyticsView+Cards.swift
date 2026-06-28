@@ -7,6 +7,7 @@ import SwiftUI
 extension AnalyticsView {
 
     @ViewBuilder
+    // swiftlint:disable:next cyclomatic_complexity
     func cardView(for cardType: AnalyticsCardType) -> some View {
         switch cardType {
         case .clearTypeOverall, .gradeBreakdown, .towerRecent, .towerTotals:

@@ -2,7 +2,9 @@ import SwiftUI
 import UIKit
 
 private enum WatchPlayType: String {
+    // swiftlint:disable:next identifier_name
     case sp
+    // swiftlint:disable:next identifier_name
     case dp
 
     var label: String {

@@ -4,7 +4,8 @@ import WebKit
 let sdvxInChartViewerCSS = """
 .btntop { display: none !important; }
 #reload_btn, .rebtn2 { display: none !important; }
-body > table.t_ > tbody > tr:nth-child(2) > td.tbg > table > tbody > tr > td:nth-child(3) > table > tbody > tr:nth-child(3) > td > table:nth-child(2) {
+body > table.t_ > tbody > tr:nth-child(2) > td.tbg > table > tbody > tr > td:nth-child(3) > table > tbody
+  > tr:nth-child(3) > td > table:nth-child(2) {
   display: none !important;
 }
 img[src*="/logo/"] { display: none !important; }

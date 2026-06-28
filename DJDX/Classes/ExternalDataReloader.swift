@@ -187,6 +187,7 @@ struct ExternalDataReloader {
 
     // MARK: - bm2dx.com
 
+    // swiftlint:disable:next function_body_length cyclomatic_complexity
     private static func reloadBM2DX(progress: Progress) async -> Int {
         let importer = IIDXImporter()
         progress(0, 1)

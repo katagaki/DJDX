@@ -59,6 +59,7 @@ enum PolarisChordGrade: String, Codable {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     init(achievementRate: Int) {
         switch achievementRate {
         case 10000...: self = .sssPlusPlus

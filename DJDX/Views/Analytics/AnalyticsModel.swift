@@ -3,6 +3,7 @@ import SwiftUI
 
 @MainActor
 @Observable
+// swiftlint:disable:next type_body_length
 final class AnalyticsModel {
 
     // Overall
@@ -191,6 +192,7 @@ final class AnalyticsModel {
     nonisolated static func computeNewEntries(
         latestRecords: [IIDXSongRecord],
         previousRecords: [IIDXSongRecord]
+    // swiftlint:disable:next large_tuple
     ) -> (
         clears: [String: [NewClearEntry]],
         highScores: [NewHighScoreEntry],

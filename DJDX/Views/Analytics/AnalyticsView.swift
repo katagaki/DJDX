@@ -87,6 +87,7 @@ struct AnalyticsView: View {
     }
 
     @ViewBuilder
+    // swiftlint:disable:next function_body_length
     func overviewCard(for cardType: AnalyticsCardType) -> some View {
         switch cardType {
         case .clearTypeOverall:

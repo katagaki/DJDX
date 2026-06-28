@@ -4,7 +4,10 @@ import HealthKit
 import WatchConnectivity
 import WidgetKit
 
+// swiftlint:disable file_length
+
 @MainActor
+// swiftlint:disable:next type_body_length
 final class WatchWorkoutManager: NSObject, ObservableObject {
     @Published var isRunning = false
     @Published var isPaused = false
@@ -259,14 +262,16 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     private func persistComplicationRadar(_ context: [String: Any]) {
         guard let shared = UserDefaults(suiteName: "group.com.tsubuzaki.DJDX") else { return }
         var changed = false
-        if let sp = context["spRadar"] as? [Double] {
-            if sp.isEmpty { shared.removeObject(forKey: "Watch.Complication.RadarSP") }
-            else { shared.set(sp, forKey: "Watch.Complication.RadarSP") }
+        if let singlePlay = context["spRadar"] as? [Double] {
+            if singlePlay.isEmpty { shared.removeObject(forKey: "Watch.Complication.RadarSP") } else {
+                shared.set(singlePlay, forKey: "Watch.Complication.RadarSP")
+            }
             changed = true
         }
-        if let dp = context["dpRadar"] as? [Double] {
-            if dp.isEmpty { shared.removeObject(forKey: "Watch.Complication.RadarDP") }
-            else { shared.set(dp, forKey: "Watch.Complication.RadarDP") }
+        if let doublePlay = context["dpRadar"] as? [Double] {
+            if doublePlay.isEmpty { shared.removeObject(forKey: "Watch.Complication.RadarDP") } else {
+                shared.set(doublePlay, forKey: "Watch.Complication.RadarDP")
+            }
             changed = true
         }
         if changed {

@@ -207,6 +207,7 @@ actor IIDXImporter {
 
     // MARK: Insert Helpers
 
+    // swiftlint:disable:next function_body_length
     static func insertSongRecord(database: Connection, record: IIDXSongRecord, importGroupID: String) {
         let col = IIDXPlayDataDatabase.self
         _ = try? database.run(col.songRecordTable.insert(

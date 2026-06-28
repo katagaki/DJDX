@@ -110,6 +110,7 @@ struct IIDXProfileHeaderView: View {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func downloadStatusPageData() async {
         let baseURLString = "https://p.eagate.573.jp"
         let request = URLRequest(url: iidxVersion.statusPageURL())

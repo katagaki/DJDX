@@ -40,9 +40,9 @@ enum DDRVersion: Int, Codable, CaseIterable {
     }
 
     func loginPageRedirectURL() -> URL {
-        URL(string: """
-https://p.eagate.573.jp/gate/p/login.html?path=https%3A%2F%2Fp.eagate.573.jp%2Fgame%2Fddr%2F\(slug)%2Fplaydata%2Fmusic_data_single.html%3Foffset%3D0%26filter%3D0%26display%3Dscore
-""")!
+        URL(string: "https://p.eagate.573.jp/gate/p/login.html?path=" +
+            "https%3A%2F%2Fp.eagate.573.jp%2Fgame%2Fddr%2F\(slug)%2Fplaydata%2F" +
+            "music_data_single.html%3Foffset%3D0%26filter%3D0%26display%3Dscore")!
     }
 
     func scorePageURL() -> URL {

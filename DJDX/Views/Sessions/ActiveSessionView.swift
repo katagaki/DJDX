@@ -2,6 +2,7 @@ import AVFoundation
 import PhotosUI
 import SwiftUI
 
+// swiftlint:disable:next type_body_length
 struct ActiveSessionView: View {
     var store: IIDXSessionStore
 
