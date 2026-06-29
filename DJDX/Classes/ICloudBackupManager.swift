@@ -11,6 +11,8 @@ enum ICloudBackupManager {
     static let lastBackupDateKey = "ICloudBackup.LastBackupDate"
     static let restorePromptCompletedKey = "ICloudBackup.RestorePromptCompleted"
 
+    static let defaultsSnapshotName = "StandardDefaults.plist"
+
     enum BackupError: Error {
         case iCloudUnavailable
         case documentsUnavailable
@@ -84,6 +86,8 @@ enum ICloudBackupManager {
         let backupFolder = try backupFolderURL(in: fileManager)
         try fileManager.createDirectory(at: backupFolder, withIntermediateDirectories: true)
 
+        writeDefaultsSnapshot(to: containerURL)
+
         let stagingURL = fileManager.temporaryDirectory
             .appendingPathComponent("DJDXBackup-\(UUID().uuidString)")
             .appendingPathExtension("zip")
@@ -117,6 +121,7 @@ enum ICloudBackupManager {
                     .appendingPathComponent("Export-\(UUID().uuidString)", isDirectory: true)
                 try fileManager.createDirectory(at: exportDirectory, withIntermediateDirectories: true)
                 let archiveURL = exportDirectory.appendingPathComponent("DJDX Backup.zip")
+                writeDefaultsSnapshot(to: SharedContainer.containerURL)
                 try ZipArchive.zip(directoryAt: SharedContainer.containerURL, to: archiveURL)
                 return archiveURL
             } catch {
@@ -178,10 +183,36 @@ enum ICloudBackupManager {
                 }
                 try fileManager.moveItem(at: item, to: destinationURL)
             }
+            applyDefaultsSnapshot(from: containerURL)
             // A pre-334 backup has the old flat layout (e.g. Qpro.png at the root, no Images/).
             DataMigration.moveImages(from: containerURL, to: SharedContainer.imagesURL)
             onProgress(100)
         }.value
+    }
+
+    // MARK: Settings Snapshot
+
+    private static func writeDefaultsSnapshot(to containerURL: URL) {
+        guard let bundleID = Bundle.main.bundleIdentifier,
+              let domain = UserDefaults.standard.persistentDomain(forName: bundleID),
+              let data = try? PropertyListSerialization.data(
+                fromPropertyList: domain, format: .binary, options: 0
+              ) else { return }
+        try? data.write(
+            to: containerURL.appendingPathComponent(defaultsSnapshotName),
+            options: .atomic
+        )
+    }
+
+    private static func applyDefaultsSnapshot(from containerURL: URL) {
+        let snapshotURL = containerURL.appendingPathComponent(defaultsSnapshotName)
+        guard let data = try? Data(contentsOf: snapshotURL),
+              let domain = try? PropertyListSerialization.propertyList(
+                from: data, options: [], format: nil
+              ) as? [String: Any] else { return }
+        for (key, value) in domain {
+            UserDefaults.standard.set(value, forKey: key)
+        }
     }
 
     // MARK: iCloud
