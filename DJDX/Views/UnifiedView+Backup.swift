@@ -21,6 +21,8 @@ extension UnifiedView {
                     }
                 }
                 hasCompletedRestorePrompt = true
+                NotificationCenter.default.post(name: .dataImported, object: nil)
+                NotificationCenter.default.post(name: .externalDataChanged, object: nil)
                 migrationProgress.hide()
                 try? await Task.sleep(for: .seconds(0.75))
                 isBackupRestoreCompleted = true
