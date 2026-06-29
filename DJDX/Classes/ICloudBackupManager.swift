@@ -166,7 +166,6 @@ enum ICloudBackupManager {
                 at: extractionURL, includingPropertiesForKeys: [.isDirectoryKey]
             )
             if extractedItems.count == 1,
-               extractedItems[0].lastPathComponent == containerURL.lastPathComponent,
                (try? extractedItems[0].resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true {
                 restoreRootURL = extractedItems[0]
             }
