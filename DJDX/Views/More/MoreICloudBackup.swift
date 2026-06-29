@@ -78,6 +78,7 @@ struct MoreICloudBackup: View {
             if newValue {
                 hasCompletedRestorePrompt = true
                 ICloudBackupManager.scheduleNextBackup()
+                backUpNow()
             } else {
                 ICloudBackupManager.cancelScheduledBackup()
             }
