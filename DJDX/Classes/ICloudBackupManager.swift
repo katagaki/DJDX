@@ -1,7 +1,10 @@
 import BackgroundTasks
 import Foundation
+import os
 
 enum ICloudBackupManager {
+
+    static let logger = Logger(subsystem: "com.tsubuzaki.DJDX", category: "iCloudBackup")
 
     static let backgroundTaskIdentifier = "com.tsubuzaki.DJDX.iCloudBackup"
     static let enabledKey = "ICloudBackup.Enabled"
@@ -34,6 +37,7 @@ enum ICloudBackupManager {
                 try backUp()
                 task.setTaskCompleted(success: true)
             } catch {
+                logger.error("Scheduled backup failed: \(error, privacy: .public)")
                 task.setTaskCompleted(success: false)
             }
         }
@@ -48,7 +52,11 @@ enum ICloudBackupManager {
             matching: DateComponents(hour: 0, minute: 0),
             matchingPolicy: .nextTime
         )
-        try? BGTaskScheduler.shared.submit(request)
+        do {
+            try BGTaskScheduler.shared.submit(request)
+        } catch {
+            logger.error("Failed to schedule backup: \(error, privacy: .public)")
+        }
     }
 
     static func cancelScheduledBackup() {
@@ -64,6 +72,7 @@ enum ICloudBackupManager {
                 try backUp()
                 return true
             } catch {
+                logger.error("Manual backup failed: \(error, privacy: .public)")
                 return false
             }
         }.value
