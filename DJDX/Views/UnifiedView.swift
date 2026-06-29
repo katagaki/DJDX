@@ -34,6 +34,7 @@ struct UnifiedView: View {
 
     @State var availableBackupDate: Date?
     @State var isPromptingBackupRestore: Bool = false
+    @State var pendingRestoreAfterOnboarding: Bool = false
     @State var isBackupRestoreCompleted: Bool = false
     @State var isBackupRestoreFailed: Bool = false
 
@@ -212,6 +213,13 @@ struct UnifiedView: View {
                 lastSeenOnboardingVersion = OnboardingView.appVersion
                 isPresentingOnboarding = false
                 ImportMovedTip.isOnboardingComplete = true
+                if pendingRestoreAfterOnboarding {
+                    pendingRestoreAfterOnboarding = false
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .seconds(0.6))
+                        isPromptingBackupRestore = true
+                    }
+                }
             }
         }
         .fullScreenCover(isPresented: $migrationProgress.isShowing) {
@@ -269,7 +277,7 @@ struct UnifiedView: View {
                 requestReview()
                 hasReviewBeenPrompted = true
             }
-            if !hasCompletedRestorePrompt && !isPresentingOnboarding {
+            if !hasCompletedRestorePrompt {
                 if await hasExistingPlayData() {
                     hasCompletedRestorePrompt = true
                 } else {
@@ -277,7 +285,11 @@ struct UnifiedView: View {
                     // Re-check: the user may have made their own backup while the check was in flight.
                     if let backupDate, !hasCompletedRestorePrompt {
                         availableBackupDate = backupDate
-                        isPromptingBackupRestore = true
+                        if isPresentingOnboarding {
+                            pendingRestoreAfterOnboarding = true
+                        } else {
+                            isPromptingBackupRestore = true
+                        }
                     }
                 }
             }
