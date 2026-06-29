@@ -17,6 +17,7 @@ enum ICloudBackupManager {
         case iCloudUnavailable
         case documentsUnavailable
         case downloadTimedOut
+        case uploadTimedOut
     }
 
     static var isEnabled: Bool {
@@ -35,12 +36,18 @@ enum ICloudBackupManager {
                 task.setTaskCompleted(success: true)
                 return
             }
-            do {
-                try backUp()
-                task.setTaskCompleted(success: true)
-            } catch {
-                logger.error("Scheduled backup failed: \(error, privacy: .public)")
-                task.setTaskCompleted(success: false)
+            nonisolated(unsafe) let unsafeTask = task
+            let backupTask = Task {
+                do {
+                    try await backUp()
+                    unsafeTask.setTaskCompleted(success: true)
+                } catch {
+                    logger.error("Scheduled backup failed: \(error, privacy: .public)")
+                    unsafeTask.setTaskCompleted(success: false)
+                }
+            }
+            task.expirationHandler = {
+                backupTask.cancel()
             }
         }
     }
@@ -71,7 +78,7 @@ enum ICloudBackupManager {
     static func performBackup() async -> Bool {
         await Task.detached(priority: .userInitiated) {
             do {
-                try backUp()
+                try await backUp()
                 return true
             } catch {
                 logger.error("Manual backup failed: \(error, privacy: .public)")
@@ -80,7 +87,7 @@ enum ICloudBackupManager {
         }.value
     }
 
-    static func backUp() throws {
+    static func backUp() async throws {
         let fileManager = FileManager.default
         let containerURL = SharedContainer.containerURL
         let backupFolder = try backupFolderURL(in: fileManager)
@@ -101,11 +108,14 @@ enum ICloudBackupManager {
         }
         try fileManager.moveItem(at: stagingURL, to: archiveURL)
 
+        let timestampURL = backupFolder.appendingPathComponent("LastBackup")
         let timestamp = ISO8601DateFormatter().string(from: backupDate)
-        try Data(timestamp.utf8).write(
-            to: backupFolder.appendingPathComponent("LastBackup"),
-            options: .atomic
-        )
+        try Data(timestamp.utf8).write(to: timestampURL, options: .atomic)
+
+        guard await ensureUploaded(archiveURL, timeout: 120.0),
+              await ensureUploaded(timestampURL, timeout: 30.0) else {
+            throw BackupError.uploadTimedOut
+        }
 
         UserDefaults.standard.set(backupDate.timeIntervalSince1970, forKey: lastBackupDateKey)
         UserDefaults.standard.set(true, forKey: restorePromptCompletedKey)
@@ -245,5 +255,23 @@ enum ICloudBackupManager {
             return true
         }
         return status == .current || status == .downloaded
+    }
+
+    private static func ensureUploaded(_ url: URL, timeout: TimeInterval) async -> Bool {
+        let deadline = Date.now.addingTimeInterval(timeout)
+        while Date.now < deadline {
+            if isUploaded(url) { return true }
+            try? await Task.sleep(for: .seconds(1))
+        }
+        return isUploaded(url)
+    }
+
+    private static func isUploaded(_ url: URL) -> Bool {
+        guard let isUploaded = try? url.resourceValues(
+            forKeys: [.ubiquitousItemIsUploadedKey]
+        ).ubiquitousItemIsUploaded else {
+            return true
+        }
+        return isUploaded
     }
 }
