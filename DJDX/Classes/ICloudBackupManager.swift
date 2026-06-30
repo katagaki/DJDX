@@ -17,7 +17,6 @@ enum ICloudBackupManager {
         case iCloudUnavailable
         case documentsUnavailable
         case downloadTimedOut
-        case uploadTimedOut
     }
 
     static var isEnabled: Bool {
@@ -95,8 +94,6 @@ enum ICloudBackupManager {
             return "iCloud Documents container could not be opened."
         case BackupError.downloadTimedOut:
             return "Backup did not finish downloading from iCloud."
-        case BackupError.uploadTimedOut:
-            return "Saved locally but the upload to iCloud did not finish."
         default:
             let nsError = error as NSError
             return "\(nsError.domain) \(nsError.code): \(nsError.localizedDescription)"
@@ -130,11 +127,6 @@ enum ICloudBackupManager {
         let timestampURL = backupFolder.appendingPathComponent("LastBackup")
         let timestamp = ISO8601DateFormatter().string(from: backupDate)
         try Data(timestamp.utf8).write(to: timestampURL, options: .atomic)
-
-        guard await ensureUploaded(archiveURL, timeout: 120.0),
-              await ensureUploaded(timestampURL, timeout: 30.0) else {
-            throw BackupError.uploadTimedOut
-        }
 
         UserDefaults.standard.set(backupDate.timeIntervalSince1970, forKey: lastBackupDateKey)
         UserDefaults.standard.set(true, forKey: restorePromptCompletedKey)
@@ -297,23 +289,5 @@ extension ICloudBackupManager {
             return true
         }
         return status == .current || status == .downloaded
-    }
-
-    private static func ensureUploaded(_ url: URL, timeout: TimeInterval) async -> Bool {
-        let deadline = Date.now.addingTimeInterval(timeout)
-        while Date.now < deadline {
-            if isUploaded(url) { return true }
-            try? await Task.sleep(for: .seconds(1))
-        }
-        return isUploaded(url)
-    }
-
-    private static func isUploaded(_ url: URL) -> Bool {
-        guard let isUploaded = try? url.resourceValues(
-            forKeys: [.ubiquitousItemIsUploadedKey]
-        ).ubiquitousItemIsUploaded else {
-            return true
-        }
-        return isUploaded
     }
 }
