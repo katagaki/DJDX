@@ -4,6 +4,8 @@ import WidgetKit
 @main
 struct DJDXApp: App {
 
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     @StateObject var navigationManager = NavigationManager()
 
     @Environment(\.scenePhase) private var scenePhase
@@ -14,6 +16,7 @@ struct DJDXApp: App {
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {
                         IIDXSessionLiveActivityController.shared.reconcile()
+                        IIDXSessionWorkoutBridge.shared.reconcileActiveSession()
                     }
                 }
         }
@@ -22,6 +25,7 @@ struct DJDXApp: App {
 
     init() {
         DataMigration.runVersion334CleanupIfNeeded()
+        DataMigration.runIIDXColumnMigrationIfNeeded()
         _ = IIDXPlayDataDatabase.shared
         _ = IIDXPlaySessionsDatabase.shared
         _ = IIDXSessionWorkoutBridge.shared
@@ -33,6 +37,7 @@ struct DJDXApp: App {
         }
         Task { @MainActor in
             IIDXSessionLiveActivityController.shared.reconcile()
+            IIDXSessionWorkoutBridge.shared.reconcileActiveSession()
         }
         Task {
             let playTypeRaw = UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter") ?? "single"

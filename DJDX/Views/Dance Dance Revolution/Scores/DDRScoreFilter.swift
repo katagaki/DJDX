@@ -44,14 +44,13 @@ struct DDRScoreFilterSheet: View {
                     } label: {
                         DDRFilterDisclosureLabel("Shared.Level", count: difficultiesToShow.count)
                     }
-                    DisclosureGroup {
-                        ForEach(availableLevels, id: \.self) { level in
-                            DDRSelectableRow(isSelected: levelsToShow.contains(level)) {
-                                Text(verbatim: String(level))
-                            } action: {
-                                toggle(level, in: $levelsToShow)
-                            }
-                        }
+                    FilterLevelDisclosure {
+                        FilterLevelGrid(
+                            items: availableLevels,
+                            selection: levelsToShow,
+                            title: { String($0) },
+                            onToggle: { toggle($0, in: $levelsToShow) }
+                        )
                     } label: {
                         DDRFilterDisclosureLabel("Shared.Sort.Difficulty", count: levelsToShow.count)
                     }

@@ -56,7 +56,7 @@ struct SessionStartWidgetView: View {
             }
         case .accessoryRectangular:
             HStack(spacing: 8.0) {
-                Image(systemName: "figure.dance")
+                Image(systemName: "figure.walk")
                     .font(.title3)
                 Text("Widget.SessionStart.Action")
                     .font(.headline)
@@ -64,7 +64,7 @@ struct SessionStartWidgetView: View {
             }
         default:
             VStack(spacing: 8.0) {
-                Image(systemName: "figure.dance")
+                Image(systemName: "figure.walk")
                     .font(.largeTitle)
                     .foregroundStyle(.tint)
                 Text("Widget.SessionStart.Action")

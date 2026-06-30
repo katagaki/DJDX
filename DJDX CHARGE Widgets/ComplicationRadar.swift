@@ -1,7 +1,5 @@
 import SwiftUI
 
-// Values are ordered [notes, chord, peak, charge, scratch, soflan]; the polygon is
-// walked in the same angular order the in-app radar uses.
 private let radarLayout: [(index: Int, angle: Double)] = [
     (0, -.pi / 2),     // NOTES (top)
     (1, 7 * .pi / 6),  // CHORD

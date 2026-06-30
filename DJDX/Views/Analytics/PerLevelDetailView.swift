@@ -24,8 +24,6 @@ struct PerLevelDetailSection<Content: View>: View {
     }
 }
 
-// Combined scrolling detail view for a single level's clear lamp makeup and
-// its trend over time. Reachable from both the makeup and trend cards.
 struct ClearTypePerLevelDetailView: View {
     @Bindable var model: AnalyticsModel
     let difficulty: Int
@@ -55,8 +53,6 @@ struct ClearTypePerLevelDetailView: View {
     }
 }
 
-// Combined scrolling detail view for a single level's DJ LEVEL makeup and its
-// trend over time. Reachable from both the makeup and trend cards.
 struct DJLevelPerLevelDetailView: View {
     @Bindable var model: AnalyticsModel
     let difficulty: Int

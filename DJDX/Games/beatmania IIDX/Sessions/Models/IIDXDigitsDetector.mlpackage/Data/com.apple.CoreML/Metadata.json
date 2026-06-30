@@ -1,0 +1,12 @@
+{
+  "MLModelVersionStringKey" : "--",
+  "MLModelDescriptionKey" : "DJDXDigitsDetector: IIDX result-screen extraction. Trained from training\/schema.yaml.",
+  "MLModelCreatorDefinedKey" : {
+    "Confidence threshold" : "0.25",
+    "classes_json" : "[\"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"minus\", \"plus\"]",
+    "IoU threshold" : "0.7",
+    "schema_version" : "1"
+  },
+  "MLModelAuthorKey" : "DJDX PEAK training pipeline",
+  "MLModelLicenseKey" : "AGPL-3.0 License (https:\/\/ultralytics.com\/license)"
+}

@@ -216,6 +216,9 @@ struct DDRScoresView<Header: View>: View {
         .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
             Task { await reload() }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .externalDataChanged)) { _ in
+            Task { await reload() }
+        }
     }
 
     func reload() async {

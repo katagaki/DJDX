@@ -2,6 +2,7 @@ import StoreKit
 import SwiftUI
 import TipKit
 
+// swiftlint:disable:next type_body_length
 struct UnifiedView: View {
 
     @Environment(\.requestReview) var requestReview
@@ -15,6 +16,7 @@ struct UnifiedView: View {
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
     @AppStorage(wrappedValue: DDRPlayStyle.single, "Global.DDR.Style") var ddrStyleToShow: DDRPlayStyle
+    @AppStorage(wrappedValue: false, "ExternalData.DDR.Enabled") var isDDRExternalDataEnabled: Bool
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: true, "More.General.ShowProfileHeader") var showProfileHeader: Bool
     @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
@@ -32,6 +34,7 @@ struct UnifiedView: View {
 
     @State var availableBackupDate: Date?
     @State var isPromptingBackupRestore: Bool = false
+    @State var pendingRestoreAfterOnboarding: Bool = false
     @State var isBackupRestoreCompleted: Bool = false
     @State var isBackupRestoreFailed: Bool = false
 
@@ -50,11 +53,15 @@ struct UnifiedView: View {
     @Namespace var towerNamespace
     @Namespace var importNamespace
 
+    var isSessionsMode: Bool {
+        appMode == .sessions && selectedGame.supportsSessions
+    }
+
     var body: some View {
         @Bindable var migrationProgress = migrationProgress
         NavigationStack(path: $navigationManager.path) {
             ZStack {
-                if appMode == .sessions {
+                if isSessionsMode {
                     SessionsView(store: sessionStore)
                 } else if selectedGame == .soundVoltex {
                     SDVXScoresView(isEditingAnalytics: $isEditingAnalytics) {
@@ -74,27 +81,29 @@ struct UnifiedView: View {
                     }
                 }
             }
-            .navigationTitle(appMode == .sessions ? "ViewTitle.Sessions" : "ViewTitle.Scores")
+            .navigationTitle(isSessionsMode ? "ViewTitle.Sessions" : "ViewTitle.Scores")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .principal) {
                     gameMenu
                 }
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    Menu {
-                        Picker("ViewTitle.Mode", selection: $appMode) {
-                            Label("ViewTitle.Scores", systemImage: "music.note.list").tag(AppMode.imports)
-                            Label("ViewTitle.Sessions.Beta", systemImage: "figure.walk").tag(AppMode.sessions)
+                    if selectedGame.supportsSessions {
+                        Menu {
+                            Picker("ViewTitle.Mode", selection: $appMode) {
+                                Label("ViewTitle.Scores", systemImage: "music.note.list").tag(AppMode.imports)
+                                Label("ViewTitle.Sessions.Beta", systemImage: "figure.walk").tag(AppMode.sessions)
+                            }
+                        } label: {
+                            Image(systemName: appMode == .sessions ? "figure.walk" : "music.note.list")
                         }
-                    } label: {
-                        Image(systemName: appMode == .sessions ? "figure.walk" : "music.note.list")
                     }
                 }
                 if #available(iOS 26.0, *) {
                     ToolbarSpacer(.fixed, placement: .topBarLeading)
                 }
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    if appMode == .imports {
+                    if !isSessionsMode {
                         Button("Shared.Import", systemImage: "arrow.down.circle.dotted") {
                             isPresentingImport = true
                         }
@@ -102,7 +111,7 @@ struct UnifiedView: View {
                         .automaticSheetMatchedTransitionSource(id: "Import", in: importNamespace)
                     }
                 }
-                if appMode == .imports {
+                if !isSessionsMode {
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         Button {
                             withAnimation(.smooth.speed(2.0)) { isEditingAnalytics.toggle() }
@@ -121,7 +130,7 @@ struct UnifiedView: View {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     MoreMenu()
                 }
-                if appMode == .sessions {
+                if isSessionsMode {
                     ToolbarItemGroup(placement: .bottomBar) {
                         Spacer()
                         Button {
@@ -204,6 +213,13 @@ struct UnifiedView: View {
                 lastSeenOnboardingVersion = OnboardingView.appVersion
                 isPresentingOnboarding = false
                 ImportMovedTip.isOnboardingComplete = true
+                if pendingRestoreAfterOnboarding {
+                    pendingRestoreAfterOnboarding = false
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .seconds(0.6))
+                        isPromptingBackupRestore = true
+                    }
+                }
             }
         }
         .fullScreenCover(isPresented: $migrationProgress.isShowing) {
@@ -223,6 +239,11 @@ struct UnifiedView: View {
 #endif
             handleDeepLink(url)
         }
+        .onChange(of: selectedGame) { _, newValue in
+            if !newValue.supportsSessions {
+                appMode = .imports
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .startSessionRequested)
             .receive(on: RunLoop.main)) { notification in
             if sessionStore.activeSession == nil {
@@ -231,8 +252,10 @@ struct UnifiedView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .endSessionRequested)
-            .receive(on: RunLoop.main)) { _ in
-            if sessionStore.activeSession != nil {
+            .receive(on: RunLoop.main)) { notification in
+            let requestedID = notification.object as? String
+            if let active = sessionStore.activeSession,
+               requestedID == nil || requestedID == active.id {
                 sessionStore.endSession()
             }
         }
@@ -254,7 +277,7 @@ struct UnifiedView: View {
                 requestReview()
                 hasReviewBeenPrompted = true
             }
-            if !hasCompletedRestorePrompt && !isPresentingOnboarding {
+            if !hasCompletedRestorePrompt {
                 if await hasExistingPlayData() {
                     hasCompletedRestorePrompt = true
                 } else {
@@ -262,7 +285,11 @@ struct UnifiedView: View {
                     // Re-check: the user may have made their own backup while the check was in flight.
                     if let backupDate, !hasCompletedRestorePrompt {
                         availableBackupDate = backupDate
-                        isPromptingBackupRestore = true
+                        if isPresentingOnboarding {
+                            pendingRestoreAfterOnboarding = true
+                        } else {
+                            isPromptingBackupRestore = true
+                        }
                     }
                 }
             }

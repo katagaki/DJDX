@@ -80,7 +80,7 @@ struct SessionStartComplicationView: View {
 
     private var startContent: some View {
         HStack(spacing: 6.0) {
-            Image(systemName: "figure.dance")
+            Image(systemName: "figure.walk")
                 .font(.title3)
                 .foregroundStyle(.accent)
             Text("Watch.Widget.StartSession")

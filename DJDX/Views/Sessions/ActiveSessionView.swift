@@ -2,14 +2,18 @@ import AVFoundation
 import PhotosUI
 import SwiftUI
 
+// swiftlint:disable:next type_body_length
 struct ActiveSessionView: View {
     var store: IIDXSessionStore
 
     @State private var isPresentingCamera: Bool = false
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isShowingCameraDeniedAlert: Bool = false
+    @State private var isShowingCameraUnavailableAlert: Bool = false
     @State private var photoAlert: PhotoExportAlert?
     @State private var isConfirmingExport: Bool = false
+    @State private var isConfirmingEnd: Bool = false
+    @State private var fileExport: SessionFileExportRequest?
     @ObservedObject private var workoutBridge = IIDXSessionWorkoutBridge.shared
 
     var body: some View {
@@ -35,12 +39,12 @@ struct ActiveSessionView: View {
             .toolbar {
                 if !store.plays.isEmpty {
                     ToolbarItem(placement: .topBarLeading) {
-                        Button("Sessions.Photos.ExportAll", systemImage: "square.and.arrow.up.on.square") {
+                        Button("Sessions.Export.All", systemImage: "square.and.arrow.up.on.square") {
                             isConfirmingExport = true
                         }
                     }
                 }
-                if workoutBridge.isWorkoutActive {
+                if workoutBridge.isSessionActive {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             workoutBridge.setWorkoutPaused(!workoutBridge.isPaused)
@@ -53,12 +57,12 @@ struct ActiveSessionView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     if #available(iOS 26.0, *) {
                         Button(role: .close) {
-                            store.endSession()
+                            isConfirmingEnd = true
                         }
                         .accessibilityLabel("Sessions.End")
                     } else {
                         Button("Sessions.End", role: .destructive) {
-                            store.endSession()
+                            isConfirmingEnd = true
                         }
                     }
                 }
@@ -66,11 +70,14 @@ struct ActiveSessionView: View {
         }
         .interactiveDismissDisabled()
         .fullScreenCover(isPresented: $isPresentingCamera) {
-            SessionCameraView { data in
-                store.capture(data, source: .camera)
+            SessionCameraView { data, staged in
+                store.capture(data, source: .camera, staged: staged)
                 isPresentingCamera = false
             } onCancel: {
                 isPresentingCamera = false
+            } onUnavailable: {
+                isPresentingCamera = false
+                isShowingCameraUnavailableAlert = true
             }
         }
         .onChange(of: pickerItems) { _, items in
@@ -81,7 +88,10 @@ struct ActiveSessionView: View {
             .receive(on: RunLoop.main)) { _ in
             store.refreshPlays()
         }
-        .onAppear(perform: consumePendingCaptureRequest)
+        .onAppear {
+            Task.detached(priority: .userInitiated) { await IIDXResultReader.prewarm() }
+            consumePendingCaptureRequest()
+        }
         .onChange(of: store.pendingCaptureRequest) { _, _ in
             consumePendingCaptureRequest()
         }
@@ -90,11 +100,35 @@ struct ActiveSessionView: View {
         } message: {
             Text("Sessions.Camera.Denied.Message")
         }
-        .alert("Sessions.Photos.ExportAll.Confirm", isPresented: $isConfirmingExport) {
-            Button("Sessions.Photos.ExportAll") {
+        .alert("Sessions.Camera.Unavailable.Title", isPresented: $isShowingCameraUnavailableAlert) {
+            Button("Shared.OK", role: .cancel) {}
+        } message: {
+            Text("Sessions.Camera.Unavailable.Message")
+        }
+        .confirmationDialog(
+            "Sessions.Export.All.Confirm",
+            isPresented: $isConfirmingExport,
+            titleVisibility: .visible
+        ) {
+            Button("Sessions.Photos.Save") {
                 exportAllToPhotos()
             }
+            Button("Sessions.Files.Save") {
+                exportAllToFiles()
+            }
             Button("Shared.Cancel", role: .cancel) {}
+        }
+        .alert("Sessions.End.Confirm", isPresented: $isConfirmingEnd) {
+            Button("Sessions.End", role: .destructive) {
+                store.endSession()
+            }
+            Button("Shared.Cancel", role: .cancel) {}
+        }
+        .sheet(item: $fileExport) { request in
+            SessionDocumentExporter(urls: request.urls) {
+                fileExport = nil
+            }
+            .ignoresSafeArea()
         }
         .alert(item: $photoAlert) { alert in
             switch alert {
@@ -126,6 +160,17 @@ struct ActiveSessionView: View {
         }
     }
 
+    private func exportAllToFiles() {
+        let filenames = store.plays.map(\.rawImageFilename)
+        let date = store.activeSession?.startDate ?? .now
+        let urls = SessionFileExporter.exportURLs(for: filenames, date: date)
+        guard !urls.isEmpty else {
+            photoAlert = .failed
+            return
+        }
+        fileExport = SessionFileExportRequest(urls: urls)
+    }
+
     private var numberFont: Font {
         .system(.largeTitle, design: .rounded)
         .weight(.bold)
@@ -141,7 +186,7 @@ struct ActiveSessionView: View {
                         Text("Sessions.Elapsed")
                             .font(.body)
                             .foregroundStyle(.secondary)
-                        Text(verbatim: elapsedString(since: session.startDate, now: context.date))
+                        Text(verbatim: elapsedString(for: session, now: context.date))
                             .font(numberFont)
                     }
                     Spacer()
@@ -286,8 +331,15 @@ struct ActiveSessionView: View {
         var id: Int { rawValue }
     }
 
-    private func elapsedString(since start: Date, now: Date) -> String {
-        let interval = Int(max(0, now.timeIntervalSince(start)))
+    private func elapsedString(for session: IIDXPlaySession, now: Date) -> String {
+        let elapsed: TimeInterval
+        if workoutBridge.isPaused {
+            elapsed = workoutBridge.pausedElapsed ?? 0
+        } else {
+            let anchor = workoutBridge.runningStart ?? session.startDate
+            elapsed = now.timeIntervalSince(anchor)
+        }
+        let interval = Int(max(0, elapsed))
         let hours = interval / 3600
         let minutes = (interval % 3600) / 60
         let seconds = interval % 60

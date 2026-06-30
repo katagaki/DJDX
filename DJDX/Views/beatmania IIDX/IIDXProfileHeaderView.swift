@@ -110,6 +110,7 @@ struct IIDXProfileHeaderView: View {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func downloadStatusPageData() async {
         let baseURLString = "https://p.eagate.573.jp"
         let request = URLRequest(url: iidxVersion.statusPageURL())
@@ -227,7 +228,7 @@ struct IIDXProfileHeaderView: View {
         }
     }
 
-    func parseProfileData(from document: Document) throws {
+    func parseProfileData(from document: SwiftSoup.Document) throws {
         for row in try document.select("div.dj-profile table tr") {
             let cells = try row.select("td")
             if cells.size() == 2, try cells.get(0).text() == "DJ NAME" {

@@ -15,6 +15,12 @@
             "state" : "translated",
             "value" : "プレーセッションをすぐに開始します。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快速開始一段遊玩記錄。"
+          }
         }
       }
     },
@@ -31,6 +37,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッションを開始"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始遊玩"
           }
         }
       }
@@ -49,6 +61,12 @@
             "state" : "translated",
             "value" : "ノーツレーダー"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面雷達"
+          }
         }
       }
     },
@@ -62,6 +80,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "開始"
@@ -83,9 +107,15 @@
             "state" : "translated",
             "value" : "セッションを開始"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始遊玩"
+          }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.3"
 }

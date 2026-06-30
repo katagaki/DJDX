@@ -1,6 +1,7 @@
 import SwiftUI
 
 extension UnifiedView {
+    // swiftlint:disable:next function_body_length cyclomatic_complexity
     func handleDeepLink(_ url: URL) {
         guard url.scheme == "djdx",
               let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
@@ -44,14 +45,16 @@ extension UnifiedView {
                 appMode = .sessions
                 if sessionStore.activeSession == nil { sessionStore.startSession() }
             case "capture":
-                navigationManager.popToRoot()
-                appMode = .sessions
-                sessionStore.requestCapture()
+                if sessionStore.activeSession != nil {
+                    navigationManager.popToRoot()
+                    appMode = .sessions
+                    sessionStore.requestCapture()
+                }
             case "stop":
                 if sessionStore.activeSession != nil { sessionStore.endSession() }
             case "pause":
                 let bridge = IIDXSessionWorkoutBridge.shared
-                if bridge.isWorkoutActive { bridge.setWorkoutPaused(!bridge.isPaused) }
+                if bridge.isSessionActive { bridge.setWorkoutPaused(!bridge.isPaused) }
             default:
                 return
             }

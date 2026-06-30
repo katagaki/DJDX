@@ -2,15 +2,6 @@ import CoreGraphics
 import CoreML
 import Vision
 
-// Optional second-stage model: a 0–9 object detector (YOLO → Core ML, exported by
-// DJDX PEAK Studio) that reads the IIDX LED number font Vision OCR cannot. It runs
-// on the numeric field crops the result detector already isolates, sorts the digit
-// boxes left-to-right, and assembles the value.
-//
-// Inert until IIDXDigitsDetector.mlpackage is added to the target — the model is
-// loaded by bundle name at runtime, so the build never depends on its presence and
-// the pipeline transparently falls back to Vision OCR while it is absent. Digit
-// classes are "0"…"9"; any non-digit class (e.g. "minus"/"plus") is ignored.
 enum IIDXDigitRecognizer {
 
     static let modelName = "IIDXDigitsDetector"
@@ -56,9 +47,6 @@ enum IIDXDigitRecognizer {
                     }
                 continuation.resume(returning: results)
             }
-            // Letterbox (preserve aspect): the model trains on letterboxed crops,
-            // and numeric fields are extreme-aspect strips that .scaleFill would
-            // stretch into unreadable rows of "1"s.
             request.imageCropAndScaleOption = .scaleFit
             let handler = VNImageRequestHandler(cgImage: image, orientation: .up, options: [:])
             DispatchQueue.global(qos: .userInitiated).async {

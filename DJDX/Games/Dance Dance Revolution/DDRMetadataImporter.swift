@@ -4,6 +4,7 @@ import SwiftSoup
 
 actor DDRMetadataImporter {
 
+    // swiftlint:disable:next type_name
     typealias DB = DDRMetadataDatabase
 
     func reloadBemaniWikiData(version: DDRVersion = .world) async -> Int {

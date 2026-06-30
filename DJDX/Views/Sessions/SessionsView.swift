@@ -83,6 +83,7 @@ struct SessionsView: View {
             if enabled {
                 Task { _ = await IIDXSessionWorkoutBridge.shared.requestAuthorization() }
             }
+            IIDXSessionWorkoutBridge.shared.syncProfileToWatch()
         }
         .onAppear {
             store.bootstrap()

@@ -113,7 +113,7 @@ struct DDRProfileHeaderView: View {
         await parseDanRank(from: document)
     }
 
-    func parseDancerName(from document: Document) async {
+    func parseDancerName(from document: SwiftSoup.Document) async {
         guard let rows = try? document.select("#sougou tr") else { return }
         for row in rows {
             let label = (try? row.select("th").first()?.text())?
@@ -128,7 +128,7 @@ struct DDRProfileHeaderView: View {
         }
     }
 
-    func parseFlareSkill(from document: Document) async {
+    func parseFlareSkill(from document: SwiftSoup.Document) async {
         guard let cells = try? document.select("td.total-flare-skill").array() else { return }
         for (index, cell) in cells.enumerated() {
             guard let style = Self.style(forIndex: index) else { continue }
@@ -146,7 +146,7 @@ struct DDRProfileHeaderView: View {
         }
     }
 
-    func parseDanRank(from document: Document) async {
+    func parseDanRank(from document: SwiftSoup.Document) async {
         guard let images = try? document.select(".danrank-grade img").array() else { return }
         for (index, img) in images.enumerated() {
             guard let style = Self.style(forIndex: index) else { continue }

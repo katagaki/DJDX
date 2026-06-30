@@ -95,13 +95,11 @@ struct PolarisChordProfileHeaderView: View {
         .cardBackground(cornerRadius: 8.0)
     }
 
-    // The profile is rendered client-side from the same JSON API as the score
-    // list, so the raw HTML has no values; POST to it for usr_profile / usr_nametag.
     func refreshProfile() async {
         var request = URLRequest(url: polarisChordVersion.playDataEndpointURL())
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.httpBody = "service_kind=profile&pdata_kind=profile".data(using: .utf8)
+        request.httpBody = Data("service_kind=profile&pdata_kind=profile".utf8)
         do {
             let (data, _) = try await URLSession.shared.data(for: request)
             guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],

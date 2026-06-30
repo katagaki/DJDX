@@ -1,8 +1,10 @@
 import Foundation
+import SQLite
 
 enum DataMigration {
 
     static let version334CleanupKey = "Internal.Version334Cleanup"
+    static let iidxColumnMigrationKey = "Internal.IIDXColumnMigration"
 
     private static let databaseFileNames = [
         "PlayData.db",
@@ -46,6 +48,56 @@ enum DataMigration {
         try? fileManager.removeItem(at: SharedContainer.widgetDataURL)
 
         UserDefaults.standard.set(true, forKey: version334CleanupKey)
+    }
+
+    static func runIIDXColumnMigrationIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: iidxColumnMigrationKey) else { return }
+        let bemaniOK = addColumns(
+            to: BEMANIWikiDatabase.songTable,
+            using: try? BEMANIWikiDatabase.shared.getWriteConnection(),
+            columns: bemaniWikiColumns
+        )
+        let scoreOK = addColumns(
+            to: IIDXPlayDataDatabase.songRecordTable,
+            using: try? IIDXPlayDataDatabase.shared.getWriteConnection(),
+            columns: scoreSongRecordColumns
+        )
+        if bemaniOK && scoreOK {
+            UserDefaults.standard.set(true, forKey: iidxColumnMigrationKey)
+        }
+    }
+
+    private static func addColumns(
+        to table: Table, using database: Connection?, columns: [SQLite.Expression<Int?>]
+    ) -> Bool {
+        guard let database else { return false }
+        for column in columns {
+            _ = try? database.run(table.addColumn(column))
+        }
+        return true
+    }
+
+    private static var bemaniWikiColumns: [SQLite.Expression<Int?>] {
+        let col = BEMANIWikiDatabase.self
+        return [
+            col.songSPBeginnerLevel, col.songSPNormalLevel, col.songSPHyperLevel,
+            col.songSPAnotherLevel, col.songSPLeggendariaLevel, col.songDPNormalLevel,
+            col.songDPHyperLevel, col.songDPAnotherLevel, col.songDPLeggendariaLevel,
+            col.songSPBeginnerNoteCount, col.songSPNormalNoteCount, col.songSPHyperNoteCount,
+            col.songSPAnotherNoteCount, col.songSPLeggendariaNoteCount, col.songDPBeginnerNoteCount,
+            col.songDPNormalNoteCount, col.songDPHyperNoteCount, col.songDPAnotherNoteCount,
+            col.songDPLeggendariaNoteCount
+        ]
+    }
+
+    private static var scoreSongRecordColumns: [SQLite.Expression<Int?>] {
+        let col = IIDXPlayDataDatabase.self
+        return [
+            col.songSPBeginnerNoteCount, col.songSPNormalNoteCount, col.songSPHyperNoteCount,
+            col.songSPAnotherNoteCount, col.songSPLeggendariaNoteCount, col.songDPBeginnerNoteCount,
+            col.songDPNormalNoteCount, col.songDPHyperNoteCount, col.songDPAnotherNoteCount,
+            col.songDPLeggendariaNoteCount
+        ]
     }
 
     static func moveImages(from source: URL, to imagesDirectory: URL) {

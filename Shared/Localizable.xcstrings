@@ -23,6 +23,18 @@
             "state" : "translated",
             "value" : "[%@](https://textage.cc)"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[%@](https://textage.cc)"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[%@](https://textage.cc)"
+          }
         }
       }
     },
@@ -87,6 +99,12 @@
             "state" : "translated",
             "value" : "最近のプレー履歴がここに表示されます。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近的遊玩記錄會顯示在這裡。"
+          }
         }
       }
     },
@@ -103,6 +121,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アクティビティがありません"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚無活動"
           }
         }
       }
@@ -121,6 +145,12 @@
             "state" : "translated",
             "value" : "6桁のコード"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6 位數驗證碼"
+          }
         }
       }
     },
@@ -137,6 +167,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのスコアデータを削除するには、コード %@ を入力してください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若要刪除所有成績資料，請輸入驗證碼 %@。"
           }
         }
       }
@@ -155,6 +191,12 @@
             "state" : "translated",
             "value" : "削除の確認"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確認刪除"
+          }
         }
       }
     },
@@ -171,6 +213,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコアデータを消去"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除成績資料"
           }
         }
       }
@@ -189,6 +237,12 @@
             "state" : "translated",
             "value" : "スコアをご覧になるために、再度インポートする必要があります。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若要查看成績資料，你需要再次匯入。"
+          }
         }
       }
     },
@@ -205,6 +259,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "インポートされたスコアデータがすべて削除されます"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有已匯入的成績資料將被刪除"
           }
         }
       }
@@ -223,6 +283,12 @@
             "state" : "translated",
             "value" : "Webデータを消去"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除網站資料"
+          }
         }
       }
     },
@@ -239,6 +305,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "次にWebでのインポートを行う際に、再度ログインする必要があります。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下次從網站匯入資料時，你需要重新登入。"
           }
         }
       }
@@ -257,6 +329,12 @@
             "state" : "translated",
             "value" : "Webデータがすべて削除されます"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有網站資料將被刪除"
+          }
         }
       }
     },
@@ -273,6 +351,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld曲の譜面データが読み込まれました。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已成功讀取 %lld 個譜面的資料。"
           }
         }
       }
@@ -291,22 +375,11 @@
             "state" : "translated",
             "value" : "データ取得が成功しました"
           }
-        }
-      }
-    },
-    "Alert.ExternalData.Downloading.Text" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1% completed"
-          }
         },
-        "ja" : {
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1%"
+            "value" : "資料更新成功"
           }
         }
       }
@@ -325,6 +398,12 @@
             "state" : "translated",
             "value" : "外部データをダウンロード中"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在從外部來源下載資料"
+          }
         }
       }
     },
@@ -341,6 +420,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloudへのバックアップに失敗しました。iCloudにサインインしていることを確認して、もう一度お試しください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法將資料備份至 iCloud。請確認你已登入 iCloud，然後再試一次。"
           }
         }
       }
@@ -359,6 +444,12 @@
             "state" : "translated",
             "value" : "バックアップに失敗しました"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "備份失敗"
+          }
         }
       }
     },
@@ -375,6 +466,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "復元"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "還原"
           }
         }
       }
@@ -393,6 +490,12 @@
             "state" : "translated",
             "value" : "復元しない"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不要還原"
+          }
         }
       }
     },
@@ -409,6 +512,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@に作成されたバックアップがiCloudで見つかりました。復元しますか？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 iCloud 中找到一份於 %@ 建立的備份。要還原嗎？"
           }
         }
       }
@@ -427,6 +536,12 @@
             "state" : "translated",
             "value" : "iCloudバックアップから復元しますか？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要從 iCloud 備份還原嗎？"
+          }
         }
       }
     },
@@ -443,6 +558,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "復元を完了するには、アプリを再起動してください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請重新啟動 App 以完成還原。"
           }
         }
       }
@@ -461,6 +582,12 @@
             "state" : "translated",
             "value" : "復元が完了しました"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "還原完成"
+          }
         }
       }
     },
@@ -477,6 +604,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloudからの復元に失敗しました。次回アプリ起動時に、もう一度お試しください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法從 iCloud 還原資料。下次開啟 App 時，請再試一次。"
           }
         }
       }
@@ -495,6 +628,12 @@
             "state" : "translated",
             "value" : "復元に失敗しました"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "還原失敗"
+          }
         }
       }
     },
@@ -511,6 +650,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "e-amusementはただいまメンテナンス中のため、ご利用いただけません。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由於 e-amusement 服務目前正在維護中，因此無法完成匯入。"
           }
         }
       }
@@ -529,6 +674,12 @@
             "state" : "translated",
             "value" : "e-amusement passが登録されていないため、インポートが失敗しました。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由於未登錄 e-amusement pass，因此無法完成匯入。"
+          }
         }
       }
     },
@@ -545,6 +696,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレーデータがないため、インポートが失敗しました。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由於沒有遊玩資料，因此無法完成匯入。"
           }
         }
       }
@@ -563,6 +720,12 @@
             "state" : "translated",
             "value" : "e-amusementプレミアムコースに入会されていないため、インポートが失敗しました。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由於 e-amusement 帳號未加入「e-amusement プレミアムコース」服務，因此無法完成匯入。"
+          }
         }
       }
     },
@@ -579,6 +742,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバーエラーが発生したため、インポートが失敗しました。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由於發生伺服器錯誤，因此無法完成匯入。"
           }
         }
       }
@@ -597,6 +766,12 @@
             "state" : "translated",
             "value" : "データがインポートできませんでした"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法匯入資料"
+          }
         }
       }
     },
@@ -613,6 +788,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "インポートが成功しました。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已成功匯入。"
           }
         }
       }
@@ -631,6 +812,12 @@
             "state" : "translated",
             "value" : "データは正常にインポートされました"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入完成"
+          }
         }
       }
     },
@@ -647,6 +834,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1%"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已完成 %1%"
           }
         }
       }
@@ -665,6 +858,12 @@
             "state" : "translated",
             "value" : "インポート中"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入中"
+          }
         }
       }
     },
@@ -680,6 +879,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "インポート中（%1$lld/%2$lld）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入中（%1$lld/%2$lld）"
           }
         }
       }
@@ -698,6 +903,12 @@
             "state" : "translated",
             "value" : "レイアウトをリセット"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重設版面配置"
+          }
         }
       }
     },
@@ -714,6 +925,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カードの表示と並び順が初期状態に戻ります。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "卡片的顯示與排列順序將還原為預設值。"
           }
         }
       }
@@ -732,6 +949,12 @@
             "state" : "translated",
             "value" : "レイアウトをリセットしますか？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要重設版面配置嗎？"
+          }
         }
       }
     },
@@ -748,6 +971,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリアランプ（レベル別概要）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型（各等級概要）"
           }
         }
       }
@@ -766,6 +995,12 @@
             "state" : "translated",
             "value" : "LEVEL %lld - クリア率"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEVEL %lld - 通關類型"
+          }
         }
       }
     },
@@ -782,6 +1017,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリアランプ概要"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型（概要）"
           }
         }
       }
@@ -800,6 +1041,12 @@
             "state" : "translated",
             "value" : "クリア内訳"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關分布"
+          }
         }
       }
     },
@@ -816,6 +1063,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ランク内訳"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "評價分布"
           }
         }
       }
@@ -834,6 +1087,12 @@
             "state" : "translated",
             "value" : "DJ LEVEL（レベル別概要）"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level（各等級概要）"
+          }
         }
       }
     },
@@ -850,6 +1109,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJ LEVEL内訳"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level 分布"
           }
         }
       }
@@ -868,31 +1133,59 @@
             "state" : "translated",
             "value" : "前回のインポートから"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自上次匯入以來"
+          }
         }
       }
     },
     "Analytics.NewHighScore.%lld" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(+%lld)"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "(+%lld)"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(+%lld)"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Analytics.NewHighScores" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NEW RECORD"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "NEW RECORD"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NEW RECORD"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Analytics.NewHighScores.Subtitle" : {
       "extractionState" : "manual",
@@ -907,6 +1200,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "前回のインポートから"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自上次匯入以來"
           }
         }
       }
@@ -925,6 +1224,12 @@
             "state" : "translated",
             "value" : "データなし"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無資料"
+          }
         }
       }
     },
@@ -941,6 +1246,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "内訳"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分布"
           }
         }
       }
@@ -959,6 +1270,12 @@
             "state" : "translated",
             "value" : "クリアレート"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關率"
+          }
         }
       }
     },
@@ -975,6 +1292,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリアレート推移"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關率趨勢"
           }
         }
       }
@@ -993,6 +1316,12 @@
             "state" : "translated",
             "value" : "クリアランプ推移"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型趨勢"
+          }
         }
       }
     },
@@ -1010,6 +1339,12 @@
             "state" : "translated",
             "value" : "DJ LEVEL推移"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level 趨勢"
+          }
         }
       }
     },
@@ -1022,6 +1357,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "・"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "・"
@@ -1043,6 +1384,12 @@
             "state" : "translated",
             "value" : "推移"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "趨勢"
+          }
         }
       }
     },
@@ -1059,6 +1406,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリア内訳"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關分布"
           }
         }
       }
@@ -1077,6 +1430,12 @@
             "state" : "translated",
             "value" : "グレード内訳"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "評價分布"
+          }
         }
       }
     },
@@ -1093,6 +1452,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリア内訳"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關分布"
           }
         }
       }
@@ -1111,6 +1476,12 @@
             "state" : "translated",
             "value" : "グレード内訳"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "評價分布"
+          }
         }
       }
     },
@@ -1128,6 +1499,12 @@
             "state" : "translated",
             "value" : "プレー譜面数"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已遊玩譜面數"
+          }
         }
       }
     },
@@ -1141,6 +1518,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VOLFORCE"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "VOLFORCE"
@@ -1162,6 +1545,12 @@
             "state" : "translated",
             "value" : "前回のプレー"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上次遊玩"
+          }
         }
       }
     },
@@ -1178,6 +1567,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "概要"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "概覽"
           }
         }
       }
@@ -1196,6 +1591,12 @@
             "state" : "translated",
             "value" : "レベル別"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各等級"
+          }
         }
       }
     },
@@ -1212,6 +1613,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレー記録"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "成績資料"
           }
         }
       }
@@ -1230,6 +1637,12 @@
             "state" : "translated",
             "value" : "並べ替え"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "變更順序"
+          }
         }
       }
     },
@@ -1246,6 +1659,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表示するレベル"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示的等級"
           }
         }
       }
@@ -1264,6 +1683,12 @@
             "state" : "translated",
             "value" : "リセット"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重設順序"
+          }
         }
       }
     },
@@ -1280,6 +1705,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリアランプ（時系列）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型趨勢"
           }
         }
       }
@@ -1298,6 +1729,12 @@
             "state" : "translated",
             "value" : "DJ LEVEL（時系列）"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level 趨勢"
+          }
         }
       }
     },
@@ -1314,6 +1751,81 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "LEVEL %lld - クリアトレンド"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEVEL %lld - 通關趨勢"
+          }
+        }
+      }
+    },
+    "Backup.Export" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Data…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データを書き出す…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯出資料…"
+          }
+        }
+      }
+    },
+    "Backup.Export.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save or share a ZIP file containing all of your data."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのデータを含むZIPファイルを保存・共有できます。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你可以儲存或分享一個包含所有資料的 ZIP 檔案。"
+          }
+        }
+      }
+    },
+    "Backup.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "備份"
           }
         }
       }
@@ -1332,6 +1844,12 @@
             "state" : "translated",
             "value" : "今日の日付に戻る"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回到今天"
+          }
         }
       }
     },
@@ -1348,6 +1866,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CSVファイルを開く"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 CSV 檔案"
           }
         }
       }
@@ -1366,6 +1890,12 @@
             "state" : "translated",
             "value" : "Webからインポート"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從網站匯入"
+          }
         }
       }
     },
@@ -1382,6 +1912,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サンプルデータを読み込む"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "載入範例資料"
           }
         }
       }
@@ -1400,6 +1936,12 @@
             "state" : "translated",
             "value" : "アプリの機能を試したい場合、サンプルデータを読み込んでからご利用いただけます。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若想試用 App 的功能，你可以先載入範例資料再開始使用。"
+          }
         }
       }
     },
@@ -1416,14 +1958,58 @@
             "state" : "translated",
             "value" : "インポート日付を選択"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇匯入日期"
+          }
         }
       }
     },
     "Clear Type" : {
-      "shouldTranslate" : false
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアタイプ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型"
+          }
+        }
+      }
     },
     "Count" : {
-      "shouldTranslate" : false
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Count"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カウント"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次數"
+          }
+        }
+      }
     },
     "Count.%lld" : {
       "localizations" : {
@@ -1438,11 +2024,105 @@
             "state" : "translated",
             "value" : "%lld回"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 次"
+          }
         }
       }
     },
     "Date" : {
-      "shouldTranslate" : false
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日付"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日期"
+          }
+        }
+      }
+    },
+    "DDR.DataSource.Warning.Action" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Data Sources"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外部データソースを開く"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟資料來源"
+          }
+        }
+      }
+    },
+    "DDR.DataSource.Warning.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When BEMANIWiki data is turned off, chart levels are not downloaded and won't appear."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEMANIWikiデータをオフにしていると、譜面のレベルが取得されず、表示されません。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若關閉 BEMANIWiki 資料，將不會下載譜面的等級，因此無法顯示。"
+          }
+        }
+      }
+    },
+    "DDR.DataSource.Warning.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Levels May Not Appear"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レベルが表示されない場合があります"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等級可能無法顯示"
+          }
+        }
+      }
     },
     "Default" : {
       "extractionState" : "manual",
@@ -1458,11 +2138,36 @@
             "state" : "translated",
             "value" : "デフォルト"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "預設"
+          }
         }
       }
     },
     "DJ Level" : {
-      "shouldTranslate" : false
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level"
+          }
+        }
+      }
     },
     "Game" : {
       "localizations" : {
@@ -1476,6 +2181,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ゲーム"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊戲"
           }
         }
       }
@@ -1493,11 +2204,36 @@
             "state" : "translated",
             "value" : "グレード"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "評價"
+          }
         }
       }
     },
     "Height" : {
-      "shouldTranslate" : false
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Height"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高さ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高度"
+          }
+        }
+      }
     },
     "ICloudBackup.BackUpNow" : {
       "extractionState" : "manual",
@@ -1512,6 +2248,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今すぐバックアップ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即備份"
           }
         }
       }
@@ -1530,6 +2272,12 @@
             "state" : "translated",
             "value" : "毎晩0時にデータがiCloudにバックアップされます。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每晚 0 點，你的資料會備份到 iCloud。"
+          }
         }
       }
     },
@@ -1546,6 +2294,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自動バックアップ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動備份"
           }
         }
       }
@@ -1564,6 +2318,12 @@
             "state" : "translated",
             "value" : "前回のバックアップ"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上次備份"
+          }
         }
       }
     },
@@ -1580,6 +2340,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "なし"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未備份"
           }
         }
       }
@@ -1598,6 +2364,12 @@
             "state" : "translated",
             "value" : "iCloudからデータを復元しています。しばらくお待ちください。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在從 iCloud 還原資料，請稍候。"
+          }
         }
       }
     },
@@ -1615,22 +2387,11 @@
             "state" : "translated",
             "value" : "バックアップを復元中"
           }
-        }
-      }
-    },
-    "ICloudBackup.Title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud Backup"
-          }
         },
-        "ja" : {
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloudバックアップ"
+            "value" : "正在還原備份"
           }
         }
       }
@@ -1649,6 +2410,12 @@
             "state" : "translated",
             "value" : "「ファイル」アプリで開く"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在「檔案」App 中開啟"
+          }
         }
       }
     },
@@ -1665,6 +2432,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJDXはインポートしたCSVファイルをバックアップとして保存しています。「ファイル」アプリの「このiPhone内」→「DJDX」から以前のファイルを開けます。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX 會將每個匯入的 CSV 檔案儲存為備份。你可以開啟「檔案」App，前往「我的 iPhone」→「DJDX」來查看先前匯入的檔案。"
           }
         }
       }
@@ -1683,6 +2456,12 @@
             "state" : "translated",
             "value" : "CSVをダウンロード"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下載 CSV 檔案"
+          }
         }
       }
     },
@@ -1699,6 +2478,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "まず、公式ウェブサイトからCSVファイルをダウンロードしてください。\nダウンロードできない場合、Safariのメニューから「デスクトップサイト用Webサイトを表示」を選択してください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請先從官方網站下載 CSV 檔案。\n若無法下載，請在 Safari 的選單中選擇「請求桌面網站」。"
           }
         }
       }
@@ -1717,6 +2502,12 @@
             "state" : "translated",
             "value" : "CSVを読み込む"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 CSV 檔案"
+          }
         }
       }
     },
@@ -1733,6 +2524,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CSVファイルのダウンロードができたら、こちらで読み込んでください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下載 CSV 檔案後，請在此開啟。"
           }
         }
       }
@@ -1763,6 +2560,12 @@
             "state" : "translated",
             "value" : "%lldプレー"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 次遊玩"
+          }
         }
       }
     },
@@ -1792,6 +2595,12 @@
             "state" : "translated",
             "value" : "%lld曲"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 首"
+          }
         }
       }
     },
@@ -1808,6 +2617,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Safariで開く"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 Safari 中開啟"
           }
         }
       }
@@ -1873,14 +2688,25 @@
     "Level.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEVEL %lld"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "LEVEL %lld"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEVEL %lld"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Migration.Description" : {
       "extractionState" : "manual",
@@ -1895,6 +2721,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アプリがアップデートされたため、データの最適化を行なっています。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由於 App 已更新，正在最佳化你的資料。"
           }
         }
       }
@@ -1913,6 +2745,12 @@
             "state" : "translated",
             "value" : "データ最適化中"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在最佳化資料"
+          }
         }
       }
     },
@@ -1929,6 +2767,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "著者権表記"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "致謝"
           }
         }
       }
@@ -1947,6 +2791,12 @@
             "state" : "translated",
             "value" : "免責事項"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免責聲明"
+          }
         }
       }
     },
@@ -1964,6 +2814,12 @@
             "state" : "translated",
             "value" : "このアプリはコナミとは一切関係がありません。アプリ内に表示される内容について、コナミは一切の責任を負いません。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本應用程式與 KONAMI 並無任何關聯。對於應用程式內顯示的內容，KONAMI 概不負責。"
+          }
         }
       }
     },
@@ -1977,6 +2833,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEMANIWiki 2nd"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "BEMANIWiki 2nd"
@@ -1998,6 +2860,12 @@
             "state" : "translated",
             "value" : "データ"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "資料"
+          }
         }
       }
     },
@@ -2014,6 +2882,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面の時間、ノーツ数"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面時間、音符數"
           }
         }
       }
@@ -2032,6 +2906,12 @@
             "state" : "translated",
             "value" : "楽曲数"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "歌曲數量"
+          }
         }
       }
     },
@@ -2049,6 +2929,12 @@
             "state" : "translated",
             "value" : "DJDXはBEMANIWiki 2ndとは一切関係ありません。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX 與 BEMANIWiki 2nd 並無任何關聯。"
+          }
         }
       }
     },
@@ -2062,6 +2948,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "joy to the beat..."
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "joy to the beat..."
@@ -2083,6 +2975,12 @@
             "state" : "translated",
             "value" : "データ"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "資料"
+          }
         }
       }
     },
@@ -2099,6 +2997,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面別ノーツレーダー"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各譜面的譜面雷達"
           }
         }
       }
@@ -2117,6 +3021,12 @@
             "state" : "translated",
             "value" : "譜面数"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面數量"
+          }
         }
       }
     },
@@ -2133,6 +3043,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJDXはbm2dx.comとは一切関係ありません。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX 與 bm2dx.com 並無任何關聯。"
           }
         }
       }
@@ -2151,6 +3067,12 @@
             "state" : "translated",
             "value" : "譜面一覧"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面資料"
+          }
         }
       }
     },
@@ -2167,6 +3089,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ノーツ数、ノーツレーダー"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音符數、譜面雷達"
           }
         }
       }
@@ -2185,6 +3113,12 @@
             "state" : "translated",
             "value" : "DJDXはこの外部データソースとは一切関係ありません。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX 與此外部資料來源並無任何關聯。"
+          }
         }
       }
     },
@@ -2202,20 +3136,37 @@
             "state" : "translated",
             "value" : "外部データソース"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外部資料來源"
+          }
         }
       }
     },
     "More.ExternalData.SDVXIn" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SDVX譜面保管所"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "SDVX譜面保管所"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SDVX譜面保管所"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "More.ExternalData.SDVXIn.Description" : {
       "extractionState" : "manual",
@@ -2230,6 +3181,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面インデックス"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面索引"
           }
         }
       }
@@ -2248,6 +3205,12 @@
             "state" : "translated",
             "value" : "譜面数"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面數量"
+          }
         }
       }
     },
@@ -2264,6 +3227,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJDXはSDVX譜面保管所とは一切関係ありません。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX 與 SDVXin 並無任何關聯。"
           }
         }
       }
@@ -2282,9 +3251,14 @@
             "state" : "translated",
             "value" : "Textage"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textage"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "More.ExternalData.Textage.Description" : {
       "extractionState" : "manual",
@@ -2299,6 +3273,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面インデックス"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面索引"
           }
         }
       }
@@ -2317,6 +3297,12 @@
             "state" : "translated",
             "value" : "譜面数"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面數量"
+          }
         }
       }
     },
@@ -2333,6 +3319,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJDXはTextageとは一切関係ありません。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX 與 Textage 並無任何關聯。"
           }
         }
       }
@@ -2351,6 +3343,12 @@
             "state" : "translated",
             "value" : "データを更新"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新資料"
+          }
         }
       }
     },
@@ -2367,6 +3365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ソースを見る"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看來源"
           }
         }
       }
@@ -2385,6 +3389,12 @@
             "state" : "translated",
             "value" : "アプリアイコン"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App 圖示"
+          }
         }
       }
     },
@@ -2398,6 +3408,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一般"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "一般"
@@ -2419,6 +3435,12 @@
             "state" : "translated",
             "value" : "アナリティクスを表示"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示分析"
+          }
         }
       }
     },
@@ -2436,6 +3458,12 @@
             "state" : "translated",
             "value" : "プロフィールを表示"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示個人檔案"
+          }
         }
       }
     },
@@ -2451,6 +3479,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ソースコード"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看原始碼"
+          }
+        }
+      }
+    },
+    "More.ManageData.Backup" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "備份"
           }
         }
       }
@@ -2469,6 +3526,12 @@
             "state" : "translated",
             "value" : "アナリティクスキャッシュをクリア"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除分析快取"
+          }
         }
       }
     },
@@ -2485,6 +3548,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "消去またはリセット…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除或還原…"
           }
         }
       }
@@ -2503,6 +3572,12 @@
             "state" : "translated",
             "value" : "スコアデータを消去"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除成績資料"
+          }
         }
       }
     },
@@ -2519,6 +3594,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Webデータを消去"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除網站資料"
           }
         }
       }
@@ -2537,6 +3618,12 @@
             "state" : "translated",
             "value" : "データ管理"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "資料管理"
+          }
         }
       }
     },
@@ -2553,6 +3640,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloudバックアップ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 備份"
           }
         }
       }
@@ -2571,6 +3664,12 @@
             "state" : "translated",
             "value" : "レイアウトをリセット"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重設版面配置"
+          }
         }
       }
     },
@@ -2587,6 +3686,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "合計レーダースコア"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "總計"
           }
         }
       }
@@ -2605,6 +3710,12 @@
             "state" : "translated",
             "value" : "表示設定"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示設定"
+          }
         }
       }
     },
@@ -2621,6 +3732,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "BEGINNERを非表示"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隱藏 BEGINNER 難易度"
           }
         }
       }
@@ -2639,6 +3756,12 @@
             "state" : "translated",
             "value" : "アーティスト"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "演出者"
+          }
         }
       }
     },
@@ -2655,6 +3778,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンル"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "曲風"
           }
         }
       }
@@ -2673,6 +3802,12 @@
             "state" : "translated",
             "value" : "レベルおよび難易度"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等級與難易度"
+          }
         }
       }
     },
@@ -2689,6 +3824,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "難易度を分けて表示"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "依難易度分別顯示"
           }
         }
       }
@@ -2707,6 +3848,12 @@
             "state" : "translated",
             "value" : "（未実装）譜面を難易度で分けて表示されます。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "（尚未實作）顯示時依難易度分別列出各譜面。"
+          }
         }
       }
     },
@@ -2723,6 +3870,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "はじめる"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始使用"
           }
         }
       }
@@ -2741,6 +3894,12 @@
             "state" : "translated",
             "value" : "さまざまな外部データソースの楽曲情報や譜面データを取り込んでライブラリーを充実させます。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從各種外部資料來源匯入樂曲資訊與譜面資料，讓你的資料庫更加充實。"
+          }
         }
       }
     },
@@ -2757,6 +3916,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "外部データソース"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外部資料來源"
           }
         }
       }
@@ -2775,6 +3940,12 @@
             "state" : "translated",
             "value" : "beatmania IIDX、SOUND VOLTEX、ポラリスコード、DanceDanceRevolutionのプレーデータを1つのアプリでまとめて管理できます。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在單一 App 中統一管理 beatmania IIDX、SOUND VOLTEX、Polaris Chord 與 DanceDanceRevolution 的遊玩資料。"
+          }
         }
       }
     },
@@ -2791,6 +3962,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "複数タイトル対応"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "支援多款遊戲"
           }
         }
       }
@@ -2809,6 +3986,12 @@
             "state" : "translated",
             "value" : "リザルト画面の写真を撮るだけで、beatmania IIDXの1Pプレーのスコアを自動で読み取ります。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只要拍下成績畫面，DJDX 就會自動讀取 beatmania IIDX 的 1P 遊玩分數。"
+          }
         }
       }
     },
@@ -2826,6 +4009,12 @@
             "state" : "translated",
             "value" : "セッション（ベータ）"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩記錄（Beta）"
+          }
         }
       }
     },
@@ -2835,13 +4024,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sign in to your KONAMI account and bring your scores in directly from e-amusement — no manual entry required."
+            "value" : "Sign in to your KONAMI account and bring your scores in directly from e-amusement, no manual entry required."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "KONAMI IDでログインすれば、e-amusementからスコアを直接取り込み。手入力は必要ありません。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入 KONAMI ID 後，即可直接從 e-amusement 匯入成績，無需手動輸入。"
           }
         }
       }
@@ -2858,7 +4053,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ウェブインポート"
+            "value" : "Webインポート"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "網站匯入"
           }
         }
       }
@@ -2877,6 +4078,12 @@
             "state" : "translated",
             "value" : "%@へようこそ"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "歡迎使用 %@"
+          }
         }
       }
     },
@@ -2892,6 +4099,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ランク"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "評價"
           }
         }
       }
@@ -2910,6 +4123,12 @@
             "state" : "translated",
             "value" : "表示をカスタマイズ"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自訂顯示"
+          }
         }
       }
     },
@@ -2926,6 +4145,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコアのある曲のみ表示"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "僅顯示有成績的譜面"
           }
         }
       }
@@ -2944,6 +4169,12 @@
             "state" : "translated",
             "value" : "スコア履歴を閲覧するには、「マイ弐寺」画面でBEMANIWiki 2ndのデータを取得する必要があります。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若要查看歷史成績資料，請先在「My IIDX」分頁更新 BEMANIWiki 2nd 的資料。"
+          }
         }
       }
     },
@@ -2957,6 +4188,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面"
@@ -2978,6 +4215,12 @@
             "state" : "translated",
             "value" : "譜面"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面"
+          }
         }
       }
     },
@@ -2994,6 +4237,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最終プレー日時：%@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後遊玩日期：%@"
           }
         }
       }
@@ -3012,6 +4261,12 @@
             "state" : "translated",
             "value" : "現バージョンのプレー記録はありません。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目前版本沒有遊玩記錄。"
+          }
         }
       }
     },
@@ -3029,6 +4284,12 @@
             "state" : "translated",
             "value" : "譜面を確認"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看譜面"
+          }
         }
       }
     },
@@ -3042,6 +4303,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textage"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Textage"
@@ -3063,6 +4330,12 @@
             "state" : "translated",
             "value" : "1Pの譜面"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1P 譜面"
+          }
         }
       }
     },
@@ -3080,6 +4353,12 @@
             "state" : "translated",
             "value" : "2Pの譜面"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2P 譜面"
+          }
         }
       }
     },
@@ -3095,6 +4374,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DPの譜面"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DP 譜面"
           }
         }
       }
@@ -3113,6 +4398,12 @@
             "state" : "translated",
             "value" : "YouTubeで譜面を検索"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 YouTube 上搜尋譜面"
+          }
         }
       }
     },
@@ -3129,6 +4420,12 @@
             "state" : "translated",
             "value" : "履歴を見る"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看記錄"
+          }
         }
       }
     },
@@ -3144,6 +4441,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面が開きませんか？\nお手数ですが、sdvx.inで手動で開いてみてください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面無法開啟嗎？\n麻煩你前往 sdvx.in 手動開啟看看。"
           }
         }
       }
@@ -3162,6 +4465,12 @@
             "state" : "translated",
             "value" : "セッション"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩記錄"
+          }
         }
       }
     },
@@ -3178,6 +4487,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッションについて"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關於遊玩記錄"
+          }
+        }
+      }
+    },
+    "Sessions.Camera.AutoDetect" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically Detect Results"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動的にリザルトを検出"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動偵測結果"
           }
         }
       }
@@ -3196,6 +4534,12 @@
             "state" : "translated",
             "value" : "リザルト画面を撮影するには、設定でカメラへのアクセスを許可してください。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若要拍攝結果畫面，請在「設定」中允許存取相機。"
+          }
         }
       }
     },
@@ -3212,6 +4556,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カメラへのアクセスが必要です"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要存取相機"
           }
         }
       }
@@ -3230,6 +4580,104 @@
             "state" : "translated",
             "value" : "リザルト画面を枠内に収めてください"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請將結果畫面對準框內"
+          }
+        }
+      }
+    },
+    "Sessions.Camera.Options" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オプション"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選項"
+          }
+        }
+      }
+    },
+    "Sessions.Camera.ShowStagedResults" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Staged Results"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検出中のリザルトを表示"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示偵測中的結果"
+          }
+        }
+      }
+    },
+    "Sessions.Camera.Unavailable.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The camera could not be started. Close other apps that may be using the camera, then try again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カメラを起動できませんでした。カメラを使用している他のアプリを終了してから、もう一度お試しください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法啟動相機。請關閉其他可能正在使用相機的 App，然後再試一次。"
+          }
+        }
+      }
+    },
+    "Sessions.Camera.Unavailable.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera Unavailable"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カメラを使用できません"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法使用相機"
+          }
         }
       }
     },
@@ -3247,124 +4695,11 @@
             "state" : "translated",
             "value" : "撮影"
           }
-        }
-      }
-    },
-    "Sessions.CropPreview.Back" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Back"
-          }
         },
-        "ja" : {
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "戻る"
-          }
-        }
-      }
-    },
-    "Sessions.CropPreview.Detecting" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Detecting screen…"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画面を検出中…"
-          }
-        }
-      }
-    },
-    "Sessions.CropPreview.Done" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Done"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完了"
-          }
-        }
-      }
-    },
-    "Sessions.CropPreview.Instruction" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drag the corners to frame the screen"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "四隅をドラッグして画面に合わせてください"
-          }
-        }
-      }
-    },
-    "Sessions.CropPreview.NoScreen" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No screen found — drag the corners to frame it"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画面が見つかりません。四隅を合わせてください"
-          }
-        }
-      }
-    },
-    "Sessions.CropPreview.Skip" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skip"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スキップ"
-          }
-        }
-      }
-    },
-    "Sessions.CropPreview.Use" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use Photo"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用する"
+            "value" : "拍攝"
           }
         }
       }
@@ -3383,6 +4718,12 @@
             "state" : "translated",
             "value" : "外部データソースを開く"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟外部資料來源"
+          }
         }
       }
     },
@@ -3399,6 +4740,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "BEMANIWiki 2ndをオフにしていると、曲名が正しく取得できなかったり、表示されないことがあります。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若關閉 BEMANIWiki 2nd，可能無法正確取得曲名，或無法顯示曲名。"
           }
         }
       }
@@ -3417,6 +4764,35 @@
             "state" : "translated",
             "value" : "曲名が正しく表示されない場合があります"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "曲名可能無法正確顯示"
+          }
+        }
+      }
+    },
+    "Sessions.Detail.AcceptAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accept All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて承認"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全部接受"
+          }
         }
       }
     },
@@ -3433,6 +4809,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "英語のみ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "僅英文"
           }
         }
       }
@@ -3451,6 +4833,35 @@
             "state" : "translated",
             "value" : "日本語＋英語"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日文＋英文"
+          }
+        }
+      }
+    },
+    "Sessions.Detail.AverageHeartRate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Average Heart Rate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均心拍数"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均心率"
+          }
         }
       }
     },
@@ -3464,6 +4875,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BAD"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "BAD"
@@ -3485,6 +4902,12 @@
             "state" : "translated",
             "value" : "譜面"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面"
+          }
         }
       }
     },
@@ -3501,6 +4924,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリアタイプ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型"
           }
         }
       }
@@ -3519,6 +4948,12 @@
             "state" : "translated",
             "value" : "クリアランプ内訳"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型分布"
+          }
         }
       }
     },
@@ -3535,6 +4970,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "信頼度"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可信度"
           }
         }
       }
@@ -3553,6 +4994,12 @@
             "state" : "translated",
             "value" : "DJ LEVEL"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level"
+          }
         }
       }
     },
@@ -3569,6 +5016,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJ LEVEL内訳"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ Level 分布"
           }
         }
       }
@@ -3587,6 +5040,12 @@
             "state" : "translated",
             "value" : "エラー"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錯誤"
+          }
         }
       }
     },
@@ -3604,6 +5063,12 @@
             "state" : "translated",
             "value" : "スコア"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分數"
+          }
         }
       }
     },
@@ -3617,6 +5082,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GOOD"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "GOOD"
@@ -3638,6 +5109,12 @@
             "state" : "translated",
             "value" : "GREAT"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GREAT"
+          }
         }
       }
     },
@@ -3654,6 +5131,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "心拍数"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心率"
           }
         }
       }
@@ -3672,6 +5155,35 @@
             "state" : "translated",
             "value" : "ミス"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "失誤"
+          }
+        }
+      }
+    },
+    "Sessions.Detail.NeedsAttention" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Needs attention"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要確認"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要確認"
+          }
         }
       }
     },
@@ -3685,6 +5197,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P-GREAT"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "P-GREAT"
@@ -3706,6 +5224,12 @@
             "state" : "translated",
             "value" : "POOR"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "POOR"
+          }
         }
       }
     },
@@ -3722,6 +5246,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "認識されたテキスト"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "辨識文字"
           }
         }
       }
@@ -3740,6 +5270,12 @@
             "state" : "translated",
             "value" : "写真を再解析"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新分析照片"
+          }
         }
       }
     },
@@ -3756,6 +5292,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リザルト"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "結果"
           }
         }
       }
@@ -3774,6 +5316,12 @@
             "state" : "translated",
             "value" : "認識テキストを表示"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示辨識文字"
+          }
         }
       }
     },
@@ -3790,6 +5338,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "曲"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "樂曲"
           }
         }
       }
@@ -3808,6 +5362,12 @@
             "state" : "translated",
             "value" : "状態"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "狀態"
+          }
         }
       }
     },
@@ -3824,6 +5384,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ステータス"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "狀態"
           }
         }
       }
@@ -3842,6 +5408,12 @@
             "state" : "translated",
             "value" : "概要"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "摘要"
+          }
         }
       }
     },
@@ -3858,6 +5430,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレー"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩"
           }
         }
       }
@@ -3888,6 +5466,12 @@
             "state" : "translated",
             "value" : "%lld分"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 分鐘"
+          }
         }
       }
     },
@@ -3904,6 +5488,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "経過時間"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "經過時間"
           }
         }
       }
@@ -3922,6 +5512,12 @@
             "state" : "translated",
             "value" : "リザルト画面を撮影してこのセッションに追加しましょう。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拍攝結果畫面，將其加入這次遊玩記錄。"
+          }
         }
       }
     },
@@ -3938,6 +5534,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレーがありません"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚無遊玩記錄"
           }
         }
       }
@@ -3956,6 +5558,104 @@
             "state" : "translated",
             "value" : "終了"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "結束"
+          }
+        }
+      }
+    },
+    "Sessions.End.Confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End this session?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このセッションを終了しますか？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要結束這次遊玩嗎？"
+          }
+        }
+      }
+    },
+    "Sessions.Export.All" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて書き出す"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯出全部"
+          }
+        }
+      }
+    },
+    "Sessions.Export.All.Confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export all captured photos?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撮影したすべての写真を書き出しますか？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要匯出所有拍攝的照片嗎？"
+          }
+        }
+      }
+    },
+    "Sessions.Files.Save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルに保存"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存到「檔案」"
+          }
         }
       }
     },
@@ -3972,6 +5672,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オンにすると、各セッションをワークアウトとして記録します。心拍数はApple Watchを接続している場合のみ表示されます。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟後，DJDX 會將每段遊玩記錄記為體能訓練。心率僅在連接 Apple Watch 時顯示。"
           }
         }
       }
@@ -3990,6 +5696,12 @@
             "state" : "translated",
             "value" : "ヘルスケアでワークアウトを記録"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在「健康」記錄體能訓練"
+          }
         }
       }
     },
@@ -4006,6 +5718,104 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "心拍数"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心率"
+          }
+        }
+      }
+    },
+    "Sessions.HeartRate.Average" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Average"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均"
+          }
+        }
+      }
+    },
+    "Sessions.HeartRate.ByChart" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面別"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各譜面"
+          }
+        }
+      }
+    },
+    "Sessions.HeartRate.Maximum" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高"
+          }
+        }
+      }
+    },
+    "Sessions.HeartRate.Minimum" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimum"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最低"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最低"
           }
         }
       }
@@ -4024,6 +5834,12 @@
             "state" : "translated",
             "value" : "過去のセッションがここに表示されます。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "過去的遊玩記錄會顯示在這裡。"
+          }
         }
       }
     },
@@ -4040,6 +5856,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレー"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩記錄"
           }
         }
       }
@@ -4058,6 +5880,12 @@
             "state" : "translated",
             "value" : "履歴"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記錄"
+          }
         }
       }
     },
@@ -4074,6 +5902,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "読み込む"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入"
           }
         }
       }
@@ -4092,6 +5926,12 @@
             "state" : "translated",
             "value" : "セッション進行中"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩記錄進行中"
+          }
         }
       }
     },
@@ -4108,6 +5948,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一時停止"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暫停"
           }
         }
       }
@@ -4126,6 +5972,12 @@
             "state" : "translated",
             "value" : "リザルト画面を保存するには、設定で写真への追加を許可してください。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若要儲存結果畫面，請在「設定」中允許加入「照片」。"
+          }
         }
       }
     },
@@ -4143,39 +5995,11 @@
             "state" : "translated",
             "value" : "写真へのアクセスが必要です"
           }
-        }
-      }
-    },
-    "Sessions.Photos.ExportAll" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export All to Photos"
-          }
         },
-        "ja" : {
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべて写真に書き出す"
-          }
-        }
-      }
-    },
-    "Sessions.Photos.ExportAll.Confirm" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export all captured photos to Photos?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "撮影したすべての写真を写真に書き出しますか？"
+            "value" : "需要存取「照片」"
           }
         }
       }
@@ -4194,6 +6018,12 @@
             "state" : "translated",
             "value" : "写真に保存できませんでした。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法儲存到「照片」。"
+          }
         }
       }
     },
@@ -4211,6 +6041,12 @@
             "state" : "translated",
             "value" : "写真に保存"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存到「照片」"
+          }
         }
       }
     },
@@ -4227,6 +6063,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "写真に保存しました"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已儲存到「照片」"
           }
         }
       }
@@ -4257,6 +6099,12 @@
             "state" : "translated",
             "value" : "%lldプレー"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 次遊玩"
+          }
         }
       }
     },
@@ -4273,6 +6121,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレー数"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩次數"
           }
         }
       }
@@ -4291,6 +6145,12 @@
             "state" : "translated",
             "value" : "再開"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "繼續"
+          }
         }
       }
     },
@@ -4304,6 +6164,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "開始"
@@ -4325,6 +6191,12 @@
             "state" : "translated",
             "value" : "解析済み"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已分析"
+          }
         }
       }
     },
@@ -4338,6 +6210,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "失敗"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "失敗"
@@ -4359,6 +6237,12 @@
             "state" : "translated",
             "value" : "要確認"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需確認"
+          }
         }
       }
     },
@@ -4375,6 +6259,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "待機中"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等待中"
           }
         }
       }
@@ -4393,6 +6283,12 @@
             "state" : "translated",
             "value" : "解析中"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分析中"
+          }
         }
       }
     },
@@ -4409,6 +6305,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "不明な曲"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未知樂曲"
           }
         }
       }
@@ -4427,6 +6329,12 @@
             "state" : "translated",
             "value" : "プレー中にセッションを開始し、カメラでリザルト画面を撮影するとスコアを記録できます。スコアの読み取りには機械学習を使用しているため、結果を必ず確認してください。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩時開始一段遊玩記錄，再用相機拍攝結果畫面，即可記錄分數。由於分數是透過機器學習讀取的，請務必確認結果是否正確。"
+          }
         }
       }
     },
@@ -4443,6 +6351,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべて"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全部"
           }
         }
       }
@@ -4461,20 +6375,37 @@
             "state" : "translated",
             "value" : "キャンセル"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
         }
       }
     },
     "Shared.ClearCount" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CLEAR COUNT"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "CLEAR COUNT"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CLEAR COUNT"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Shared.Connecting" : {
       "extractionState" : "manual",
@@ -4489,6 +6420,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "接続中…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連線中…"
           }
         }
       }
@@ -4507,6 +6444,12 @@
             "state" : "translated",
             "value" : "続ける"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "繼續"
+          }
         }
       }
     },
@@ -4524,6 +6467,12 @@
             "state" : "translated",
             "value" : "日付"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日期"
+          }
         }
       }
     },
@@ -4540,6 +6489,12 @@
             "state" : "translated",
             "value" : "クリアマーク"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型"
+          }
         }
       }
     },
@@ -4555,6 +6510,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコアランク"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分數評價"
           }
         }
       }
@@ -4573,6 +6534,12 @@
             "state" : "translated",
             "value" : "削除"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除"
+          }
         }
       }
     },
@@ -4589,6 +6556,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "レベル"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等級"
           }
         }
       }
@@ -4607,6 +6580,12 @@
             "state" : "translated",
             "value" : "完了"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
         }
       }
     },
@@ -4623,6 +6602,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編集"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編輯"
           }
         }
       }
@@ -4641,6 +6626,12 @@
             "state" : "translated",
             "value" : "フィルター"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "篩選"
+          }
         }
       }
     },
@@ -4657,6 +6648,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "項目"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "個通關類型"
           }
         }
       }
@@ -4675,6 +6672,12 @@
             "state" : "translated",
             "value" : "項目"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "個難易度"
+          }
         }
       }
     },
@@ -4691,6 +6694,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "項目"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "個 DJ Level"
           }
         }
       }
@@ -4709,6 +6718,12 @@
             "state" : "translated",
             "value" : "項目"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "個難易度"
+          }
         }
       }
     },
@@ -4725,6 +6740,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "項目"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "個版本"
           }
         }
       }
@@ -4743,6 +6764,12 @@
             "state" : "translated",
             "value" : "フィルターを初期化"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重設篩選"
+          }
         }
       }
     },
@@ -4759,19 +6786,36 @@
             "state" : "translated",
             "value" : "クリアランプ"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型"
+          }
         }
       }
     },
     "Shared.IIDX.DJLevel" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJ LEVEL"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Shared.IIDX.Keys" : {
       "localizations" : {
@@ -4782,6 +6826,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "鍵盤"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "鍵盤"
@@ -4802,6 +6852,12 @@
             "state" : "translated",
             "value" : "データがありません"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有資料"
+          }
         }
       }
     },
@@ -4817,6 +6873,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "エントリーがありません"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有項目"
           }
         }
       }
@@ -4834,6 +6896,12 @@
             "state" : "translated",
             "value" : "ノーツレーダー"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面雷達"
+          }
         }
       }
     },
@@ -4849,6 +6917,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スクラッチ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刮盤"
           }
         }
       }
@@ -4866,6 +6940,12 @@
             "state" : "translated",
             "value" : "IIDXタワー"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDX Tower"
+          }
         }
       }
     },
@@ -4881,6 +6961,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "インポート"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入"
           }
         }
       }
@@ -4899,68 +6985,129 @@
             "state" : "translated",
             "value" : "難易度"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "難易度"
+          }
         }
       }
     },
     "Shared.Level.Another" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ANOTHER"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "ANOTHER"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ANOTHER"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Shared.Level.Beginner" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEGINNER"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "BEGINNER"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEGINNER"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Shared.Level.Hyper" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HYPER"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "HYPER"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HYPER"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Shared.Level.Leggendaria" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEGGENDARIA"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "LEGGENDARIA"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEGGENDARIA"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Shared.Level.Normal" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NORMAL"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "NORMAL"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NORMAL"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Shared.Loading" : {
       "extractionState" : "manual",
@@ -4975,6 +7122,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "読み込み中…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "載入中…"
           }
         }
       }
@@ -4993,6 +7146,12 @@
             "state" : "translated",
             "value" : "該当するデータはありません。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到符合的資料。"
+          }
         }
       }
     },
@@ -5010,6 +7169,12 @@
             "state" : "translated",
             "value" : "未実装の機能です。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此功能尚未實作。"
+          }
         }
       }
     },
@@ -5023,6 +7188,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -5043,20 +7214,37 @@
             "state" : "translated",
             "value" : "Safariで開く"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 Safari 中開啟"
+          }
         }
       }
     },
     "Shared.PlayType" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play Type"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PLAY TYPE"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play Type"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Shared.PolarisChord.ClearType" : {
       "localizations" : {
@@ -5070,6 +7258,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリアランク"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型"
           }
         }
       }
@@ -5087,6 +7281,12 @@
             "state" : "translated",
             "value" : "達成度ランク"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "評價"
+          }
         }
       }
     },
@@ -5100,6 +7300,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PA CLASS"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PA CLASS"
@@ -5121,6 +7327,12 @@
             "state" : "translated",
             "value" : "PA SKILL"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PA SKILL"
+          }
         }
       }
     },
@@ -5137,6 +7349,12 @@
             "state" : "translated",
             "value" : "リロード"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新載入"
+          }
         }
       }
     },
@@ -5152,6 +7370,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコア"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分數"
           }
         }
       }
@@ -5170,6 +7394,12 @@
             "state" : "translated",
             "value" : "スコアレート"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分數比率"
+          }
         }
       }
     },
@@ -5185,6 +7415,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリアランク"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型"
           }
         }
       }
@@ -5202,6 +7438,12 @@
             "state" : "translated",
             "value" : "スコアグレード"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分數評價"
+          }
         }
       }
     },
@@ -5218,6 +7460,12 @@
             "state" : "translated",
             "value" : "日付を選択"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇日期"
+          }
         }
       }
     },
@@ -5233,6 +7481,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "遡る"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回顧過往資料"
           }
         }
       }
@@ -5262,6 +7516,12 @@
             "state" : "translated",
             "value" : "%lld曲（SP/DP合計）"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 首（SP/DP 合計）"
+          }
         }
       }
     },
@@ -5278,6 +7538,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "並べ替え"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排序"
           }
         }
       }
@@ -5296,6 +7562,12 @@
             "state" : "translated",
             "value" : "昇順"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遞增"
+          }
         }
       }
     },
@@ -5312,6 +7584,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "降順"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遞減"
           }
         }
       }
@@ -5330,6 +7608,12 @@
             "state" : "translated",
             "value" : "レベル"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等級"
+          }
         }
       }
     },
@@ -5346,6 +7630,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最終プレー日時"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後遊玩日期"
           }
         }
       }
@@ -5364,6 +7654,12 @@
             "state" : "translated",
             "value" : "ミスカウント"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "失誤數"
+          }
         }
       }
     },
@@ -5381,6 +7677,12 @@
             "state" : "translated",
             "value" : "並べ替え順序"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排序順序"
+          }
         }
       }
     },
@@ -5394,6 +7696,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "達成率"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "達成率"
@@ -5415,6 +7723,12 @@
             "state" : "translated",
             "value" : "スコア"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分數"
+          }
         }
       }
     },
@@ -5431,6 +7745,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スコアレート"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分數比率"
           }
         }
       }
@@ -5449,6 +7769,12 @@
             "state" : "translated",
             "value" : "タイトル"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標題"
+          }
         }
       }
     },
@@ -5465,6 +7791,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バージョン"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "版本"
           }
         }
       }
@@ -5483,6 +7815,12 @@
             "state" : "translated",
             "value" : "アナリティクス"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分析"
+          }
         }
       }
     },
@@ -5499,6 +7837,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "インポート"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入"
           }
         }
       }
@@ -5517,6 +7861,12 @@
             "state" : "translated",
             "value" : "マイ弐寺"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我的 IIDX"
+          }
         }
       }
     },
@@ -5534,6 +7884,12 @@
             "state" : "translated",
             "value" : "プレーデータ"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩資料"
+          }
         }
       }
     },
@@ -5549,6 +7905,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面が開きませんか？\nお手数ですが、Textageで手動で検索してみてください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面無法開啟嗎？\n麻煩你前往 Textage 手動搜尋看看。"
           }
         }
       }
@@ -5567,6 +7929,12 @@
             "state" : "translated",
             "value" : "「外部データソース」から、ノーツ数やノーツレーダーなどの追加データを有効化できます。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你可以從「外部資料來源」啟用音符數、譜面雷達等額外資料。"
+          }
         }
       }
     },
@@ -5583,6 +7951,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "外部データソース"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外部資料來源"
           }
         }
       }
@@ -5601,6 +7975,12 @@
             "state" : "translated",
             "value" : "新しいプレーデータをインポートするには、こちらのボタンを押してください。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若要匯入新的遊玩資料，請輕點此按鈕。"
+          }
         }
       }
     },
@@ -5617,6 +7997,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "インポートはこちら"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入功能已移至此處"
           }
         }
       }
@@ -5635,6 +8021,12 @@
             "state" : "translated",
             "value" : "BEMANIWiki 2ndのデータをダウンロードすると、スコアレートや譜面の追加情報が見えるようになります。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下載 BEMANIWiki 2nd 資料後，你就能查看分數率與譜面的額外資訊。"
+          }
         }
       }
     },
@@ -5652,6 +8044,12 @@
             "state" : "translated",
             "value" : "BEMANIWiki 2ndのデータをダウンロードしましょう"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下載 BEMANIWiki 2nd 資料"
+          }
         }
       }
     },
@@ -5667,6 +8065,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "公式ウェブサイトからデータをインポートするには、こちらにタッチしてください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若要從官方網站匯入資料，請輕點此處。"
           }
         }
       }
@@ -5684,6 +8088,12 @@
             "state" : "translated",
             "value" : "ここから始めましょう"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從這裡開始"
+          }
         }
       }
     },
@@ -5699,6 +8109,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "マイアクティビティ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我的活動"
           }
         }
       }
@@ -5716,6 +8132,12 @@
             "state" : "translated",
             "value" : "プレー日"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩日期"
+          }
         }
       }
     },
@@ -5732,6 +8154,12 @@
             "state" : "translated",
             "value" : "タワーの高さ"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高塔高度"
+          }
         }
       }
     },
@@ -5744,6 +8172,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldm"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lldm"
@@ -5764,6 +8198,12 @@
             "state" : "translated",
             "value" : "鍵盤タワー"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "鍵盤 Tower"
+          }
         }
       }
     },
@@ -5780,6 +8220,12 @@
             "state" : "translated",
             "value" : "スクラッチタワー"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刮盤 Tower"
+          }
         }
       }
     },
@@ -5795,6 +8241,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "タイプ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "類型"
           }
         }
       }
@@ -5813,6 +8265,12 @@
             "state" : "translated",
             "value" : "選択されたバージョンのIIDXタワーはご利用いただけません。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選的 IIDX 版本目前無法使用 IIDX Tower。"
+          }
         }
       }
     },
@@ -5829,6 +8287,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "IIDXタワーはご利用いただけません"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法使用 IIDX Tower"
           }
         }
       }
@@ -5850,6 +8314,12 @@
             "state" : "translated",
             "value" : "マイアクティビティ"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我的活動"
+          }
         }
       }
     },
@@ -5866,6 +8336,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレー分析"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩分析"
           }
         }
       }
@@ -5884,6 +8360,12 @@
             "state" : "translated",
             "value" : "インポート履歴"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入記錄"
+          }
         }
       }
     },
@@ -5900,6 +8382,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CSVインポート"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CSV 匯入"
           }
         }
       }
@@ -5918,6 +8406,12 @@
             "state" : "translated",
             "value" : "Webインポート"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "網站匯入"
+          }
         }
       }
     },
@@ -5935,6 +8429,12 @@
             "state" : "translated",
             "value" : "モード"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模式"
+          }
         }
       }
     },
@@ -5948,6 +8448,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEMANIWiki 2nd"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "BEMANIWiki 2nd"
@@ -5969,6 +8475,12 @@
             "state" : "translated",
             "value" : "bm2dx.com"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bm2dx.com"
+          }
         }
       }
     },
@@ -5986,6 +8498,12 @@
             "state" : "translated",
             "value" : "プレーデータ"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩資料"
+          }
         }
       }
     },
@@ -6002,6 +8520,12 @@
             "state" : "translated",
             "value" : "スコアデータ"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "成績資料"
+          }
         }
       }
     },
@@ -6014,6 +8538,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面"
@@ -6035,6 +8565,12 @@
             "state" : "translated",
             "value" : "セッション"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊玩記錄"
+          }
         }
       }
     },
@@ -6052,6 +8588,12 @@
             "state" : "translated",
             "value" : "セッション（ベータ）"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "場次（Beta）"
+          }
         }
       }
     },
@@ -6067,6 +8609,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Textage譜面"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TEXTAGE 譜面"
           }
         }
       }
@@ -6084,6 +8632,12 @@
             "state" : "translated",
             "value" : "最新データ（棒グラフ）"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新資料（長條圖）"
+          }
         }
       }
     },
@@ -6099,6 +8653,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最新データ（円グラフ）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新資料（圓餅圖）"
           }
         }
       }
@@ -6116,6 +8676,12 @@
             "state" : "translated",
             "value" : "推移"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "趨勢"
+          }
         }
       }
     },
@@ -6131,6 +8697,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表示"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示"
           }
         }
       }
@@ -6148,6 +8720,12 @@
             "state" : "translated",
             "value" : "クリアタイプの分布を表示します"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示你的通關類型分布"
+          }
         }
       }
     },
@@ -6163,6 +8741,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJレベルの分布を表示します"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示你的 DJ Level 分布"
           }
         }
       }
@@ -6180,6 +8764,12 @@
             "state" : "translated",
             "value" : "レベル"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等級"
+          }
         }
       }
     },
@@ -6195,6 +8785,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "レベル"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等級"
           }
         }
       }
@@ -6212,19 +8808,36 @@
             "state" : "translated",
             "value" : "クリアランプ（IIDX）"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型（IIDX）"
+          }
         }
       }
     },
     "Widget.Name.DJLevel" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL（IIDX）"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "DJ LEVEL（IIDX）"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJ LEVEL（IIDX）"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Widget.Name.NotesRadar" : {
       "localizations" : {
@@ -6238,6 +8851,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ノーツレーダー（IIDX）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面雷達（IIDX）"
           }
         }
       }
@@ -6255,6 +8874,12 @@
             "state" : "translated",
             "value" : "クプロ（IIDX）"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qpro（IIDX）"
+          }
         }
       }
     },
@@ -6270,6 +8895,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッションを開始"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始遊玩"
           }
         }
       }
@@ -6287,6 +8918,12 @@
             "state" : "translated",
             "value" : "IIDXタワー"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IIDX Tower"
+          }
         }
       }
     },
@@ -6302,6 +8939,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ノーツレーダーを表示します"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示你的譜面雷達"
           }
         }
       }
@@ -6319,6 +8962,12 @@
             "state" : "translated",
             "value" : "数値を表示"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示數值"
+          }
         }
       }
     },
@@ -6334,6 +8983,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クプロを表示します"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示你的 Qpro"
           }
         }
       }
@@ -6351,6 +9006,12 @@
             "state" : "translated",
             "value" : "アプリを開いてクプロを読み込んでください"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請開啟 App 以載入 Qpro"
+          }
         }
       }
     },
@@ -6366,6 +9027,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッションを開始"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始遊玩"
           }
         }
       }
@@ -6383,6 +9050,12 @@
             "state" : "translated",
             "value" : "プレーセッションをすぐに開始します。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快速開始一段遊玩記錄。"
+          }
         }
       }
     },
@@ -6399,6 +9072,12 @@
             "state" : "translated",
             "value" : "IIDXタワーの進捗を表示します"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示你的 IIDX Tower 進度"
+          }
         }
       }
     },
@@ -6406,5 +9085,5 @@
       "shouldTranslate" : false
     }
   },
-  "version" : "1.0"
+  "version" : "1.3"
 }

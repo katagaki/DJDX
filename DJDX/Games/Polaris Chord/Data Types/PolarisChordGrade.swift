@@ -27,9 +27,6 @@ enum PolarisChordGrade: String, Codable {
         sorted.map { $0.rawValue }
     }
 
-    // Text styling for the grade label.
-    // SSS tier: horizontal cyan → pastel yellow → pink gradient.
-    // SS / S: gold. AAA and below: light blue (matching IIDX).
     func style(colorScheme: ColorScheme) -> any ShapeStyle {
         switch self {
         case .sssPlusPlus, .sssPlus, .sss:
@@ -62,8 +59,7 @@ enum PolarisChordGrade: String, Codable {
         }
     }
 
-    // Derived from achievement_rate (integer hundredths) using the site's own
-    // thresholds; SSS++ requires a perfect 100.00%.
+    // swiftlint:disable:next cyclomatic_complexity
     init(achievementRate: Int) {
         switch achievementRate {
         case 10000...: self = .sssPlusPlus

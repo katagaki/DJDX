@@ -212,10 +212,6 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
                     self.hasStartedExtraction = true
                     self.startExtractionWatchdog()
                 }
-                // Login redirects straight to the styled URL (?style=SP|DP|tower),
-                // which renders the CSV into <textarea id="score_data">; read it
-                // directly. Fall back to a styled navigation if we ever land on
-                // the base page without a style.
                 if urlString.contains("style=") {
                     self.handleStyledPageLoaded(webView, urlString: urlString)
                 } else {
@@ -253,8 +249,6 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         ) { result in
             let value = (try? result.get()) as? String
             if isTowerStyle {
-                // Tower phase (either a tower-only import or the chained tower
-                // fetch after SP/DP). Import tower data if present, then resolve.
                 if let towerCSV = value, !towerCSV.isEmpty, !towerCSV.hasPrefix("ERR:") {
                     Task {
                         await self.delegate.importTowerData(using: towerCSV)

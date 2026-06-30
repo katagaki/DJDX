@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct MoreICloudBackup: View {
 
@@ -11,11 +12,14 @@ struct MoreICloudBackup: View {
 
     @State var isBackingUp: Bool = false
     @State var isBackupFailed: Bool = false
+    @State var backupFailureDetail: String = ""
 
     var body: some View {
         List {
             Section {
                 Toggle("ICloudBackup.Enable", systemImage: "icloud", isOn: $isBackupEnabled)
+            } header: {
+                Text("More.ManageData.ICloudBackup")
             } footer: {
                 Text("ICloudBackup.Description")
             }
@@ -42,8 +46,15 @@ struct MoreICloudBackup: View {
                     .disabled(isBackingUp)
                 }
             }
+            Section {
+                ShareLink(item: BackupExport(), preview: SharePreview("Backup.Title")) {
+                    Label("Backup.Export", systemImage: "square.and.arrow.up")
+                }
+            } footer: {
+                Text("Backup.Export.Footer")
+            }
         }
-        .navigationTitle("ICloudBackup.Title")
+        .navigationTitle("Backup.Title")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -68,6 +79,7 @@ struct MoreICloudBackup: View {
             if newValue {
                 hasCompletedRestorePrompt = true
                 ICloudBackupManager.scheduleNextBackup()
+                backUpNow()
             } else {
                 ICloudBackupManager.cancelScheduledBackup()
             }
@@ -78,17 +90,31 @@ struct MoreICloudBackup: View {
             }
         } message: {
             Text("Alert.ICloudBackup.Failed.Subtitle")
+            + Text(verbatim: "\n\n")
+            + Text(verbatim: backupFailureDetail)
         }
     }
 
     func backUpNow() {
         isBackingUp = true
         Task {
-            let isSuccessful = await ICloudBackupManager.performBackup()
+            let failureDetail = await ICloudBackupManager.performBackup()
             isBackingUp = false
-            if !isSuccessful {
+            if let failureDetail {
+                backupFailureDetail = failureDetail
                 isBackupFailed = true
             }
+        }
+    }
+}
+
+struct BackupExport: Transferable {
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(exportedContentType: .zip) { _ in
+            guard let url = await ICloudBackupManager.exportArchive() else {
+                throw CocoaError(.fileWriteUnknown)
+            }
+            return SentTransferredFile(url)
         }
     }
 }

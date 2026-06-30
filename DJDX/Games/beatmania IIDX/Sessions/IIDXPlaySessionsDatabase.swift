@@ -59,11 +59,15 @@ final class IIDXPlaySessionsDatabase: Sendable {
     }
 
     func getReadConnection() throws -> Connection {
-        try Connection(databasePath, readonly: true)
+        let connection = try Connection(databasePath, readonly: true)
+        connection.busyTimeout = 5.0
+        return connection
     }
 
     func getWriteConnection() throws -> Connection {
-        try Connection(databasePath)
+        let connection = try Connection(databasePath)
+        connection.busyTimeout = 5.0
+        return connection
     }
 
     // swiftlint:disable:next function_body_length
@@ -155,11 +159,17 @@ final class IIDXPlaySessionsDatabase: Sendable {
         ))
     }
 
-    func endSession(id: String, endDate: Date = .now) {
-        guard let database = try? getWriteConnection() else { return }
-        try? database.run(Self.sessionTable.filter(Self.sID == id).update(
-            Self.sEndDate <- endDate.timeIntervalSince1970
-        ))
+    @discardableResult
+    func endSession(id: String, endDate: Date = .now) -> Bool {
+        guard let database = try? getWriteConnection() else { return false }
+        do {
+            try database.run(Self.sessionTable.filter(Self.sID == id).update(
+                Self.sEndDate <- endDate.timeIntervalSince1970
+            ))
+            return true
+        } catch {
+            return false
+        }
     }
 
     func deleteSession(id: String) {

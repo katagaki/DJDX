@@ -25,13 +25,15 @@ final class IIDXSessionLiveActivityController {
             gameIconAssetName: "GameIconIIDX"
         )
         let content = ActivityContent(state: contentState(for: session.id), staleDate: nil)
-        activity = try? Activity.request(attributes: attributes, content: content)
+        guard let activity = try? Activity.request(attributes: attributes, content: content) else {
+            self.activity = nil
+            sessionID = nil
+            return
+        }
+        self.activity = activity
         sessionID = session.id
     }
 
-    // Cold-launch recovery: if a session is still active, adopt a Live Activity
-    // that the system kept alive, or start a fresh one if it was removed (e.g.
-    // force quit). Any activity for an already-ended session is cleaned up.
     func reconcile() {
         let activeSession = database.activeSession()
         var adopted: Activity<SessionActivityAttributes>?
@@ -82,8 +84,7 @@ final class IIDXSessionLiveActivityController {
             lastDJLevel: state.lastDJLevel,
             lastClearType: state.lastClearType,
             lastScore: state.lastScore,
-            lastResultSummary: state.lastResultSummary,
-            bestThisSession: state.bestThisSession
+            lastResultSummary: state.lastResultSummary
         )
     }
 

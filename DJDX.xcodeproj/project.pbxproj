@@ -360,6 +360,7 @@
 				Base,
 				ja,
 				en,
+				"zh-Hant",
 			);
 			mainGroup = E4B123A32BF8E8E400D4A3D1;
 			packageReferences = (
@@ -858,7 +859,7 @@
 					"@executable_path/../../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 33.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tsubuzaki.DJDX.watchkitapp.DJDX-CHARGE-Widgets";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -891,7 +892,7 @@
 					"@executable_path/../../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 33.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tsubuzaki.DJDX.watchkitapp.DJDX-CHARGE-Widgets";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;

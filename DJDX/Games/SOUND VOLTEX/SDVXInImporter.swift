@@ -3,6 +3,7 @@ import SQLite
 
 actor SDVXInImporter {
 
+    // swiftlint:disable:next type_name
     typealias DB = SDVXInDatabase
 
     func replaceAllCharts(_ charts: [SDVXInChart]) {

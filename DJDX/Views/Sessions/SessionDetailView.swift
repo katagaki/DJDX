@@ -1,19 +1,26 @@
 import SwiftUI
+import UIKit
 
+// swiftlint:disable:next type_body_length
 struct SessionDetailView: View {
     var store: IIDXSessionStore
     var session: IIDXPlaySession
 
     @State private var plays: [IIDXCapturedPlay] = []
     @State private var isSummaryExpanded: Bool = true
+    @State private var isHeartRateExpanded: Bool = true
     @State private var isDJLevelExpanded: Bool = true
     @State private var isClearTypeExpanded: Bool = true
     @State private var isPlaysExpanded: Bool = true
+    @State private var isConfirmingExport: Bool = false
+    @State private var fileExport: SessionFileExportRequest?
+    @State private var photoAlert: PhotoExportAlert?
 
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 20.0) {
                 summarySection
+                heartRateSection
                 breakdownSection(
                     title: "Sessions.Detail.DJLevelBreakdown",
                     isExpanded: $isDJLevelExpanded,
@@ -37,13 +44,84 @@ struct SessionDetailView: View {
             )
             .ignoresSafeArea()
         }
-        .navigationTitle("Sessions.Detail.Title")
+        .navigationTitle(Text(session.startDate, format: .dateTime.year().month().day()))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if !plays.isEmpty {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Sessions.Export.All", systemImage: "square.and.arrow.up.on.square") {
+                        isConfirmingExport = true
+                    }
+                    .confirmationDialog(
+                        "Sessions.Export.All.Confirm",
+                        isPresented: $isConfirmingExport,
+                        titleVisibility: .visible
+                    ) {
+                        Button("Sessions.Photos.Save") {
+                            exportAllToPhotos()
+                        }
+                        Button("Sessions.Files.Save") {
+                            exportAllToFiles()
+                        }
+                        Button("Shared.Cancel", role: .cancel) {}
+                    }
+                }
+            }
+        }
         .onAppear { plays = store.plays(for: session) }
         .onReceive(NotificationCenter.default.publisher(for: .capturedPlayDidChange)
             .receive(on: RunLoop.main)) { _ in
             plays = store.plays(for: session)
         }
+        .sheet(item: $fileExport) { request in
+            SessionDocumentExporter(urls: request.urls) {
+                fileExport = nil
+            }
+            .ignoresSafeArea()
+        }
+        .alert(item: $photoAlert) { alert in
+            switch alert {
+            case .saved:
+                return Alert(title: Text("Sessions.Photos.Saved"), dismissButton: .default(Text("Shared.OK")))
+            case .failed:
+                return Alert(title: Text("Sessions.Photos.Failed"), dismissButton: .default(Text("Shared.OK")))
+            case .denied:
+                return Alert(
+                    title: Text("Sessions.Photos.Denied.Title"),
+                    message: Text("Sessions.Photos.Denied.Message"),
+                    dismissButton: .default(Text("Shared.OK"))
+                )
+            }
+        }
+    }
+
+    private func exportAllToPhotos() {
+        let filenames = plays.map(\.rawImageFilename)
+        Task {
+            let images: [UIImage] = await Task.detached {
+                filenames.compactMap { IIDXSessionImageStore.shared.image(for: $0) }
+            }.value
+            switch await SessionPhotoExporter.save(images) {
+            case .saved: photoAlert = .saved
+            case .denied: photoAlert = .denied
+            case .failed: photoAlert = .failed
+            }
+        }
+    }
+
+    private func exportAllToFiles() {
+        let filenames = plays.map(\.rawImageFilename)
+        let urls = SessionFileExporter.exportURLs(for: filenames, date: session.startDate)
+        guard !urls.isEmpty else {
+            photoAlert = .failed
+            return
+        }
+        fileExport = SessionFileExportRequest(urls: urls)
+    }
+
+    private enum PhotoExportAlert: Int, Identifiable {
+        case saved, denied, failed
+        var id: Int { rawValue }
     }
 
     private var summarySection: some View {
@@ -64,13 +142,43 @@ struct SessionDetailView: View {
                     summaryRow("Sessions.Elapsed") {
                         Text(verbatim: durationText)
                     }
-                    Divider()
-                    summaryRow("Sessions.Plays") {
-                        Text(verbatim: "\(plays.count)")
-                    }
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var heartRateSection: some View {
+        let points = heartRatePoints
+        if !points.isEmpty {
+            VStack(spacing: 12.0) {
+                AnalyticsSectionHeader(
+                    title: "Sessions.Detail.HeartRate",
+                    isCollapsible: true,
+                    isExpanded: isHeartRateExpanded
+                ) {
+                    withAnimation(.smooth.speed(2.0)) { isHeartRateExpanded.toggle() }
+                }
+                if isHeartRateExpanded {
+                    NavigationLink {
+                        SessionHeartRateDetailView(session: session, plays: plays)
+                    } label: {
+                        SessionHeartRateGraph(session: session, points: points)
+                            .padding(.horizontal)
+                            .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private var heartRatePoints: [SessionHeartRatePoint] {
+        plays.compactMap { play in
+            guard let min = play.minHeartRate, let max = play.maxHeartRate else { return nil }
+            return SessionHeartRatePoint(id: play.id, date: play.captureDate, min: min, max: max)
+        }
+        .sorted { $0.date < $1.date }
     }
 
     private var playsSection: some View {
@@ -235,14 +343,14 @@ private struct CapturedPlayDestination: View {
 
     var body: some View {
         Group {
-            if showsScore ?? play.isReviewed {
+            if showsScore ?? play.hasConfidentResult {
                 CapturedPlayScoreView(store: store, play: play)
             } else {
                 CapturedPlayDetailView(store: store, play: play)
             }
         }
         .onAppear {
-            if showsScore == nil { showsScore = play.isReviewed }
+            if showsScore == nil { showsScore = play.hasConfidentResult }
         }
     }
 }

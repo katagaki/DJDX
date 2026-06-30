@@ -64,16 +64,6 @@ struct WorkoutView: View {
                     )
                 }
 
-                if let best = workoutManager.bestThisSession {
-                    HStack(spacing: 4.0) {
-                        Image(systemName: "trophy.fill").foregroundStyle(.yellow)
-                        Text("Watch.Session.Best")
-                            .foregroundStyle(.secondary)
-                        Text(verbatim: best).fontWeight(.semibold)
-                    }
-                    .font(.caption2)
-                }
-
                 if workoutManager.isCollecting {
                     pauseButton
                         .padding(.top, 6.0)

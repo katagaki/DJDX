@@ -45,8 +45,6 @@ struct AnalyticsView: View {
     // Width of the layout container, measured rather than read from UIScreen.
     @State var containerWidth: CGFloat = 0.0
 
-    // On iPad (regular width) we have room for a wider layout: 4-column grids
-    // and a denser Last Play carousel.
     var isRegularWidth: Bool { horizontalSizeClass == .regular }
 
     // Overview grid: 4 columns on iPad, 2 on iPhone.
@@ -89,6 +87,7 @@ struct AnalyticsView: View {
     }
 
     @ViewBuilder
+    // swiftlint:disable:next function_body_length
     func overviewCard(for cardType: AnalyticsCardType) -> some View {
         switch cardType {
         case .clearTypeOverall:
@@ -197,8 +196,6 @@ struct AnalyticsView: View {
     }
 
     var body: some View {
-        // Inter-section gap is carried by this VStack's spacing; each section's
-        // own VStack carries the smaller header-to-content gap.
         VStack(spacing: 20.0) {
                 // MARK: Overview section
                 let overviewCards = cardOrder.filter {

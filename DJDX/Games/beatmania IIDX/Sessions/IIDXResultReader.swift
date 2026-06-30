@@ -8,6 +8,7 @@ struct DetectedRegion: Sendable {
     let text: String
     let box: CGRect
     let confidence: Float
+    var recognitionFailed: Bool = false
 }
 
 enum IIDXResultReaderError: Error {
@@ -21,26 +22,19 @@ private struct RawDetection: Sendable {
     let box: CGRect
 }
 
-// The IIDXResultDetector Core ML model is an object detector: every class is a
-// region on the result screen (song_title, score_now, dj_level_now, ...), not a
-// value. Vision localizes each region, then per-region OCR reads the text.
 enum IIDXResultReader {
 
     static let maxDimension: CGFloat = 2048.0
 
     private static let titleLabels: Set<String> = ["song_title", "song_artist"]
 
-    // Pure-number fields routed to the digit model when it is available; the rest
-    // (clear_type, difficulty_label, stage_label, dj_level) stay on Vision OCR.
-    private static let digitLabels: Set<String> = [
+    static let digitLabels: Set<String> = [
         "score_now", "score_prev", "score_delta",
         "miss_count_now", "miss_count_prev", "miss_count_delta",
         "judge_pgreat", "judge_great", "judge_good", "judge_bad", "judge_poor",
         "notes_count", "combo_break"
     ]
 
-    // Index order matches the model's "classes" metadata; used to recover a class
-    // name when Vision reports a label as its numeric index rather than its name.
     private static let classNames = [
         "dj_level_now", "dj_level_prev", "clear_type_now", "clear_type_prev",
         "score_now", "score_prev", "score_delta", "miss_count_now", "miss_count_prev",
@@ -63,38 +57,69 @@ enum IIDXResultReader {
         return try? VNCoreMLModel(for: detector.model)
     }()
 
+    static func prewarm() async {
+        guard let image = warmupImage() else { return }
+        _ = try? await detect(cgImage: image)
+        _ = await IIDXDigitRecognizer.recognize(cgImage: image)
+        _ = await IIDXRankRecognizer.classify(cgImage: image)
+        _ = try? await IIDXSessionTextRecognizer.recognize(
+            cgImage: image, languages: IIDXSessionTextRecognizer.numericLanguages
+        )
+    }
+
+    private static func warmupImage() -> CGImage? {
+        let dimension = 64
+        guard let context = CGContext(
+            data: nil,
+            width: dimension,
+            height: dimension,
+            bitsPerComponent: 8,
+            bytesPerRow: dimension * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return nil }
+        context.setFillColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+        context.fill(CGRect(x: 0, y: 0, width: dimension, height: dimension))
+        return context.makeImage()
+    }
+
     static func detect(imageData: Data) async throws -> [DetectedRegion] {
-        guard let vnModel else { throw IIDXResultReaderError.modelUnavailable }
         guard let image = uprightCGImage(from: imageData, maxDimension: maxDimension) else {
             throw IIDXResultReaderError.invalidImage
         }
+        return try await detect(cgImage: image)
+    }
+
+    static func detect(cgImage image: CGImage) async throws -> [DetectedRegion] {
+        guard let vnModel else { throw IIDXResultReaderError.modelUnavailable }
 
         let detections = bestPerLabel(try await runDetection(vnModel: vnModel, image: image))
 
         var regions: [DetectedRegion] = []
         for detection in detections {
-            let text = await read(detection, in: image)
+            let (text, failed) = await read(detection, in: image)
             regions.append(DetectedRegion(
                 label: detection.label,
                 text: text,
                 box: detection.box,
-                confidence: detection.confidence
+                confidence: detection.confidence,
+                recognitionFailed: failed
             ))
         }
         return regions
     }
 
-    private static func read(_ detection: RawDetection, in image: CGImage) async -> String {
-        guard let crop = crop(detection.box, from: image) else { return "" }
+    private static func read(_ detection: RawDetection, in image: CGImage) async -> (text: String, failed: Bool) {
+        guard let crop = crop(detection.box, from: image) else { return ("", false) }
         if detection.label == "dj_level_now" {
-            return await IIDXRankRecognizer.classify(cgImage: crop) ?? ""
+            return (await IIDXRankRecognizer.classify(cgImage: crop) ?? "", false)
         }
         if titleLabels.contains(detection.label) {
             return await ocrText(crop, languages: IIDXSessionTextRecognizer.titleLanguages)
         }
         if digitLabels.contains(detection.label),
            let value = await IIDXDigitRecognizer.recognize(cgImage: crop) {
-            return String(value)
+            return (String(value), false)
         }
         return await ocrText(crop, languages: IIDXSessionTextRecognizer.numericLanguages)
     }
@@ -143,15 +168,19 @@ enum IIDXResultReader {
 
     // MARK: - Per-region OCR
 
-    private static func ocrText(_ crop: CGImage, languages: [String]) async -> String {
-        let lines = (try? await IIDXSessionTextRecognizer.recognize(cgImage: crop, languages: languages)) ?? []
-        // Headline value first: a field's own value is rendered larger than any
-        // neighbouring delta/column that bleeds into the crop.
-        return lines
+    private static func ocrText(_ crop: CGImage, languages: [String]) async -> (text: String, failed: Bool) {
+        let lines: [OCRLine]
+        do {
+            lines = try await IIDXSessionTextRecognizer.recognize(cgImage: crop, languages: languages)
+        } catch {
+            return ("", true)
+        }
+        let text = lines
             .sorted { $0.box.height > $1.box.height }
             .map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
             .joined(separator: "\n")
+        return (text, false)
     }
 
     private static func crop(_ box: CGRect, from image: CGImage) -> CGImage? {

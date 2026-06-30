@@ -1,10 +1,9 @@
 import SwiftUI
 
+// swiftlint:disable:next type_body_length
 struct CapturedPlayDetailView: View {
     var store: IIDXSessionStore
     var play: IIDXCapturedPlay
-
-    @Environment(\.dismiss) private var dismiss
 
     @State private var songTitle: String = ""
     @State private var level: IIDXLevel = .unknown
@@ -24,109 +23,30 @@ struct CapturedPlayDetailView: View {
     @State private var songSuggestions: [IIDXSong] = []
     @State private var searchTask: Task<Void, Never>?
     @State private var capturedImage: UIImage?
-    @State private var photoAlert: PhotoAlert?
+    @State private var isReanalyzing: Bool = false
+    @State private var needsReview: Bool = false
     @FocusState private var songFieldFocused: Bool
 
     private let reader = IIDXReader()
 
     var body: some View {
-        Form {
-            Section {
-                if let image = capturedImage {
-                    RecognizedTextImage(image: image)
-                        .frame(maxWidth: .infinity)
-                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                        .listRowInsets(EdgeInsets())
-                }
-            }
-
-            Section("Sessions.Detail.Chart") {
-                TextField("Sessions.Detail.Song", text: $songTitle)
-                    .focused($songFieldFocused)
-                if songFieldFocused {
-                    ForEach(songSuggestions, id: \.title) { song in
-                        Button {
-                            songTitle = song.title
-                            songSuggestions = []
-                            songFieldFocused = false
-                        } label: {
-                            Label(song.title, systemImage: "music.note")
-                                .foregroundStyle(.primary)
-                                .lineLimit(1)
-                        }
-                    }
-                }
-                Picker("Shared.Level", selection: $level) {
-                    ForEach(IIDXLevel.sorted, id: \.self) { value in
-                        Text(verbatim: levelName(value)).tag(value)
-                    }
-                }
-                Picker("Shared.Difficulty", selection: $difficulty) {
-                    Text(verbatim: "—").tag(0)
-                    ForEach(IIDXDifficulty.sortedInts, id: \.self) { value in
-                        Text(verbatim: "\(value)").tag(value)
-                    }
-                }
-                Picker("Shared.PlayType", selection: $playType) {
-                    Text(verbatim: "SP").tag(IIDXPlayType.single)
-                    Text(verbatim: "DP").tag(IIDXPlayType.double)
-                }
-            }
-
-            Section("Sessions.Detail.Result") {
-                Picker("Sessions.Detail.ClearType", selection: $clearType) {
-                    ForEach(IIDXClearType.sorted, id: \.self) { value in
-                        Text(verbatim: value.rawValue).tag(value)
-                    }
-                }
-                Picker("Sessions.Detail.DJLevel", selection: $djLevel) {
-                    ForEach(IIDXDJLevel.sorted.reversed(), id: \.self) { value in
-                        Text(verbatim: value.rawValue).tag(value)
-                    }
-                }
-                numberRow("Sessions.Detail.ExScore", value: $exScore)
-                numberRow("Sessions.Detail.PGreat", value: $perfectGreat)
-                numberRow("Sessions.Detail.Great", value: $great)
-                numberRow("Sessions.Detail.Good", value: $good)
-                numberRow("Sessions.Detail.Bad", value: $bad)
-                numberRow("Sessions.Detail.Poor", value: $poor)
-            }
-
-            Section {
-                Button("Sessions.Detail.Reprocess", systemImage: "arrow.clockwise") {
-                    store.reprocess(play)
-                    dismiss()
-                }
-                if let capturedImage {
-                    Button("Sessions.Photos.Save", systemImage: "square.and.arrow.down") {
-                        saveToPhotos(capturedImage)
-                    }
-                }
-            }
+        GeometryReader { proxy in
+            responsiveLayout(in: proxy)
+        }
+        .background {
+            LinearGradient(
+                colors: [.backgroundGradientTop, .backgroundGradientBottom],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
         }
         .navigationTitle("Sessions.Detail.Title")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            if let capturedImage {
-                ShareLink(
-                    item: Image(uiImage: capturedImage),
-                    preview: SharePreview("Sessions.Detail.Title", image: Image(uiImage: capturedImage))
-                )
-            }
-        }
-        .alert(item: $photoAlert) { alert in
-            switch alert {
-            case .saved:
-                return Alert(title: Text("Sessions.Photos.Saved"), dismissButton: .default(Text("Shared.OK")))
-            case .failed:
-                return Alert(title: Text("Sessions.Photos.Failed"), dismissButton: .default(Text("Shared.OK")))
-            case .denied:
-                return Alert(
-                    title: Text("Sessions.Photos.Denied.Title"),
-                    message: Text("Sessions.Photos.Denied.Message"),
-                    dismissButton: .default(Text("Shared.OK"))
-                )
-            }
+        .toolbar { editorToolbar }
+        .onReceive(NotificationCenter.default.publisher(for: .capturedPlayDidChange)
+            .receive(on: RunLoop.main)) { note in
+            reanalyzeDidUpdate(note.object as? String)
         }
         .onAppear(perform: loadFields)
         .task {
@@ -154,6 +74,181 @@ struct CapturedPlayDetailView: View {
                 searchTask?.cancel()
                 songSuggestions = []
             }
+        }
+    }
+
+    private var editorForm: some View {
+        Form {
+            Section("Sessions.Detail.Chart") {
+                marked(songNeedsAttention) {
+                    TextField("Sessions.Detail.Song", text: $songTitle)
+                        .focused($songFieldFocused)
+                }
+                if songFieldFocused {
+                    ForEach(songSuggestions, id: \.title) { song in
+                        Button {
+                            songTitle = song.title
+                            songSuggestions = []
+                            songFieldFocused = false
+                        } label: {
+                            Label(song.title, systemImage: "music.note")
+                                .foregroundStyle(.primary)
+                                .lineLimit(1)
+                        }
+                    }
+                }
+                marked(levelNeedsAttention) {
+                    Picker("Shared.Level", selection: $level) {
+                        ForEach(IIDXLevel.sorted, id: \.self) { value in
+                            Text(verbatim: levelName(value)).tag(value)
+                        }
+                    }
+                }
+                marked(difficultyNeedsAttention) {
+                    Picker("Shared.Difficulty", selection: $difficulty) {
+                        Text(verbatim: "---").tag(0)
+                        ForEach(IIDXDifficulty.sortedInts, id: \.self) { value in
+                            Text(verbatim: "\(value)").tag(value)
+                        }
+                    }
+                }
+                Picker("Shared.PlayType", selection: $playType) {
+                    Text(verbatim: "SP").tag(IIDXPlayType.single)
+                    Text(verbatim: "DP").tag(IIDXPlayType.double)
+                }
+            }
+
+            Section("Sessions.Detail.Result") {
+                marked(clearTypeNeedsAttention) {
+                    Picker("Sessions.Detail.ClearType", selection: $clearType) {
+                        ForEach(IIDXClearType.sorted, id: \.self) { value in
+                            Text(verbatim: value.rawValue).tag(value)
+                        }
+                    }
+                }
+                marked(djLevelNeedsAttention) {
+                    Picker("Sessions.Detail.DJLevel", selection: $djLevel) {
+                        ForEach(IIDXDJLevel.sorted.reversed(), id: \.self) { value in
+                            Text(verbatim: value.rawValue).tag(value)
+                        }
+                    }
+                }
+                marked(exScoreNeedsAttention) { numberRow("Sessions.Detail.ExScore", value: $exScore) }
+                marked(judgmentNeedsAttention) { numberRow("Sessions.Detail.PGreat", value: $perfectGreat) }
+                marked(judgmentNeedsAttention) { numberRow("Sessions.Detail.Great", value: $great) }
+                numberRow("Sessions.Detail.Good", value: $good)
+                numberRow("Sessions.Detail.Bad", value: $bad)
+                numberRow("Sessions.Detail.Poor", value: $poor)
+            }
+        }
+        .scrollContentBackground(.hidden)
+        .scrollDismissesKeyboard(.immediately)
+        .disabled(isReanalyzing)
+    }
+
+    @ToolbarContentBuilder
+    private var editorToolbar: some ToolbarContent {
+        if let capturedImage {
+            ToolbarItem(placement: .topBarTrailing) {
+                ShareLink(
+                    item: Image(uiImage: capturedImage),
+                    preview: SharePreview("Sessions.Detail.Title", image: Image(uiImage: capturedImage))
+                )
+            }
+        }
+        if #available(iOS 26.0, *) {
+            ToolbarItem(placement: .bottomBar) { reanalyzeButton }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) { acceptAllButton }
+        } else {
+            ToolbarItemGroup(placement: .bottomBar) {
+                reanalyzeButton
+                Spacer()
+                acceptAllButton
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var reanalyzeButton: some View {
+        Button(action: reanalyze) {
+            if isReanalyzing {
+                ProgressView()
+            } else {
+                Label("Sessions.Detail.Reprocess", systemImage: "arrow.clockwise")
+            }
+        }
+        .disabled(isReanalyzing)
+    }
+
+    private var acceptAllButton: some View {
+        Button(action: acceptAll) {
+            Label("Sessions.Detail.AcceptAll", systemImage: "checkmark")
+        }
+        .disabled(isReanalyzing || !needsReview)
+    }
+
+    private func marked<Content: View>(
+        _ needsAttention: Bool,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        HStack(spacing: 8.0) {
+            content()
+            if needsAttention {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundStyle(.orange)
+                    .accessibilityLabel(Text("Sessions.Detail.NeedsAttention"))
+            }
+        }
+    }
+
+    private var songNeedsAttention: Bool {
+        needsReview && songTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    private var levelNeedsAttention: Bool { needsReview && level == .unknown }
+    private var difficultyNeedsAttention: Bool { needsReview && difficulty <= 0 }
+    private var clearTypeNeedsAttention: Bool {
+        needsReview && (clearType == .noPlay || clearType == .unknown)
+    }
+    private var djLevelNeedsAttention: Bool { needsReview && djLevel == .none }
+    private var exScoreNeedsAttention: Bool { needsReview && exScore <= 0 }
+    private var judgmentNeedsAttention: Bool { needsReview && perfectGreat + great <= 0 }
+
+    @ViewBuilder
+    private func responsiveLayout(in proxy: GeometryProxy) -> some View {
+        if proxy.size.width > proxy.size.height {
+            HStack(spacing: 0.0) {
+                dockedImage(in: proxy, landscape: true)
+                editorForm
+            }
+        } else {
+            VStack(spacing: 0.0) {
+                dockedImage(in: proxy, landscape: false)
+                editorForm
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func dockedImage(in proxy: GeometryProxy, landscape: Bool) -> some View {
+        if let capturedImage {
+            if landscape {
+                DetectorOverlayImage(image: capturedImage, imageFilename: play.rawImageFilename)
+                    .frame(maxHeight: .infinity)
+                    .frame(width: min(
+                        proxy.size.height * capturedImage.size.width / capturedImage.size.height,
+                        proxy.size.width / 2.0
+                    ))
+            } else {
+                DetectorOverlayImage(image: capturedImage, imageFilename: play.rawImageFilename)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: min(
+                        proxy.size.width * capturedImage.size.height / capturedImage.size.width,
+                        proxy.size.height / 2.0
+                    ))
+            }
+            Divider()
+                .ignoresSafeArea()
         }
     }
 
@@ -228,7 +323,7 @@ struct CapturedPlayDetailView: View {
         case .hyper: "HYPER"
         case .another: "ANOTHER"
         case .leggendaria: "LEGGENDARIA"
-        default: "—"
+        default: "---"
         }
     }
 
@@ -245,17 +340,34 @@ struct CapturedPlayDetailView: View {
         poor = play.poor
         clearType = IIDXClearType(rawValue: play.clearType) ?? .noPlay
         djLevel = IIDXDJLevel(rawValue: play.djLevel) ?? .none
+        needsReview = play.state == .needsReview
         DispatchQueue.main.async { hasLoaded = true }
     }
 
-    private func saveToPhotos(_ image: UIImage) {
-        Task {
-            switch await SessionPhotoExporter.save([image]) {
-            case .saved: photoAlert = .saved
-            case .denied: photoAlert = .denied
-            case .failed: photoAlert = .failed
-            }
-        }
+    private func reanalyze() {
+        guard !isReanalyzing else { return }
+        songFieldFocused = false
+        searchTask?.cancel()
+        songSuggestions = []
+        hasLoaded = false
+        isReanalyzing = true
+        store.reprocess(play)
+    }
+
+    private func acceptAll() {
+        songFieldFocused = false
+        searchTask?.cancel()
+        songSuggestions = []
+        needsReview = false
+        save()
+    }
+
+    private func reanalyzeDidUpdate(_ changedID: String?) {
+        guard isReanalyzing, changedID == play.id,
+              let fresh = store.play(id: play.id), fresh.state.isTerminal else { return }
+        play.adopt(from: fresh)
+        loadFields()
+        isReanalyzing = false
     }
 
     private func save() {
@@ -279,19 +391,4 @@ struct CapturedPlayDetailView: View {
 private struct SongEntry: Sendable {
     let song: IIDXSong
     let compact: String
-}
-
-private enum PhotoAlert: Int, Identifiable {
-    case saved, denied, failed
-    var id: Int { rawValue }
-}
-
-struct RecognizedTextImage: View {
-    let image: UIImage
-
-    var body: some View {
-        Image(uiImage: image)
-            .resizable()
-            .scaledToFit()
-    }
 }

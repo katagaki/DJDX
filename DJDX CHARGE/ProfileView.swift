@@ -2,7 +2,9 @@ import SwiftUI
 import UIKit
 
 private enum WatchPlayType: String {
+    // swiftlint:disable:next identifier_name
     case sp
+    // swiftlint:disable:next identifier_name
     case dp
 
     var label: String {
@@ -67,7 +69,9 @@ struct ProfileView: View {
         if hasProfile {
             ScrollView {
                 VStack(spacing: 12.0) {
-                    startButton
+                    if workoutManager.healthKitEnabled {
+                        startButton
+                    }
                     profileHeader
                     if let radar = selectedRadar {
                         WatchRadarChartView(data: radar)
@@ -128,7 +132,7 @@ struct ProfileView: View {
     private var idlePlaceholder: some View {
         ScrollView {
             VStack(spacing: 8.0) {
-                Image(systemName: "figure.dance")
+                Image(systemName: "figure.walk")
                     .imageScale(.large)
                     .foregroundStyle(.tint)
                 Text("Watch.Idle.Title")

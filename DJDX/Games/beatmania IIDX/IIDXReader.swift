@@ -52,8 +52,6 @@ actor IIDXReader {
         return closestGroup
     }
 
-    // Resolve the import group for a date scoped to a specific version, so the
-    // displayed data follows the selected version (matching the trends queries).
     func importGroup(for selectedDate: Date, version: IIDXVersion?) -> ImportGroup? {
         guard let version else { return importGroup(for: selectedDate) }
         let groups = importGroups(for: version)
@@ -238,8 +236,6 @@ actor IIDXReader {
             let isAscending = sortOptions.order == .ascending
 
             if songLevelScores.isEmpty {
-                // When no single level/difficulty is selected, sort by title as a base order.
-                // Per-level sorting is handled at the view layer.
                 sortedSongRecords.sort { lhs, rhs in
                     isAscending ? lhs.title < rhs.title : lhs.title > rhs.title
                 }

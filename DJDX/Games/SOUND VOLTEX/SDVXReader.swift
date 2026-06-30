@@ -3,6 +3,7 @@ import SQLite
 
 actor SDVXReader {
 
+    // swiftlint:disable:next type_name
     typealias DB = SDVXPlayDataDatabase
 
     // MARK: Import Groups

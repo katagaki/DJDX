@@ -14,8 +14,6 @@ struct OverviewClearTypeOverallGraph: View {
         }.keys.sorted()
     }
 
-    // Pad the domain by half a unit on each side so the first and last bars
-    // sit fully inside the plot instead of overflowing its edges.
     var levelDomain: ClosedRange<Double> {
         if isInteractive {
             return 0.5...12.5
@@ -32,8 +30,6 @@ struct OverviewClearTypeOverallGraph: View {
         return (Double(first) - 0.5)...(Double(last) + 0.5)
     }
 
-    // Integer level ticks within the (half-unit padded) domain, so each axis
-    // label lines up exactly with its bar.
     var axisValues: [Double] {
         let lower = Int(levelDomain.lowerBound.rounded(.up))
         let upper = Int(levelDomain.upperBound.rounded(.down))

@@ -1,0 +1,25 @@
+{
+  "MLModelVersionStringKey" : "8.4.69",
+  "MLModelDescriptionKey" : "DJDXRankClassifier: IIDX result-screen extraction. Trained from training\/schema.yaml.",
+  "MLModelCreatorDefinedKey" : {
+    "schema_version" : "1",
+    "batch" : "1",
+    "com.github.apple.coremltools.version" : "9.0",
+    "docs" : "https:\/\/docs.ultralytics.com",
+    "imgsz" : "[128, 128]",
+    "names" : "{0: 'A', 1: 'AA', 2: 'AAA', 3: 'B', 4: 'C', 5: 'D', 6: 'F'}",
+    "channels" : "3",
+    "com.github.apple.coremltools.conversion_date" : "2026-06-24",
+    "date" : "2026-06-24T22:46:50.334362",
+    "stride" : "1",
+    "args" : "{'batch': 1, 'half': True, 'int8': False, 'dynamic': False, 'nms': False}",
+    "classes_json" : "[\"F\", \"E\", \"D\", \"C\", \"B\", \"A\", \"AA\", \"AAA\"]",
+    "com.github.apple.coremltools.source_dialect" : "TorchScript",
+    "com.github.apple.coremltools.source" : "torch==2.12.0",
+    "com.apple.coreml.model.preview.type" : "imageClassifier",
+    "task" : "classify",
+    "end2end" : "False"
+  },
+  "MLModelAuthorKey" : "DJDX PEAK training pipeline",
+  "MLModelLicenseKey" : "AGPL-3.0 License (https:\/\/ultralytics.com\/license)"
+}

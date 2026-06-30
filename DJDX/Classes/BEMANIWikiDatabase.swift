@@ -25,6 +25,15 @@ final class BEMANIWikiDatabase: Sendable {
     static let songTime = SQLite.Expression<String>("time")
     static let songMovie = SQLite.Expression<String>("movie")
     static let songLayer = SQLite.Expression<String>("layer")
+    static let songSPBeginnerLevel = SQLite.Expression<Int?>("spBeginnerLevel")
+    static let songSPNormalLevel = SQLite.Expression<Int?>("spNormalLevel")
+    static let songSPHyperLevel = SQLite.Expression<Int?>("spHyperLevel")
+    static let songSPAnotherLevel = SQLite.Expression<Int?>("spAnotherLevel")
+    static let songSPLeggendariaLevel = SQLite.Expression<Int?>("spLeggendariaLevel")
+    static let songDPNormalLevel = SQLite.Expression<Int?>("dpNormalLevel")
+    static let songDPHyperLevel = SQLite.Expression<Int?>("dpHyperLevel")
+    static let songDPAnotherLevel = SQLite.Expression<Int?>("dpAnotherLevel")
+    static let songDPLeggendariaLevel = SQLite.Expression<Int?>("dpLeggendariaLevel")
 
     // MARK: - Initialization
 
@@ -67,6 +76,15 @@ final class BEMANIWikiDatabase: Sendable {
                 table.column(Self.songTime, defaultValue: "")
                 table.column(Self.songMovie, defaultValue: "")
                 table.column(Self.songLayer, defaultValue: "")
+                table.column(Self.songSPBeginnerLevel)
+                table.column(Self.songSPNormalLevel)
+                table.column(Self.songSPHyperLevel)
+                table.column(Self.songSPAnotherLevel)
+                table.column(Self.songSPLeggendariaLevel)
+                table.column(Self.songDPNormalLevel)
+                table.column(Self.songDPHyperLevel)
+                table.column(Self.songDPAnotherLevel)
+                table.column(Self.songDPLeggendariaLevel)
             })
         } catch {
             debugPrint("Failed to create BEMANIWiki tables: \(error)")

@@ -3,6 +3,7 @@ import SQLite
 
 actor SDVXImporter {
 
+    // swiftlint:disable:next type_name
     typealias DB = SDVXPlayDataDatabase
 
     func importSampleCSV(to importToDate: Date, version: SDVXVersion) -> AsyncStream<ImportProgress> {

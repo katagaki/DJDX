@@ -3,6 +3,7 @@ import SQLite
 
 actor TextageImporter {
 
+    // swiftlint:disable:next type_name
     typealias DB = TextageDatabase
 
     func replaceAllCharts(_ charts: [TextageChart]) {

@@ -20,9 +20,9 @@ enum PolarisChordVersion: Int, Codable, CaseIterable {
     }
 
     func loginPageRedirectURL() -> URL {
-        URL(string: """
-https://p.eagate.573.jp/gate/p/login.html?path=https%3A%2F%2Fp.eagate.573.jp%2Fgame%2Fpolarischord%2F\(slug)%2Fplaydata%2Fmusic_data.html
-""")!
+        URL(string: "https://p.eagate.573.jp/gate/p/login.html?path=" +
+            "https%3A%2F%2Fp.eagate.573.jp%2Fgame%2Fpolarischord%2F" +
+            "\(slug)%2Fplaydata%2Fmusic_data.html")!
     }
 
     func musicDataPageURL() -> URL {

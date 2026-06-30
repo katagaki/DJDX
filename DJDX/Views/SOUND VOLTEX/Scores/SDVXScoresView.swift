@@ -15,8 +15,6 @@ struct SDVXScoresView<Header: View>: View {
     @AppStorage(wrappedValue: [], "SDVXScoresView.ClearTypeFilters") var clearTypesToShow: Set<SDVXClearType>
     @AppStorage(wrappedValue: [], "SDVXScoresView.GradeFilters") var gradesToShow: Set<SDVXGrade>
 
-    // Persisted store; `isScoreDataExpanded` mirrors it so a global `withAnimation`
-    // can drive the collapse (animating @AppStorage directly does not work).
     var isScoreDataExpandedKey: String = "SDVXScoresView.ScoreDataExpanded"
     @State var isScoreDataExpanded: Bool
 
@@ -107,8 +105,6 @@ struct SDVXScoresView<Header: View>: View {
         return sortOrder == .ascending ? sorted : sorted.reversed()
     }
 
-    // Lower rank is a better clear (PERFECT ULTIMATE CHAIN ... PLAYED), so an
-    // ascending sort lists COMP-tier clears before PLAY-tier ones.
     func clearRank(_ record: SDVXSongRecord) -> Int {
         SDVXClearType.sorted.firstIndex(of: record.clearTypeEnum) ?? SDVXClearType.sorted.count
     }
@@ -250,6 +246,9 @@ struct SDVXScoresView<Header: View>: View {
             Task { await reload() }
         }
         .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
+            Task { await reload() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .externalDataChanged)) { _ in
             Task { await reload() }
         }
     }

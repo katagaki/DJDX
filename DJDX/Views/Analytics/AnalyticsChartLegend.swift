@@ -1,7 +1,5 @@
 import SwiftUI
 
-// A compact two-column wrapping legend used in place of the built-in chart
-// legend, which overflows horizontally when there are many categories.
 struct AnalyticsChartLegend: View {
 
     let items: [(label: String, color: Color)]

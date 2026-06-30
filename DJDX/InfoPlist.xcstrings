@@ -15,6 +15,12 @@
             "state" : "translated",
             "value" : "DJDX"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX"
+          }
         }
       }
     },
@@ -31,6 +37,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッション中にリザルト画面を撮影するためにカメラを使用します。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX 會在遊玩過程中使用相機拍攝成績畫面。"
           }
         }
       }
@@ -49,6 +61,12 @@
             "state" : "translated",
             "value" : "プレーセッションをまとめるために、ワークアウト・心拍数・アクティブエネルギーを読み出します。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX 會讀取你的體能訓練、心率與活動能量，以彙整你的遊玩記錄。"
+          }
         }
       }
     },
@@ -65,6 +83,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プレーセッションをワークアウトとしてヘルスケアに保存します。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX 會將你的遊玩記錄以體能訓練形式儲存到「健康」App。"
           }
         }
       }
@@ -83,9 +107,15 @@
             "state" : "translated",
             "value" : "撮影したリザルト画面を写真に保存します。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX 會將拍攝的成績畫面儲存到「照片」。"
+          }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.3"
 }

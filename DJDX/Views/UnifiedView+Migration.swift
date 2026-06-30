@@ -3,8 +3,6 @@ import UIKit
 
 extension UnifiedView {
 #if DEBUG
-    // Triggered by djdx://max300 to preview the migration fullscreen cover.
-    // Animates fake progress over 3 seconds without touching any data.
     func runFakeMigration() async {
         migrationProgress.show(
             title: "Migration.Title",
