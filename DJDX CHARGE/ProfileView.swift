@@ -132,7 +132,7 @@ struct ProfileView: View {
     private var idlePlaceholder: some View {
         ScrollView {
             VStack(spacing: 8.0) {
-                Image(systemName: "figure.dance")
+                Image(systemName: "figure.walk")
                     .imageScale(.large)
                     .foregroundStyle(.tint)
                 Text("Watch.Idle.Title")
