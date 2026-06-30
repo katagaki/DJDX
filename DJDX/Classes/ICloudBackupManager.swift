@@ -111,11 +111,14 @@ enum ICloudBackupManager {
 
         writeDefaultsSnapshot(to: containerURL)
 
+        let stagingDirectory = try stagedCopy(of: containerURL, using: fileManager)
+        defer { try? fileManager.removeItem(at: stagingDirectory) }
+
         let stagingURL = fileManager.temporaryDirectory
             .appendingPathComponent("DJDXBackup-\(UUID().uuidString)")
             .appendingPathExtension("zip")
         defer { try? fileManager.removeItem(at: stagingURL) }
-        try ZipArchive.zip(directoryAt: containerURL, to: stagingURL)
+        try ZipArchive.zip(directoryAt: stagingDirectory, to: stagingURL)
 
         let backupDate = Date.now
         let archiveURL = backupFolder.appendingPathComponent("Data.zip")
@@ -148,7 +151,9 @@ enum ICloudBackupManager {
                 try fileManager.createDirectory(at: exportDirectory, withIntermediateDirectories: true)
                 let archiveURL = exportDirectory.appendingPathComponent("DJDX Backup.zip")
                 writeDefaultsSnapshot(to: SharedContainer.containerURL)
-                try ZipArchive.zip(directoryAt: SharedContainer.containerURL, to: archiveURL)
+                let stagingDirectory = try stagedCopy(of: SharedContainer.containerURL, using: fileManager)
+                defer { try? fileManager.removeItem(at: stagingDirectory) }
+                try ZipArchive.zip(directoryAt: stagingDirectory, to: archiveURL)
                 return archiveURL
             } catch {
                 return nil
@@ -201,7 +206,7 @@ enum ICloudBackupManager {
                 restoreRootURL = extractedItems[0]
             }
             for item in try fileManager.contentsOfDirectory(
-                at: restoreRootURL, includingPropertiesForKeys: nil
+                at: restoreRootURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
             ) {
                 let destinationURL = containerURL.appendingPathComponent(item.lastPathComponent)
                 if fileManager.fileExists(atPath: destinationURL.path) {
@@ -215,6 +220,10 @@ enum ICloudBackupManager {
             onProgress(100)
         }.value
     }
+
+}
+
+extension ICloudBackupManager {
 
     // MARK: Settings Snapshot
 
@@ -239,6 +248,23 @@ enum ICloudBackupManager {
         for (key, value) in domain {
             UserDefaults.standard.set(value, forKey: key)
         }
+    }
+
+    // MARK: Staging
+
+    private static func stagedCopy(of containerURL: URL, using fileManager: FileManager) throws -> URL {
+        let stagingURL = fileManager.temporaryDirectory
+            .appendingPathComponent("DJDXStaging-\(UUID().uuidString)", isDirectory: true)
+        try fileManager.createDirectory(at: stagingURL, withIntermediateDirectories: true)
+        let items = try fileManager.contentsOfDirectory(
+            at: containerURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
+        )
+        for item in items {
+            try fileManager.copyItem(
+                at: item, to: stagingURL.appendingPathComponent(item.lastPathComponent)
+            )
+        }
+        return stagingURL
     }
 
     // MARK: iCloud
