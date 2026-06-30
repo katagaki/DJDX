@@ -12,6 +12,7 @@ struct MoreICloudBackup: View {
 
     @State var isBackingUp: Bool = false
     @State var isBackupFailed: Bool = false
+    @State var backupFailureDetail: String = ""
 
     var body: some View {
         List {
@@ -89,15 +90,18 @@ struct MoreICloudBackup: View {
             }
         } message: {
             Text("Alert.ICloudBackup.Failed.Subtitle")
+            + Text(verbatim: "\n\n")
+            + Text(verbatim: backupFailureDetail)
         }
     }
 
     func backUpNow() {
         isBackingUp = true
         Task {
-            let isSuccessful = await ICloudBackupManager.performBackup()
+            let failureDetail = await ICloudBackupManager.performBackup()
             isBackingUp = false
-            if !isSuccessful {
+            if let failureDetail {
+                backupFailureDetail = failureDetail
                 isBackupFailed = true
             }
         }

@@ -122,7 +122,7 @@ struct CapturedPlayDetailView: View {
                     }
                 }
                 Picker("Shared.Difficulty", selection: $difficulty) {
-                    Text(verbatim: "—").tag(0)
+                    Text(verbatim: "---").tag(0)
                     ForEach(IIDXDifficulty.sortedInts, id: \.self) { value in
                         Text(verbatim: "\(value)").tag(value)
                     }
@@ -266,7 +266,7 @@ struct CapturedPlayDetailView: View {
         case .hyper: "HYPER"
         case .another: "ANOTHER"
         case .leggendaria: "LEGGENDARIA"
-        default: "—"
+        default: "---"
         }
     }
 

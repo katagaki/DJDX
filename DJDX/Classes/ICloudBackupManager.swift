@@ -75,16 +75,32 @@ enum ICloudBackupManager {
     // MARK: Backup
 
     @discardableResult
-    static func performBackup() async -> Bool {
-        await Task.detached(priority: .userInitiated) {
+    static func performBackup() async -> String? {
+        await Task.detached(priority: .userInitiated) { () -> String? in
             do {
                 try await backUp()
-                return true
+                return nil
             } catch {
                 logger.error("Manual backup failed: \(error, privacy: .public)")
-                return false
+                return failureDetail(for: error)
             }
         }.value
+    }
+
+    static func failureDetail(for error: Error) -> String {
+        switch error {
+        case BackupError.iCloudUnavailable:
+            return "Signed out of iCloud, iCloud Drive off, or DJDX disabled under iCloud settings."
+        case BackupError.documentsUnavailable:
+            return "iCloud Documents container could not be opened."
+        case BackupError.downloadTimedOut:
+            return "Backup did not finish downloading from iCloud."
+        case BackupError.uploadTimedOut:
+            return "Saved locally but the upload to iCloud did not finish."
+        default:
+            let nsError = error as NSError
+            return "\(nsError.domain) \(nsError.code): \(nsError.localizedDescription)"
+        }
     }
 
     static func backUp() async throws {
