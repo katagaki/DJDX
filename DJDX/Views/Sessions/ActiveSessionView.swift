@@ -12,6 +12,7 @@ struct ActiveSessionView: View {
     @State private var isShowingCameraUnavailableAlert: Bool = false
     @State private var photoAlert: PhotoExportAlert?
     @State private var isConfirmingExport: Bool = false
+    @State private var isConfirmingEnd: Bool = false
     @State private var fileExport: SessionFileExportRequest?
     @ObservedObject private var workoutBridge = IIDXSessionWorkoutBridge.shared
 
@@ -56,12 +57,12 @@ struct ActiveSessionView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     if #available(iOS 26.0, *) {
                         Button(role: .close) {
-                            store.endSession()
+                            isConfirmingEnd = true
                         }
                         .accessibilityLabel("Sessions.End")
                     } else {
                         Button("Sessions.End", role: .destructive) {
-                            store.endSession()
+                            isConfirmingEnd = true
                         }
                     }
                 }
@@ -114,6 +115,12 @@ struct ActiveSessionView: View {
             }
             Button("Sessions.Files.Save") {
                 exportAllToFiles()
+            }
+            Button("Shared.Cancel", role: .cancel) {}
+        }
+        .alert("Sessions.End.Confirm", isPresented: $isConfirmingEnd) {
+            Button("Sessions.End", role: .destructive) {
+                store.endSession()
             }
             Button("Shared.Cancel", role: .cancel) {}
         }

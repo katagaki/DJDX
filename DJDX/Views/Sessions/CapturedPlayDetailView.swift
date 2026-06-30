@@ -24,6 +24,7 @@ struct CapturedPlayDetailView: View {
     @State private var searchTask: Task<Void, Never>?
     @State private var capturedImage: UIImage?
     @State private var isReanalyzing: Bool = false
+    @State private var needsReview: Bool = false
     @FocusState private var songFieldFocused: Bool
 
     private let reader = IIDXReader()
@@ -42,29 +43,7 @@ struct CapturedPlayDetailView: View {
         }
         .navigationTitle("Sessions.Detail.Title")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: reanalyze) {
-                    if isReanalyzing {
-                        ProgressView()
-                    } else {
-                        Label("Sessions.Detail.Reprocess", systemImage: "arrow.clockwise")
-                    }
-                }
-                .disabled(isReanalyzing)
-            }
-            if #available(iOS 26.0, *) {
-                ToolbarSpacer(.fixed, placement: .topBarTrailing)
-            }
-            if let capturedImage {
-                ToolbarItem(placement: .topBarTrailing) {
-                    ShareLink(
-                        item: Image(uiImage: capturedImage),
-                        preview: SharePreview("Sessions.Detail.Title", image: Image(uiImage: capturedImage))
-                    )
-                }
-            }
-        }
+        .toolbar { editorToolbar }
         .onReceive(NotificationCenter.default.publisher(for: .capturedPlayDidChange)
             .receive(on: RunLoop.main)) { note in
             reanalyzeDidUpdate(note.object as? String)
@@ -101,8 +80,10 @@ struct CapturedPlayDetailView: View {
     private var editorForm: some View {
         Form {
             Section("Sessions.Detail.Chart") {
-                TextField("Sessions.Detail.Song", text: $songTitle)
-                    .focused($songFieldFocused)
+                marked(songNeedsAttention) {
+                    TextField("Sessions.Detail.Song", text: $songTitle)
+                        .focused($songFieldFocused)
+                }
                 if songFieldFocused {
                     ForEach(songSuggestions, id: \.title) { song in
                         Button {
@@ -116,15 +97,19 @@ struct CapturedPlayDetailView: View {
                         }
                     }
                 }
-                Picker("Shared.Level", selection: $level) {
-                    ForEach(IIDXLevel.sorted, id: \.self) { value in
-                        Text(verbatim: levelName(value)).tag(value)
+                marked(levelNeedsAttention) {
+                    Picker("Shared.Level", selection: $level) {
+                        ForEach(IIDXLevel.sorted, id: \.self) { value in
+                            Text(verbatim: levelName(value)).tag(value)
+                        }
                     }
                 }
-                Picker("Shared.Difficulty", selection: $difficulty) {
-                    Text(verbatim: "---").tag(0)
-                    ForEach(IIDXDifficulty.sortedInts, id: \.self) { value in
-                        Text(verbatim: "\(value)").tag(value)
+                marked(difficultyNeedsAttention) {
+                    Picker("Shared.Difficulty", selection: $difficulty) {
+                        Text(verbatim: "---").tag(0)
+                        ForEach(IIDXDifficulty.sortedInts, id: \.self) { value in
+                            Text(verbatim: "\(value)").tag(value)
+                        }
                     }
                 }
                 Picker("Shared.PlayType", selection: $playType) {
@@ -134,19 +119,23 @@ struct CapturedPlayDetailView: View {
             }
 
             Section("Sessions.Detail.Result") {
-                Picker("Sessions.Detail.ClearType", selection: $clearType) {
-                    ForEach(IIDXClearType.sorted, id: \.self) { value in
-                        Text(verbatim: value.rawValue).tag(value)
+                marked(clearTypeNeedsAttention) {
+                    Picker("Sessions.Detail.ClearType", selection: $clearType) {
+                        ForEach(IIDXClearType.sorted, id: \.self) { value in
+                            Text(verbatim: value.rawValue).tag(value)
+                        }
                     }
                 }
-                Picker("Sessions.Detail.DJLevel", selection: $djLevel) {
-                    ForEach(IIDXDJLevel.sorted.reversed(), id: \.self) { value in
-                        Text(verbatim: value.rawValue).tag(value)
+                marked(djLevelNeedsAttention) {
+                    Picker("Sessions.Detail.DJLevel", selection: $djLevel) {
+                        ForEach(IIDXDJLevel.sorted.reversed(), id: \.self) { value in
+                            Text(verbatim: value.rawValue).tag(value)
+                        }
                     }
                 }
-                numberRow("Sessions.Detail.ExScore", value: $exScore)
-                numberRow("Sessions.Detail.PGreat", value: $perfectGreat)
-                numberRow("Sessions.Detail.Great", value: $great)
+                marked(exScoreNeedsAttention) { numberRow("Sessions.Detail.ExScore", value: $exScore) }
+                marked(judgmentNeedsAttention) { numberRow("Sessions.Detail.PGreat", value: $perfectGreat) }
+                marked(judgmentNeedsAttention) { numberRow("Sessions.Detail.Great", value: $great) }
                 numberRow("Sessions.Detail.Good", value: $good)
                 numberRow("Sessions.Detail.Bad", value: $bad)
                 numberRow("Sessions.Detail.Poor", value: $poor)
@@ -156,6 +145,74 @@ struct CapturedPlayDetailView: View {
         .scrollDismissesKeyboard(.immediately)
         .disabled(isReanalyzing)
     }
+
+    @ToolbarContentBuilder
+    private var editorToolbar: some ToolbarContent {
+        if let capturedImage {
+            ToolbarItem(placement: .topBarTrailing) {
+                ShareLink(
+                    item: Image(uiImage: capturedImage),
+                    preview: SharePreview("Sessions.Detail.Title", image: Image(uiImage: capturedImage))
+                )
+            }
+        }
+        if #available(iOS 26.0, *) {
+            ToolbarItem(placement: .bottomBar) { reanalyzeButton }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) { acceptAllButton }
+        } else {
+            ToolbarItemGroup(placement: .bottomBar) {
+                reanalyzeButton
+                Spacer()
+                acceptAllButton
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var reanalyzeButton: some View {
+        Button(action: reanalyze) {
+            if isReanalyzing {
+                ProgressView()
+            } else {
+                Label("Sessions.Detail.Reprocess", systemImage: "arrow.clockwise")
+            }
+        }
+        .disabled(isReanalyzing)
+    }
+
+    private var acceptAllButton: some View {
+        Button(action: acceptAll) {
+            Label("Sessions.Detail.AcceptAll", systemImage: "checkmark")
+        }
+        .disabled(isReanalyzing || !needsReview)
+    }
+
+    private func marked<Content: View>(
+        _ needsAttention: Bool,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        HStack(spacing: 8.0) {
+            content()
+            if needsAttention {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundStyle(.orange)
+                    .accessibilityLabel(Text("Sessions.Detail.NeedsAttention"))
+            }
+        }
+    }
+
+    private var songNeedsAttention: Bool {
+        needsReview && songTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    private var levelNeedsAttention: Bool { needsReview && level == .unknown }
+    private var difficultyNeedsAttention: Bool { needsReview && difficulty <= 0 }
+    private var clearTypeNeedsAttention: Bool {
+        needsReview && (clearType == .noPlay || clearType == .unknown)
+    }
+    private var djLevelNeedsAttention: Bool { needsReview && djLevel == .none }
+    private var exScoreNeedsAttention: Bool { needsReview && exScore <= 0 }
+    private var judgmentNeedsAttention: Bool { needsReview && perfectGreat + great <= 0 }
 
     @ViewBuilder
     private func responsiveLayout(in proxy: GeometryProxy) -> some View {
@@ -283,6 +340,7 @@ struct CapturedPlayDetailView: View {
         poor = play.poor
         clearType = IIDXClearType(rawValue: play.clearType) ?? .noPlay
         djLevel = IIDXDJLevel(rawValue: play.djLevel) ?? .none
+        needsReview = play.state == .needsReview
         DispatchQueue.main.async { hasLoaded = true }
     }
 
@@ -294,6 +352,14 @@ struct CapturedPlayDetailView: View {
         hasLoaded = false
         isReanalyzing = true
         store.reprocess(play)
+    }
+
+    private func acceptAll() {
+        songFieldFocused = false
+        searchTask?.cancel()
+        songSuggestions = []
+        needsReview = false
+        save()
     }
 
     private func reanalyzeDidUpdate(_ changedID: String?) {
