@@ -254,5 +254,6 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
         .font(.subheadline)
         .fontWeight(.heavy)
         .italic()
+        .frame(maxWidth: .infinity, alignment: .trailing)
     }
 }
