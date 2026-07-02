@@ -137,6 +137,7 @@ struct WebViewForTextage: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         webView.configuration.userContentController.addUserScript(Self.chartViewerScript)
         webView.navigationDelegate = context.coordinator
+        webView.uiDelegate = context.coordinator
         webView.layer.opacity = 0.0
         #if DEBUG
         webView.isInspectable = true
@@ -161,13 +162,23 @@ struct WebViewForTextage: UIViewRepresentable {
         }
     }
 
-    class Coordinator: NSObject, WKNavigationDelegate {
+    class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
 
         var updateState: (Bool) -> Void
 
         init(updateState: @escaping (Bool) -> Void) {
             self.updateState = updateState
             super.init()
+        }
+
+        func webView(_ webView: WKWebView,
+                     createWebViewWith configuration: WKWebViewConfiguration,
+                     for navigationAction: WKNavigationAction,
+                     windowFeatures: WKWindowFeatures) -> WKWebView? {
+            if let url = navigationAction.request.url {
+                UIApplication.shared.open(url)
+            }
+            return nil
         }
 
         func webView(_: WKWebView, didFinish _: WKNavigation!) {
