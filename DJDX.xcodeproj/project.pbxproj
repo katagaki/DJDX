@@ -511,7 +511,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 33.4.1;
+				MARKETING_VERSION = 34.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.Widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -542,7 +542,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 33.4.1;
+				MARKETING_VERSION = 34.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.Widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -574,7 +574,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 33.4.1;
+				MARKETING_VERSION = 34.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -609,7 +609,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 33.4.1;
+				MARKETING_VERSION = 34.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -755,7 +755,7 @@
 		E4B123BD2BF8E8E500D4A3D1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon.31 AppIcon.32 AppIcon.33 AppIcon.VI AppIcon.VII";
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon.31 AppIcon.32 AppIcon.33 AppIcon.34 AppIcon.VI AppIcon.VII";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -783,7 +783,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 33.4.1;
+				MARKETING_VERSION = 34.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -799,7 +799,7 @@
 		E4B123BE2BF8E8E500D4A3D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon.31 AppIcon.32 AppIcon.33 AppIcon.VI AppIcon.VII";
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon.31 AppIcon.32 AppIcon.33 AppIcon.34 AppIcon.VI AppIcon.VII";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -828,7 +828,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 33.4.1;
+				MARKETING_VERSION = 34.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.DJDX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
