@@ -3,13 +3,35 @@ import WebKit
 
 struct TextageViewer: View {
 
+    enum Source {
+        case legacy
+        case chartViewer
+    }
+
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
-    var url: URL
+    var legacyURL: URL?
+    var chartViewerURL: URL?
 
+    @State var selectedSource: Source
     @State var webView = WKWebView()
     @State var isLoading: Bool = true
     @State var isShowingFallbackButton: Bool = false
+
+    init(legacyURL: URL?, chartViewerURL: URL?) {
+        self.legacyURL = legacyURL
+        self.chartViewerURL = chartViewerURL
+        self._selectedSource = State(initialValue: chartViewerURL != nil ? .chartViewer : .legacy)
+    }
+
+    var url: URL {
+        switch selectedSource {
+        case .legacy: legacyURL ?? chartViewerURL ?? Self.fallbackURL
+        case .chartViewer: chartViewerURL ?? legacyURL ?? Self.fallbackURL
+        }
+    }
+
+    private static let fallbackURL = URL(string: "https://textage.cc/")!
 
     var body: some View {
         WebViewForTextage(
@@ -21,6 +43,19 @@ struct TextageViewer: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
+                if legacyURL != nil && chartViewerURL != nil {
+                    ToolbarItem(placement: .principal) {
+                        Picker(selection: $selectedSource) {
+                            Text("TextageViewer.Source.ChartViewer")
+                                .tag(Source.chartViewer)
+                            Text("TextageViewer.Source.Legacy")
+                                .tag(Source.legacy)
+                        } label: {
+                            Text("ViewTitle.TextageViewer")
+                        }
+                        .pickerStyle(.segmented)
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Shared.Refresh", systemImage: "arrow.clockwise") {
                         refresh()
@@ -46,6 +81,9 @@ struct TextageViewer: View {
                         .clipShape(.rect(cornerRadius: 10.0))
                     }
                 }
+            }
+            .onChange(of: selectedSource) { _, _ in
+                refresh()
             }
             .task {
                 await showFallbackAfterDelay()
@@ -112,25 +150,18 @@ struct WebViewForTextage: UIViewRepresentable {
     class Coordinator: NSObject, WKNavigationDelegate {
 
         var updateState: (Bool) -> Void
-        var hasRevealed: Bool = false
 
         init(updateState: @escaping (Bool) -> Void) {
             self.updateState = updateState
             super.init()
         }
 
-        func reveal() {
-            guard !hasRevealed else { return }
-            hasRevealed = true
+        func webView(_: WKWebView, didFinish _: WKNavigation!) {
             updateState(true)
         }
 
-        func webView(_: WKWebView, didFinish _: WKNavigation!) {
-            reveal()
-        }
-
         func webView(_: WKWebView, didCommit _: WKNavigation!) {
-            reveal()
+            updateState(true)
         }
     }
 }

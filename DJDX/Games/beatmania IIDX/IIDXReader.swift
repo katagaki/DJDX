@@ -498,6 +498,33 @@ actor IIDXReader {
         )
     }
 
+    func textageChartViewerChartCount() -> Int {
+        guard let database = try? TextageChartViewerDatabase.shared.getReadConnection() else { return 0 }
+        return (try? database.scalar(TextageChartViewerDatabase.chartTable.count)) ?? 0
+    }
+
+    func textageChartViewerChart(title: String) -> TextageChartViewerChart? {
+        guard let database = try? TextageChartViewerDatabase.shared.getReadConnection() else { return nil }
+        let col = TextageChartViewerDatabase.self
+        let query = col.chartTable.filter(col.chartTitleCompact == title.compact).limit(1)
+        guard let row = try? database.pluck(query) else { return nil }
+        return TextageChartViewerChart(
+            songId: row[col.chartSongId],
+            version: row[col.chartVersion],
+            title: row[col.chartTitle],
+            spBeginner: row[col.chartSPBeginner],
+            spNormal: row[col.chartSPNormal],
+            spHyper: row[col.chartSPHyper],
+            spAnother: row[col.chartSPAnother],
+            spLeggendaria: row[col.chartSPLeggendaria],
+            dpBeginner: row[col.chartDPBeginner],
+            dpNormal: row[col.chartDPNormal],
+            dpHyper: row[col.chartDPHyper],
+            dpAnother: row[col.chartDPAnother],
+            dpLeggendaria: row[col.chartDPLeggendaria]
+        )
+    }
+
     // MARK: Analytics - Aggregated Counts
 
     private struct LevelColumns {

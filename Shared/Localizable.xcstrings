@@ -3329,6 +3329,75 @@
         }
       }
     },
+    "More.ExternalData.TextageChartViewer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textage Chart Viewer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textage Chart Viewer"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textage Chart Viewer"
+          }
+        }
+      }
+    },
+    "More.ExternalData.TextageChartViewer.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Index"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面インデックス"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面索引"
+          }
+        }
+      }
+    },
+    "More.ExternalData.TextageChartViewer.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX is not affiliated with or endorsed by Textage Chart Viewer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDXはTextage Chart Viewerとは一切関係ありません。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DJDX 與 Textage Chart Viewer 並無任何關聯。"
+          }
+        }
+      }
+    },
     "More.ExternalData.UpdateData" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -7911,6 +7980,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "譜面無法開啟嗎？\n麻煩你前往 Textage 手動搜尋看看。"
+          }
+        }
+      }
+    },
+    "TextageViewer.Source.ChartViewer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Viewer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Viewer"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Viewer"
+          }
+        }
+      }
+    },
+    "TextageViewer.Source.Legacy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legacy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レガシー"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "舊版"
           }
         }
       }
