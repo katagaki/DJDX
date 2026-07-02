@@ -859,7 +859,7 @@
 					"@executable_path/../../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 33.4;
+				MARKETING_VERSION = 33.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tsubuzaki.DJDX.watchkitapp.DJDX-CHARGE-Widgets";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -892,7 +892,7 @@
 					"@executable_path/../../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 33.4;
+				MARKETING_VERSION = 33.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tsubuzaki.DJDX.watchkitapp.DJDX-CHARGE-Widgets";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;

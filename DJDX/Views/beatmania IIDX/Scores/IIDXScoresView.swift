@@ -339,8 +339,8 @@ struct IIDXScoresView<Header: View>: View {
                     )
                     .automaticNavigationTransition(id: "\(songRecord.title).\(initialLevel.rawValue)",
                                                    in: scoresNamespace)
-                case .textageViewer(let url):
-                    TextageViewer(url: url)
+                case .textageViewer(let legacyURL, let chartViewerURL):
+                    TextageViewer(legacyURL: legacyURL, chartViewerURL: chartViewerURL)
                 }
             }
     }

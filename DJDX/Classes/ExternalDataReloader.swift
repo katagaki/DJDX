@@ -3,6 +3,7 @@ import SwiftSoup
 
 enum ExternalDataSourceID: String, CaseIterable {
     case textage
+    case textageChartViewer
     case sdvxIn
     case wikiIidx
     case bm2dx
@@ -22,6 +23,7 @@ struct ExternalDataReloader {
     ) async -> Int {
         switch id {
         case .textage: await reloadTextage(progress: progress)
+        case .textageChartViewer: await reloadTextageChartViewer(progress: progress)
         case .sdvxIn: await reloadSDVXIn(progress: progress)
         case .wikiIidx: await reloadWikiIIDX(version: iidxVersion, progress: progress)
         case .bm2dx: await reloadBM2DX(progress: progress)
@@ -54,6 +56,47 @@ struct ExternalDataReloader {
                                                accessTableText: accessTableText)
         await TextageImporter().replaceAllCharts(charts)
         return await IIDXReader().textageChartCount()
+    }
+
+    // MARK: - Textage Chart Viewer
+
+    private static func reloadTextageChartViewer(progress: Progress) async -> Int {
+        progress(0, 1)
+        guard let url = URL(string: "https://textage-chart-viewer.vercel.app/api/songs"),
+              let (data, _) = try? await URLSession.shared.data(from: url),
+              let response = try? JSONDecoder().decode(TextageChartViewerSongsResponse.self, from: data) else {
+            return 0
+        }
+
+        var charts: [TextageChartViewerChart] = []
+        for song in response.data {
+            let chart = TextageChartViewerChart(
+                songId: song.songId,
+                version: song.version,
+                title: song.title + (song.subtitle ?? ""),
+                spBeginner: song.levels.spBeginner,
+                spNormal: song.levels.spNormal,
+                spHyper: song.levels.spHyper,
+                spAnother: song.levels.spAnother,
+                spLeggendaria: song.levels.spLeggendaria,
+                dpBeginner: song.levels.dpBeginner,
+                dpNormal: song.levels.dpNormal,
+                dpHyper: song.levels.dpHyper,
+                dpAnother: song.levels.dpAnother,
+                dpLeggendaria: song.levels.dpLeggendaria
+            )
+            let hasAnyChart = [
+                chart.spBeginner, chart.spNormal, chart.spHyper, chart.spAnother, chart.spLeggendaria,
+                chart.dpBeginner, chart.dpNormal, chart.dpHyper, chart.dpAnother, chart.dpLeggendaria
+            ].contains { $0 > 0 }
+            if hasAnyChart, !chart.title.isEmpty {
+                charts.append(chart)
+            }
+        }
+
+        await TextageChartViewerImporter().replaceAllCharts(charts)
+        progress(1, 1)
+        return await IIDXReader().textageChartViewerChartCount()
     }
 
     // MARK: - sdvx.in
@@ -261,6 +304,32 @@ struct ExternalDataReloader {
         progress(1, 1)
         return count
     }
+}
+
+private struct TextageChartViewerSongsResponse: Decodable {
+
+    struct Song: Decodable {
+        var songId: String
+        var version: Int
+        var title: String
+        var subtitle: String?
+        var levels: Levels
+    }
+
+    struct Levels: Decodable {
+        var spBeginner: Int
+        var spNormal: Int
+        var spHyper: Int
+        var spAnother: Int
+        var spLeggendaria: Int
+        var dpBeginner: Int
+        var dpNormal: Int
+        var dpHyper: Int
+        var dpAnother: Int
+        var dpLeggendaria: Int
+    }
+
+    var data: [Song]
 }
 
 @MainActor
