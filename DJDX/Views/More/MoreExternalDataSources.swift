@@ -8,6 +8,7 @@ struct MoreExternalDataSources: View {
     @Environment(\.dismiss) var dismiss
 
     @AppStorage(wrappedValue: false, "ExternalData.Textage.Enabled") var isTextageEnabled: Bool
+    @AppStorage(wrappedValue: false, "ExternalData.TextageChartViewer.Enabled") var isTextageChartViewerEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.SDVXIn.Enabled") var isSDVXInEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.BM2DX.Enabled") var isBM2DXEnabled: Bool
@@ -18,19 +19,21 @@ struct MoreExternalDataSources: View {
     @State var bm2dxEntryCount: Int = 0
     @State var sdvxInEntryCount: Int = 0
     @State var textageEntryCount: Int = 0
+    @State var textageChartViewerEntryCount: Int = 0
     @State var ddrSongMetaCount: Int = 0
 
     @State var isBemaniWikiReloadCompleted: Bool = false
     @State var isBM2DXReloadCompleted: Bool = false
     @State var isSDVXInReloadCompleted: Bool = false
     @State var isTextageReloadCompleted: Bool = false
+    @State var isTextageChartViewerReloadCompleted: Bool = false
     @State var isDDRReloadCompleted: Bool = false
     @State var dataImported: Int = 0
     @State var dataTotal: Int = 2
     @State var reloadingSource: ExternalDataReloadSource?
 
     enum ExternalDataReloadSource {
-        case bemaniWiki, bm2dx, sdvxIn, textage, ddr
+        case bemaniWiki, bm2dx, sdvxIn, textage, textageChartViewer, ddr
     }
 
     let fetcher = IIDXReader()
@@ -39,6 +42,7 @@ struct MoreExternalDataSources: View {
 
     var body: some View {
         List {
+            textageChartViewerSection()
             textageSection()
             sdvxInSection()
             bemaniWikiSection()
@@ -46,7 +50,8 @@ struct MoreExternalDataSources: View {
         }
         .navigationTitle("More.ExternalData.Header")
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: [isTextageEnabled, isSDVXInEnabled, isBemaniWikiEnabled, isBM2DXEnabled, isDDREnabled]) { _, _ in
+        .onChange(of: [isTextageEnabled, isTextageChartViewerEnabled, isSDVXInEnabled,
+                       isBemaniWikiEnabled, isBM2DXEnabled, isDDREnabled]) { _, _ in
             NotificationCenter.default.post(name: .externalDataChanged, object: nil)
         }
         .toolbar {
@@ -72,6 +77,7 @@ struct MoreExternalDataSources: View {
             bm2dxEntryCount = await fetcher.chartRadarDataCount()
             sdvxInEntryCount = await sdvxFetcher.sdvxInChartCount()
             textageEntryCount = await fetcher.textageChartCount()
+            textageChartViewerEntryCount = await fetcher.textageChartViewerChartCount()
             ddrSongMetaCount = await ddrMetaImporter.songMetaCount()
         }
         .alert(
@@ -120,6 +126,18 @@ struct MoreExternalDataSources: View {
             },
             message: {
                 Text("Alert.ExternalData.Completed.Text.\(textageEntryCount)")
+            }
+        )
+        .alert(
+            "Alert.ExternalData.Completed.Title",
+            isPresented: $isTextageChartViewerReloadCompleted,
+            actions: {
+                Button("Shared.OK", role: .cancel) {
+                    isTextageChartViewerReloadCompleted = false
+                }
+            },
+            message: {
+                Text("Alert.ExternalData.Completed.Text.\(textageChartViewerEntryCount)")
             }
         )
         .alert(
@@ -193,7 +211,7 @@ struct MoreExternalDataSources: View {
     private func reloadIndicator(for source: ExternalDataReloadSource) -> some View {
         if reloadingSource == source {
             switch source {
-            case .bm2dx, .ddr:
+            case .bm2dx, .ddr, .textageChartViewer:
                 ProgressView()
             default:
                 ProgressDonut(progress: dataTotal > 0 ? Double(dataImported) / Double(dataTotal) : 0.0)
@@ -302,10 +320,45 @@ struct MoreExternalDataSources: View {
         }
     }
 
+    // MARK: - Textage Chart Viewer
+
+    @ViewBuilder
+    private func textageChartViewerSection() -> some View {
+        Section {
+            dataSourceCard(
+                title: { Text("More.ExternalData.TextageChartViewer.Description") },
+                count: textageChartViewerEntryCount,
+                isOn: $isTextageChartViewerEnabled,
+                source: .textageChartViewer,
+                reload: reloadTextageChartViewerData,
+                completed: $isTextageChartViewerReloadCompleted
+            )
+        } header: {
+            ListSectionHeader(text: "More.ExternalData.TextageChartViewer")
+                .font(.body)
+        } footer: {
+            Text("More.ExternalData.TextageChartViewer.Footer") +
+            Text(" ") +
+            Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://textage-chart-viewer.vercel.app)")
+        }
+    }
+
     // MARK: - Textage Data Loading
 
     func reloadTextageData() async {
         textageEntryCount = await ExternalDataReloader.reload(.textage, iidxVersion: iidxVersion) { done, total in
+            dataImported = done
+            dataTotal = total
+        }
+    }
+
+    // MARK: - Textage Chart Viewer Data Loading
+
+    func reloadTextageChartViewerData() async {
+        textageChartViewerEntryCount = await ExternalDataReloader.reload(
+            .textageChartViewer,
+            iidxVersion: iidxVersion
+        ) { done, total in
             dataImported = done
             dataTotal = total
         }

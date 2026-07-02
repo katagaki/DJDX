@@ -23,6 +23,7 @@ struct IIDXScoreSection: View {
     @State private var latestDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: .now)!
 
     @State private var textageChart: TextageChart?
+    @State private var textageChartViewerChart: TextageChartViewerChart?
 
     private let fetcher = IIDXReader()
 
@@ -120,6 +121,7 @@ struct IIDXScoreSection: View {
             }
             if score.level != .beginner {
                 textageChart = await fetcher.textageChart(title: songTitle)
+                textageChartViewerChart = await fetcher.textageChartViewerChart(title: songTitle)
             }
         }
     }
@@ -222,17 +224,17 @@ struct IIDXScoreSection: View {
                 chartActionLabel(image: Image(.listIconYouTube), label: "YouTube")
             }
             .buttonStyle(.plain)
-            if let textageChart, score.level != .beginner {
+            if score.level != .beginner, textageChart != nil || textageChartViewerChart != nil {
                 switch playType {
                 case .single:
-                    textageButton(chart: textageChart, playSide: .side1P,
+                    textageButton(playSide: .side1P,
                                   image: Image(.listIconTextage),
                                   label: "Scores.Viewer.OpenTextage.1P")
-                    textageButton(chart: textageChart, playSide: .side2P,
+                    textageButton(playSide: .side2P,
                                   image: Image(.listIconTextageFlipped),
                                   label: "Scores.Viewer.OpenTextage.2P")
                 case .double:
-                    textageButton(chart: textageChart, playSide: .notApplicable,
+                    textageButton(playSide: .notApplicable,
                                   image: Image(.listIconTextage),
                                   label: "Scores.Viewer.OpenTextage.DP")
                 }
@@ -241,14 +243,16 @@ struct IIDXScoreSection: View {
     }
 
     @ViewBuilder
-    func textageButton(chart: TextageChart,
-                       playSide: IIDXPlaySide,
+    func textageButton(playSide: IIDXPlaySide,
                        image: Image,
                        label: LocalizedStringKey) -> some View {
-        if let url = chart.pageURL(for: score.level, playType: playType, playSide: playSide) {
+        let legacyURL = textageChart?.pageURL(for: score.level, playType: playType, playSide: playSide)
+        let chartViewerURL = textageChartViewerChart?.pageURL(for: score.level, playType: playType)
+        if legacyURL != nil || chartViewerURL != nil {
             Divider()
             Button {
-                navigationManager.push(ScoresPath.textageViewer(url: url))
+                navigationManager.push(ScoresPath.textageViewer(legacyURL: legacyURL,
+                                                                chartViewerURL: chartViewerURL))
             } label: {
                 chartActionLabel(image: image, label: label)
             }
