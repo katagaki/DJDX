@@ -45,7 +45,8 @@ struct TextageChartViewerChart: Sendable, Hashable {
         case .single: playTypeCode = "sp"
         case .double: playTypeCode = "dp"
         }
-        let path = "chart/\(version)/\(songId)/\(difficultyCode)/\(playTypeCode)"
+        let folder = version == 35 ? "s" : String(version)
+        let path = "chart/\(folder)/\(songId)/\(difficultyCode)/\(playTypeCode)"
         return URL(string: "https://textage-chart-viewer.vercel.app/\(path)")
     }
 
