@@ -16,6 +16,9 @@
     "[%@](https://sdvx.in)" : {
       "shouldTranslate" : false
     },
+    "[%@](https://textage-chart-viewer.vercel.app)" : {
+      "shouldTranslate" : false
+    },
     "[%@](https://textage.cc)" : {
       "localizations" : {
         "en" : {
