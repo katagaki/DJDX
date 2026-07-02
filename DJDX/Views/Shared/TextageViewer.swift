@@ -121,10 +121,13 @@ struct WebViewForTextage: UIViewRepresentable {
 
     var url: URL
 
-    private static let hideWelcomeDialogScript = WKUserScript(
+    private static let chartViewerScript = WKUserScript(
         source: """
         if (location.hostname === "textage-chart-viewer.vercel.app") {
             try { localStorage.setItem("hideWelcomeDialog", "true"); } catch (error) {}
+            const style = document.createElement("style");
+            style.textContent = "header { display: none !important; }";
+            document.documentElement.appendChild(style);
         }
         """,
         injectionTime: .atDocumentStart,
@@ -132,7 +135,7 @@ struct WebViewForTextage: UIViewRepresentable {
     )
 
     func makeUIView(context: Context) -> WKWebView {
-        webView.configuration.userContentController.addUserScript(Self.hideWelcomeDialogScript)
+        webView.configuration.userContentController.addUserScript(Self.chartViewerScript)
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
         #if DEBUG
