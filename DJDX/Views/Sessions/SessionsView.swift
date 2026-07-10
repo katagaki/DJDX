@@ -2,11 +2,15 @@ import SwiftUI
 
 struct SessionsView: View {
     var store: IIDXSessionStore
+    var analyticsModel: AnalyticsModel
+    var analyticsNamespace: Namespace.ID
+    var towerNamespace: Namespace.ID
 
     @State private var isPresentingActive: Bool = false
     @State private var isPresentingExternalDataSources: Bool = false
     @AppStorage(wrappedValue: false, IIDXSessionWorkoutBridge.healthKitEnabledKey) private var healthKitEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") private var isBemaniWikiEnabled: Bool
+    @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") private var showAnalytics: Bool
 
     private var pastSessions: [IIDXPlaySession] {
         store.sessions.filter { !$0.isActive }
@@ -49,6 +53,17 @@ struct SessionsView: View {
                         resumeCard(active)
                     }
                     .buttonStyle(.plain)
+                }
+            }
+            if showAnalytics {
+                Section {
+                    AnalyticsView(model: analyticsModel,
+                                  isEditing: .constant(false),
+                                  analyticsNamespace: analyticsNamespace,
+                                  towerNamespace: towerNamespace)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
                 }
             }
             Section("Sessions.History.Title") {

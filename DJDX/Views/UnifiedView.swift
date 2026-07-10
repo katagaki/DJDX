@@ -62,7 +62,10 @@ struct UnifiedView: View {
         NavigationStack(path: $navigationManager.path) {
             ZStack {
                 if isSessionsMode {
-                    SessionsView(store: sessionStore)
+                    SessionsView(store: sessionStore,
+                                 analyticsModel: analyticsModel,
+                                 analyticsNamespace: analyticsNamespace,
+                                 towerNamespace: towerNamespace)
                 } else if selectedGame == .soundVoltex {
                     SDVXScoresView(isEditingAnalytics: $isEditingAnalytics) {
                         sdvxHeader
