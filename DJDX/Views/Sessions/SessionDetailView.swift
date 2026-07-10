@@ -231,7 +231,7 @@ struct SessionDetailView: View {
     private func breakdownSection(
         title: LocalizedStringKey,
         isExpanded: Binding<Bool>,
-        items: [BreakdownItem]
+        items: [BreakdownBarItem]
     ) -> some View {
         if !items.isEmpty {
             VStack(spacing: 12.0) {
@@ -243,59 +243,18 @@ struct SessionDetailView: View {
                     withAnimation(.smooth.speed(2.0)) { isExpanded.wrappedValue.toggle() }
                 }
                 if isExpanded.wrappedValue {
-                    VStack(spacing: 12.0) {
-                        breakdownBar(items)
-                        breakdownLegend(items)
-                    }
-                    .padding(.horizontal)
+                    BreakdownBarView(items: items)
+                        .padding(.horizontal)
                 }
             }
         }
     }
 
-    private func breakdownBar(_ items: [BreakdownItem]) -> some View {
-        let total = max(1, items.reduce(0) { $0 + $1.count })
-        return GeometryReader { proxy in
-            HStack(spacing: 0.0) {
-                ForEach(items) { item in
-                    Rectangle()
-                        .fill(item.color)
-                        .frame(width: proxy.size.width * CGFloat(item.count) / CGFloat(total))
-                }
-            }
-        }
-        .frame(height: 18.0)
-        .clipShape(Capsule())
-    }
-
-    private func breakdownLegend(_ items: [BreakdownItem]) -> some View {
-        LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: 96.0), spacing: 8.0)],
-            alignment: .leading,
-            spacing: 6.0
-        ) {
-            ForEach(items) { item in
-                HStack(spacing: 5.0) {
-                    RoundedRectangle(cornerRadius: 2.0)
-                        .fill(item.color)
-                        .frame(width: 10.0, height: 10.0)
-                    Text(verbatim: item.label)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                    Spacer(minLength: 2.0)
-                    Text(verbatim: "\(item.count)")
-                        .font(.caption.monospacedDigit().weight(.semibold))
-                }
-            }
-        }
-    }
-
-    private var djLevelItems: [BreakdownItem] {
+    private var djLevelItems: [BreakdownBarItem] {
         IIDXDJLevel.sorted.reversed().compactMap { level in
             let count = plays.filter { $0.djLevel == level.rawValue }.count
             guard count > 0 else { return nil }
-            return BreakdownItem(
+            return BreakdownBarItem(
                 label: level.rawValue,
                 count: count,
                 color: IIDXDJLevel.color(for: level.rawValue)
@@ -303,11 +262,11 @@ struct SessionDetailView: View {
         }
     }
 
-    private var clearTypeItems: [BreakdownItem] {
+    private var clearTypeItems: [BreakdownBarItem] {
         IIDXClearType.sortedWithoutNoPlay.compactMap { clearType in
             let count = plays.filter { $0.clearType == clearType.rawValue }.count
             guard count > 0 else { return nil }
-            return BreakdownItem(
+            return BreakdownBarItem(
                 label: IIDXClearType.abbreviation(for: clearType.rawValue),
                 count: count,
                 color: IIDXClearType.color(for: clearType.rawValue)
@@ -353,11 +312,4 @@ private struct CapturedPlayDestination: View {
             if showsScore == nil { showsScore = play.hasConfidentResult }
         }
     }
-}
-
-private struct BreakdownItem: Identifiable {
-    var id: String { label }
-    let label: String
-    let count: Int
-    let color: Color
 }
