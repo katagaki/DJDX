@@ -36,6 +36,8 @@ struct CapturedPlayScoreView: View {
 
             if !history.isEmpty {
                 Section("Sessions.Score.History") {
+                    CapturedPlayHistoryChart(plays: history + [play], noteCount: matchedNoteCount)
+                        .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                     ForEach(history) { pastPlay in
                         NavigationLink {
                             CapturedPlayScoreView(store: store, play: pastPlay)
