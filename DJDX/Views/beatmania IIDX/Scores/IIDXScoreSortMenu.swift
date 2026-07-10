@@ -218,7 +218,7 @@ struct ScoreFilterSheet: View {
     }
 }
 
-private struct FilterDisclosureLabel: View {
+struct FilterDisclosureLabel: View {
 
     let title: LocalizedStringResource
     let count: Int
@@ -245,7 +245,7 @@ private struct FilterDisclosureLabel: View {
     }
 }
 
-private struct SelectableRow<Label: View>: View {
+struct SelectableRow<Label: View>: View {
 
     var isSelected: Bool
     @ViewBuilder var label: Label
