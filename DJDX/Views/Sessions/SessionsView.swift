@@ -157,49 +157,28 @@ struct SessionsView: View {
     }
 
     private var betaNotice: some View {
-        HStack(alignment: .top, spacing: 12.0) {
-            Image(systemName: "info.circle.fill")
-                .font(.system(size: 18.0, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 36.0, height: 36.0)
-                .background(.accent, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
-            VStack(alignment: .leading, spacing: 3.0) {
-                Text("Sessions.Beta.Title")
-                    .font(.subheadline.weight(.semibold))
-                Text("Sessions.Welcome.Message")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            Spacer(minLength: 0.0)
-        }
-        .padding(.vertical, 4.0)
+        SessionsNoticeRow(
+            systemImage: "info.circle.fill",
+            color: .accent,
+            title: "Sessions.Beta.Title",
+            message: "Sessions.Welcome.Message"
+        )
     }
 
     private var bemaniWikiWarning: some View {
-        HStack(alignment: .top, spacing: 12.0) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 18.0, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 36.0, height: 36.0)
-                .background(.orange, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
-            VStack(alignment: .leading, spacing: 3.0) {
-                Text("Sessions.DataSource.Warning.Title")
-                    .font(.subheadline.weight(.semibold))
-                Text("Sessions.DataSource.Warning.Message")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Button("Sessions.DataSource.Warning.Action") {
-                    isPresentingExternalDataSources = true
-                }
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.orange)
-                .buttonStyle(.plain)
+        SessionsNoticeRow(
+            systemImage: "exclamationmark.triangle.fill",
+            color: .orange,
+            title: "Sessions.DataSource.Warning.Title",
+            message: "Sessions.DataSource.Warning.Message"
+        ) {
+            Button("Sessions.DataSource.Warning.Action") {
+                isPresentingExternalDataSources = true
             }
-            Spacer(minLength: 0.0)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.orange)
+            .buttonStyle(.plain)
         }
-        .padding(.vertical, 4.0)
     }
 
     private var sessionCards: some View {
@@ -318,5 +297,46 @@ struct SessionCardsRow: View {
     private func durationText(for session: IIDXPlaySession) -> String {
         let minutes = Int(session.duration / 60.0)
         return String(localized: "Sessions.Duration.\(minutes)")
+    }
+}
+
+struct SessionsNoticeRow<Accessory: View>: View {
+    var systemImage: String
+    var color: Color
+    var title: LocalizedStringKey
+    var message: LocalizedStringKey
+    @ViewBuilder var accessory: () -> Accessory
+
+    init(systemImage: String,
+         color: Color,
+         title: LocalizedStringKey,
+         message: LocalizedStringKey,
+         @ViewBuilder accessory: @escaping () -> Accessory = { EmptyView() }) {
+        self.systemImage = systemImage
+        self.color = color
+        self.title = title
+        self.message = message
+        self.accessory = accessory
+    }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12.0) {
+            Image(systemName: systemImage)
+                .font(.system(size: 18.0, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 36.0, height: 36.0)
+                .background(color, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
+            VStack(alignment: .leading, spacing: 3.0) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Text(message)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                accessory()
+            }
+            Spacer(minLength: 0.0)
+        }
+        .padding(.vertical, 4.0)
     }
 }
