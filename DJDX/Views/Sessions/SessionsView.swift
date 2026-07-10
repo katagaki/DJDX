@@ -8,14 +8,14 @@ struct SessionsView: View {
 
     @State private var isPresentingActive: Bool = false
     @State private var isPresentingExternalDataSources: Bool = false
+    @State private var isHistoryExpanded: Bool = true
+    @State private var isScoreDataExpanded: Bool = true
     @State private var latestPlays: [IIDXCapturedPlay] = []
     @State private var playHistories: [String: [IIDXCapturedPlay]] = [:]
     @State private var songCompactTitles: [String: IIDXSong] = [:]
     @AppStorage(wrappedValue: false, IIDXSessionWorkoutBridge.healthKitEnabledKey) private var healthKitEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") private var isBemaniWikiEnabled: Bool
     @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") private var showAnalytics: Bool
-
-    @Namespace private var scoresNamespace
 
     private let reader = IIDXReader()
 
@@ -24,91 +24,38 @@ struct SessionsView: View {
     }
 
     var body: some View {
-        List {
-            Section {
-                betaNotice
-            }
-            if !isBemaniWikiEnabled {
-                Section {
-                    bemaniWikiWarning
-                }
-            }
-            Section {
-                Toggle(isOn: $healthKitEnabled) {
-                    HStack(alignment: .top, spacing: 12.0) {
-                        Image(systemName: "heart.fill")
-                            .font(.system(size: 18.0, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .frame(width: 36.0, height: 36.0)
-                            .background(.pink, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
-                        VStack(alignment: .leading, spacing: 3.0) {
-                            Text("Sessions.HealthKit.Toggle")
-                                .font(.subheadline.weight(.semibold))
-                            Text("Sessions.HealthKit.Footer")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
+        ScrollView {
+            LazyVStack(spacing: 0.0) {
+                VStack(spacing: 12.0) {
+                    sessionsCard { betaNotice }
+                    if !isBemaniWikiEnabled {
+                        sessionsCard { bemaniWikiWarning }
+                    }
+                    sessionsCard { healthKitToggle }
+                    if let active = store.activeSession {
+                        Button {
+                            isPresentingActive = true
+                        } label: {
+                            sessionsCard { resumeCard(active) }
                         }
+                        .buttonStyle(.plain)
                     }
                 }
-            }
-            if let active = store.activeSession {
-                Section {
-                    Button {
-                        isPresentingActive = true
-                    } label: {
-                        resumeCard(active)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            Section("Sessions.History.Title") {
-                if pastSessions.isEmpty {
-                    Text("Sessions.History.Empty.Message")
-                        .foregroundStyle(.secondary)
-                } else {
-                    sessionCards
-                }
-            }
-            if showAnalytics {
-                Section {
+                .padding(.horizontal)
+                .padding(.top, 8.0)
+                historySection
+                    .padding(.top, 20.0)
+                if showAnalytics {
                     AnalyticsView(model: analyticsModel,
                                   isEditing: .constant(false),
                                   analyticsNamespace: analyticsNamespace,
                                   towerNamespace: towerNamespace)
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
                 }
+                scoreDataSection
+                    .padding(.top, 20.0)
             }
-            Section("Analytics.Section.ScoreData") {
-                if latestPlays.isEmpty {
-                    Text("Sessions.Empty.Title")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(latestPlays) { play in
-                        NavigationLink {
-                            scoreDestination(for: play)
-                        } label: {
-                            IIDXScoreRow(
-                                namespace: scoresNamespace,
-                                songRecord: play.asSongRecord(),
-                                level: play.level == .unknown ? .another : play.level,
-                                score: play.levelScore(),
-                                scoreRate: scoreRate(for: play)
-                            )
-                            .contentShape(.rect)
-                        }
-                        .buttonStyle(.plain)
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
-                    }
-                }
-            }
+            .padding(.bottom, 8.0)
         }
-        .listSectionSpacing(.compact)
-        .contentMargins(.top, 8.0, for: .scrollContent)
-        .scrollContentBackground(.hidden)
         .background {
             LinearGradient(
                 colors: [.backgroundGradientTop, .backgroundGradientBottom],
@@ -181,11 +128,69 @@ struct SessionsView: View {
         }
     }
 
-    private var sessionCards: some View {
-        SessionCardsRow(store: store, sessions: pastSessions)
-            .listRowInsets(EdgeInsets())
-            .listRowBackground(Color.clear)
-            .listRowSeparator(.hidden)
+    private var healthKitToggle: some View {
+        Toggle(isOn: $healthKitEnabled) {
+            HStack(alignment: .top, spacing: 12.0) {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 18.0, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 36.0, height: 36.0)
+                    .background(.pink, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
+                VStack(alignment: .leading, spacing: 3.0) {
+                    Text("Sessions.HealthKit.Toggle")
+                        .font(.subheadline.weight(.semibold))
+                    Text("Sessions.HealthKit.Footer")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+
+    private var historySection: some View {
+        VStack(spacing: 12.0) {
+            AnalyticsSectionHeader(
+                title: "Sessions.History.Title",
+                isCollapsible: true,
+                isExpanded: isHistoryExpanded
+            ) {
+                withAnimation(.smooth.speed(2.0)) { isHistoryExpanded.toggle() }
+            }
+            if isHistoryExpanded {
+                if pastSessions.isEmpty {
+                    Text("Sessions.History.Empty.Message")
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                } else {
+                    SessionCardsRow(store: store, sessions: pastSessions)
+                }
+            }
+        }
+    }
+
+    private var scoreDataSection: some View {
+        SessionScoreDataSection(
+            store: store,
+            latestPlays: latestPlays,
+            playHistories: playHistories,
+            songCompactTitles: songCompactTitles,
+            isExpanded: $isScoreDataExpanded
+        )
+    }
+
+    private func sessionsCard<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        let cornerRadius: CGFloat
+        if #available(iOS 26.0, *) {
+            cornerRadius = 20.0
+        } else {
+            cornerRadius = 12.0
+        }
+        return content()
+            .padding(12.0)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .cardBackground(cornerRadius: cornerRadius)
     }
 
     private func reloadScores() {
@@ -210,23 +215,6 @@ struct SessionsView: View {
         latestPlays = histories.values.compactMap(\.first).sorted { $0.captureDate > $1.captureDate }
     }
 
-    @ViewBuilder
-    private func scoreDestination(for play: IIDXCapturedPlay) -> some View {
-        let history = Array(playHistories[play.chartKey()]?.dropFirst() ?? [])
-        if play.hasConfidentResult {
-            CapturedPlayScoreView(store: store, play: play, history: history)
-        } else {
-            CapturedPlayDetailView(store: store, play: play)
-        }
-    }
-
-    private func scoreRate(for play: IIDXCapturedPlay) -> Float? {
-        guard let title = play.songTitle,
-              let noteCount = songCompactTitles[title.compact]?.spNoteCount?.noteCount(for: play.level),
-              noteCount > 0 else { return nil }
-        return Float(play.exScore) / Float(noteCount * 2)
-    }
-
     private func resumeCard(_ session: IIDXPlaySession) -> some View {
         HStack {
             Image(systemName: "record.circle")
@@ -244,6 +232,72 @@ struct SessionsView: View {
                 .font(.caption.bold())
                 .foregroundStyle(.tertiary)
         }
+    }
+}
+
+struct SessionScoreDataSection: View {
+    var store: IIDXSessionStore
+    var latestPlays: [IIDXCapturedPlay]
+    var playHistories: [String: [IIDXCapturedPlay]]
+    var songCompactTitles: [String: IIDXSong]
+    @Binding var isExpanded: Bool
+
+    @Namespace private var scoresNamespace
+
+    var body: some View {
+        VStack(spacing: 0.0) {
+            AnalyticsSectionHeader(
+                title: "Analytics.Section.ScoreData",
+                isCollapsible: true,
+                isExpanded: isExpanded
+            ) {
+                withAnimation(.smooth.speed(2.0)) { isExpanded.toggle() }
+            }
+            .padding(.bottom, 12.0)
+            if isExpanded {
+                if latestPlays.isEmpty {
+                    Text("Sessions.Empty.Title")
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 24.0)
+                } else {
+                    Divider()
+                    ForEach(latestPlays) { play in
+                        NavigationLink {
+                            scoreDestination(for: play)
+                        } label: {
+                            IIDXScoreRow(
+                                namespace: scoresNamespace,
+                                songRecord: play.asSongRecord(),
+                                level: play.level == .unknown ? .another : play.level,
+                                score: play.levelScore(),
+                                scoreRate: scoreRate(for: play)
+                            )
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
+                        Divider()
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func scoreDestination(for play: IIDXCapturedPlay) -> some View {
+        let history = Array(playHistories[play.chartKey()]?.dropFirst() ?? [])
+        if play.hasConfidentResult {
+            CapturedPlayScoreView(store: store, play: play, history: history)
+        } else {
+            CapturedPlayDetailView(store: store, play: play)
+        }
+    }
+
+    private func scoreRate(for play: IIDXCapturedPlay) -> Float? {
+        guard let title = play.songTitle,
+              let noteCount = songCompactTitles[title.compact]?.spNoteCount?.noteCount(for: play.level),
+              noteCount > 0 else { return nil }
+        return Float(play.exScore) / Float(noteCount * 2)
     }
 }
 
