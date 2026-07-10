@@ -59,6 +59,27 @@ final class IIDXCapturedPlay: Identifiable, @unchecked Sendable {
             && djLevel != IIDXDJLevel.none.rawValue
     }
 
+    func chartKey() -> String {
+        "\((songTitle ?? "").compact)|\(playType.displayName())|\(level.rawValue)"
+    }
+
+    func asSongRecord() -> IIDXSongRecord {
+        let record = IIDXSongRecord()
+        record.title = songTitle ?? String(localized: "Sessions.UnknownSong")
+        record.playType = playType
+        record.lastPlayDate = captureDate
+        let score = levelScore()
+        switch level {
+        case .beginner: record.beginnerScore = score
+        case .normal: record.normalScore = score
+        case .hyper: record.hyperScore = score
+        case .another: record.anotherScore = score
+        case .leggendaria: record.leggendariaScore = score
+        default: break
+        }
+        return record
+    }
+
     func levelScore() -> IIDXLevelScore {
         IIDXLevelScore(
             level: level,

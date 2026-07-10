@@ -34,6 +34,11 @@ final class AnalyticsModel {
 
     let fetcher = IIDXReader()
     let difficulties: [Int] = Array(1...12)
+    let sessionStore: IIDXSessionStore?
+
+    init(sessionStore: IIDXSessionStore? = nil) {
+        self.sessionStore = sessionStore
+    }
 
     var towerChartEntries: [IIDXTowerEntry] {
         let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: .now)!
@@ -55,6 +60,14 @@ final class AnalyticsModel {
     func reload(playType: IIDXPlayType, iidxVersion: IIDXVersion) async {
         dataState = .loading
         try? await Task.sleep(for: .seconds(0.5))
+        if let sessionStore {
+            reloadFromLastSession(store: sessionStore, playType: playType)
+            towerEntries = await fetcher.allTowerEntries()
+            withAnimation(.smooth.speed(2.0)) {
+                dataState = .presenting
+            }
+            return
+        }
         await reloadOverview(playType: playType, iidxVersion: iidxVersion)
         await reloadTrends(playType: playType, iidxVersion: iidxVersion)
         await reloadNewClearsAndHighScores(playType: playType, iidxVersion: iidxVersion)
