@@ -71,6 +71,7 @@ struct UnifiedView: View {
                 if isSessionsMode {
                     SessionsView(store: sessionStore,
                                  analyticsModel: sessionAnalyticsModel,
+                                 isEditingAnalytics: $isEditingAnalytics,
                                  analyticsNamespace: analyticsNamespace,
                                  towerNamespace: towerNamespace)
                 } else if selectedGame == .soundVoltex {
@@ -113,7 +114,9 @@ struct UnifiedView: View {
                     ToolbarSpacer(.fixed, placement: .topBarLeading)
                 }
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    if !isSessionsMode {
+                    if isSessionsMode {
+                        sessionButton
+                    } else {
                         Button("Shared.Import", systemImage: "arrow.down.circle.dotted") {
                             isPresentingImport = true
                         }
@@ -121,7 +124,7 @@ struct UnifiedView: View {
                         .automaticSheetMatchedTransitionSource(id: "Import", in: importNamespace)
                     }
                 }
-                if !isSessionsMode {
+                if !isSessionsMode || showAnalytics {
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         Button {
                             withAnimation(.smooth.speed(2.0)) { isEditingAnalytics.toggle() }
@@ -139,30 +142,6 @@ struct UnifiedView: View {
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     MoreMenu()
-                }
-                if isSessionsMode {
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        Spacer()
-                        Button {
-                            if sessionStore.activeSession == nil {
-                                sessionStore.startSession()
-                            } else {
-                                sessionStore.endSession()
-                            }
-                        } label: {
-                            if sessionStore.activeSession == nil {
-                                Label("Sessions.Start", systemImage: "play.fill")
-                            } else {
-                                Label("Sessions.End", systemImage: "stop.fill")
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .labelsVisibility(.visible)
-                        .labelStyle(.titleAndIcon)
-                        .tint(sessionStore.activeSession == nil ? .accent : .red)
-                        Spacer()
-                        SessionsHelpMenu()
-                    }
                 }
             }
             .navigationDestination(for: MorePath.self) { viewPath in
@@ -254,6 +233,9 @@ struct UnifiedView: View {
             if !newValue.supportsSessions {
                 appMode = .imports
             }
+        }
+        .onChange(of: appMode) { _, _ in
+            isEditingAnalytics = false
         }
         .onReceive(NotificationCenter.default.publisher(for: .startSessionRequested)
             .receive(on: RunLoop.main)) { notification in
