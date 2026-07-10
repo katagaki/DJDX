@@ -13,7 +13,6 @@ struct SessionsView: View {
     @State private var latestPlays: [IIDXCapturedPlay] = []
     @State private var playHistories: [String: [IIDXCapturedPlay]] = [:]
     @State private var songCompactTitles: [String: IIDXSong] = [:]
-    @AppStorage(wrappedValue: false, IIDXSessionWorkoutBridge.healthKitEnabledKey) private var healthKitEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") private var isBemaniWikiEnabled: Bool
     @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") private var showAnalytics: Bool
 
@@ -26,23 +25,23 @@ struct SessionsView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 0.0) {
-                VStack(spacing: 12.0) {
-                    sessionsCard { betaNotice }
-                    if !isBemaniWikiEnabled {
-                        sessionsCard { bemaniWikiWarning }
-                    }
-                    sessionsCard { healthKitToggle }
-                    if let active = store.activeSession {
-                        Button {
-                            isPresentingActive = true
-                        } label: {
-                            sessionsCard { resumeCard(active) }
+                if !isBemaniWikiEnabled || store.activeSession != nil {
+                    VStack(spacing: 12.0) {
+                        if !isBemaniWikiEnabled {
+                            sessionsCard { bemaniWikiWarning }
                         }
-                        .buttonStyle(.plain)
+                        if let active = store.activeSession {
+                            Button {
+                                isPresentingActive = true
+                            } label: {
+                                sessionsCard { resumeCard(active) }
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
+                    .padding(.horizontal)
+                    .padding(.top, 8.0)
                 }
-                .padding(.horizontal)
-                .padding(.top, 8.0)
                 historySection
                     .padding(.top, 20.0)
                 if showAnalytics {
@@ -63,12 +62,6 @@ struct SessionsView: View {
                 endPoint: .bottom
             )
             .ignoresSafeArea()
-        }
-        .onChange(of: healthKitEnabled) { _, enabled in
-            if enabled {
-                Task { _ = await IIDXSessionWorkoutBridge.shared.requestAuthorization() }
-            }
-            IIDXSessionWorkoutBridge.shared.syncProfileToWatch()
         }
         .onAppear {
             store.bootstrap()
@@ -103,15 +96,6 @@ struct SessionsView: View {
         }
     }
 
-    private var betaNotice: some View {
-        SessionsNoticeRow(
-            systemImage: "info.circle.fill",
-            color: .accent,
-            title: "Sessions.Beta.Title",
-            message: "Sessions.Welcome.Message"
-        )
-    }
-
     private var bemaniWikiWarning: some View {
         SessionsNoticeRow(
             systemImage: "exclamationmark.triangle.fill",
@@ -125,26 +109,6 @@ struct SessionsView: View {
             .font(.subheadline.weight(.semibold))
             .foregroundStyle(.orange)
             .buttonStyle(.plain)
-        }
-    }
-
-    private var healthKitToggle: some View {
-        Toggle(isOn: $healthKitEnabled) {
-            HStack(alignment: .top, spacing: 12.0) {
-                Image(systemName: "heart.fill")
-                    .font(.system(size: 18.0, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 36.0, height: 36.0)
-                    .background(.pink, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
-                VStack(alignment: .leading, spacing: 3.0) {
-                    Text("Sessions.HealthKit.Toggle")
-                        .font(.subheadline.weight(.semibold))
-                    Text("Sessions.HealthKit.Footer")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
         }
     }
 
@@ -339,5 +303,28 @@ struct SessionsNoticeRow<Accessory: View>: View {
             Spacer(minLength: 0.0)
         }
         .padding(.vertical, 4.0)
+    }
+}
+
+struct SessionsHelpMenu: View {
+    @AppStorage(wrappedValue: false, IIDXSessionWorkoutBridge.healthKitEnabledKey) private var healthKitEnabled: Bool
+
+    var body: some View {
+        Menu {
+            Text("Sessions.Welcome.Message")
+            Divider()
+            Toggle(isOn: $healthKitEnabled) {
+                Label("Sessions.HealthKit.Toggle", systemImage: "heart.fill")
+            }
+        } label: {
+            Label("Sessions.Help", systemImage: "questionmark.circle")
+        }
+        .menuOrder(.fixed)
+        .onChange(of: healthKitEnabled) { _, enabled in
+            if enabled {
+                Task { _ = await IIDXSessionWorkoutBridge.shared.requestAuthorization() }
+            }
+            IIDXSessionWorkoutBridge.shared.syncProfileToWatch()
+        }
     }
 }

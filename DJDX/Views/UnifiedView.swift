@@ -161,6 +161,7 @@ struct UnifiedView: View {
                         .labelStyle(.titleAndIcon)
                         .tint(sessionStore.activeSession == nil ? .accent : .red)
                         Spacer()
+                        SessionsHelpMenu()
                     }
                 }
             }
