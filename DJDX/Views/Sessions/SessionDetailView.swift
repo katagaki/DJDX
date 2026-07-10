@@ -198,6 +198,7 @@ struct SessionDetailView: View {
                         .padding(.vertical, 24.0)
                 } else {
                     VStack(spacing: 0.0) {
+                        Divider()
                         ForEach(plays.reversed()) { play in
                             NavigationLink {
                                 playDestination(for: play)
@@ -211,6 +212,7 @@ struct SessionDetailView: View {
                                     deletePlay(play)
                                 }
                             }
+                            Divider()
                         }
                     }
                 }
