@@ -22,14 +22,7 @@ extension AnalyticsModel {
         )
         let cumulativePlays = Self.latestPlaysPerChart(baseline + lastPlays)
 
-        var clearTypeTrends: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-        var djLevelTrends: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-        for session in sessions {
-            let plays = Self.latestPlaysPerChart(validPlays(store.plays(for: session), playType: playType))
-            guard !plays.isEmpty else { continue }
-            clearTypeTrends[session.startDate] = buildOrderedClearType(from: Self.clearTypeCounts(of: plays))
-            djLevelTrends[session.startDate] = buildOrderedDJLevel(from: Self.djLevelCounts(of: plays))
-        }
+        let trends = cumulativeTrends(store: store, playType: playType, sessions: sessions)
 
         let computed = Self.computeNewEntries(
             latestRecords: Self.mergedSongRecords(lastPlays),
@@ -41,8 +34,8 @@ extension AnalyticsModel {
             djLevelPerDifficulty = convertToEnumKeyed(
                 buildOrderedDJLevel(from: Self.djLevelCounts(of: cumulativePlays))
             )
-            clearTypePerImportGroup = clearTypeTrends
-            djLevelPerImportGroup = djLevelTrends
+            clearTypePerImportGroup = trends.clearType
+            djLevelPerImportGroup = trends.djLevel
             newClears = computed.clears["CLEAR"]!
             newEasyClears = computed.clears["EASY CLEAR"]!
             newAssistClears = computed.clears["ASSIST CLEAR"]!
@@ -55,6 +48,31 @@ extension AnalyticsModel {
             newAA = computed.djLevels["AA"]!
             newA = computed.djLevels["A"]!
         }
+    }
+
+    private func cumulativeTrends(
+        store: IIDXSessionStore,
+        playType: IIDXPlayType,
+        sessions: [IIDXPlaySession]
+    ) -> (
+        clearType: [Date: [Int: OrderedDictionary<String, Int>]],
+        djLevel: [Date: [Int: OrderedDictionary<String, Int>]]
+    ) {
+        var clearType: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
+        var djLevel: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
+        var accumulatedPlays: [IIDXCapturedPlay] = []
+        for session in sessions {
+            let plays = validPlays(store.plays(for: session), playType: playType)
+            guard !plays.isEmpty else { continue }
+            accumulatedPlays = Self.latestPlaysPerChart(accumulatedPlays + plays)
+            clearType[session.startDate] = buildOrderedClearType(
+                from: Self.clearTypeCounts(of: accumulatedPlays)
+            )
+            djLevel[session.startDate] = buildOrderedDJLevel(
+                from: Self.djLevelCounts(of: accumulatedPlays)
+            )
+        }
+        return (clearType, djLevel)
     }
 
     private func clearSessionData() {
