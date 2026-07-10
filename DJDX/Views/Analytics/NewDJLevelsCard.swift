@@ -29,12 +29,9 @@ struct NewDJLevelsCard: View {
     }
 }
 
-struct NewDJLevelEntry: Identifiable, Hashable {
+struct NewDJLevelEntry: Identifiable, Hashable, IIDXNewEntry {
     let id = UUID()
-    let songTitle: String
-    let songArtist: String
+    let songRecord: IIDXSongRecord
     let level: IIDXLevel
-    let difficulty: Int
-    let djLevel: String
-    let previousDJLevel: String
+    let score: IIDXLevelScore
 }

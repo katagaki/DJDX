@@ -29,14 +29,10 @@ struct NewHighScoresCard: View {
     }
 }
 
-struct NewHighScoreEntry: Identifiable, Hashable {
+struct NewHighScoreEntry: Identifiable, Hashable, IIDXNewEntry {
     let id = UUID()
-    let songTitle: String
-    let songArtist: String
+    let songRecord: IIDXSongRecord
     let level: IIDXLevel
-    let difficulty: Int
-    let newScore: Int
+    let score: IIDXLevelScore
     let previousScore: Int
-    let newDJLevel: String
-    let previousDJLevel: String
 }

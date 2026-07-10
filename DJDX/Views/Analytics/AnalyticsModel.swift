@@ -242,11 +242,9 @@ final class AnalyticsModel {
                    computedClears.keys.contains(clearType),
                    previousClearType != clearType {
                     computedClears[clearType]!.append(NewClearEntry(
-                        songTitle: latestRecord.title,
-                        songArtist: latestRecord.artist,
+                        songRecord: latestRecord,
                         level: level,
-                        difficulty: latestScore.difficulty,
-                        clearType: clearType,
+                        score: latestScore,
                         previousClearType: previousClearType
                     ))
                 }
@@ -256,26 +254,19 @@ final class AnalyticsModel {
                    computedDJLevels.keys.contains(djLevel),
                    previousDJLevel != djLevel {
                     computedDJLevels[djLevel]!.append(NewDJLevelEntry(
-                        songTitle: latestRecord.title,
-                        songArtist: latestRecord.artist,
+                        songRecord: latestRecord,
                         level: level,
-                        difficulty: latestScore.difficulty,
-                        djLevel: djLevel,
-                        previousDJLevel: previousDJLevel
+                        score: latestScore
                     ))
                 }
 
                 let previousScoreValue = previousScore?.score ?? 0
                 if latestScore.score > previousScoreValue {
                     computedNewHighScores.append(NewHighScoreEntry(
-                        songTitle: latestRecord.title,
-                        songArtist: latestRecord.artist,
+                        songRecord: latestRecord,
                         level: level,
-                        difficulty: latestScore.difficulty,
-                        newScore: latestScore.score,
-                        previousScore: previousScoreValue,
-                        newDJLevel: latestScore.djLevel,
-                        previousDJLevel: previousScore?.djLevel ?? "---"
+                        score: latestScore,
+                        previousScore: previousScoreValue
                     ))
                 }
             }

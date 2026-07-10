@@ -123,7 +123,7 @@ final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
     }
 }
 
-struct IIDXLevelScore: Codable, Equatable {
+struct IIDXLevelScore: Codable, Equatable, Hashable {
     var level: IIDXLevel
     var difficulty: Int
     var score: Int
@@ -171,5 +171,12 @@ struct IIDXLevelScore: Codable, Equatable {
         lhs.difficulty == rhs.difficulty &&
         lhs.score == rhs.score &&
         lhs.clearType == rhs.clearType
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(level)
+        hasher.combine(difficulty)
+        hasher.combine(score)
+        hasher.combine(clearType)
     }
 }
