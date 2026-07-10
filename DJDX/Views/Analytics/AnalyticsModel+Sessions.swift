@@ -20,6 +20,7 @@ extension AnalyticsModel {
         let baseline = Self.latestPlaysPerChart(
             sessions.dropLast().flatMap { validPlays(store.plays(for: $0), playType: playType) }
         )
+        let cumulativePlays = Self.latestPlaysPerChart(baseline + lastPlays)
 
         var clearTypeTrends: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
         var djLevelTrends: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
@@ -36,9 +37,9 @@ extension AnalyticsModel {
         )
 
         withAnimation(.smooth.speed(2.0)) {
-            clearTypePerDifficulty = buildOrderedClearType(from: Self.clearTypeCounts(of: lastPlays))
+            clearTypePerDifficulty = buildOrderedClearType(from: Self.clearTypeCounts(of: cumulativePlays))
             djLevelPerDifficulty = convertToEnumKeyed(
-                buildOrderedDJLevel(from: Self.djLevelCounts(of: lastPlays))
+                buildOrderedDJLevel(from: Self.djLevelCounts(of: cumulativePlays))
             )
             clearTypePerImportGroup = clearTypeTrends
             djLevelPerImportGroup = djLevelTrends
