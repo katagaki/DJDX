@@ -6272,6 +6272,29 @@
         }
       }
     },
+    "Sessions.Score.History" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score History"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコア履歴"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分數紀錄"
+          }
+        }
+      }
+    },
     "Sessions.Start" : {
       "extractionState" : "manual",
       "localizations" : {
