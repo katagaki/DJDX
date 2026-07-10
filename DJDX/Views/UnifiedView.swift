@@ -44,7 +44,14 @@ struct UnifiedView: View {
     @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
     @State var polarisChordAnalyticsModel = PolarisChordAnalyticsModel()
     @State var ddrAnalyticsModel = DDRAnalyticsModel()
-    @State var sessionStore = IIDXSessionStore()
+    @State var sessionStore: IIDXSessionStore
+    @State var sessionAnalyticsModel: AnalyticsModel
+
+    init() {
+        let store = IIDXSessionStore()
+        _sessionStore = State(initialValue: store)
+        _sessionAnalyticsModel = State(initialValue: AnalyticsModel(sessionStore: store))
+    }
 
     @Namespace var analyticsNamespace
     @Namespace var sdvxAnalyticsNamespace
@@ -62,7 +69,10 @@ struct UnifiedView: View {
         NavigationStack(path: $navigationManager.path) {
             ZStack {
                 if isSessionsMode {
-                    SessionsView(store: sessionStore)
+                    SessionsView(store: sessionStore,
+                                 analyticsModel: sessionAnalyticsModel,
+                                 analyticsNamespace: analyticsNamespace,
+                                 towerNamespace: towerNamespace)
                 } else if selectedGame == .soundVoltex {
                     SDVXScoresView(isEditingAnalytics: $isEditingAnalytics) {
                         sdvxHeader
@@ -151,6 +161,7 @@ struct UnifiedView: View {
                         .labelStyle(.titleAndIcon)
                         .tint(sessionStore.activeSession == nil ? .accent : .red)
                         Spacer()
+                        SessionsHelpMenu()
                     }
                 }
             }
@@ -162,7 +173,7 @@ struct UnifiedView: View {
             }
             .navigationDestination(for: AnalyticsPath.self) { viewPath in
                 AnalyticsDestinationView(
-                    model: analyticsModel,
+                    model: isSessionsMode ? sessionAnalyticsModel : analyticsModel,
                     path: viewPath,
                     analyticsNamespace: analyticsNamespace
                 )

@@ -18,6 +18,7 @@ struct IIDXScoreRow: View {
     var level: IIDXLevel
     var score: IIDXLevelScore
     @State var scoreRate: Float?
+    var scoreDelta: Int?
 
     var body: some View {
         HStack(alignment: .center, spacing: 8.0) {
@@ -106,6 +107,12 @@ struct IIDXScoreRow: View {
                                                                             endPoint: .bottom))
                                             .fontWidth(.expanded)
                                             .fontWeight(.heavy)
+                                        if let scoreDelta, scoreDelta > 0 {
+                                            Text("Analytics.NewHighScore.\(scoreDelta)")
+                                                .foregroundStyle(.orange)
+                                                .fontWidth(.expanded)
+                                                .fontWeight(.heavy)
+                                        }
                                     }
                                 }
                                 .font(.caption)
