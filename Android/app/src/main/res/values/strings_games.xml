@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="games_score_data">Score Data</string>
+    <string name="games_search_hint">Search</string>
+    <string name="games_sort">Sort</string>
+    <string name="games_filter">Filter</string>
+    <string name="games_time_machine">Time Machine</string>
+    <string name="games_sort_title">Title</string>
+    <string name="games_sort_score">Score</string>
+    <string name="games_sort_level">Level</string>
+    <string name="games_sort_clear_type">Clear Type</string>
+    <string name="games_filter_difficulty">Difficulty</string>
+    <string name="games_filter_level">Level</string>
+    <string name="games_filter_clear_type">Clear Type</string>
+    <string name="games_filter_grade">Grade</string>
+    <string name="games_filter_reset">Reset Filters</string>
+    <string name="games_empty_title">No Score Data</string>
+    <string name="games_empty_message">Import your play data to see your scores here.</string>
+    <string name="games_back">Back</string>
+    <string name="games_ok">OK</string>
+    <string name="games_cancel">Cancel</string>
+    <string name="games_clear_search">Clear search</string>
+    <string name="games_youtube">YouTube</string>
+    <string name="sdvx_clear_type">Clear Rank</string>
+    <string name="sdvx_grade">Grade</string>
+    <string name="sdvx_high_score">High Score</string>
+    <string name="sdvx_ex_score">EX Score</string>
+    <string name="sdvx_plays">PLAYS</string>
+    <string name="sdvx_clears">CLEARS</string>
+    <string name="sdvx_uc">UC</string>
+    <string name="sdvx_perfect">PERFECT</string>
+    <string name="sdvx_view_chart">Chart (sdvx.in)</string>
+    <string name="polaris_achievement_rate">Achievement Rate</string>
+    <string name="polaris_grade">Grade</string>
+    <string name="polaris_score">Score</string>
+    <string name="polaris_clear_type">Clear Type</string>
+    <string name="polaris_sort_rate">Achievement Rate</string>
+    <string name="ddr_score">Score</string>
+    <string name="ddr_rank">Rank</string>
+    <string name="ddr_clear">Clear</string>
+    <string name="ddr_clear_lamp">Clear Lamp</string>
+    <string name="ddr_flare_skill">Flare Skill</string>
+    <string name="ddr_flare_rank">Flare Rank</string>
+    <string name="ddr_play_style">Play Style</string>
+    <string name="ddr_only_played">Only Played</string>
+    <string name="games_search_no_results">No results found.</string>
+</resources>

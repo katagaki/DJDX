@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">DJDX</string>
+
+    <string name="shared_cancel">Cancel</string>
+    <string name="shared_delete">Delete</string>
+    <string name="shared_close">Close</string>
+    <string name="shared_ok">OK</string>
+    <string name="shared_import">Import</string>
+
+    <string name="onboarding_title">Welcome to DJDX</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_feature_web_import_title">Web Import</string>
+    <string name="onboarding_feature_web_import_description">Import your play data automatically from e-amusement.</string>
+    <string name="onboarding_feature_external_data_title">External Data</string>
+    <string name="onboarding_feature_external_data_description">Enrich your scores with note counts, notes radar, and chart viewers.</string>
+    <string name="onboarding_feature_multiple_games_title">Multiple Games</string>
+    <string name="onboarding_feature_multiple_games_description">Track beatmania IIDX, SOUND VOLTEX, Polaris Chord, and DDR.</string>
+
+    <string name="more_title">More</string>
+    <string name="more_external_data">External Data Sources</string>
+    <string name="more_show_analytics">Show Analytics</string>
+    <string name="more_delete_web_data">Delete Web Data</string>
+    <string name="more_delete_web_data_done">Web data deleted.</string>
+    <string name="more_delete_web_data_confirm">Delete all saved web login data (cookies and cache)?</string>
+    <string name="more_delete_score_data">Delete Score Data</string>
+    <string name="more_delete_score_data_message">This deletes ALL imported score data and cannot be undone. Enter %1$s to confirm.</string>
+    <string name="more_delete_score_data_done">Score data deleted.</string>
+    <string name="more_delete_score_data_confirm">Delete ALL imported score data? This cannot be undone.</string>
+    <string name="more_github">View Source Code</string>
+    <string name="more_attributions">Attributions</string>
+    <string name="more_disclaimer">Disclaimer</string>
+    <string name="more_disclaimer_text">This app is not affiliated with KONAMI. KONAMI bears no responsibility for any content shown in this app.</string>
+
+    <string name="game_version_sdvx">SOUND VOLTEX version</string>
+
+    <string name="tab_scores">Play Data</string>
+    <string name="tab_analytics">Analytics</string>
+</resources>

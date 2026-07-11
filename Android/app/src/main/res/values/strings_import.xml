@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="import_title">Import</string>
+    <string name="import_web_title">Web Import</string>
+    <string name="import_close">Close</string>
+    <string name="import_to_date">Import to date</string>
+    <string name="import_via_web">Import via web</string>
+    <string name="import_via_web_sp">Import via web (SP)</string>
+    <string name="import_via_web_dp">Import via web (DP)</string>
+    <string name="import_load_csv">Load CSV file</string>
+    <string name="import_download_csv">Download CSV in browser</string>
+    <string name="import_history">Past imports</string>
+    <string name="import_history_empty">No imports yet</string>
+    <string name="import_delete">Delete</string>
+    <string name="import_delete_confirm_title">Delete this import?</string>
+    <string name="import_delete_confirm_message">The data imported on %1$s will be deleted.</string>
+    <string name="import_cancel">Cancel</string>
+    <string name="import_ok">OK</string>
+    <string name="import_status_connecting">Connecting…</string>
+    <string name="import_status_loading">Loading…</string>
+    <string name="import_status_importing">Importing…</string>
+    <string name="import_success_title">Import complete</string>
+    <string name="import_success_message">%1$d records were imported.</string>
+    <string name="import_error_title">Import failed</string>
+    <string name="import_error_no_premium_course">You do not have an active e-amusement premium course subscription.</string>
+    <string name="import_error_no_eamusement_pass">There is no e-amusement pass linked to this account.</string>
+    <string name="import_error_no_play_data">No play data was found.</string>
+    <string name="import_error_server">A server error occurred. Please try again later.</string>
+    <string name="import_error_maintenance">e-amusement is currently under maintenance. Please try again later.</string>
+</resources>

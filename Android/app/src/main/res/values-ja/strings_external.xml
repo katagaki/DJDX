@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="external_title">外部データソース</string>
+    <string name="external_back">戻る</string>
+    <string name="external_reload_all">有効なソースを一括再読み込み</string>
+    <string name="external_reload">再読み込み</string>
+    <string name="external_entry_count">%1$s件のエントリー</string>
+    <string name="external_reload_done">%1$s件のエントリーを再読み込みしました。</string>
+    <string name="external_reload_failed">再読み込みに失敗しました: %1$s</string>
+
+    <string name="external_textage_chart_viewer_name">Textage Chart Viewer</string>
+    <string name="external_textage_chart_viewer_description">IIDXの譜面ビューアーへのリンク</string>
+    <string name="external_bemaniwiki_iidx_name">BEMANIWiki (IIDX)</string>
+    <string name="external_bemaniwiki_iidx_description">スコアレート算出用の総ノーツ数</string>
+    <string name="external_bm2dx_name">bm2dx.com</string>
+    <string name="external_bm2dx_description">ノーツレーダーのデータ</string>
+    <string name="external_sdvxin_name">sdvx.in</string>
+    <string name="external_sdvxin_description">SDVXの譜面へのリンク</string>
+    <string name="external_ddr_name">BEMANIWiki (DDR)</string>
+    <string name="external_ddr_description">DDRの楽曲レベル情報</string>
+</resources>

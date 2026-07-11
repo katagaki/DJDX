@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="analytics_clear_types">Clear Type</string>
+    <string name="analytics_dj_levels">DJ LEVEL</string>
+    <string name="analytics_tower_recent">Tower (Recent)</string>
+    <string name="analytics_tower_totals">Tower (Totals)</string>
+    <string name="analytics_clear_breakdown">Clears</string>
+    <string name="analytics_grade_breakdown">Grades</string>
+    <string name="analytics_rank_breakdown">Ranks</string>
+    <string name="analytics_no_data">No Data</string>
+    <string name="tower_title">Tower</string>
+    <string name="tower_recent">Recent</string>
+    <string name="tower_totals">Totals</string>
+    <string name="tower_keys">Keys</string>
+    <string name="tower_scratch">Scratch</string>
+    <string name="tower_play_date">Play Date</string>
+    <string name="tower_height_cm">%1$d cm</string>
+    <string name="tower_keys_caption">7 keypresses = 1 cm</string>
+    <string name="tower_scratch_caption">1 scratch = 1 cm</string>
+    <string name="tower_back">Back</string>
+    <string name="analytics_last_play">Last Play</string>
+    <string name="analytics_new_record">NEW RECORD</string>
+</resources>

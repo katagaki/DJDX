@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="analytics_clear_types">クリアランプ</string>
+    <string name="analytics_dj_levels">DJ LEVEL</string>
+    <string name="analytics_tower_recent">タワー（最近）</string>
+    <string name="analytics_tower_totals">タワー（合計）</string>
+    <string name="analytics_clear_breakdown">クリア</string>
+    <string name="analytics_grade_breakdown">グレード</string>
+    <string name="analytics_rank_breakdown">ランク</string>
+    <string name="analytics_no_data">データなし</string>
+    <string name="tower_title">タワー</string>
+    <string name="tower_recent">最近</string>
+    <string name="tower_totals">合計</string>
+    <string name="tower_keys">鍵盤</string>
+    <string name="tower_scratch">スクラッチ</string>
+    <string name="tower_play_date">プレー日</string>
+    <string name="tower_height_cm">%1$d cm</string>
+    <string name="tower_keys_caption">鍵盤7回分で1cm</string>
+    <string name="tower_scratch_caption">スクラッチ1回分で1cm</string>
+    <string name="tower_back">戻る</string>
+    <string name="analytics_last_play">最近のプレー</string>
+    <string name="analytics_new_record">NEW RECORD</string>
+</resources>

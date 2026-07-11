@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shared_cancel">キャンセル</string>
+    <string name="shared_delete">削除</string>
+    <string name="shared_close">閉じる</string>
+    <string name="shared_ok">OK</string>
+    <string name="shared_import">インポート</string>
+
+    <string name="onboarding_title">DJDXへようこそ</string>
+    <string name="onboarding_continue">続ける</string>
+    <string name="onboarding_feature_web_import_title">Webインポート</string>
+    <string name="onboarding_feature_web_import_description">e-amusementからプレーデータを自動的に取り込みます。</string>
+    <string name="onboarding_feature_external_data_title">外部データ</string>
+    <string name="onboarding_feature_external_data_description">ノーツ数、ノーツレーダー、譜面ビューアでスコアを強化します。</string>
+    <string name="onboarding_feature_multiple_games_title">複数のゲーム</string>
+    <string name="onboarding_feature_multiple_games_description">beatmania IIDX、SOUND VOLTEX、ポラリスコード、DDRに対応。</string>
+
+    <string name="more_title">その他</string>
+    <string name="more_external_data">外部データソース</string>
+    <string name="more_show_analytics">アナリティクスを表示</string>
+    <string name="more_delete_web_data">Webデータを削除</string>
+    <string name="more_delete_web_data_done">Webデータを削除しました。</string>
+    <string name="more_delete_web_data_confirm">保存されたWebログインデータ（Cookieとキャッシュ）をすべて削除しますか？</string>
+    <string name="more_delete_score_data">スコアデータを削除</string>
+    <string name="more_delete_score_data_message">インポートしたスコアデータをすべて削除します。この操作は取り消せません。確認のため %1$s を入力してください。</string>
+    <string name="more_delete_score_data_done">スコアデータを削除しました。</string>
+    <string name="more_delete_score_data_confirm">インポートしたスコアデータをすべて削除しますか？この操作は取り消せません。</string>
+    <string name="more_github">ソースコード</string>
+    <string name="more_attributions">著者権表記</string>
+    <string name="more_disclaimer">免責事項</string>
+    <string name="more_disclaimer_text">このアプリはコナミとは一切関係がありません。アプリ内に表示される内容について、コナミは一切の責任を負いません。</string>
+
+    <string name="game_version_sdvx">SOUND VOLTEXのバージョン</string>
+
+    <string name="tab_scores">プレーデータ</string>
+    <string name="tab_analytics">アナリティクス</string>
+</resources>

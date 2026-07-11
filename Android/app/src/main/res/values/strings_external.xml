@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="external_title">External Data Sources</string>
+    <string name="external_back">Back</string>
+    <string name="external_reload_all">Reload All Enabled</string>
+    <string name="external_reload">Reload</string>
+    <string name="external_entry_count">%1$s entries</string>
+    <string name="external_reload_done">Reloaded %1$s entries.</string>
+    <string name="external_reload_failed">Reload failed: %1$s</string>
+
+    <string name="external_textage_chart_viewer_name">Textage Chart Viewer</string>
+    <string name="external_textage_chart_viewer_description">IIDX chart viewer links</string>
+    <string name="external_bemaniwiki_iidx_name">BEMANIWiki (IIDX)</string>
+    <string name="external_bemaniwiki_iidx_description">Song note counts for score rates</string>
+    <string name="external_bm2dx_name">bm2dx.com</string>
+    <string name="external_bm2dx_description">Notes radar data</string>
+    <string name="external_sdvxin_name">sdvx.in</string>
+    <string name="external_sdvxin_description">SDVX chart links</string>
+    <string name="external_ddr_name">BEMANIWiki (DDR)</string>
+    <string name="external_ddr_description">DDR song levels</string>
+</resources>
