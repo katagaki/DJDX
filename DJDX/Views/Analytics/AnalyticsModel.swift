@@ -34,6 +34,11 @@ final class AnalyticsModel {
 
     let fetcher = IIDXReader()
     let difficulties: [Int] = Array(1...12)
+    let sessionStore: IIDXSessionStore?
+
+    init(sessionStore: IIDXSessionStore? = nil) {
+        self.sessionStore = sessionStore
+    }
 
     var towerChartEntries: [IIDXTowerEntry] {
         let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: .now)!
@@ -55,6 +60,14 @@ final class AnalyticsModel {
     func reload(playType: IIDXPlayType, iidxVersion: IIDXVersion) async {
         dataState = .loading
         try? await Task.sleep(for: .seconds(0.5))
+        if let sessionStore {
+            reloadFromLastSession(store: sessionStore, playType: playType)
+            towerEntries = await fetcher.allTowerEntries()
+            withAnimation(.smooth.speed(2.0)) {
+                dataState = .presenting
+            }
+            return
+        }
         await reloadOverview(playType: playType, iidxVersion: iidxVersion)
         await reloadTrends(playType: playType, iidxVersion: iidxVersion)
         await reloadNewClearsAndHighScores(playType: playType, iidxVersion: iidxVersion)
@@ -242,11 +255,9 @@ final class AnalyticsModel {
                    computedClears.keys.contains(clearType),
                    previousClearType != clearType {
                     computedClears[clearType]!.append(NewClearEntry(
-                        songTitle: latestRecord.title,
-                        songArtist: latestRecord.artist,
+                        songRecord: latestRecord,
                         level: level,
-                        difficulty: latestScore.difficulty,
-                        clearType: clearType,
+                        score: latestScore,
                         previousClearType: previousClearType
                     ))
                 }
@@ -256,26 +267,19 @@ final class AnalyticsModel {
                    computedDJLevels.keys.contains(djLevel),
                    previousDJLevel != djLevel {
                     computedDJLevels[djLevel]!.append(NewDJLevelEntry(
-                        songTitle: latestRecord.title,
-                        songArtist: latestRecord.artist,
+                        songRecord: latestRecord,
                         level: level,
-                        difficulty: latestScore.difficulty,
-                        djLevel: djLevel,
-                        previousDJLevel: previousDJLevel
+                        score: latestScore
                     ))
                 }
 
                 let previousScoreValue = previousScore?.score ?? 0
                 if latestScore.score > previousScoreValue {
                     computedNewHighScores.append(NewHighScoreEntry(
-                        songTitle: latestRecord.title,
-                        songArtist: latestRecord.artist,
+                        songRecord: latestRecord,
                         level: level,
-                        difficulty: latestScore.difficulty,
-                        newScore: latestScore.score,
-                        previousScore: previousScoreValue,
-                        newDJLevel: latestScore.djLevel,
-                        previousDJLevel: previousScore?.djLevel ?? "---"
+                        score: latestScore,
+                        previousScore: previousScoreValue
                     ))
                 }
             }

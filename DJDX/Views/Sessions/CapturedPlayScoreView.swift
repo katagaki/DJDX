@@ -6,6 +6,7 @@ struct CapturedPlayScoreView: View {
 
     var store: IIDXSessionStore
     var play: IIDXCapturedPlay
+    var history: [IIDXCapturedPlay] = []
 
     @State private var matchedSong: IIDXSong?
     @State private var matchedNoteCount: Int?
@@ -31,6 +32,20 @@ struct CapturedPlayScoreView: View {
 
             Section {
                 scoreContent()
+            }
+
+            if !history.isEmpty {
+                Section("Sessions.Score.History") {
+                    CapturedPlayHistoryChart(plays: history + [play], noteCount: matchedNoteCount)
+                        .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
+                    ForEach(history) { pastPlay in
+                        NavigationLink {
+                            CapturedPlayScoreView(store: store, play: pastPlay)
+                        } label: {
+                            historyRow(pastPlay)
+                        }
+                    }
+                }
             }
         }
         .listSectionSpacing(.compact)
@@ -183,6 +198,29 @@ struct CapturedPlayScoreView: View {
             IIDXNoteTypeDetailRow("POOR", value: play.poor, style: Color.red)
         }
         .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+    }
+
+    private func historyRow(_ play: IIDXCapturedPlay) -> some View {
+        HStack(alignment: .center, spacing: 8.0) {
+            VStack(alignment: .leading, spacing: 2.0) {
+                Text(play.captureDate, format: .dateTime.year().month().day().hour().minute())
+                    .font(.subheadline)
+                HStack(spacing: 6.0) {
+                    Text(verbatim: IIDXClearType.abbreviation(for: play.clearType))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(IIDXClearType.style(for: play.clearType, colorScheme: colorScheme))
+                    Text(verbatim: play.djLevel)
+                        .font(.caption.weight(.black))
+                        .fontWidth(.expanded)
+                        .foregroundStyle(IIDXDJLevel.style(for: play.djLevel, colorScheme: colorScheme))
+                }
+            }
+            Spacer(minLength: 0.0)
+            Text(verbatim: "\(play.exScore)")
+                .font(.body.monospacedDigit().weight(.heavy))
+                .fontWidth(.expanded)
+                .foregroundStyle(LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom))
+        }
     }
 
     private func clearTypeStyle() -> any ShapeStyle {

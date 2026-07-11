@@ -961,6 +961,52 @@
         }
       }
     },
+    "Analytics.Breakdown.ClearType" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Lamp Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリアランプ内訳"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通關類型分布"
+          }
+        }
+      }
+    },
+    "Analytics.Breakdown.Level" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Level Breakdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レベル内訳"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等級分布"
+          }
+        }
+      }
+    },
     "Analytics.ClearType.ByDifficulty" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5547,6 +5593,41 @@
         }
       }
     },
+    "Sessions.Duration.Hours.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hr"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hr"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld時間"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 小時"
+          }
+        }
+      }
+    },
     "Sessions.Elapsed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5892,6 +5973,29 @@
         }
       }
     },
+    "Sessions.Help" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Help"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルプ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "說明"
+          }
+        }
+      }
+    },
     "Sessions.History.Empty.Message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5944,19 +6048,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "History"
+            "value" : "Sessions"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "履歴"
+            "value" : "セッション"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "記錄"
+            "value" : "遊玩記錄"
           }
         }
       }
@@ -6226,6 +6330,29 @@
         }
       }
     },
+    "Sessions.Score.History" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score History"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スコア履歴"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分數紀錄"
+          }
+        }
+      }
+    },
     "Sessions.Start" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6393,19 +6520,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start a session while you play, then snap result screens with your camera to log your scores. Scores are read using machine learning, so be sure to verify the results."
+            "value" : "Snap result screens to log your scores. Always check the results."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "プレー中にセッションを開始し、カメラでリザルト画面を撮影するとスコアを記録できます。スコアの読み取りには機械学習を使用しているため、結果を必ず確認してください。"
+            "value" : "リザルト画面を撮影してスコアを記録します。結果は必ず確認してください。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "遊玩時開始一段遊玩記錄，再用相機拍攝結果畫面，即可記錄分數。由於分數是透過機器學習讀取的，請務必確認結果是否正確。"
+            "value" : "拍攝結果畫面即可記錄分數。請務必確認結果。"
           }
         }
       }

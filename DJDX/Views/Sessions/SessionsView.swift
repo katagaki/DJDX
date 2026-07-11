@@ -2,75 +2,86 @@ import SwiftUI
 
 struct SessionsView: View {
     var store: IIDXSessionStore
+    var analyticsModel: AnalyticsModel
+    @Binding var isEditingAnalytics: Bool
+    var analyticsNamespace: Namespace.ID
+    var towerNamespace: Namespace.ID
 
-    @State private var isPresentingActive: Bool = false
-    @State private var isPresentingExternalDataSources: Bool = false
-    @AppStorage(wrappedValue: false, IIDXSessionWorkoutBridge.healthKitEnabledKey) private var healthKitEnabled: Bool
-    @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") private var isBemaniWikiEnabled: Bool
+    @State var isPresentingActive: Bool = false
+    @State var isPresentingExternalDataSources: Bool = false
+    @State var isHistoryExpanded: Bool = true
+    @State var isScoreDataExpanded: Bool = true
+    @State var latestPlays: [IIDXCapturedPlay] = []
+    @State var playHistories: [String: [IIDXCapturedPlay]] = [:]
+    @State var songCompactTitles: [String: IIDXSong] = [:]
+    @State var searchTerm: String = ""
+    @State var isShowingFilterSheet: Bool = false
+    @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
+    @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
+    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
-    private var pastSessions: [IIDXPlaySession] {
-        store.sessions.filter { !$0.isActive }
+    @AppStorage(wrappedValue: [], "SessionsView.LevelFilters") var levelsToShow: Set<IIDXLevel>
+    @AppStorage(wrappedValue: [], "SessionsView.DifficultyFilters") var difficultiesToShow: Set<IIDXDifficulty>
+    @AppStorage(wrappedValue: [], "SessionsView.ClearTypeFilters") var clearTypesToShow: Set<IIDXClearType>
+    @AppStorage(wrappedValue: [], "SessionsView.DJLevelFilters") var djLevelsToShow: Set<IIDXDJLevel>
+    @AppStorage(wrappedValue: .lastPlayDate, "SessionsView.SortOrder") var sortMode: SortMode
+    @AppStorage(wrappedValue: .descending, "SessionsView.SortDirection") var sortOrder: SortOrder
+
+    @Namespace var sessionsNamespace
+
+    private let reader = IIDXReader()
+
+    var pastSessions: [IIDXPlaySession] {
+        store.sessions.filter { !$0.isActive }.sorted { $0.startDate > $1.startDate }
+    }
+
+    var searchPlacement: SearchFieldPlacement {
+        if #available(iOS 26.0, *) {
+            .automatic
+        } else {
+            .navigationBarDrawer(displayMode: .always)
+        }
     }
 
     var body: some View {
-        List {
-            Section {
-                betaNotice
-            }
-            if !isBemaniWikiEnabled {
-                Section {
-                    bemaniWikiWarning
-                }
-            }
-            Section {
-                Toggle(isOn: $healthKitEnabled) {
-                    HStack(alignment: .top, spacing: 12.0) {
-                        Image(systemName: "heart.fill")
-                            .font(.system(size: 18.0, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .frame(width: 36.0, height: 36.0)
-                            .background(.pink, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
-                        VStack(alignment: .leading, spacing: 3.0) {
-                            Text("Sessions.HealthKit.Toggle")
-                                .font(.subheadline.weight(.semibold))
-                            Text("Sessions.HealthKit.Footer")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
+        ScrollView {
+            LazyVStack(spacing: 0.0) {
+                if !isSearching {
+                    if !isEditingAnalytics, !isBemaniWikiEnabled || store.activeSession != nil {
+                        VStack(spacing: 12.0) {
+                            if !isBemaniWikiEnabled {
+                                sessionsCard { bemaniWikiWarning }
+                            }
+                            if let active = store.activeSession {
+                                Button {
+                                    isPresentingActive = true
+                                } label: {
+                                    sessionsCard { resumeCard(active) }
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
+                        .padding(.horizontal)
+                        .padding(.top, 8.0)
+                    }
+                    if !isEditingAnalytics {
+                        historySection
+                            .padding(.top, 20.0)
+                    }
+                    if showAnalytics {
+                        AnalyticsView(model: analyticsModel,
+                                      isEditing: $isEditingAnalytics,
+                                      analyticsNamespace: analyticsNamespace,
+                                      towerNamespace: towerNamespace)
                     }
                 }
-            }
-            if let active = store.activeSession {
-                Section {
-                    Button {
-                        isPresentingActive = true
-                    } label: {
-                        resumeCard(active)
-                    }
-                    .buttonStyle(.plain)
+                if !isEditingAnalytics {
+                    scoreDataSection
+                        .padding(.top, isSearching ? 8.0 : 20.0)
                 }
             }
-            Section("Sessions.History.Title") {
-                if pastSessions.isEmpty {
-                    Text("Sessions.History.Empty.Message")
-                        .foregroundStyle(.secondary)
-                }
-                ForEach(pastSessions) { session in
-                    NavigationLink {
-                        SessionDetailView(store: store, session: session)
-                    } label: {
-                        SessionSummaryRow(store: store, session: session)
-                    }
-                }
-                .onDelete { offsets in
-                    for offset in offsets { store.deleteSession(pastSessions[offset]) }
-                }
-            }
+            .padding(.bottom, 8.0)
         }
-        .listSectionSpacing(.compact)
-        .contentMargins(.top, 8.0, for: .scrollContent)
-        .scrollContentBackground(.hidden)
         .background {
             LinearGradient(
                 colors: [.backgroundGradientTop, .backgroundGradientBottom],
@@ -79,15 +90,48 @@ struct SessionsView: View {
             )
             .ignoresSafeArea()
         }
-        .onChange(of: healthKitEnabled) { _, enabled in
-            if enabled {
-                Task { _ = await IIDXSessionWorkoutBridge.shared.requestAuthorization() }
+        .searchable(text: $searchTerm,
+                    placement: searchPlacement,
+                    prompt: "Scores.Search.Prompt")
+        .toolbar {
+            if #available(iOS 26.0, *) {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    SessionsHelpMenu()
+                }
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+                DefaultToolbarItem(kind: .search, placement: .bottomBar)
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    sortControl
+                    filterControl
+                }
+            } else {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    SessionsHelpMenu()
+                    Spacer()
+                    sortControl
+                    filterControl
+                }
             }
-            IIDXSessionWorkoutBridge.shared.syncProfileToWatch()
+        }
+        .sheet(isPresented: $isShowingFilterSheet) {
+            SessionScoreFilterSheet(
+                levelsToShow: $levelsToShow.animation(.smooth.speed(2.0)),
+                difficultiesToShow: $difficultiesToShow.animation(.smooth.speed(2.0)),
+                clearTypesToShow: $clearTypesToShow.animation(.smooth.speed(2.0)),
+                djLevelsToShow: $djLevelsToShow.animation(.smooth.speed(2.0))
+            )
+            .automaticSheetNavigationTransition(id: "ScoreFilterSheet", in: sessionsNamespace)
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.hidden)
         }
         .onAppear {
             store.bootstrap()
             if store.activeSession != nil { isPresentingActive = true }
+        }
+        .task {
+            songCompactTitles = await reader.songCompactTitles()
+            reloadScores()
         }
         .onChange(of: store.activeSession?.id) { _, newValue in
             isPresentingActive = newValue != nil
@@ -98,6 +142,11 @@ struct SessionsView: View {
         .onReceive(NotificationCenter.default.publisher(for: .playSessionDidChange)
             .receive(on: RunLoop.main)) { _ in
             store.loadSessions()
+            reloadScores()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .capturedPlayDidChange)
+            .receive(on: RunLoop.main)) { _ in
+            reloadScores()
         }
         .fullScreenCover(isPresented: $isPresentingActive) {
             ActiveSessionView(store: store)
@@ -109,94 +158,25 @@ struct SessionsView: View {
         }
     }
 
-    private var betaNotice: some View {
-        HStack(alignment: .top, spacing: 12.0) {
-            Image(systemName: "info.circle.fill")
-                .font(.system(size: 18.0, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 36.0, height: 36.0)
-                .background(.accent, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
-            VStack(alignment: .leading, spacing: 3.0) {
-                Text("Sessions.Beta.Title")
-                    .font(.subheadline.weight(.semibold))
-                Text("Sessions.Welcome.Message")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            Spacer(minLength: 0.0)
+    private func reloadScores() {
+        var allPlays: [IIDXCapturedPlay] = []
+        for session in store.sessions {
+            allPlays.append(contentsOf: store.plays(for: session))
         }
-        .padding(.vertical, 4.0)
-    }
-
-    private var bemaniWikiWarning: some View {
-        HStack(alignment: .top, spacing: 12.0) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 18.0, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 36.0, height: 36.0)
-                .background(.orange, in: RoundedRectangle(cornerRadius: 9.0, style: .continuous))
-            VStack(alignment: .leading, spacing: 3.0) {
-                Text("Sessions.DataSource.Warning.Title")
-                    .font(.subheadline.weight(.semibold))
-                Text("Sessions.DataSource.Warning.Message")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Button("Sessions.DataSource.Warning.Action") {
-                    isPresentingExternalDataSources = true
-                }
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.orange)
-                .buttonStyle(.plain)
-            }
-            Spacer(minLength: 0.0)
+        allPlays = allPlays.filter { play in
+            guard play.state == .done || play.state == .needsReview else { return false }
+            guard play.difficulty > 0 else { return false }
+            guard let title = play.songTitle, !title.isEmpty else { return false }
+            return true
         }
-        .padding(.vertical, 4.0)
-    }
-
-    private func resumeCard(_ session: IIDXPlaySession) -> some View {
-        HStack {
-            Image(systemName: "record.circle")
-                .foregroundStyle(.red)
-                .symbolEffect(.pulse)
-            VStack(alignment: .leading, spacing: 2.0) {
-                Text("Sessions.InProgress")
-                    .font(.headline)
-                Text(session.startDate, format: .dateTime.hour().minute())
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption.bold())
-                .foregroundStyle(.tertiary)
+        var histories: [String: [IIDXCapturedPlay]] = [:]
+        for play in allPlays {
+            histories[play.chartKey(), default: []].append(play)
         }
-    }
-}
-
-struct SessionSummaryRow: View {
-    var store: IIDXSessionStore
-    var session: IIDXPlaySession
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2.0) {
-                Text(session.startDate, format: .dateTime.year().month().day())
-                    .font(.subheadline.weight(.semibold))
-                Text(durationText)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Text("Sessions.PlayCount.\(store.plays(for: session).count)")
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
+        for key in histories.keys {
+            histories[key]?.sort { $0.captureDate > $1.captureDate }
         }
-    }
-
-    private var durationText: String {
-        let minutes = Int(session.duration / 60.0)
-        return String(localized: "Sessions.Duration.\(minutes)")
+        playHistories = histories
+        latestPlays = histories.values.compactMap(\.first).sorted { $0.captureDate > $1.captureDate }
     }
 }

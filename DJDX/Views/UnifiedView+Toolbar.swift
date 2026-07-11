@@ -3,6 +3,31 @@ import SwiftUI
 extension UnifiedView {
 
     @ViewBuilder
+    var sessionButton: some View {
+        let isActive = sessionStore.activeSession != nil
+        let button = Button {
+            if isActive {
+                sessionStore.endSession()
+            } else {
+                sessionStore.startSession()
+            }
+        } label: {
+            if isActive {
+                Label("Sessions.End", systemImage: "stop.fill")
+            } else {
+                Label("Sessions.Start", systemImage: "play.fill")
+            }
+        }
+        .tint(isActive ? .red : .accent)
+
+        if #available(iOS 26.0, *) {
+            button.buttonStyle(.glassProminent)
+        } else {
+            button.buttonStyle(.borderedProminent)
+        }
+    }
+
+    @ViewBuilder
     var gameMenu: some View {
         Menu {
             Section {

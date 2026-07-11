@@ -61,65 +61,70 @@ struct AnalyticsDestinationView: View {
     var newEntryDestination: some View {
         switch path {
         case .newClearsDetail:
-            NewClearsDetailView(
-                newClears: $model.newClears,
+            NewEntryDetailView(
+                entries: model.newClears,
                 title: AnalyticsCardType.newClears.titleKey
             )
             .automaticNavigationTransition(id: "NewClears", in: analyticsNamespace)
         case .newAssistClearsDetail:
-            NewClearsDetailView(
-                newClears: $model.newAssistClears,
+            NewEntryDetailView(
+                entries: model.newAssistClears,
                 title: AnalyticsCardType.newAssistClears.titleKey
             )
             .automaticNavigationTransition(id: "NewAssistClears", in: analyticsNamespace)
         case .newEasyClearsDetail:
-            NewClearsDetailView(
-                newClears: $model.newEasyClears,
+            NewEntryDetailView(
+                entries: model.newEasyClears,
                 title: AnalyticsCardType.newEasyClears.titleKey
             )
             .automaticNavigationTransition(id: "NewEasyClears", in: analyticsNamespace)
         case .newFullComboClearDetail:
-            NewClearsDetailView(
-                newClears: $model.newFullComboClears,
+            NewEntryDetailView(
+                entries: model.newFullComboClears,
                 title: AnalyticsCardType.newFullComboClear.titleKey
             )
             .automaticNavigationTransition(id: "NewFullComboClear", in: analyticsNamespace)
         case .newHardClearDetail:
-            NewClearsDetailView(
-                newClears: $model.newHardClears,
+            NewEntryDetailView(
+                entries: model.newHardClears,
                 title: AnalyticsCardType.newHardClear.titleKey
             )
             .automaticNavigationTransition(id: "NewHardClear", in: analyticsNamespace)
         case .newExHardClearDetail:
-            NewClearsDetailView(
-                newClears: $model.newExHardClears,
+            NewEntryDetailView(
+                entries: model.newExHardClears,
                 title: AnalyticsCardType.newExHardClear.titleKey
             )
             .automaticNavigationTransition(id: "NewExHardClear", in: analyticsNamespace)
         case .newFailedDetail:
-            NewClearsDetailView(
-                newClears: $model.newFailed,
+            NewEntryDetailView(
+                entries: model.newFailed,
                 title: AnalyticsCardType.newFailed.titleKey
             )
             .automaticNavigationTransition(id: "NewFailed", in: analyticsNamespace)
         case .newHighScoresDetail:
-            NewHighScoresDetailView(newHighScores: $model.newHighScores)
-                .automaticNavigationTransition(id: "NewHighScores", in: analyticsNamespace)
+            NewEntryDetailView(
+                entries: model.newHighScores,
+                title: NSLocalizedString("Analytics.NewHighScores", comment: ""),
+                showsClearTypeBreakdown: true,
+                scoreDelta: { $0.score.score - $0.previousScore }
+            )
+            .automaticNavigationTransition(id: "NewHighScores", in: analyticsNamespace)
         case .newAAADetail:
-            NewDJLevelsDetailView(
-                newDJLevels: $model.newAAA,
+            NewEntryDetailView(
+                entries: model.newAAA,
                 title: AnalyticsCardType.newAAA.titleKey
             )
             .automaticNavigationTransition(id: "NewAAA", in: analyticsNamespace)
         case .newAADetail:
-            NewDJLevelsDetailView(
-                newDJLevels: $model.newAA,
+            NewEntryDetailView(
+                entries: model.newAA,
                 title: AnalyticsCardType.newAA.titleKey
             )
             .automaticNavigationTransition(id: "NewAA", in: analyticsNamespace)
         case .newADetail:
-            NewDJLevelsDetailView(
-                newDJLevels: $model.newA,
+            NewEntryDetailView(
+                entries: model.newA,
                 title: AnalyticsCardType.newA.titleKey
             )
             .automaticNavigationTransition(id: "NewA", in: analyticsNamespace)

@@ -48,6 +48,10 @@ final class IIDXSessionStore {
         guard database.endSession(id: activeSession.id) else { return }
         let endedID = activeSession.id
         IIDXSessionWorkoutBridge.shared.endWorkout(session: activeSession)
+        let duration = Date.now.timeIntervalSince(activeSession.startDate)
+        if duration < 60.0, database.plays(forSession: endedID).isEmpty {
+            database.deleteSession(id: endedID)
+        }
         self.activeSession = nil
         plays = []
         loadSessions()

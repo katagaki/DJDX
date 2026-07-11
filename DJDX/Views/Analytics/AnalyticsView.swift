@@ -331,6 +331,18 @@ struct AnalyticsView: View {
             .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
                 Task { await reload() }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .playSessionDidChange)
+                .receive(on: RunLoop.main)) { _ in
+                if model.sessionStore != nil {
+                    Task { await reload() }
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .capturedPlayDidChange)
+                .receive(on: RunLoop.main)) { _ in
+                if model.sessionStore != nil {
+                    Task { await reload() }
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .analyticsLayoutReset)) { _ in
                 withAnimation(.smooth.speed(2.0)) {
                     isEditing = false
