@@ -96,7 +96,7 @@ private data class ImportGroupRow(
 private sealed interface ImportState {
     data object Idle : ImportState
     data object Importing : ImportState
-    data class Succeeded(val recordCount: Int) : ImportState
+    data object Succeeded : ImportState
     data class Failed(val reason: ImportFailedReason) : ImportState
 }
 
@@ -135,14 +135,13 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
         val defaultImportDate = importDateEpochSeconds(selectedDate)
         importState = ImportState.Importing
         scope.launch(Dispatchers.IO) {
-            var total = 0
             uris.forEach { uri ->
                 val content = runCatching {
                     context.contentResolver.openInputStream(uri)
                         ?.bufferedReader(Charsets.UTF_8)
                         ?.use { it.readText() }
                 }.getOrNull() ?: return@forEach
-                total += when (game) {
+                when (game) {
                     Game.IIDX_ARCADE -> container.iidxRepository.importCSV(
                         content,
                         fileNameImportDate(context, uri) ?: defaultImportDate,
@@ -153,11 +152,11 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                         defaultImportDate,
                         sdvxVersion
                     )
-                    else -> 0
+                    else -> Unit
                 }
             }
             withContext(Dispatchers.Main) {
-                importState = ImportState.Succeeded(total)
+                importState = ImportState.Succeeded
             }
         }
     }
@@ -173,9 +172,9 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                     importState = ImportState.Importing
                     val importDate = importDateEpochSeconds(selectedDate)
                     scope.launch(Dispatchers.IO) {
-                        val count = when (game) {
+                        when (game) {
                             Game.IIDX_ARCADE -> {
-                                val imported = container.iidxRepository.importCSV(
+                                container.iidxRepository.importCSV(
                                     result.payload,
                                     importDate,
                                     pending.playType ?: IIDXPlayType.SINGLE
@@ -183,7 +182,6 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                                 result.towerPayload?.let {
                                     container.iidxRepository.importTowerCSV(it)
                                 }
-                                imported
                             }
                             Game.SOUND_VOLTEX -> container.sdvxRepository.importCSV(
                                 result.payload, importDate, sdvxVersion
@@ -196,7 +194,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                             )
                         }
                         withContext(Dispatchers.Main) {
-                            importState = ImportState.Succeeded(count)
+                            importState = ImportState.Succeeded
                         }
                     }
                 }
@@ -415,7 +413,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
             title = { Text(stringResource(R.string.import_status_importing)) },
             text = { LinearProgressIndicator(modifier = Modifier.fillMaxWidth()) }
         )
-        is ImportState.Succeeded -> AlertDialog(
+        ImportState.Succeeded -> AlertDialog(
             onDismissRequest = { importState = ImportState.Idle },
             confirmButton = {
                 TextButton(onClick = { importState = ImportState.Idle }) {
@@ -423,7 +421,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                 }
             },
             title = { Text(stringResource(R.string.import_success_title)) },
-            text = { Text(stringResource(R.string.import_success_message, state.recordCount)) }
+            text = { Text(stringResource(R.string.import_success_message)) }
         )
         is ImportState.Failed -> AlertDialog(
             onDismissRequest = { importState = ImportState.Idle },

@@ -7,7 +7,7 @@
     <string name="scores_time_machine">Go back in time</string>
     <string name="scores_select_date">Select date</string>
     <string name="scores_sort">Sort</string>
-    <string name="scores_filter">Filter</string>
+    <string name="scores_filter">Customize Display</string>
     <string name="scores_sort_title">Title</string>
     <string name="scores_sort_clear_type">Clear Type</string>
     <string name="scores_sort_dj_level">DJ LEVEL</string>

@@ -7,7 +7,7 @@
     <string name="scores_time_machine">遡る</string>
     <string name="scores_select_date">日付を選択</string>
     <string name="scores_sort">並べ替え</string>
-    <string name="scores_filter">フィルター</string>
+    <string name="scores_filter">表示のカスタマイズ</string>
     <string name="scores_sort_title">タイトル</string>
     <string name="scores_sort_clear_type">クリアランプ</string>
     <string name="scores_sort_dj_level">DJ LEVEL</string>

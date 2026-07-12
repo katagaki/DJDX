@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="import_title">Import</string>
-    <string name="import_web_title">Web Import</string>
+    <string name="import_title">Import History</string>
+    <string name="import_web_title">Web Importer</string>
     <string name="import_close">Close</string>
-    <string name="import_to_date">Import to date</string>
-    <string name="import_via_web">Import via web</string>
-    <string name="import_via_csv">Import via CSV</string>
-    <string name="import_csv_instructions_title">Import via CSV</string>
+    <string name="import_to_date">Import To Date</string>
+    <string name="import_via_web">Use Web Importer</string>
+    <string name="import_via_csv">Open CSV File...</string>
+    <string name="import_csv_instructions_title">Import From CSV</string>
     <string name="import_csv_instructions_message">You will first need to download your CSV data from the e-amusement website.\nIf you cannot download the CSV file, select "Request Desktop Site" from the menu within your browser.</string>
     <string name="import_csv_download_button">Download CSV File</string>
     <string name="import_csv_load_button">Open CSV File</string>
@@ -20,12 +20,12 @@
     <string name="import_status_connecting">Connecting…</string>
     <string name="import_status_loading">Loading…</string>
     <string name="import_status_importing">Importing…</string>
-    <string name="import_success_title">Import complete</string>
-    <string name="import_success_message">%1$d records were imported.</string>
-    <string name="import_error_title">Import failed</string>
-    <string name="import_error_no_premium_course">You do not have an active e-amusement premium course subscription.</string>
-    <string name="import_error_no_eamusement_pass">There is no e-amusement pass linked to this account.</string>
-    <string name="import_error_no_play_data">No play data was found.</string>
-    <string name="import_error_server">A server error occurred. Please try again later.</string>
-    <string name="import_error_maintenance">e-amusement is currently under maintenance. Please try again later.</string>
+    <string name="import_success_title">Import Completed</string>
+    <string name="import_success_message">Your score data was imported successfully.</string>
+    <string name="import_error_title">Import Failed</string>
+    <string name="import_error_no_premium_course">The import could not be completed as the e-amusement account is not subscribed to the "e-amusementプレミアムコース" service.</string>
+    <string name="import_error_no_eamusement_pass">The import could not be completed as there is no e-amusement pass linked.</string>
+    <string name="import_error_no_play_data">The import could not be completed as there is no play data available.</string>
+    <string name="import_error_server">The import could not be completed as a server error occurred.</string>
+    <string name="import_error_maintenance">The import could not be completed as the e-amusement service is currently under maintenance.</string>
 </resources>

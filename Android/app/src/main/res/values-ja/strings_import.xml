@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="import_title">インポート</string>
+    <string name="import_title">インポート履歴</string>
     <string name="import_web_title">Webインポート</string>
     <string name="import_close">閉じる</string>
-    <string name="import_to_date">インポート先の日付</string>
-    <string name="import_via_web">Webでインポート</string>
-    <string name="import_via_csv">CSVでインポート</string>
-    <string name="import_csv_instructions_title">CSVでインポート</string>
+    <string name="import_to_date">インポート日付を選択</string>
+    <string name="import_via_web">Webからインポート</string>
+    <string name="import_via_csv">CSVファイルを開く</string>
+    <string name="import_csv_instructions_title">CSVインポート</string>
     <string name="import_csv_instructions_message">まず、公式ウェブサイトからCSVファイルをダウンロードしてください。\nダウンロードできない場合、ブラウザのメニューから「デスクトップサイト用Webサイトを表示」を選択してください。</string>
     <string name="import_csv_download_button">CSVをダウンロード</string>
     <string name="import_csv_load_button">CSVを読み込む</string>
@@ -20,12 +20,12 @@
     <string name="import_status_connecting">接続中…</string>
     <string name="import_status_loading">読み込み中…</string>
     <string name="import_status_importing">インポート中…</string>
-    <string name="import_success_title">インポート完了</string>
-    <string name="import_success_message">%1$d件のレコードをインポートしました。</string>
-    <string name="import_error_title">インポート失敗</string>
-    <string name="import_error_no_premium_course">e-amusementプレミアムコースに加入されていません。</string>
-    <string name="import_error_no_eamusement_pass">e-amusement passが登録されていません。</string>
-    <string name="import_error_no_play_data">プレーデータが見つかりませんでした。</string>
-    <string name="import_error_server">サーバーエラーが発生しました。時間をおいてもう一度お試しください。</string>
-    <string name="import_error_maintenance">e-amusementは現在メンテナンス中です。時間をおいてもう一度お試しください。</string>
+    <string name="import_success_title">データは正常にインポートされました</string>
+    <string name="import_success_message">インポートが成功しました。</string>
+    <string name="import_error_title">データがインポートできませんでした</string>
+    <string name="import_error_no_premium_course">e-amusementプレミアムコースに入会されていないため、インポートが失敗しました。</string>
+    <string name="import_error_no_eamusement_pass">e-amusement passが登録されていないため、インポートが失敗しました。</string>
+    <string name="import_error_no_play_data">プレーデータがないため、インポートが失敗しました。</string>
+    <string name="import_error_server">サーバーエラーが発生したため、インポートが失敗しました。</string>
+    <string name="import_error_maintenance">e-amusementはただいまメンテナンス中のため、ご利用いただけません。</string>
 </resources>

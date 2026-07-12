@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.SmartDisplay
@@ -49,7 +50,6 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXLevelScore
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXSongRecord
-import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
 import com.tsubuzaki.djdxgo.ui.games.ChartActionButton
 import com.tsubuzaki.djdxgo.ui.games.ExpressiveLevelSelector
 import com.tsubuzaki.djdxgo.ui.games.ViewerWithSelector
@@ -139,14 +139,17 @@ fun IIDXScoreViewerScreen(
     ViewerWithSelector(
         onBack = onBack,
         topBarActions = {
-            Text(
-                text = IIDXVersionInfo.MARKETING_NAME,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.ExtraBold,
-                fontStyle = FontStyle.Italic,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(end = 16.dp)
-            )
+            val songVersion = record?.version.orEmpty()
+            if (songVersion.isNotEmpty()) {
+                Text(
+                    text = songVersion.uppercase(),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+            }
         },
         selector = if (availableLevels.size > 1) {
             {
@@ -156,12 +159,27 @@ fun IIDXScoreViewerScreen(
                     selectedIndex = selectedIndex,
                     onSelect = { index -> selectedLevelCode = availableLevels[index].first.code }
                 ) { (level, score) ->
-                    Text(
-                        text = score.difficulty.toString(),
-                        color = IIDXColors.levelColor(level),
-                        fontWeight = FontWeight.Bold,
-                        fontStyle = FontStyle.Italic
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(1.dp)
+                    ) {
+                        Text(
+                            text = score.difficulty.toString(),
+                            color = IIDXColors.levelColor(level),
+                            fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Italic
+                        )
+                        Text(
+                            text = level.csvPrefix,
+                            color = IIDXColors.levelColor(level),
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            autoSize = TextAutoSize.StepBased(
+                                minFontSize = 6.sp,
+                                maxFontSize = 10.sp
+                            )
+                        )
+                    }
                 }
             }
         } else {
@@ -397,18 +415,36 @@ private fun ScoreSection(
             }
         }
     } else {
-        Text(
-            text = stringResource(R.string.scores_viewer_no_data),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+            )
+        ) {
+            Text(
+                text = stringResource(R.string.scores_viewer_no_data),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
         if (score.clearType != IIDXClearType.NO_PLAY.value) {
-            DetailRow(label = stringResource(R.string.scores_viewer_clear_type)) {
-                Text(
-                    text = score.clearType,
-                    fontWeight = FontWeight.Bold,
-                    color = IIDXColors.clearTypeColor(score.clearType)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                 )
+            ) {
+                DetailRow(
+                    label = stringResource(R.string.scores_viewer_clear_type),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = score.clearType,
+                        fontWeight = FontWeight.Bold,
+                        color = IIDXColors.clearTypeColor(score.clearType)
+                    )
+                }
             }
         }
     }
@@ -487,9 +523,13 @@ private fun ScoreSection(
 }
 
 @Composable
-private fun DetailRow(label: String, value: @Composable () -> Unit) {
+private fun DetailRow(
+    label: String,
+    modifier: Modifier = Modifier,
+    value: @Composable () -> Unit
+) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
