@@ -32,7 +32,7 @@
     <string name="more_disclaimer">Disclaimer</string>
     <string name="more_disclaimer_text">This app is not affiliated with KONAMI. KONAMI bears no responsibility for any content shown in this app.</string>
 
-    <string name="game_version_sdvx">SOUND VOLTEX version</string>
+    <string name="game_version_sdvx">Version</string>
 
     <string name="tab_scores">Play Data</string>
     <string name="tab_analytics">Analytics</string>

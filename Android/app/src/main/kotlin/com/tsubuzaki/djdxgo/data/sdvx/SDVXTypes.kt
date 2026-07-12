@@ -3,7 +3,6 @@ package com.tsubuzaki.djdxgo.data.sdvx
 import java.net.URLEncoder
 
 enum class SDVXVersion(val number: Int, val slug: String, val marketingName: String) {
-    EXCEED_GEAR(6, "vi", "EXCEED GEAR"),
     NABLA(7, "vii", "NABLA");
 
     private val eagate = "https://p.eagate.573.jp"

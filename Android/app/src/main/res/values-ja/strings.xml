@@ -30,7 +30,7 @@
     <string name="more_disclaimer">免責事項</string>
     <string name="more_disclaimer_text">このアプリはコナミとは一切関係がありません。アプリ内に表示される内容について、コナミは一切の責任を負いません。</string>
 
-    <string name="game_version_sdvx">SOUND VOLTEXのバージョン</string>
+    <string name="game_version_sdvx">バージョン</string>
 
     <string name="tab_scores">プレーデータ</string>
     <string name="tab_analytics">アナリティクス</string>

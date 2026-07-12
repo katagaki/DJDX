@@ -57,6 +57,9 @@ import com.tsubuzaki.djdxgo.DJDXApplication
 import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.SettingsKeys
+import com.tsubuzaki.djdxgo.data.ddr.DDRVersionInfo
+import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
+import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordVersionInfo
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVersion
 import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingFlow
@@ -290,14 +293,14 @@ private fun ScoresShell(
                                 }
                             )
                         }
+                        HorizontalDivider()
+                        Text(
+                            stringResource(R.string.game_version_sdvx),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                        )
                         if (selectedGame == Game.SOUND_VOLTEX) {
-                            HorizontalDivider()
-                            Text(
-                                stringResource(R.string.game_version_sdvx),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                            )
                             SDVXVersion.entries.forEach { version ->
                                 DropdownMenuItem(
                                     text = { Text(version.marketingName) },
@@ -314,6 +317,20 @@ private fun ScoresShell(
                                     }
                                 )
                             }
+                        } else {
+                            val versionName = when (selectedGame) {
+                                Game.IIDX_ARCADE -> IIDXVersionInfo.MARKETING_NAME
+                                Game.POLARIS_CHORD -> PolarisChordVersionInfo.MARKETING_NAME
+                                Game.DANCE_DANCE_REVOLUTION -> DDRVersionInfo.MARKETING_NAME
+                                else -> ""
+                            }
+                            DropdownMenuItem(
+                                text = { Text(versionName) },
+                                leadingIcon = {
+                                    Icon(Icons.Default.Check, contentDescription = null)
+                                },
+                                onClick = { isGameMenuExpanded = false }
+                            )
                         }
                     }
                 },
