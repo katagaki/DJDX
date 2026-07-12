@@ -7,13 +7,13 @@
     <string name="shared_import">インポート</string>
 
     <string name="onboarding_title">DJDXへようこそ</string>
-    <string name="onboarding_continue">続ける</string>
+    <string name="onboarding_continue">はじめる</string>
     <string name="onboarding_feature_web_import_title">Webインポート</string>
-    <string name="onboarding_feature_web_import_description">e-amusementからプレーデータを自動的に取り込みます。</string>
-    <string name="onboarding_feature_external_data_title">外部データ</string>
-    <string name="onboarding_feature_external_data_description">ノーツ数、ノーツレーダー、譜面ビューアでスコアを強化します。</string>
-    <string name="onboarding_feature_multiple_games_title">複数のゲーム</string>
-    <string name="onboarding_feature_multiple_games_description">beatmania IIDX、SOUND VOLTEX、ポラリスコード、DDRに対応。</string>
+    <string name="onboarding_feature_web_import_description">KONAMI IDでログインすれば、e-amusementからスコアを直接取り込み。手入力は必要ありません。</string>
+    <string name="onboarding_feature_external_data_title">外部データソース</string>
+    <string name="onboarding_feature_external_data_description">さまざまな外部データソースの楽曲情報や譜面データを取り込んでライブラリーを充実させます。</string>
+    <string name="onboarding_feature_multiple_games_title">複数タイトル対応</string>
+    <string name="onboarding_feature_multiple_games_description">beatmania IIDX、SOUND VOLTEX、ポラリスコード、DanceDanceRevolutionのプレーデータを1つのアプリでまとめて管理できます。</string>
 
     <string name="more_title">その他</string>
     <string name="more_external_data">外部データソース</string>

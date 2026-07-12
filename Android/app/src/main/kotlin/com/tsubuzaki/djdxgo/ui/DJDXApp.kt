@@ -287,13 +287,15 @@ private fun ScoresShell(
                         }
                     }
                 },
-                actions = {
+                navigationIcon = {
                     IconButton(onClick = { onNavigate("import") }) {
                         Icon(
                             Icons.Default.SaveAlt,
                             contentDescription = stringResource(R.string.shared_import)
                         )
                     }
+                },
+                actions = {
                     IconButton(onClick = { isMoreMenuExpanded = true }) {
                         Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_title))
                     }

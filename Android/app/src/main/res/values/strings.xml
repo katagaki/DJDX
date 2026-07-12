@@ -9,13 +9,13 @@
     <string name="shared_import">Import</string>
 
     <string name="onboarding_title">Welcome to DJDX</string>
-    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_continue">Get Started</string>
     <string name="onboarding_feature_web_import_title">Web Import</string>
-    <string name="onboarding_feature_web_import_description">Import your play data automatically from e-amusement.</string>
-    <string name="onboarding_feature_external_data_title">External Data</string>
-    <string name="onboarding_feature_external_data_description">Enrich your scores with note counts, notes radar, and chart viewers.</string>
-    <string name="onboarding_feature_multiple_games_title">Multiple Games</string>
-    <string name="onboarding_feature_multiple_games_description">Track beatmania IIDX, SOUND VOLTEX, Polaris Chord, and DDR.</string>
+    <string name="onboarding_feature_web_import_description">Sign in to your KONAMI account and bring your scores in directly from e-amusement, no manual entry required.</string>
+    <string name="onboarding_feature_external_data_title">External Data Sources</string>
+    <string name="onboarding_feature_external_data_description">Enrich your library with song details, chart info, and notes radar data from external sources.</string>
+    <string name="onboarding_feature_multiple_games_title">Multiple Game Support</string>
+    <string name="onboarding_feature_multiple_games_description">Track beatmania IIDX, SOUND VOLTEX, ポラリスコード, and DanceDanceRevolution scores all in one place.</string>
 
     <string name="more_title">More</string>
     <string name="more_external_data">External Data Sources</string>

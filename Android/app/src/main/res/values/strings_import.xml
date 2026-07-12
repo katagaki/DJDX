@@ -5,10 +5,11 @@
     <string name="import_close">Close</string>
     <string name="import_to_date">Import to date</string>
     <string name="import_via_web">Import via web</string>
-    <string name="import_via_web_sp">Import via web (SP)</string>
-    <string name="import_via_web_dp">Import via web (DP)</string>
-    <string name="import_load_csv">Load CSV file</string>
-    <string name="import_download_csv">Download CSV in browser</string>
+    <string name="import_via_csv">Import via CSV</string>
+    <string name="import_csv_instructions_title">Import via CSV</string>
+    <string name="import_csv_instructions_message">You will first need to download your CSV data from the e-amusement website.\nIf you cannot download the CSV file, select "Request Desktop Site" from the menu within your browser.</string>
+    <string name="import_csv_download_button">Download CSV File</string>
+    <string name="import_csv_load_button">Open CSV File</string>
     <string name="import_history">Past imports</string>
     <string name="import_history_empty">No imports yet</string>
     <string name="import_delete">Delete</string>

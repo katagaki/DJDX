@@ -5,10 +5,11 @@
     <string name="import_close">閉じる</string>
     <string name="import_to_date">インポート先の日付</string>
     <string name="import_via_web">Webでインポート</string>
-    <string name="import_via_web_sp">Webでインポート（SP）</string>
-    <string name="import_via_web_dp">Webでインポート（DP）</string>
-    <string name="import_load_csv">CSVファイルを読み込む</string>
-    <string name="import_download_csv">ブラウザでCSVをダウンロード</string>
+    <string name="import_via_csv">CSVでインポート</string>
+    <string name="import_csv_instructions_title">CSVでインポート</string>
+    <string name="import_csv_instructions_message">まず、公式ウェブサイトからCSVファイルをダウンロードしてください。\nダウンロードできない場合、ブラウザのメニューから「デスクトップサイト用Webサイトを表示」を選択してください。</string>
+    <string name="import_csv_download_button">CSVをダウンロード</string>
+    <string name="import_csv_load_button">CSVを読み込む</string>
     <string name="import_history">過去のインポート</string>
     <string name="import_history_empty">インポートがありません</string>
     <string name="import_delete">削除</string>

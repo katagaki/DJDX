@@ -9,13 +9,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -29,9 +34,11 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -44,6 +51,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -56,6 +64,7 @@ import com.tsubuzaki.djdxgo.data.SettingsKeys
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVersion
+import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingFlow
 import com.tsubuzaki.djdxgo.importer.ImportFailedReason
 import com.tsubuzaki.djdxgo.importer.WebImportResult
@@ -109,6 +118,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
     var selectedEpochDay by rememberSaveable { mutableStateOf(LocalDate.now().toEpochDay()) }
     val selectedDate = LocalDate.ofEpochDay(selectedEpochDay)
     var isDatePickerShown by remember { mutableStateOf(false) }
+    var isCsvInstructionsShown by remember { mutableStateOf(false) }
     var pendingWebImport by remember { mutableStateOf<PendingWebImport?>(null) }
     var importState by remember { mutableStateOf<ImportState>(ImportState.Idle) }
     var groupPendingDeletion by remember { mutableStateOf<ImportGroupRow?>(null) }
@@ -215,6 +225,28 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                if (game == Game.IIDX_ARCADE) {
+                    item {
+                        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                            IIDXPlayType.entries.forEachIndexed { index, type ->
+                                SegmentedButton(
+                                    selected = csvPlayType == type,
+                                    onClick = {
+                                        scope.launch {
+                                            context.setSetting(SettingsKeys.iidxPlayType, type.value)
+                                        }
+                                    },
+                                    shape = SegmentedButtonDefaults.itemShape(
+                                        index = index,
+                                        count = IIDXPlayType.entries.size
+                                    )
+                                ) {
+                                    Text(type.displayName)
+                                }
+                            }
+                        }
+                    }
+                }
                 item {
                     Card(modifier = Modifier.fillMaxWidth()) {
                         ListItem(
@@ -229,67 +261,39 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                     }
                 }
                 item {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (game == Game.IIDX_ARCADE) {
-                            Button(
-                                onClick = {
-                                    pendingWebImport = PendingWebImport(
-                                        WebImporterSpecs.iidx(IIDXPlayType.SINGLE),
-                                        IIDXPlayType.SINGLE
-                                    )
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(stringResource(R.string.import_via_web_sp))
-                            }
-                            Button(
-                                onClick = {
-                                    pendingWebImport = PendingWebImport(
-                                        WebImporterSpecs.iidx(IIDXPlayType.DOUBLE),
-                                        IIDXPlayType.DOUBLE
-                                    )
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(stringResource(R.string.import_via_web_dp))
-                            }
-                        } else {
-                            Button(
-                                onClick = {
-                                    pendingWebImport = PendingWebImport(
-                                        when (game) {
-                                            Game.SOUND_VOLTEX -> WebImporterSpecs.sdvx(sdvxVersion)
-                                            Game.POLARIS_CHORD -> WebImporterSpecs.polarisChord()
-                                            else -> WebImporterSpecs.ddr()
-                                        },
-                                        null
-                                    )
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        Button(
+                            onClick = {
+                                pendingWebImport = PendingWebImport(
+                                    when (game) {
+                                        Game.IIDX_ARCADE -> WebImporterSpecs.iidx(csvPlayType)
+                                        Game.SOUND_VOLTEX -> WebImporterSpecs.sdvx(sdvxVersion)
+                                        Game.POLARIS_CHORD -> WebImporterSpecs.polarisChord()
+                                        Game.DANCE_DANCE_REVOLUTION -> WebImporterSpecs.ddr()
+                                    },
+                                    if (game == Game.IIDX_ARCADE) csvPlayType else null
+                                )
+                            },
+                            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(Icons.Filled.Language, contentDescription = null)
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(stringResource(R.string.import_via_web))
                             }
                         }
                         if (game == Game.IIDX_ARCADE || game == Game.SOUND_VOLTEX) {
-                            OutlinedButton(
-                                onClick = {
-                                    csvLauncher.launch(
-                                        arrayOf(
-                                            "text/comma-separated-values",
-                                            "text/csv",
-                                            "text/plain"
-                                        )
-                                    )
-                                },
-                                modifier = Modifier.fillMaxWidth()
+                            Button(
+                                onClick = { isCsvInstructionsShown = true },
+                                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+                                modifier = Modifier.weight(1f)
                             ) {
-                                Text(stringResource(R.string.import_load_csv))
-                            }
-                            TextButton(
-                                onClick = { openDownloadPage(context, game, sdvxVersion) },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(stringResource(R.string.import_download_csv))
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(Icons.Filled.Description, contentDescription = null)
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(stringResource(R.string.import_via_csv))
+                                }
                             }
                         }
                     }
@@ -363,6 +367,45 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
         ) {
             DatePicker(state = datePickerState)
         }
+    }
+
+    if (isCsvInstructionsShown) {
+        AlertDialog(
+            onDismissRequest = { isCsvInstructionsShown = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        isCsvInstructionsShown = false
+                        csvLauncher.launch(
+                            arrayOf(
+                                "text/comma-separated-values",
+                                "text/csv",
+                                "text/plain"
+                            )
+                        )
+                    }
+                ) {
+                    Text(stringResource(R.string.import_csv_load_button))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { isCsvInstructionsShown = false }) {
+                    Text(stringResource(R.string.import_cancel))
+                }
+            },
+            title = { Text(stringResource(R.string.import_csv_instructions_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.import_csv_instructions_message))
+                    TextButton(
+                        onClick = { openDownloadPage(context, game, sdvxVersion) },
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text(stringResource(R.string.import_csv_download_button))
+                    }
+                }
+            }
+        )
     }
 
     when (val state = importState) {
