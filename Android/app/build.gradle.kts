@@ -5,6 +5,22 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+fun loadProperties(filename: String): Map<String, String> {
+    val properties = mutableMapOf<String, String>()
+    val file = rootProject.file(filename)
+    if (file.exists()) {
+        file.reader().use { reader ->
+            reader.buffered().forEachLine { line ->
+                if (!line.startsWith("#") && line.contains("=")) {
+                    val (key, value) = line.split("=", limit = 2)
+                    properties[key.trim()] = value.trim()
+                }
+            }
+        }
+    }
+    return properties
+}
+
 android {
     namespace = "com.tsubuzaki.djdxgo"
     compileSdk = 37
@@ -17,6 +33,16 @@ android {
         versionName = "1.0"
     }
 
+    signingConfigs {
+        create("release") {
+            val localProperties = loadProperties("local.properties")
+            storeFile = localProperties["signing.storeFile"]?.let { file(it) }
+            storePassword = localProperties["signing.storePassword"]
+            keyAlias = localProperties["signing.keyAlias"]
+            keyPassword = localProperties["signing.keyPassword"]
+        }
+    }
+
     buildTypes {
         debug {
             isDebuggable = true
@@ -24,6 +50,7 @@ android {
         release {
             isDebuggable = false
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -32,6 +59,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources {
