@@ -53,6 +53,7 @@ import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingFlow
 import com.tsubuzaki.djdxgo.ui.theme.SDVXColors
 import java.time.Instant
+import kotlin.math.floor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,6 +62,9 @@ private const val SORT_TITLE = "Title"
 private const val SORT_CLEAR_TYPE = "ClearType"
 private const val SORT_SCORE = "Score"
 private const val SORT_LEVEL = "Level"
+
+private fun sdvxLevelBucket(level: String): String =
+    level.toDoubleOrNull()?.let { floor(it).toInt().toString() } ?: level
 
 @Composable
 fun SDVXScoresScreen(
@@ -236,21 +240,21 @@ private fun sdvxDisplayRecords(
     val filtered = records.filter { record ->
         (queryCompact.isEmpty() || record.title.compact.contains(queryCompact)) &&
             (difficulties.isEmpty() || record.difficulty in difficulties) &&
-            (levels.isEmpty() || record.level in levels) &&
+            (levels.isEmpty() || sdvxLevelBucket(record.level) in levels) &&
             (clearTypes.isEmpty() || record.clearType in clearTypes) &&
             (grades.isEmpty() || record.grade in grades)
     }
     val primary: Comparator<SDVXSongRecord> = when (sortMode) {
         SORT_CLEAR_TYPE -> compareBy { SDVXClearType.sortIndex(it.clearType) }
         SORT_SCORE -> compareBy { it.highScore }
-        SORT_LEVEL -> compareBy { it.level.toIntOrNull() ?: 0 }
+        SORT_LEVEL -> compareBy { it.level.toDoubleOrNull() ?: 0.0 }
         else -> compareBy { it.title.compact }
     }
     val directed = if (sortDescending) primary.reversed() else primary
     return filtered.sortedWith(
         directed
             .thenBy { it.title.compact }
-            .thenBy { it.level.toIntOrNull() ?: 0 }
+            .thenBy { it.level.toDoubleOrNull() ?: 0.0 }
     )
 }
 

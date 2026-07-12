@@ -1,6 +1,9 @@
 package com.tsubuzaki.djdxgo.data.ddr
 
 import com.tsubuzaki.djdxgo.data.dayBucket
+import com.tsubuzaki.djdxgo.data.ddrCompact
+import com.tsubuzaki.djdxgo.data.external.DDRSongMeta
+import com.tsubuzaki.djdxgo.data.external.ExternalDataDao
 import java.util.UUID
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -19,7 +22,10 @@ data class DDRScrapedRow(
     val flareRank: String = ""
 )
 
-class DDRRepository(private val dao: DDRDao) {
+class DDRRepository(
+    private val dao: DDRDao,
+    private val externalDao: ExternalDataDao
+) {
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -78,7 +84,21 @@ class DDRRepository(private val dao: DDRDao) {
 
     suspend fun songRecords(date: Long, style: DDRPlayStyle): List<DDRSongRecord> {
         val group = importGroupFor(date) ?: return emptyList()
-        return dao.songRecords(group.id, style.value)
+        return applyMetadata(dao.songRecords(group.id, style.value))
+    }
+
+    private suspend fun applyMetadata(records: List<DDRSongRecord>): List<DDRSongRecord> {
+        if (records.isEmpty()) return records
+        val metaByTitle = externalDao.allDDRSongMetas().associateBy { it.titleCompact }
+        if (metaByTitle.isEmpty()) return records
+        return records.map { record ->
+            val meta = metaByTitle[record.title.ddrCompact] ?: return@map record
+            val level = meta.level(
+                DDRPlayStyle.fromValue(record.style),
+                DDRDifficulty.fromValue(record.difficulty)
+            )
+            if (level > 0) record.copy(level = level) else record
+        }
     }
 
     suspend fun deleteImportGroup(groupID: String) {
@@ -91,3 +111,22 @@ class DDRRepository(private val dao: DDRDao) {
         dao.deleteAllImportGroups()
     }
 }
+
+private fun DDRSongMeta.level(style: DDRPlayStyle, difficulty: DDRDifficulty?): Int =
+    when (style) {
+        DDRPlayStyle.SINGLE -> when (difficulty) {
+            DDRDifficulty.BEGINNER -> spBeginner
+            DDRDifficulty.BASIC -> spBasic
+            DDRDifficulty.DIFFICULT -> spDifficult
+            DDRDifficulty.EXPERT -> spExpert
+            DDRDifficulty.CHALLENGE -> spChallenge
+            null -> 0
+        }
+        DDRPlayStyle.DOUBLE -> when (difficulty) {
+            DDRDifficulty.BASIC -> dpBasic
+            DDRDifficulty.DIFFICULT -> dpDifficult
+            DDRDifficulty.EXPERT -> dpExpert
+            DDRDifficulty.CHALLENGE -> dpChallenge
+            else -> 0
+        }
+    }

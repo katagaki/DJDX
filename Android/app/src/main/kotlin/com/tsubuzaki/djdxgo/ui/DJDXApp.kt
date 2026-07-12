@@ -47,9 +47,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import android.net.Uri
 import com.tsubuzaki.djdxgo.DJDXApplication
 import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.data.Game
@@ -82,8 +85,14 @@ sealed interface ViewerTarget {
     data class Web(val url: String, val title: String) : ViewerTarget
 }
 
-object NavigationState {
-    var pendingViewerTarget: ViewerTarget? = null
+private fun ViewerTarget.toRoute(): String = when (this) {
+    is ViewerTarget.IIDX ->
+        "viewer/iidx?title=${Uri.encode(title)}&playType=${Uri.encode(playType)}" +
+            "&level=${Uri.encode(level)}&date=$date"
+    is ViewerTarget.SDVX ->
+        "viewer/sdvx?title=${Uri.encode(title)}&date=$date"
+    is ViewerTarget.Web ->
+        "viewer/web?url=${Uri.encode(url)}&title=${Uri.encode(title)}"
 }
 
 private enum class PendingDelete { WEB, SCORE }
@@ -115,8 +124,7 @@ fun DJDXApp() {
     }
 
     fun openViewer(target: ViewerTarget) {
-        NavigationState.pendingViewerTarget = target
-        navController.navigate("viewer")
+        navController.navigate(target.toRoute())
     }
 
     NavHost(navController = navController, startDestination = "scores") {
@@ -135,35 +143,57 @@ fun DJDXApp() {
                 onDismiss = { navController.popBackStack() }
             )
         }
-        composable("viewer") {
-            when (val target = NavigationState.pendingViewerTarget) {
-                is ViewerTarget.IIDX -> IIDXScoreViewerScreen(
-                    container = container,
-                    title = target.title,
-                    playType = target.playType,
-                    initialLevel = target.level,
-                    dateEpoch = target.date,
-                    onBack = { navController.popBackStack() },
-                    onOpenWeb = { url -> openViewer(ViewerTarget.Web(url, target.title)) }
-                )
-                is ViewerTarget.SDVX -> SDVXScoreViewerScreen(
-                    container = container,
-                    title = target.title,
-                    dateEpoch = target.date,
-                    onBack = { navController.popBackStack() },
-                    onOpenWeb = { url -> openViewer(ViewerTarget.Web(url, target.title)) }
-                )
-                is ViewerTarget.Web -> WebViewScreen(
-                    url = target.url,
-                    title = target.title,
-                    onBack = { navController.popBackStack() }
-                )
-                null -> {
-                    androidx.compose.runtime.LaunchedEffect(Unit) {
-                        navController.popBackStack()
-                    }
-                }
-            }
+        composable(
+            route = "viewer/iidx?title={title}&playType={playType}&level={level}&date={date}",
+            arguments = listOf(
+                navArgument("title") { type = NavType.StringType; defaultValue = "" },
+                navArgument("playType") { type = NavType.StringType; defaultValue = "single" },
+                navArgument("level") { type = NavType.StringType; defaultValue = "" },
+                navArgument("date") { type = NavType.LongType; defaultValue = 0L }
+            )
+        ) { entry ->
+            val args = entry.arguments!!
+            val title = args.getString("title").orEmpty()
+            IIDXScoreViewerScreen(
+                container = container,
+                title = title,
+                playType = args.getString("playType") ?: "single",
+                initialLevel = args.getString("level").orEmpty(),
+                dateEpoch = args.getLong("date"),
+                onBack = { navController.popBackStack() },
+                onOpenWeb = { url -> openViewer(ViewerTarget.Web(url, title)) }
+            )
+        }
+        composable(
+            route = "viewer/sdvx?title={title}&date={date}",
+            arguments = listOf(
+                navArgument("title") { type = NavType.StringType; defaultValue = "" },
+                navArgument("date") { type = NavType.LongType; defaultValue = 0L }
+            )
+        ) { entry ->
+            val args = entry.arguments!!
+            val title = args.getString("title").orEmpty()
+            SDVXScoreViewerScreen(
+                container = container,
+                title = title,
+                dateEpoch = args.getLong("date"),
+                onBack = { navController.popBackStack() },
+                onOpenWeb = { url -> openViewer(ViewerTarget.Web(url, title)) }
+            )
+        }
+        composable(
+            route = "viewer/web?url={url}&title={title}",
+            arguments = listOf(
+                navArgument("url") { type = NavType.StringType; defaultValue = "" },
+                navArgument("title") { type = NavType.StringType; defaultValue = "" }
+            )
+        ) { entry ->
+            val args = entry.arguments!!
+            WebViewScreen(
+                url = args.getString("url").orEmpty(),
+                title = args.getString("title").orEmpty(),
+                onBack = { navController.popBackStack() }
+            )
         }
         composable("tower") {
             TowerDetailScreen(container = container, onBack = { navController.popBackStack() })

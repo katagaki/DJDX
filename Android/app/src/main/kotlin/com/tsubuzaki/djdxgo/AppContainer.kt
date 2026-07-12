@@ -12,6 +12,6 @@ class AppContainer(context: Context) {
     val iidxRepository = IIDXRepository(database.iidxDao())
     val sdvxRepository = SDVXRepository(database.sdvxDao())
     val polarisChordRepository = PolarisChordRepository(database.polarisChordDao())
-    val ddrRepository = DDRRepository(database.ddrDao())
     val externalDataDao = database.externalDataDao()
+    val ddrRepository = DDRRepository(database.ddrDao(), externalDataDao)
 }
