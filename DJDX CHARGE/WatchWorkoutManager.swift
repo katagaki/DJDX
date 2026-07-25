@@ -36,6 +36,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
     private var sessionID: String?
+    private var pendingSessionID: String?
+    private var pendingSessionStart: Date?
 
     override init() {
         super.init()
@@ -45,10 +47,17 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         }
     }
 
-    func activateSession(sessionID: String) {
-        guard !isRunning else { return }
+    func activateSession(sessionID: String, at start: Date = Date()) {
+        guard !sessionID.isEmpty else { return }
+        if isRunning {
+            guard sessionID != self.sessionID else { return }
+            pendingSessionID = sessionID
+            pendingSessionStart = start
+            endWorkout()
+            return
+        }
         self.sessionID = sessionID
-        startDate = Date()
+        startDate = start
         isRunning = true
         requestAuthorizationAndStartWorkout()
     }
@@ -87,9 +96,19 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
             session.startActivity(with: start)
             builder.beginCollection(withStart: start) { _, _ in }
             isCollecting = true
+            sendWorkoutStarted()
         } catch {
             failWorkoutStart()
         }
+    }
+
+    private func sendWorkoutStarted() {
+        guard let sessionID, let startDate else { return }
+        sendToPhone([
+            "command": "workoutStarted",
+            "sessionID": sessionID,
+            "start": startDate.timeIntervalSince1970
+        ])
     }
 
     private func failWorkoutStart() {
@@ -97,6 +116,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         if let sessionID {
             sendToPhone(["command": "endSession", "sessionID": sessionID])
         }
+        pendingSessionID = nil
+        pendingSessionStart = nil
         session = nil
         builder = nil
         sessionID = nil
@@ -146,8 +167,13 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     func requestStartSession() {
         guard healthKitEnabled, !isRunning else { return }
         let sessionID = UUID().uuidString
-        sendToPhone(["command": "startSession", "sessionID": sessionID])
-        activateSession(sessionID: sessionID)
+        let start = Date()
+        sendToPhone([
+            "command": "startSession",
+            "sessionID": sessionID,
+            "start": start.timeIntervalSince1970
+        ])
+        activateSession(sessionID: sessionID, at: start)
     }
 
     func requestEndSession() {
@@ -180,13 +206,28 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     private func sendWorkoutState() {
         guard let sessionID else { return }
-        var payload: [String: Any] = ["command": "workoutState", "sessionID": sessionID, "paused": isPaused]
+        var payload: [String: Any] = [
+            "command": "workoutState", "sessionID": sessionID,
+            "paused": isPaused, "running": isRunning
+        ]
         if isPaused {
             payload["elapsed"] = pausedElapsed
         } else if let startDate {
             payload["start"] = startDate.timeIntervalSince1970
         }
         sendToPhone(payload)
+    }
+
+    private func reportWorkoutState(sessionID: String) {
+        if isRunning, sessionID.isEmpty || sessionID == self.sessionID {
+            sendWorkoutState()
+            return
+        }
+        guard !sessionID.isEmpty else { return }
+        sendToPhone([
+            "command": "workoutState", "sessionID": sessionID,
+            "paused": false, "running": false
+        ])
     }
 
     func endWorkout() {
@@ -211,8 +252,10 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     private func finishUp(workoutUUID: String?, sessionID: String?) {
-        if let workoutUUID, let sessionID {
-            sendToPhone(["workoutUUID": workoutUUID, "sessionID": sessionID])
+        if let sessionID {
+            var payload: [String: Any] = ["sessionID": sessionID, "workoutFinished": true]
+            if let workoutUUID { payload["workoutUUID"] = workoutUUID }
+            sendToPhone(payload)
         }
         session = nil
         builder = nil
@@ -224,6 +267,12 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         isCollecting = false
         pausedElapsed = 0
         resetSessionInfo()
+        if let pendingSessionID {
+            let start = pendingSessionStart ?? Date()
+            self.pendingSessionID = nil
+            pendingSessionStart = nil
+            activateSession(sessionID: pendingSessionID, at: start)
+        }
     }
 
     private func resetSessionInfo() {
@@ -296,12 +345,16 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         ])
     }
 
-    fileprivate func handleCommand(_ command: String, sessionID: String) {
+    fileprivate func handleCommand(_ command: String, sessionID: String, start: Double?) {
         switch command {
-        case "start": activateSession(sessionID: sessionID)
+        case "start":
+            activateSession(
+                sessionID: sessionID,
+                at: start.map { Date(timeIntervalSince1970: $0) } ?? Date()
+            )
         case "end": endWorkout()
         case "adoptSession": adoptSession(sessionID)
-        case "requestWorkoutState": if isRunning { sendWorkoutState() }
+        case "requestWorkoutState": reportWorkoutState(sessionID: sessionID)
         default: break
         }
     }
@@ -397,7 +450,8 @@ extension WatchWorkoutManager: WCSessionDelegate {
                 Task { @MainActor in manager.setPaused(paused, sessionID: sessionID) }
                 return
             }
-            Task { @MainActor in manager.handleCommand(command, sessionID: sessionID) }
+            let start = message["start"] as? Double
+            Task { @MainActor in manager.handleCommand(command, sessionID: sessionID, start: start) }
             return
         }
         if message["sessionInfo"] != nil {
