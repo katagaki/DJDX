@@ -103,8 +103,10 @@ enum IIDXResultParser {
 
         if parse.level != .unknown { hits += 1 }
 
-        if let value = text("clear_type_now").flatMap(clearTypeOf) {
-            parse.clearType = value
+        var clearTypeAmbiguous = false
+        if let resolved = text("clear_type_now").flatMap(clearTypeOf) {
+            parse.clearType = resolved.value
+            clearTypeAmbiguous = resolved.ambiguous
             hits += 1
         }
 
@@ -143,7 +145,7 @@ enum IIDXResultParser {
             bonus = 1.0
         }
         parse.confidence = min(1.0, (Double(hits) + bonus) / 8.0)
-        if djLevelConflict { parse.confidence = min(parse.confidence, 0.5) }
+        if djLevelConflict || clearTypeAmbiguous { parse.confidence = min(parse.confidence, 0.5) }
         return parse
     }
 
@@ -391,21 +393,44 @@ enum IIDXResultParser {
 
     // MARK: - Value maps
 
-    private static func clearTypeOf(_ text: String) -> String? {
-        let label = normalize(text)
-        let ordered: [(String, IIDXClearType)] = [
-            ("FULLCOMBO", .fullComboClear),
-            ("EXHARD", .exHardClear),
-            ("HARDCLEAR", .hardClear),
-            ("EASYCLEAR", .easyClear),
-            ("ASSIST", .assistClear),
-            ("FAILED", .failed),
-            ("CLEAR", .clear)
-        ]
-        for (keyword, type) in ordered where label.contains(keyword) {
-            return type.rawValue
+    private static let clearTypeKeywords: [(String, IIDXClearType)] = [
+        ("NOPLAY", .noPlay),
+        ("FULLCOMBO", .fullComboClear),
+        ("FULLCONBO", .fullComboClear),
+        ("FCOMBO", .fullComboClear),
+        ("EXHARD", .exHardClear),
+        ("EXHCLEAR", .exHardClear),
+        ("EXCLEAR", .exHardClear),
+        ("HARDCLEAR", .hardClear),
+        ("HCLEAR", .hardClear),
+        ("EASYCLEAR", .easyClear),
+        ("ECLEAR", .easyClear),
+        ("ASSIST", .assistClear),
+        ("ACLEAR", .assistClear),
+        ("FAILED", .failed),
+        ("FAILE", .failed),
+        ("NORMALCLEAR", .clear),
+        ("NCLEAR", .clear)
+    ]
+
+    private static func clearTypeOf(_ text: String) -> (value: String, ambiguous: Bool)? {
+        var fallback: (value: String, ambiguous: Bool)?
+        for line in text.split(whereSeparator: \.isNewline).map(String.init) + [text] {
+            let label = clearTypeLabel(line)
+            guard !label.isEmpty else { continue }
+            for (keyword, type) in clearTypeKeywords where label.contains(keyword) {
+                return (type.rawValue, false)
+            }
+            if fallback == nil, label.contains("CLEAR") {
+                fallback = (IIDXClearType.clear.rawValue, label != "CLEAR")
+            }
         }
-        return nil
+        return fallback
+    }
+
+    private static func clearTypeLabel(_ text: String) -> String {
+        String(text.uppercased().filter { $0.isLetter })
+            .replacingOccurrences(of: "CLEARTYPE", with: "")
     }
 
     private static func gradeOf(_ text: String) -> String? {
