@@ -12,6 +12,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     static let shared = IIDXSessionWorkoutBridge()
 
     static let healthKitEnabledKey = "Sessions.HealthKitEnabled"
+    static let pendingWorkoutUUIDsKey = "Sessions.PendingWorkoutUUIDs"
 
     @Published var heartRate: Int = 0
     @Published var activeCalories: Int = 0
@@ -20,11 +21,12 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     @Published private(set) var runningStart: Date?
     @Published private(set) var pausedElapsed: TimeInterval?
 
-    private let healthStore = HKHealthStore()
-    private let database = IIDXPlaySessionsDatabase.shared
+    let healthStore = HKHealthStore()
+    let database = IIDXPlaySessionsDatabase.shared
     private var activeSessionID: String?
     private var workoutStart: Date?
     private var watchWorkoutConfirmed = false
+    private var rearmedSessionIDs: Set<String> = []
 
     var isEnabled: Bool {
         UserDefaults.standard.bool(forKey: Self.healthKitEnabledKey)
@@ -114,19 +116,30 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     func startWorkout(session: IIDXPlaySession) {
+        let isResuming = activeSessionID == session.id
         activeSessionID = session.id
         workoutStart = session.startDate
-        runningStart = session.startDate
-        pausedElapsed = nil
-        isPaused = false
-        watchWorkoutConfirmed = false
-        heartRate = 0
-        activeCalories = 0
+        runningStart = isResuming ? (runningStart ?? session.startDate) : session.startDate
+        pausedElapsed = isResuming ? pausedElapsed : nil
+        isPaused = isResuming ? isPaused : false
+        watchWorkoutConfirmed = isResuming ? watchWorkoutConfirmed : false
+        if !isResuming {
+            heartRate = 0
+            activeCalories = 0
+        }
         isWorkoutActive = isEnabled
         if isEnabled {
-            send(["command": "start", "sessionID": session.id])
+            sendStartCommand(session: session)
             launchWatchApp()
         }
+    }
+
+    private func sendStartCommand(session: IIDXPlaySession) {
+        send([
+            "command": "start",
+            "sessionID": session.id,
+            "start": session.startDate.timeIntervalSince1970
+        ])
     }
 
     func setWorkoutPaused(_ paused: Bool) {
@@ -155,6 +168,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     func reconcileActiveSession() {
+        Task { @MainActor in await reconcileWorkoutLinks() }
         guard let session = database.activeSession(), session.isActive else { return }
         if activeSessionID == nil {
             activeSessionID = session.id
@@ -185,18 +199,24 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     fileprivate func resendStartIfActive() {
-        guard isWorkoutActive, let activeSessionID else { return }
-        send(["command": "start", "sessionID": activeSessionID])
+        guard isWorkoutActive, let activeSessionID,
+              let session = database.session(id: activeSessionID) else { return }
+        sendStartCommand(session: session)
     }
 
     func endWorkout(session: IIDXPlaySession) {
-        guard activeSessionID == session.id else { return }
-        if isWorkoutActive {
+        let wasTracking = activeSessionID == session.id
+        if isEnabled || wasTracking {
             send(["command": "end", "sessionID": session.id])
         }
-        if isEnabled, !watchWorkoutConfirmed {
-            saveFallbackWorkout(for: session)
+        if isEnabled {
+            resolveWorkoutRecord(
+                for: session,
+                watchConfirmed: wasTracking && watchWorkoutConfirmed
+            )
         }
+        rearmedSessionIDs.remove(session.id)
+        guard wasTracking else { return }
         isWorkoutActive = false
         isPaused = false
         activeSessionID = nil
@@ -206,6 +226,33 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         watchWorkoutConfirmed = false
         heartRate = 0
         activeCalories = 0
+    }
+
+    private var watchCanRecordWorkout: Bool {
+        let connectivity = WCSession.default
+        return connectivity.activationState == .activated
+            && connectivity.isPaired
+            && connectivity.isWatchAppInstalled
+    }
+
+    private func resolveWorkoutRecord(for session: IIDXPlaySession, watchConfirmed: Bool) {
+        let sessionID = session.id
+        guard let stored = database.session(id: sessionID), stored.workoutUUID == nil else { return }
+        let start = workoutStart ?? session.startDate
+        let end = Date()
+        guard watchConfirmed || watchCanRecordWorkout else {
+            saveFallbackWorkout(sessionID: sessionID, start: start, end: end)
+            return
+        }
+        let grace: Duration = watchConfirmed ? .seconds(45) : .seconds(15)
+        Task { @MainActor in
+            try? await Task.sleep(for: grace)
+            guard let current = database.session(id: sessionID),
+                  current.workoutUUID == nil else { return }
+            if await linkWorkout(toSessionID: sessionID) { return }
+            guard !watchConfirmed else { return }
+            saveFallbackWorkout(sessionID: sessionID, start: start, end: end)
+        }
     }
 
     private func send(_ payload: [String: Any]) {
@@ -308,6 +355,64 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         NotificationCenter.default.post(name: .playSessionDidChange, object: sessionID)
     }
 
+    fileprivate func handleRemoteStart(sessionID: String?, start: Double?) {
+        if let active = database.activeSession(), active.isActive {
+            reconcileActiveSession()
+            if active.id != sessionID {
+                send(["command": "adoptSession", "sessionID": active.id])
+            }
+            return
+        }
+        guard let sessionID, !sessionID.isEmpty else {
+            NotificationCenter.default.post(name: .startSessionRequested, object: nil)
+            return
+        }
+        if database.session(id: sessionID) == nil {
+            database.createSession(IIDXPlaySession(
+                id: sessionID,
+                game: .iidxArcade,
+                startDate: start.map { Date(timeIntervalSince1970: $0) } ?? .now
+            ))
+        }
+        flushPendingWorkoutUUIDs()
+        NotificationCenter.default.post(name: .startSessionRequested, object: sessionID)
+    }
+
+    fileprivate func handleRemoteEnd(sessionID: String) {
+        let requestedID = sessionID.isEmpty ? nil : sessionID
+        NotificationCenter.default.post(name: .endSessionRequested, object: requestedID)
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(1))
+            let resolved = requestedID.flatMap { database.session(id: $0) } ?? database.activeSession()
+            guard let session = resolved, session.isActive,
+                  database.endSession(id: session.id) else { return }
+            endWorkout(session: session)
+            NotificationCenter.default.post(name: .playSessionDidChange, object: session.id)
+        }
+    }
+
+    fileprivate func applyWorkoutFinished(sessionID: String, uuid: String?) {
+        guard let uuid else {
+            if sessionID == activeSessionID { watchWorkoutConfirmed = false }
+            return
+        }
+        storeWorkoutUUID(uuid, sessionID: sessionID)
+    }
+
+    fileprivate func applyWorkoutStarted(sessionID: String) {
+        adoptSessionIfNeeded(sessionID)
+        guard sessionID == activeSessionID else { return }
+        watchWorkoutConfirmed = true
+    }
+
+    fileprivate func applyWatchWorkoutStopped(sessionID: String) {
+        guard sessionID == activeSessionID, isWorkoutActive,
+              let session = database.session(id: sessionID), session.isActive else { return }
+        watchWorkoutConfirmed = false
+        guard rearmedSessionIDs.insert(sessionID).inserted else { return }
+        sendStartCommand(session: session)
+    }
+
     fileprivate func applyWorkoutState(sessionID: String, paused: Bool, elapsed: Double?, start: Double?) {
         adoptSessionIfNeeded(sessionID)
         guard sessionID == activeSessionID else { return }
@@ -329,14 +434,62 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
 
     fileprivate func storeWorkoutUUID(_ uuid: String, sessionID: String) {
         if sessionID == activeSessionID { watchWorkoutConfirmed = true }
-        guard let session = database.session(id: sessionID) else { return }
+        guard let session = database.session(id: sessionID) else {
+            bufferWorkoutUUID(uuid, sessionID: sessionID)
+            return
+        }
         session.workoutUUID = uuid
         database.updateSession(session)
+        removeBufferedWorkoutUUID(sessionID: sessionID)
+        NotificationCenter.default.post(name: .playSessionDidChange, object: sessionID)
     }
 
-    private func saveFallbackWorkout(for session: IIDXPlaySession) {
-        guard let start = workoutStart else { return }
-        let end = Date()
+    private var pendingWorkoutUUIDs: [String: String] {
+        get {
+            UserDefaults.standard.dictionary(
+                forKey: Self.pendingWorkoutUUIDsKey
+            ) as? [String: String] ?? [:]
+        }
+        set { UserDefaults.standard.set(newValue, forKey: Self.pendingWorkoutUUIDsKey) }
+    }
+
+    private func bufferWorkoutUUID(_ uuid: String, sessionID: String) {
+        var pending = pendingWorkoutUUIDs
+        if pending.count >= 20, pending[sessionID] == nil,
+           let oldest = pending.keys.sorted().first {
+            pending[oldest] = nil
+        }
+        pending[sessionID] = uuid
+        pendingWorkoutUUIDs = pending
+    }
+
+    private func removeBufferedWorkoutUUID(sessionID: String) {
+        var pending = pendingWorkoutUUIDs
+        guard pending.removeValue(forKey: sessionID) != nil else { return }
+        pendingWorkoutUUIDs = pending
+    }
+
+    func flushPendingWorkoutUUIDs() {
+        var pending = pendingWorkoutUUIDs
+        guard !pending.isEmpty else { return }
+        var didLink = false
+        for (sessionID, uuid) in pending {
+            guard let session = database.session(id: sessionID) else { continue }
+            if session.workoutUUID == nil {
+                session.workoutUUID = uuid
+                database.updateSession(session)
+                didLink = true
+            }
+            pending[sessionID] = nil
+        }
+        pendingWorkoutUUIDs = pending
+        if didLink {
+            NotificationCenter.default.post(name: .playSessionDidChange, object: nil)
+        }
+    }
+
+    private func saveFallbackWorkout(sessionID: String, start: Date, end: Date) {
+        guard end > start else { return }
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .fitnessGaming
         configuration.locationType = .indoor
@@ -345,7 +498,6 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
             configuration: configuration,
             device: .local()
         )
-        let sessionID = session.id
         nonisolated(unsafe) let liveBuilder = builder
         nonisolated(unsafe) let bridge = self
         liveBuilder.beginCollection(withStart: start) { _, _ in
@@ -386,37 +538,12 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
         let sessionID = message["sessionID"] as? String ?? ""
         nonisolated(unsafe) let bridge = self
         if let command = message["command"] as? String {
-            switch command {
-            case "requestProfile":
-                Task { @MainActor in
-                    bridge.syncProfileToWatch()
-                    bridge.resendStartIfActive()
-                }
-            case "startSession":
-                let requestedID = sessionID.isEmpty ? nil : sessionID
-                Task { @MainActor in
-                    if let active = bridge.database.activeSession(), active.isActive,
-                       active.id != requestedID {
-                        bridge.reconcileActiveSession()
-                        bridge.send(["command": "adoptSession", "sessionID": active.id])
-                    } else {
-                        NotificationCenter.default.post(name: .startSessionRequested, object: requestedID)
-                    }
-                }
-            case "endSession":
-                Task { @MainActor in
-                    NotificationCenter.default.post(name: .endSessionRequested, object: sessionID)
-                }
-            case "workoutState":
-                let paused = message["paused"] as? Bool ?? false
-                let elapsed = message["elapsed"] as? Double
-                let start = message["start"] as? Double
-                Task { @MainActor in
-                    bridge.applyWorkoutState(sessionID: sessionID, paused: paused, elapsed: elapsed, start: start)
-                }
-            default:
-                break
-            }
+            routeCommand(command, sessionID: sessionID, message: message)
+            return
+        }
+        if message["workoutFinished"] != nil {
+            let uuid = message["workoutUUID"] as? String
+            Task { @MainActor in bridge.applyWorkoutFinished(sessionID: sessionID, uuid: uuid) }
             return
         }
         if let uuid = message["workoutUUID"] as? String {
@@ -429,6 +556,43 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
             Task { @MainActor in
                 bridge.ingestMetrics(heartRate: heartRate, activeCalories: activeCalories, sessionID: sessionID)
             }
+        }
+    }
+
+    private nonisolated func routeCommand(_ command: String,
+                                          sessionID: String,
+                                          message: [String: Any]) {
+        nonisolated(unsafe) let bridge = self
+        switch command {
+        case "requestProfile":
+            Task { @MainActor in
+                bridge.syncProfileToWatch()
+                bridge.resendStartIfActive()
+            }
+        case "startSession":
+            let requestedID = sessionID.isEmpty ? nil : sessionID
+            let start = message["start"] as? Double
+            Task { @MainActor in bridge.handleRemoteStart(sessionID: requestedID, start: start) }
+        case "endSession":
+            Task { @MainActor in bridge.handleRemoteEnd(sessionID: sessionID) }
+        case "workoutStarted":
+            Task { @MainActor in bridge.applyWorkoutStarted(sessionID: sessionID) }
+        case "workoutState":
+            let paused = message["paused"] as? Bool ?? false
+            let elapsed = message["elapsed"] as? Double
+            let start = message["start"] as? Double
+            let running = message["running"] as? Bool ?? true
+            Task { @MainActor in
+                guard running else {
+                    bridge.applyWatchWorkoutStopped(sessionID: sessionID)
+                    return
+                }
+                bridge.applyWorkoutState(
+                    sessionID: sessionID, paused: paused, elapsed: elapsed, start: start
+                )
+            }
+        default:
+            break
         }
     }
 }

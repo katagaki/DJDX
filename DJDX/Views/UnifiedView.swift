@@ -241,7 +241,11 @@ struct UnifiedView: View {
             .receive(on: RunLoop.main)) { notification in
             if sessionStore.activeSession == nil {
                 appMode = .sessions
-                sessionStore.startSession(id: notification.object as? String)
+                if let requestedID = notification.object as? String {
+                    sessionStore.adoptRemoteSession(id: requestedID)
+                } else {
+                    sessionStore.startSession()
+                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .endSessionRequested)
