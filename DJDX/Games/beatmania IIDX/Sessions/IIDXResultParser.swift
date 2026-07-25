@@ -84,10 +84,11 @@ enum IIDXResultParser {
                                     level: parse.level,
                                     difficulty: parse.difficulty,
                                     playType: parse.playType)
+        let chartMatch = resolved.matched.flatMap { $0.playType == parse.playType ? $0 : nil }
         if let matched = resolved.matched {
             parse.songTitle = matched.title
             parse.matchedSongID = matched.id
-            if parse.level != .unknown, let known = matched.difficulties[parse.level] {
+            if parse.level != .unknown, let known = chartMatch?.difficulties[parse.level] {
                 parse.difficulty = known
             }
             hits += 1
@@ -97,7 +98,7 @@ enum IIDXResultParser {
 
         if ocrDifficulty == 1,
            parse.level == .another || parse.level == .leggendaria,
-           resolved.matched?.difficulties[parse.level] == nil {
+           chartMatch?.difficulties[parse.level] == nil {
             parse.difficulty = 11
         }
 
@@ -110,7 +111,7 @@ enum IIDXResultParser {
             hits += 1
         }
 
-        let notes = resolved.matched?.noteCounts[parse.level] ?? headlineNumber(text("notes_count"))
+        let notes = chartMatch?.noteCounts[parse.level] ?? headlineNumber(text("notes_count"))
         if let value = headlineNumber(text("score_now")) {
             parse.exScore = sanitizedScore(value)
             hits += 1
@@ -246,6 +247,10 @@ enum IIDXResultParser {
 
     // MARK: - Title
 
+    private static let nearChartThreshold = 0.40
+    private static let chartCategoryThreshold = 0.28
+    private static let wideTitleThreshold = 0.34
+
     private static func resolveTitle(titleText: String?,
                                      songs: [IIDXSongCandidate],
                                      level: IIDXLevel,
@@ -261,23 +266,17 @@ enum IIDXResultParser {
         )
         let needles = titleNeedles(titleText)
 
-        for needle in needles {
-            if let exact = pool.first(where: { $0.compact == needle }) {
-                return (exact, nil)
-            }
+        if let matched = bestMatch(needles: needles, pool: pool, threshold: threshold) {
+            return (matched, nil)
         }
-
-        var best: (song: IIDXSongCandidate, ratio: Double)?
-        for needle in needles where needle.count >= 3 {
-            for song in pool where song.compact.count >= 2 {
-                let ratio = editRatio(needle, song.compact)
-                if ratio <= threshold, best == nil || ratio < best!.ratio {
-                    best = (song, ratio)
-                }
-            }
+        let sameType = songs.filter { $0.playType == playType }
+        if sameType.count != pool.count,
+           let matched = bestMatch(needles: needles, pool: sameType, threshold: wideTitleThreshold) {
+            return (matched, nil)
         }
-        if let best {
-            return (best.song, nil)
+        if sameType.count != songs.count,
+           let matched = bestMatch(needles: needles, pool: songs, threshold: wideTitleThreshold) {
+            return (matched, nil)
         }
         return (nil, rawTitle)
     }
@@ -288,17 +287,48 @@ enum IIDXResultParser {
         difficulty: Int,
         playType: IIDXPlayType
     ) -> (pool: [IIDXSongCandidate], threshold: Double) {
-        guard level != .unknown else { return (songs, 0.15) }
+        guard level != .unknown else { return (songs, chartCategoryThreshold) }
         if difficulty > 0 {
             let near = songs.filter { candidate in
                 candidate.playType == playType
                 && (candidate.difficulties[level].map { abs($0 - difficulty) <= 1 } ?? false)
             }
-            if !near.isEmpty { return (near, 0.40) }
+            if !near.isEmpty { return (near, nearChartThreshold) }
         }
         let category = songs.filter { $0.playType == playType && $0.difficulties[level] != nil }
-        if !category.isEmpty { return (category, 0.15) }
-        return (songs, 0.15)
+        if !category.isEmpty { return (category, chartCategoryThreshold) }
+        return (songs, chartCategoryThreshold)
+    }
+
+    private static func bestMatch(needles: [String],
+                                  pool: [IIDXSongCandidate],
+                                  threshold: Double) -> IIDXSongCandidate? {
+        for needle in needles {
+            if let exact = pool.first(where: { $0.compact == needle }) { return exact }
+        }
+        var best: (song: IIDXSongCandidate, score: Double)?
+        for needle in needles where needle.count >= 3 {
+            for song in pool where song.compact.count >= 2 {
+                guard let score = matchScore(
+                    needle: needle, candidate: song.compact, threshold: threshold
+                ) else { continue }
+                if best == nil || score < best!.score { best = (song, score) }
+            }
+        }
+        return best?.song
+    }
+
+    private static func matchScore(needle: String,
+                                   candidate: String,
+                                   threshold: Double) -> Double? {
+        let longest = max(needle.count, candidate.count)
+        let drift = Double(abs(needle.count - candidate.count)) / Double(longest)
+        if candidate.contains(needle) || needle.contains(candidate) {
+            return drift <= 0.5 ? drift : nil
+        }
+        guard drift <= 0.4 else { return nil }
+        let ratio = editRatio(needle, candidate)
+        return ratio <= threshold ? 1.0 + ratio : nil
     }
 
     private static func titleNeedles(_ text: String) -> [String] {

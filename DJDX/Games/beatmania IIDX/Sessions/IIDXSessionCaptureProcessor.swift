@@ -228,16 +228,21 @@ extension IIDXSessionCaptureProcessor {
                 (.normal, col.songDPNormalLevel), (.hyper, col.songDPHyperLevel),
                 (.another, col.songDPAnotherLevel), (.leggendaria, col.songDPLeggendariaLevel)
             ]
-            if let candidate = makeCandidate(id: identifier, title: title, playType: .single,
-                                             difficulties: levelInts(row, singleLevels),
-                                             noteCounts: bemaniWikiNoteCounts(row, double: false)) {
-                candidates.append(candidate)
+            let single = makeCandidate(id: identifier, title: title, playType: .single,
+                                       difficulties: levelInts(row, singleLevels),
+                                       noteCounts: bemaniWikiNoteCounts(row, double: false))
+            let double = makeCandidate(id: identifier, title: title, playType: .double,
+                                       difficulties: levelInts(row, doubleLevels),
+                                       noteCounts: bemaniWikiNoteCounts(row, double: true))
+            if single == nil, double == nil {
+                candidates.append(IIDXSongCandidate(
+                    id: identifier, title: title, compact: title.compact, playType: .single,
+                    difficulties: [:], noteCounts: bemaniWikiNoteCounts(row, double: false)
+                ))
+                continue
             }
-            if let candidate = makeCandidate(id: identifier, title: title, playType: .double,
-                                             difficulties: levelInts(row, doubleLevels),
-                                             noteCounts: bemaniWikiNoteCounts(row, double: true)) {
-                candidates.append(candidate)
-            }
+            if let single { candidates.append(single) }
+            if let double { candidates.append(double) }
         }
         return candidates
     }
