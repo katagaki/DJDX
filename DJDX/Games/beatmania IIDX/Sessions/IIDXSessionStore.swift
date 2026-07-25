@@ -43,15 +43,30 @@ final class IIDXSessionStore {
         return session
     }
 
+    @discardableResult
+    func adoptRemoteSession(id: String) -> IIDXPlaySession {
+        guard let existing = database.session(id: id), existing.isActive else {
+            return startSession(id: id)
+        }
+        activeSession = existing
+        plays = database.plays(forSession: existing.id)
+        loadSessions()
+        IIDXSessionLiveActivityController.shared.reconcile()
+        IIDXSessionWorkoutBridge.shared.reconcileActiveSession()
+        IIDXSessionLiveActivityController.shared.pushSessionInfoToWatch(sessionID: existing.id)
+        NotificationCenter.default.post(name: .playSessionDidChange, object: existing.id)
+        return existing
+    }
+
     func endSession() {
         guard let activeSession else { return }
         guard database.endSession(id: activeSession.id) else { return }
         let endedID = activeSession.id
-        IIDXSessionWorkoutBridge.shared.endWorkout(session: activeSession)
         let duration = Date.now.timeIntervalSince(activeSession.startDate)
         if duration < 60.0, database.plays(forSession: endedID).isEmpty {
             database.deleteSession(id: endedID)
         }
+        IIDXSessionWorkoutBridge.shared.endWorkout(session: activeSession)
         self.activeSession = nil
         plays = []
         loadSessions()
