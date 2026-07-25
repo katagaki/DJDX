@@ -173,6 +173,9 @@ final class IIDXPlaySessionsDatabase: Sendable {
     }
 
     func deleteSession(id: String) {
+        if let workoutUUID = session(id: id)?.workoutUUID {
+            IIDXSessionWorkoutBridge.dismissWorkoutUUID(workoutUUID)
+        }
         for play in plays(forSession: id) {
             IIDXSessionImageStore.shared.delete(filename: play.rawImageFilename)
         }
