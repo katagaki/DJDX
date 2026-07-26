@@ -13,6 +13,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
 
     static let healthKitEnabledKey = "Sessions.HealthKitEnabled"
     static let pendingWorkoutUUIDsKey = "Sessions.PendingWorkoutUUIDs"
+    nonisolated static let dismissedWorkoutUUIDsKey = "Sessions.DismissedWorkoutUUIDs"
 
     @Published var heartRate: Int = 0
     @Published var activeCalories: Int = 0
