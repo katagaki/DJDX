@@ -4,7 +4,7 @@ struct IIDXScoreViewer: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
-    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     var songRecord: IIDXSongRecord
     var noteCount: (IIDXSongRecord, IIDXLevel) -> Int?

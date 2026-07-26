@@ -58,7 +58,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
 
     let loadingState: WebImporterLoadingState
 
-    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     let webView: WKWebView = {
         let contentController = WKUserContentController()
