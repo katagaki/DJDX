@@ -39,6 +39,28 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     private var pendingSessionID: String?
     private var pendingSessionStart: Date?
 
+    private static let endedSessionIDsKey = "Watch.EndedSessionIDs"
+
+    private var endedSessionIDs: [String] {
+        get { UserDefaults.standard.stringArray(forKey: Self.endedSessionIDsKey) ?? [] }
+        set { UserDefaults.standard.set(newValue, forKey: Self.endedSessionIDsKey) }
+    }
+
+    private func markSessionEnded(_ id: String) {
+        guard !id.isEmpty else { return }
+        var ended = endedSessionIDs
+        ended.removeAll { $0 == id }
+        ended.append(id)
+        if ended.count > 20 {
+            ended.removeFirst(ended.count - 20)
+        }
+        endedSessionIDs = ended
+    }
+
+    private func isSessionEnded(_ id: String) -> Bool {
+        endedSessionIDs.contains(id)
+    }
+
     override init() {
         super.init()
         if WCSession.isSupported() {
@@ -48,12 +70,14 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     func activateSession(sessionID: String, at start: Date = Date()) {
-        guard !sessionID.isEmpty else { return }
-        if isRunning {
+        guard !sessionID.isEmpty, !isSessionEnded(sessionID) else { return }
+        if isRunning || session != nil || builder != nil {
             guard sessionID != self.sessionID else { return }
             pendingSessionID = sessionID
             pendingSessionStart = start
-            endWorkout()
+            if isRunning {
+                endWorkout()
+            }
             return
         }
         self.sessionID = sessionID
@@ -178,7 +202,21 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     func requestEndSession() {
         if let sessionID {
+            markSessionEnded(sessionID)
             sendToPhone(["command": "endSession", "sessionID": sessionID])
+        }
+        endWorkout()
+    }
+
+    fileprivate func handleEndCommand(sessionID: String) {
+        markSessionEnded(sessionID)
+        if pendingSessionID == sessionID {
+            pendingSessionID = nil
+            pendingSessionStart = nil
+        }
+        guard sessionID.isEmpty || sessionID == self.sessionID else { return }
+        if let current = self.sessionID {
+            markSessionEnded(current)
         }
         endWorkout()
     }
@@ -352,7 +390,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
                 sessionID: sessionID,
                 at: start.map { Date(timeIntervalSince1970: $0) } ?? Date()
             )
-        case "end": endWorkout()
+        case "end": handleEndCommand(sessionID: sessionID)
         case "adoptSession": adoptSession(sessionID)
         case "requestWorkoutState": reportWorkoutState(sessionID: sessionID)
         default: break
