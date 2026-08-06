@@ -9,6 +9,8 @@ import WidgetKit
 @MainActor
 // swiftlint:disable:next type_body_length
 final class WatchWorkoutManager: NSObject, ObservableObject {
+    static let shared = WatchWorkoutManager()
+
     @Published var isRunning = false
     @Published var isPaused = false
     @Published private(set) var isCollecting = false
@@ -61,12 +63,17 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         endedSessionIDs.contains(id)
     }
 
-    override init() {
+    override private init() {
         super.init()
         if WCSession.isSupported() {
             WCSession.default.delegate = self
             WCSession.default.activate()
         }
+    }
+
+    func handleRemoteWorkoutLaunch() {
+        guard !isRunning else { return }
+        requestProfile()
     }
 
     func activateSession(sessionID: String, at start: Date = Date()) {
