@@ -208,6 +208,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     func endWorkout(session: IIDXPlaySession) {
         let wasTracking = activeSessionID == session.id
         if isEnabled || wasTracking {
+            cancelQueuedTransfers(sessionID: session.id)
             send(["command": "end", "sessionID": session.id])
         }
         if isEnabled {
@@ -253,6 +254,14 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
             if await linkWorkout(toSessionID: sessionID) { return }
             guard !watchConfirmed else { return }
             saveFallbackWorkout(sessionID: sessionID, start: start, end: end)
+        }
+    }
+
+    private func cancelQueuedTransfers(sessionID: String) {
+        for transfer in WCSession.default.outstandingUserInfoTransfers
+        where transfer.userInfo["sessionID"] as? String == sessionID
+            && transfer.userInfo["command"] as? String != "end" {
+            transfer.cancel()
         }
     }
 
@@ -368,7 +377,12 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
             NotificationCenter.default.post(name: .startSessionRequested, object: nil)
             return
         }
-        if database.session(id: sessionID) == nil {
+        if let existing = database.session(id: sessionID) {
+            guard existing.isActive else {
+                send(["command": "end", "sessionID": sessionID])
+                return
+            }
+        } else {
             database.createSession(IIDXPlaySession(
                 id: sessionID,
                 game: .iidxArcade,

@@ -1,8 +1,17 @@
+import HealthKit
 import SwiftUI
+import WatchKit
+
+final class AppDelegate: NSObject, WKApplicationDelegate {
+    func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
+        WatchWorkoutManager.shared.handleRemoteWorkoutLaunch()
+    }
+}
 
 @main
 struct DJDXChargeWatchApp: App {
-    @StateObject private var workoutManager = WatchWorkoutManager()
+    @WKApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    @StateObject private var workoutManager = WatchWorkoutManager.shared
 
     var body: some Scene {
         WindowGroup {

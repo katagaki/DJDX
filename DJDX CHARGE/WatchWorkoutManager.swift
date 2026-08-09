@@ -9,6 +9,8 @@ import WidgetKit
 @MainActor
 // swiftlint:disable:next type_body_length
 final class WatchWorkoutManager: NSObject, ObservableObject {
+    static let shared = WatchWorkoutManager()
+
     @Published var isRunning = false
     @Published var isPaused = false
     @Published private(set) var isCollecting = false
@@ -39,7 +41,29 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     private var pendingSessionID: String?
     private var pendingSessionStart: Date?
 
-    override init() {
+    private static let endedSessionIDsKey = "Watch.EndedSessionIDs"
+
+    private var endedSessionIDs: [String] {
+        get { UserDefaults.standard.stringArray(forKey: Self.endedSessionIDsKey) ?? [] }
+        set { UserDefaults.standard.set(newValue, forKey: Self.endedSessionIDsKey) }
+    }
+
+    private func markSessionEnded(_ id: String) {
+        guard !id.isEmpty else { return }
+        var ended = endedSessionIDs
+        ended.removeAll { $0 == id }
+        ended.append(id)
+        if ended.count > 20 {
+            ended.removeFirst(ended.count - 20)
+        }
+        endedSessionIDs = ended
+    }
+
+    private func isSessionEnded(_ id: String) -> Bool {
+        endedSessionIDs.contains(id)
+    }
+
+    override private init() {
         super.init()
         if WCSession.isSupported() {
             WCSession.default.delegate = self
@@ -47,13 +71,35 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         }
     }
 
+    func handleRemoteWorkoutLaunch() {
+        guard !isRunning, session == nil, builder == nil else { return }
+        isRunning = true
+        startDate = Date()
+        beginWorkoutCollection()
+        guard session != nil else { return }
+        requestProfile()
+        Task {
+            try? await Task.sleep(for: .seconds(30))
+            guard isRunning, sessionID == nil else { return }
+            endWorkout()
+        }
+    }
+
     func activateSession(sessionID: String, at start: Date = Date()) {
-        guard !sessionID.isEmpty else { return }
-        if isRunning {
+        guard !sessionID.isEmpty, !isSessionEnded(sessionID) else { return }
+        if isRunning, self.sessionID == nil, session != nil {
+            self.sessionID = sessionID
+            startDate = start
+            sendWorkoutStarted()
+            return
+        }
+        if isRunning || session != nil || builder != nil {
             guard sessionID != self.sessionID else { return }
             pendingSessionID = sessionID
             pendingSessionStart = start
-            endWorkout()
+            if isRunning {
+                endWorkout()
+            }
             return
         }
         self.sessionID = sessionID
@@ -178,7 +224,21 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     func requestEndSession() {
         if let sessionID {
+            markSessionEnded(sessionID)
             sendToPhone(["command": "endSession", "sessionID": sessionID])
+        }
+        endWorkout()
+    }
+
+    fileprivate func handleEndCommand(sessionID: String) {
+        markSessionEnded(sessionID)
+        if pendingSessionID == sessionID {
+            pendingSessionID = nil
+            pendingSessionStart = nil
+        }
+        guard sessionID.isEmpty || sessionID == self.sessionID else { return }
+        if let current = self.sessionID {
+            markSessionEnded(current)
         }
         endWorkout()
     }
@@ -352,7 +412,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
                 sessionID: sessionID,
                 at: start.map { Date(timeIntervalSince1970: $0) } ?? Date()
             )
-        case "end": endWorkout()
+        case "end": handleEndCommand(sessionID: sessionID)
         case "adoptSession": adoptSession(sessionID)
         case "requestWorkoutState": reportWorkoutState(sessionID: sessionID)
         default: break
