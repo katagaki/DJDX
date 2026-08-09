@@ -569,6 +569,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKBackgroundModes = "workout-processing";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.DJDX;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -604,6 +605,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKBackgroundModes = "workout-processing";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.DJDX;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

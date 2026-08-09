@@ -72,12 +72,27 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     func handleRemoteWorkoutLaunch() {
-        guard !isRunning else { return }
+        guard !isRunning, session == nil, builder == nil else { return }
+        isRunning = true
+        startDate = Date()
+        beginWorkoutCollection()
+        guard session != nil else { return }
         requestProfile()
+        Task {
+            try? await Task.sleep(for: .seconds(30))
+            guard isRunning, sessionID == nil else { return }
+            endWorkout()
+        }
     }
 
     func activateSession(sessionID: String, at start: Date = Date()) {
         guard !sessionID.isEmpty, !isSessionEnded(sessionID) else { return }
+        if isRunning, self.sessionID == nil, session != nil {
+            self.sessionID = sessionID
+            startDate = start
+            sendWorkoutStarted()
+            return
+        }
         if isRunning || session != nil || builder != nil {
             guard sessionID != self.sessionID else { return }
             pendingSessionID = sessionID

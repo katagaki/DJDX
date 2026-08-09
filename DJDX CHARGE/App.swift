@@ -4,9 +4,7 @@ import WatchKit
 
 final class AppDelegate: NSObject, WKApplicationDelegate {
     func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
-        Task { @MainActor in
-            WatchWorkoutManager.shared.handleRemoteWorkoutLaunch()
-        }
+        WatchWorkoutManager.shared.handleRemoteWorkoutLaunch()
     }
 }
 
