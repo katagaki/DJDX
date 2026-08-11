@@ -34,6 +34,7 @@ struct UnifiedView: View {
 
     @State var availableBackupDate: Date?
     @State var isPromptingBackupRestore: Bool = false
+    @State var isPromptingBackupRestoreInOnboarding: Bool = false
     @State var pendingRestoreAfterOnboarding: Bool = false
     @State var isBackupRestoreCompleted: Bool = false
     @State var isBackupRestoreFailed: Bool = false
@@ -202,14 +203,25 @@ struct UnifiedView: View {
             OnboardingView {
                 lastSeenOnboardingVersion = OnboardingView.appVersion
                 isPresentingOnboarding = false
-                ImportMovedTip.isOnboardingComplete = true
                 if pendingRestoreAfterOnboarding {
                     pendingRestoreAfterOnboarding = false
                     Task { @MainActor in
                         try? await Task.sleep(for: .seconds(0.6))
-                        isPromptingBackupRestore = true
+                        restoreFromBackup()
                     }
+                } else {
+                    ImportMovedTip.isOnboardingComplete = true
                 }
+            }
+            .alert("Alert.ICloudBackup.Restore.Title", isPresented: $isPromptingBackupRestoreInOnboarding) {
+                Button("Alert.ICloudBackup.Restore.Confirm") {
+                    pendingRestoreAfterOnboarding = true
+                }
+                Button("Alert.ICloudBackup.Restore.Decline", role: .cancel) {
+                    hasCompletedRestorePrompt = true
+                }
+            } message: {
+                Text("Alert.ICloudBackup.Restore.Subtitle.\(availableBackupDate ?? .now, format: .dateTime)")
             }
         }
         .fullScreenCover(isPresented: $migrationProgress.isShowing) {
@@ -283,7 +295,7 @@ struct UnifiedView: View {
                     if let backupDate, !hasCompletedRestorePrompt {
                         availableBackupDate = backupDate
                         if isPresentingOnboarding {
-                            pendingRestoreAfterOnboarding = true
+                            isPromptingBackupRestoreInOnboarding = true
                         } else {
                             isPromptingBackupRestore = true
                         }
@@ -304,6 +316,7 @@ struct UnifiedView: View {
         .alert("Alert.ICloudBackup.RestoreCompleted.Title", isPresented: $isBackupRestoreCompleted) {
             Button("Shared.OK", role: .cancel) {
                 isBackupRestoreCompleted = false
+                ImportMovedTip.isOnboardingComplete = true
             }
         } message: {
             Text("Alert.ICloudBackup.RestoreCompleted.Subtitle")
@@ -311,6 +324,7 @@ struct UnifiedView: View {
         .alert("Alert.ICloudBackup.RestoreFailed.Title", isPresented: $isBackupRestoreFailed) {
             Button("Shared.OK", role: .cancel) {
                 isBackupRestoreFailed = false
+                ImportMovedTip.isOnboardingComplete = true
             }
         } message: {
             Text("Alert.ICloudBackup.RestoreFailed.Subtitle")
