@@ -28,6 +28,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     private var workoutStart: Date?
     private var watchWorkoutConfirmed = false
     private var rearmedSessionIDs: Set<String> = []
+    var lastWorkoutLinkSweep: Date?
 
     var isEnabled: Bool {
         UserDefaults.standard.bool(forKey: Self.healthKitEnabledKey)

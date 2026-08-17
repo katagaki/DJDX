@@ -8,6 +8,7 @@ extension IIDXSessionWorkoutBridge {
     static let linkSearchPadding: TimeInterval = 60.0 * 60.0
     static let linkMinimumOverlap: TimeInterval = 30.0
     static let minimumAdoptableWorkout: TimeInterval = 180.0
+    static let linkSweepInterval: TimeInterval = 15.0 * 60.0
 
     @discardableResult
     func linkWorkout(toSessionID sessionID: String) async -> Bool {
@@ -32,6 +33,10 @@ extension IIDXSessionWorkoutBridge {
     func reconcileWorkoutLinks() async {
         flushPendingWorkoutUUIDs()
         guard isEnabled, HKHealthStore.isHealthDataAvailable() else { return }
+        if let last = lastWorkoutLinkSweep, Date.now.timeIntervalSince(last) < Self.linkSweepInterval {
+            return
+        }
+        lastWorkoutLinkSweep = .now
         let horizon = Date.now.addingTimeInterval(-Self.linkLookback)
         let workouts = await djdxWorkouts(
             from: horizon.addingTimeInterval(-Self.linkSearchPadding),
