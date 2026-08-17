@@ -74,12 +74,11 @@ final class IIDXSessionStore {
         NotificationCenter.default.post(name: .playSessionDidChange, object: endedID)
     }
 
-    func capture(_ imageData: Data, source: IIDXCapturedPlaySource, staged: [DetectedRegion] = []) {
+    func capture(_ imageData: Data, source: IIDXCapturedPlaySource) {
         guard let activeSession else { return }
         let id = UUID().uuidString
         let captureDate = Date()
         let filename = IIDXSessionImageStore.shared.write(imageData, id: id)
-        IIDXLiveResultAccumulator.shared.stage(staged, for: id)
         let play = IIDXCapturedPlay(
             id: id,
             sessionID: activeSession.id,

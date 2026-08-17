@@ -4615,29 +4615,6 @@
         }
       }
     },
-    "Sessions.Camera.AutoDetect" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Automatically Detect Results"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自動的にリザルトを検出"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自動偵測結果"
-          }
-        }
-      }
-    },
     "Sessions.Camera.Denied.Message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4703,52 +4680,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "請將結果畫面對準框內"
-          }
-        }
-      }
-    },
-    "Sessions.Camera.Options" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Options"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "オプション"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選項"
-          }
-        }
-      }
-    },
-    "Sessions.Camera.ShowStagedResults" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Staged Results"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "検出中のリザルトを表示"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "顯示偵測中的結果"
           }
         }
       }

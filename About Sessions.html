@@ -393,9 +393,6 @@
           <path class="edge" marker-end="url(#ktuiArrow)" d="M500 1000 L200 1048"/>
           <path class="edge" marker-end="url(#ktuiArrow)" d="M500 1000 L500 1048"/>
           <path class="edge" marker-end="url(#ktuiArrow)" d="M500 1000 L800 1048"/>
-          <!-- dev probe tap -->
-          <path class="edge dash" marker-end="url(#ktuiArrow)" d="M252 362 L280 362"/>
-          <text class="edge-label" x="50" y="410">live frames · logs only</text>
         </g>
 
         <!-- ===== N1 Capture ===== -->
@@ -405,16 +402,6 @@
           <text class="eyebrow-t proc" x="300" y="42">CAPTURE</text>
           <text class="title-t" x="300" y="61">Camera capture</text>
           <text class="sub-t mono" x="300" y="76">SessionCameraView → IIDXSessionStore.capture</text>
-        </g>
-
-        <!-- ===== Dev probe (left of reader) ===== -->
-        <g>
-          <rect class="n dev" x="40" y="326" width="212" height="72"/>
-          <rect class="bar dev" x="40" y="326" width="6" height="72"/>
-          <text class="eyebrow-t muted" x="58" y="346">DEV PROBE</text>
-          <text class="title-t mono" x="58" y="365">LiveResultProbe</text>
-          <text class="sub-t" x="58" y="382">self-clocked loop,</text>
-          <text class="sub-t" x="58" y="394">no persistence</text>
         </g>
 
         <!-- ===== N2 Persist ===== -->
@@ -560,9 +547,7 @@
       <span class="item"><span class="swatch sw-failed"></span> failed</span>
     </div>
     <figcaption>
-      Solid arrows follow the persistent capture path. The dashed branch is the development
-      probe, which taps the same detect-and-parse core on live camera frames without writing
-      to the store.
+      Arrows follow the persistent capture path.
     </figcaption>
   </figure>
 

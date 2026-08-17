@@ -5,7 +5,7 @@ import UIKit
 // swiftlint:disable file_length
 
 struct SessionCameraView: UIViewControllerRepresentable {
-    var onCapture: (Data, [DetectedRegion]) -> Void
+    var onCapture: (Data) -> Void
     var onCancel: () -> Void
     var onUnavailable: () -> Void = {}
 
@@ -22,16 +22,13 @@ struct SessionCameraView: UIViewControllerRepresentable {
 
 // swiftlint:disable:next type_body_length
 final class SessionCameraViewController: UIViewController {
-    var onCapture: ((Data, [DetectedRegion]) -> Void)?
+    var onCapture: ((Data) -> Void)?
     var onCancel: (() -> Void)?
     var onUnavailable: (() -> Void)?
 
     private let session = AVCaptureSession()
     private let photoOutput = AVCapturePhotoOutput()
-    private let videoDataOutput = AVCaptureVideoDataOutput()
-    private let liveProbe = LiveResultProbe()
     private let sessionQueue = DispatchQueue(label: "com.tsubuzaki.DJDX.SessionCamera")
-    private let videoQueue = DispatchQueue(label: "com.tsubuzaki.DJDX.SessionCamera.Video")
     private let previewLayer = AVCaptureVideoPreviewLayer()
     private let topGradient = CAGradientLayer()
     private let bottomGradient = CAGradientLayer()
@@ -42,7 +39,6 @@ final class SessionCameraViewController: UIViewController {
     private let overlayView = UIView()
     private let shutterButton = UIButton(type: .custom)
     private let cancelButton = UIButton(type: .system)
-    private let optionsButton = UIButton(type: .system)
     private let playerSideControl = UISegmentedControl(items: ["1P", "2P"])
     private let shutterHaptic = UIImpactFeedbackGenerator(style: .rigid)
     private var overlayAngle: CGFloat = .pi / 2
@@ -56,9 +52,6 @@ final class SessionCameraViewController: UIViewController {
     private let playerSideDefaultsKey = "Sessions.Camera.IsPlayer2"
     private var isPlayer2 = false
     private let guidePerspective: CGFloat = 0.14
-
-    private let stagedOverlay = StagedResultsOverlayView()
-    private var stagedTimer: Timer?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -78,7 +71,6 @@ final class SessionCameraViewController: UIViewController {
         overlayView.layer.addSublayer(scoreRegionLayer)
         overlayView.layer.addSublayer(titleRegionLayer)
         configureControls()
-        configureStagedOverlay()
         sessionQueue.async { [weak self] in self?.configureSession() }
     }
 
@@ -88,25 +80,15 @@ final class SessionCameraViewController: UIViewController {
         shutterHaptic.prepare()
         NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationDidChange),
                                                name: UIDevice.orientationDidChangeNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(powerStateDidChange),
-                                               name: .NSProcessInfoPowerStateDidChange, object: nil)
         sessionQueue.async { [weak self] in
             guard let self, !self.session.isRunning else { return }
             self.session.startRunning()
         }
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        applyLiveDetectionState()
-    }
-
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        liveProbe.stop()
-        stopStagedTimer()
         NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .NSProcessInfoPowerStateDidChange, object: nil)
         UIDevice.current.endGeneratingDeviceOrientationNotifications()
         sessionQueue.async { [weak self] in
             guard let self, self.session.isRunning else { return }
@@ -116,14 +98,12 @@ final class SessionCameraViewController: UIViewController {
 
     @objc private func deviceOrientationDidChange() {
         applyPreviewRotation()
-        applyVideoOutputRotation()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         coordinator.animate(alongsideTransition: nil) { [weak self] _ in
             self?.applyPreviewRotation()
-            self?.applyVideoOutputRotation()
         }
     }
 
@@ -149,7 +129,6 @@ final class SessionCameraViewController: UIViewController {
         layoutOverlay()
         layoutControls()
         applyPreviewRotation()
-        applyVideoOutputRotation()
     }
 
     private func layoutOverlay() {
@@ -163,7 +142,6 @@ final class SessionCameraViewController: UIViewController {
         let landscape = bounds.width > bounds.height
 
         cancelButton.frame = CGRect(x: safe.left + 20, y: safe.top + 20, width: 48, height: 48)
-        optionsButton.frame = CGRect(x: bounds.width - safe.right - 20 - 48, y: safe.top + 20, width: 48, height: 48)
 
         let shutter: CGFloat = 80
         let player = playerSideControl.intrinsicContentSize
@@ -221,14 +199,6 @@ final class SessionCameraViewController: UIViewController {
         }
         session.addInput(input)
         session.addOutput(photoOutput)
-        if DeviceCapability.supportsLiveDetection {
-            videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
-            videoDataOutput.alwaysDiscardsLateVideoFrames = true
-            videoDataOutput.setSampleBufferDelegate(liveProbe, queue: videoQueue)
-            if session.canAddOutput(videoDataOutput) {
-                session.addOutput(videoDataOutput)
-            }
-        }
         session.commitConfiguration()
         session.startRunning()
 
@@ -237,7 +207,6 @@ final class SessionCameraViewController: UIViewController {
             self.rotationCoordinator = AVCaptureDevice.RotationCoordinator(
                 device: device, previewLayer: self.previewLayer
             )
-            self.applyVideoOutputRotation()
             self.shutterButton.isEnabled = true
             self.view.setNeedsLayout()
         }
@@ -291,8 +260,6 @@ final class SessionCameraViewController: UIViewController {
         view.addSubview(shutterButton)
         view.addSubview(cancelButton)
         view.addSubview(playerSideControl)
-
-        configureOptionsButton()
     }
 
     private func circleImage(diameter: CGFloat) -> UIImage {
@@ -351,8 +318,7 @@ final class SessionCameraViewController: UIViewController {
     private func handleCaptured(_ data: Data?) {
         captureDelegate = nil
         if let data {
-            let staged = autoDetectEnabled ? IIDXLiveResultAccumulator.shared.snapshot() : []
-            onCapture?(data, staged)
+            onCapture?(data)
         } else {
             shutterButton.isEnabled = true
         }
@@ -360,115 +326,6 @@ final class SessionCameraViewController: UIViewController {
 }
 
 extension SessionCameraViewController {
-    private var autoDetectPreference: Bool {
-        get { UserDefaults.standard.object(forKey: "Sessions.Camera.AutoDetect") as? Bool ?? true }
-        set { UserDefaults.standard.set(newValue, forKey: "Sessions.Camera.AutoDetect") }
-    }
-
-    private var autoDetectEnabled: Bool {
-        DeviceCapability.supportsLiveDetection
-            && !ProcessInfo.processInfo.isLowPowerModeEnabled
-            && autoDetectPreference
-    }
-
-    private var showStagedResults: Bool {
-        get { UserDefaults.standard.bool(forKey: "Sessions.Camera.ShowStagedResults") }
-        set { UserDefaults.standard.set(newValue, forKey: "Sessions.Camera.ShowStagedResults") }
-    }
-
-    func configureOptionsButton() {
-        var config = glassButtonConfiguration()
-        config.image = UIImage(systemName: "ellipsis",
-                               withConfiguration: UIImage.SymbolConfiguration(pointSize: 16, weight: .semibold))
-        config.cornerStyle = .fixed
-        config.background.cornerRadius = 24
-        optionsButton.configuration = config
-        optionsButton.showsMenuAsPrimaryAction = true
-        optionsButton.menu = buildOptionsMenu()
-        optionsButton.accessibilityLabel = NSLocalizedString("Sessions.Camera.Options", comment: "")
-        optionsButton.isHidden = !DeviceCapability.supportsLiveDetection
-        view.addSubview(optionsButton)
-    }
-
-    private func buildOptionsMenu() -> UIMenu {
-        let autoTitle = NSLocalizedString("Sessions.Camera.AutoDetect", comment: "")
-        let autoToggle = UIAction(title: autoTitle, state: autoDetectPreference ? .on : .off) { [weak self] _ in
-            self?.toggleAutoDetect()
-        }
-        let stagedTitle = NSLocalizedString("Sessions.Camera.ShowStagedResults", comment: "")
-        let stagedToggle = UIAction(title: stagedTitle, state: showStagedResults ? .on : .off) { [weak self] _ in
-            self?.toggleStagedResults()
-        }
-        return UIMenu(children: [autoToggle, stagedToggle])
-    }
-
-    private func toggleAutoDetect() {
-        autoDetectPreference.toggle()
-        optionsButton.menu = buildOptionsMenu()
-        applyLiveDetectionState()
-    }
-
-    private func applyLiveDetectionState() {
-        if autoDetectEnabled {
-            liveProbe.start()
-            startStagedTimer()
-        } else {
-            liveProbe.stop()
-            stopStagedTimer()
-        }
-    }
-
-    @objc func powerStateDidChange() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.applyLiveDetectionState()
-            self.optionsButton.menu = self.buildOptionsMenu()
-        }
-    }
-
-    private func toggleStagedResults() {
-        showStagedResults.toggle()
-        optionsButton.menu = buildOptionsMenu()
-        if showStagedResults { startStagedTimer() } else { stopStagedTimer() }
-    }
-
-    func configureStagedOverlay() {
-        stagedOverlay.translatesAutoresizingMaskIntoConstraints = false
-        stagedOverlay.isHidden = true
-        view.addSubview(stagedOverlay)
-        NSLayoutConstraint.activate([
-            stagedOverlay.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 78.0),
-            stagedOverlay.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stagedOverlay.widthAnchor.constraint(lessThanOrEqualToConstant: 280.0)
-        ])
-    }
-
-    func startStagedTimer() {
-        stagedTimer?.invalidate()
-        guard showStagedResults else {
-            stagedOverlay.isHidden = true
-            return
-        }
-        stagedTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
-            self?.stagedOverlay.update(with: IIDXLiveResultAccumulator.shared.snapshot())
-        }
-    }
-
-    func stopStagedTimer() {
-        stagedTimer?.invalidate()
-        stagedTimer = nil
-        stagedOverlay.isHidden = true
-    }
-
-    func applyVideoOutputRotation() {
-        guard let coordinator = rotationCoordinator,
-              let connection = videoDataOutput.connection(with: .video) else { return }
-        let angle = coordinator.videoRotationAngleForHorizonLevelCapture
-        if connection.isVideoRotationAngleSupported(angle) {
-            connection.videoRotationAngle = angle
-        }
-    }
-
     func guideCorners() -> Corners {
         let rect = guideRect()
         let inset = rect.height * guidePerspective
