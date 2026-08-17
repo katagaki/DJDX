@@ -13,6 +13,10 @@ final class IIDXSessionLiveActivityController {
     private var isPaused: Bool = false
     private var pausedElapsed: TimeInterval?
     private var runningStart: Date?
+    private var metricsUpdate: Task<Void, Never>?
+    private var lastMetricsUpdate: Date?
+
+    private static let metricsInterval: TimeInterval = 10.0
 
     func start(_ session: IIDXPlaySession) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
@@ -89,12 +93,24 @@ final class IIDXSessionLiveActivityController {
     }
 
     func updateMetrics(sessionID: String, heartRate: Int?, activeCalories: Int?) {
-        guard sessionID == self.sessionID, let activity else { return }
+        guard sessionID == self.sessionID, activity != nil else { return }
         latestHeartRate = heartRate
         latestActiveCalories = activeCalories
-        let content = ActivityContent(state: contentState(for: sessionID), staleDate: nil)
-        nonisolated(unsafe) let target = activity
-        Task { await target.update(content) }
+        scheduleMetricsUpdate()
+    }
+
+    private func scheduleMetricsUpdate() {
+        guard metricsUpdate == nil else { return }
+        let elapsed = lastMetricsUpdate.map { Date.now.timeIntervalSince($0) } ?? Self.metricsInterval
+        let delay = max(0.0, Self.metricsInterval - elapsed)
+        metricsUpdate = Task { @MainActor [weak self] in
+            if delay > 0.0 { try? await Task.sleep(for: .seconds(delay)) }
+            guard let self else { return }
+            self.metricsUpdate = nil
+            guard !Task.isCancelled, let sessionID = self.sessionID else { return }
+            self.lastMetricsUpdate = .now
+            self.refresh(sessionID: sessionID)
+        }
     }
 
     func updatePauseState(sessionID: String, isPaused: Bool, pausedElapsed: TimeInterval?, runningStart: Date?) {
@@ -108,6 +124,9 @@ final class IIDXSessionLiveActivityController {
     }
 
     private func resetTransientState() {
+        metricsUpdate?.cancel()
+        metricsUpdate = nil
+        lastMetricsUpdate = nil
         latestHeartRate = nil
         latestActiveCalories = nil
         isPaused = false
@@ -116,6 +135,8 @@ final class IIDXSessionLiveActivityController {
     }
 
     func end() {
+        metricsUpdate?.cancel()
+        metricsUpdate = nil
         guard let activity, let sessionID else { return }
         let content = ActivityContent(state: contentState(for: sessionID), staleDate: nil)
         nonisolated(unsafe) let target = activity

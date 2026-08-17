@@ -355,14 +355,16 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         adoptSessionIfNeeded(sessionID)
         guard sessionID == activeSessionID else { return }
         watchWorkoutConfirmed = true
+        let previousHeartRate = self.heartRate
+        let previousCalories = self.activeCalories
         if let heartRate { self.heartRate = heartRate }
         if let activeCalories { self.activeCalories = activeCalories }
+        guard self.heartRate != previousHeartRate || self.activeCalories != previousCalories else { return }
         IIDXSessionLiveActivityController.shared.updateMetrics(
             sessionID: sessionID,
             heartRate: self.heartRate > 0 ? self.heartRate : nil,
             activeCalories: self.activeCalories > 0 ? self.activeCalories : nil
         )
-        NotificationCenter.default.post(name: .playSessionDidChange, object: sessionID)
     }
 
     fileprivate func handleRemoteStart(sessionID: String?, start: Double?) {
