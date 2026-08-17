@@ -57,7 +57,11 @@ enum IIDXResultReader {
         return try? VNCoreMLModel(for: detector.model)
     }()
 
+    nonisolated(unsafe) private static var hasPrewarmed = false
+
     static func prewarm() async {
+        guard !hasPrewarmed else { return }
+        hasPrewarmed = true
         guard let image = warmupImage() else { return }
         _ = try? await detect(cgImage: image)
         _ = await IIDXDigitRecognizer.recognize(cgImage: image)
