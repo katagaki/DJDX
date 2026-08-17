@@ -40,6 +40,11 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     private var sessionID: String?
     private var pendingSessionID: String?
     private var pendingSessionStart: Date?
+    private var lastMetricsSend: Date?
+    private var sentHeartRate: Int?
+    private var sentActiveCalories: Int?
+
+    private static let metricsInterval: TimeInterval = 5.0
 
     private static let endedSessionIDsKey = "Watch.EndedSessionIDs"
 
@@ -322,6 +327,9 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         self.sessionID = nil
         heartRate = 0
         activeCalories = 0
+        lastMetricsSend = nil
+        sentHeartRate = nil
+        sentActiveCalories = nil
         startDate = nil
         isPaused = false
         isCollecting = false
@@ -398,7 +406,17 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         if let heartRate { self.heartRate = heartRate }
         if let activeCalories { self.activeCalories = activeCalories }
         guard let sessionID else { return }
-        sendToPhone([
+        let changed = self.heartRate != sentHeartRate || self.activeCalories != sentActiveCalories
+        guard changed else { return }
+        let now = Date()
+        if let lastMetricsSend = lastMetricsSend,
+           now.timeIntervalSince(lastMetricsSend) < Self.metricsInterval {
+            return
+        }
+        lastMetricsSend = now
+        sentHeartRate = self.heartRate
+        sentActiveCalories = self.activeCalories
+        sendMetricsToPhone([
             "heartRate": self.heartRate,
             "activeCalories": self.activeCalories,
             "sessionID": sessionID
@@ -417,6 +435,12 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         case "requestWorkoutState": reportWorkoutState(sessionID: sessionID)
         default: break
         }
+    }
+
+    private func sendMetricsToPhone(_ payload: [String: Any]) {
+        let connectivity = WCSession.default
+        guard connectivity.activationState == .activated, connectivity.isReachable else { return }
+        connectivity.sendMessage(payload, replyHandler: nil, errorHandler: nil)
     }
 
     private func sendToPhone(_ payload: [String: Any]) {
