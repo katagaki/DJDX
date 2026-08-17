@@ -37,6 +37,8 @@ final class SessionCameraViewController: UIViewController {
     private let bottomGradient = CAGradientLayer()
     private let hintLabel = UILabel()
     private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
+    private var previewRotationObservation: NSKeyValueObservation?
+    private var captureRotationObservation: NSKeyValueObservation?
     private var captureDelegate: PhotoCaptureDelegate?
 
     private let overlayView = UIView()
@@ -84,10 +86,7 @@ final class SessionCameraViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         shutterHaptic.prepare()
-        NotificationCenter.default.addObserver(self, selector: #selector(deviceOrientationDidChange),
-                                               name: UIDevice.orientationDidChangeNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(powerStateDidChange),
                                                name: .NSProcessInfoPowerStateDidChange, object: nil)
         sessionQueue.async { [weak self] in
@@ -105,18 +104,11 @@ final class SessionCameraViewController: UIViewController {
         super.viewWillDisappear(animated)
         liveProbe.stop()
         stopStagedTimer()
-        NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: .NSProcessInfoPowerStateDidChange, object: nil)
-        UIDevice.current.endGeneratingDeviceOrientationNotifications()
         sessionQueue.async { [weak self] in
             guard let self, self.session.isRunning else { return }
             self.session.stopRunning()
         }
-    }
-
-    @objc private func deviceOrientationDidChange() {
-        applyPreviewRotation()
-        applyVideoOutputRotation()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -238,12 +230,26 @@ final class SessionCameraViewController: UIViewController {
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            self.rotationCoordinator = AVCaptureDevice.RotationCoordinator(
+            let coordinator = AVCaptureDevice.RotationCoordinator(
                 device: device, previewLayer: self.previewLayer
             )
-            self.applyVideoOutputRotation()
+            self.rotationCoordinator = coordinator
+            self.observeRotation(coordinator)
             self.shutterButton.isEnabled = true
             self.view.setNeedsLayout()
+        }
+    }
+
+    private func observeRotation(_ coordinator: AVCaptureDevice.RotationCoordinator) {
+        previewRotationObservation = coordinator.observe(
+            \.videoRotationAngleForHorizonLevelPreview, options: [.initial, .new]
+        ) { [weak self] _, _ in
+            Task { @MainActor in self?.applyPreviewRotation() }
+        }
+        captureRotationObservation = coordinator.observe(
+            \.videoRotationAngleForHorizonLevelCapture, options: [.initial, .new]
+        ) { [weak self] _, _ in
+            Task { @MainActor in self?.applyVideoOutputRotation() }
         }
     }
 
