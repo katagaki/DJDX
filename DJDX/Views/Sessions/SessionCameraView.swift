@@ -222,7 +222,11 @@ final class SessionCameraViewController: UIViewController {
         session.addInput(input)
         session.addOutput(photoOutput)
         if DeviceCapability.supportsLiveDetection {
-            videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
+            videoDataOutput.videoSettings = [
+                kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+                kCVPixelBufferWidthKey as String: 1440,
+                kCVPixelBufferHeightKey as String: 1080
+            ]
             videoDataOutput.alwaysDiscardsLateVideoFrames = true
             videoDataOutput.setSampleBufferDelegate(liveProbe, queue: videoQueue)
             if session.canAddOutput(videoDataOutput) {
