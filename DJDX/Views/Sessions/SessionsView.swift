@@ -140,12 +140,12 @@ struct SessionsView: View {
             if pending, store.activeSession != nil { isPresentingActive = true }
         }
         .onReceive(NotificationCenter.default.publisher(for: .playSessionDidChange)
-            .receive(on: RunLoop.main)) { _ in
+            .debounce(for: .seconds(0.4), scheduler: RunLoop.main)) { _ in
             store.loadSessions()
             reloadScores()
         }
         .onReceive(NotificationCenter.default.publisher(for: .capturedPlayDidChange)
-            .receive(on: RunLoop.main)) { _ in
+            .debounce(for: .seconds(0.4), scheduler: RunLoop.main)) { _ in
             reloadScores()
         }
         .fullScreenCover(isPresented: $isPresentingActive) {

@@ -332,13 +332,13 @@ struct AnalyticsView: View {
                 Task { await reload() }
             }
             .onReceive(NotificationCenter.default.publisher(for: .playSessionDidChange)
-                .receive(on: RunLoop.main)) { _ in
+                .debounce(for: .seconds(0.4), scheduler: RunLoop.main)) { _ in
                 if model.sessionStore != nil {
                     Task { await reload() }
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .capturedPlayDidChange)
-                .receive(on: RunLoop.main)) { _ in
+                .debounce(for: .seconds(0.4), scheduler: RunLoop.main)) { _ in
                 if model.sessionStore != nil {
                     Task { await reload() }
                 }
