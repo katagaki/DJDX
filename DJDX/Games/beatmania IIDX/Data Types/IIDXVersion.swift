@@ -35,9 +35,10 @@ enum IIDXVersion: Int, Codable, CaseIterable {
     case epolis = 31
     case pinkyCrush = 32
     case sparkleShower = 33
+    case zinrai = 34
 
     static var supportedVersions: [IIDXVersion] {
-        [.epolis, .pinkyCrush, .sparkleShower]
+        [.epolis, .pinkyCrush, .sparkleShower, .zinrai]
     }
 
     var marketingName: String {
@@ -75,6 +76,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .epolis: return "EPOLIS"
         case .pinkyCrush: return "Pinky Crush"
         case .sparkleShower: return "Sparkle Shower"
+        case .zinrai: return "ZINRAI"
         }
     }
 
@@ -119,6 +121,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .epolis: return UIColor(red: 50 / 255, green: 50 / 255, blue: 50 / 255, alpha: 1.0)
         case .pinkyCrush: return UIColor(red: 249 / 255, green: 87 / 255, blue: 142 / 255, alpha: 1.0)
         case .sparkleShower: return UIColor(red: 67 / 255, green: 143 / 255, blue: 82 / 255, alpha: 1.0)
+        case .zinrai: return UIColor(red: 138 / 255, green: 43 / 255, blue: 226 / 255, alpha: 1.0)
         }
     }
 
@@ -157,6 +160,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .epolis: return UIColor(red: 240 / 255, green: 254 / 255, blue: 0 / 255, alpha: 1.0)
         case .pinkyCrush: return UIColor(red: 1.0, green: 97 / 255, blue: 178 / 255, alpha: 1.0)
         case .sparkleShower: return UIColor(red: 173 / 255, green: 227 / 255, blue: 77 / 255, alpha: 1.0)
+        case .zinrai: return UIColor(red: 198 / 255, green: 109 / 255, blue: 1.0, alpha: 1.0)
         }
     }
 
@@ -223,6 +227,10 @@ https://bemaniwiki.com/?beatmania+IIDX+32+Pinky+Crush/%BF%B7%B6%CA%A5%EA%A5%B9%A
             return URL(string: """
 https://bemaniwiki.com/?beatmania+IIDX+33+Sparkle+Shower/%BF%B7%B6%CA%A5%EA%A5%B9%A5%C8
 """)!
+        case .zinrai:
+            return URL(string: """
+https://bemaniwiki.com/?beatmania+IIDX+34+ZINRAI/%BF%B7%B6%CA%A5%EA%A5%B9%A5%C8
+""")!
         default: return URL(string: "https://bemaniwiki.com")!
         }
     }
@@ -240,6 +248,10 @@ https://bemaniwiki.com/?beatmania+IIDX+32+Pinky+Crush/%B5%EC%B6%CA%C1%ED%A5%CE%A
         case .sparkleShower:
             return URL(string: """
 https://bemaniwiki.com/?beatmania+IIDX+33+Sparkle+Shower/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%A5%C4%BF%F4%A5%EA%A5%B9%A5%C8
+""")!
+        case .zinrai:
+            return URL(string: """
+https://bemaniwiki.com/?beatmania+IIDX+34+ZINRAI/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%A5%C4%BF%F4%A5%EA%A5%B9%A5%C8
 """)!
         default: return URL(string: "https://bemaniwiki.com")!
         }
@@ -263,6 +275,9 @@ extension IIDXVersion {
             case .sparkleShower:
                 topColor = Color(red: 251 / 255, green: 254 / 255, blue: 1.0)
                 bottomColor = Color(red: 211 / 255, green: 250 / 255, blue: 149 / 255)
+            case .zinrai:
+                topColor = Color(red: 254 / 255, green: 251 / 255, blue: 1.0)
+                bottomColor = Color(red: 214 / 255, green: 169 / 255, blue: 252 / 255)
             default: break
             }
         }
@@ -285,6 +300,8 @@ extension IIDXVersion {
                 return Color(red: 35 / 255, green: 59 / 255, blue: 158 / 255)
             case .sparkleShower:
                 return Color(red: 28 / 255, green: 65 / 255, blue: 118 / 255)
+            case .zinrai:
+                return Color(red: 60 / 255, green: 18 / 255, blue: 108 / 255)
             default:
                 return Color(red: 77 / 255, green: 77 / 255, blue: 77 / 255)
             }

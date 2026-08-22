@@ -13,7 +13,7 @@ struct MoreExternalDataSources: View {
     @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.BM2DX.Enabled") var isBM2DXEnabled: Bool
     @AppStorage(wrappedValue: false, "ExternalData.DDR.Enabled") var isDDREnabled: Bool
-    @AppStorage(wrappedValue: IIDXVersion.sparkleShower, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var bemaniWikiEntryCount: Int = 0
     @State var bm2dxEntryCount: Int = 0

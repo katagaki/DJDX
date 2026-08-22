@@ -25,6 +25,7 @@ struct MoreMenu: View {
 
     let appIcons: [AppIconChoice] = [
         AppIconChoice("Default", imageName: nil, isNameLocalized: true),
+        AppIconChoice("ZINRAI", imageName: "AppIcon.34"),
         AppIconChoice("Sparkle Shower", imageName: "AppIcon.33"),
         AppIconChoice("Pinky Crush", imageName: "AppIcon.32"),
         AppIconChoice("EPOLIS", imageName: "AppIcon.31"),

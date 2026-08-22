@@ -43,7 +43,7 @@ struct DJDXApp: App {
             let playTypeRaw = UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter") ?? "single"
             let playType = IIDXPlayType(rawValue: playTypeRaw) ?? .single
             let versionRaw = UserDefaults.standard.integer(forKey: "Global.IIDX.Version")
-            let version = IIDXVersion(rawValue: versionRaw) ?? .sparkleShower
+            let version = IIDXVersion(rawValue: versionRaw) ?? .zinrai
             await WidgetDataPublisher.shared.publishAll(playType: playType, iidxVersion: version)
         }
     }
