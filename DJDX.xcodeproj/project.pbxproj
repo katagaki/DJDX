@@ -774,6 +774,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "DJDX uses the camera to capture your result screens during a session.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "DJDX saves your captured result screens to Photos.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -819,6 +820,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "DJDX uses the camera to capture your result screens during a session.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "DJDX saves your captured result screens to Photos.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
