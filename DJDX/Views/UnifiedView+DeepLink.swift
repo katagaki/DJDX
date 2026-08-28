@@ -61,9 +61,9 @@ extension UnifiedView {
 
         case "prune":
             Task {
-                let reclaimed = await TemporaryFilePruner.prune()
+                let report = await StoragePruner.prune()
                 await MainActor.run {
-                    prunedByteCount = reclaimed
+                    storageReport = report
                     isPruneCompleted = true
                 }
             }
@@ -74,6 +74,23 @@ extension UnifiedView {
         default:
             break
         }
+    }
+
+    var storageReportSummary: String {
+        func line(_ key: String.LocalizationValue, _ bytes: Int64) -> String {
+            "\(String(localized: key)): \(bytes.formatted(.byteCount(style: .file)))"
+        }
+        return [
+            line("Alert.Prune.Freed", storageReport.freed),
+            line("Alert.Prune.Temporary", storageReport.temporaryFiles),
+            line("Alert.Prune.Caches", storageReport.caches),
+            line("Alert.Prune.WebData", storageReport.webData),
+            line("Alert.Prune.Orphans", storageReport.orphanedSessionImages),
+            "",
+            line("Alert.Prune.SessionImages", storageReport.sessionImages),
+            line("Alert.Prune.Documents", storageReport.documents),
+            line("Alert.Prune.Databases", storageReport.databases)
+        ].joined(separator: "\n")
     }
 
     static func game(named name: String) -> Game? {

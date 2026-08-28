@@ -39,7 +39,7 @@ struct UnifiedView: View {
     @State var isBackupRestoreCompleted: Bool = false
     @State var isBackupRestoreFailed: Bool = false
     @State var isPruneCompleted: Bool = false
-    @State var prunedByteCount: Int64 = 0
+    @State var storageReport = StorageReport()
 
     @State var migrationProgress = ProgressReporter()
 
@@ -336,7 +336,7 @@ struct UnifiedView: View {
                 isPruneCompleted = false
             }
         } message: {
-            Text("Alert.Prune.Completed.Subtitle.\(prunedByteCount.formatted(.byteCount(style: .file)))")
+            Text(storageReportSummary)
         }
     }
 

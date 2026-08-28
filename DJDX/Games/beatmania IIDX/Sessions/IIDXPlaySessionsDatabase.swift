@@ -229,6 +229,14 @@ final class IIDXPlaySessionsDatabase: Sendable {
         return rows.map { Self.play(from: $0) }
     }
 
+    func referencedImageFilenames() -> [String]? {
+        guard let database = try? getReadConnection(),
+              let rows = try? database.prepare(Self.playTable.select(Self.pRawImageFilename)) else {
+            return nil
+        }
+        return rows.map { $0[Self.pRawImageFilename] }
+    }
+
     func play(id: String) -> IIDXCapturedPlay? {
         guard let database = try? getReadConnection() else { return nil }
         guard let row = try? database.pluck(Self.playTable.filter(Self.pID == id)) else { return nil }
