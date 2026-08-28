@@ -29,14 +29,24 @@ let charactersToReplace = [
     "И": "N"
 ]
 
+private let characterReplacements: [Character: String] = charactersToReplace.reduce(into: [:]) {
+    if let character = $1.key.first, $1.key.count == 1 {
+        $0[character] = $1.value
+    }
+}
+
 extension String {
     var compact: String {
-        var filteredString = precomposedStringWithCompatibilityMapping
-        for (characterToReplace, characterToReplaceWith) in charactersToReplace {
-            filteredString = filteredString.replacingOccurrences(of: characterToReplace, with: characterToReplaceWith)
+        var filteredString = ""
+        filteredString.reserveCapacity(count)
+        for character in precomposedStringWithCompatibilityMapping {
+            if let replacement = characterReplacements[character] {
+                filteredString.append(replacement)
+            } else {
+                filteredString.append(character)
+            }
         }
-        filteredString = filteredString.folding(options: .diacriticInsensitive, locale: nil)
-        return filteredString.lowercased()
+        return filteredString.folding(options: .diacriticInsensitive, locale: nil).lowercased()
     }
 
     func editRatio(to other: String) -> Double {
