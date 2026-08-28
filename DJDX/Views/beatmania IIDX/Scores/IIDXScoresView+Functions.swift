@@ -86,6 +86,7 @@ extension IIDXScoresView {
         let songRecord: IIDXSongRecord
         let level: IIDXLevel
         let score: IIDXLevelScore
+        let scoreRate: Float?
         var id: String { "\(songRecord.title)_\(level.rawValue)" }
     }
 
@@ -93,7 +94,8 @@ extension IIDXScoresView {
     func levelEntries(from records: [IIDXSongRecord]) -> [SongLevelEntry] {
         let difficultyRawValues = Set(difficultiesToShow.map(\.rawValue))
         var entries = records.flatMap { record in
-            Self.allLevels.compactMap { level, keyPath -> SongLevelEntry? in
+            let clearRates = songRecordClearRates[record]
+            return Self.allLevels.compactMap { level, keyPath -> SongLevelEntry? in
                 let score = record[keyPath: keyPath]
                 guard score.difficulty > 0 else { return nil }
                 if level == .beginner && isBeginnerLevelHidden { return nil }
@@ -103,7 +105,8 @@ extension IIDXScoresView {
                     !clearTypesToShow.contains(where: { $0.rawValue == score.clearType }) { return nil }
                 if !djLevelsToShow.isEmpty &&
                     !djLevelsToShow.contains(where: { $0.rawValue == score.djLevel }) { return nil }
-                return SongLevelEntry(songRecord: record, level: level, score: score)
+                return SongLevelEntry(songRecord: record, level: level, score: score,
+                                      scoreRate: clearRates?[level])
             }
         }
 
@@ -132,8 +135,8 @@ extension IIDXScoresView {
             }
         case .scoreRate:
             entries.sort { lhs, rhs in
-                let leftRate = songRecordClearRates[lhs.songRecord]?[lhs.level] ?? 0
-                let rightRate = songRecordClearRates[rhs.songRecord]?[rhs.level] ?? 0
+                let leftRate = lhs.scoreRate ?? 0
+                let rightRate = rhs.scoreRate ?? 0
                 if leftRate == rightRate { return lhs.songRecord.title < rhs.songRecord.title }
                 return isAscending ? leftRate < rightRate : leftRate > rightRate
             }

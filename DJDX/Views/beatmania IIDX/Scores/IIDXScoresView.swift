@@ -201,7 +201,7 @@ struct IIDXScoresView<Header: View>: View {
                                 songRecord: entry.songRecord,
                                 level: entry.level,
                                 score: entry.score,
-                                scoreRate: songRecordClearRates[entry.songRecord]?[entry.level]
+                                scoreRate: entry.scoreRate
                             )
                             .contentShape(.rect)
                         }
