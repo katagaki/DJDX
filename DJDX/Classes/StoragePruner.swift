@@ -98,11 +98,6 @@ enum StoragePruner {
             ?? FileManager.default.temporaryDirectory
     }
 
-    private static func documentsDirectory() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-            ?? FileManager.default.temporaryDirectory
-    }
-
     private static func sessionImagesDirectory() -> URL {
         SharedContainer.containerURL
             .appendingPathComponent("Sessions", isDirectory: true)
