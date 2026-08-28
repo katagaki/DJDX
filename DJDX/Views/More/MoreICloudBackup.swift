@@ -13,6 +13,9 @@ struct MoreICloudBackup: View {
     @State var isBackingUp: Bool = false
     @State var isBackupFailed: Bool = false
     @State var backupFailureDetail: String = ""
+    @State var isPreparingExport: Bool = false
+    @State var isExportFailed: Bool = false
+    @State var exportedArchive: ExportedArchive?
 
     var body: some View {
         List {
@@ -47,9 +50,18 @@ struct MoreICloudBackup: View {
                 }
             }
             Section {
-                ShareLink(item: BackupExport(), preview: SharePreview("Backup.Title")) {
-                    Label("Backup.Export", systemImage: "square.and.arrow.up")
+                Button {
+                    exportNow()
+                } label: {
+                    HStack {
+                        Label("Backup.Export", systemImage: "square.and.arrow.up")
+                        if isPreparingExport {
+                            Spacer()
+                            ProgressView()
+                        }
+                    }
                 }
+                .disabled(isPreparingExport)
             } footer: {
                 Text("Backup.Export.Footer")
             }
@@ -84,6 +96,16 @@ struct MoreICloudBackup: View {
                 ICloudBackupManager.cancelScheduledBackup()
             }
         }
+        .sheet(item: $exportedArchive) { archive in
+            ExportShareSheet(url: archive.url)
+        }
+        .alert("Alert.Backup.ExportFailed.Title", isPresented: $isExportFailed) {
+            Button("Shared.OK", role: .cancel) {
+                isExportFailed = false
+            }
+        } message: {
+            Text("Alert.Backup.ExportFailed.Subtitle")
+        }
         .alert("Alert.ICloudBackup.Failed.Title", isPresented: $isBackupFailed) {
             Button("Shared.OK", role: .cancel) {
                 isBackupFailed = false
@@ -106,15 +128,32 @@ struct MoreICloudBackup: View {
             }
         }
     }
-}
 
-struct BackupExport: Transferable {
-    static var transferRepresentation: some TransferRepresentation {
-        FileRepresentation(exportedContentType: .zip) { _ in
-            guard let url = await ICloudBackupManager.exportArchive() else {
-                throw CocoaError(.fileWriteUnknown)
+    func exportNow() {
+        isPreparingExport = true
+        Task {
+            let archiveURL = await ICloudBackupManager.exportArchive()
+            isPreparingExport = false
+            if let archiveURL {
+                exportedArchive = ExportedArchive(url: archiveURL)
+            } else {
+                isExportFailed = true
             }
-            return SentTransferredFile(url)
         }
     }
+}
+
+struct ExportedArchive: Identifiable {
+    let url: URL
+    var id: String { url.path }
+}
+
+struct ExportShareSheet: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: [url], applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }

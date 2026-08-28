@@ -134,6 +134,52 @@
         }
       }
     },
+    "Alert.Backup.ExportFailed.Subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data could not be exported. Make sure there is enough free space on your device, then try again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データの書き出しに失敗しました。デバイスの空き容量を確認してから、もう一度お試しください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法匯出資料。請確認裝置有足夠的可用空間後再試一次。"
+          }
+        }
+      }
+    },
+    "Alert.Backup.ExportFailed.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Failed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "書き出しに失敗しました"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯出失敗"
+          }
+        }
+      }
+    },
     "Alert.DeleteData.Score.Code.Placeholder" : {
       "extractionState" : "manual",
       "localizations" : {
