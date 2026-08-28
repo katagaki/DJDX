@@ -38,6 +38,8 @@ struct UnifiedView: View {
     @State var pendingRestoreAfterOnboarding: Bool = false
     @State var isBackupRestoreCompleted: Bool = false
     @State var isBackupRestoreFailed: Bool = false
+    @State var isPruneCompleted: Bool = false
+    @State var prunedByteCount: Int64 = 0
 
     @State var migrationProgress = ProgressReporter()
 
@@ -328,6 +330,13 @@ struct UnifiedView: View {
             }
         } message: {
             Text("Alert.ICloudBackup.RestoreFailed.Subtitle")
+        }
+        .alert("Alert.Prune.Completed.Title", isPresented: $isPruneCompleted) {
+            Button("Shared.OK", role: .cancel) {
+                isPruneCompleted = false
+            }
+        } message: {
+            Text("Alert.Prune.Completed.Subtitle.\(prunedByteCount.formatted(.byteCount(style: .file)))")
         }
     }
 

@@ -59,6 +59,15 @@ extension UnifiedView {
                 return
             }
 
+        case "prune":
+            Task {
+                let reclaimed = await TemporaryFilePruner.prune()
+                await MainActor.run {
+                    prunedByteCount = reclaimed
+                    isPruneCompleted = true
+                }
+            }
+
         case "reonboard":
             isPresentingOnboarding = true
 
