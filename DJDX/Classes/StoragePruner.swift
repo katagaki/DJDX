@@ -1,15 +1,19 @@
 import Foundation
 import WebKit
 
+struct StorageEntry: Sendable {
+    let path: String
+    let bytes: Int64
+}
+
 struct StorageReport: Sendable {
     var temporaryFiles: Int64 = 0
     var caches: Int64 = 0
     var webData: Int64 = 0
     var orphanedSessionImages: Int64 = 0
 
-    var sessionImages: Int64 = 0
-    var documents: Int64 = 0
-    var databases: Int64 = 0
+    var total: Int64 = 0
+    var largest: [StorageEntry] = []
 
     var freed: Int64 { temporaryFiles + caches + webData + orphanedSessionImages }
 }
@@ -28,9 +32,9 @@ enum StoragePruner {
             report.orphanedSessionImages = removeOrphanedSessionImages()
             report.webData = max(0, webKitBefore - sizeOfWebKitDirectory()) + cachedResponses
 
-            report.sessionImages = size(of: sessionImagesDirectory())
-            report.documents = size(of: documentsDirectory())
-            report.databases = sizeOfDatabases()
+            let survey = surveyStorage()
+            report.total = survey.total
+            report.largest = survey.largest
             return report
         }.value
     }
@@ -105,17 +109,54 @@ enum StoragePruner {
             .appendingPathComponent("Images", isDirectory: true)
     }
 
-    private static func sizeOfDatabases() -> Int64 {
-        let fileManager = FileManager.default
-        let container = SharedContainer.containerURL
-        guard let items = try? fileManager.contentsOfDirectory(
-            at: container, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
-        ) else { return 0 }
+    // MARK: Survey
+
+    private static func surveyStorage() -> (total: Int64, largest: [StorageEntry]) {
+        let roots: [(String, URL)] = [
+            ("App", URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)),
+            ("Group", SharedContainer.containerURL)
+        ]
+        var entries: [StorageEntry] = []
         var total: Int64 = 0
-        for item in items where item.lastPathComponent != "Sessions" {
-            total += size(of: item)
+        for (label, root) in roots {
+            let branches = survey(root, label: label, depth: 2)
+            total += branches.total
+            entries.append(contentsOf: branches.entries)
         }
-        return total
+        let largest = entries
+            .filter { $0.bytes >= 1_048_576 }
+            .sorted { $0.bytes > $1.bytes }
+            .prefix(8)
+        return (total, Array(largest))
+    }
+
+    private static func survey(_ directory: URL, label: String, depth: Int) -> (
+        total: Int64, entries: [StorageEntry]
+    ) {
+        guard let items = try? FileManager.default.contentsOfDirectory(
+            at: directory, includingPropertiesForKeys: [.isDirectoryKey]
+        ) else {
+            let bytes = size(of: directory)
+            return (bytes, [StorageEntry(path: label, bytes: bytes)])
+        }
+        var total: Int64 = 0
+        var entries: [StorageEntry] = []
+        for item in items {
+            let name = "\(label)/\(item.lastPathComponent)"
+            let isDirectory = (try? item.resourceValues(
+                forKeys: [.isDirectoryKey]
+            ).isDirectory) == true
+            if isDirectory, depth > 1 {
+                let branch = survey(item, label: name, depth: depth - 1)
+                total += branch.total
+                entries.append(contentsOf: branch.entries)
+            } else {
+                let bytes = size(of: item)
+                total += bytes
+                entries.append(StorageEntry(path: name, bytes: bytes))
+            }
+        }
+        return (total, entries)
     }
 
     private static func emptyDirectory(_ directory: URL) -> Int64 {

@@ -80,17 +80,15 @@ extension UnifiedView {
         func line(_ key: String.LocalizationValue, _ bytes: Int64) -> String {
             "\(String(localized: key)): \(bytes.formatted(.byteCount(style: .file)))"
         }
-        return [
+        var lines = [
             line("Alert.Prune.Freed", storageReport.freed),
-            line("Alert.Prune.Temporary", storageReport.temporaryFiles),
-            line("Alert.Prune.Caches", storageReport.caches),
-            line("Alert.Prune.WebData", storageReport.webData),
-            line("Alert.Prune.Orphans", storageReport.orphanedSessionImages),
-            "",
-            line("Alert.Prune.SessionImages", storageReport.sessionImages),
-            line("Alert.Prune.Documents", storageReport.documents),
-            line("Alert.Prune.Databases", storageReport.databases)
-        ].joined(separator: "\n")
+            line("Alert.Prune.Total", storageReport.total),
+            ""
+        ]
+        lines.append(contentsOf: storageReport.largest.map {
+            "\($0.path)  \($0.bytes.formatted(.byteCount(style: .file)))"
+        })
+        return lines.joined(separator: "\n")
     }
 
     static func game(named name: String) -> Game? {
