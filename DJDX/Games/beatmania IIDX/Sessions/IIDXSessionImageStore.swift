@@ -1,5 +1,7 @@
 import Foundation
+import ImageIO
 import UIKit
+import UniformTypeIdentifiers
 
 struct RecognizedTextBox: Codable, Sendable {
     let text: String
@@ -17,6 +19,9 @@ struct RecognizedTextResult: Codable, Sendable {
 final class IIDXSessionImageStore: Sendable {
     static let shared = IIDXSessionImageStore()
 
+    static let maxDimension: Int = 2048
+    static let compressionQuality: Double = 0.8
+
     private let directory: URL
 
     private init() {
@@ -33,8 +38,29 @@ final class IIDXSessionImageStore: Sendable {
     @discardableResult
     func write(_ imageData: Data, id: String) -> String {
         let filename = "\(id).heic"
-        try? imageData.write(to: url(for: filename), options: .atomic)
+        let encoded = Self.encode(imageData) ?? imageData
+        try? encoded.write(to: url(for: filename), options: .atomic)
         return filename
+    }
+
+    static func encode(_ imageData: Data) -> Data? {
+        guard let source = CGImageSourceCreateWithData(imageData as CFData, nil) else { return nil }
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: maxDimension
+        ]
+        guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+            return nil
+        }
+        let output = NSMutableData()
+        let type = (UTType.heic.identifier as CFString)
+        guard let destination = CGImageDestinationCreateWithData(output, type, 1, nil) else { return nil }
+        CGImageDestinationAddImage(destination, image, [
+            kCGImageDestinationLossyCompressionQuality: compressionQuality
+        ] as CFDictionary)
+        guard CGImageDestinationFinalize(destination) else { return nil }
+        return output as Data
     }
 
     func data(for filename: String) -> Data? {
