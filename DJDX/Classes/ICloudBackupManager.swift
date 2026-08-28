@@ -138,6 +138,7 @@ enum ICloudBackupManager {
         await Task.detached(priority: .userInitiated) { () -> URL? in
             do {
                 let fileManager = FileManager.default
+                removeStaleExportDirectories(using: fileManager)
                 let exportDirectory = fileManager.temporaryDirectory
                     .appendingPathComponent("Export-\(UUID().uuidString)", isDirectory: true)
                 try fileManager.createDirectory(at: exportDirectory, withIntermediateDirectories: true)
@@ -243,6 +244,15 @@ extension ICloudBackupManager {
     }
 
     // MARK: Staging
+
+    private static func removeStaleExportDirectories(using fileManager: FileManager) {
+        guard let items = try? fileManager.contentsOfDirectory(
+            at: fileManager.temporaryDirectory, includingPropertiesForKeys: nil
+        ) else { return }
+        for item in items where item.lastPathComponent.hasPrefix("Export-") {
+            try? fileManager.removeItem(at: item)
+        }
+    }
 
     private static func stagedCopy(of containerURL: URL, using fileManager: FileManager) throws -> URL {
         let stagingURL = fileManager.temporaryDirectory
