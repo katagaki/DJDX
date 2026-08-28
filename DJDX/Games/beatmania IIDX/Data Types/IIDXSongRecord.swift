@@ -4,7 +4,10 @@ let songLevelCSVHeaders: [String] = ["BEGINNER", "NORMAL", "HYPER", "ANOTHER", "
 
 final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
     var version: String = ""
-    var title: String = ""
+    var title: String = "" {
+        didSet { cachedTitleCompact = title.compact }
+    }
+    private var cachedTitleCompact: String = ""
     var genre: String = ""
     var artist: String = ""
     var playCount: Int = 0
@@ -22,6 +25,7 @@ final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
     init(csvRowData: [String: Any], playType: IIDXPlayType? = nil) {
         self.version = csvRowData["バージョン"] as? String ?? ""
         self.title = csvRowData["タイトル"] as? String ?? ""
+        self.cachedTitleCompact = self.title.compact
         self.genre = csvRowData["ジャンル"] as? String ?? ""
         self.artist = csvRowData["アーティスト"] as? String ?? ""
         self.playCount = Int(csvRowData["プレー回数"] as? String ?? "0") ?? 0
@@ -96,7 +100,7 @@ final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
     }
 
     func titleCompact() -> String {
-        return title.compact
+        return cachedTitleCompact
     }
 
     static func == (lhs: IIDXSongRecord, rhs: IIDXSongRecord) -> Bool {
