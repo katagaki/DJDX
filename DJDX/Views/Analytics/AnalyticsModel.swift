@@ -214,7 +214,7 @@ final class AnalyticsModel {
         var previousByTitle: [String: IIDXSongRecord] = [:]
         previousByTitle.reserveCapacity(previousRecords.count)
         for record in previousRecords {
-            previousByTitle[record.titleCompact()] = record
+            previousByTitle[Self.matchKey(for: record)] = record
         }
         var computedClears: [String: [NewClearEntry]] = [
             "CLEAR": [],
@@ -241,8 +241,7 @@ final class AnalyticsModel {
         ]
 
         for latestRecord in latestRecords {
-            let compactTitle = latestRecord.titleCompact()
-            let previousRecord = previousByTitle[compactTitle]
+            let previousRecord = previousByTitle[Self.matchKey(for: latestRecord)]
 
             for (level, keyPath) in levels {
                 let latestScore = latestRecord[keyPath: keyPath]
@@ -290,6 +289,10 @@ final class AnalyticsModel {
     // swiftlint:enable function_body_length
 
     // MARK: - Helpers
+
+    nonisolated static func matchKey(for record: IIDXSongRecord) -> String {
+        record.titleCompact() + "\u{1}" + record.artist.compact
+    }
 
     func convertToEnumKeyed(_ data: [Int: OrderedDictionary<String, Int>]) -> [Int: [IIDXDJLevel: Int]] {
         var result: [Int: [IIDXDJLevel: Int]] = [:]
