@@ -21,6 +21,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     private var startAttemptID: String?
     private var isWatchInitiated = false
     private var desiredPause = false
+    private var sessionClock: SessionElapsedClock?
+    private var pendingClock: SessionElapsedClock?
     private var syncRetryRequested = false
     private var syncTimeout: Task<Void, Never>?
     private var pendingPhoneMessages: [[String: Any]] {
@@ -115,7 +117,6 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         if isRunning, self.sessionID == nil {
             self.sessionID = sessionID
             attachmentTimeout?.cancel()
-            // Keep the actual collection start; assigning an older date cannot recover missed samples.
             sendWorkoutStarted()
             return
         }
@@ -130,7 +131,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
             return
         }
         self.sessionID = sessionID
-        startDate = Date()
+        if sessionClock == nil { applySessionClock(SessionElapsedClock(start: start)) }
         startAuthorizedWorkout()
     }
 
@@ -186,7 +187,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
             self.session = session
             self.builder = builder
             let start = Date()
-            startDate = start
+            // Sensor collection begins now; the displayed gameplay clock keeps its shared anchor.
             collectionStarting = true
             session.startActivity(with: start)
             builder.beginCollection(withStart: start) { [weak self] success, error in
@@ -203,7 +204,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
                         self.stopWorkoutSession()
                     } else {
                         self.sendWorkoutStarted()
-                        self.requestPause(self.desiredPause)
+                        self.synchronizeWorkoutPause()
                     }
                 }
             }
@@ -247,33 +248,43 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         requestPause(false)
     }
 
-    fileprivate func setPaused(_ paused: Bool, sessionID: String) {
-        guard sessionID.isEmpty || sessionID == self.sessionID else { return }
-        desiredPause = paused
-        requestPause(paused)
-    }
-
-    fileprivate func adoptSession(_ newID: String) {
-        guard isRunning, !newID.isEmpty, newID != sessionID else { return }
-        sessionID = newID
-        sendWorkoutStarted()
-        sendWorkoutState()
-        ingest(heartRate: nil, activeCalories: nil)
+    fileprivate func setPaused(_ paused: Bool, sessionID: String, clock: SessionElapsedClock?) {
+        guard sessionID == self.sessionID else { return }
+        if let clock {
+            mergeSessionClock(clock)
+            synchronizeWorkoutPause()
+        } else {
+            requestPause(paused)
+        }
     }
 
     private func requestPause(_ paused: Bool) {
+        guard isRunning, var clock = sessionClock else { return }
+        clock.setPaused(paused, at: Date(), origin: "watch")
+        applySessionClock(clock)
+        synchronizeWorkoutPause()
+        sendWorkoutState()
+    }
+
+    private func synchronizeWorkoutPause() {
         guard isCollecting, !isEnding, let session else { return }
-        let date = Date()
-        switch (paused, session.state) {
-        case (true, .running):
-            session.pause()
-            applyPaused(true, at: date)
-        case (false, .paused):
-            session.resume()
-            applyPaused(false, at: date)
-        default:
-            applyPaused(session.state == .paused, at: date)
+        switch (desiredPause, session.state) {
+        case (true, .running): session.pause()
+        case (false, .paused): session.resume()
+        default: break
         }
+    }
+
+    private func applySessionClock(_ clock: SessionElapsedClock) {
+        sessionClock = clock
+        startDate = clock.runningStart
+        pausedElapsed = clock.pausedElapsed ?? 0
+        isPaused = clock.isPaused
+        desiredPause = clock.isPaused
+    }
+
+    private func mergeSessionClock(_ clock: SessionElapsedClock) {
+        if sessionClock.map({ clock.supersedes($0) }) ?? true { applySessionClock(clock) }
     }
 
     func requestStartSession() {
@@ -322,25 +333,13 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     fileprivate func handleWorkoutState(_ state: HKWorkoutSessionState, date: Date) {
         switch state {
-        case .paused: applyPaused(true, at: date)
-        case .running: applyPaused(false, at: date)
+        case .paused, .running:
+            // Delayed HealthKit callbacks must not recompute or reset the gameplay clock.
+            synchronizeWorkoutPause()
         case .ended:
             if isEnding { finishCollection() } else if isRunning { endWorkout() }
         default: break
         }
-    }
-
-    private func applyPaused(_ paused: Bool, at date: Date) {
-        if paused {
-            guard isRunning, !isPaused, let startDate else { return }
-            pausedElapsed = max(0, date.timeIntervalSince(startDate))
-            isPaused = true
-        } else {
-            guard isPaused else { return }
-            startDate = date.addingTimeInterval(-pausedElapsed)
-            isPaused = false
-        }
-        sendWorkoutState()
     }
 
     private func sendWorkoutState() {
@@ -354,6 +353,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         } else if let startDate {
             payload["start"] = startDate.timeIntervalSince1970
         }
+        payload["timer"] = sessionClock?.encoded
         sendToPhone(payload)
     }
 
@@ -435,6 +435,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         isRunning = false
         isWatchInitiated = false
         desiredPause = false
+        sessionClock = nil
         session?.delegate = nil
         builder?.delegate = nil
         if let sessionID {
@@ -461,6 +462,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
             pendingSessionStart = nil
             startAttemptID = pendingStartAttemptID
             desiredPause = pendingPaused
+            if let pendingClock { applySessionClock(pendingClock) }
+            pendingClock = nil
             pendingStartAttemptID = nil
             pendingPaused = false
             activateSession(sessionID: pendingSessionID, at: start)
@@ -530,10 +533,11 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         let retry = syncRetryRequested
         syncRetryRequested = false
         var request: [String: Any] = ["command": "watchReady", "retry": retry]
-        if isWatchInitiated, let sessionID {
-            request["watchInitiated"] = true
+        if let sessionID {
+            request["watchInitiated"] = isWatchInitiated
             request["sessionID"] = sessionID
             request["start"] = startDate?.timeIntervalSince1970
+            request["timer"] = sessionClock?.encoded
         }
         let showFailure = retry || isRunning || recordingIssueKey != nil
         sendSessionRequest(request, id: id, retry: retry, showFailure: showFailure)
@@ -601,6 +605,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         if let sessionID, sessionID != sid {
             pendingStartAttemptID = remoteAttempt
             pendingPaused = snapshot.paused
+            pendingClock = snapshot.clock
             activateSession(sessionID: sid)
             return
         }
@@ -612,9 +617,10 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
             sessionID = nil
             return
         }
-        desiredPause = snapshot.paused
+        if let clock = snapshot.clock { mergeSessionClock(clock) }
+        desiredPause = sessionClock?.isPaused ?? snapshot.paused
         activateSession(sessionID: sid)
-        requestPause(desiredPause)
+        synchronizeWorkoutPause()
     }
 
     fileprivate func flushPendingPhoneMessages() {
@@ -785,7 +791,8 @@ extension WatchWorkoutManager: WCSessionDelegate {
             let sessionID = message["sessionID"] as? String ?? ""
             if command == "setPaused" {
                 let paused = message["paused"] as? Bool ?? false
-                Task { @MainActor in manager.setPaused(paused, sessionID: sessionID) }
+                let clock = SessionElapsedClock(data: message["timer"] as? Data)
+                Task { @MainActor in manager.setPaused(paused, sessionID: sessionID, clock: clock) }
                 return
             }
             let start = message["start"] as? Double

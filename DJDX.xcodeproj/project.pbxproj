@@ -119,6 +119,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				AppIcon.icon,
+				SessionElapsedClock.swift,
 			);
 			target = E4449F142FE17495003AC8B6 /* DJDX CHARGE */;
 		};

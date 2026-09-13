@@ -28,6 +28,8 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     let database = IIDXPlaySessionsDatabase.shared
     private var activeSessionID: String?
     private var workoutStart: Date?
+    private var sessionClock: SessionElapsedClock?
+    private static let sessionClockKey = "Sessions.ElapsedClock"
     private var watchWorkoutConfirmed = false
     private var rearmedSessionIDs: Set<String> = []
     private var pendingLaunchSessionID: String?
@@ -130,9 +132,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         let isResuming = activeSessionID == session.id
         activeSessionID = session.id
         workoutStart = session.startDate
-        runningStart = isResuming ? (runningStart ?? session.startDate) : session.startDate
-        pausedElapsed = isResuming ? pausedElapsed : nil
-        isPaused = isResuming ? isPaused : false
+        if !isResuming || sessionClock == nil { restoreSessionClock(for: session) }
         watchWorkoutConfirmed = isResuming ? watchWorkoutConfirmed : false
         if !isResuming {
             heartRate = 0
@@ -153,28 +153,46 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     func setWorkoutPaused(_ paused: Bool) {
+        guard let activeSessionID, var clock = sessionClock, clock.isPaused != paused else { return }
+        clock.setPaused(paused, at: Date(), origin: "phone")
+        applySessionClock(clock)
+        if isWorkoutActive { sendSessionClock(sessionID: activeSessionID) }
+    }
+
+    private func sendSessionClock(sessionID: String) {
+        guard let clock = sessionClock else { return }
+        var message: [String: Any] = ["command": "setPaused", "sessionID": sessionID, "paused": clock.isPaused]
+        message["timer"] = clock.encoded
+        send(message)
+    }
+
+    private func restoreSessionClock(for session: IIDXPlaySession) {
+        let stored = UserDefaults.standard.dictionary(forKey: Self.sessionClockKey)
+        let restored = stored?["sessionID"] as? String == session.id
+            ? SessionElapsedClock(data: stored?["timer"] as? Data) : nil
+        applySessionClock(restored ?? SessionElapsedClock(start: session.startDate))
+    }
+
+    private func applySessionClock(_ clock: SessionElapsedClock) {
+        sessionClock = clock
+        runningStart = clock.runningStart
+        pausedElapsed = clock.pausedElapsed
+        isPaused = clock.isPaused
         guard let activeSessionID else { return }
-        let now = Date()
-        if paused {
-            guard !isPaused else { return }
-            let anchor = runningStart ?? workoutStart ?? now
-            pausedElapsed = max(0, now.timeIntervalSince(anchor))
-            isPaused = true
-        } else {
-            guard isPaused else { return }
-            runningStart = now.addingTimeInterval(-(pausedElapsed ?? 0))
-            pausedElapsed = nil
-            isPaused = false
+        if let data = clock.encoded {
+            UserDefaults.standard.set(["sessionID": activeSessionID, "timer": data], forKey: Self.sessionClockKey)
         }
         IIDXSessionLiveActivityController.shared.updatePauseState(
             sessionID: activeSessionID,
             isPaused: isPaused,
-            pausedElapsed: isPaused ? pausedElapsed : nil,
+            pausedElapsed: pausedElapsed,
             runningStart: isPaused ? nil : runningStart
         )
-        if isWorkoutActive {
-            send(["command": "setPaused", "sessionID": activeSessionID, "paused": paused])
-        }
+    }
+
+    private func mergeSessionClock(_ clock: SessionElapsedClock?) {
+        guard let clock else { return }
+        if sessionClock.map({ clock.supersedes($0) }) ?? true { applySessionClock(clock) }
     }
 
     func reconcileActiveSession() {
@@ -183,7 +201,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         if activeSessionID == nil {
             activeSessionID = session.id
             workoutStart = session.startDate
-            runningStart = runningStart ?? session.startDate
+            restoreSessionClock(for: session)
             isWorkoutActive = isEnabled
         }
         if isWorkoutActive {
@@ -256,19 +274,23 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         startTimeout?.cancel()
     }
 
-    fileprivate func watchSessionSnapshot(retry: Bool) -> [String: Any] {
+    fileprivate func watchSessionSnapshot(retry: Bool, remoteSessionID: String?,
+                                          remoteClock: SessionElapsedClock?) -> [String: Any] {
         guard isEnabled, let session = database.activeSession(), session.isActive else {
             return ["active": false]
         }
         adoptSessionIfNeeded(session.id)
+        if remoteSessionID == session.id { mergeSessionClock(remoteClock) }
         if retry { beginWatchStartAttempt() }
-        return [
+        var snapshot: [String: Any] = [
             "active": true,
             "sessionID": session.id,
             "start": session.startDate.timeIntervalSince1970,
             "startAttemptID": launchAttemptID?.uuidString ?? session.id,
             "paused": isPaused
         ]
+        snapshot["timer"] = sessionClock?.encoded
+        return snapshot
     }
 
     fileprivate func connectivityActivated() {
@@ -309,6 +331,8 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         isPaused = false
         activeSessionID = nil
         workoutStart = nil
+        sessionClock = nil
+        UserDefaults.standard.removeObject(forKey: Self.sessionClockKey)
         runningStart = nil
         pausedElapsed = nil
         watchWorkoutConfirmed = false
@@ -441,7 +465,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
               let session = database.session(id: sessionID), session.isActive else { return }
         activeSessionID = sessionID
         workoutStart = session.startDate
-        runningStart = runningStart ?? session.startDate
+        restoreSessionClock(for: session)
         isWorkoutActive = true
     }
 
@@ -533,6 +557,8 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         adoptSessionIfNeeded(sessionID)
         guard sessionID == activeSessionID else { return }
         confirmWatchRecording()
+        // A pause may have changed while the Watch was still attaching its session ID.
+        sendSessionClock(sessionID: sessionID)
     }
 
     fileprivate func applyWatchWorkoutStopped(sessionID: String) {
@@ -543,23 +569,16 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         sendStartCommand(session: session)
     }
 
-    fileprivate func applyWorkoutState(sessionID: String, paused: Bool, elapsed: Double?, start: Double?) {
+    fileprivate func applyWorkoutState(sessionID: String, paused: Bool, clock: SessionElapsedClock?) {
         adoptSessionIfNeeded(sessionID)
         guard sessionID == activeSessionID else { return }
         confirmWatchRecording()
-        isPaused = paused
-        if paused {
-            if let elapsed { pausedElapsed = elapsed }
-        } else {
-            if let start { runningStart = Date(timeIntervalSince1970: start) }
-            pausedElapsed = nil
+        if let clock {
+            mergeSessionClock(clock)
+        } else if isPaused != paused {
+            // Older companions cannot supply exact timing. Never replace our start with their collection start.
+            setWorkoutPaused(paused)
         }
-        IIDXSessionLiveActivityController.shared.updatePauseState(
-            sessionID: sessionID,
-            isPaused: paused,
-            pausedElapsed: paused ? pausedElapsed : nil,
-            runningStart: paused ? nil : runningStart
-        )
     }
 
     fileprivate func storeWorkoutUUID(_ uuid: String, sessionID: String) {
@@ -702,11 +721,12 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
         let watchInitiated = message["watchInitiated"] as? Bool ?? false
         let requestedID = message["sessionID"] as? String
         let start = message["start"] as? Double
+        let clock = SessionElapsedClock(data: message["timer"] as? Data)
         // WatchConnectivity permits invoking its reply handler asynchronously on another queue.
         nonisolated(unsafe) let reply = replyHandler
         Task { @MainActor in
             if watchInitiated { self.handleRemoteStart(sessionID: requestedID, start: start) }
-            reply(self.watchSessionSnapshot(retry: retry))
+            reply(self.watchSessionSnapshot(retry: retry, remoteSessionID: requestedID, remoteClock: clock))
         }
     }
 
@@ -778,8 +798,7 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
             routeWorkoutAcknowledgement(command, sessionID: sessionID, message: message)
         case "workoutState":
             let paused = message["paused"] as? Bool ?? false
-            let elapsed = message["elapsed"] as? Double
-            let start = message["start"] as? Double
+            let clock = SessionElapsedClock(data: message["timer"] as? Data)
             let running = message["running"] as? Bool ?? true
             let attempt = message["startAttemptID"] as? String
             Task { @MainActor in
@@ -789,7 +808,7 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
                     return
                 }
                 bridge.applyWorkoutState(
-                    sessionID: sessionID, paused: paused, elapsed: elapsed, start: start
+                    sessionID: sessionID, paused: paused, clock: clock
                 )
             }
         default:

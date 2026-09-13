@@ -1,7 +1,7 @@
 import Foundation
 
-// Run: swiftc 'DJDX CHARGE/WatchSessionHandshake.swift' Tests/WatchSessionHandshakeTests.swift \
-//      -o /tmp/djdx-watch-sync-tests && /tmp/djdx-watch-sync-tests
+// Run: swiftc Shared/SessionElapsedClock.swift 'DJDX CHARGE/WatchSessionHandshake.swift' \
+//      Tests/WatchSessionHandshakeTests.swift -o /tmp/djdx-watch-sync-tests && /tmp/djdx-watch-sync-tests
 @main
 struct WatchSessionHandshakeTests {
     static func main() {
@@ -45,7 +45,48 @@ struct WatchSessionHandshakeTests {
         let snapshot = WatchSessionSnapshot(reply: ["active": true, "sessionID": "next", "paused": true])
         expect(snapshot?.sessionID == "next" && snapshot?.paused == true,
                "The snapshot preserves the phone's current session and pause state")
-        print("Passed 12 Watch session handshake regression checks")
+        testElapsedClock()
+        print("Passed 12 handshake and 12 elapsed-clock regression checks")
+    }
+
+    private static func testElapsedClock() {
+        let start = Date(timeIntervalSince1970: 1_000_000)
+        var phone = SessionElapsedClock(start: start)
+        let delayedLaunch = start.addingTimeInterval(6 * 3600)
+        var watch = SessionElapsedClock(data: phone.encoded)!
+        expect(watch.elapsed(at: delayedLaunch) == 21_600,
+               "A late Watch launch must display gameplay elapsed time, not collection elapsed time")
+        expect(watch.runningStart == phone.runningStart, "Both displays use the same absolute timer anchor")
+        phone.setPaused(true, at: start.addingTimeInterval(21_620), origin: "phone")
+        watch = SessionElapsedClock(data: phone.encoded)!
+        expect(watch.elapsed(at: delayedLaunch.addingTimeInterval(500)) == 21_620,
+               "Delivery delay must not add time to a paused clock")
+        phone.setPaused(false, at: start.addingTimeInterval(21_680), origin: "phone")
+        watch = SessionElapsedClock(data: phone.encoded)!
+        expect(watch.elapsed(at: start.addingTimeInterval(21_690)) == 21_630,
+               "A resumed clock excludes the pause, including after delayed delivery")
+        let staleReply = watch
+        watch.setPaused(true, at: start.addingTimeInterval(21_700), origin: "watch")
+        expect(!staleReply.supersedes(watch), "A stale handshake cannot undo a local Watch pause")
+        expect(watch.supersedes(phone), "A Watch pause can synchronize back to the phone")
+        phone = SessionElapsedClock(data: watch.encoded)!
+        expect(phone.elapsed(at: start.addingTimeInterval(22_000)) == 21_640,
+               "Persisting and restoring a paused phone must keep its exact elapsed time")
+        watch.setPaused(false, at: start.addingTimeInterval(21_720), origin: "watch")
+        phone = SessionElapsedClock(data: watch.encoded)!
+        expect(phone.elapsed(at: start.addingTimeInterval(21_730)) == 21_650,
+               "Multiple pauses must not accumulate communication delay")
+        let revision = watch.revision
+        watch.setPaused(false, at: start.addingTimeInterval(21_740), origin: "watch")
+        expect(watch.revision == revision, "Duplicate resume callbacks must not reset the timer")
+        phone.setPaused(true, at: start.addingTimeInterval(21_750), origin: "phone")
+        watch.setPaused(true, at: start.addingTimeInterval(21_751), origin: "watch")
+        expect(watch.supersedes(phone) && !phone.supersedes(watch),
+               "Concurrent controls converge using a deterministic revision order")
+        let snapshot = WatchSessionSnapshot(reply: ["active": true, "sessionID": "session", "timer": watch.encoded!])
+        expect(snapshot?.clock == watch && snapshot?.paused == true,
+               "A reconnect snapshot carries the full paused clock")
+        expect(SessionElapsedClock(data: Data("invalid".utf8)) == nil, "Invalid timer data is rejected")
     }
 
     private static func expect(_ condition: Bool, _ message: String) {

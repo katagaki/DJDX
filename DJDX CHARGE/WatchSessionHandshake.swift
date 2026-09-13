@@ -47,6 +47,7 @@ nonisolated struct WatchSessionSnapshot: Sendable {
     let sessionID: String?
     let attemptID: String?
     let paused: Bool
+    let clock: SessionElapsedClock?
 
     init?(reply: [String: Any]) {
         guard let active = reply["active"] as? Bool else { return nil }
@@ -57,6 +58,8 @@ nonisolated struct WatchSessionSnapshot: Sendable {
             sessionID = nil
         }
         attemptID = reply["startAttemptID"] as? String
-        paused = reply["paused"] as? Bool ?? false
+        clock = SessionElapsedClock(data: reply["timer"] as? Data)
+            ?? (reply["start"] as? Double).map { SessionElapsedClock(start: Date(timeIntervalSince1970: $0)) }
+        paused = clock?.isPaused ?? (reply["paused"] as? Bool ?? false)
     }
 }
