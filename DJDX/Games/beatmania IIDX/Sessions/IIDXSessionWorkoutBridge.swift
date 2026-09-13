@@ -33,7 +33,10 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     private var pendingLaunchSessionID: String?
     private var launchAttemptID: UUID?
     private var startTimeout: Task<Void, Never>?
-    private var pendingControlMessages: [[String: Any]] = []
+    private var pendingControlMessages: [[String: Any]] {
+        get { UserDefaults.standard.array(forKey: "Sessions.PendingWatchCommands") as? [[String: Any]] ?? [] }
+        set { UserDefaults.standard.set(newValue, forKey: "Sessions.PendingWatchCommands") }
+    }
 
     var isEnabled: Bool {
         UserDefaults.standard.bool(forKey: Self.healthKitEnabledKey)
@@ -184,15 +187,23 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         }
         if isWorkoutActive {
             send(["command": "requestWorkoutState", "sessionID": session.id])
+            if !watchWorkoutConfirmed, !isStartingWatch, recordingIssueKey == nil { retryWatchWorkout() }
         }
     }
 
     func retryWatchWorkout() {
         guard isEnabled, let activeSessionID,
               let session = database.session(id: activeSessionID), session.isActive else { return }
+        beginWatchStartAttempt()
+        pendingLaunchSessionID = activeSessionID
+        sendStartCommand(session: session)
+        launchWatchApp()
+    }
+
+    private func beginWatchStartAttempt() {
         recordingIssueKey = nil
         isStartingWatch = true
-        pendingLaunchSessionID = activeSessionID
+        watchWorkoutConfirmed = false
         let attemptID = UUID()
         launchAttemptID = attemptID
         startTimeout?.cancel()
@@ -202,8 +213,6 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
             isStartingWatch = false
             recordingIssueKey = "Sessions.Watch.NotRecording"
         }
-        sendStartCommand(session: session)
-        launchWatchApp()
     }
 
     private func launchWatchApp() {
@@ -240,9 +249,25 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
 
     private func confirmWatchRecording() {
         watchWorkoutConfirmed = true
+        pendingLaunchSessionID = nil
         isStartingWatch = false
         recordingIssueKey = nil
         startTimeout?.cancel()
+    }
+
+    fileprivate func watchSessionSnapshot(retry: Bool) -> [String: Any] {
+        guard isEnabled, let session = database.activeSession(), session.isActive else {
+            return ["active": false]
+        }
+        adoptSessionIfNeeded(session.id)
+        if retry { beginWatchStartAttempt() }
+        return [
+            "active": true,
+            "sessionID": session.id,
+            "start": session.startDate.timeIntervalSince1970,
+            "startAttemptID": launchAttemptID?.uuidString ?? session.id,
+            "paused": isPaused
+        ]
     }
 
     fileprivate func connectivityActivated() {
@@ -300,8 +325,8 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     private func resolveWorkoutRecord(for session: IIDXPlaySession, watchConfirmed: Bool) {
         let sessionID = session.id
         guard let stored = database.session(id: sessionID), stored.workoutUUID == nil else { return }
-        let start = workoutStart ?? session.startDate
-        let end = Date()
+        let start = session.startDate
+        let end = session.endDate ?? Date()
         guard watchConfirmed || watchCanRecordWorkout else {
             saveFallbackWorkout(sessionID: sessionID, start: start, end: end)
             return
@@ -329,16 +354,18 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     private func send(_ payload: [String: Any]) {
         let connectivity = WCSession.default
         guard connectivity.activationState == .activated else {
-            if payload["command"] as? String == "end" || payload["command"] as? String == "setPaused" {
+            if payload["command"] as? String == "end" {
                 pendingControlMessages.append(payload)
             }
             return
         }
-        if connectivity.isReachable {
-            connectivity.sendMessage(payload, replyHandler: nil) { _ in
-                connectivity.transferUserInfo(payload)
-            }
-        } else {
+        if payload["command"] as? String == "end" {
+            connectivity.transferUserInfo(payload)
+            if connectivity.isReachable { connectivity.sendMessage(payload, replyHandler: nil, errorHandler: nil) }
+        } else if connectivity.isReachable {
+            connectivity.sendMessage(payload, replyHandler: nil, errorHandler: nil)
+        } else if payload["command"] as? String == "start" {
+            // This is a wake-up hint, never authority to resurrect a historical session.
             connectivity.transferUserInfo(payload)
         }
     }
@@ -476,10 +503,20 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
 
     fileprivate func applyWorkoutFinished(sessionID: String, uuid: String?) {
         guard let uuid else {
-            if sessionID == activeSessionID { watchWorkoutConfirmed = false }
+            if sessionID == activeSessionID {
+                watchWorkoutConfirmed = false
+            } else if let stored = database.session(id: sessionID), !stored.isActive {
+                resolveWorkoutRecord(for: stored, watchConfirmed: false)
+            }
             return
         }
         storeWorkoutUUID(uuid, sessionID: sessionID)
+    }
+
+    private func matchesWatchAttempt(_ attempt: String?, sessionID: String) -> Bool {
+        // Legacy and Watch-initiated workouts have no phone launch generation.
+        guard let attempt else { return true }
+        return attempt == (launchAttemptID?.uuidString ?? sessionID)
     }
 
     fileprivate func applyWorkoutFailure(sessionID: String, reason: String?) {
@@ -627,6 +664,25 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
         route(message)
     }
 
+    nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any],
+                             replyHandler: @escaping ([String: Any]) -> Void) {
+        guard message["command"] as? String == "watchReady" else {
+            replyHandler([:])
+            route(message)
+            return
+        }
+        let retry = message["retry"] as? Bool ?? false
+        let watchInitiated = message["watchInitiated"] as? Bool ?? false
+        let requestedID = message["sessionID"] as? String
+        let start = message["start"] as? Double
+        // WatchConnectivity permits invoking its reply handler asynchronously on another queue.
+        nonisolated(unsafe) let reply = replyHandler
+        Task { @MainActor in
+            if watchInitiated { self.handleRemoteStart(sessionID: requestedID, start: start) }
+            reply(self.watchSessionSnapshot(retry: retry))
+        }
+    }
+
     nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
         route(userInfo)
     }
@@ -640,7 +696,12 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
         }
         if message["workoutFinished"] != nil {
             let uuid = message["workoutUUID"] as? String
-            Task { @MainActor in bridge.applyWorkoutFinished(sessionID: sessionID, uuid: uuid) }
+            let attempt = message["startAttemptID"] as? String
+            Task { @MainActor in
+                if uuid == nil, sessionID == bridge.activeSessionID,
+                   !bridge.matchesWatchAttempt(attempt, sessionID: sessionID) { return }
+                bridge.applyWorkoutFinished(sessionID: sessionID, uuid: uuid)
+            }
             return
         }
         if let uuid = message["workoutUUID"] as? String {
@@ -652,6 +713,20 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
         if heartRate != nil || activeCalories != nil {
             Task { @MainActor in
                 bridge.ingestMetrics(heartRate: heartRate, activeCalories: activeCalories, sessionID: sessionID)
+            }
+        }
+    }
+
+    private nonisolated func routeWorkoutAcknowledgement(_ command: String,
+                                                         sessionID: String, message: [String: Any]) {
+        let reason = message["reason"] as? String
+        let attempt = message["startAttemptID"] as? String
+        Task { @MainActor in
+            guard self.matchesWatchAttempt(attempt, sessionID: sessionID) else { return }
+            if command == "workoutFailed" {
+                self.applyWorkoutFailure(sessionID: sessionID, reason: reason)
+            } else {
+                self.applyWorkoutStarted(sessionID: sessionID)
             }
         }
     }
@@ -672,17 +747,16 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
             Task { @MainActor in bridge.handleRemoteStart(sessionID: requestedID, start: start) }
         case "endSession":
             Task { @MainActor in bridge.handleRemoteEnd(sessionID: sessionID) }
-        case "workoutFailed":
-            let reason = message["reason"] as? String
-            Task { @MainActor in bridge.applyWorkoutFailure(sessionID: sessionID, reason: reason) }
-        case "workoutStarted":
-            Task { @MainActor in bridge.applyWorkoutStarted(sessionID: sessionID) }
+        case "workoutFailed", "workoutStarted":
+            routeWorkoutAcknowledgement(command, sessionID: sessionID, message: message)
         case "workoutState":
             let paused = message["paused"] as? Bool ?? false
             let elapsed = message["elapsed"] as? Double
             let start = message["start"] as? Double
             let running = message["running"] as? Bool ?? true
+            let attempt = message["startAttemptID"] as? String
             Task { @MainActor in
+                guard bridge.matchesWatchAttempt(attempt, sessionID: sessionID) else { return }
                 guard running else {
                     bridge.applyWatchWorkoutStopped(sessionID: sessionID)
                     return

@@ -17,8 +17,16 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     private var collectionStarting = false
     private var isEnding = false
     private var isFinishing = false
-    private var failedSessionID: String?
-    private var failedSessionStart: Date?
+    private var handshake = WatchSessionHandshake()
+    private var startAttemptID: String?
+    private var isWatchInitiated = false
+    private var desiredPause = false
+    private var syncRetryRequested = false
+    private var syncTimeout: Task<Void, Never>?
+    private var pendingPhoneMessages: [[String: Any]] {
+        get { UserDefaults.standard.array(forKey: "Watch.PendingPhoneMessages") as? [[String: Any]] ?? [] }
+        set { UserDefaults.standard.set(newValue, forKey: "Watch.PendingPhoneMessages") }
+    }
     private var attachmentTimeout: Task<Void, Never>?
     @Published var isPaused = false
     @Published private(set) var isCollecting = false
@@ -48,6 +56,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     private var sessionID: String?
     private var pendingSessionID: String?
     private var pendingSessionStart: Date?
+    private var pendingStartAttemptID: String?
+    private var pendingPaused = false
     private var lastMetricsSend: Date?
     private var sentHeartRate: Int?
     private var sentActiveCalories: Int?
@@ -86,7 +96,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     func handleRemoteWorkoutLaunch() {
         requestProfile()
-        guard !isRunning, session == nil, builder == nil else { return }
+        requestSessionSync()
+        guard recordingIssueKey == nil, !isRunning, session == nil, builder == nil else { return }
         startDate = Date()
         startAuthorizedWorkout()
         let token = attemptID
@@ -124,11 +135,12 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     func retryWorkout() {
-        if let failedSessionID {
-            activateSession(sessionID: failedSessionID, at: failedSessionStart ?? Date())
-        } else {
-            handleRemoteWorkoutLaunch()
-        }
+        // Retry must ask the phone whether this gameplay session is still active.
+        requestSessionSync(retry: true)
+    }
+
+    func dismissRecordingIssue() {
+        recordingIssueKey = nil
     }
 
     private func startAuthorizedWorkout() {
@@ -191,6 +203,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
                         self.stopWorkoutSession()
                     } else {
                         self.sendWorkoutStarted()
+                        self.requestPause(self.desiredPause)
                     }
                 }
             }
@@ -211,8 +224,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     private func reportFailure(_ issueKey: String) {
         recordingIssueKey = issueKey
-        failedSessionID = sessionID
-        failedSessionStart = startDate
+        handshake.failStart()
         if let sessionID {
             sendToPhone(["command": "workoutFailed", "sessionID": sessionID, "reason": issueKey])
         }
@@ -237,6 +249,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     fileprivate func setPaused(_ paused: Bool, sessionID: String) {
         guard sessionID.isEmpty || sessionID == self.sessionID else { return }
+        desiredPause = paused
         requestPause(paused)
     }
 
@@ -267,6 +280,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         guard healthKitEnabled, !isRunning else { return }
         let sessionID = UUID().uuidString
         let start = Date()
+        isWatchInitiated = true
+        startAttemptID = nil
         sendToPhone([
             "command": "startSession",
             "sessionID": sessionID,
@@ -276,6 +291,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     func requestEndSession() {
+        handshake.invalidate()
+        syncTimeout?.cancel()
         if let sessionID {
             markSessionEnded(sessionID)
             sendToPhone(["command": "endSession", "sessionID": sessionID])
@@ -285,11 +302,18 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     fileprivate func handleEndCommand(sessionID: String) {
         markSessionEnded(sessionID)
+        if sessionID.isEmpty || sessionID == self.sessionID || self.sessionID == nil {
+            handshake.invalidate()
+            syncTimeout?.cancel()
+        }
         if pendingSessionID == sessionID {
             pendingSessionID = nil
             pendingSessionStart = nil
         }
-        guard sessionID.isEmpty || sessionID == self.sessionID else { return }
+        guard sessionID.isEmpty || sessionID == self.sessionID else {
+            if self.sessionID == nil { requestSessionSync() }
+            return
+        }
         if let current = self.sessionID {
             markSessionEnded(current)
         }
@@ -409,6 +433,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         isEnding = false
         isFinishing = false
         isRunning = false
+        isWatchInitiated = false
+        desiredPause = false
         session?.delegate = nil
         builder?.delegate = nil
         if let sessionID {
@@ -433,6 +459,10 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
             let start = pendingSessionStart ?? Date()
             self.pendingSessionID = nil
             pendingSessionStart = nil
+            startAttemptID = pendingStartAttemptID
+            desiredPause = pendingPaused
+            pendingStartAttemptID = nil
+            pendingPaused = false
             activateSession(sessionID: pendingSessionID, at: start)
         }
     }
@@ -447,6 +477,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     fileprivate func applySessionInfo(_ message: [String: Any]) {
+        guard message["sessionID"] as? String == sessionID else { return }
         if let playCount = message["playCount"] as? Int { self.playCount = playCount }
         lastSongTitle = message["lastSongTitle"] as? String
         lastDJLevel = message["lastDJLevel"] as? String
@@ -490,6 +521,108 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         }
     }
 
+    fileprivate func requestSessionSync(retry: Bool = false) {
+        syncRetryRequested = syncRetryRequested || retry
+        let connectivity = WCSession.default
+        guard connectivity.activationState == .activated, connectivity.isReachable else { return }
+        guard handshake.requestID == nil else { return }
+        let id = handshake.beginRequest()
+        let retry = syncRetryRequested
+        syncRetryRequested = false
+        var request: [String: Any] = ["command": "watchReady", "retry": retry]
+        if isWatchInitiated, let sessionID {
+            request["watchInitiated"] = true
+            request["sessionID"] = sessionID
+            request["start"] = startDate?.timeIntervalSince1970
+        }
+        let showFailure = retry || isRunning || recordingIssueKey != nil
+        sendSessionRequest(request, id: id, retry: retry, showFailure: showFailure)
+        syncTimeout?.cancel()
+        syncTimeout = Task { @MainActor in
+            do { try await Task.sleep(for: .seconds(15)) } catch { return }
+            guard handshake.requestID == id else { return }
+            handshake.cancelRequest(id)
+            syncRetryRequested = retry
+            if showFailure, !isRunning { recordingIssueKey = "Watch.Recording.ConnectionFailed" }
+        }
+    }
+
+    private nonisolated func sendSessionRequest(_ request: [String: Any], id: UUID,
+                                                retry: Bool, showFailure: Bool) {
+        WCSession.default.sendMessage(request) { reply in
+            let snapshot = WatchSessionSnapshot(reply: reply)
+            Task { @MainActor in
+                guard let snapshot else {
+                    self.handshake.cancelRequest(id)
+                    return
+                }
+                self.applySessionSnapshot(snapshot, requestID: id, retry: retry)
+            }
+        } errorHandler: { error in
+            debugPrint("Watch session handshake failed: \(error)")
+            Task { @MainActor in
+                guard self.handshake.requestID == id else { return }
+                self.handshake.cancelRequest(id)
+                self.syncRetryRequested = retry
+                if showFailure, !self.isRunning { self.recordingIssueKey = "Watch.Recording.ConnectionFailed" }
+            }
+        }
+    }
+
+    private func applySessionSnapshot(_ snapshot: WatchSessionSnapshot, requestID: UUID, retry: Bool) {
+        let sid = snapshot.sessionID
+        let remoteAttempt = snapshot.attemptID
+        let failedBeforeAttachment = handshake.acceptedStartKey == nil
+            && recordingIssueKey == "Watch.Recording.AuthorizationRequired"
+        let decision = handshake.accept(requestID: requestID, sessionID: sid, attemptID: remoteAttempt)
+        guard decision != .stale else { return }
+        syncTimeout?.cancel()
+        defer { if syncRetryRequested { requestSessionSync() } }
+        switch decision {
+        case .inactive:
+            if let sessionID { markSessionEnded(sessionID) }
+            endWorkout()
+            recordingIssueKey = nil
+        case .failed: break
+        case .start:
+            attachPhoneSession(snapshot, sid: sid, retry: retry, failedBeforeAttachment: failedBeforeAttachment)
+        case .stale: break
+        }
+    }
+
+    private func attachPhoneSession(_ snapshot: WatchSessionSnapshot, sid: String?,
+                                    retry: Bool, failedBeforeAttachment: Bool) {
+        let remoteAttempt = snapshot.attemptID
+        guard let sid else { return }
+        guard !isSessionEnded(sid) else {
+            requestSessionSync()
+            return
+        }
+        if let sessionID, sessionID != sid {
+            pendingStartAttemptID = remoteAttempt
+            pendingPaused = snapshot.paused
+            activateSession(sessionID: sid)
+            return
+        }
+        startAttemptID = remoteAttempt
+        // A provisional launch may have already failed authorization before its ID arrived.
+        if !retry, sessionID == nil, failedBeforeAttachment {
+            sessionID = sid
+            reportFailure("Watch.Recording.AuthorizationRequired")
+            sessionID = nil
+            return
+        }
+        desiredPause = snapshot.paused
+        activateSession(sessionID: sid)
+        requestPause(desiredPause)
+    }
+
+    fileprivate func flushPendingPhoneMessages() {
+        let messages = pendingPhoneMessages
+        pendingPhoneMessages.removeAll()
+        for message in messages { WCSession.default.transferUserInfo(message) }
+    }
+
     fileprivate func requestProfile() {
         let connectivity = WCSession.default
         guard connectivity.activationState == .activated, connectivity.isReachable else { return }
@@ -519,13 +652,9 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     fileprivate func handleCommand(_ command: String, sessionID: String, start: Double?) {
         switch command {
-        case "start":
-            activateSession(
-                sessionID: sessionID,
-                at: start.map { Date(timeIntervalSince1970: $0) } ?? Date()
-            )
+        case "start": requestSessionSync()
         case "end": handleEndCommand(sessionID: sessionID)
-        case "adoptSession": adoptSession(sessionID)
+        case "adoptSession": requestSessionSync()
         case "requestWorkoutState": reportWorkoutState(sessionID: sessionID)
         default: break
         }
@@ -539,15 +668,19 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
 
     private func sendToPhone(_ payload: [String: Any]) {
         let connectivity = WCSession.default
-        guard connectivity.activationState == .activated else { return }
-        if connectivity.isReachable {
-            connectivity.sendMessage(payload, replyHandler: nil) { _ in
-                connectivity.transferUserInfo(payload)
-            }
-        } else {
-            connectivity.transferUserInfo(payload)
+        var message = payload
+        if let startAttemptID { message["startAttemptID"] = startAttemptID }
+        let command = message["command"] as? String
+        let durable = message["workoutFinished"] != nil || command == "startSession" || command == "endSession"
+        guard connectivity.activationState == .activated else {
+            if durable { pendingPhoneMessages.append(message) }
+            return
         }
+        if durable { connectivity.transferUserInfo(message) }
+        // Transient acknowledgements must never replay later and falsely confirm a failed workout.
+        if connectivity.isReachable { connectivity.sendMessage(message, replyHandler: nil, errorHandler: nil) }
     }
+
 }
 
 extension WatchWorkoutManager: HKWorkoutSessionDelegate {
@@ -618,7 +751,17 @@ extension WatchWorkoutManager: WCSessionDelegate {
         nonisolated(unsafe) let manager = self
         Task { @MainActor in
             if !context.isEmpty { manager.applyProfile(context) }
+            manager.flushPendingPhoneMessages()
             manager.requestProfile()
+            manager.requestSessionSync()
+        }
+    }
+
+    nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
+        guard session.isReachable else { return }
+        Task { @MainActor in
+            self.requestProfile()
+            self.requestSessionSync()
         }
     }
 

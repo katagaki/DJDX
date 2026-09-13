@@ -10,6 +10,7 @@ struct ContentView: View {
                     Text(LocalizedStringKey(issueKey))
                     if !workoutManager.isRunning {
                         Button("Watch.Recording.Retry") { workoutManager.retryWorkout() }
+                        Button("Watch.Shared.Cancel") { workoutManager.dismissRecordingIssue() }
                     }
                 }
                 .padding()
