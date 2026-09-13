@@ -1,6 +1,6 @@
 # DJDX
 
-A score viewer for beatmania IIDX, SOUND VOLTEX, and Polaris Chord, built for iOS.
+A score viewer for beatmania IIDX, SOUND VOLTEX, DDR, and Polaris Chord, built for iOS.
 
 Features:
 - Full English and Japanese support
