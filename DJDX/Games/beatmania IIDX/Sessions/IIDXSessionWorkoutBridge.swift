@@ -19,6 +19,8 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     @Published var activeCalories: Int = 0
     @Published var isWorkoutActive: Bool = false
     @Published var isPaused: Bool = false
+    @Published private(set) var isStartingWatch = false
+    @Published private(set) var recordingIssueKey: String?
     @Published private(set) var runningStart: Date?
     @Published private(set) var pausedElapsed: TimeInterval?
 
@@ -28,6 +30,10 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     private var workoutStart: Date?
     private var watchWorkoutConfirmed = false
     private var rearmedSessionIDs: Set<String> = []
+    private var pendingLaunchSessionID: String?
+    private var launchAttemptID: UUID?
+    private var startTimeout: Task<Void, Never>?
+    private var pendingControlMessages: [[String: Any]] = []
 
     var isEnabled: Bool {
         UserDefaults.standard.bool(forKey: Self.healthKitEnabledKey)
@@ -130,8 +136,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         }
         isWorkoutActive = isEnabled
         if isEnabled {
-            sendStartCommand(session: session)
-            launchWatchApp()
+            if !watchWorkoutConfirmed { retryWatchWorkout() }
         }
     }
 
@@ -182,26 +187,76 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         }
     }
 
+    func retryWatchWorkout() {
+        guard isEnabled, let activeSessionID,
+              let session = database.session(id: activeSessionID), session.isActive else { return }
+        recordingIssueKey = nil
+        isStartingWatch = true
+        pendingLaunchSessionID = activeSessionID
+        let attemptID = UUID()
+        launchAttemptID = attemptID
+        startTimeout?.cancel()
+        startTimeout = Task { @MainActor in
+            do { try await Task.sleep(for: .seconds(45)) } catch { return }
+            guard launchAttemptID == attemptID, !watchWorkoutConfirmed else { return }
+            isStartingWatch = false
+            recordingIssueKey = "Sessions.Watch.NotRecording"
+        }
+        sendStartCommand(session: session)
+        launchWatchApp()
+    }
+
     private func launchWatchApp() {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
+        guard let sessionID = pendingLaunchSessionID, sessionID == activeSessionID,
+              isEnabled, let session = database.session(id: sessionID), session.isActive else { return }
         let connectivity = WCSession.default
-        guard connectivity.activationState == .activated,
-              connectivity.isPaired,
-              connectivity.isWatchAppInstalled,
-              !connectivity.isReachable else { return }
+        // Activation is asynchronous. Keep the launch pending until its delegate callback.
+        guard connectivity.activationState == .activated else { return }
+        pendingLaunchSessionID = nil
+        guard HKHealthStore.isHealthDataAvailable(), connectivity.isPaired,
+              connectivity.isWatchAppInstalled else {
+            isStartingWatch = false
+            recordingIssueKey = "Sessions.Watch.Unavailable"
+            startTimeout?.cancel()
+            return
+        }
+        let attemptID = launchAttemptID
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .fitnessGaming
         configuration.locationType = .indoor
-        healthStore.startWatchApp(with: configuration) { success, error in
-            if !success {
-                debugPrint("Failed to launch Watch app for session: \(String(describing: error))")
+        healthStore.startWatchApp(with: configuration) { [weak self] success, error in
+            if let error { debugPrint("Watch launch failed: \(error)") }
+            Task { @MainActor in
+                guard let self, self.launchAttemptID == attemptID,
+                      self.activeSessionID == sessionID, !self.watchWorkoutConfirmed else { return }
+                if !success {
+                    self.isStartingWatch = false
+                    self.recordingIssueKey = "Sessions.Watch.NotRecording"
+                    self.startTimeout?.cancel()
+                }
             }
         }
     }
 
+    private func confirmWatchRecording() {
+        watchWorkoutConfirmed = true
+        isStartingWatch = false
+        recordingIssueKey = nil
+        startTimeout?.cancel()
+    }
+
+    fileprivate func connectivityActivated() {
+        let messages = pendingControlMessages
+        pendingControlMessages.removeAll()
+        for message in messages { send(message) }
+        syncProfileToWatch()
+        resendStartIfActive()
+        launchWatchApp()
+    }
+
     fileprivate func resendStartIfActive() {
         guard isWorkoutActive, let activeSessionID,
-              let session = database.session(id: activeSessionID) else { return }
+              let session = database.session(id: activeSessionID), session.isActive else { return }
         sendStartCommand(session: session)
     }
 
@@ -219,6 +274,11 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         }
         rearmedSessionIDs.remove(session.id)
         guard wasTracking else { return }
+        startTimeout?.cancel()
+        pendingLaunchSessionID = nil
+        launchAttemptID = nil
+        isStartingWatch = false
+        recordingIssueKey = nil
         isWorkoutActive = false
         isPaused = false
         activeSessionID = nil
@@ -258,6 +318,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     private func cancelQueuedTransfers(sessionID: String) {
+        pendingControlMessages.removeAll { $0["sessionID"] as? String == sessionID }
         for transfer in WCSession.default.outstandingUserInfoTransfers
         where transfer.userInfo["sessionID"] as? String == sessionID
             && transfer.userInfo["command"] as? String != "end" {
@@ -267,7 +328,12 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
 
     private func send(_ payload: [String: Any]) {
         let connectivity = WCSession.default
-        guard connectivity.activationState == .activated else { return }
+        guard connectivity.activationState == .activated else {
+            if payload["command"] as? String == "end" || payload["command"] as? String == "setPaused" {
+                pendingControlMessages.append(payload)
+            }
+            return
+        }
         if connectivity.isReachable {
             connectivity.sendMessage(payload, replyHandler: nil) { _ in
                 connectivity.transferUserInfo(payload)
@@ -354,7 +420,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     fileprivate func ingestMetrics(heartRate: Int?, activeCalories: Int?, sessionID: String) {
         adoptSessionIfNeeded(sessionID)
         guard sessionID == activeSessionID else { return }
-        watchWorkoutConfirmed = true
+        confirmWatchRecording()
         let previousHeartRate = self.heartRate
         let previousCalories = self.activeCalories
         if let heartRate { self.heartRate = heartRate }
@@ -419,7 +485,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     fileprivate func applyWorkoutStarted(sessionID: String) {
         adoptSessionIfNeeded(sessionID)
         guard sessionID == activeSessionID else { return }
-        watchWorkoutConfirmed = true
+        confirmWatchRecording()
     }
 
     fileprivate func applyWatchWorkoutStopped(sessionID: String) {
@@ -433,7 +499,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     fileprivate func applyWorkoutState(sessionID: String, paused: Bool, elapsed: Double?, start: Double?) {
         adoptSessionIfNeeded(sessionID)
         guard sessionID == activeSessionID else { return }
-        watchWorkoutConfirmed = true
+        confirmWatchRecording()
         isPaused = paused
         if paused {
             if let elapsed { pausedElapsed = elapsed }
@@ -534,7 +600,12 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
                              error: Error?) {
         guard activationState == .activated else { return }
         nonisolated(unsafe) let bridge = self
-        Task { @MainActor in bridge.syncProfileToWatch() }
+        Task { @MainActor in bridge.connectivityActivated() }
+    }
+
+    nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
+        guard session.isReachable else { return }
+        Task { @MainActor in self.resendStartIfActive() }
     }
 
     nonisolated func sessionDidBecomeInactive(_ session: WCSession) {}

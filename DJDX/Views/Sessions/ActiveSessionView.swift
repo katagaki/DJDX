@@ -20,6 +20,7 @@ struct ActiveSessionView: View {
         NavigationStack {
             VStack(spacing: 0.0) {
                 header
+                watchRecordingStatus
                 Divider()
                 playList
                     .safeAreaInset(edge: .bottom) {
@@ -221,6 +222,25 @@ struct ActiveSessionView: View {
                 }
                 .padding()
             }
+        }
+    }
+
+    @ViewBuilder
+    private var watchRecordingStatus: some View {
+        if let issueKey = workoutBridge.recordingIssueKey {
+            HStack {
+                Label(LocalizedStringKey(issueKey), systemImage: "applewatch.slash")
+                    .font(.caption)
+                Spacer()
+                Button("Sessions.Watch.Retry") { workoutBridge.retryWatchWorkout() }
+            }
+            .padding([.horizontal, .bottom])
+        } else if workoutBridge.isStartingWatch {
+            HStack {
+                ProgressView()
+                Text("Sessions.Watch.Starting").font(.caption)
+            }
+            .padding(.bottom)
         }
     }
 
