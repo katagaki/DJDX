@@ -13,6 +13,8 @@ enum ICloudBackupManager {
 
     static let defaultsSnapshotName = "StandardDefaults.plist"
 
+    private static let operationCoordinator = BackupOperationCoordinator()
+
     enum BackupError: Error {
         case iCloudUnavailable
         case documentsUnavailable
@@ -35,18 +37,19 @@ enum ICloudBackupManager {
                 task.setTaskCompleted(success: true)
                 return
             }
-            nonisolated(unsafe) let unsafeTask = task
+            let completion = BackgroundTaskCompletion(task: task)
             let backupTask = Task {
                 do {
                     try await backUp()
-                    unsafeTask.setTaskCompleted(success: true)
+                    completion.finish(success: true)
                 } catch {
                     logger.error("Scheduled backup failed: \(error, privacy: .public)")
-                    unsafeTask.setTaskCompleted(success: false)
+                    completion.finish(success: false)
                 }
             }
             task.expirationHandler = {
                 backupTask.cancel()
+                completion.finish(success: false)
             }
         }
     }
@@ -101,6 +104,14 @@ enum ICloudBackupManager {
     }
 
     static func backUp() async throws {
+        try await operationCoordinator.backUp()
+    }
+
+    static func pruneAfterBackup() async -> StorageReport {
+        await operationCoordinator.pruneStorage()
+    }
+
+    static func createBackup() async throws {
         let fileManager = FileManager.default
         let containerURL = SharedContainer.containerURL
         let backupFolder = try backupFolderURL(in: fileManager)
@@ -108,7 +119,7 @@ enum ICloudBackupManager {
 
         writeDefaultsSnapshot(to: containerURL)
 
-        let stagingDirectory = try stagedCopy(of: containerURL, using: fileManager)
+        let stagingDirectory = try await stagedCopy(of: containerURL, using: fileManager)
         defer { try? fileManager.removeItem(at: stagingDirectory) }
 
         let stagingURL = fileManager.temporaryDirectory
@@ -116,6 +127,7 @@ enum ICloudBackupManager {
             .appendingPathExtension("zip")
         defer { try? fileManager.removeItem(at: stagingURL) }
         try ZipArchive.zip(directoryAt: stagingDirectory, to: stagingURL)
+        try Task.checkCancellation()
 
         let backupDate = Date.now
         let archiveURL = backupFolder.appendingPathComponent("Data.zip")
@@ -130,6 +142,7 @@ enum ICloudBackupManager {
 
         UserDefaults.standard.set(backupDate.timeIntervalSince1970, forKey: lastBackupDateKey)
         UserDefaults.standard.set(true, forKey: restorePromptCompletedKey)
+        PostBackupPruneBackgroundTask.schedule()
     }
 
     // MARK: Export
@@ -137,17 +150,7 @@ enum ICloudBackupManager {
     static func exportArchive() async -> URL? {
         await Task.detached(priority: .userInitiated) { () -> URL? in
             do {
-                let fileManager = FileManager.default
-                removeStaleExportDirectories(using: fileManager)
-                let exportDirectory = fileManager.temporaryDirectory
-                    .appendingPathComponent("Export-\(UUID().uuidString)", isDirectory: true)
-                try fileManager.createDirectory(at: exportDirectory, withIntermediateDirectories: true)
-                let archiveURL = exportDirectory.appendingPathComponent("DJDX Backup.zip")
-                writeDefaultsSnapshot(to: SharedContainer.containerURL)
-                let stagingDirectory = try stagedCopy(of: SharedContainer.containerURL, using: fileManager)
-                defer { try? fileManager.removeItem(at: stagingDirectory) }
-                try ZipArchive.zip(directoryAt: stagingDirectory, to: archiveURL)
-                return archiveURL
+                return try await operationCoordinator.exportArchive()
             } catch {
                 return nil
             }
@@ -245,6 +248,24 @@ extension ICloudBackupManager {
 
     // MARK: Staging
 
+    static func createExportArchive() async throws -> URL {
+        let fileManager = FileManager.default
+        removeStaleExportDirectories(using: fileManager)
+        let exportDirectory = fileManager.temporaryDirectory
+            .appendingPathComponent("Export-\(UUID().uuidString)", isDirectory: true)
+        try fileManager.createDirectory(at: exportDirectory, withIntermediateDirectories: true)
+        let archiveURL = exportDirectory.appendingPathComponent("DJDX Backup.zip")
+        writeDefaultsSnapshot(to: SharedContainer.containerURL)
+        let stagingDirectory = try await stagedCopy(
+            of: SharedContainer.containerURL,
+            using: fileManager
+        )
+        defer { try? fileManager.removeItem(at: stagingDirectory) }
+        try ZipArchive.zip(directoryAt: stagingDirectory, to: archiveURL)
+        try Task.checkCancellation()
+        return archiveURL
+    }
+
     private static func removeStaleExportDirectories(using fileManager: FileManager) {
         guard let items = try? fileManager.contentsOfDirectory(
             at: fileManager.temporaryDirectory, includingPropertiesForKeys: nil
@@ -254,19 +275,65 @@ extension ICloudBackupManager {
         }
     }
 
-    private static func stagedCopy(of containerURL: URL, using fileManager: FileManager) throws -> URL {
+    private static func stagedCopy(
+        of containerURL: URL,
+        using fileManager: FileManager
+    ) async throws -> URL {
         let stagingURL = fileManager.temporaryDirectory
             .appendingPathComponent("DJDXStaging-\(UUID().uuidString)", isDirectory: true)
         try fileManager.createDirectory(at: stagingURL, withIntermediateDirectories: true)
+        do {
+            try await copyBackupItems(
+                from: containerURL,
+                to: stagingURL,
+                rootURL: containerURL,
+                using: fileManager
+            )
+            return stagingURL
+        } catch {
+            try? fileManager.removeItem(at: stagingURL)
+            throw error
+        }
+    }
+
+    private static func copyBackupItems(
+        from sourceURL: URL,
+        to destinationURL: URL,
+        rootURL: URL,
+        using fileManager: FileManager
+    ) async throws {
         let items = try fileManager.contentsOfDirectory(
-            at: containerURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
+            at: sourceURL,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
         )
         for item in items {
-            try fileManager.copyItem(
-                at: item, to: stagingURL.appendingPathComponent(item.lastPathComponent)
-            )
+            try Task.checkCancellation()
+            guard shouldIncludeInBackup(item, rootURL: rootURL) else { continue }
+
+            let destination = destinationURL.appendingPathComponent(item.lastPathComponent)
+            let isDirectory = try item.resourceValues(forKeys: [.isDirectoryKey]).isDirectory == true
+            if isDirectory {
+                try fileManager.createDirectory(at: destination, withIntermediateDirectories: true)
+                try await copyBackupItems(
+                    from: item,
+                    to: destination,
+                    rootURL: rootURL,
+                    using: fileManager
+                )
+            } else {
+                try fileManager.copyItem(at: item, to: destination)
+            }
         }
-        return stagingURL
+    }
+
+    private static func shouldIncludeInBackup(_ url: URL, rootURL: URL) -> Bool {
+        guard url.deletingLastPathComponent().standardizedFileURL == rootURL.standardizedFileURL else {
+            return true
+        }
+        let name = url.lastPathComponent
+        // External-data databases can be downloaded again. WidgetData is derived from user data.
+        return !name.hasPrefix("ExD_") && name != "WidgetData"
     }
 
     // MARK: iCloud

@@ -6,6 +6,7 @@
 	<array>
 		<string>com.tsubuzaki.DJDX.iCloudBackup</string>
 		<string>com.tsubuzaki.DJDX.sessionOCR</string>
+		<string>com.tsubuzaki.DJDX.postBackupPrune</string>
 	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
