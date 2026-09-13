@@ -33,6 +33,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     private var pendingLaunchSessionID: String?
     private var launchAttemptID: UUID?
     private var startTimeout: Task<Void, Never>?
+    private var fallbackSavesInFlight: Set<String> = []
     private var pendingControlMessages: [[String: Any]] {
         get { UserDefaults.standard.array(forKey: "Sessions.PendingWatchCommands") as? [[String: Any]] ?? [] }
         set { UserDefaults.standard.set(newValue, forKey: "Sessions.PendingWatchCommands") }
@@ -618,7 +619,8 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     }
 
     private func saveFallbackWorkout(sessionID: String, start: Date, end: Date) {
-        guard end > start else { return }
+        guard end > start, let stored = database.session(id: sessionID), stored.workoutUUID == nil,
+              fallbackSavesInFlight.insert(sessionID).inserted else { return }
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .fitnessGaming
         configuration.locationType = .indoor
@@ -627,17 +629,42 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
             configuration: configuration,
             device: .local()
         )
-        nonisolated(unsafe) let liveBuilder = builder
-        nonisolated(unsafe) let bridge = self
-        liveBuilder.beginCollection(withStart: start) { _, _ in
-            liveBuilder.endCollection(withEnd: end) { _, _ in
-                liveBuilder.finishWorkout { workout, _ in
-                    guard let uuid = workout?.uuid.uuidString else { return }
-                    Task { @MainActor in bridge.storeWorkoutUUID(uuid, sessionID: sessionID) }
+        builder.beginCollection(withStart: start) { [weak self] success, error in
+            Task { @MainActor in
+                guard let self else { return }
+                guard success else {
+                    self.completeFallbackSave(sessionID: sessionID, uuid: nil, error: error)
+                    return
                 }
+                self.finishFallbackWorkout(builder, sessionID: sessionID, end: end)
             }
         }
     }
+
+    private func finishFallbackWorkout(_ builder: HKWorkoutBuilder, sessionID: String, end: Date) {
+        builder.endCollection(withEnd: end) { [weak self] success, error in
+            guard success else {
+                Task { @MainActor in self?.completeFallbackSave(sessionID: sessionID, uuid: nil, error: error) }
+                return
+            }
+            builder.finishWorkout { workout, error in
+                let uuid = workout?.uuid.uuidString
+                Task { @MainActor in self?.completeFallbackSave(sessionID: sessionID, uuid: uuid, error: error) }
+            }
+        }
+    }
+
+    private func completeFallbackSave(sessionID: String, uuid: String?, error: Error?) {
+        fallbackSavesInFlight.remove(sessionID)
+        guard let uuid else {
+            debugPrint("Fallback workout save failed for \(sessionID): \(String(describing: error))")
+            return
+        }
+        // A late Watch record may have linked while the fallback was saving.
+        guard let stored = database.session(id: sessionID), stored.workoutUUID == nil else { return }
+        storeWorkoutUUID(uuid, sessionID: sessionID)
+    }
+
 }
 
 extension IIDXSessionWorkoutBridge: WCSessionDelegate {
