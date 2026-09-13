@@ -37,6 +37,5 @@ struct SessionsNoticeRow<Accessory: View>: View {
             }
             Spacer(minLength: 0.0)
         }
-        .padding(.vertical, 4.0)
     }
 }
