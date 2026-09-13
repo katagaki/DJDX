@@ -1,6 +1,144 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "Watch.Recording.Starting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starting recording…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記録を開始中…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在開始記錄⋯"
+          }
+        }
+      }
+    },
+    "Watch.Recording.AuthorizationRequired" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow workout access in Health permissions, then retry on your Watch. Your play session continues on iPhone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルスケアのアクセス権でワークアウトを許可して、Watchで再試行してください。iPhoneでのセッションは継続します。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請在健康權限中允許體能訓練存取，然後在手錶上重試。iPhone 上的遊玩仍會繼續。"
+          }
+        }
+      }
+    },
+    "Watch.Recording.Failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Workout recording failed. Your play session continues on iPhone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトの記録に失敗しました。iPhoneでのセッションは継続します。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "體能訓練記錄失敗。iPhone 上的遊玩仍會繼續。"
+          }
+        }
+      }
+    },
+    "Watch.Recording.ConnectionFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not connect to your iPhone session. Check the connection and retry."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhoneのセッションに接続できませんでした。接続を確認して再試行してください。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法連接 iPhone 上的遊玩。請檢查連線後重試。"
+          }
+        }
+      }
+    },
+    "Watch.Recording.SaveFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The workout could not be saved. Your play session is still available on iPhone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトを保存できませんでした。セッションはiPhoneで確認できます。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法儲存體能訓練。您仍可在 iPhone 上查看遊玩紀錄。"
+          }
+        }
+      }
+    },
+    "Watch.Recording.Retry" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再試行"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重試"
+          }
+        }
+      }
+    },
     "Watch.Idle.Message" : {
       "extractionState" : "manual",
       "localizations" : {

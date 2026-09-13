@@ -482,6 +482,15 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         storeWorkoutUUID(uuid, sessionID: sessionID)
     }
 
+    fileprivate func applyWorkoutFailure(sessionID: String, reason: String?) {
+        guard sessionID == activeSessionID else { return }
+        watchWorkoutConfirmed = false
+        isStartingWatch = false
+        startTimeout?.cancel()
+        recordingIssueKey = reason == "Watch.Recording.AuthorizationRequired"
+            ? "Sessions.Watch.AuthorizationRequired" : "Sessions.Watch.NotRecording"
+    }
+
     fileprivate func applyWorkoutStarted(sessionID: String) {
         adoptSessionIfNeeded(sessionID)
         guard sessionID == activeSessionID else { return }
@@ -663,6 +672,9 @@ extension IIDXSessionWorkoutBridge: WCSessionDelegate {
             Task { @MainActor in bridge.handleRemoteStart(sessionID: requestedID, start: start) }
         case "endSession":
             Task { @MainActor in bridge.handleRemoteEnd(sessionID: sessionID) }
+        case "workoutFailed":
+            let reason = message["reason"] as? String
+            Task { @MainActor in bridge.applyWorkoutFailure(sessionID: sessionID, reason: reason) }
         case "workoutStarted":
             Task { @MainActor in bridge.applyWorkoutStarted(sessionID: sessionID) }
         case "workoutState":

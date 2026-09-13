@@ -4,7 +4,17 @@ struct ContentView: View {
     @EnvironmentObject private var workoutManager: WatchWorkoutManager
 
     var body: some View {
-        if workoutManager.isRunning {
+        if let issueKey = workoutManager.recordingIssueKey {
+            ScrollView {
+                VStack(spacing: 12.0) {
+                    Text(LocalizedStringKey(issueKey))
+                    if !workoutManager.isRunning {
+                        Button("Watch.Recording.Retry") { workoutManager.retryWorkout() }
+                    }
+                }
+                .padding()
+            }
+        } else if workoutManager.isRunning {
             WorkoutView()
         } else {
             ProfileView()

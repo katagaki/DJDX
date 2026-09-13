@@ -12,6 +12,14 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     static let shared = WatchWorkoutManager()
 
     @Published var isRunning = false
+    @Published private(set) var recordingIssueKey: String?
+    private var attemptID: UUID?
+    private var collectionStarting = false
+    private var isEnding = false
+    private var isFinishing = false
+    private var failedSessionID: String?
+    private var failedSessionStart: Date?
+    private var attachmentTimeout: Task<Void, Never>?
     @Published var isPaused = false
     @Published private(set) var isCollecting = false
     @Published var heartRate: Int = 0
@@ -77,59 +85,80 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     func handleRemoteWorkoutLaunch() {
-        guard !isRunning, session == nil, builder == nil else { return }
-        isRunning = true
-        startDate = Date()
-        beginWorkoutCollection()
-        guard session != nil else { return }
         requestProfile()
-        Task {
-            try? await Task.sleep(for: .seconds(30))
-            guard isRunning, sessionID == nil else { return }
-            endWorkout()
+        guard !isRunning, session == nil, builder == nil else { return }
+        startDate = Date()
+        startAuthorizedWorkout()
+        let token = attemptID
+        attachmentTimeout?.cancel()
+        attachmentTimeout = Task { @MainActor in
+            do { try await Task.sleep(for: .seconds(45)) } catch { return }
+            guard attemptID == token, isRunning, sessionID == nil else { return }
+            failWorkoutStart(issueKey: "Watch.Recording.ConnectionFailed")
         }
     }
 
     func activateSession(sessionID: String, at start: Date = Date()) {
         guard !sessionID.isEmpty, !isSessionEnded(sessionID) else { return }
-        if isRunning, self.sessionID == nil, session != nil {
+        // A launch and a start command may arrive in either order, including during authorization.
+        if isRunning, self.sessionID == nil {
             self.sessionID = sessionID
-            startDate = start
+            attachmentTimeout?.cancel()
+            // Keep the actual collection start; assigning an older date cannot recover missed samples.
             sendWorkoutStarted()
             return
         }
         if isRunning || session != nil || builder != nil {
-            guard sessionID != self.sessionID else { return }
+            if sessionID == self.sessionID {
+                sendWorkoutStarted()
+                return
+            }
             pendingSessionID = sessionID
             pendingSessionStart = start
-            if isRunning {
-                endWorkout()
-            }
+            if isRunning { endWorkout() }
             return
         }
         self.sessionID = sessionID
-        startDate = start
-        isRunning = true
-        requestAuthorizationAndStartWorkout()
+        startDate = Date()
+        startAuthorizedWorkout()
     }
 
-    private func requestAuthorizationAndStartWorkout() {
+    func retryWorkout() {
+        if let failedSessionID {
+            activateSession(sessionID: failedSessionID, at: failedSessionStart ?? Date())
+        } else {
+            handleRemoteWorkoutLaunch()
+        }
+    }
+
+    private func startAuthorizedWorkout() {
+        recordingIssueKey = nil
+        isRunning = true
+        isEnding = false
+        isFinishing = false
+        let token = UUID()
+        attemptID = token
         let share: Set = [HKQuantityType.workoutType()]
         let read: Set = [HKQuantityType(.heartRate), HKQuantityType(.activeEnergyBurned)]
-        nonisolated(unsafe) let manager = self
-        healthStore.requestAuthorization(toShare: share, read: read) { success, _ in
+        guard HKHealthStore.isHealthDataAvailable() else {
+            failWorkoutStart(issueKey: "Watch.Recording.AuthorizationRequired")
+            return
+        }
+        healthStore.requestAuthorization(toShare: share, read: read) { [weak self] success, error in
+            if let error { debugPrint("Watch authorization failed: \(error)") }
             Task { @MainActor in
-                if success {
-                    manager.beginWorkoutCollection()
-                } else {
-                    manager.failWorkoutStart()
+                guard let self, self.attemptID == token, self.isRunning else { return }
+                guard success, self.healthStore.authorizationStatus(for: .workoutType()) == .sharingAuthorized else {
+                    self.failWorkoutStart(issueKey: "Watch.Recording.AuthorizationRequired")
+                    return
                 }
+                self.beginWorkoutCollection()
             }
         }
     }
 
     private func beginWorkoutCollection() {
-        guard isRunning, session == nil, let start = startDate else { return }
+        guard isRunning, session == nil, let token = attemptID else { return }
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .fitnessGaming
         configuration.locationType = .indoor
@@ -144,17 +173,35 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
             builder.delegate = self
             self.session = session
             self.builder = builder
+            let start = Date()
+            startDate = start
+            collectionStarting = true
             session.startActivity(with: start)
-            builder.beginCollection(withStart: start) { _, _ in }
-            isCollecting = true
-            sendWorkoutStarted()
+            builder.beginCollection(withStart: start) { [weak self] success, error in
+                if let error { debugPrint("Watch collection failed: \(error)") }
+                Task { @MainActor in
+                    guard let self, self.attemptID == token else { return }
+                    self.collectionStarting = false
+                    guard success else {
+                        self.failWorkoutStart()
+                        return
+                    }
+                    self.isCollecting = true
+                    if self.isEnding {
+                        self.stopWorkoutSession()
+                    } else {
+                        self.sendWorkoutStarted()
+                    }
+                }
+            }
         } catch {
+            debugPrint("Watch workout creation failed: \(error)")
             failWorkoutStart()
         }
     }
 
     private func sendWorkoutStarted() {
-        guard let sessionID, let startDate else { return }
+        guard isRunning, isCollecting, let sessionID, let startDate else { return }
         sendToPhone([
             "command": "workoutStarted",
             "sessionID": sessionID,
@@ -162,22 +209,22 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         ])
     }
 
-    private func failWorkoutStart() {
-        guard isRunning else { return }
+    private func reportFailure(_ issueKey: String) {
+        recordingIssueKey = issueKey
+        failedSessionID = sessionID
+        failedSessionStart = startDate
         if let sessionID {
-            sendToPhone(["command": "endSession", "sessionID": sessionID])
+            sendToPhone(["command": "workoutFailed", "sessionID": sessionID, "reason": issueKey])
         }
-        pendingSessionID = nil
-        pendingSessionStart = nil
-        session = nil
-        builder = nil
-        sessionID = nil
+    }
+
+    private func failWorkoutStart(issueKey: String = "Watch.Recording.Failed") {
+        reportFailure(issueKey)
+        session?.delegate = nil
+        session?.end()
+        builder?.discardWorkout()
         isRunning = false
-        isPaused = false
-        isCollecting = false
-        startDate = nil
-        pausedElapsed = 0
-        resetSessionInfo()
+        finishUp(workoutUUID: nil, sessionID: sessionID)
     }
 
     func pauseWorkout() {
@@ -196,12 +243,13 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     fileprivate func adoptSession(_ newID: String) {
         guard isRunning, !newID.isEmpty, newID != sessionID else { return }
         sessionID = newID
+        sendWorkoutStarted()
         sendWorkoutState()
         ingest(heartRate: nil, activeCalories: nil)
     }
 
     private func requestPause(_ paused: Bool) {
-        guard let session else { return }
+        guard isCollecting, !isEnding, let session else { return }
         let date = Date()
         switch (paused, session.state) {
         case (true, .running):
@@ -252,6 +300,8 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
         switch state {
         case .paused: applyPaused(true, at: date)
         case .running: applyPaused(false, at: date)
+        case .ended:
+            if isEnding { finishCollection() } else if isRunning { endWorkout() }
         default: break
         }
     }
@@ -270,7 +320,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     }
 
     private func sendWorkoutState() {
-        guard let sessionID else { return }
+        guard isCollecting, !isEnding, let sessionID else { return }
         var payload: [String: Any] = [
             "command": "workoutState", "sessionID": sessionID,
             "paused": isPaused, "running": isRunning
@@ -298,25 +348,69 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     func endWorkout() {
         guard isRunning else { return }
         isRunning = false
-        let sid = sessionID
-        guard let session, let builder else {
-            finishUp(workoutUUID: nil, sessionID: sid)
+        isEnding = true
+        attachmentTimeout?.cancel()
+        // Do not end a builder while beginCollection is still in flight.
+        guard !collectionStarting else { return }
+        stopWorkoutSession()
+    }
+
+    private func stopWorkoutSession() {
+        guard let session, builder != nil, isCollecting else {
+            finishUp(workoutUUID: nil, sessionID: sessionID)
             return
         }
-        nonisolated(unsafe) let liveSession = session
-        nonisolated(unsafe) let liveBuilder = builder
-        nonisolated(unsafe) let manager = self
-        let end = Date()
-        liveSession.end()
-        liveBuilder.endCollection(withEnd: end) { _, _ in
-            liveBuilder.finishWorkout { workout, _ in
-                let uuid = workout?.uuid.uuidString
-                Task { @MainActor in manager.finishUp(workoutUUID: uuid, sessionID: sid) }
+        if session.state == .ended {
+            finishCollection()
+        } else {
+            session.end()
+        }
+    }
+
+    private func finishCollection() {
+        guard !isFinishing, let builder, let token = attemptID else { return }
+        isFinishing = true
+        guard let sid = sessionID else {
+            builder.discardWorkout()
+            finishUp(workoutUUID: nil, sessionID: nil)
+            return
+        }
+        builder.endCollection(withEnd: Date()) { [weak self] success, error in
+            if let error { debugPrint("Watch end collection failed: \(error)") }
+            Task { @MainActor in
+                guard let self, self.attemptID == token else { return }
+                guard success else {
+                    self.reportFailure("Watch.Recording.SaveFailed")
+                    builder.discardWorkout()
+                    self.finishUp(workoutUUID: nil, sessionID: sid)
+                    return
+                }
+                self.saveWorkout(builder, sessionID: sid, token: token)
+            }
+        }
+    }
+
+    private func saveWorkout(_ builder: HKLiveWorkoutBuilder, sessionID: String, token: UUID) {
+        builder.finishWorkout { [weak self] workout, error in
+            if let error { debugPrint("Watch save failed: \(error)") }
+            let uuid = workout?.uuid.uuidString
+            Task { @MainActor in
+                guard let self, self.attemptID == token else { return }
+                if uuid == nil { self.reportFailure("Watch.Recording.SaveFailed") }
+                self.finishUp(workoutUUID: uuid, sessionID: sessionID)
             }
         }
     }
 
     private func finishUp(workoutUUID: String?, sessionID: String?) {
+        attachmentTimeout?.cancel()
+        attemptID = nil
+        collectionStarting = false
+        isEnding = false
+        isFinishing = false
+        isRunning = false
+        session?.delegate = nil
+        builder?.delegate = nil
         if let sessionID {
             var payload: [String: Any] = ["sessionID": sessionID, "workoutFinished": true]
             if let workoutUUID { payload["workoutUUID"] = workoutUUID }
@@ -405,7 +499,7 @@ final class WatchWorkoutManager: NSObject, ObservableObject {
     fileprivate func ingest(heartRate: Int?, activeCalories: Int?) {
         if let heartRate { self.heartRate = heartRate }
         if let activeCalories { self.activeCalories = activeCalories }
-        guard let sessionID else { return }
+        guard isRunning, isCollecting, let sessionID else { return }
         let changed = self.heartRate != sentHeartRate || self.activeCalories != sentActiveCalories
         guard changed else { return }
         let now = Date()
@@ -462,13 +556,27 @@ extension WatchWorkoutManager: HKWorkoutSessionDelegate {
                                     from fromState: HKWorkoutSessionState,
                                     date: Date) {
         nonisolated(unsafe) let manager = self
-        Task { @MainActor in manager.handleWorkoutState(toState, date: date) }
+        Task { @MainActor in
+            guard manager.session === workoutSession else { return }
+            manager.handleWorkoutState(toState, date: date)
+        }
     }
 
     nonisolated func workoutSession(_ workoutSession: HKWorkoutSession,
                                     didFailWithError error: Error) {
         nonisolated(unsafe) let manager = self
-        Task { @MainActor in manager.requestEndSession() }
+        Task { @MainActor in
+            guard manager.session === workoutSession else { return }
+            debugPrint("Watch workout failed: \(error)")
+            manager.reportFailure("Watch.Recording.Failed")
+            if manager.isCollecting {
+                manager.isRunning = false
+                manager.isEnding = true
+                manager.finishCollection()
+            } else {
+                manager.failWorkoutStart()
+            }
+        }
     }
 }
 
@@ -494,7 +602,10 @@ extension WatchWorkoutManager: HKLiveWorkoutBuilderDelegate {
                 }
             }
         }
-        Task { @MainActor in manager.ingest(heartRate: newHeartRate, activeCalories: newCalories) }
+        Task { @MainActor in
+            guard manager.builder === workoutBuilder else { return }
+            manager.ingest(heartRate: newHeartRate, activeCalories: newCalories)
+        }
     }
 }
 

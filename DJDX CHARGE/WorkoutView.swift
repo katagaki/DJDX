@@ -7,6 +7,9 @@ struct WorkoutView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10.0) {
+                if !workoutManager.isCollecting {
+                    ProgressView("Watch.Recording.Starting")
+                }
                 if let startDate = workoutManager.startDate {
                     HStack(spacing: 6.0) {
                         Group {

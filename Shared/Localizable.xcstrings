@@ -1,6 +1,29 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "Sessions.Watch.AuthorizationRequired" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow workout access on Apple Watch, then retry. Your play session is still running."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watchでワークアウトへのアクセスを許可して再試行してください。セッションは継続中です。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請在 Apple Watch 上允許體能訓練存取後重試。遊玩仍在進行中。"
+          }
+        }
+      }
+    },
     "Sessions.Watch.Starting" : {
       "extractionState" : "manual",
       "localizations" : {
