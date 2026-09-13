@@ -78,7 +78,9 @@ final class IIDXSessionStore {
         guard let activeSession else { return }
         let id = UUID().uuidString
         let captureDate = Date()
-        let filename = IIDXSessionImageStore.shared.write(imageData, id: id)
+        guard let filename = IIDXSessionImageStore.shared.write(imageData, id: id) else {
+            return
+        }
         IIDXLiveResultAccumulator.shared.stage(staged, for: id)
         let play = IIDXCapturedPlay(
             id: id,
@@ -88,7 +90,10 @@ final class IIDXSessionStore {
             rawImageFilename: filename,
             state: .pending
         )
-        database.insertPlay(play)
+        guard database.insertPlay(play) else {
+            IIDXSessionImageStore.shared.delete(filename: filename)
+            return
+        }
         refreshPlays()
         IIDXSessionLiveActivityController.shared.refresh(sessionID: activeSession.id)
         IIDXSessionLiveActivityController.shared.pushSessionInfoToWatch(sessionID: activeSession.id)

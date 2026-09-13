@@ -36,11 +36,16 @@ final class IIDXSessionImageStore: Sendable {
     }
 
     @discardableResult
-    func write(_ imageData: Data, id: String) -> String {
+    func write(_ imageData: Data, id: String) -> String? {
         let filename = "\(id).heic"
         let encoded = Self.encode(imageData) ?? imageData
-        try? encoded.write(to: url(for: filename), options: .atomic)
-        return filename
+        do {
+            try encoded.write(to: url(for: filename), options: .atomic)
+            return filename
+        } catch {
+            debugPrint("Failed to write session image: \(error)")
+            return nil
+        }
     }
 
     static func encode(_ imageData: Data) -> Data? {

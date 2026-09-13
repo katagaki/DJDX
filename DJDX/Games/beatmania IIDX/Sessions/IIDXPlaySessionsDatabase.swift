@@ -172,16 +172,27 @@ final class IIDXPlaySessionsDatabase: Sendable {
         }
     }
 
-    func deleteSession(id: String) {
-        if let workoutUUID = session(id: id)?.workoutUUID {
+    @discardableResult
+    func deleteSession(id: String) -> Bool {
+        let session = session(id: id)
+        let capturedPlays = plays(forSession: id)
+        guard let database = try? getWriteConnection() else { return false }
+        do {
+            try database.transaction {
+                try database.run(Self.playTable.filter(Self.pSessionID == id).delete())
+                try database.run(Self.sessionTable.filter(Self.sID == id).delete())
+            }
+        } catch {
+            debugPrint("Failed to delete session: \(error)")
+            return false
+        }
+        if let workoutUUID = session?.workoutUUID {
             IIDXSessionWorkoutBridge.dismissWorkoutUUID(workoutUUID)
         }
-        for play in plays(forSession: id) {
+        for play in capturedPlays {
             IIDXSessionImageStore.shared.delete(filename: play.rawImageFilename)
         }
-        guard let database = try? getWriteConnection() else { return }
-        try? database.run(Self.playTable.filter(Self.pSessionID == id).delete())
-        try? database.run(Self.sessionTable.filter(Self.sID == id).delete())
+        return true
     }
 
     func activeSession() -> IIDXPlaySession? {
@@ -207,9 +218,16 @@ final class IIDXPlaySessionsDatabase: Sendable {
 
     // MARK: - Play CRUD
 
-    func insertPlay(_ play: IIDXCapturedPlay) {
-        guard let database = try? getWriteConnection() else { return }
-        try? database.run(Self.playTable.insert(or: .replace, setters(for: play)))
+    @discardableResult
+    func insertPlay(_ play: IIDXCapturedPlay) -> Bool {
+        guard let database = try? getWriteConnection() else { return false }
+        do {
+            try database.run(Self.playTable.insert(or: .replace, setters(for: play)))
+            return true
+        } catch {
+            debugPrint("Failed to insert captured play: \(error)")
+            return false
+        }
     }
 
     func updatePlay(_ play: IIDXCapturedPlay) {
@@ -253,12 +271,20 @@ final class IIDXPlaySessionsDatabase: Sendable {
         return rows.map { Self.play(from: $0) }
     }
 
-    func deletePlay(id: String) {
-        if let play = play(id: id) {
-            IIDXSessionImageStore.shared.delete(filename: play.rawImageFilename)
+    @discardableResult
+    func deletePlay(id: String) -> Bool {
+        let capturedPlay = play(id: id)
+        guard let database = try? getWriteConnection() else { return false }
+        do {
+            try database.run(Self.playTable.filter(Self.pID == id).delete())
+        } catch {
+            debugPrint("Failed to delete captured play: \(error)")
+            return false
         }
-        guard let database = try? getWriteConnection() else { return }
-        try? database.run(Self.playTable.filter(Self.pID == id).delete())
+        if let capturedPlay {
+            IIDXSessionImageStore.shared.delete(filename: capturedPlay.rawImageFilename)
+        }
+        return true
     }
 
     // MARK: - Row mapping
