@@ -103,6 +103,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+        AAE100013001000000000001 /* Watch Info.plist */ = {
+            isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+            membershipExceptions = (Info.plist, );
+            target = E4449F142FE17495003AC8B6 /* DJDX CHARGE */;
+        };
 		AA00000130010000000000E1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -143,7 +148,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AA000001300100000000000E /* Widgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AA00000130010000000000E1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Widgets; sourceTree = "<group>"; };
-		E4449F162FE17495003AC8B6 /* DJDX CHARGE */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "DJDX CHARGE"; sourceTree = "<group>"; };
+		E4449F162FE17495003AC8B6 /* DJDX CHARGE */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AAE100013001000000000001 /* Watch Info.plist */, ); explicitFileTypes = {}; explicitFolders = (); path = "DJDX CHARGE"; sourceTree = "<group>"; };
 		E4B2630B2E79986D0031A646 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4449F392FE18674003AC8B6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, E4BF6DBF2FE8223700D0E9D0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 		E4B2636E2E7998840031A646 /* DJDX */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4B263BC2E7998840031A646 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DJDX; sourceTree = "<group>"; };
 		E4BF6DAB2FE821DD00D0E9D0 /* DJDX CHARGE Widgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4BF6DBC2FE821DE00D0E9D0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "DJDX CHARGE Widgets"; sourceTree = "<group>"; };
@@ -569,7 +574,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKBackgroundModes = "workout-processing";
+				INFOPLIST_FILE = "DJDX CHARGE/Info.plist";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.DJDX;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -605,7 +610,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKBackgroundModes = "workout-processing";
+				INFOPLIST_FILE = "DJDX CHARGE/Info.plist";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.DJDX;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
