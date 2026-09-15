@@ -37,3 +37,35 @@ final class BackgroundTaskCompletion: @unchecked Sendable {
         task.setTaskCompleted(success: success)
     }
 }
+
+struct PhaseTimer {
+
+    private let start = ContinuousClock.now
+    private var last = ContinuousClock.now
+    private var phases: [String] = []
+
+    mutating func mark(_ name: String, bytes: Int64 = 0) {
+        let now = ContinuousClock.now
+        let seconds = Double((last.duration(to: now)).components.seconds)
+            + Double((last.duration(to: now)).components.attoseconds) / 1e18
+        last = now
+        if bytes > 0 {
+            let megabytes = Double(bytes) / 1_048_576.0
+            phases.append(String(format: "%@ %.1fs (%.1f MB, %.1f MB/s)",
+                                 name, seconds, megabytes, seconds > 0 ? megabytes / seconds : 0))
+        } else {
+            phases.append(String(format: "%@ %.1fs", name, seconds))
+        }
+    }
+
+    func summarize() {
+        let total = start.duration(to: .now)
+        let seconds = Double(total.components.seconds)
+            + Double(total.components.attoseconds) / 1e18
+        let breakdown = phases.joined(separator: ", ")
+        let totalText = String(format: "%.1fs", seconds)
+        ICloudBackupManager.logger.log(
+            "Backup phases: \(breakdown, privacy: .public) | total \(totalText, privacy: .public)"
+        )
+    }
+}

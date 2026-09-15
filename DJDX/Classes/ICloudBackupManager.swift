@@ -89,6 +89,13 @@ enum ICloudBackupManager {
         }.value
     }
 
+    static func fileSize(of url: URL) -> Int64 {
+        let values = try? url.resourceValues(
+            forKeys: [.totalFileAllocatedSizeKey, .fileAllocatedSizeKey]
+        )
+        return Int64(values?.totalFileAllocatedSize ?? values?.fileAllocatedSize ?? 0)
+    }
+
     static func failureDetail(for error: Error) -> String {
         switch error {
         case BackupError.iCloudUnavailable:
@@ -121,8 +128,10 @@ enum ICloudBackupManager {
 
         writeDefaultsSnapshot(to: containerURL)
 
+        var phase = PhaseTimer()
         let stagingDirectory = try await stagedCopy(of: containerURL, using: fileManager)
         defer { try? fileManager.removeItem(at: stagingDirectory) }
+        phase.mark("stage")
 
         let stagingURL = fileManager.temporaryDirectory
             .appendingPathComponent("DJDXBackup-\(UUID().uuidString)")
@@ -131,6 +140,7 @@ enum ICloudBackupManager {
         try Task.checkCancellation()
         try ZipArchive.zip(directoryAt: stagingDirectory, to: stagingURL)
         try? fileManager.removeItem(at: stagingDirectory)
+        phase.mark("zip", bytes: fileSize(of: stagingURL))
         try Task.checkCancellation()
 
         let backupDate = Date.now
@@ -139,6 +149,8 @@ enum ICloudBackupManager {
             try fileManager.removeItem(at: archiveURL)
         }
         try fileManager.moveItem(at: stagingURL, to: archiveURL)
+        phase.mark("handoff")
+        phase.summarize()
 
         let timestampURL = backupFolder.appendingPathComponent("LastBackup")
         let timestamp = ISO8601DateFormatter().string(from: backupDate)
