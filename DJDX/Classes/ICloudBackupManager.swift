@@ -12,6 +12,15 @@ enum ICloudBackupManager {
     static let restorePromptCompletedKey = "ICloudBackup.RestorePromptCompleted"
 
     static let defaultsSnapshotName = "StandardDefaults.plist"
+    static let dataArchiveName = "Data.zip"
+    static let imagesArchiveName = "Images.zip"
+    static let imagesManifestKey = "ICloudBackup.ImagesManifest"
+
+    static var sessionImagesURL: URL {
+        SharedContainer.containerURL
+            .appendingPathComponent("Sessions", isDirectory: true)
+            .appendingPathComponent("Images", isDirectory: true)
+    }
 
     private static let operationCoordinator = BackupOperationCoordinator()
 
@@ -129,7 +138,11 @@ enum ICloudBackupManager {
         writeDefaultsSnapshot(to: containerURL)
 
         var phase = PhaseTimer()
-        let stagingDirectory = try await stagedCopy(of: containerURL, using: fileManager)
+        let stagingDirectory = try await stagedCopy(
+            of: containerURL,
+            using: fileManager,
+            excludingSessionImages: true
+        )
         defer { try? fileManager.removeItem(at: stagingDirectory) }
         phase.mark("stage")
 
@@ -144,12 +157,15 @@ enum ICloudBackupManager {
         try Task.checkCancellation()
 
         let backupDate = Date.now
-        let archiveURL = backupFolder.appendingPathComponent("Data.zip")
+        let archiveURL = backupFolder.appendingPathComponent(dataArchiveName)
         if fileManager.fileExists(atPath: archiveURL.path) {
             try fileManager.removeItem(at: archiveURL)
         }
         try fileManager.moveItem(at: stagingURL, to: archiveURL)
         phase.mark("handoff")
+
+        let rebuiltImages = try updateImagesArchive(in: backupFolder, using: fileManager)
+        phase.mark(rebuiltImages ? "images" : "images (unchanged)")
         phase.summarize()
 
         let timestampURL = backupFolder.appendingPathComponent("LastBackup")
@@ -194,7 +210,7 @@ enum ICloudBackupManager {
         try await Task.detached(priority: .userInitiated) {
             let fileManager = FileManager.default
             let backupFolder = try backupFolderURL(in: fileManager)
-            let archiveURL = backupFolder.appendingPathComponent("Data.zip")
+            let archiveURL = backupFolder.appendingPathComponent(dataArchiveName)
             onProgress(10)
             guard await ensureDownloaded(archiveURL, timeout: 600.0) else {
                 throw BackupError.downloadTimedOut
@@ -208,14 +224,7 @@ enum ICloudBackupManager {
             try ZipArchive.unzip(fileAt: archiveURL, to: extractionURL)
             onProgress(90)
 
-            var restoreRootURL = extractionURL
-            let extractedItems = try fileManager.contentsOfDirectory(
-                at: extractionURL, includingPropertiesForKeys: [.isDirectoryKey]
-            )
-            if extractedItems.count == 1,
-               (try? extractedItems[0].resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true {
-                restoreRootURL = extractedItems[0]
-            }
+            let restoreRootURL = try unwrappedRoot(of: extractionURL, using: fileManager)
             for item in try fileManager.contentsOfDirectory(
                 at: restoreRootURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles
             ) {
@@ -225,6 +234,9 @@ enum ICloudBackupManager {
                 }
                 try fileManager.moveItem(at: item, to: destinationURL)
             }
+            try await restoreImagesArchive(
+                from: backupFolder, to: containerURL, using: fileManager
+            )
             applyDefaultsSnapshot(from: containerURL)
             // A pre-334 backup has the old flat layout (e.g. Qpro.png at the root, no Images/).
             DataMigration.moveImages(from: containerURL, to: SharedContainer.imagesURL)
@@ -235,31 +247,6 @@ enum ICloudBackupManager {
 }
 
 extension ICloudBackupManager {
-
-    // MARK: Settings Snapshot
-
-    private static func writeDefaultsSnapshot(to containerURL: URL) {
-        guard let bundleID = Bundle.main.bundleIdentifier,
-              let domain = UserDefaults.standard.persistentDomain(forName: bundleID),
-              let data = try? PropertyListSerialization.data(
-                fromPropertyList: domain, format: .binary, options: 0
-              ) else { return }
-        try? data.write(
-            to: containerURL.appendingPathComponent(defaultsSnapshotName),
-            options: .atomic
-        )
-    }
-
-    private static func applyDefaultsSnapshot(from containerURL: URL) {
-        let snapshotURL = containerURL.appendingPathComponent(defaultsSnapshotName)
-        guard let data = try? Data(contentsOf: snapshotURL),
-              let domain = try? PropertyListSerialization.propertyList(
-                from: data, options: [], format: nil
-              ) as? [String: Any] else { return }
-        for (key, value) in domain {
-            UserDefaults.standard.set(value, forKey: key)
-        }
-    }
 
     // MARK: Staging
 
@@ -273,7 +260,8 @@ extension ICloudBackupManager {
         writeDefaultsSnapshot(to: SharedContainer.containerURL)
         let stagingDirectory = try await stagedCopy(
             of: SharedContainer.containerURL,
-            using: fileManager
+            using: fileManager,
+            excludingSessionImages: false
         )
         defer { try? fileManager.removeItem(at: stagingDirectory) }
         try ZipArchive.zip(directoryAt: stagingDirectory, to: archiveURL)
@@ -296,7 +284,8 @@ extension ICloudBackupManager {
 
     private static func stagedCopy(
         of containerURL: URL,
-        using fileManager: FileManager
+        using fileManager: FileManager,
+        excludingSessionImages: Bool
     ) async throws -> URL {
         let stagingURL = fileManager.temporaryDirectory
             .appendingPathComponent("DJDXStaging-\(UUID().uuidString)", isDirectory: true)
@@ -306,7 +295,8 @@ extension ICloudBackupManager {
                 from: containerURL,
                 to: stagingURL,
                 rootURL: containerURL,
-                using: fileManager
+                using: fileManager,
+                excludingSessionImages: excludingSessionImages
             )
             return stagingURL
         } catch {
@@ -319,7 +309,8 @@ extension ICloudBackupManager {
         from sourceURL: URL,
         to destinationURL: URL,
         rootURL: URL,
-        using fileManager: FileManager
+        using fileManager: FileManager,
+        excludingSessionImages: Bool
     ) async throws {
         let items = try fileManager.contentsOfDirectory(
             at: sourceURL,
@@ -328,7 +319,9 @@ extension ICloudBackupManager {
         )
         for item in items {
             try Task.checkCancellation()
-            guard shouldIncludeInBackup(item, rootURL: rootURL) else { continue }
+            guard shouldIncludeInBackup(
+                item, rootURL: rootURL, excludingSessionImages: excludingSessionImages
+            ) else { continue }
 
             let destination = destinationURL.appendingPathComponent(item.lastPathComponent)
             let isDirectory = try item.resourceValues(forKeys: [.isDirectoryKey]).isDirectory == true
@@ -338,7 +331,8 @@ extension ICloudBackupManager {
                     from: item,
                     to: destination,
                     rootURL: rootURL,
-                    using: fileManager
+                    using: fileManager,
+                    excludingSessionImages: excludingSessionImages
                 )
             } else {
                 do {
@@ -350,7 +344,15 @@ extension ICloudBackupManager {
         }
     }
 
-    private static func shouldIncludeInBackup(_ url: URL, rootURL: URL) -> Bool {
+    private static func shouldIncludeInBackup(
+        _ url: URL,
+        rootURL: URL,
+        excludingSessionImages: Bool
+    ) -> Bool {
+        if excludingSessionImages,
+           url.standardizedFileURL == sessionImagesURL.standardizedFileURL {
+            return false
+        }
         guard url.deletingLastPathComponent().standardizedFileURL == rootURL.standardizedFileURL else {
             return true
         }
@@ -370,7 +372,7 @@ extension ICloudBackupManager {
             .appendingPathComponent("Backup", isDirectory: true)
     }
 
-    private static func ensureDownloaded(_ url: URL, timeout: TimeInterval) async -> Bool {
+    static func ensureDownloaded(_ url: URL, timeout: TimeInterval) async -> Bool {
         let fileManager = FileManager.default
         let deadline = Date.now.addingTimeInterval(timeout)
         while Date.now < deadline {
