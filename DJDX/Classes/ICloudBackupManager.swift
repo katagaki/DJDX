@@ -104,6 +104,7 @@ enum ICloudBackupManager {
     }
 
     static func backUp() async throws {
+        defer { PostBackupPruneBackgroundTask.schedule() }
         try await operationCoordinator.backUp()
     }
 
@@ -113,6 +114,7 @@ enum ICloudBackupManager {
 
     static func createBackup() async throws {
         let fileManager = FileManager.default
+        removeStaleWorkingFiles(using: fileManager)
         let containerURL = SharedContainer.containerURL
         let backupFolder = try backupFolderURL(in: fileManager)
         try fileManager.createDirectory(at: backupFolder, withIntermediateDirectories: true)
@@ -126,7 +128,9 @@ enum ICloudBackupManager {
             .appendingPathComponent("DJDXBackup-\(UUID().uuidString)")
             .appendingPathExtension("zip")
         defer { try? fileManager.removeItem(at: stagingURL) }
+        try Task.checkCancellation()
         try ZipArchive.zip(directoryAt: stagingDirectory, to: stagingURL)
+        try? fileManager.removeItem(at: stagingDirectory)
         try Task.checkCancellation()
 
         let backupDate = Date.now
@@ -142,7 +146,6 @@ enum ICloudBackupManager {
 
         UserDefaults.standard.set(backupDate.timeIntervalSince1970, forKey: lastBackupDateKey)
         UserDefaults.standard.set(true, forKey: restorePromptCompletedKey)
-        PostBackupPruneBackgroundTask.schedule()
     }
 
     // MARK: Export
@@ -250,7 +253,7 @@ extension ICloudBackupManager {
 
     static func createExportArchive() async throws -> URL {
         let fileManager = FileManager.default
-        removeStaleExportDirectories(using: fileManager)
+        removeStaleWorkingFiles(using: fileManager)
         let exportDirectory = fileManager.temporaryDirectory
             .appendingPathComponent("Export-\(UUID().uuidString)", isDirectory: true)
         try fileManager.createDirectory(at: exportDirectory, withIntermediateDirectories: true)
@@ -266,11 +269,15 @@ extension ICloudBackupManager {
         return archiveURL
     }
 
-    private static func removeStaleExportDirectories(using fileManager: FileManager) {
+    static let workingFilePrefixes = ["Export-", "DJDXStaging-", "DJDXBackup-", "DJDXRestore-"]
+
+    static func removeStaleWorkingFiles(using fileManager: FileManager) {
         guard let items = try? fileManager.contentsOfDirectory(
             at: fileManager.temporaryDirectory, includingPropertiesForKeys: nil
         ) else { return }
-        for item in items where item.lastPathComponent.hasPrefix("Export-") {
+        for item in items {
+            let name = item.lastPathComponent
+            guard workingFilePrefixes.contains(where: { name.hasPrefix($0) }) else { continue }
             try? fileManager.removeItem(at: item)
         }
     }
@@ -322,7 +329,11 @@ extension ICloudBackupManager {
                     using: fileManager
                 )
             } else {
-                try fileManager.copyItem(at: item, to: destination)
+                do {
+                    try fileManager.linkItem(at: item, to: destination)
+                } catch {
+                    try fileManager.copyItem(at: item, to: destination)
+                }
             }
         }
     }

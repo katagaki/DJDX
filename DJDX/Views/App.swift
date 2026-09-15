@@ -32,6 +32,7 @@ struct DJDXApp: App {
         ICloudBackupManager.registerBackgroundTask()
         PostBackupPruneBackgroundTask.register()
         ICloudBackupManager.scheduleNextBackup()
+        ICloudBackupManager.removeStaleWorkingFiles(using: .default)
         IIDXSessionOCRBackgroundTask.register()
         Task {
             await IIDXSessionCaptureProcessor.shared.recover()
