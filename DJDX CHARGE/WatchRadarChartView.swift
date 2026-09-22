@@ -184,14 +184,6 @@ struct WatchRadarChartView: View {
                     .stroke(Color.gray.opacity(0.3), style: StrokeStyle(lineWidth: 0.5, dash: [3]))
                     .frame(width: size, height: size)
 
-                WatchRadarPolygonShape(points: points, maxValue: maxValue)
-                    .fill(color.opacity(0.5))
-                    .frame(width: size, height: size)
-
-                WatchRadarPolygonShape(points: points, maxValue: maxValue)
-                    .stroke(color, lineWidth: 1.5)
-                    .frame(width: size, height: size)
-
                 if showLabels {
                     let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
                     let radius = size / 2
@@ -212,6 +204,14 @@ struct WatchRadarChartView: View {
                             .position(x: tipX, y: tipY)
                     }
                 }
+
+                WatchRadarPolygonShape(points: points, maxValue: maxValue)
+                    .fill(color.opacity(0.5))
+                    .frame(width: size, height: size)
+
+                WatchRadarPolygonShape(points: points, maxValue: maxValue)
+                    .stroke(color, lineWidth: 1.5)
+                    .frame(width: size, height: size)
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
         }

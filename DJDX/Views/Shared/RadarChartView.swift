@@ -33,14 +33,6 @@ struct RadarChartView: View {
                     .stroke(Color.gray.opacity(0.4), style: StrokeStyle(lineWidth: 1, dash: [4]))
                     .frame(width: size, height: size)
 
-                ZStack {
-                    RadarPolygonShape(configs: points, maxValue: maxValue)
-                        .fill(color.opacity(0.5))
-                    RadarPolygonShape(configs: points, maxValue: maxValue)
-                        .stroke(color, lineWidth: lineWidth)
-                }
-                .frame(width: size, height: size)
-
                 ForEach(0..<points.count, id: \.self) { index in
                     let config = points[index]
                     let tipX = center.x + radius * CGFloat(cos(config.angle))
@@ -61,6 +53,14 @@ struct RadarChartView: View {
                         )
                         .position(x: tipX, y: tipY)
                 }
+
+                ZStack {
+                    RadarPolygonShape(configs: points, maxValue: maxValue)
+                        .fill(color.opacity(0.5))
+                    RadarPolygonShape(configs: points, maxValue: maxValue)
+                        .stroke(color, lineWidth: lineWidth)
+                }
+                .frame(width: size, height: size)
             }
         }
     }
