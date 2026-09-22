@@ -15,6 +15,7 @@ struct MoreMenu: View {
 
     @State var isPresentingExternalDataSources: Bool = false
     @State var isPresentingICloudBackup: Bool = false
+    @State var isPresentingRadarMaker: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingResetLayout: Bool = false
     @State var isPromptingScoreDeleteCode: Bool = false
@@ -67,6 +68,9 @@ struct MoreMenu: View {
                         }
                     }
                 }
+                Button("More.RadarMaker.Header", systemImage: "hexagon") {
+                    isPresentingRadarMaker = true
+                }
             }
             Section("More.ManageData.Header") {
                 Button("More.ManageData.Backup", systemImage: "icloud") {
@@ -108,6 +112,11 @@ struct MoreMenu: View {
         .sheet(isPresented: $isPresentingICloudBackup) {
             NavigationStack {
                 MoreICloudBackup()
+            }
+        }
+        .sheet(isPresented: $isPresentingRadarMaker) {
+            NavigationStack {
+                MoreRadarMaker()
             }
         }
         .alert("Alert.DeleteData.Web.Title", isPresented: $isConfirmingWebDataDelete) {

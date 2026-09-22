@@ -15,6 +15,13 @@ struct RadarChartView: View {
         self.lineWidth = lineWidth
     }
 
+    init(_ data: RadarData, color: Color, labelFontSize: CGFloat = 12.0, lineWidth: CGFloat = 2.0) {
+        self.color = color
+        self.points = data.points()
+        self.labelFontSize = labelFontSize
+        self.lineWidth = lineWidth
+    }
+
     var body: some View {
         GeometryReader { geometry in
             let size = min(geometry.size.width - 30.0, geometry.size.height - 30.0)
