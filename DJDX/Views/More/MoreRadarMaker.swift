@@ -64,6 +64,7 @@ struct MoreRadarMaker: View {
                 }
                 .pickerStyle(.segmented)
                 .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 12.0, leading: 16.0, bottom: 0.0, trailing: 16.0))
                 colorCarousel()
             } header: {
                 Text("More.RadarMaker.Color")
@@ -153,10 +154,10 @@ struct MoreRadarMaker: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.vertical, 12.0)
+            .padding(.vertical, 8.0)
             .padding(.horizontal, 8.0)
         }
-        .listRowInsets(EdgeInsets(top: 0.0, leading: 16.0, bottom: 0.0, trailing: 16.0))
+        .listRowInsets(EdgeInsets(top: 0.0, leading: 16.0, bottom: 4.0, trailing: 16.0))
     }
 
     @ViewBuilder
