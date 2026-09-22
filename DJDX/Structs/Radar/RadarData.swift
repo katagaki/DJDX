@@ -68,11 +68,16 @@ struct RadarData {
         return [self.notes, self.peak, self.scratch, self.soflan, self.charge, self.chord].reduce(0, +)
     }
 
+    func highestPoint() -> RadarPointConfig? {
+        return displayPoints().max { $0.value < $1.value }
+    }
+
     func color(isPlayerRadar: Bool = false) -> Color {
+        if isPlayerRadar {
+            return highestPoint()?.color ?? .cyan
+        }
         let sum = self.sum()
-        if isPlayerRadar && sum > 800.0 {
-            return .green
-        } else if sum > 600.0 {
+        if sum > 600.0 {
             return .purple
         } else if sum > 400.0 {
             return .red

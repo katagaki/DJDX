@@ -9,6 +9,15 @@ private let radarLayout: [(index: Int, angle: Double)] = [
     (2, -.pi / 6)      // PEAK
 ]
 
+private let radarSpokeColors: [Color] = [
+    .init(red: 1.0, green: 64 / 255, blue: 235 / 255),      // NOTES
+    .init(red: 133 / 255, green: 225 / 255, blue: 0 / 255), // CHORD
+    .init(red: 1.0, green: 108 / 255, blue: 0 / 255),       // PEAK
+    .init(red: 137 / 255, green: 87 / 255, blue: 221 / 255), // CHARGE
+    .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255),   // SCRATCH
+    .init(red: 0 / 255, green: 134 / 255, blue: 229 / 255)  // SOF-LAN
+]
+
 struct ComplicationRadarShape: Shape {
     let values: [Double]
     let maxValue: Double
@@ -57,12 +66,11 @@ struct ComplicationRadarView: View {
     private let benchmarkValue: Double = 100.0
 
     private var color: Color {
-        let sum = values.reduce(0, +)
-        if sum > 800.0 { return .green
-        } else if sum > 600.0 { return .purple
-        } else if sum > 400.0 { return .red
-        } else if sum > 200.0 { return .yellow
-        } else { return .cyan }
+        let highest = radarLayout
+            .map { (index: $0.index, value: $0.index < values.count ? values[$0.index] : 0) }
+            .max { $0.value < $1.value }
+        guard let highest else { return .cyan }
+        return radarSpokeColors[highest.index]
     }
 
     var body: some View {
