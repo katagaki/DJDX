@@ -153,8 +153,8 @@ struct MoreRadarMaker: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.vertical, 8.0)
-            .padding(.horizontal, 4.0)
+            .padding(.vertical, 12.0)
+            .padding(.horizontal, 8.0)
         }
         .listRowInsets(EdgeInsets(top: 0.0, leading: 16.0, bottom: 0.0, trailing: 16.0))
     }
@@ -201,22 +201,11 @@ struct MoreRadarMaker: View {
 
     @ViewBuilder
     func exportableRadar() -> some View {
-        VStack(spacing: 8.0) {
-            RadarChartView(radarData, color: selectedColor, labelFontSize: 14.0, lineWidth: 2.5)
-                .frame(width: 480.0, height: 380.0)
-            HStack {
-                Text("More.NotesRadar.Total")
-                Spacer()
-                Text(verbatim: String(format: "%.2f", radarData.sum()))
-                    .monospacedDigit()
-            }
-            .font(.system(size: 14.0, weight: .bold))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 24.0)
-        }
-        .padding(24.0)
-        .background(Color.black)
-        .environment(\.colorScheme, .dark)
+        RadarChartView(radarData, color: selectedColor, labelFontSize: 14.0, lineWidth: 2.5)
+            .frame(width: 480.0, height: 380.0)
+            .padding(24.0)
+            .background(Color.black)
+            .environment(\.colorScheme, .dark)
     }
 }
 
