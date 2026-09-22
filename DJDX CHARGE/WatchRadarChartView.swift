@@ -68,7 +68,7 @@ struct WatchRadarPolygonShape: Shape {
         let center = CGPoint(x: rect.midX, y: rect.midY)
         let maxRadius = min(rect.width, rect.height) / 2
         for (index, point) in points.enumerated() {
-            let normalizedValue = min(max(point.value / maxValue, 0), 1)
+            let normalizedValue = max(point.value / maxValue, 0)
             let pointRadius = maxRadius * CGFloat(normalizedValue)
             let xPt = center.x + pointRadius * CGFloat(cos(point.angle))
             let yPt = center.y + pointRadius * CGFloat(sin(point.angle))

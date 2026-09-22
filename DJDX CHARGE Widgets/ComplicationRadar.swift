@@ -28,7 +28,7 @@ struct ComplicationRadarShape: Shape {
         let maxRadius = min(rect.width, rect.height) / 2
         for (offset, entry) in radarLayout.enumerated() {
             let value = entry.index < values.count ? values[entry.index] : 0
-            let radius = maxRadius * CGFloat(min(max(value / maxValue, 0), 1))
+            let radius = maxRadius * CGFloat(max(value / maxValue, 0))
             let point = CGPoint(
                 x: center.x + radius * CGFloat(cos(entry.angle)),
                 y: center.y + radius * CGFloat(sin(entry.angle))

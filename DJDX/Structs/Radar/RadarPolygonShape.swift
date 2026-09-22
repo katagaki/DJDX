@@ -10,7 +10,7 @@ struct RadarPolygonShape: Shape {
         let maxRadius = min(rect.width, rect.height) / 2
 
         for (index, config) in configs.enumerated() {
-            let normalizedValue = min(max(config.value / maxValue, 0), 1)
+            let normalizedValue = max(config.value / maxValue, 0)
             let pointRadius = maxRadius * CGFloat(normalizedValue)
             let xPt = center.x + pointRadius * CGFloat(cos(config.angle))
             let yPt = center.y + pointRadius * CGFloat(sin(config.angle))
