@@ -157,7 +157,7 @@ struct MoreRadarMaker: View {
             .padding(.vertical, 8.0)
             .padding(.horizontal, 8.0)
         }
-        .listRowInsets(EdgeInsets(top: 0.0, leading: 16.0, bottom: 4.0, trailing: 16.0))
+        .listRowInsets(EdgeInsets(top: 0.0, leading: 16.0, bottom: 14.0, trailing: 16.0))
     }
 
     @ViewBuilder
