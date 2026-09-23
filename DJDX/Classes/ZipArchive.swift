@@ -6,38 +6,9 @@ enum ZipArchive {
     enum ZipArchiveError: Error {
         case invalidArchive
         case unsupportedEntry
+        case compressionFailed
         case decompressionFailed
         case invalidEntryPath
-    }
-
-    static func zip(directoryAt sourceURL: URL, to destinationURL: URL) throws {
-        let fileManager = FileManager.default
-        var coordinatorError: NSError?
-        var operationError: Error?
-        NSFileCoordinator().coordinate(
-            readingItemAt: sourceURL,
-            options: .forUploading,
-            error: &coordinatorError
-        ) { zippedURL in
-            do {
-                try fileManager.createDirectory(
-                    at: destinationURL.deletingLastPathComponent(),
-                    withIntermediateDirectories: true
-                )
-                if fileManager.fileExists(atPath: destinationURL.path) {
-                    try fileManager.removeItem(at: destinationURL)
-                }
-                try fileManager.copyItem(at: zippedURL, to: destinationURL)
-            } catch {
-                operationError = error
-            }
-        }
-        if let coordinatorError {
-            throw coordinatorError
-        }
-        if let operationError {
-            throw operationError
-        }
     }
 
     static func unzip(fileAt archiveURL: URL, to destinationURL: URL) throws {

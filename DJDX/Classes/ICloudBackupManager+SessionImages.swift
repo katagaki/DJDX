@@ -21,7 +21,7 @@ extension ICloudBackupManager {
             .appendingPathExtension("zip")
         defer { try? fileManager.removeItem(at: stagingURL) }
         try Task.checkCancellation()
-        try ZipArchive.zip(directoryAt: imagesURL, to: stagingURL)
+        try ZipArchive.zip(directoryAt: imagesURL, to: stagingURL, rootName: "Images")
 
         if fileManager.fileExists(atPath: archiveURL.path) {
             try fileManager.removeItem(at: archiveURL)

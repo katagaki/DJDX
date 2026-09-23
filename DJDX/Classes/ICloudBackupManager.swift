@@ -14,6 +14,7 @@ enum ICloudBackupManager {
     static let defaultsSnapshotName = "StandardDefaults.plist"
     static let dataArchiveName = "Data.zip"
     static let imagesArchiveName = "Images.zip"
+    static let archiveRootName = "DJDX Backup"
     static let imagesManifestKey = "ICloudBackup.ImagesManifest"
 
     static var sessionImagesURL: URL {
@@ -138,21 +139,13 @@ enum ICloudBackupManager {
         writeDefaultsSnapshot(to: containerURL)
 
         var phase = PhaseTimer()
-        let stagingDirectory = try await stagedCopy(
-            of: containerURL,
-            using: fileManager,
-            excludingSessionImages: true
-        )
-        defer { try? fileManager.removeItem(at: stagingDirectory) }
-        phase.mark("stage")
-
         let stagingURL = fileManager.temporaryDirectory
             .appendingPathComponent("DJDXBackup-\(UUID().uuidString)")
             .appendingPathExtension("zip")
         defer { try? fileManager.removeItem(at: stagingURL) }
-        try Task.checkCancellation()
-        try ZipArchive.zip(directoryAt: stagingDirectory, to: stagingURL)
-        try? fileManager.removeItem(at: stagingDirectory)
+        try ZipArchive.zip(directoryAt: containerURL, to: stagingURL, rootName: archiveRootName) {
+            shouldIncludeInBackup($0, rootURL: containerURL, excludingSessionImages: true)
+        }
         phase.mark("zip", bytes: fileSize(of: stagingURL))
         try Task.checkCancellation()
 
@@ -256,15 +249,12 @@ extension ICloudBackupManager {
         let exportDirectory = fileManager.temporaryDirectory
             .appendingPathComponent("Export-\(UUID().uuidString)", isDirectory: true)
         try fileManager.createDirectory(at: exportDirectory, withIntermediateDirectories: true)
-        let archiveURL = exportDirectory.appendingPathComponent("DJDX Backup.zip")
-        writeDefaultsSnapshot(to: SharedContainer.containerURL)
-        let stagingDirectory = try await stagedCopy(
-            of: SharedContainer.containerURL,
-            using: fileManager,
-            excludingSessionImages: false
-        )
-        defer { try? fileManager.removeItem(at: stagingDirectory) }
-        try ZipArchive.zip(directoryAt: stagingDirectory, to: archiveURL)
+        let archiveURL = exportDirectory.appendingPathComponent("\(archiveRootName).zip")
+        let containerURL = SharedContainer.containerURL
+        writeDefaultsSnapshot(to: containerURL)
+        try ZipArchive.zip(directoryAt: containerURL, to: archiveURL, rootName: archiveRootName) {
+            shouldIncludeInBackup($0, rootURL: containerURL, excludingSessionImages: false)
+        }
         try Task.checkCancellation()
         return archiveURL
     }
@@ -279,68 +269,6 @@ extension ICloudBackupManager {
             let name = item.lastPathComponent
             guard workingFilePrefixes.contains(where: { name.hasPrefix($0) }) else { continue }
             try? fileManager.removeItem(at: item)
-        }
-    }
-
-    private static func stagedCopy(
-        of containerURL: URL,
-        using fileManager: FileManager,
-        excludingSessionImages: Bool
-    ) async throws -> URL {
-        let stagingURL = fileManager.temporaryDirectory
-            .appendingPathComponent("DJDXStaging-\(UUID().uuidString)", isDirectory: true)
-        try fileManager.createDirectory(at: stagingURL, withIntermediateDirectories: true)
-        do {
-            try await copyBackupItems(
-                from: containerURL,
-                to: stagingURL,
-                rootURL: containerURL,
-                using: fileManager,
-                excludingSessionImages: excludingSessionImages
-            )
-            return stagingURL
-        } catch {
-            try? fileManager.removeItem(at: stagingURL)
-            throw error
-        }
-    }
-
-    private static func copyBackupItems(
-        from sourceURL: URL,
-        to destinationURL: URL,
-        rootURL: URL,
-        using fileManager: FileManager,
-        excludingSessionImages: Bool
-    ) async throws {
-        let items = try fileManager.contentsOfDirectory(
-            at: sourceURL,
-            includingPropertiesForKeys: [.isDirectoryKey],
-            options: [.skipsHiddenFiles]
-        )
-        for item in items {
-            try Task.checkCancellation()
-            guard shouldIncludeInBackup(
-                item, rootURL: rootURL, excludingSessionImages: excludingSessionImages
-            ) else { continue }
-
-            let destination = destinationURL.appendingPathComponent(item.lastPathComponent)
-            let isDirectory = try item.resourceValues(forKeys: [.isDirectoryKey]).isDirectory == true
-            if isDirectory {
-                try fileManager.createDirectory(at: destination, withIntermediateDirectories: true)
-                try await copyBackupItems(
-                    from: item,
-                    to: destination,
-                    rootURL: rootURL,
-                    using: fileManager,
-                    excludingSessionImages: excludingSessionImages
-                )
-            } else {
-                do {
-                    try fileManager.linkItem(at: item, to: destination)
-                } catch {
-                    try fileManager.copyItem(at: item, to: destination)
-                }
-            }
         }
     }
 
