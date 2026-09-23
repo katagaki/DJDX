@@ -119,9 +119,11 @@ struct MoreICloudBackup: View {
 
     func backUpNow() {
         isBackingUp = true
+        UIApplication.shared.isIdleTimerDisabled = true
         Task {
             let failureDetail = await ICloudBackupManager.performBackup()
             isBackingUp = false
+            UIApplication.shared.isIdleTimerDisabled = isPreparingExport
             if let failureDetail {
                 backupFailureDetail = failureDetail
                 isBackupFailed = true
@@ -131,9 +133,11 @@ struct MoreICloudBackup: View {
 
     func exportNow() {
         isPreparingExport = true
+        UIApplication.shared.isIdleTimerDisabled = true
         Task {
             let archiveURL = await ICloudBackupManager.exportArchive()
             isPreparingExport = false
+            UIApplication.shared.isIdleTimerDisabled = isBackingUp
             if let archiveURL {
                 exportedArchive = ExportedArchive(url: archiveURL)
             } else {
