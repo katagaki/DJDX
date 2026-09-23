@@ -49,8 +49,8 @@ struct MoreRadarMaker: View {
         List {
             Section {
                 RadarChartView(radarData, color: selectedColor)
-                    .frame(height: 240.0)
-                    .padding(.vertical, 8.0)
+                    .frame(height: 220.0)
+                    .padding(.vertical, 40.0)
                     .listRowBackground(Color.clear)
             }
             Section {
@@ -204,7 +204,8 @@ struct MoreRadarMaker: View {
     func exportableRadar() -> some View {
         RadarChartView(radarData, color: selectedColor, labelFontSize: 14.0, lineWidth: 2.5)
             .frame(width: 480.0, height: 380.0)
-            .padding(24.0)
+            .padding(.horizontal, 24.0)
+            .padding(.vertical, 110.0)
             .background(Color.black)
             .environment(\.colorScheme, .dark)
     }
