@@ -7,11 +7,17 @@ struct OverviewClearTypeOverallGraph: View {
 
     @State var isInteractive: Bool = false
     var isHorizontal: Bool = false
+    var levelLimit: Int?
 
     var populatedDifficulties: [Int] {
         graphData.filter { _, counts in
             counts.values.contains(where: { $0 > 0 })
         }.keys.sorted()
+    }
+
+    var shownDifficulties: [Int] {
+        guard let levelLimit else { return populatedDifficulties }
+        return Array(populatedDifficulties.suffix(levelLimit))
     }
 
     var levelDomain: ClosedRange<Double> {
@@ -87,7 +93,7 @@ struct OverviewClearTypeOverallGraph: View {
 
     @ViewBuilder
     var horizontalChart: some View {
-        Chart(populatedDifficulties, id: \.self) { difficulty in
+        Chart(shownDifficulties, id: \.self) { difficulty in
             ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
                 let count = graphData[difficulty]![clearType]!
                 BarMark(
@@ -103,7 +109,7 @@ struct OverviewClearTypeOverallGraph: View {
                 AxisValueLabel()
             }
         }
-        .chartYScale(domain: populatedDifficulties.map { "\($0)" })
+        .chartYScale(domain: shownDifficulties.map { "\($0)" })
         .chartForegroundStyleScale(clearTypeColorScale)
     }
 }

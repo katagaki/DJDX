@@ -98,7 +98,8 @@ struct AnalyticsView: View {
             } label: {
                 AnalyticsCardView(cardType: .clearTypeOverall, showsHeader: false) {
                     OverviewClearTypeOverallGraph(graphData: .constant(model.clearTypePerDifficulty),
-                                                  isHorizontal: true)
+                                                  isHorizontal: true,
+                                                  levelLimit: 3)
                         .chartLegend(.hidden)
                         .chartXAxis(.hidden)
                 }
@@ -113,7 +114,7 @@ struct AnalyticsView: View {
                 }
             } label: {
                 AnalyticsCardView(cardType: .gradeBreakdown, showsHeader: false) {
-                    let counts = totalDJLevelCounts.elements.filter { $0.value > 0 }
+                    let counts = Array(totalDJLevelCounts.elements.filter { $0.value > 0 }.prefix(3))
                     Chart(counts, id: \.key) { element in
                         BarMark(
                             x: .value("Shared.ClearCount", element.value),
