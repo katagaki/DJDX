@@ -68,6 +68,7 @@ enum ICloudBackupManager {
         guard isEnabled else { return }
         let request = BGProcessingTaskRequest(identifier: backgroundTaskIdentifier)
         request.requiresNetworkConnectivity = true
+        request.requiresExternalPower = true
         request.earliestBeginDate = Calendar.current.nextDate(
             after: .now,
             matching: DateComponents(hour: 0, minute: 0),
