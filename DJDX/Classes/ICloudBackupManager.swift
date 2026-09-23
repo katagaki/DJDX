@@ -157,8 +157,8 @@ enum ICloudBackupManager {
         try fileManager.moveItem(at: stagingURL, to: archiveURL)
         phase.mark("handoff")
 
-        let rebuiltImages = try updateImagesArchive(in: backupFolder, using: fileManager)
-        phase.mark(rebuiltImages ? "images" : "images (unchanged)")
+        let imageChanges = try syncSessionImages(to: backupFolder, using: fileManager)
+        phase.mark("images (\(imageChanges) changed)")
         phase.summarize()
 
         let timestampURL = backupFolder.appendingPathComponent("LastBackup")
@@ -227,7 +227,7 @@ enum ICloudBackupManager {
                 }
                 try fileManager.moveItem(at: item, to: destinationURL)
             }
-            try await restoreImagesArchive(
+            try await restoreSessionImages(
                 from: backupFolder, to: containerURL, using: fileManager
             )
             applyDefaultsSnapshot(from: containerURL)

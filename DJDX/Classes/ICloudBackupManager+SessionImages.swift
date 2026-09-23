@@ -1,57 +1,93 @@
-import CryptoKit
 import Foundation
 
 extension ICloudBackupManager {
 
     // MARK: Session Images
 
-    static func updateImagesArchive(in backupFolder: URL, using fileManager: FileManager) throws -> Bool {
-        let imagesURL = sessionImagesURL
-        let archiveURL = backupFolder.appendingPathComponent(imagesArchiveName)
-        guard fileManager.fileExists(atPath: imagesURL.path) else { return false }
+    static let imagesFolderName = "Images"
 
-        let manifest = imagesManifest(at: imagesURL, using: fileManager)
-        if manifest == UserDefaults.standard.string(forKey: imagesManifestKey),
-           fileManager.fileExists(atPath: archiveURL.path) {
-            return false
-        }
-
-        let stagingURL = fileManager.temporaryDirectory
-            .appendingPathComponent("DJDXBackup-\(UUID().uuidString)")
-            .appendingPathExtension("zip")
-        defer { try? fileManager.removeItem(at: stagingURL) }
-        try Task.checkCancellation()
-        try ZipArchive.zip(directoryAt: imagesURL, to: stagingURL, rootName: "Images")
-
-        if fileManager.fileExists(atPath: archiveURL.path) {
-            try fileManager.removeItem(at: archiveURL)
-        }
-        try fileManager.moveItem(at: stagingURL, to: archiveURL)
-        UserDefaults.standard.set(manifest, forKey: imagesManifestKey)
-        return true
+    private static var imagesManifestURL: URL? {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("ICloudBackupImagesManifest.json")
     }
 
-    static func imagesManifest(at directory: URL, using fileManager: FileManager) -> String {
-        guard let items = try? fileManager.contentsOfDirectory(
-            at: directory,
-            includingPropertiesForKeys: [.fileSizeKey, .contentModificationDateKey],
-            options: [.skipsHiddenFiles]
-        ) else { return "" }
-        let entries = items.map { item -> String in
-            let values = try? item.resourceValues(
-                forKeys: [.fileSizeKey, .contentModificationDateKey]
-            )
-            let size = values?.fileSize ?? 0
-            let modified = Int(values?.contentModificationDate?.timeIntervalSince1970 ?? 0)
-            return "\(item.lastPathComponent):\(size):\(modified)"
-        }.sorted()
-        let digest = SHA256.hash(data: Data(entries.joined(separator: "\n").utf8))
-        return digest.map { String(format: "%02x", $0) }.joined()
+    static func syncSessionImages(to backupFolder: URL, using fileManager: FileManager) throws -> Int {
+        let sourceURL = sessionImagesURL
+        guard fileManager.fileExists(atPath: sourceURL.path) else { return 0 }
+        let destination = backupFolder.appendingPathComponent(imagesFolderName, isDirectory: true)
+        try fileManager.createDirectory(at: destination, withIntermediateDirectories: true)
+
+        let local = imageSignatures(at: sourceURL, using: fileManager)
+        var manifest = loadImagesManifest()
+        manifest = manifest.filter { local[$0.key] != nil }
+        defer { saveImagesManifest(manifest) }
+
+        var changes = 0
+        for (name, signature) in local where manifest[name] != signature {
+            try Task.checkCancellation()
+            let target = destination.appendingPathComponent(name)
+            try? fileManager.removeItem(at: target)
+            try fileManager.copyItem(at: sourceURL.appendingPathComponent(name), to: target)
+            manifest[name] = signature
+            changes += 1
+        }
+
+        let remoteItems = (try? fileManager.contentsOfDirectory(
+            at: destination, includingPropertiesForKeys: nil
+        )) ?? []
+        for item in remoteItems {
+            guard let name = cloudItemName(item.lastPathComponent), local[name] == nil else { continue }
+            try? fileManager.removeItem(at: item)
+            changes += 1
+        }
+
+        let legacyArchiveURL = backupFolder.appendingPathComponent(imagesArchiveName)
+        if fileManager.fileExists(atPath: legacyArchiveURL.path) {
+            try? fileManager.removeItem(at: legacyArchiveURL)
+        }
+        UserDefaults.standard.removeObject(forKey: imagesManifestKey)
+        return changes
     }
 
-    static func restoreImagesArchive(
+    static func restoreSessionImages(
         from backupFolder: URL,
         to containerURL: URL,
+        using fileManager: FileManager
+    ) async throws {
+        let destination = containerURL
+            .appendingPathComponent("Sessions", isDirectory: true)
+            .appendingPathComponent("Images", isDirectory: true)
+        let folder = backupFolder.appendingPathComponent(imagesFolderName, isDirectory: true)
+        let names = ((try? fileManager.contentsOfDirectory(
+            at: folder, includingPropertiesForKeys: nil
+        )) ?? []).compactMap { cloudItemName($0.lastPathComponent) }
+
+        if names.isEmpty {
+            try await restoreLegacyImagesArchive(
+                from: backupFolder, to: destination, using: fileManager
+            )
+        } else {
+            try fileManager.createDirectory(at: destination, withIntermediateDirectories: true)
+            for name in names {
+                try? fileManager.startDownloadingUbiquitousItem(at: folder.appendingPathComponent(name))
+            }
+            let deadline = Date.now.addingTimeInterval(1800.0)
+            for name in names {
+                let source = folder.appendingPathComponent(name)
+                guard await ensureDownloaded(source, timeout: max(1.0, deadline.timeIntervalSinceNow)) else {
+                    throw BackupError.downloadTimedOut
+                }
+                let target = destination.appendingPathComponent(name)
+                try? fileManager.removeItem(at: target)
+                try fileManager.copyItem(at: source, to: target)
+            }
+        }
+        saveImagesManifest(imageSignatures(at: destination, using: fileManager))
+    }
+
+    private static func restoreLegacyImagesArchive(
+        from backupFolder: URL,
+        to destination: URL,
         using fileManager: FileManager
     ) async throws {
         let archiveURL = backupFolder.appendingPathComponent(imagesArchiveName)
@@ -65,9 +101,6 @@ extension ICloudBackupManager {
         defer { try? fileManager.removeItem(at: extractionURL) }
         try ZipArchive.unzip(fileAt: archiveURL, to: extractionURL)
 
-        let destination = containerURL
-            .appendingPathComponent("Sessions", isDirectory: true)
-            .appendingPathComponent("Images", isDirectory: true)
         try fileManager.createDirectory(at: destination, withIntermediateDirectories: true)
         let root = try unwrappedRoot(of: extractionURL, using: fileManager)
         for item in try fileManager.contentsOfDirectory(
@@ -79,10 +112,49 @@ extension ICloudBackupManager {
             }
             try fileManager.moveItem(at: item, to: target)
         }
-        UserDefaults.standard.set(
-            imagesManifest(at: destination, using: fileManager),
-            forKey: imagesManifestKey
+    }
+
+    // MARK: Manifest
+
+    private static func imageSignatures(at directory: URL, using fileManager: FileManager) -> [String: String] {
+        let keys: [URLResourceKey] = [.isRegularFileKey, .fileSizeKey, .contentModificationDateKey]
+        guard let items = try? fileManager.contentsOfDirectory(
+            at: directory, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles]
+        ) else { return [:] }
+        var signatures: [String: String] = [:]
+        for item in items {
+            guard let values = try? item.resourceValues(forKeys: Set(keys)),
+                  values.isRegularFile == true else { continue }
+            let size = values.fileSize ?? 0
+            let modified = Int(values.contentModificationDate?.timeIntervalSince1970 ?? 0)
+            signatures[item.lastPathComponent] = "\(size):\(modified)"
+        }
+        return signatures
+    }
+
+    private static func cloudItemName(_ fileName: String) -> String? {
+        if fileName.hasPrefix("."), fileName.hasSuffix(".icloud") {
+            return String(fileName.dropFirst().dropLast(".icloud".count))
+        }
+        return fileName.hasPrefix(".") ? nil : fileName
+    }
+
+    private static func loadImagesManifest() -> [String: String] {
+        guard let url = imagesManifestURL,
+              let data = try? Data(contentsOf: url),
+              let manifest = try? JSONDecoder().decode([String: String].self, from: data) else {
+            return [:]
+        }
+        return manifest
+    }
+
+    private static func saveImagesManifest(_ manifest: [String: String]) {
+        guard let url = imagesManifestURL,
+              let data = try? JSONEncoder().encode(manifest) else { return }
+        try? FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(), withIntermediateDirectories: true
         )
+        try? data.write(to: url, options: .atomic)
     }
 
     static func unwrappedRoot(of extractionURL: URL, using fileManager: FileManager) throws -> URL {
