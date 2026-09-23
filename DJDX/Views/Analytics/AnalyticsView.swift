@@ -122,6 +122,11 @@ struct AnalyticsView: View {
                         .foregroundStyle(IIDXDJLevel.color(for: element.key))
                     }
                     .chartXAxis { AxisMarks { AxisGridLine() } }
+                    .chartYAxis {
+                        AxisMarks(preset: .extended, position: .leading) {
+                            AxisValueLabel()
+                        }
+                    }
                     .chartYScale(domain: counts.map(\.key))
                 }
                 .perLevelCaption("Analytics.DJLevel.Overall")

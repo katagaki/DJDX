@@ -98,6 +98,11 @@ struct OverviewClearTypeOverallGraph: View {
                 .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
             }
         }
+        .chartYAxis {
+            AxisMarks(preset: .extended, position: .leading) {
+                AxisValueLabel()
+            }
+        }
         .chartYScale(domain: populatedDifficulties.map { "\($0)" })
         .chartForegroundStyleScale(clearTypeColorScale)
     }
