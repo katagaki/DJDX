@@ -202,9 +202,9 @@ struct MoreRadarMaker: View {
 
     @ViewBuilder
     func exportableRadar() -> some View {
-        RadarChartView(radarData, color: selectedColor, labelFontSize: 14.0, lineWidth: 2.5)
+        RadarChartView(radarData, color: selectedColor, labelFontSize: 20.0, lineWidth: 2.5)
             .frame(width: 480.0, height: 380.0)
-            .padding(.horizontal, 24.0)
+            .padding(.horizontal, 80.0)
             .padding(.vertical, 110.0)
             .background(Color.black)
             .environment(\.colorScheme, .dark)
