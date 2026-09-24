@@ -43,6 +43,19 @@ struct ActiveSessionView: View {
                         Button("Sessions.Export.All", systemImage: "square.and.arrow.up.on.square") {
                             isConfirmingExport = true
                         }
+                        .confirmationDialog(
+                            "Sessions.Export.All.Confirm",
+                            isPresented: $isConfirmingExport,
+                            titleVisibility: .visible
+                        ) {
+                            Button("Sessions.Photos.Save") {
+                                exportAllToPhotos()
+                            }
+                            Button("Sessions.Files.Save") {
+                                exportAllToFiles()
+                            }
+                            Button("Shared.Cancel", role: .cancel) {}
+                        }
                     }
                 }
                 if workoutBridge.isSessionActive {
@@ -105,19 +118,6 @@ struct ActiveSessionView: View {
             Button("Shared.OK", role: .cancel) {}
         } message: {
             Text("Sessions.Camera.Unavailable.Message")
-        }
-        .confirmationDialog(
-            "Sessions.Export.All.Confirm",
-            isPresented: $isConfirmingExport,
-            titleVisibility: .visible
-        ) {
-            Button("Sessions.Photos.Save") {
-                exportAllToPhotos()
-            }
-            Button("Sessions.Files.Save") {
-                exportAllToFiles()
-            }
-            Button("Shared.Cancel", role: .cancel) {}
         }
         .alert("Sessions.End.Confirm", isPresented: $isConfirmingEnd) {
             Button("Sessions.End", role: .destructive) {
