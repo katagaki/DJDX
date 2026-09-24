@@ -101,7 +101,7 @@ struct AnalyticsView: View {
                                                   isHorizontal: true,
                                                   levelLimit: 3)
                         .chartLegend(.hidden)
-                        .chartXAxis(.hidden)
+                        .chartXAxis { AxisMarks { AxisGridLine() } }
                 }
                 .perLevelCaption("Analytics.ClearType.Overall")
             }
