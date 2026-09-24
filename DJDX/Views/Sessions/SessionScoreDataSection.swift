@@ -30,22 +30,27 @@ struct SessionScoreDataSection: View {
                         .padding(.vertical, 24.0)
                 } else {
                     Divider()
-                    ForEach(plays) { play in
-                        NavigationLink {
-                            scoreDestination(for: play)
-                        } label: {
-                            IIDXScoreRow(
-                                namespace: scoresNamespace,
-                                songRecord: play.asSongRecord(),
-                                level: play.level == .unknown ? .another : play.level,
-                                score: play.levelScore(),
-                                scoreRate: play.scoreRate(songCompactTitles: songCompactTitles)
-                            )
-                            .contentShape(.rect)
-                        }
-                        .buttonStyle(.plain)
-                        Divider()
+                }
+            }
+        }
+        .padding(.top, isSearching ? 8.0 : 20.0)
+        if isExpanded || isSearching {
+            ForEach(plays) { play in
+                VStack(spacing: 0.0) {
+                    NavigationLink {
+                        scoreDestination(for: play)
+                    } label: {
+                        IIDXScoreRow(
+                            namespace: scoresNamespace,
+                            songRecord: play.asSongRecord(),
+                            level: play.level == .unknown ? .another : play.level,
+                            score: play.levelScore(),
+                            scoreRate: play.scoreRate(songCompactTitles: songCompactTitles)
+                        )
+                        .contentShape(.rect)
                     }
+                    .buttonStyle(.plain)
+                    Divider()
                 }
             }
         }

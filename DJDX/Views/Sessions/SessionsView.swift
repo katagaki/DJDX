@@ -72,7 +72,6 @@ struct SessionsView: View {
                 }
                 if !isEditingAnalytics {
                     scoreDataSection
-                        .padding(.top, isSearching ? 8.0 : 20.0)
                 }
             }
             .padding(.bottom, 8.0)
