@@ -6180,6 +6180,29 @@
         }
       }
     },
+    "Sessions.End.Confirm.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can minimize this session to keep it running while you use other parts of the app."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションを最小化すると、記録を続けたままアプリの他の画面を利用できます。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "將遊玩最小化後，可以在繼續記錄的同時使用 App 的其他部分。"
+          }
+        }
+      }
+    },
     "Sessions.Export.All" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6544,6 +6567,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "遊玩記錄進行中"
+          }
+        }
+      }
+    },
+    "Sessions.Minimize" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimize"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最小化"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最小化"
           }
         }
       }

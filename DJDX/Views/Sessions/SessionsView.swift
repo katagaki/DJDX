@@ -7,7 +7,6 @@ struct SessionsView: View {
     var analyticsNamespace: Namespace.ID
     var towerNamespace: Namespace.ID
 
-    @State var isPresentingActive: Bool = false
     @State var isPresentingExternalDataSources: Bool = false
     @State var isHistoryExpanded: Bool = true
     @State var isScoreDataExpanded: Bool = true
@@ -35,6 +34,14 @@ struct SessionsView: View {
         store.sessions.filter { !$0.isActive }.sorted { $0.startDate > $1.startDate }
     }
 
+    var isPresentingActive: Binding<Bool> {
+        Binding {
+            store.activeSession != nil && !store.isActiveSessionMinimized
+        } set: { isPresented in
+            store.isActiveSessionMinimized = !isPresented
+        }
+    }
+
     var searchPlacement: SearchFieldPlacement {
         if #available(iOS 26.0, *) {
             .automatic
@@ -47,22 +54,10 @@ struct SessionsView: View {
         ScrollView {
             LazyVStack(spacing: 0.0) {
                 if !isSearching {
-                    if !isEditingAnalytics, !isBemaniWikiEnabled || store.activeSession != nil {
-                        VStack(spacing: 12.0) {
-                            if !isBemaniWikiEnabled {
-                                sessionsCard { bemaniWikiWarning }
-                            }
-                            if let active = store.activeSession {
-                                Button {
-                                    isPresentingActive = true
-                                } label: {
-                                    sessionsCard { resumeCard(active) }
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 8.0)
+                    if !isEditingAnalytics, !isBemaniWikiEnabled {
+                        sessionsCard { bemaniWikiWarning }
+                            .padding(.horizontal)
+                            .padding(.top, 8.0)
                     }
                     if !isEditingAnalytics {
                         historySection
@@ -127,17 +122,10 @@ struct SessionsView: View {
         }
         .onAppear {
             store.bootstrap()
-            if store.activeSession != nil { isPresentingActive = true }
         }
         .task {
             songCompactTitles = await reader.songCompactTitles()
             reloadScores()
-        }
-        .onChange(of: store.activeSession?.id) { _, newValue in
-            isPresentingActive = newValue != nil
-        }
-        .onChange(of: store.pendingCaptureRequest) { _, pending in
-            if pending, store.activeSession != nil { isPresentingActive = true }
         }
         .onReceive(NotificationCenter.default.publisher(for: .playSessionDidChange)
             .debounce(for: .seconds(0.4), scheduler: RunLoop.main)) { _ in
@@ -148,7 +136,7 @@ struct SessionsView: View {
             .debounce(for: .seconds(0.4), scheduler: RunLoop.main)) { _ in
             reloadScores()
         }
-        .fullScreenCover(isPresented: $isPresentingActive) {
+        .fullScreenCover(isPresented: isPresentingActive) {
             ActiveSessionView(store: store)
         }
         .sheet(isPresented: $isPresentingExternalDataSources) {

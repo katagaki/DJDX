@@ -42,13 +42,15 @@ extension SessionsView {
                 withAnimation(.smooth.speed(2.0)) { isHistoryExpanded.toggle() }
             }
             if isHistoryExpanded {
-                if pastSessions.isEmpty {
+                if pastSessions.isEmpty && store.activeSession == nil {
                     Text("Sessions.History.Empty.Message")
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                 } else {
-                    SessionCardsRow(store: store, sessions: pastSessions)
+                    SessionCardsRow(store: store, sessions: pastSessions) {
+                        store.isActiveSessionMinimized = false
+                    }
                 }
             }
         }
@@ -76,24 +78,5 @@ extension SessionsView {
             .padding(12.0)
             .frame(maxWidth: .infinity, alignment: .leading)
             .cardBackground(cornerRadius: cornerRadius)
-    }
-
-    func resumeCard(_ session: IIDXPlaySession) -> some View {
-        HStack {
-            Image(systemName: "record.circle")
-                .foregroundStyle(.red)
-                .symbolEffect(.pulse)
-            VStack(alignment: .leading, spacing: 2.0) {
-                Text("Sessions.InProgress")
-                    .font(.headline)
-                Text(session.startDate, format: .dateTime.hour().minute())
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption.bold())
-                .foregroundStyle(.tertiary)
-        }
     }
 }

@@ -3,10 +3,17 @@ import SwiftUI
 struct SessionCardsRow: View {
     var store: IIDXSessionStore
     var sessions: [IIDXPlaySession]
+    var onResume: () -> Void
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12.0) {
+                if let active = store.activeSession {
+                    Button(action: onResume) {
+                        activeSessionCard(active)
+                    }
+                    .buttonStyle(AnalyticsCardButtonStyle())
+                }
                 ForEach(sessions) { session in
                     NavigationLink {
                         SessionDetailView(store: store, session: session)
@@ -25,14 +32,40 @@ struct SessionCardsRow: View {
         }
     }
 
-    private func sessionCard(_ session: IIDXPlaySession) -> some View {
-        let cornerRadius: CGFloat
+    private var cornerRadius: CGFloat {
         if #available(iOS 26.0, *) {
-            cornerRadius = 20.0
+            20.0
         } else {
-            cornerRadius = 12.0
+            12.0
         }
-        return VStack(alignment: .leading, spacing: 4.0) {
+    }
+
+    private func activeSessionCard(_ session: IIDXPlaySession) -> some View {
+        VStack(alignment: .leading, spacing: 4.0) {
+            HStack(alignment: .top) {
+                Text("Sessions.InProgress")
+                    .font(.system(size: 20.0, weight: .black))
+                    .fontWidth(.expanded)
+                    .foregroundStyle(.red)
+                    .lineLimit(2, reservesSpace: true)
+                    .minimumScaleFactor(0.6)
+                Spacer(minLength: 0.0)
+                Image(systemName: "record.circle")
+                    .foregroundStyle(.red)
+                    .symbolEffect(.pulse)
+            }
+            Spacer(minLength: 0.0)
+            Text(session.startDate, format: .dateTime.hour().minute())
+                .font(.caption2.bold())
+                .foregroundStyle(.secondary)
+        }
+        .padding(12.0)
+        .frame(width: 148.0, height: 108.0, alignment: .leading)
+        .cardBackground(cornerRadius: cornerRadius)
+    }
+
+    private func sessionCard(_ session: IIDXPlaySession) -> some View {
+        VStack(alignment: .leading, spacing: 4.0) {
             Text(verbatim: durationText(for: session))
                 .font(.system(size: 20.0, weight: .black))
                 .fontWidth(.expanded)

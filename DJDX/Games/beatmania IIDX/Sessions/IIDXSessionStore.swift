@@ -9,6 +9,7 @@ final class IIDXSessionStore {
     var plays: [IIDXCapturedPlay] = []
     var sessions: [IIDXPlaySession] = []
     var pendingCaptureRequest: Bool = false
+    var isActiveSessionMinimized: Bool = false
 
     private let database = IIDXPlaySessionsDatabase.shared
 
@@ -34,6 +35,7 @@ final class IIDXSessionStore {
         let session = IIDXPlaySession(id: id ?? UUID().uuidString, game: .iidxArcade)
         database.createSession(session)
         activeSession = session
+        isActiveSessionMinimized = false
         plays = []
         loadSessions()
         IIDXSessionLiveActivityController.shared.start(session)
@@ -68,6 +70,7 @@ final class IIDXSessionStore {
         }
         IIDXSessionWorkoutBridge.shared.endWorkout(session: activeSession)
         self.activeSession = nil
+        isActiveSessionMinimized = false
         plays = []
         loadSessions()
         IIDXSessionLiveActivityController.shared.end()
@@ -102,6 +105,7 @@ final class IIDXSessionStore {
     }
 
     func requestCapture() {
+        isActiveSessionMinimized = false
         pendingCaptureRequest = true
     }
 

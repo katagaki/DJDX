@@ -123,7 +123,12 @@ struct ActiveSessionView: View {
             Button("Sessions.End", role: .destructive) {
                 store.endSession()
             }
+            Button("Sessions.Minimize") {
+                store.isActiveSessionMinimized = true
+            }
             Button("Shared.Cancel", role: .cancel) {}
+        } message: {
+            Text("Sessions.End.Confirm.Message")
         }
         .sheet(item: $fileExport) { request in
             SessionDocumentExporter(urls: request.urls) {
