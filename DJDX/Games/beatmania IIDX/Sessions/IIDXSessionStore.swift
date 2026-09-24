@@ -97,6 +97,7 @@ final class IIDXSessionStore {
             IIDXSessionImageStore.shared.delete(filename: filename)
             return
         }
+        IIDXSessionWorkoutBridge.shared.setWorkoutPaused(false)
         refreshPlays()
         IIDXSessionLiveActivityController.shared.refresh(sessionID: activeSession.id)
         IIDXSessionLiveActivityController.shared.pushSessionInfoToWatch(sessionID: activeSession.id)
