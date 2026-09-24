@@ -45,7 +45,7 @@ struct SessionCardsRow: View {
             Text("Sessions.InProgress")
                 .font(.system(size: 20.0, weight: .black))
                 .fontWidth(.expanded)
-                .foregroundStyle(.red)
+                .foregroundStyle(.primary)
                 .lineLimit(2, reservesSpace: true)
                 .minimumScaleFactor(0.6)
             Spacer(minLength: 0.0)
