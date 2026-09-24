@@ -6554,19 +6554,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Session in Progress"
+            "value" : "In Progress"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッション進行中"
+            "value" : "進行中"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "遊玩記錄進行中"
+            "value" : "進行中"
           }
         }
       }

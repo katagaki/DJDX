@@ -42,18 +42,12 @@ struct SessionCardsRow: View {
 
     private func activeSessionCard(_ session: IIDXPlaySession) -> some View {
         VStack(alignment: .leading, spacing: 4.0) {
-            HStack(alignment: .top) {
-                Text("Sessions.InProgress")
-                    .font(.system(size: 20.0, weight: .black))
-                    .fontWidth(.expanded)
-                    .foregroundStyle(.red)
-                    .lineLimit(2, reservesSpace: true)
-                    .minimumScaleFactor(0.6)
-                Spacer(minLength: 0.0)
-                Image(systemName: "record.circle")
-                    .foregroundStyle(.red)
-                    .symbolEffect(.pulse)
-            }
+            Text("Sessions.InProgress")
+                .font(.system(size: 20.0, weight: .black))
+                .fontWidth(.expanded)
+                .foregroundStyle(.red)
+                .lineLimit(2, reservesSpace: true)
+                .minimumScaleFactor(0.6)
             Spacer(minLength: 0.0)
             Text(session.startDate, format: .dateTime.hour().minute())
                 .font(.caption2.bold())
