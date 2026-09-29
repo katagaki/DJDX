@@ -163,6 +163,10 @@ struct WebViewForSDVXIn: UIViewRepresentable {
             updateState(true)
         }
 
+        func webView(_: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
+            hasRevealed = false
+        }
+
         func webView(_: WKWebView, didFinish _: WKNavigation!) {
             reveal()
         }
