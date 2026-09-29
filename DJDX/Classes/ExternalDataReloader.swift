@@ -103,32 +103,30 @@ struct ExternalDataReloader {
 
     private static func reloadSDVXIn(progress: Progress) async -> Int {
         var charts: [SDVXInChart] = []
-        let pattern = "SORT([0-9]{5})([NAEMnaem])\\(\\);</script><!--(.*?)-->"
-        let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])
+        let fileCount = await sdvxInSongFileCount()
 
-        progress(0, 20)
-        for level in 1...20 {
-            defer { progress(level, 20) }
-            let levelSlug = String(format: "%02d", level)
-            guard let regex,
-                  let url = URL(string: "https://sdvx.in/sort/sort_\(levelSlug).htm"),
+        progress(0, fileCount)
+        for fileNumber in 1...fileCount {
+            defer { progress(fileNumber, fileCount) }
+            let fileSlug = String(format: "%02d", fileNumber)
+            guard let url = URL(string: "https://sdvx.in/sdvx/_/json/songs\(fileSlug).json"),
                   let (data, _) = try? await URLSession.shared.data(from: url),
-                  let html = String(data: data, encoding: .utf8) else { continue }
-            let htmlString = html as NSString
-            let matches = regex.matches(in: html, range: NSRange(location: 0, length: htmlString.length))
-            for match in matches where match.numberOfRanges == 4 {
-                let code = htmlString.substring(with: match.range(at: 1))
-                let slot = htmlString.substring(with: match.range(at: 2)).lowercased()
-                let rawTitle = htmlString.substring(with: match.range(at: 3))
-                let title = ((try? SwiftSoup.Entities.unescape(rawTitle)) ?? rawTitle)
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !title.isEmpty else { continue }
-                charts.append(SDVXInChart(code: code, slot: slot, title: title, level: level))
-            }
+                  let songs = try? JSONDecoder().decode([SDVXInSong].self, from: data) else { continue }
+            charts.append(contentsOf: songs.flatMap(\.charts))
         }
 
         await SDVXInImporter().replaceAllCharts(charts)
         return await SDVXReader().sdvxInChartCount()
+    }
+
+    private static func sdvxInSongFileCount() async -> Int {
+        let fallbackCount = 7
+        guard let url = URL(string: "https://sdvx.in/sdvx/_/data.js"),
+              let (data, _) = try? await URLSession.shared.data(from: url),
+              let script = String(data: data, encoding: .utf8),
+              let match = script.firstMatch(of: /FILE_COUNT:\s*(\d+)/),
+              let count = Int(match.1), count > 0 else { return fallbackCount }
+        return count
     }
 
     // MARK: - BEMANIWiki (beatmania IIDX note counts)

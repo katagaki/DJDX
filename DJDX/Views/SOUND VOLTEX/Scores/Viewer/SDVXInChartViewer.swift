@@ -9,6 +9,7 @@ body > table.t_ > tbody > tr:nth-child(2) > td.tbg > table > tbody > tr > td:nth
   display: none !important;
 }
 img[src*="/logo/"] { display: none !important; }
+#closeBtn { display: none !important; }
 """
 
 let sdvxInChartViewerUserScript = """
@@ -38,14 +39,14 @@ struct SDVXInChartViewer: View {
     var chart: SDVXInChart
 
     @State var webView = makeSDVXInWebView()
+    @State var pageURL: URL?
     @State var isLoading: Bool = true
     @State var isShowingFallbackButton: Bool = false
 
     var body: some View {
         WebViewForSDVXIn(
             webView: $webView,
-            isLoading: $isLoading,
-            chart: chart
+            isLoading: $isLoading
         )
         .navigationTitle("ViewTitle.SDVXInChartViewer")
         .navigationBarTitleDisplayMode(.inline)
@@ -65,7 +66,7 @@ struct SDVXInChartViewer: View {
                 if isShowingFallbackButton {
                     VStack(spacing: 8.0) {
                         Text("SDVXInChartViewer.FallbackMessage")
-                        if let pageURL = chart.pageURL {
+                        if let pageURL = pageURL ?? chart.legacyPageURL {
                             Link(destination: pageURL) {
                                 Label("Shared.OpenInSafari", systemImage: "safari")
                             }
@@ -80,21 +81,28 @@ struct SDVXInChartViewer: View {
             }
         }
         .task {
-            await showFallbackAfterDelay()
+            await load()
         }
         .padding(0.0)
     }
 
+    func load() async {
+        async let fallback: Void = showFallbackAfterDelay()
+        if let resolvedURL = await chart.resolvePageURL() {
+            pageURL = resolvedURL
+            webView.load(URLRequest(url: resolvedURL))
+        }
+        await fallback
+    }
+
     func refresh() {
-        guard let pageURL = chart.pageURL else { return }
         webView.layer.opacity = 0.0
         withAnimation(.smooth.speed(2.0)) {
             isLoading = true
             isShowingFallbackButton = false
         } completion: {
-            webView.load(URLRequest(url: pageURL))
             Task {
-                await showFallbackAfterDelay()
+                await load()
             }
         }
     }
@@ -114,17 +122,12 @@ struct WebViewForSDVXIn: UIViewRepresentable {
     @Binding var webView: WKWebView
     @Binding var isLoading: Bool
 
-    var chart: SDVXInChart
-
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
         #if DEBUG
         webView.isInspectable = true
         #endif
-        if let pageURL = chart.pageURL {
-            webView.load(URLRequest(url: pageURL))
-        }
         return webView
     }
 

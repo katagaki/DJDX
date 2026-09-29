@@ -45,6 +45,7 @@ enum SDVXDifficulty: String, Codable, CaseIterable {
         case .novice: return "n"
         case .advanced: return "a"
         case .exhaust: return "e"
+        case .ultimate: return "u"
         default: return "m"
         }
     }
