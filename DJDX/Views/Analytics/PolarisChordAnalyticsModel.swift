@@ -37,9 +37,12 @@ final class PolarisChordAnalyticsModel {
 
     let fetcher = PolarisChordReader()
 
-    func reload(version: PolarisChordVersion) async {
+    func reload(version: PolarisChordVersion, filters: PolarisChordFilterOptions? = nil) async {
         dataState = .loading
-        let records = await fetcher.latestSongRecords(for: version)
+        var records = await fetcher.latestSongRecords(for: version)
+        if let filters {
+            records = records.filter { filters.matches($0) }
+        }
 
         var clearByDiff: [PolarisChordDifficulty: OrderedDictionary<String, Int>] = [:]
         var gradeByDiff: [PolarisChordDifficulty: OrderedDictionary<String, Int>] = [:]
@@ -77,7 +80,7 @@ final class PolarisChordAnalyticsModel {
             }
         }
 
-        let lastPlay = await computeLastPlay(version: version)
+        let lastPlay = await computeLastPlay(version: version, filters: filters)
 
         withAnimation(.smooth.speed(2.0)) {
             self.clearTypePerDifficulty = clearByDiff
@@ -93,7 +96,7 @@ final class PolarisChordAnalyticsModel {
 
     // Compares the latest two import groups for the version and computes what improved.
     // swiftlint:disable:next large_tuple
-    private func computeLastPlay(version: PolarisChordVersion) async -> (
+    private func computeLastPlay(version: PolarisChordVersion, filters: PolarisChordFilterOptions?) async -> (
         clears: [String: [PolarisChordNewClearEntry]],
         highScores: [PolarisChordNewHighScoreEntry],
         grades: [String: [PolarisChordNewGradeEntry]]
@@ -103,7 +106,10 @@ final class PolarisChordAnalyticsModel {
             return ([:], [], [:])
         }
         // importGroups is newest-first, so [0] is the latest and [1] the previous.
-        let latestRecords = await fetcher.songRecords(for: groups[0].id)
+        var latestRecords = await fetcher.songRecords(for: groups[0].id)
+        if let filters {
+            latestRecords = latestRecords.filter { filters.matches($0) }
+        }
         let previousRecords = await fetcher.songRecords(for: groups[1].id)
         return Self.computeNewEntries(latestRecords: latestRecords, previousRecords: previousRecords)
     }

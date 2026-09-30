@@ -48,19 +48,15 @@ struct PolarisChordScoresView<Header: View>: View {
             let term = searchTerm.lowercased()
             result = result.filter { $0.title.lowercased().contains(term) }
         }
-        if !difficultiesToShow.isEmpty {
-            result = result.filter { difficultiesToShow.contains($0.difficultyEnum) }
-        }
-        if !levelsToShow.isEmpty {
-            result = result.filter { levelsToShow.contains($0.level) }
-        }
-        if !clearTypesToShow.isEmpty {
-            result = result.filter { clearTypesToShow.contains($0.clearTypeEnum) }
-        }
-        if !gradesToShow.isEmpty {
-            result = result.filter { gradesToShow.contains($0.gradeEnum) }
-        }
-        return result
+        let filters = filters
+        return result.filter { filters.matches($0) }
+    }
+
+    var filters: PolarisChordFilterOptions {
+        PolarisChordFilterOptions(difficulties: difficultiesToShow,
+                                  levels: levelsToShow,
+                                  clearTypes: clearTypesToShow,
+                                  grades: gradesToShow)
     }
 
     // Levels are strings like "12" or "12+"; order by numeric base, "+" after.

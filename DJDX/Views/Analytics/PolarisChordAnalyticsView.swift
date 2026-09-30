@@ -13,6 +13,14 @@ struct PolarisChordAnalyticsView: View {
 
     @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
     var polarisChordVersion: PolarisChordVersion
+    @AppStorage(wrappedValue: [], "PolarisChordScoresView.DifficultyFilters")
+    var difficultiesToShow: Set<PolarisChordDifficulty>
+    @AppStorage(wrappedValue: [], "PolarisChordScoresView.LevelFilters")
+    var levelsToShow: Set<String>
+    @AppStorage(wrappedValue: [], "PolarisChordScoresView.ClearTypeFilters")
+    var clearTypesToShow: Set<PolarisChordClearType>
+    @AppStorage(wrappedValue: [], "PolarisChordScoresView.GradeFilters")
+    var gradesToShow: Set<PolarisChordGrade>
 
     @Binding var isEditing: Bool
 
@@ -50,15 +58,29 @@ struct PolarisChordAnalyticsView: View {
         }
         .task {
             if model.dataState == .initializing {
-                await model.reload(version: polarisChordVersion)
+                await reload()
             }
         }
         .onChange(of: polarisChordVersion) { _, _ in
-            Task { await model.reload(version: polarisChordVersion) }
+            Task { await reload() }
+        }
+        .onChange(of: filters) { _, _ in
+            Task { await reload() }
         }
         .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
-            Task { await model.reload(version: polarisChordVersion) }
+            Task { await reload() }
         }
+    }
+
+    var filters: PolarisChordFilterOptions {
+        PolarisChordFilterOptions(difficulties: difficultiesToShow,
+                                  levels: levelsToShow,
+                                  clearTypes: clearTypesToShow,
+                                  grades: gradesToShow)
+    }
+
+    func reload() async {
+        await model.reload(version: polarisChordVersion, filters: filters)
     }
 
     // MARK: - Sections
