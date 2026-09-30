@@ -49,26 +49,20 @@ struct DDRScoresView<Header: View>: View {
 
     var filteredRecords: [DDRSongRecord] {
         var result = styleRecords
-        if isShowingOnlyPlayedCharts {
-            result = result.filter { $0.hasScore }
-        }
         if !searchTerm.isEmpty {
             let term = searchTerm.lowercased()
             result = result.filter { $0.title.lowercased().contains(term) }
         }
-        if !difficultiesToShow.isEmpty {
-            result = result.filter { difficultiesToShow.contains($0.difficultyEnum) }
-        }
-        if !levelsToShow.isEmpty {
-            result = result.filter { levelsToShow.contains($0.level) }
-        }
-        if !clearLampsToShow.isEmpty {
-            result = result.filter { clearLampsToShow.contains($0.clearKind) }
-        }
-        if !ranksToShow.isEmpty {
-            result = result.filter { ranksToShow.contains($0.rank) }
-        }
-        return result
+        let filters = filters
+        return result.filter { filters.matches($0) }
+    }
+
+    var filters: DDRFilterOptions {
+        DDRFilterOptions(onlyPlayedCharts: isShowingOnlyPlayedCharts,
+                         difficulties: difficultiesToShow,
+                         levels: levelsToShow,
+                         clearLamps: clearLampsToShow,
+                         ranks: ranksToShow)
     }
 
     var sortedRecords: [DDRSongRecord] {

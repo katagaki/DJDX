@@ -16,10 +16,10 @@ final class DDRAnalyticsModel {
 
     let fetcher = DDRReader()
 
-    func reload(version: DDRVersion, style: DDRPlayStyle) async {
+    func reload(version: DDRVersion, style: DDRPlayStyle, filters: DDRFilterOptions? = nil) async {
         dataState = .loading
         let records = await fetcher.latestSongRecords(for: version)
-            .filter { $0.styleEnum == style }
+            .filter { $0.styleEnum == style && filters?.matches($0) ?? true }
 
         var clearByDiff: [DDRDifficulty: OrderedDictionary<String, Int>] = [:]
         var rankByDiff: [DDRDifficulty: OrderedDictionary<String, Int>] = [:]

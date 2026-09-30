@@ -10,6 +10,11 @@ struct DDRAnalyticsView: View {
 
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
     @AppStorage(wrappedValue: DDRPlayStyle.single, "Global.DDR.Style") var ddrStyleToShow: DDRPlayStyle
+    @AppStorage(wrappedValue: true, "DDRScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayedCharts: Bool
+    @AppStorage(wrappedValue: [], "DDRScoresView.DifficultyFilters") var difficultiesToShow: Set<DDRDifficulty>
+    @AppStorage(wrappedValue: [], "DDRScoresView.LevelFilters") var levelsToShow: Set<Int>
+    @AppStorage(wrappedValue: [], "DDRScoresView.ClearLampFilters") var clearLampsToShow: Set<String>
+    @AppStorage(wrappedValue: [], "DDRScoresView.RankFilters") var ranksToShow: Set<String>
 
     @Binding var isEditing: Bool
 
@@ -42,18 +47,33 @@ struct DDRAnalyticsView: View {
         }
         .task {
             if model.dataState == .initializing {
-                await model.reload(version: ddrVersion, style: ddrStyleToShow)
+                await reload()
             }
         }
         .onChange(of: ddrVersion) { _, _ in
-            Task { await model.reload(version: ddrVersion, style: ddrStyleToShow) }
+            Task { await reload() }
         }
         .onChange(of: ddrStyleToShow) { _, _ in
-            Task { await model.reload(version: ddrVersion, style: ddrStyleToShow) }
+            Task { await reload() }
+        }
+        .onChange(of: filters) { _, _ in
+            Task { await reload() }
         }
         .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
-            Task { await model.reload(version: ddrVersion, style: ddrStyleToShow) }
+            Task { await reload() }
         }
+    }
+
+    var filters: DDRFilterOptions {
+        DDRFilterOptions(onlyPlayedCharts: isShowingOnlyPlayedCharts,
+                         difficulties: difficultiesToShow,
+                         levels: levelsToShow,
+                         clearLamps: clearLampsToShow,
+                         ranks: ranksToShow)
+    }
+
+    func reload() async {
+        await model.reload(version: ddrVersion, style: ddrStyleToShow, filters: filters)
     }
 
     // MARK: - Sections
