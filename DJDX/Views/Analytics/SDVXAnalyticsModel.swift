@@ -48,9 +48,10 @@ final class SDVXAnalyticsModel {
         return levelValue * 2.0 * (Double(record.highScore) / 10_000_000.0)
     }
 
-    func reload(version: SDVXVersion) async {
+    func reload(version: SDVXVersion, filters: SDVXFilterOptions? = nil) async {
         dataState = .loading
-        let records = await fetcher.latestSongRecords(for: version)
+        let allRecords = await fetcher.latestSongRecords(for: version)
+        let records = filters.map { filters in allRecords.filter { filters.matches($0) } } ?? allRecords
 
         var clearByDiff: [SDVXDifficulty: OrderedDictionary<String, Int>] = [:]
         var gradeByDiff: [SDVXDifficulty: OrderedDictionary<String, Int>] = [:]
@@ -92,10 +93,10 @@ final class SDVXAnalyticsModel {
             }
         }
 
-        let topForces = records.map { chartForce($0) }.sorted(by: >).prefix(50)
+        let topForces = allRecords.map { chartForce($0) }.sorted(by: >).prefix(50)
         let computedVolforce = (topForces.reduce(0.0, +) * 100).rounded() / 100
 
-        let lastPlay = await computeLastPlay(version: version)
+        let lastPlay = await computeLastPlay(version: version, filters: filters)
 
         withAnimation(.smooth.speed(2.0)) {
             self.clearTypePerDifficulty = clearByDiff
@@ -113,7 +114,7 @@ final class SDVXAnalyticsModel {
 
     // Compares the latest two import groups for the version and computes what improved.
     // swiftlint:disable:next large_tuple
-    private func computeLastPlay(version: SDVXVersion) async -> (
+    private func computeLastPlay(version: SDVXVersion, filters: SDVXFilterOptions?) async -> (
         clears: [String: [SDVXNewClearEntry]],
         highScores: [SDVXNewHighScoreEntry],
         grades: [String: [SDVXNewGradeEntry]]
@@ -123,7 +124,10 @@ final class SDVXAnalyticsModel {
             return ([:], [], [:])
         }
         // importGroups is newest-first, so [0] is the latest and [1] the previous.
-        let latestRecords = await fetcher.songRecords(for: groups[0].id)
+        var latestRecords = await fetcher.songRecords(for: groups[0].id)
+        if let filters {
+            latestRecords = latestRecords.filter { filters.matches($0) }
+        }
         let previousRecords = await fetcher.songRecords(for: groups[1].id)
         return Self.computeNewEntries(latestRecords: latestRecords, previousRecords: previousRecords)
     }

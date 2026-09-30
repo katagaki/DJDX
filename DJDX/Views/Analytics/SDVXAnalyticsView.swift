@@ -11,6 +11,10 @@ struct SDVXAnalyticsView: View {
     @Bindable var model: SDVXAnalyticsModel
 
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
+    @AppStorage(wrappedValue: [], "SDVXScoresView.DifficultyFilters") var difficultiesToShow: Set<SDVXDifficulty>
+    @AppStorage(wrappedValue: [], "SDVXScoresView.LevelFilters") var levelBucketsToShow: Set<Double>
+    @AppStorage(wrappedValue: [], "SDVXScoresView.ClearTypeFilters") var clearTypesToShow: Set<SDVXClearType>
+    @AppStorage(wrappedValue: [], "SDVXScoresView.GradeFilters") var gradesToShow: Set<SDVXGrade>
 
     @Binding var isEditing: Bool
 
@@ -48,15 +52,29 @@ struct SDVXAnalyticsView: View {
         }
         .task {
             if model.dataState == .initializing {
-                await model.reload(version: sdvxVersion)
+                await reload()
             }
         }
         .onChange(of: sdvxVersion) { _, _ in
-            Task { await model.reload(version: sdvxVersion) }
+            Task { await reload() }
+        }
+        .onChange(of: filters) { _, _ in
+            Task { await reload() }
         }
         .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
-            Task { await model.reload(version: sdvxVersion) }
+            Task { await reload() }
         }
+    }
+
+    var filters: SDVXFilterOptions {
+        SDVXFilterOptions(difficulties: difficultiesToShow,
+                          levelBuckets: levelBucketsToShow,
+                          clearTypes: clearTypesToShow,
+                          grades: gradesToShow)
+    }
+
+    func reload() async {
+        await model.reload(version: sdvxVersion, filters: filters)
     }
 
     // MARK: - Sections

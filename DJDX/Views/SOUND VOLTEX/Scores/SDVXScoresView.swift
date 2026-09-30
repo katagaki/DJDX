@@ -41,19 +41,15 @@ struct SDVXScoresView<Header: View>: View {
             let term = searchTerm.lowercased()
             result = result.filter { $0.title.lowercased().contains(term) }
         }
-        if !difficultiesToShow.isEmpty {
-            result = result.filter { difficultiesToShow.contains($0.difficultyEnum) }
-        }
-        if !levelBucketsToShow.isEmpty {
-            result = result.filter { levelBucketsToShow.contains(levelBucket($0.level)) }
-        }
-        if !clearTypesToShow.isEmpty {
-            result = result.filter { clearTypesToShow.contains($0.clearTypeEnum) }
-        }
-        if !gradesToShow.isEmpty {
-            result = result.filter { gradesToShow.contains($0.gradeEnum) }
-        }
-        return result
+        let filters = filters
+        return result.filter { filters.matches($0) }
+    }
+
+    var filters: SDVXFilterOptions {
+        SDVXFilterOptions(difficulties: difficultiesToShow,
+                          levelBuckets: levelBucketsToShow,
+                          clearTypes: clearTypesToShow,
+                          grades: gradesToShow)
     }
 
     func siblingCharts(of record: SDVXSongRecord) -> [SDVXSongRecord] {
@@ -66,14 +62,8 @@ struct SDVXScoresView<Header: View>: View {
             }
     }
 
-    // Group decimal levels into 0.5-wide buckets (e.g. 17.0–17.4 -> 17.0).
-    func levelBucket(_ level: String) -> Double {
-        let value = Double(level) ?? 0.0
-        return (value * 2.0).rounded(.down) / 2.0
-    }
-
     var availableLevelBuckets: [Double] {
-        Set(records.map { levelBucket($0.level) }).sorted()
+        Set(records.map { SDVXFilterOptions.levelBucket($0.level) }).sorted()
     }
 
     var sortedRecords: [SDVXSongRecord] {
