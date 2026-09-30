@@ -528,15 +528,38 @@ actor IIDXReader {
     // MARK: Analytics - Aggregated Counts
 
     private struct LevelColumns {
+        let level: IIDXLevel
         let difficulty: SQLite.Expression<Int>
         let clearType: SQLite.Expression<String>
         let djLevel: SQLite.Expression<String>
         let score: SQLite.Expression<Int>
     }
 
+    private static let levelColumns: [LevelColumns] = {
+        let cols = IIDXPlayDataDatabase.self
+        return [
+            LevelColumns(level: .beginner, difficulty: cols.srBeginnerDifficulty,
+                         clearType: cols.srBeginnerClearType,
+                         djLevel: cols.srBeginnerDJLevel, score: cols.srBeginnerScore),
+            LevelColumns(level: .normal, difficulty: cols.srNormalDifficulty,
+                         clearType: cols.srNormalClearType,
+                         djLevel: cols.srNormalDJLevel, score: cols.srNormalScore),
+            LevelColumns(level: .hyper, difficulty: cols.srHyperDifficulty,
+                         clearType: cols.srHyperClearType,
+                         djLevel: cols.srHyperDJLevel, score: cols.srHyperScore),
+            LevelColumns(level: .another, difficulty: cols.srAnotherDifficulty,
+                         clearType: cols.srAnotherClearType,
+                         djLevel: cols.srAnotherDJLevel, score: cols.srAnotherScore),
+            LevelColumns(level: .leggendaria, difficulty: cols.srLeggendariaDifficulty,
+                         clearType: cols.srLeggendariaClearType,
+                         djLevel: cols.srLeggendariaDJLevel, score: cols.srLeggendariaScore)
+        ]
+    }()
+
     func aggregatedCounts(
         for importGroupIDs: [String],
-        playType: IIDXPlayType
+        playType: IIDXPlayType,
+        filters: FilterOptions? = nil
     ) -> (clearType: [String: [Int: [String: Int]]], djLevel: [String: [Int: [String: Int]]]) {
         guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else {
             return ([:], [:])
@@ -546,25 +569,17 @@ actor IIDXReader {
         var clearTypeResult: [String: [Int: [String: Int]]] = [:]
         var djLevelResult: [String: [Int: [String: Int]]] = [:]
 
-        let levelColumns: [LevelColumns] = [
-            LevelColumns(difficulty: cols.srBeginnerDifficulty, clearType: cols.srBeginnerClearType,
-                         djLevel: cols.srBeginnerDJLevel, score: cols.srBeginnerScore),
-            LevelColumns(difficulty: cols.srNormalDifficulty, clearType: cols.srNormalClearType,
-                         djLevel: cols.srNormalDJLevel, score: cols.srNormalScore),
-            LevelColumns(difficulty: cols.srHyperDifficulty, clearType: cols.srHyperClearType,
-                         djLevel: cols.srHyperDJLevel, score: cols.srHyperScore),
-            LevelColumns(difficulty: cols.srAnotherDifficulty, clearType: cols.srAnotherClearType,
-                         djLevel: cols.srAnotherDJLevel, score: cols.srAnotherScore),
-            LevelColumns(difficulty: cols.srLeggendariaDifficulty, clearType: cols.srLeggendariaClearType,
-                         djLevel: cols.srLeggendariaDJLevel, score: cols.srLeggendariaScore)
-        ]
-
         let idSet = importGroupIDs
-        let table = IIDXPlayDataDatabase.songRecordTable
+        var table = IIDXPlayDataDatabase.songRecordTable
             .filter(idSet.contains(cols.srImportGroupID) && cols.srPlayType == playType.rawValue)
+        if let versions = filters?.versions, !versions.isEmpty {
+            table = table.filter(Array(versions).contains(cols.srVersion))
+        }
 
-        for level in levelColumns {
-            let clearQuery = table
+        for level in Self.levelColumns {
+            guard let levelTable = Self.filteredTable(table, for: level, filters: filters) else { continue }
+
+            let clearQuery = levelTable
                 .select(cols.srImportGroupID, level.difficulty, level.clearType, level.score.count)
                 .filter(level.difficulty > 0 && level.clearType != "NO PLAY" && level.score > 0)
                 .group(cols.srImportGroupID, level.difficulty, level.clearType)
@@ -579,7 +594,7 @@ actor IIDXReader {
                 }
             }
 
-            let djQuery = table
+            let djQuery = levelTable
                 .select(cols.srImportGroupID, level.difficulty, level.djLevel, level.djLevel.count)
                 .filter(level.difficulty > 0 && level.djLevel != "---")
                 .group(cols.srImportGroupID, level.difficulty, level.djLevel)
@@ -596,6 +611,25 @@ actor IIDXReader {
         }
 
         return (clearTypeResult, djLevelResult)
+    }
+
+    private static func filteredTable(_ table: Table, for level: LevelColumns, filters: FilterOptions?) -> Table? {
+        guard let filters else { return table }
+        if !filters.levels.isEmpty, !filters.levels.contains(level.level) { return nil }
+        var table = table
+        if !filters.difficulties.isEmpty {
+            table = table.filter(filters.difficulties.map(\.rawValue).contains(level.difficulty))
+        }
+        if !filters.clearTypes.isEmpty {
+            table = table.filter(filters.clearTypes.map(\.rawValue).contains(level.clearType))
+        }
+        if !filters.djLevels.isEmpty {
+            table = table.filter(filters.djLevels.map(\.rawValue).contains(level.djLevel))
+        }
+        if filters.onlyPlayDataWithScores {
+            table = table.filter(level.score > 0)
+        }
+        return table
     }
 
     func importGroups(for version: IIDXVersion) -> [ImportGroup] {

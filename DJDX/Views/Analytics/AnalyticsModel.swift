@@ -57,7 +57,7 @@ final class AnalyticsModel {
         towerEntries.reduce(0) { $0 + $1.scratchCount } / 100
     }
 
-    func reload(playType: IIDXPlayType, iidxVersion: IIDXVersion) async {
+    func reload(playType: IIDXPlayType, iidxVersion: IIDXVersion, filters: FilterOptions? = nil) async {
         dataState = .loading
         try? await Task.sleep(for: .seconds(0.5))
         if let sessionStore {
@@ -68,9 +68,9 @@ final class AnalyticsModel {
             }
             return
         }
-        await reloadOverview(playType: playType, iidxVersion: iidxVersion)
-        await reloadTrends(playType: playType, iidxVersion: iidxVersion)
-        await reloadNewClearsAndHighScores(playType: playType, iidxVersion: iidxVersion)
+        await reloadOverview(playType: playType, iidxVersion: iidxVersion, filters: filters)
+        await reloadTrends(playType: playType, iidxVersion: iidxVersion, filters: filters)
+        await reloadNewClearsAndHighScores(playType: playType, iidxVersion: iidxVersion, filters: filters)
         towerEntries = await fetcher.allTowerEntries()
         await WidgetDataPublisher.shared.publishClearTypeAndDJLevel(
             playType: playType, iidxVersion: iidxVersion
@@ -80,12 +80,12 @@ final class AnalyticsModel {
         }
     }
 
-    func reloadOverview(playType: IIDXPlayType, iidxVersion: IIDXVersion) async {
+    func reloadOverview(playType: IIDXPlayType, iidxVersion: IIDXVersion, filters: FilterOptions? = nil) async {
         debugPrint("Calculating overview")
         let importGroupID = await fetcher.importGroups(for: iidxVersion).last?.id
         if let importGroupID {
             let result = await fetcher.aggregatedCounts(
-                for: [importGroupID], playType: playType
+                for: [importGroupID], playType: playType, filters: filters
             )
             let rawClearType = result.clearType[importGroupID]
             let rawDJLevel = result.djLevel[importGroupID]
@@ -112,7 +112,7 @@ final class AnalyticsModel {
         }
     }
 
-    func reloadTrends(playType: IIDXPlayType, iidxVersion: IIDXVersion) async {
+    func reloadTrends(playType: IIDXPlayType, iidxVersion: IIDXVersion, filters: FilterOptions? = nil) async {
         debugPrint("Calculating trends")
         let importGroups = await fetcher.importGroups(for: iidxVersion)
         guard !importGroups.isEmpty else { return }
@@ -120,7 +120,7 @@ final class AnalyticsModel {
         let importGroupIDs = importGroups.map(\.id)
         let idToDate = Dictionary(uniqueKeysWithValues: importGroups.map { ($0.id, $0.importDate) })
 
-        let result = await fetcher.aggregatedCounts(for: importGroupIDs, playType: playType)
+        let result = await fetcher.aggregatedCounts(for: importGroupIDs, playType: playType, filters: filters)
 
         var newClearTypeData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
         var newDJLevelData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
@@ -148,7 +148,9 @@ final class AnalyticsModel {
         }
     }
 
-    func reloadNewClearsAndHighScores(playType: IIDXPlayType, iidxVersion: IIDXVersion) async {
+    func reloadNewClearsAndHighScores(
+        playType: IIDXPlayType, iidxVersion: IIDXVersion, filters: FilterOptions? = nil
+    ) async {
         debugPrint("Calculating new clears and high scores")
         let importGroups = await fetcher.importGroups(for: iidxVersion)
 
@@ -184,7 +186,9 @@ final class AnalyticsModel {
         })
         let previousRecords = await previousRecordsTask
 
-        let computed = Self.computeNewEntries(latestRecords: latestRecords, previousRecords: previousRecords)
+        let computed = Self.computeNewEntries(
+            latestRecords: latestRecords, previousRecords: previousRecords, filters: filters
+        )
 
         withAnimation(.smooth.speed(2.0)) {
             self.newClears = computed.clears["CLEAR"]!
@@ -204,7 +208,8 @@ final class AnalyticsModel {
     // swiftlint:disable function_body_length
     nonisolated static func computeNewEntries(
         latestRecords: [IIDXSongRecord],
-        previousRecords: [IIDXSongRecord]
+        previousRecords: [IIDXSongRecord],
+        filters: FilterOptions? = nil
     // swiftlint:disable:next large_tuple
     ) -> (
         clears: [String: [NewClearEntry]],
@@ -241,11 +246,15 @@ final class AnalyticsModel {
         ]
 
         for latestRecord in latestRecords {
+            if let versions = filters?.versions, !versions.isEmpty, !versions.contains(latestRecord.version) {
+                continue
+            }
             let previousRecord = previousByTitle[Self.matchKey(for: latestRecord)]
 
             for (level, keyPath) in levels {
                 let latestScore = latestRecord[keyPath: keyPath]
                 guard latestScore.difficulty > 0, latestScore.score > 0 else { continue }
+                if let filters, !Self.score(latestScore, level: level, matches: filters) { continue }
 
                 let previousScore = previousRecord?[keyPath: keyPath]
                 let previousClearType = previousScore?.clearType ?? "NO PLAY"
@@ -289,6 +298,17 @@ final class AnalyticsModel {
     // swiftlint:enable function_body_length
 
     // MARK: - Helpers
+
+    nonisolated static func score(_ score: IIDXLevelScore, level: IIDXLevel, matches filters: FilterOptions) -> Bool {
+        if !filters.levels.isEmpty, !filters.levels.contains(level) { return false }
+        if !filters.difficulties.isEmpty,
+           !filters.difficulties.contains(where: { $0.rawValue == score.difficulty }) { return false }
+        if !filters.clearTypes.isEmpty,
+           !filters.clearTypes.contains(where: { $0.rawValue == score.clearType }) { return false }
+        if !filters.djLevels.isEmpty,
+           !filters.djLevels.contains(where: { $0.rawValue == score.djLevel }) { return false }
+        return true
+    }
 
     nonisolated static func matchKey(for record: IIDXSongRecord) -> String {
         record.titleCompact() + "\u{1}" + record.artist.compact

@@ -16,6 +16,12 @@ struct AnalyticsView: View {
     @AppStorage(wrappedValue: Game.iidxArcade, "Global.SelectedGame") var selectedGame: Game
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: true, "ScoresView.ScoreAvailableOnlyFilter") var isShowingOnlyPlayDataWithScores: Bool
+    @AppStorage(wrappedValue: [], "ScoresView.DifficultyFilters") var difficultiesToShow: Set<IIDXDifficulty>
+    @AppStorage(wrappedValue: [], "ScoresView.LevelFilters") var levelsToShow: Set<IIDXLevel>
+    @AppStorage(wrappedValue: [], "ScoresView.ClearTypeFilters") var clearTypesToShow: Set<IIDXClearType>
+    @AppStorage(wrappedValue: [], "ScoresView.DJLevelFilters") var djLevelsToShow: Set<IIDXDJLevel>
+    @AppStorage(wrappedValue: [], "ScoresView.VersionFilters") var versionsToShow: Set<String>
 
     // Card ordering
     @AppStorage(wrappedValue: Data(), "Analytics.CardOrder") var cardOrderData: Data
@@ -334,6 +340,11 @@ struct AnalyticsView: View {
                     debugPrint("Reloaded on change of version")
                 }
             }
+            .onChange(of: filters) { _, _ in
+                if model.sessionStore == nil {
+                    Task { await reload() }
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
                 Task { await reload() }
             }
@@ -362,8 +373,18 @@ struct AnalyticsView: View {
             }
     }
 
+    var filters: FilterOptions {
+        FilterOptions(playType: playTypeToShow,
+                      onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
+                      levels: levelsToShow,
+                      difficulties: difficultiesToShow,
+                      clearTypes: clearTypesToShow,
+                      djLevels: djLevelsToShow,
+                      versions: versionsToShow)
+    }
+
     func reload() async {
-        await model.reload(playType: playTypeToShow, iidxVersion: iidxVersion)
+        await model.reload(playType: playTypeToShow, iidxVersion: iidxVersion, filters: filters)
     }
 
 }
