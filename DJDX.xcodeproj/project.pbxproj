@@ -15,7 +15,7 @@
 		E47D068D2F53F4E6006081EF /* DJDX Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA000001300100000000000D /* DJDX Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4BF6DA82FE821DD00D0E9D0 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4BF6DA72FE821DD00D0E9D0 /* WidgetKit.framework */; };
 		E4BF6DAA2FE821DD00D0E9D0 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4BF6DA92FE821DD00D0E9D0 /* SwiftUI.framework */; };
-		E4BF6DB72FE821DE00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E4BF6DB72FE821DE00D0E9D0 /* DJDX CHARGE Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4E3D0D72BF9A220001942FE /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4E3D0D62BF9A220001942FE /* Komponents */; };
 /* End PBXBuildFile section */
 
@@ -86,7 +86,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				E4BF6DB72FE821DE00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex in Embed Foundation Extensions */,
+				E4BF6DB72FE821DE00D0E9D0 /* DJDX CHARGE Widgets.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -97,23 +97,25 @@
 		AA000001300100000000000D /* DJDX Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "DJDX Widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DJDX CHARGE.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DJDX.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "DJDX CHARGE WidgetsExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "DJDX CHARGE Widgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4BF6DA72FE821DD00D0E9D0 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		E4BF6DA92FE821DD00D0E9D0 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-        AAE100013001000000000001 /* Watch Info.plist */ = {
-            isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-            membershipExceptions = (Info.plist, );
-            target = E4449F142FE17495003AC8B6 /* DJDX CHARGE */;
-        };
 		AA00000130010000000000E1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = AA000001300100000000000C /* DJDX Widgets */;
+		};
+		AAE100013001000000000001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E4449F142FE17495003AC8B6 /* DJDX CHARGE */;
 		};
 		E4449F392FE18674003AC8B6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -122,6 +124,13 @@
 				SessionElapsedClock.swift,
 			);
 			target = E4449F142FE17495003AC8B6 /* DJDX CHARGE */;
+		};
+		E49F0CD0306FAF9D0088AD6B /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				InfoPlist.xcstrings,
+			);
+			target = E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE Widgets */;
 		};
 		E4B263BC2E7998840031A646 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -136,20 +145,20 @@
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension */;
+			target = E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE Widgets */;
 		};
 		E4BF6DBF2FE8223700D0E9D0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				AppIcon.icon,
 			);
-			target = E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension */;
+			target = E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE Widgets */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AA000001300100000000000E /* Widgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AA00000130010000000000E1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Widgets; sourceTree = "<group>"; };
-		E4449F162FE17495003AC8B6 /* DJDX CHARGE */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AAE100013001000000000001 /* Watch Info.plist */, ); explicitFileTypes = {}; explicitFolders = (); path = "DJDX CHARGE"; sourceTree = "<group>"; };
+		E4449F162FE17495003AC8B6 /* DJDX CHARGE */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AAE100013001000000000001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, E49F0CD0306FAF9D0088AD6B /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "DJDX CHARGE"; sourceTree = "<group>"; };
 		E4B2630B2E79986D0031A646 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4449F392FE18674003AC8B6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, E4BF6DBF2FE8223700D0E9D0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 		E4B2636E2E7998840031A646 /* DJDX */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4B263BC2E7998840031A646 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DJDX; sourceTree = "<group>"; };
 		E4BF6DAB2FE821DD00D0E9D0 /* DJDX CHARGE Widgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4BF6DBC2FE821DE00D0E9D0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "DJDX CHARGE Widgets"; sourceTree = "<group>"; };
@@ -222,7 +231,7 @@
 				E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */,
 				AA000001300100000000000D /* DJDX Widgets.appex */,
 				E4449F152FE17495003AC8B6 /* DJDX CHARGE.app */,
-				E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex */,
+				E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE Widgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -312,9 +321,9 @@
 			productReference = E4B123AC2BF8E8E400D4A3D1 /* DJDX.app */;
 			productType = "com.apple.product-type.application";
 		};
-		E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension */ = {
+		E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE Widgets */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E4BF6DBB2FE821DE00D0E9D0 /* Build configuration list for PBXNativeTarget "DJDX CHARGE WidgetsExtension" */;
+			buildConfigurationList = E4BF6DBB2FE821DE00D0E9D0 /* Build configuration list for PBXNativeTarget "DJDX CHARGE Widgets" */;
 			buildPhases = (
 				E4BF6DA22FE821DC00D0E9D0 /* Sources */,
 				E4BF6DA32FE821DC00D0E9D0 /* Frameworks */,
@@ -327,11 +336,11 @@
 			fileSystemSynchronizedGroups = (
 				E4BF6DAB2FE821DD00D0E9D0 /* DJDX CHARGE Widgets */,
 			);
-			name = "DJDX CHARGE WidgetsExtension";
+			name = "DJDX CHARGE Widgets";
 			packageProductDependencies = (
 			);
 			productName = "DJDX CHARGE WidgetsExtension";
-			productReference = E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension.appex */;
+			productReference = E4BF6DA62FE821DC00D0E9D0 /* DJDX CHARGE Widgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -382,7 +391,7 @@
 				E4B123AB2BF8E8E400D4A3D1 /* DJDX */,
 				AA000001300100000000000C /* DJDX Widgets */,
 				E4449F142FE17495003AC8B6 /* DJDX CHARGE */,
-				E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension */,
+				E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE Widgets */,
 			);
 		};
 /* End PBXProject section */
@@ -493,7 +502,7 @@
 		};
 		E4BF6DB62FE821DE00D0E9D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE WidgetsExtension */;
+			target = E4BF6DA52FE821DC00D0E9D0 /* DJDX CHARGE Widgets */;
 			targetProxy = E4BF6DB52FE821DE00D0E9D0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -571,11 +580,11 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "DJDX CHARGE/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = DJDX;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_FILE = "DJDX CHARGE/Info.plist";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.DJDX;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -607,11 +616,11 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "DJDX CHARGE/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = DJDX;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "DJDX reads your workout, heart rate, and active energy to summarize your play sessions.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "DJDX saves your play sessions as workouts in the Health app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_FILE = "DJDX CHARGE/Info.plist";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.DJDX;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -956,7 +965,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E4BF6DBB2FE821DE00D0E9D0 /* Build configuration list for PBXNativeTarget "DJDX CHARGE WidgetsExtension" */ = {
+		E4BF6DBB2FE821DE00D0E9D0 /* Build configuration list for PBXNativeTarget "DJDX CHARGE Widgets" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E4BF6DB92FE821DE00D0E9D0 /* Debug */,

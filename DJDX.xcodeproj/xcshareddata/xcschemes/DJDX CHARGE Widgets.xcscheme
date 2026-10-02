@@ -17,7 +17,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E4BF6DA52FE821DC00D0E9D0"
-               BuildableName = "DJDX CHARGE WidgetsExtension.appex"
+               BuildableName = "DJDX CHARGE Widgets.appex"
+               BlueprintName = "DJDX CHARGE Widgets"
                ReferencedContainer = "container:DJDX.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -74,7 +75,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4BF6DA52FE821DC00D0E9D0"
-            BuildableName = "DJDX CHARGE WidgetsExtension.appex"
+            BuildableName = "DJDX CHARGE Widgets.appex"
+            BlueprintName = "DJDX CHARGE Widgets"
             ReferencedContainer = "container:DJDX.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -115,7 +117,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4BF6DA52FE821DC00D0E9D0"
-            BuildableName = "DJDX CHARGE WidgetsExtension.appex"
+            BuildableName = "DJDX CHARGE Widgets.appex"
+            BlueprintName = "DJDX CHARGE Widgets"
             ReferencedContainer = "container:DJDX.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
