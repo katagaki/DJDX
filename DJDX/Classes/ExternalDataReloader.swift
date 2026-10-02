@@ -228,11 +228,9 @@ struct ExternalDataReloader {
 
     // MARK: - bm2dx.com
 
-    // swiftlint:disable:next function_body_length cyclomatic_complexity
     private static func reloadBM2DX(progress: Progress) async -> Int {
         let importer = IIDXImporter()
         progress(0, 1)
-        await importer.deleteAllNotesRadar()
         var allEntries: [ChartRadarData] = []
 
         do {
@@ -241,55 +239,40 @@ struct ExternalDataReloader {
             guard let decompressedData = data.gunzip() else { return 0 }
             guard let json = try? JSONSerialization.jsonObject(with: decompressedData) as? [String: Any],
                   let midDict = json["mid"] as? [String: String],
-                  let notesRadar = json["notes_radar"] as? [String: [String: [[String: Any]]]] else {
+                  let radarSP = json["radar_sp"] as? [[Any]],
+                  let radarDP = json["radar_dp"] as? [[Any]],
+                  !radarSP.isEmpty, !radarDP.isEmpty else {
                 return 0
             }
 
-            var lookup: [String: [String: [Int: (noteCount: Int, values: [String: Double])]]] = [:]
-            for (playType, radarTypes) in notesRadar {
-                for (radarType, entries) in radarTypes {
-                    for entry in entries {
-                        guard let mid = entry["mid"] as? String,
-                              let difficulty = entry["difficult"] as? Int,
-                              let noteCount = entry["note"] as? Int,
-                              let value = entry["value"] as? Double else { continue }
-                        lookup[playType, default: [:]][mid, default: [:]][difficulty, default: (
-                            noteCount: noteCount, values: [:]
-                        )].noteCount = noteCount
-                        lookup[playType, default: [:]][mid, default: [:]][difficulty, default: (
-                            noteCount: noteCount, values: [:]
-                        )].values[radarType] = value
-                    }
-                }
-            }
-
-            for (playType, mids) in lookup {
-                for (mid, difficulties) in mids {
-                    guard let title = midDict[mid] else { continue }
-                    for (difficulty, data) in difficulties {
-                        let radarData = RadarData(
-                            notes: data.values["NOTES"] ?? 0.0,
-                            chord: data.values["CHORD"] ?? 0.0,
-                            peak: data.values["PEAK"] ?? 0.0,
-                            charge: data.values["CHARGE"] ?? 0.0,
-                            scratch: data.values["SCRATCH"] ?? 0.0,
-                            soflan: data.values["SOFLAN"] ?? 0.0
-                        )
-                        allEntries.append(ChartRadarData(
-                            title: title,
-                            playType: playType,
-                            difficulty: difficulty,
-                            noteCount: data.noteCount,
-                            radarData: radarData
-                        ))
-                    }
+            for (playType, rows) in [("SP", radarSP), ("DP", radarDP)] {
+                for row in rows {
+                    guard row.count == 10,
+                          let mid = row[0] as? String,
+                          let title = midDict[mid],
+                          let difficulty = row[1] as? Int,
+                          let noteCount = row[3] as? Int,
+                          let notes = row[4] as? Double,
+                          let chord = row[5] as? Double,
+                          let peak = row[6] as? Double,
+                          let charge = row[7] as? Double,
+                          let scratch = row[8] as? Double,
+                          let soflan = row[9] as? Double else { return 0 }
+                    allEntries.append(ChartRadarData(
+                        title: title,
+                        playType: playType,
+                        difficulty: difficulty,
+                        noteCount: noteCount,
+                        radarData: RadarData(notes: notes, chord: chord, peak: peak,
+                                             charge: charge, scratch: scratch, soflan: soflan)
+                    ))
                 }
             }
         } catch {
             debugPrint("Failed to fetch BM2DX data: \(error)")
         }
 
-        await importer.insertNotesRadarEntries(allEntries)
+        guard await importer.replaceAllNotesRadarEntries(allEntries) else { return 0 }
         progress(1, 1)
         return await IIDXReader().chartRadarDataCount()
     }

@@ -369,30 +369,32 @@ actor IIDXImporter {
 
     // MARK: BM2DX Notes Radar
 
-    func deleteAllNotesRadar() {
-        guard let database = try? BM2DXDatabase.shared.getWriteConnection() else { return }
-        _ = try? database.run(BM2DXDatabase.notesRadarTable.delete())
-    }
-
-    func insertNotesRadarEntries(_ entries: [ChartRadarData]) {
-        guard let database = try? BM2DXDatabase.shared.getWriteConnection() else { return }
+    func replaceAllNotesRadarEntries(_ entries: [ChartRadarData]) -> Bool {
+        guard !entries.isEmpty,
+              let database = try? BM2DXDatabase.shared.getWriteConnection() else { return false }
         let col = BM2DXDatabase.self
-        try? database.transaction {
-            for entry in entries {
-                _ = try? database.run(col.notesRadarTable.insert(or: .replace,
-                    col.nrTitle <- entry.title,
-                    col.nrPlayType <- entry.playType,
-                    col.nrDifficulty <- entry.difficulty,
-                    col.nrNoteCount <- entry.noteCount,
-                    col.nrNotes <- entry.radarData.notes,
-                    col.nrChord <- entry.radarData.chord,
-                    col.nrPeak <- entry.radarData.peak,
-                    col.nrCharge <- entry.radarData.charge,
-                    col.nrScratch <- entry.radarData.scratch,
-                    col.nrSoflan <- entry.radarData.soflan
-                ))
+        do {
+            try database.transaction {
+                try database.run(col.notesRadarTable.delete())
+                for entry in entries {
+                    try database.run(col.notesRadarTable.insert(or: .replace,
+                        col.nrTitle <- entry.title,
+                        col.nrPlayType <- entry.playType,
+                        col.nrDifficulty <- entry.difficulty,
+                        col.nrNoteCount <- entry.noteCount,
+                        col.nrNotes <- entry.radarData.notes,
+                        col.nrChord <- entry.radarData.chord,
+                        col.nrPeak <- entry.radarData.peak,
+                        col.nrCharge <- entry.radarData.charge,
+                        col.nrScratch <- entry.radarData.scratch,
+                        col.nrSoflan <- entry.radarData.soflan
+                    ))
+                }
             }
+            return true
+        } catch {
+            debugPrint("Failed to replace BM2DX notes radar: \(error)")
+            return false
         }
     }
-
 }
