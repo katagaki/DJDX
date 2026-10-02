@@ -236,7 +236,7 @@ struct ExternalDataReloader {
         var allEntries: [ChartRadarData] = []
 
         do {
-            let url = URL(string: "https://bm2dx.com/IIDX/notes_radar/notes_radar.json.gz")!
+            let url = URL(string: "https://bm2dx.com/IIDX/notes_radar/notes_radar_data.json.gz")!
             let (data, _) = try await URLSession.shared.data(from: url)
             guard let decompressedData = data.gunzip() else { return 0 }
             guard let json = try? JSONSerialization.jsonObject(with: decompressedData) as? [String: Any],
