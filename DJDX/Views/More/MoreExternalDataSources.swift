@@ -28,9 +28,8 @@ struct MoreExternalDataSources: View {
     @State var isTextageReloadCompleted: Bool = false
     @State var isTextageChartViewerReloadCompleted: Bool = false
     @State var isDDRReloadCompleted: Bool = false
-    @State var dataImported: Int = 0
-    @State var dataTotal: Int = 2
-    @State var reloadingSource: ExternalDataReloadSource?
+    @State var reloadingSources: Set<ExternalDataReloadSource> = []
+    @State var reloadProgress: [ExternalDataReloadSource: Double] = [:]
 
     enum ExternalDataReloadSource {
         case bemaniWiki, bm2dx, sdvxIn, textage, textageChartViewer, ddr
@@ -185,15 +184,17 @@ struct MoreExternalDataSources: View {
                     .padding(.vertical, 12.0)
                 HStack {
                     Button("More.ExternalData.UpdateData") {
-                        reloadingSource = source
+                        reloadingSources.insert(source)
+                        reloadProgress[source] = 0.0
                         Task {
                             await reload()
-                            reloadingSource = nil
+                            reloadingSources.remove(source)
+                            reloadProgress[source] = nil
                             completed.wrappedValue = true
                             NotificationCenter.default.post(name: .externalDataChanged, object: nil)
                         }
                     }
-                    .disabled(reloadingSource != nil)
+                    .disabled(reloadingSources.contains(source))
                     Spacer()
                     reloadIndicator(for: source)
                 }
@@ -209,13 +210,19 @@ struct MoreExternalDataSources: View {
 
     @ViewBuilder
     private func reloadIndicator(for source: ExternalDataReloadSource) -> some View {
-        if reloadingSource == source {
+        if reloadingSources.contains(source) {
             switch source {
             case .bm2dx, .ddr, .textageChartViewer:
                 ProgressView()
             default:
-                ProgressDonut(progress: dataTotal > 0 ? Double(dataImported) / Double(dataTotal) : 0.0)
+                ProgressDonut(progress: reloadProgress[source] ?? 0.0)
             }
+        }
+    }
+
+    private func progressHandler(for source: ExternalDataReloadSource) -> ExternalDataReloader.Progress {
+        { done, total in
+            reloadProgress[source] = total > 0 ? Double(done) / Double(total) : 0.0
         }
     }
 
@@ -343,58 +350,41 @@ struct MoreExternalDataSources: View {
         }
     }
 
-    // MARK: - Textage Data Loading
+    // MARK: - Data Loading
 
     func reloadTextageData() async {
-        textageEntryCount = await ExternalDataReloader.reload(.textage, iidxVersion: iidxVersion) { done, total in
-            dataImported = done
-            dataTotal = total
-        }
+        textageEntryCount = await ExternalDataReloader.reload(
+            .textage, iidxVersion: iidxVersion, progress: progressHandler(for: .textage)
+        )
     }
-
-    // MARK: - Textage Chart Viewer Data Loading
 
     func reloadTextageChartViewerData() async {
         textageChartViewerEntryCount = await ExternalDataReloader.reload(
-            .textageChartViewer,
-            iidxVersion: iidxVersion
-        ) { done, total in
-            dataImported = done
-            dataTotal = total
-        }
+            .textageChartViewer, iidxVersion: iidxVersion, progress: progressHandler(for: .textageChartViewer)
+        )
     }
-
-    // MARK: - sdvx.in Data Loading
 
     func reloadSDVXInData() async {
-        sdvxInEntryCount = await ExternalDataReloader.reload(.sdvxIn, iidxVersion: iidxVersion) { done, total in
-            dataImported = done
-            dataTotal = total
-        }
+        sdvxInEntryCount = await ExternalDataReloader.reload(
+            .sdvxIn, iidxVersion: iidxVersion, progress: progressHandler(for: .sdvxIn)
+        )
     }
-
-    // MARK: - BEMANIWiki Data Loading
 
     func reloadBemaniWikiData() async {
-        bemaniWikiEntryCount = await ExternalDataReloader.reload(.wikiIidx, iidxVersion: iidxVersion) { done, total in
-            dataImported = done
-            dataTotal = total
-        }
+        bemaniWikiEntryCount = await ExternalDataReloader.reload(
+            .wikiIidx, iidxVersion: iidxVersion, progress: progressHandler(for: .bemaniWiki)
+        )
     }
 
-    // MARK: - BM2DX Data Loading
-
     func reloadBM2DXData() async {
-        bm2dxEntryCount = await ExternalDataReloader.reload(.bm2dx, iidxVersion: iidxVersion) { done, total in
-            dataImported = done
-            dataTotal = total
-        }
+        bm2dxEntryCount = await ExternalDataReloader.reload(
+            .bm2dx, iidxVersion: iidxVersion, progress: progressHandler(for: .bm2dx)
+        )
     }
 
     func reloadDDRData() async {
-        ddrSongMetaCount = await ExternalDataReloader.reload(.wikiDdr, iidxVersion: iidxVersion) { done, total in
-            dataImported = done
-            dataTotal = total
-        }
+        ddrSongMetaCount = await ExternalDataReloader.reload(
+            .wikiDdr, iidxVersion: iidxVersion, progress: progressHandler(for: .ddr)
+        )
     }
 }
