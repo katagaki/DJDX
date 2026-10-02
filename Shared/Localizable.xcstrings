@@ -502,52 +502,6 @@
         }
       }
     },
-    "Alert.ExternalData.Completed.Text.%lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld charts were read successfully."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld曲の譜面データが読み込まれました。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已成功讀取 %lld 個譜面的資料。"
-          }
-        }
-      }
-    },
-    "Alert.ExternalData.Completed.Title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Data Updated Successful"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データ取得が成功しました"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "資料更新成功"
-          }
-        }
-      }
-    },
     "Alert.ExternalData.Downloading.Title" : {
       "extractionState" : "manual",
       "localizations" : {

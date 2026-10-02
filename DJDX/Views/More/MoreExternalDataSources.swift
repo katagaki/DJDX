@@ -22,12 +22,6 @@ struct MoreExternalDataSources: View {
     @State var textageChartViewerEntryCount: Int = 0
     @State var ddrSongMetaCount: Int = 0
 
-    @State var isBemaniWikiReloadCompleted: Bool = false
-    @State var isBM2DXReloadCompleted: Bool = false
-    @State var isSDVXInReloadCompleted: Bool = false
-    @State var isTextageReloadCompleted: Bool = false
-    @State var isTextageChartViewerReloadCompleted: Bool = false
-    @State var isDDRReloadCompleted: Bool = false
     @State var reloadingSources: Set<ExternalDataReloadSource> = []
     @State var reloadProgress: [ExternalDataReloadSource: Double] = [:]
 
@@ -79,91 +73,17 @@ struct MoreExternalDataSources: View {
             textageChartViewerEntryCount = await fetcher.textageChartViewerChartCount()
             ddrSongMetaCount = await ddrMetaImporter.songMetaCount()
         }
-        .alert(
-            "Alert.ExternalData.Completed.Title",
-            isPresented: $isBemaniWikiReloadCompleted,
-            actions: {
-                Button("Shared.OK", role: .cancel) {
-                    isBemaniWikiReloadCompleted = false
-                }
-            },
-            message: {
-                Text("Alert.ExternalData.Completed.Text.\(bemaniWikiEntryCount)")
-            }
-        )
-        .alert(
-            "Alert.ExternalData.Completed.Title",
-            isPresented: $isBM2DXReloadCompleted,
-            actions: {
-                Button("Shared.OK", role: .cancel) {
-                    isBM2DXReloadCompleted = false
-                }
-            },
-            message: {
-                Text("Alert.ExternalData.Completed.Text.\(bm2dxEntryCount)")
-            }
-        )
-        .alert(
-            "Alert.ExternalData.Completed.Title",
-            isPresented: $isSDVXInReloadCompleted,
-            actions: {
-                Button("Shared.OK", role: .cancel) {
-                    isSDVXInReloadCompleted = false
-                }
-            },
-            message: {
-                Text("Alert.ExternalData.Completed.Text.\(sdvxInEntryCount)")
-            }
-        )
-        .alert(
-            "Alert.ExternalData.Completed.Title",
-            isPresented: $isTextageReloadCompleted,
-            actions: {
-                Button("Shared.OK", role: .cancel) {
-                    isTextageReloadCompleted = false
-                }
-            },
-            message: {
-                Text("Alert.ExternalData.Completed.Text.\(textageEntryCount)")
-            }
-        )
-        .alert(
-            "Alert.ExternalData.Completed.Title",
-            isPresented: $isTextageChartViewerReloadCompleted,
-            actions: {
-                Button("Shared.OK", role: .cancel) {
-                    isTextageChartViewerReloadCompleted = false
-                }
-            },
-            message: {
-                Text("Alert.ExternalData.Completed.Text.\(textageChartViewerEntryCount)")
-            }
-        )
-        .alert(
-            "Alert.ExternalData.Completed.Title",
-            isPresented: $isDDRReloadCompleted,
-            actions: {
-                Button("Shared.OK", role: .cancel) {
-                    isDDRReloadCompleted = false
-                }
-            },
-            message: {
-                Text("Alert.ExternalData.Completed.Text.\(ddrSongMetaCount)")
-            }
-        )
     }
 
     // MARK: - Data Source Card
 
     @ViewBuilder
-    // swiftlint:disable:next function_parameter_count
     private func dataSourceCard<Title: View>(
         @ViewBuilder title: () -> Title,
         count: Int,
         isOn: Binding<Bool>,
         source: ExternalDataReloadSource,
-        reload: @escaping () async -> Void,
-        completed: Binding<Bool>
+        reload: @escaping () async -> Void
     ) -> some View {
         VStack(spacing: 0) {
             HStack(spacing: 12.0) {
@@ -190,7 +110,6 @@ struct MoreExternalDataSources: View {
                             await reload()
                             reloadingSources.remove(source)
                             reloadProgress[source] = nil
-                            completed.wrappedValue = true
                             NotificationCenter.default.post(name: .externalDataChanged, object: nil)
                         }
                     }
@@ -236,8 +155,7 @@ struct MoreExternalDataSources: View {
                 count: bemaniWikiEntryCount,
                 isOn: $isBemaniWikiEnabled,
                 source: .bemaniWiki,
-                reload: reloadBemaniWikiData,
-                completed: $isBemaniWikiReloadCompleted
+                reload: reloadBemaniWikiData
             )
             .padding(.bottom, 8.0)
             dataSourceCard(
@@ -245,8 +163,7 @@ struct MoreExternalDataSources: View {
                 count: ddrSongMetaCount,
                 isOn: $isDDREnabled,
                 source: .ddr,
-                reload: reloadDDRData,
-                completed: $isDDRReloadCompleted
+                reload: reloadDDRData
             )
         } header: {
             ListSectionHeader(text: "More.ExternalData.BemaniWiki2nd")
@@ -268,8 +185,7 @@ struct MoreExternalDataSources: View {
                 count: bm2dxEntryCount,
                 isOn: $isBM2DXEnabled,
                 source: .bm2dx,
-                reload: reloadBM2DXData,
-                completed: $isBM2DXReloadCompleted
+                reload: reloadBM2DXData
             )
         } header: {
             ListSectionHeader(text: "More.ExternalData.BM2DX")
@@ -291,8 +207,7 @@ struct MoreExternalDataSources: View {
                 count: sdvxInEntryCount,
                 isOn: $isSDVXInEnabled,
                 source: .sdvxIn,
-                reload: reloadSDVXInData,
-                completed: $isSDVXInReloadCompleted
+                reload: reloadSDVXInData
             )
         } header: {
             ListSectionHeader(text: "More.ExternalData.SDVXIn")
@@ -314,8 +229,7 @@ struct MoreExternalDataSources: View {
                 count: textageEntryCount,
                 isOn: $isTextageEnabled,
                 source: .textage,
-                reload: reloadTextageData,
-                completed: $isTextageReloadCompleted
+                reload: reloadTextageData
             )
         } header: {
             ListSectionHeader(text: "More.ExternalData.Textage")
@@ -337,8 +251,7 @@ struct MoreExternalDataSources: View {
                 count: textageChartViewerEntryCount,
                 isOn: $isTextageChartViewerEnabled,
                 source: .textageChartViewer,
-                reload: reloadTextageChartViewerData,
-                completed: $isTextageChartViewerReloadCompleted
+                reload: reloadTextageChartViewerData
             )
         } header: {
             ListSectionHeader(text: "More.ExternalData.TextageChartViewer")
