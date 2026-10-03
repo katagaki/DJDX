@@ -65,3 +65,13 @@ data class IIDXTowerEntry(
     val keyCount: Int = 0,
     val scratchCount: Int = 0
 )
+
+data class IIDXLevelAggregate(
+    val groupID: String,
+    val version: String,
+    val difficulty: Int,
+    val clearType: String,
+    val djLevel: String,
+    val hasScore: Boolean,
+    val count: Int
+)

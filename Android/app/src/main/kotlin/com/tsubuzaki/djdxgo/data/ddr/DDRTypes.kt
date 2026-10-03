@@ -23,10 +23,12 @@ object DDRVersionInfo {
 
     val errorPageURL = "$EAGATE/game/ddr/$SLUG/error/"
 
+    val profilePageURL = "$EAGATE/game/ddr/$SLUG/playdata/index.html"
+
     val bemaniWikiNewSongsPageURL =
-        "https://bemaniwiki.com/?DanceDanceRevolution+WORLD/%BF%B7%B6%CA%A5%EA%A5%B9%A5%C8"
+        "https://bemaniwiki.com/?DanceDanceRevolution+WORLD/%E6%96%B0%E6%9B%B2%E3%83%AA%E3%82%B9%E3%83%88"
     val bemaniWikiOldSongsPageURL =
-        "https://bemaniwiki.com/?DanceDanceRevolution+WORLD/%B5%EC%B6%CA%A5%EA%A5%B9%A5%C8"
+        "https://bemaniwiki.com/?DanceDanceRevolution+WORLD/%E6%97%A7%E6%9B%B2%E3%83%AA%E3%82%B9%E3%83%88"
 }
 
 enum class DDRPlayStyle(val value: String) {

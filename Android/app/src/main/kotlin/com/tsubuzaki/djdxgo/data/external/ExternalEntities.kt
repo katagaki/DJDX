@@ -70,9 +70,38 @@ data class SDVXInChart(
     val titleCompact: String = "",
     val level: Int = 0
 ) {
-    val pageURL: String
-        get() = "https://sdvx.in/${code.take(2)}/$code$slot.htm"
+    val folder: String
+        get() = code.take(2)
+
+    val legacyPageURL: String
+        get() = "https://sdvx.in/$folder/$code$slot.htm"
+
+    val viewerPageURL: String
+        get() = "https://sdvx.in/sdvx/_/viewer/viewer.php?id=$code$slot&folder=$folder"
+
+    val viewerDataURL: String
+        get() = "https://sdvx.in/sdvx/$folder/$code$slot.json"
 }
+
+@Entity(
+    tableName = "TextageChart",
+    indices = [Index("titleCompact", unique = true)]
+)
+data class TextageChart(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val tag: String = "",
+    val version: Int = 0,
+    val title: String = "",
+    val titleCompact: String = "",
+    val spNormal: Int = 0,
+    val spHyper: Int = 0,
+    val spAnother: Int = 0,
+    val spLeggendaria: Int = 0,
+    val dpNormal: Int = 0,
+    val dpHyper: Int = 0,
+    val dpAnother: Int = 0,
+    val dpLeggendaria: Int = 0
+)
 
 @Entity(
     tableName = "NotesRadar",

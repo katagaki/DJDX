@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Language
@@ -61,6 +62,8 @@ import com.tsubuzaki.djdxgo.AppContainer
 import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.SettingsKeys
+import com.tsubuzaki.djdxgo.data.ddr.DDRVersionInfo
+import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordVersionInfo
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVersion
@@ -90,7 +93,8 @@ private data class PendingWebImport(
 
 private data class ImportGroupRow(
     val id: String,
-    val importDate: Long
+    val importDate: Long,
+    val versionName: String
 )
 
 private sealed interface ImportState {
@@ -122,6 +126,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
     var pendingWebImport by remember { mutableStateOf<PendingWebImport?>(null) }
     var importState by remember { mutableStateOf<ImportState>(ImportState.Idle) }
     var groupPendingDeletion by remember { mutableStateOf<ImportGroupRow?>(null) }
+    var isSampleDataPromptShown by remember { mutableStateOf(false) }
 
     val importGroups by remember(game) { importGroupRowsFlow(container, game) }
         .collectAsState(initial = emptyList())
@@ -155,8 +160,31 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                     else -> Unit
                 }
             }
+            container.notifyImportCompleted()
             withContext(Dispatchers.Main) {
                 importState = ImportState.Succeeded
+            }
+        }
+    }
+
+    fun importSampleData() {
+        val sampleFile = if (game == Game.SOUND_VOLTEX) "SampleDataSDVX.csv" else "SampleData.csv"
+        val importDate = importDateEpochSeconds(selectedDate)
+        importState = ImportState.Importing
+        scope.launch(Dispatchers.IO) {
+            val content = runCatching {
+                context.assets.open(sampleFile).bufferedReader(Charsets.UTF_8).use { it.readText() }
+            }.getOrNull()
+            if (content != null) {
+                if (game == Game.SOUND_VOLTEX) {
+                    container.sdvxRepository.importCSV(content, importDate, sdvxVersion)
+                } else {
+                    container.iidxRepository.importCSV(content, importDate, IIDXPlayType.SINGLE)
+                }
+                container.notifyImportCompleted()
+            }
+            withContext(Dispatchers.Main) {
+                importState = if (content != null) ImportState.Succeeded else ImportState.Failed(ImportFailedReason.SERVER_ERROR)
             }
         }
     }
@@ -193,6 +221,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                                 result.payload, importDate
                             )
                         }
+                        container.notifyImportCompleted()
                         withContext(Dispatchers.Main) {
                             importState = ImportState.Succeeded
                         }
@@ -211,6 +240,16 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                                 Icons.Filled.Close,
                                 contentDescription = stringResource(R.string.import_close)
                             )
+                        }
+                    },
+                    actions = {
+                        if (game == Game.IIDX_ARCADE || game == Game.SOUND_VOLTEX) {
+                            IconButton(onClick = { isSampleDataPromptShown = true }) {
+                                Icon(
+                                    Icons.AutoMirrored.Outlined.HelpOutline,
+                                    contentDescription = stringResource(R.string.import_load_samples)
+                                )
+                            }
                         }
                     }
                 )
@@ -318,6 +357,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                                 headlineContent = {
                                     Text(formatEpochDate(group.importDate, dateFormatter))
                                 },
+                                supportingContent = { Text(group.versionName) },
                                 trailingContent = {
                                     IconButton(onClick = { groupPendingDeletion = group }) {
                                         Icon(
@@ -436,6 +476,27 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
         ImportState.Idle -> Unit
     }
 
+    if (isSampleDataPromptShown) {
+        AlertDialog(
+            onDismissRequest = { isSampleDataPromptShown = false },
+            title = { Text(stringResource(R.string.import_load_samples)) },
+            text = { Text(stringResource(R.string.import_load_samples_description)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    isSampleDataPromptShown = false
+                    importSampleData()
+                }) {
+                    Text(stringResource(R.string.import_load_samples))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { isSampleDataPromptShown = false }) {
+                    Text(stringResource(R.string.import_cancel))
+                }
+            }
+        )
+    }
+
     groupPendingDeletion?.let { group ->
         AlertDialog(
             onDismissRequest = { groupPendingDeletion = null },
@@ -445,6 +506,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                         groupPendingDeletion = null
                         scope.launch(Dispatchers.IO) {
                             deleteImportGroup(container, game, group.id)
+                            container.notifyDataChanged()
                         }
                     }
                 ) {
@@ -479,14 +541,20 @@ private fun ImportFailedReason.messageResource(): Int = when (this) {
 
 private fun importGroupRowsFlow(container: AppContainer, game: Game): Flow<List<ImportGroupRow>> =
     when (game) {
-        Game.IIDX_ARCADE -> container.database.iidxDao().importGroupsFlow()
-            .map { groups -> groups.map { ImportGroupRow(it.id, it.importDate) } }
+        Game.IIDX_ARCADE -> container.database.iidxDao().importGroupsFlow(IIDXVersionInfo.NUMBER)
+            .map { groups -> groups.map { ImportGroupRow(it.id, it.importDate, IIDXVersionInfo.MARKETING_NAME) } }
         Game.SOUND_VOLTEX -> container.database.sdvxDao().importGroupsFlow()
-            .map { groups -> groups.map { ImportGroupRow(it.id, it.importDate) } }
+            .map { groups ->
+                groups.map {
+                    ImportGroupRow(it.id, it.importDate, SDVXVersion.fromNumber(it.version ?: 0).marketingName)
+                }
+            }
         Game.POLARIS_CHORD -> container.database.polarisChordDao().importGroupsFlow()
-            .map { groups -> groups.map { ImportGroupRow(it.id, it.importDate) } }
+            .map { groups ->
+                groups.map { ImportGroupRow(it.id, it.importDate, PolarisChordVersionInfo.MARKETING_NAME) }
+            }
         Game.DANCE_DANCE_REVOLUTION -> container.database.ddrDao().importGroupsFlow()
-            .map { groups -> groups.map { ImportGroupRow(it.id, it.importDate) } }
+            .map { groups -> groups.map { ImportGroupRow(it.id, it.importDate, DDRVersionInfo.MARKETING_NAME) } }
     }
 
 private suspend fun deleteImportGroup(container: AppContainer, game: Game, groupID: String) {

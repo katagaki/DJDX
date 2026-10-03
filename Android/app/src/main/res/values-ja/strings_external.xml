@@ -5,17 +5,27 @@
     <string name="external_reload_all">有効なソースを一括再読み込み</string>
     <string name="external_reload">再読み込み</string>
     <string name="external_entry_count">%1$s件のエントリー</string>
-    <string name="external_reload_done">%1$s件のエントリーを再読み込みしました。</string>
-    <string name="external_reload_failed">再読み込みに失敗しました: %1$s</string>
+    <string name="external_reload_done">%1$s曲の譜面データが読み込まれました。</string>
+    <string name="external_reload_failed">データを更新できませんでした。しばらくしてからもう一度お試しください。</string>
 
     <string name="external_textage_chart_viewer_name">Textage Chart Viewer</string>
     <string name="external_textage_chart_viewer_description">IIDXの譜面ビューアーへのリンク</string>
     <string name="external_bemaniwiki_iidx_name">BEMANIWiki (IIDX)</string>
     <string name="external_bemaniwiki_iidx_description">スコアレート算出用の総ノーツ数</string>
-    <string name="external_bm2dx_name">bm2dx.com</string>
-    <string name="external_bm2dx_description">ノーツレーダーのデータ</string>
-    <string name="external_sdvxin_name">sdvx.in</string>
+    <string name="external_bm2dx_name">joy to the beat...</string>
+    <string name="external_bm2dx_description">譜面別ノーツレーダー</string>
+    <string name="external_sdvxin_name">SDVX譜面保管所</string>
     <string name="external_sdvxin_description">SDVXの譜面へのリンク</string>
     <string name="external_ddr_name">BEMANIWiki (DDR)</string>
     <string name="external_ddr_description">DDRの楽曲レベル情報</string>
+    <string name="external_textage_name">Textage</string>
+    <string name="external_textage_footer">DJDXはTextageとは一切関係ありません。</string>
+    <string name="external_textage_chart_viewer_footer">DJDXはTextage Chart Viewerとは一切関係ありません。</string>
+    <string name="external_sdvxin_footer">DJDXはSDVX譜面保管所とは一切関係ありません。</string>
+    <string name="external_bemaniwiki_name">BEMANIWiki 2nd</string>
+    <string name="external_bemaniwiki_footer">DJDXはBEMANIWiki 2ndとは一切関係ありません。</string>
+    <string name="external_bm2dx_footer">DJDXはbm2dx.comとは一切関係ありません。</string>
+    <string name="external_chart_index">譜面インデックス</string>
+    <string name="external_view_source">ソースを見る</string>
+    <string name="external_update_data">データを更新</string>
 </resources>

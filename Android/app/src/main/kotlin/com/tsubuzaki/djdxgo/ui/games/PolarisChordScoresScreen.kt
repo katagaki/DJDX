@@ -74,7 +74,8 @@ fun PolarisChordScoresScreen(
     var selectedDateEpoch by rememberSaveable { mutableLongStateOf(Instant.now().epochSecond) }
     var records by remember { mutableStateOf(listOf<PolarisChordSongRecord>()) }
     var isLoaded by remember { mutableStateOf(false) }
-    LaunchedEffect(selectedDateEpoch) {
+    val dataVersion by container.dataVersion.collectAsState()
+    LaunchedEffect(selectedDateEpoch, dataVersion) {
         records = withContext(Dispatchers.IO) {
             container.polarisChordRepository.songRecords(selectedDateEpoch)
         }

@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.tsubuzaki.djdxgo.data.ddr.DDRDao
 import com.tsubuzaki.djdxgo.data.ddr.DDRImportGroup
 import com.tsubuzaki.djdxgo.data.ddr.DDRSongRecord
@@ -12,6 +14,7 @@ import com.tsubuzaki.djdxgo.data.external.ExternalDataDao
 import com.tsubuzaki.djdxgo.data.external.IIDXSong
 import com.tsubuzaki.djdxgo.data.external.NotesRadarEntry
 import com.tsubuzaki.djdxgo.data.external.SDVXInChart
+import com.tsubuzaki.djdxgo.data.external.TextageChart
 import com.tsubuzaki.djdxgo.data.external.TextageChartViewerChart
 import com.tsubuzaki.djdxgo.data.iidx.IIDXDao
 import com.tsubuzaki.djdxgo.data.iidx.IIDXImportGroup
@@ -39,9 +42,10 @@ import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
         TextageChartViewerChart::class,
         SDVXInChart::class,
         NotesRadarEntry::class,
-        DDRSongMeta::class
+        DDRSongMeta::class,
+        TextageChart::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class DJDXDatabase : RoomDatabase() {
@@ -52,6 +56,21 @@ abstract class DJDXDatabase : RoomDatabase() {
     abstract fun externalDataDao(): ExternalDataDao
 
     companion object {
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `TextageChart` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`tag` TEXT NOT NULL, `version` INTEGER NOT NULL, `title` TEXT NOT NULL, " +
+                        "`titleCompact` TEXT NOT NULL, `spNormal` INTEGER NOT NULL, `spHyper` INTEGER NOT NULL, " +
+                        "`spAnother` INTEGER NOT NULL, `spLeggendaria` INTEGER NOT NULL, `dpNormal` INTEGER NOT NULL, " +
+                        "`dpHyper` INTEGER NOT NULL, `dpAnother` INTEGER NOT NULL, `dpLeggendaria` INTEGER NOT NULL)"
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_TextageChart_titleCompact` ON `TextageChart` (`titleCompact`)"
+                )
+            }
+        }
+
         @Volatile
         private var instance: DJDXDatabase? = null
 
@@ -61,7 +80,7 @@ abstract class DJDXDatabase : RoomDatabase() {
                     context.applicationContext,
                     DJDXDatabase::class.java,
                     "PlayData.db"
-                ).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
             }
     }
 }

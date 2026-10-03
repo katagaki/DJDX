@@ -7,12 +7,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.lifecycle.lifecycleScope
-import com.tsubuzaki.djdxgo.data.SettingsKeys
-import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.ui.DJDXApp
 import com.tsubuzaki.djdxgo.ui.theme.DJDXTheme
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,10 +34,6 @@ class MainActivity : ComponentActivity() {
     private fun handleDeepLink(intent: Intent) {
         val uri = intent.data ?: return
         if (uri.scheme != "djdx") return
-        when (uri.host) {
-            "reonboard" -> lifecycleScope.launch {
-                setSetting(SettingsKeys.onboardingLastSeenVersion, "")
-            }
-        }
+        (application as DJDXApplication).container.handleDeepLink(uri)
     }
 }

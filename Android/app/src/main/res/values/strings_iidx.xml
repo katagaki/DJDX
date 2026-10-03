@@ -48,4 +48,12 @@
     <string name="scores_viewer_miss">MISS</string>
     <string name="scores_viewer_youtube">YouTube</string>
     <string name="scores_viewer_chart_viewer">Chart Viewer</string>
+    <string name="scores_filter_version">Version</string>
+    <string name="scores_viewer_textage_1p">1P Chart</string>
+    <string name="scores_viewer_textage_2p">2P Chart</string>
+    <string name="scores_viewer_textage_dp">DP Chart</string>
+    <string name="textage_viewer_title">Textage Viewer</string>
+    <string name="textage_source_chart_viewer">Chart Viewer</string>
+    <string name="textage_source_legacy">Legacy</string>
+    <string name="textage_fallback_message">Chart not opening?\nTry searching manually on Textage.</string>
 </resources>

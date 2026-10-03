@@ -82,7 +82,8 @@ fun DDRScoresScreen(
     var selectedDateEpoch by rememberSaveable { mutableLongStateOf(Instant.now().epochSecond) }
     var records by remember { mutableStateOf(listOf<DDRSongRecord>()) }
     var isLoaded by remember { mutableStateOf(false) }
-    LaunchedEffect(selectedDateEpoch, playStyle) {
+    val dataVersion by container.dataVersion.collectAsState()
+    LaunchedEffect(selectedDateEpoch, playStyle, dataVersion) {
         records = withContext(Dispatchers.IO) {
             container.ddrRepository.songRecords(selectedDateEpoch, playStyle)
         }

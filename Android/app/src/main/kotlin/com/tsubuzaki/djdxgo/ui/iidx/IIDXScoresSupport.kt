@@ -77,16 +77,18 @@ fun filterAndSortEntries(
     difficultyFilters: Set<String>,
     clearTypeFilters: Set<String>,
     djLevelFilters: Set<String>,
+    versionFilters: Set<String>,
     scoreAvailableOnly: Boolean,
     beginnerHidden: Boolean,
     sortMode: IIDXSortMode,
     sortDescending: Boolean
 ): List<IIDXScoreEntry> {
     val searchCompact = searchTerm.trim().compact
+    val versioned = if (versionFilters.isEmpty()) records else records.filter { it.version in versionFilters }
     val searched = if (searchCompact.isEmpty()) {
-        records
+        versioned
     } else {
-        records.filter {
+        versioned.filter {
             it.title.compact.contains(searchCompact) || it.artist.compact.contains(searchCompact)
         }
     }

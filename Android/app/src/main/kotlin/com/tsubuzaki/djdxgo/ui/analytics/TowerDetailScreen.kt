@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.tsubuzaki.djdxgo.AppContainer
 import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.data.iidx.IIDXTowerEntry
+import com.tsubuzaki.djdxgo.ui.Routes
 import com.tsubuzaki.djdxgo.ui.theme.Palette
 import java.time.Instant
 import java.time.ZoneId
@@ -48,17 +49,19 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TowerDetailScreen(container: AppContainer, onBack: () -> Unit) {
+fun TowerDetailScreen(container: AppContainer, initialMode: String, onBack: () -> Unit) {
     val entries by produceState(emptyList<IIDXTowerEntry>(), Unit) {
         value = withContext(Dispatchers.IO) {
-            container.database.iidxDao().towerEntries()
+            container.iidxRepository.towerEntries()
         }
     }
-    var selectedMode by rememberSaveable { mutableIntStateOf(0) }
+    var selectedMode by rememberSaveable {
+        mutableIntStateOf(if (initialMode == Routes.TOWER_TOTALS) 1 else 0)
+    }
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.tower_title)) },
+                title = { Text(stringResource(R.string.tower_iidx_tower)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -84,7 +87,7 @@ fun TowerDetailScreen(container: AppContainer, onBack: () -> Unit) {
                         onClick = { selectedMode = 0 },
                         shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
                     ) {
-                        Text(stringResource(R.string.tower_recent))
+                        Text(stringResource(R.string.tower_mode_recent))
                     }
                     SegmentedButton(
                         selected = selectedMode == 1,

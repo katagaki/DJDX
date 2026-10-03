@@ -4,10 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
 interface ExternalDataDao {
-    // BEMANIWiki IIDX songs
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertIIDXSongs(songs: List<IIDXSong>)
 
@@ -23,7 +23,55 @@ interface ExternalDataDao {
     @Query("SELECT COUNT(*) FROM IIDXSong")
     suspend fun iidxSongCount(): Int
 
-    // Textage Chart Viewer
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertTextageCharts(charts: List<TextageChart>)
+
+    @Query("DELETE FROM TextageChart")
+    suspend fun deleteAllTextageCharts()
+
+    @Query("SELECT * FROM TextageChart WHERE titleCompact = :titleCompact LIMIT 1")
+    suspend fun textageChart(titleCompact: String): TextageChart?
+
+    @Query("SELECT COUNT(*) FROM TextageChart")
+    suspend fun textageChartCount(): Int
+
+    @Transaction
+    suspend fun replaceTextageCharts(charts: List<TextageChart>) {
+        deleteAllTextageCharts()
+        insertTextageCharts(charts)
+    }
+
+    @Transaction
+    suspend fun replaceTextageChartViewerCharts(charts: List<TextageChartViewerChart>) {
+        deleteAllTextageChartViewerCharts()
+        insertTextageChartViewerCharts(charts)
+    }
+
+    @Transaction
+    suspend fun replaceSDVXInCharts(charts: List<SDVXInChart>) {
+        deleteAllSDVXInCharts()
+        insertSDVXInCharts(charts)
+    }
+
+    @Transaction
+    suspend fun replaceIIDXSongs(songs: List<IIDXSong>) {
+        deleteAllIIDXSongs()
+        insertIIDXSongs(songs)
+    }
+
+    @Transaction
+    suspend fun replaceNotesRadarEntries(entries: List<NotesRadarEntry>) {
+        deleteAllNotesRadarEntries()
+        insertNotesRadarEntries(entries)
+    }
+
+    @Transaction
+    suspend fun replaceDDRSongMetas(metas: List<DDRSongMeta>) {
+        deleteAllDDRSongMetas()
+        insertDDRSongMetas(metas)
+    }
+
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTextageChartViewerCharts(charts: List<TextageChartViewerChart>)
 
@@ -36,7 +84,6 @@ interface ExternalDataDao {
     @Query("SELECT COUNT(*) FROM TextageChartViewerChart")
     suspend fun textageChartViewerChartCount(): Int
 
-    // sdvx.in
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSDVXInCharts(charts: List<SDVXInChart>)
 
@@ -49,7 +96,6 @@ interface ExternalDataDao {
     @Query("SELECT COUNT(*) FROM SDVXInChart")
     suspend fun sdvxInChartCount(): Int
 
-    // BM2DX notes radar
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNotesRadarEntries(entries: List<NotesRadarEntry>)
 
@@ -59,10 +105,12 @@ interface ExternalDataDao {
     @Query("SELECT * FROM NotesRadar WHERE titleCompact = :titleCompact AND playType = :playType AND difficulty = :difficulty LIMIT 1")
     suspend fun notesRadar(titleCompact: String, playType: String, difficulty: Int): NotesRadarEntry?
 
+    @Query("SELECT * FROM NotesRadar WHERE playType = :playType")
+    suspend fun notesRadarEntries(playType: String): List<NotesRadarEntry>
+
     @Query("SELECT COUNT(*) FROM NotesRadar")
     suspend fun notesRadarCount(): Int
 
-    // BEMANIWiki DDR metadata
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDDRSongMetas(metas: List<DDRSongMeta>)
 

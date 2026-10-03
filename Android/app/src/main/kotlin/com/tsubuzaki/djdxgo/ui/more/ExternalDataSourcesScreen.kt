@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.more
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,21 +13,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,76 +36,91 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.datastore.preferences.core.Preferences
 import com.tsubuzaki.djdxgo.AppContainer
 import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.data.SettingsKeys
-import com.tsubuzaki.djdxgo.data.external.ExternalDataDao
-import com.tsubuzaki.djdxgo.data.external.ExternalDataReloader
 import com.tsubuzaki.djdxgo.data.external.ExternalDataSource
 import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingsDataStore
+import com.tsubuzaki.djdxgo.ui.common.DetailScaffold
+import java.text.NumberFormat
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.text.NumberFormat
 
 private data class ExternalSourceInfo(
     val source: ExternalDataSource,
     val settingKey: Preferences.Key<Boolean>,
-    val nameRes: Int,
-    val descriptionRes: Int
+    val title: @Composable () -> String
 )
 
-private val externalSources = listOf(
-    ExternalSourceInfo(
-        ExternalDataSource.TEXTAGE_CHART_VIEWER,
-        SettingsKeys.externalTextageChartViewerEnabled,
+private data class ExternalSourceGroup(
+    val headerRes: Int,
+    val footerRes: Int,
+    val url: String,
+    val sources: List<ExternalSourceInfo>
+)
+
+private val externalSourceGroups = listOf(
+    ExternalSourceGroup(
         R.string.external_textage_chart_viewer_name,
-        R.string.external_textage_chart_viewer_description
+        R.string.external_textage_chart_viewer_footer,
+        "https://textage-chart-viewer.vercel.app",
+        listOf(
+            ExternalSourceInfo(ExternalDataSource.TEXTAGE_CHART_VIEWER, SettingsKeys.externalTextageChartViewerEnabled) {
+                stringResource(R.string.external_chart_index)
+            }
+        )
     ),
-    ExternalSourceInfo(
-        ExternalDataSource.WIKI_IIDX,
-        SettingsKeys.externalBemaniWikiEnabled,
-        R.string.external_bemaniwiki_iidx_name,
-        R.string.external_bemaniwiki_iidx_description
+    ExternalSourceGroup(
+        R.string.external_textage_name,
+        R.string.external_textage_footer,
+        "https://textage.cc",
+        listOf(
+            ExternalSourceInfo(ExternalDataSource.TEXTAGE, SettingsKeys.externalTextageEnabled) {
+                stringResource(R.string.external_chart_index)
+            }
+        )
     ),
-    ExternalSourceInfo(
-        ExternalDataSource.BM2DX,
-        SettingsKeys.externalBM2DXEnabled,
-        R.string.external_bm2dx_name,
-        R.string.external_bm2dx_description
-    ),
-    ExternalSourceInfo(
-        ExternalDataSource.SDVX_IN,
-        SettingsKeys.externalSDVXInEnabled,
+    ExternalSourceGroup(
         R.string.external_sdvxin_name,
-        R.string.external_sdvxin_description
+        R.string.external_sdvxin_footer,
+        "https://sdvx.in",
+        listOf(
+            ExternalSourceInfo(ExternalDataSource.SDVX_IN, SettingsKeys.externalSDVXInEnabled) {
+                stringResource(R.string.external_chart_index)
+            }
+        )
     ),
-    ExternalSourceInfo(
-        ExternalDataSource.WIKI_DDR,
-        SettingsKeys.externalDDREnabled,
-        R.string.external_ddr_name,
-        R.string.external_ddr_description
+    ExternalSourceGroup(
+        R.string.external_bemaniwiki_name,
+        R.string.external_bemaniwiki_footer,
+        "https://bemaniwiki.com",
+        listOf(
+            ExternalSourceInfo(ExternalDataSource.WIKI_IIDX, SettingsKeys.externalBemaniWikiEnabled) { "beatmania IIDX" },
+            ExternalSourceInfo(ExternalDataSource.WIKI_DDR, SettingsKeys.externalDDREnabled) { "DanceDanceRevolution" }
+        )
+    ),
+    ExternalSourceGroup(
+        R.string.external_bm2dx_name,
+        R.string.external_bm2dx_footer,
+        "https://bm2dx.com/IIDX/notes_radar/",
+        listOf(
+            ExternalSourceInfo(ExternalDataSource.BM2DX, SettingsKeys.externalBM2DXEnabled) {
+                stringResource(R.string.external_bm2dx_description)
+            }
+        )
     )
 )
 
-private suspend fun entryCount(dao: ExternalDataDao, source: ExternalDataSource): Int =
-    when (source) {
-        ExternalDataSource.TEXTAGE_CHART_VIEWER -> dao.textageChartViewerChartCount()
-        ExternalDataSource.SDVX_IN -> dao.sdvxInChartCount()
-        ExternalDataSource.WIKI_IIDX -> dao.iidxSongCount()
-        ExternalDataSource.BM2DX -> dao.notesRadarCount()
-        ExternalDataSource.WIKI_DDR -> dao.ddrSongMetaCount()
-    }
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExternalDataSourcesScreen(container: AppContainer, onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val dao = container.externalDataDao
-    val reloader = remember { ExternalDataReloader(dao) }
+    val reloader = container.externalDataReloader
     val snackbarHostState = remember { SnackbarHostState() }
 
     val counts = remember { mutableStateMapOf<ExternalDataSource, Int>() }
@@ -120,56 +131,36 @@ fun ExternalDataSourcesScreen(container: AppContainer, onBack: () -> Unit) {
     val numberFormat = remember { NumberFormat.getIntegerInstance() }
     val doneMessage = stringResource(R.string.external_reload_done)
     val failedMessage = stringResource(R.string.external_reload_failed)
+    val allSources = externalSourceGroups.flatMap { it.sources }
 
     LaunchedEffect(Unit) {
-        externalSources.forEach { info ->
-            counts[info.source] = entryCount(dao, info.source)
-        }
+        allSources.forEach { info -> counts[info.source] = reloader.entryCount(info.source) }
         context.settingsDataStore.data
-            .map { preferences ->
-                externalSources.associate { info ->
-                    info.source to (preferences[info.settingKey] ?: false)
-                }
-            }
-            .collect { states -> enabledStates.putAll(states) }
+            .map { preferences -> allSources.associate { it.source to (preferences[it.settingKey] ?: false) } }
+            .collect { enabledStates.putAll(it) }
     }
 
-    suspend fun runReload(source: ExternalDataSource): Result<Int> {
-        progress = 0f
-        val result = reloader.reload(source) { progress = it }
-        result.onSuccess { counts[source] = it }
-        return result
-    }
-
-    fun reloadSingle(source: ExternalDataSource) {
+    fun reload(source: ExternalDataSource) {
         if (reloadingSource != null) return
         reloadingSource = source
+        progress = 0f
         scope.launch {
-            val result = runReload(source)
+            val result = reloader.reload(source) { progress = it }
+            counts[source] = reloader.entryCount(source)
             reloadingSource = null
+            if (result.isSuccess) container.notifyDataChanged()
             snackbarHostState.showSnackbar(
                 result.fold(
                     onSuccess = { String.format(doneMessage, numberFormat.format(it)) },
-                    onFailure = { String.format(failedMessage, it.localizedMessage ?: it.javaClass.simpleName) }
+                    onFailure = { failedMessage }
                 )
             )
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.external_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.external_back)
-                        )
-                    }
-                }
-            )
-        },
+    DetailScaffold(
+        title = stringResource(R.string.external_title),
+        onBack = onBack,
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         LazyColumn(
@@ -177,22 +168,47 @@ fun ExternalDataSourcesScreen(container: AppContainer, onBack: () -> Unit) {
                 .fillMaxSize()
                 .padding(innerPadding),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(externalSources, key = { it.source.name }) { info ->
-                ExternalSourceCard(
-                    info = info,
-                    count = counts[info.source],
-                    enabled = enabledStates[info.source] ?: false,
-                    isReloading = reloadingSource == info.source,
-                    reloadAllowed = reloadingSource == null,
-                    progress = progress,
-                    onToggle = { isOn ->
-                        enabledStates[info.source] = isOn
-                        scope.launch { context.setSetting(info.settingKey, isOn) }
-                    },
-                    onReload = { reloadSingle(info.source) }
-                )
+            externalSourceGroups.forEach { group ->
+                item(key = "header_${group.headerRes}") {
+                    Text(
+                        text = stringResource(group.headerRes),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 12.dp, start = 4.dp)
+                    )
+                }
+                items(group.sources, key = { it.source.id }) { info ->
+                    ExternalSourceCard(
+                        title = info.title(),
+                        count = numberFormat.format(counts[info.source] ?: 0),
+                        enabled = enabledStates[info.source] ?: false,
+                        isReloading = reloadingSource == info.source,
+                        reloadAllowed = reloadingSource == null,
+                        progress = progress,
+                        onToggle = { isOn ->
+                            enabledStates[info.source] = isOn
+                            scope.launch { context.setSetting(info.settingKey, isOn) }
+                        },
+                        onReload = { reload(info.source) }
+                    )
+                }
+                item(key = "footer_${group.headerRes}") {
+                    Column(modifier = Modifier.padding(horizontal = 4.dp)) {
+                        Text(
+                            text = stringResource(group.footerRes),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        TextButton(
+                            onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, group.url.toUri())) },
+                            contentPadding = PaddingValues(0.dp)
+                        ) {
+                            Text(stringResource(R.string.external_view_source))
+                        }
+                    }
+                }
             }
         }
     }
@@ -200,8 +216,8 @@ fun ExternalDataSourcesScreen(container: AppContainer, onBack: () -> Unit) {
 
 @Composable
 private fun ExternalSourceCard(
-    info: ExternalSourceInfo,
-    count: Int?,
+    title: String,
+    count: String,
     enabled: Boolean,
     isReloading: Boolean,
     reloadAllowed: Boolean,
@@ -209,59 +225,36 @@ private fun ExternalSourceCard(
     onToggle: (Boolean) -> Unit,
     onReload: () -> Unit
 ) {
-    val numberFormat = remember { NumberFormat.getIntegerInstance() }
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(info.nameRes),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = stringResource(info.descriptionRes),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Text(text = title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                Text(
+                    text = count,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Spacer(modifier = Modifier.width(12.dp))
                 Switch(checked = enabled, onCheckedChange = onToggle)
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(
-                        R.string.external_entry_count,
-                        numberFormat.format(count ?: 0)
-                    ),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f)
-                )
-                FilledTonalButton(
-                    onClick = onReload,
-                    enabled = enabled && reloadAllowed
-                ) {
+            if (enabled) {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    FilledTonalButton(onClick = onReload, enabled = reloadAllowed) {
+                        Text(stringResource(R.string.external_update_data))
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
                     if (isReloading) {
                         if (progress > 0f && progress < 1f) {
                             CircularProgressIndicator(
                                 progress = { progress },
-                                modifier = Modifier.size(18.dp),
+                                modifier = Modifier.size(22.dp),
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                strokeWidth = 2.dp
-                            )
+                            CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
                     }
-                    Text(stringResource(R.string.external_reload))
                 }
             }
         }

@@ -1,6 +1,9 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -39,8 +42,9 @@ fun SDVXScoreViewerScreen(
     container: AppContainer,
     title: String,
     dateEpoch: Long,
+    initialDifficulty: String,
     onBack: () -> Unit,
-    onOpenWeb: (String) -> Unit
+    onOpenChart: (SDVXInChart) -> Unit
 ) {
     var records by remember { mutableStateOf(listOf<SDVXSongRecord>()) }
     LaunchedEffect(title, dateEpoch) {
@@ -52,7 +56,12 @@ fun SDVXScoreViewerScreen(
         }
     }
 
-    var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
+    var selectedIndex by rememberSaveable { mutableIntStateOf(-1) }
+    LaunchedEffect(records) {
+        if (selectedIndex < 0 && records.isNotEmpty()) {
+            selectedIndex = records.indexOfFirst { it.difficulty == initialDifficulty }.coerceAtLeast(0)
+        }
+    }
     val record = records.getOrNull(selectedIndex.coerceIn(0, (records.size - 1).coerceAtLeast(0)))
 
     var chart by remember { mutableStateOf<SDVXInChart?>(null) }
@@ -74,13 +83,23 @@ fun SDVXScoreViewerScreen(
                     selectedIndex = selectedIndex.coerceIn(0, records.size - 1),
                     onSelect = { selectedIndex = it }
                 ) { segment ->
-                    Text(
-                        text = SDVXDifficulty.fromValue(segment.difficulty)?.abbreviation
-                            ?: segment.difficulty,
-                        color = SDVXColors.difficultyColor(segment.difficulty),
-                        fontWeight = FontWeight.Black,
-                        maxLines = 1
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = segment.level,
+                            color = SDVXColors.difficultyColor(segment.difficulty),
+                            fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Italic,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = SDVXDifficulty.fromValue(segment.difficulty)?.abbreviation
+                                ?: segment.difficulty,
+                            color = SDVXColors.difficultyColor(segment.difficulty),
+                            fontWeight = FontWeight.Black,
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         } else {
@@ -157,7 +176,11 @@ fun SDVXScoreViewerScreen(
                             context.startActivity(
                                 android.content.Intent(
                                     android.content.Intent.ACTION_VIEW,
-                                    android.net.Uri.parse(youTubeSearchURL("SDVX $title"))
+                                    android.net.Uri.parse(
+                                        youTubeSearchURL(
+                                            "SDVX ${SDVXDifficulty.fromValue(current.difficulty)?.abbreviation.orEmpty()} $title"
+                                        )
+                                    )
                                 )
                             )
                         }
@@ -166,7 +189,7 @@ fun SDVXScoreViewerScreen(
                                 icon = Icons.Outlined.Article,
                                 label = stringResource(R.string.sdvx_view_chart)
                             ) {
-                                onOpenWeb(sdvxInChart.pageURL)
+                                onOpenChart(sdvxInChart)
                             }
                         }
                     }

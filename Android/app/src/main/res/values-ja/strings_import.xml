@@ -28,4 +28,6 @@
     <string name="import_error_no_play_data">プレーデータがないため、インポートが失敗しました。</string>
     <string name="import_error_server">サーバーエラーが発生したため、インポートが失敗しました。</string>
     <string name="import_error_maintenance">e-amusementはただいまメンテナンス中のため、ご利用いただけません。</string>
+    <string name="import_load_samples">サンプルデータを読み込む</string>
+    <string name="import_load_samples_description">アプリの機能を試したい場合、サンプルデータを読み込んでからご利用いただけます。</string>
 </resources>

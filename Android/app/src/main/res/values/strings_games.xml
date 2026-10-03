@@ -44,4 +44,11 @@
     <string name="ddr_play_style">Play Style</string>
     <string name="ddr_only_played">Only Played</string>
     <string name="games_search_no_results">No results found.</string>
+    <string name="polaris_pa_class">PA CLASS</string>
+    <string name="polaris_pa_skill">PA SKILL</string>
+    <string name="ddr_data_source_warning_title">Levels May Not Appear</string>
+    <string name="ddr_data_source_warning_message">When BEMANIWiki data is turned off, chart levels are not downloaded and won\'t appear.</string>
+    <string name="ddr_data_source_warning_action">Open Data Sources</string>
+    <string name="sdvx_in_viewer_title">Chart</string>
+    <string name="sdvx_in_fallback_message">Chart not opening?\nTry opening it manually on sdvx.in.</string>
 </resources>

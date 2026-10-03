@@ -46,7 +46,7 @@ class IIDXRepository(private val dao: IIDXDao) {
 
     private suspend fun prepareImportGroup(importDate: Long, playType: IIDXPlayType): String {
         val bucket = dayBucket(importDate)
-        val existing = dao.importGroup(bucket.startOfDay, bucket.startOfNextDay)
+        val existing = dao.importGroup(IIDXVersionInfo.NUMBER, bucket.startOfDay, bucket.startOfNextDay)
         if (existing != null) {
             dao.deleteSongRecords(existing.id, playType.value)
             return existing.id
@@ -107,9 +107,16 @@ class IIDXRepository(private val dao: IIDXDao) {
 
     suspend fun importGroupFor(date: Long): IIDXImportGroup? {
         val bucket = dayBucket(date)
-        return dao.importGroup(bucket.startOfDay, bucket.startOfNextDay)
-            ?: dao.closestImportGroupBefore(bucket.startOfNextDay)
+        return dao.importGroup(IIDXVersionInfo.NUMBER, bucket.startOfDay, bucket.startOfNextDay)
+            ?: dao.closestImportGroupBefore(IIDXVersionInfo.NUMBER, bucket.startOfNextDay)
     }
+
+    suspend fun importGroups(): List<IIDXImportGroup> = dao.importGroups(IIDXVersionInfo.NUMBER)
+
+    suspend fun songRecords(groupID: String, playType: IIDXPlayType): List<IIDXSongRecord> =
+        dao.songRecords(groupID, playType.value)
+
+    suspend fun towerEntries(): List<IIDXTowerEntry> = dao.towerEntries()
 
     suspend fun songRecords(date: Long, playType: IIDXPlayType): List<IIDXSongRecord> {
         val group = importGroupFor(date) ?: return emptyList()

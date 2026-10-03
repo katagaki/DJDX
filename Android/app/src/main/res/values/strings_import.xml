@@ -28,4 +28,6 @@
     <string name="import_error_no_play_data">The import could not be completed as there is no play data available.</string>
     <string name="import_error_server">The import could not be completed as a server error occurred.</string>
     <string name="import_error_maintenance">The import could not be completed as the e-amusement service is currently under maintenance.</string>
+    <string name="import_load_samples">Load Sample Data</string>
+    <string name="import_load_samples_description">If you would like to try out the app, you can also load a set of sample data.</string>
 </resources>

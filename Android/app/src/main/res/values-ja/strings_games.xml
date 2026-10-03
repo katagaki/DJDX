@@ -44,4 +44,11 @@
     <string name="ddr_play_style">プレースタイル</string>
     <string name="ddr_only_played">プレー済みのみ表示</string>
     <string name="games_search_no_results">検索結果がありません。</string>
+    <string name="polaris_pa_class">PA CLASS</string>
+    <string name="polaris_pa_skill">PA SKILL</string>
+    <string name="ddr_data_source_warning_title">レベルが表示されない場合があります</string>
+    <string name="ddr_data_source_warning_message">BEMANIWikiデータをオフにしていると、譜面のレベルが取得されず、表示されません。</string>
+    <string name="ddr_data_source_warning_action">外部データソースを開く</string>
+    <string name="sdvx_in_viewer_title">譜面</string>
+    <string name="sdvx_in_fallback_message">譜面が開きませんか？\nお手数ですが、sdvx.inで手動で開いてみてください。</string>
 </resources>

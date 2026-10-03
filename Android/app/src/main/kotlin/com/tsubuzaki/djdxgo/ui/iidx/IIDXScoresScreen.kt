@@ -10,7 +10,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.collectAsState
+import java.time.LocalDate
+import java.time.ZoneId
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -64,6 +77,7 @@ fun IIDXScoresScreen(
     val difficultyFilters by rememberSetting(SettingsKeys.iidxDifficultyFilters, emptySet())
     val clearTypeFilters by rememberSetting(SettingsKeys.iidxClearTypeFilters, emptySet())
     val djLevelFilters by rememberSetting(SettingsKeys.iidxDJLevelFilters, emptySet())
+    val versionFilters by rememberSetting(SettingsKeys.iidxVersionFilters, emptySet())
     val scoreAvailableOnly by rememberSetting(SettingsKeys.iidxScoreAvailableOnly, true)
     val beginnerHidden by rememberSetting(SettingsKeys.iidxBeginnerLevelHidden, false)
     val genreVisible by rememberSetting(SettingsKeys.iidxGenreVisible, false)
@@ -77,6 +91,8 @@ fun IIDXScoresScreen(
     var selectedDateEpoch by rememberSaveable {
         mutableLongStateOf(System.currentTimeMillis() / 1000L)
     }
+    var isTimeTravelling by rememberSaveable { mutableStateOf(false) }
+    var isDatePickerShown by rememberSaveable { mutableStateOf(false) }
     var searchTerm by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by rememberSaveable { mutableStateOf(false) }
 
@@ -86,12 +102,14 @@ fun IIDXScoresScreen(
     val playType = IIDXPlayType.fromValue(playTypeValue)
     val sortMode = IIDXSortMode.fromValue(sortModeValue)
 
-    LaunchedEffect(selectedDateEpoch, playTypeValue) {
+    val dataVersion by container.dataVersion.collectAsState()
+
+    LaunchedEffect(selectedDateEpoch, playTypeValue, dataVersion) {
         records = withContext(Dispatchers.IO) {
             container.iidxRepository.songRecords(selectedDateEpoch, playType)
         }
     }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(dataVersion) {
         songs = withContext(Dispatchers.IO) {
             container.externalDataDao.allIIDXSongs().associateBy { it.titleCompact }
         }
@@ -99,7 +117,7 @@ fun IIDXScoresScreen(
 
     val entries = remember(
         records, songs, playTypeValue, levelFilters, difficultyFilters,
-        clearTypeFilters, djLevelFilters, scoreAvailableOnly, beginnerHidden,
+        clearTypeFilters, djLevelFilters, versionFilters, scoreAvailableOnly, beginnerHidden,
         sortModeValue, sortDescending
     ) {
         filterAndSortEntries(
@@ -111,6 +129,7 @@ fun IIDXScoresScreen(
             difficultyFilters = difficultyFilters,
             clearTypeFilters = clearTypeFilters,
             djLevelFilters = djLevelFilters,
+            versionFilters = versionFilters,
             scoreAvailableOnly = scoreAvailableOnly,
             beginnerHidden = beginnerHidden,
             sortMode = sortMode,
@@ -119,7 +138,7 @@ fun IIDXScoresScreen(
     }
     val searchEntries = remember(
         records, songs, playTypeValue, searchTerm, levelFilters, difficultyFilters,
-        clearTypeFilters, djLevelFilters, scoreAvailableOnly, beginnerHidden,
+        clearTypeFilters, djLevelFilters, versionFilters, scoreAvailableOnly, beginnerHidden,
         sortModeValue, sortDescending
     ) {
         if (searchTerm.isEmpty()) {
@@ -134,6 +153,7 @@ fun IIDXScoresScreen(
                 difficultyFilters = difficultyFilters,
                 clearTypeFilters = clearTypeFilters,
                 djLevelFilters = djLevelFilters,
+                versionFilters = versionFilters,
                 scoreAvailableOnly = scoreAvailableOnly,
                 beginnerHidden = beginnerHidden,
                 sortMode = sortMode,
@@ -261,8 +281,61 @@ fun IIDXScoresScreen(
                     context.setSetting(SettingsKeys.iidxSortDescending, descending)
                 }
             },
-            onFilterClick = { showFilterSheet = true }
+            onFilterClick = { showFilterSheet = true },
+            leadingContent = {
+                if (isTimeTravelling) {
+                    FilledIconButton(onClick = {
+                        isTimeTravelling = false
+                        selectedDateEpoch = System.currentTimeMillis() / 1000L
+                    }) {
+                        Icon(Icons.Outlined.History, contentDescription = stringResource(R.string.scores_time_machine))
+                    }
+                } else {
+                    IconButton(onClick = { isDatePickerShown = true }) {
+                        Icon(Icons.Outlined.History, contentDescription = stringResource(R.string.scores_time_machine))
+                    }
+                }
+            }
         )
+    }
+
+    if (isDatePickerShown) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = LocalDate.now().toEpochDay() * 86_400_000L,
+            selectableDates = object : SelectableDates {
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+                    utcTimeMillis / 86_400_000L <= LocalDate.now().toEpochDay()
+            }
+        )
+        DatePickerDialog(
+            onDismissRequest = { isDatePickerShown = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val date = LocalDate.ofEpochDay(millis / 86_400_000L)
+                        if (date != LocalDate.now()) {
+                            isTimeTravelling = true
+                            selectedDateEpoch = date.atTime(23, 59).atZone(ZoneId.systemDefault()).toEpochSecond()
+                        }
+                    }
+                    isDatePickerShown = false
+                }) {
+                    Text(stringResource(R.string.scores_done))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { isDatePickerShown = false }) {
+                    Text(stringResource(R.string.games_cancel))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState, title = {
+                Text(
+                    stringResource(R.string.scores_select_date),
+                    modifier = Modifier.padding(start = 24.dp, top = 16.dp)
+                )
+            })
+        }
     }
 
     if (showFilterSheet) {

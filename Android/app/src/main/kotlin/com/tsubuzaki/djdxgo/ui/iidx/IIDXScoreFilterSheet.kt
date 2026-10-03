@@ -38,6 +38,7 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXDJLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
+import com.tsubuzaki.djdxgo.data.iidx.IIDXVersion
 import com.tsubuzaki.djdxgo.data.setSetting
 import kotlinx.coroutines.launch
 
@@ -53,6 +54,7 @@ fun IIDXScoreFilterSheet(onDismiss: () -> Unit) {
     val difficultyFilters by rememberSetting(SettingsKeys.iidxDifficultyFilters, emptySet())
     val clearTypeFilters by rememberSetting(SettingsKeys.iidxClearTypeFilters, emptySet())
     val djLevelFilters by rememberSetting(SettingsKeys.iidxDJLevelFilters, emptySet())
+    val versionFilters by rememberSetting(SettingsKeys.iidxVersionFilters, emptySet())
     val scoreAvailableOnly by rememberSetting(SettingsKeys.iidxScoreAvailableOnly, true)
     val beginnerHidden by rememberSetting(SettingsKeys.iidxBeginnerLevelHidden, false)
     val genreVisible by rememberSetting(SettingsKeys.iidxGenreVisible, false)
@@ -94,6 +96,7 @@ fun IIDXScoreFilterSheet(onDismiss: () -> Unit) {
                         set(SettingsKeys.iidxDifficultyFilters, emptySet())
                         set(SettingsKeys.iidxClearTypeFilters, emptySet())
                         set(SettingsKeys.iidxDJLevelFilters, emptySet())
+                        set(SettingsKeys.iidxVersionFilters, emptySet())
                     }
                 ) {
                     Icon(Icons.Default.Refresh, contentDescription = null)
@@ -167,6 +170,19 @@ fun IIDXScoreFilterSheet(onDismiss: () -> Unit) {
                             toggle(SettingsKeys.iidxDJLevelFilters, djLevelFilters, djLevel.value)
                         },
                         label = { Text(djLevel.value) }
+                    )
+                }
+            }
+
+            SectionLabel(stringResource(R.string.scores_filter_version))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                IIDXVersion.entries.reversed().forEach { version ->
+                    FilterChip(
+                        selected = version.marketingName in versionFilters,
+                        onClick = {
+                            toggle(SettingsKeys.iidxVersionFilters, versionFilters, version.marketingName)
+                        },
+                        label = { Text(version.marketingName) }
                     )
                 }
             }

@@ -53,7 +53,7 @@ import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingFlow
 import com.tsubuzaki.djdxgo.ui.theme.SDVXColors
 import java.time.Instant
-import kotlin.math.floor
+import com.tsubuzaki.djdxgo.data.analytics.sdvxLevelBucket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,15 +63,12 @@ private const val SORT_CLEAR_TYPE = "ClearType"
 private const val SORT_SCORE = "Score"
 private const val SORT_LEVEL = "Level"
 
-private fun sdvxLevelBucket(level: String): String =
-    level.toDoubleOrNull()?.let { floor(it).toInt().toString() } ?: level
-
 @Composable
 fun SDVXScoresScreen(
     container: AppContainer,
     contentPadding: PaddingValues,
     analyticsContent: (@Composable () -> Unit)? = null,
-    onOpenSong: (title: String, dateEpoch: Long) -> Unit
+    onOpenSong: (title: String, dateEpoch: Long, difficulty: String) -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -79,7 +76,8 @@ fun SDVXScoresScreen(
     var selectedDateEpoch by rememberSaveable { mutableLongStateOf(Instant.now().epochSecond) }
     var records by remember { mutableStateOf(listOf<SDVXSongRecord>()) }
     var isLoaded by remember { mutableStateOf(false) }
-    LaunchedEffect(selectedDateEpoch) {
+    val dataVersion by container.dataVersion.collectAsState()
+    LaunchedEffect(selectedDateEpoch, dataVersion) {
         records = withContext(Dispatchers.IO) {
             container.sdvxRepository.songRecords(selectedDateEpoch)
         }
@@ -148,7 +146,7 @@ fun SDVXScoresScreen(
             }
             items(displayed, key = { it.id }) { record ->
                 SDVXScoreRow(record = record) {
-                    onOpenSong(record.title, selectedDateEpoch)
+                    onOpenSong(record.title, selectedDateEpoch, record.difficulty)
                 }
                 HorizontalDivider()
             }
@@ -163,7 +161,7 @@ fun SDVXScoresScreen(
             searchResults = searchResults,
             searchResultContent = { record ->
                 SDVXScoreRow(record = record) {
-                    onOpenSong(record.title, selectedDateEpoch)
+                    onOpenSong(record.title, selectedDateEpoch, record.difficulty)
                 }
             },
             sortOptions = listOf(
@@ -205,7 +203,10 @@ fun SDVXScoresScreen(
             )
             FilterChipGroup(
                 title = stringResource(R.string.games_filter_level),
-                options = (1..20).map { it.toString() to it.toString() },
+                options = records.map { sdvxLevelBucket(it.level) }
+                    .distinct()
+                    .sortedBy { it.toDoubleOrNull() ?: 0.0 }
+                    .map { it to it },
                 selected = levelFilters,
                 onToggle = { toggleFilter(SettingsKeys.sdvxLevelFilters, levelFilters, it) }
             )

@@ -3,6 +3,8 @@ package com.tsubuzaki.djdxgo.data.iidx
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -16,18 +18,26 @@ interface IIDXDao {
     @Query("SELECT * FROM IIDXImportGroup ORDER BY importDate DESC")
     fun importGroupsFlow(): Flow<List<IIDXImportGroup>>
 
+    @Query("SELECT * FROM IIDXImportGroup WHERE iidxVersion = :version ORDER BY importDate DESC")
+    fun importGroupsFlow(version: Int): Flow<List<IIDXImportGroup>>
+
     @Query("SELECT * FROM IIDXImportGroup ORDER BY importDate DESC")
     suspend fun importGroups(): List<IIDXImportGroup>
 
-    @Query(
-        "SELECT * FROM IIDXImportGroup WHERE importDate >= :startOfDay AND importDate < :startOfNextDay LIMIT 1"
-    )
-    suspend fun importGroup(startOfDay: Long, startOfNextDay: Long): IIDXImportGroup?
+    @Query("SELECT * FROM IIDXImportGroup WHERE iidxVersion = :version ORDER BY importDate DESC")
+    suspend fun importGroups(version: Int): List<IIDXImportGroup>
 
     @Query(
-        "SELECT * FROM IIDXImportGroup WHERE importDate < :date ORDER BY importDate DESC LIMIT 1"
+        "SELECT * FROM IIDXImportGroup WHERE iidxVersion = :version AND importDate >= :startOfDay " +
+            "AND importDate < :startOfNextDay ORDER BY importDate LIMIT 1"
     )
-    suspend fun closestImportGroupBefore(date: Long): IIDXImportGroup?
+    suspend fun importGroup(version: Int, startOfDay: Long, startOfNextDay: Long): IIDXImportGroup?
+
+    @Query(
+        "SELECT * FROM IIDXImportGroup WHERE iidxVersion = :version AND importDate < :date " +
+            "ORDER BY importDate DESC LIMIT 1"
+    )
+    suspend fun closestImportGroupBefore(version: Int, date: Long): IIDXImportGroup?
 
     @Query("DELETE FROM IIDXSongRecord WHERE importGroupID = :groupID AND playType = :playType")
     suspend fun deleteSongRecords(groupID: String, playType: String)
@@ -44,6 +54,9 @@ interface IIDXDao {
     @Query("SELECT * FROM IIDXSongRecord WHERE title = :title AND playType = :playType ORDER BY id")
     suspend fun songRecordsForTitle(title: String, playType: String): List<IIDXSongRecord>
 
+    @Query("SELECT * FROM IIDXSongRecord WHERE title = :title ORDER BY id")
+    suspend fun songRecordsForTitle(title: String): List<IIDXSongRecord>
+
     @Query("DELETE FROM IIDXTowerEntry")
     suspend fun deleteAllTowerEntries()
 
@@ -58,4 +71,7 @@ interface IIDXDao {
 
     @Query("DELETE FROM IIDXImportGroup")
     suspend fun deleteAllImportGroups()
+
+    @RawQuery
+    suspend fun levelAggregates(query: SupportSQLiteQuery): List<IIDXLevelAggregate>
 }

@@ -43,7 +43,14 @@ import com.tsubuzaki.djdxgo.data.SettingsKeys
 import com.tsubuzaki.djdxgo.data.compact
 import com.tsubuzaki.djdxgo.data.external.IIDXSong
 import com.tsubuzaki.djdxgo.data.external.NotesRadarEntry
+import com.tsubuzaki.djdxgo.data.external.IIDXPlaySide
+import com.tsubuzaki.djdxgo.data.external.TextageChart
 import com.tsubuzaki.djdxgo.data.external.TextageChartViewerChart
+import com.tsubuzaki.djdxgo.data.external.pageURL
+import com.tsubuzaki.djdxgo.data.toRadarData
+import com.tsubuzaki.djdxgo.ui.common.RadarChart
+import com.tsubuzaki.djdxgo.ui.common.RadarValuesList
+import androidx.compose.foundation.layout.height
 import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXDJLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXLevel
@@ -74,7 +81,7 @@ fun IIDXScoreViewerScreen(
     initialLevel: String,
     dateEpoch: Long,
     onBack: () -> Unit,
-    onOpenWeb: (url: String) -> Unit
+    onOpenTextage: (legacyURL: String?, chartViewerURL: String?) -> Unit
 ) {
     val darkTheme = isSystemInDarkTheme()
     val playTypeEnum = IIDXPlayType.fromValue(playType)
@@ -85,6 +92,7 @@ fun IIDXScoreViewerScreen(
     var scoreHistory by remember { mutableStateOf<Map<String, List<Int>>>(emptyMap()) }
     var radarEntries by remember { mutableStateOf<Map<String, NotesRadarEntry>>(emptyMap()) }
     var textageChart by remember { mutableStateOf<TextageChartViewerChart?>(null) }
+    var legacyTextageChart by remember { mutableStateOf<TextageChart?>(null) }
     var selectedLevelCode by rememberSaveable { mutableStateOf(initialLevel) }
 
     LaunchedEffect(title, playType, dateEpoch) {
@@ -94,10 +102,12 @@ fun IIDXScoreViewerScreen(
             val titleCompact = title.compact
             val loadedSong = container.externalDataDao.iidxSong(titleCompact)
             val loadedTextage = container.externalDataDao.textageChartViewerChart(titleCompact)
+            val loadedLegacyTextage = container.externalDataDao.textageChart(titleCompact)
 
             val dao = container.database.iidxDao()
-            val groupDates = dao.importGroups().associate { it.id to it.importDate }
+            val groupDates = container.iidxRepository.importGroups().associate { it.id to it.importDate }
             val historyRecords = dao.songRecordsForTitle(title, playType)
+                .filter { it.importGroupID in groupDates }
                 .sortedBy { groupDates[it.importGroupID] ?: 0L }
             val history = IIDXLevel.entries.associate { level ->
                 level.code to historyRecords.mapNotNull { historyRecord ->
@@ -117,6 +127,7 @@ fun IIDXScoreViewerScreen(
                 record = loaded
                 song = loadedSong
                 textageChart = loadedTextage
+                legacyTextageChart = loadedLegacyTextage
                 scoreHistory = history
                 radarEntries = radar
             }
@@ -142,11 +153,12 @@ fun IIDXScoreViewerScreen(
             val songVersion = record?.version.orEmpty()
             if (songVersion.isNotEmpty()) {
                 Text(
-                    text = songVersion.uppercase(),
+                    text = songVersion,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.ExtraBold,
                     fontStyle = FontStyle.Italic,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = IIDXColors.versionColor(songVersion, darkTheme)
+                        ?: MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(end = 16.dp)
                 )
             }
@@ -207,7 +219,8 @@ fun IIDXScoreViewerScreen(
                     history = scoreHistory[level.code].orEmpty(),
                     radarEntry = radarEntries[level.code],
                     textageChart = textageChart,
-                    onOpenWeb = onOpenWeb
+                    legacyTextageChart = legacyTextageChart,
+                    onOpenTextage = onOpenTextage
                 )
             }
         }
@@ -320,7 +333,8 @@ private fun ScoreSection(
     history: List<Int>,
     radarEntry: NotesRadarEntry?,
     textageChart: TextageChartViewerChart?,
-    onOpenWeb: (String) -> Unit
+    legacyTextageChart: TextageChart?,
+    onOpenTextage: (String?, String?) -> Unit
 ) {
     val hasDJLevel = IIDXDJLevel.fromValue(score.djLevel)
         ?.let { it != IIDXDJLevel.NONE } == true
@@ -481,10 +495,17 @@ private fun ScoreSection(
             )
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
+                val radar = radarEntry.toRadarData()
                 if (showRadarValues) {
-                    RadarValuesList(radarEntry)
+                    RadarValuesList(data = radar, modifier = Modifier.padding(vertical = 4.dp))
                 } else {
-                    IIDXNotesRadarChart(entry = radarEntry)
+                    RadarChart(
+                        data = radar,
+                        color = RadarColors.chartColor(radar),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(220.dp)
+                    )
                 }
             }
         }
@@ -501,7 +522,7 @@ private fun ScoreSection(
                 icon = Icons.Outlined.SmartDisplay,
                 label = stringResource(R.string.scores_viewer_youtube)
             ) {
-                val query = URLEncoder.encode("IIDX $title", "UTF-8")
+                val query = URLEncoder.encode("IIDX ${playTypeEnum.code}${level.code} $title", "UTF-8")
                 context.startActivity(
                     android.content.Intent(
                         android.content.Intent.ACTION_VIEW,
@@ -509,13 +530,26 @@ private fun ScoreSection(
                     )
                 )
             }
-            val chartViewerURL = textageChart?.pageURL(level, playTypeEnum)
-            if (level != IIDXLevel.BEGINNER && chartViewerURL != null) {
-                ChartActionButton(
-                    icon = Icons.Outlined.Article,
-                    label = stringResource(R.string.scores_viewer_chart_viewer)
-                ) {
-                    onOpenWeb(chartViewerURL)
+            if (level != IIDXLevel.BEGINNER) {
+                val chartViewerURL = textageChart?.pageURL(level, playTypeEnum)
+                val sides = if (playTypeEnum == IIDXPlayType.SINGLE) {
+                    listOf(
+                        IIDXPlaySide.SIDE_1P to R.string.scores_viewer_textage_1p,
+                        IIDXPlaySide.SIDE_2P to R.string.scores_viewer_textage_2p
+                    )
+                } else {
+                    listOf(IIDXPlaySide.NOT_APPLICABLE to R.string.scores_viewer_textage_dp)
+                }
+                sides.forEach { (side, labelRes) ->
+                    val legacyURL = legacyTextageChart?.pageURL(level, playTypeEnum, side)
+                    if (legacyURL != null || chartViewerURL != null) {
+                        ChartActionButton(
+                            icon = Icons.Outlined.Article,
+                            label = stringResource(labelRes)
+                        ) {
+                            onOpenTextage(legacyURL, chartViewerURL)
+                        }
+                    }
                 }
             }
         }
@@ -566,71 +600,4 @@ private fun NoteTypeColumn(
             fontWeight = FontWeight.Bold
         )
     }
-}
-
-@Composable
-private fun RadarValuesList(entry: NotesRadarEntry) {
-    val points = listOf(
-        Triple("NOTES", entry.notes, RadarColors.notes),
-        Triple("CHORD", entry.chord, RadarColors.chord),
-        Triple("PEAK", entry.peak, RadarColors.peak),
-        Triple("CHARGE", entry.charge, RadarColors.charge),
-        Triple("SCRATCH", entry.scratch, RadarColors.scratch),
-        Triple("SOF-LAN", entry.soflan, RadarColors.soflan)
-    )
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        points.forEach { (label, value, color) ->
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = color,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = String.format(Locale.ROOT, "%.2f", value),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
-    }
-}
-
-private fun TextageChartViewerChart.chartLevel(
-    level: IIDXLevel,
-    playType: IIDXPlayType
-): Int = when (playType) {
-    IIDXPlayType.SINGLE -> when (level) {
-        IIDXLevel.BEGINNER -> spBeginner
-        IIDXLevel.NORMAL -> spNormal
-        IIDXLevel.HYPER -> spHyper
-        IIDXLevel.ANOTHER -> spAnother
-        IIDXLevel.LEGGENDARIA -> spLeggendaria
-    }
-    IIDXPlayType.DOUBLE -> when (level) {
-        IIDXLevel.BEGINNER -> dpBeginner
-        IIDXLevel.NORMAL -> dpNormal
-        IIDXLevel.HYPER -> dpHyper
-        IIDXLevel.ANOTHER -> dpAnother
-        IIDXLevel.LEGGENDARIA -> dpLeggendaria
-    }
-}
-
-private fun TextageChartViewerChart.pageURL(
-    level: IIDXLevel,
-    playType: IIDXPlayType
-): String? {
-    if (chartLevel(level, playType) <= 0) return null
-    val difficultyCode = when (level) {
-        IIDXLevel.BEGINNER -> "b"
-        IIDXLevel.NORMAL -> "n"
-        IIDXLevel.HYPER -> "h"
-        IIDXLevel.ANOTHER -> "a"
-        IIDXLevel.LEGGENDARIA -> "l"
-    }
-    val playTypeCode = if (playType == IIDXPlayType.SINGLE) "sp" else "dp"
-    val folder = if (version == 35) "s" else version.toString()
-    return "https://textage-chart-viewer.vercel.app/chart/$folder/$songId/$difficultyCode/$playTypeCode"
 }

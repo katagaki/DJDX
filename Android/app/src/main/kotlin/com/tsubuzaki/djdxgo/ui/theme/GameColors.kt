@@ -2,10 +2,13 @@ package com.tsubuzaki.djdxgo.ui.theme
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.tsubuzaki.djdxgo.data.RadarAxis
+import com.tsubuzaki.djdxgo.data.RadarData
 import com.tsubuzaki.djdxgo.data.ddr.DDRDifficulty
 import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXDJLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXLevel
+import com.tsubuzaki.djdxgo.data.iidx.IIDXVersion
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordDifficulty
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordGrade
@@ -13,7 +16,6 @@ import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXDifficulty
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXGrade
 
-// System palette approximations shared by the game-semantic colors.
 object Palette {
     val red = Color(0xFFFF3B30)
     val orange = Color(0xFFFF9500)
@@ -39,7 +41,6 @@ object IIDXColors {
         IIDXLevel.LEGGENDARIA -> Palette.purple
     }
 
-    // Canonical chart palette.
     fun clearTypeColor(clearType: String): Color = when (IIDXClearType.fromValue(clearType)) {
         IIDXClearType.FULL_COMBO_CLEAR -> Palette.blue
         IIDXClearType.CLEAR -> Palette.cyan
@@ -51,7 +52,6 @@ object IIDXColors {
         else -> Palette.gray
     }
 
-    // Score row leading lamp palette.
     fun lampColor(clearType: String, darkTheme: Boolean): Color =
         when (IIDXClearType.fromValue(clearType)) {
             IIDXClearType.CLEAR -> Palette.cyan
@@ -92,17 +92,27 @@ object IIDXColors {
             Brush.verticalGradient(listOf(Palette.cyan, Palette.blue))
         }
 
-    private const val SPARKLE_SHOWER = "Sparkle Shower"
-
     fun songTitleBrush(version: String): Brush =
-        if (version == SPARKLE_SHOWER) {
-            Brush.verticalGradient(listOf(Color(0xFFFBFEFF), Color(0xFFD3FA95)))
+        if (version == IIDXVersion.current.marketingName) {
+            Brush.verticalGradient(listOf(Color(0xFFFEFBFF), Color(0xFFD6A9FC)))
         } else {
             Brush.verticalGradient(listOf(Color.White, Palette.gray))
         }
 
     fun songTitleStrokeColor(version: String): Color =
-        if (version == SPARKLE_SHOWER) Color(0xFF1C4176) else Color(0xFF4D4D4D)
+        if (version == IIDXVersion.current.marketingName) Color(0xFF3C126C) else Color(0xFF4D4D4D)
+
+    fun versionColor(version: String, darkTheme: Boolean): Color? =
+        IIDXVersion.fromMarketingName(version)?.let {
+            Color(if (darkTheme) it.darkColor else it.lightColor)
+        }
+
+    fun difficultyLevelColor(difficulty: Int): Color =
+        Color.hsv(
+            hue = ((0.6f - 0.6f * (difficulty - 1) / 11f) * 360f).coerceIn(0f, 360f),
+            saturation = 0.75f,
+            value = 0.9f
+        )
 }
 
 object SDVXColors {
@@ -167,6 +177,21 @@ object PolarisChordColors {
             else -> Palette.gray
         }
 
+    fun gradeColor(grade: String): Color = when (PolarisChordGrade.fromValue(grade)) {
+        PolarisChordGrade.SSS_PLUS_PLUS,
+        PolarisChordGrade.SSS_PLUS,
+        PolarisChordGrade.SSS -> Palette.pink
+        PolarisChordGrade.SS -> Palette.orange
+        PolarisChordGrade.S -> Palette.yellow
+        PolarisChordGrade.AAA -> Palette.green
+        PolarisChordGrade.AA -> Palette.mint
+        PolarisChordGrade.A -> Palette.teal
+        PolarisChordGrade.B -> Palette.blue
+        PolarisChordGrade.C -> Palette.indigo
+        PolarisChordGrade.D -> Palette.purple
+        else -> Palette.gray
+    }
+
     fun gradeBrush(grade: String, darkTheme: Boolean): Brush {
         val parsed = PolarisChordGrade.fromValue(grade)
         return when {
@@ -207,6 +232,9 @@ object DDRColors {
         else -> Palette.gray
     }
 
+    fun clearLampColor(clearKind: String, darkTheme: Boolean): Color =
+        if (clearKind == "noclear") Palette.gray else clearColor(clearKind, darkTheme)
+
     fun rankColor(rankStem: String): Color = when {
         rankStem.startsWith("aaa") -> Palette.yellow
         rankStem.startsWith("aa") -> Palette.gray
@@ -220,18 +248,30 @@ object DDRColors {
 }
 
 object RadarColors {
-    val notes = Color(0xFFFF40EB)
-    val chord = Palette.lime
-    val peak = Palette.orange
-    val charge = Palette.purple
-    val scratch = Palette.red
-    val soflan = Palette.blue
-
-    fun polygonColor(sum: Double, isPlayerRadar: Boolean = false): Color = when {
-        isPlayerRadar && sum > 800 -> Palette.green
-        sum < 200 -> Palette.cyan
-        sum < 400 -> Palette.yellow
-        sum < 600 -> Palette.red
-        else -> Palette.purple
+    fun axisColor(axis: RadarAxis): Color = when (axis) {
+        RadarAxis.NOTES -> Color(0xFFFF40EB)
+        RadarAxis.CHORD -> Color(0xFF85E100)
+        RadarAxis.PEAK -> Color(0xFFFF6C00)
+        RadarAxis.CHARGE -> Color(0xFF8957DD)
+        RadarAxis.SCRATCH -> Color(0xFFDD0000)
+        RadarAxis.SOFLAN -> Color(0xFF0086E5)
     }
+
+    fun chartColor(data: RadarData): Color {
+        val sum = data.sum()
+        return when {
+            sum > 600.0 -> Palette.purple
+            sum > 400.0 -> Palette.red
+            sum > 200.0 -> Palette.yellow
+            else -> Palette.cyan
+        }
+    }
+
+    fun playerColor(data: RadarData): Color = axisColor(data.highestAxis())
+
+    val notesPalette: List<Color> = listOf(
+        Palette.cyan, Palette.yellow, Palette.red, Palette.purple, Palette.green
+    )
+
+    val playerPalette: List<Color> = RadarAxis.displayOrder.map(::axisColor)
 }

@@ -4,10 +4,10 @@
     <string name="analytics_dj_levels">DJ LEVEL</string>
     <string name="analytics_tower_recent">Tower (Recent)</string>
     <string name="analytics_tower_totals">Tower (Totals)</string>
-    <string name="analytics_clear_breakdown">Clears</string>
-    <string name="analytics_grade_breakdown">Grades</string>
-    <string name="analytics_rank_breakdown">Ranks</string>
-    <string name="analytics_no_data">No Data</string>
+    <string name="analytics_clear_breakdown">Clear Breakdown</string>
+    <string name="analytics_grade_breakdown">Grade Breakdown</string>
+    <string name="analytics_rank_breakdown">Rank Breakdown</string>
+    <string name="analytics_no_data">No data</string>
     <string name="tower_title">Tower</string>
     <string name="tower_recent">Recent</string>
     <string name="tower_totals">Totals</string>
@@ -20,4 +20,24 @@
     <string name="tower_back">Back</string>
     <string name="analytics_last_play">Last Play</string>
     <string name="analytics_new_record">NEW RECORD</string>
+    <string name="analytics_section_overview">Overview</string>
+    <string name="analytics_section_last_play">Last Play</string>
+    <string name="analytics_section_per_level">Per Level</string>
+    <string name="analytics_clear_type_overall">Summary - Clear Type</string>
+    <string name="analytics_dj_level_overall">DJ LEVEL Breakdown</string>
+    <string name="analytics_clear_type">Clear Type</string>
+    <string name="analytics_dj_level">DJ LEVEL</string>
+    <string name="analytics_per_level_title_separator"> - </string>
+    <string name="analytics_level">Level</string>
+    <string name="analytics_per_level_breakdown">Breakdown</string>
+    <string name="analytics_per_level_trend">Trend</string>
+    <string name="analytics_breakdown_level">Level Breakdown</string>
+    <string name="analytics_breakdown_clear_type">Clear Lamp Breakdown</string>
+    <string name="analytics_new_high_score_delta">(+%1$d)</string>
+    <string name="tower_mode_recent">Activity</string>
+    <string name="tower_iidx_tower">IIDX Tower</string>
+    <plurals name="analytics_song_count">
+        <item quantity="one">%1$d song</item>
+        <item quantity="other">%1$d songs</item>
+    </plurals>
 </resources>

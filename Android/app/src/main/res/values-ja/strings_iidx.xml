@@ -48,4 +48,12 @@
     <string name="scores_viewer_miss">MISS</string>
     <string name="scores_viewer_youtube">YouTube</string>
     <string name="scores_viewer_chart_viewer">譜面ビューアー</string>
+    <string name="scores_filter_version">バージョン</string>
+    <string name="scores_viewer_textage_1p">1Pの譜面</string>
+    <string name="scores_viewer_textage_2p">2Pの譜面</string>
+    <string name="scores_viewer_textage_dp">DPの譜面</string>
+    <string name="textage_viewer_title">Textage譜面</string>
+    <string name="textage_source_chart_viewer">Chart Viewer</string>
+    <string name="textage_source_legacy">レガシー</string>
+    <string name="textage_fallback_message">譜面が開きませんか？\nお手数ですが、Textageで手動で検索してみてください。</string>
 </resources>

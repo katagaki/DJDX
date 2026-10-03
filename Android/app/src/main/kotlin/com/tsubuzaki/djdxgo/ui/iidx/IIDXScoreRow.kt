@@ -34,7 +34,10 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXLevelScore
 import com.tsubuzaki.djdxgo.data.iidx.IIDXSongRecord
+import androidx.compose.ui.res.stringResource
+import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
+import com.tsubuzaki.djdxgo.ui.theme.Palette
 import java.util.Locale
 
 @Composable
@@ -50,6 +53,7 @@ fun IIDXScoreRow(
     scoreRateVisible: Boolean,
     scoreVisible: Boolean,
     lastPlayDateVisible: Boolean,
+    scoreDelta: Int? = null,
     onClick: () -> Unit
 ) {
     val darkTheme = isSystemInDarkTheme()
@@ -122,6 +126,14 @@ fun IIDXScoreRow(
                             ),
                             fontWeight = FontWeight.ExtraBold
                         )
+                        if (scoreDelta != null && scoreDelta > 0) {
+                            Text(
+                                text = stringResource(R.string.analytics_new_high_score_delta, scoreDelta),
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Palette.orange
+                            )
+                        }
                     }
                     if (lastPlayDateVisible && record.lastPlayDate != 0L) {
                         Text(

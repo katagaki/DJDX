@@ -10,6 +10,27 @@ object PolarisChordVersionInfo {
     private const val EAGATE = "https://p.eagate.573.jp"
 
     val musicDataPageURL = "$EAGATE/game/polarischord/$SLUG/playdata/music_data.html"
+    val playDataEndpointURL = "$EAGATE/game/polarischord/$SLUG/json/pdata_getdata.html"
+
+    val paClassIconURL = "https://eacache.s.konaminet.jp/game/polarischord/$SLUG/img/playdata/profile/icn_star.png"
+
+    fun paSkillIconURL(skill: Double): String {
+        val name = when {
+            skill < 1.00 -> "none"
+            skill < 3.00 -> "A"
+            skill < 6.00 -> "B"
+            skill < 9.00 -> "C"
+            skill < 11.00 -> "D"
+            skill < 12.00 -> "E"
+            skill < 13.00 -> "F"
+            skill < 14.00 -> "G"
+            skill < 15.00 -> "H"
+            skill < 15.50 -> "I"
+            skill < 16.00 -> "J"
+            else -> "K"
+        }
+        return "https://eacache.s.konaminet.jp/game/polarischord/$SLUG/img/playdata/paskill/$name.png"
+    }
 
     fun loginPageRedirectURL(): String {
         val path = URLEncoder.encode("/game/polarischord/$SLUG/playdata/music_data.html", "UTF-8")

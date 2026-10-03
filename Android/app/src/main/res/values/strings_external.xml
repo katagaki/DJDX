@@ -5,17 +5,27 @@
     <string name="external_reload_all">Reload All Enabled</string>
     <string name="external_reload">Reload</string>
     <string name="external_entry_count">%1$s entries</string>
-    <string name="external_reload_done">Reloaded %1$s entries.</string>
-    <string name="external_reload_failed">Reload failed: %1$s</string>
+    <string name="external_reload_done">%1$s charts were read successfully.</string>
+    <string name="external_reload_failed">The data could not be updated. Please try again later.</string>
 
     <string name="external_textage_chart_viewer_name">Textage Chart Viewer</string>
     <string name="external_textage_chart_viewer_description">IIDX chart viewer links</string>
     <string name="external_bemaniwiki_iidx_name">BEMANIWiki (IIDX)</string>
     <string name="external_bemaniwiki_iidx_description">Song note counts for score rates</string>
-    <string name="external_bm2dx_name">bm2dx.com</string>
-    <string name="external_bm2dx_description">Notes radar data</string>
-    <string name="external_sdvxin_name">sdvx.in</string>
+    <string name="external_bm2dx_name">joy to the beat...</string>
+    <string name="external_bm2dx_description">Notes Radar Per Chart</string>
+    <string name="external_sdvxin_name">SDVX譜面保管所</string>
     <string name="external_sdvxin_description">SDVX chart links</string>
     <string name="external_ddr_name">BEMANIWiki (DDR)</string>
     <string name="external_ddr_description">DDR song levels</string>
+    <string name="external_textage_name">Textage</string>
+    <string name="external_textage_footer">DJDX is not affiliated with or endorsed by Textage.</string>
+    <string name="external_textage_chart_viewer_footer">DJDX is not affiliated with or endorsed by Textage Chart Viewer.</string>
+    <string name="external_sdvxin_footer">DJDX is not affiliated with or endorsed by SDVX譜面保管所.</string>
+    <string name="external_bemaniwiki_name">BEMANIWiki 2nd</string>
+    <string name="external_bemaniwiki_footer">DJDX is not affiliated with or endorsed by BEMANIWiki 2nd.</string>
+    <string name="external_bm2dx_footer">DJDX is not affiliated with or endorsed by bm2dx.com.</string>
+    <string name="external_chart_index">Chart Index</string>
+    <string name="external_view_source">Visit Source</string>
+    <string name="external_update_data">Update Data</string>
 </resources>

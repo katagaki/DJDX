@@ -20,11 +20,11 @@
     <string name="more_title">More</string>
     <string name="more_external_data">External Data Sources</string>
     <string name="more_show_analytics">Show Analytics</string>
-    <string name="more_delete_web_data">Delete Web Data</string>
+    <string name="more_delete_web_data">Delete Website Data</string>
     <string name="more_delete_web_data_done">Web data deleted.</string>
     <string name="more_delete_web_data_confirm">Delete all saved web login data (cookies and cache)?</string>
     <string name="more_delete_score_data">Delete Score Data</string>
-    <string name="more_delete_score_data_message">This deletes ALL imported score data and cannot be undone. Enter %1$s to confirm.</string>
+    <string name="more_delete_score_data_message">To confirm deletion of all score data, enter the code %1$s.</string>
     <string name="more_delete_score_data_done">Score data deleted.</string>
     <string name="more_delete_score_data_confirm">Delete ALL imported score data? This cannot be undone.</string>
     <string name="more_github">View Source Code</string>
@@ -36,4 +36,26 @@
 
     <string name="tab_scores">Play Data</string>
     <string name="tab_analytics">Analytics</string>
+    <string name="shared_refresh">Reload</string>
+    <string name="shared_open_in_browser">Open in Browser</string>
+    <string name="shared_edit">Edit</string>
+    <string name="shared_done">Done</string>
+    <string name="more_show_profile_header">Show Profile Header</string>
+    <string name="more_reset_layout">Reset Layout</string>
+    <string name="more_reset_layout_title">Reset Layout?</string>
+    <string name="more_reset_layout_message">Card visibility and order will be restored to their defaults.</string>
+    <string name="more_delete_web_data_title">All Website Data Will Be Deleted</string>
+    <string name="more_delete_web_data_message">You will need to login again when you next import your data.</string>
+    <string name="more_delete_web_data_confirm_button">Delete Website Data</string>
+    <string name="more_delete_score_data_title">All Score Data Will Be Deleted</string>
+    <string name="more_delete_score_data_subtitle">To view your score data in-app, you will need to import your score data again.</string>
+    <string name="radar_maker_title">Radar Maker</string>
+    <string name="radar_maker_palette_player">Player Radar</string>
+    <string name="radar_maker_palette_notes">Notes Radar</string>
+    <string name="radar_maker_color">Color</string>
+    <string name="radar_maker_values">Values</string>
+    <string name="radar_maker_export">Export as Image</string>
+    <string name="radar_maker_export_failed_title">Could Not Export Radar</string>
+    <string name="radar_maker_export_failed_message">The radar image could not be created. Please try again.</string>
+    <string name="radar_total">TOTAL</string>
 </resources>

@@ -18,11 +18,11 @@
     <string name="more_title">その他</string>
     <string name="more_external_data">外部データソース</string>
     <string name="more_show_analytics">アナリティクスを表示</string>
-    <string name="more_delete_web_data">Webデータを削除</string>
+    <string name="more_delete_web_data">Webデータを消去</string>
     <string name="more_delete_web_data_done">Webデータを削除しました。</string>
     <string name="more_delete_web_data_confirm">保存されたWebログインデータ（Cookieとキャッシュ）をすべて削除しますか？</string>
-    <string name="more_delete_score_data">スコアデータを削除</string>
-    <string name="more_delete_score_data_message">インポートしたスコアデータをすべて削除します。この操作は取り消せません。確認のため %1$s を入力してください。</string>
+    <string name="more_delete_score_data">スコアデータを消去</string>
+    <string name="more_delete_score_data_message">すべてのスコアデータを削除するには、コード %1$s を入力してください。</string>
     <string name="more_delete_score_data_done">スコアデータを削除しました。</string>
     <string name="more_delete_score_data_confirm">インポートしたスコアデータをすべて削除しますか？この操作は取り消せません。</string>
     <string name="more_github">ソースコード</string>
@@ -34,4 +34,26 @@
 
     <string name="tab_scores">プレーデータ</string>
     <string name="tab_analytics">アナリティクス</string>
+    <string name="shared_refresh">リロード</string>
+    <string name="shared_open_in_browser">ブラウザで開く</string>
+    <string name="shared_edit">編集</string>
+    <string name="shared_done">完了</string>
+    <string name="more_show_profile_header">プロフィールを表示</string>
+    <string name="more_reset_layout">レイアウトをリセット</string>
+    <string name="more_reset_layout_title">レイアウトをリセットしますか？</string>
+    <string name="more_reset_layout_message">カードの表示と並び順が初期状態に戻ります。</string>
+    <string name="more_delete_web_data_title">Webデータがすべて削除されます</string>
+    <string name="more_delete_web_data_message">次にWebでのインポートを行う際に、再度ログインする必要があります。</string>
+    <string name="more_delete_web_data_confirm_button">Webデータを消去</string>
+    <string name="more_delete_score_data_title">インポートされたスコアデータがすべて削除されます</string>
+    <string name="more_delete_score_data_subtitle">スコアをご覧になるために、再度インポートする必要があります。</string>
+    <string name="radar_maker_title">レーダーメーカー</string>
+    <string name="radar_maker_palette_player">プレーレーダー</string>
+    <string name="radar_maker_palette_notes">ノーツレーダー</string>
+    <string name="radar_maker_color">カラー</string>
+    <string name="radar_maker_values">数値</string>
+    <string name="radar_maker_export">画像として書き出す</string>
+    <string name="radar_maker_export_failed_title">レーダーを書き出せませんでした</string>
+    <string name="radar_maker_export_failed_message">レーダー画像を作成できませんでした。もう一度お試しください。</string>
+    <string name="radar_total">合計レーダースコア</string>
 </resources>

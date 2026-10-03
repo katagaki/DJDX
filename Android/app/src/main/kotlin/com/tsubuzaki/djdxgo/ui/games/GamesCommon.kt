@@ -163,7 +163,8 @@ internal fun <T> ScoresToolbar(
     sortDescending: Boolean,
     onSortChange: (String, Boolean) -> Unit,
     onFilterClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    leadingContent: (@Composable () -> Unit)? = null
 ) {
     var showSortMenu by remember { mutableStateOf(false) }
     var showSearchSheet by remember { mutableStateOf(false) }
@@ -174,6 +175,7 @@ internal fun <T> ScoresToolbar(
             .vibrantFloatingToolbarColors(),
         modifier = modifier
     ) {
+        leadingContent?.invoke()
         if (query.isNotEmpty()) {
             FilledIconButton(onClick = { showSearchSheet = true }) {
                 Icon(

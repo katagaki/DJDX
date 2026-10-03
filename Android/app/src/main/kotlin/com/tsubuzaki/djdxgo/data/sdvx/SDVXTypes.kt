@@ -21,6 +21,12 @@ enum class SDVXVersion(val number: Int, val slug: String, val marketingName: Str
     val errorPageURL: String
         get() = "$eagate/game/sdvx/$slug/error/index.html"
 
+    val profilePageURL: String
+        get() = "$eagate/game/sdvx/$slug/playdata/profile/index.html"
+
+    fun volforceIconURL(number: String): String =
+        "https://eacache.s.konaminet.jp/game/sdvx/$slug/images/playdata/profile/force_icon_$number.png"
+
     companion object {
         fun fromNumber(number: Int): SDVXVersion =
             entries.firstOrNull { it.number == number } ?: NABLA
@@ -60,10 +66,19 @@ enum class SDVXDifficulty(val value: String) {
             NOVICE -> "n"
             ADVANCED -> "a"
             EXHAUST -> "e"
+            ULTIMATE -> "u"
             else -> "m"
         }
 
+    val isInfiniteTier: Boolean
+        get() = this != NOVICE && this != ADVANCED && this != EXHAUST && this != MAXIMUM
+
     companion object {
+        val sorted: List<SDVXDifficulty> = listOf(
+            NOVICE, ADVANCED, EXHAUST, MAXIMUM,
+            INFINITE, GRAVITY, HEAVENLY, VIVID, EXCEED, NABLA, ULTIMATE
+        )
+
         fun fromValue(value: String): SDVXDifficulty? =
             entries.firstOrNull { it.value == value }
     }
