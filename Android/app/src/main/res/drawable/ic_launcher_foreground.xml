@@ -21,7 +21,7 @@
     <!-- Center label -->
     <path
         android:pathData="M54,54 m-7.65,0 a7.65,7.65 0 1,1 15.3,0 a7.65,7.65 0 1,1 -15.3,0"
-        android:fillColor="#327345" />
+        android:fillColor="#8A4FB8" />
     <!-- Spindle -->
     <path
         android:pathData="M54,54 m-2.1,0 a2.1,2.1 0 1,1 4.2,0 a2.1,2.1 0 1,1 -4.2,0"

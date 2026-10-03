@@ -56,7 +56,7 @@ let rDisc = 25.5 * discScale
 let rLabel = 7.65 * discScale
 let rSpindle = 2.1 * discScale
 
-let bg = vGradient(top: "#D0EC10", bottom: "#3FA561", y0: 0, y1: viewport)
+let bg = vGradient(top: "#B093F0", bottom: "#5C317B", y0: 0, y1: viewport)
 ctx.drawLinearGradient(
     bg,
     start: CGPoint(x: 54, y: viewport),
@@ -65,7 +65,7 @@ ctx.drawLinearGradient(
 )
 
 fillDisc(cx: 54, cy: 54, r: rDisc, gradientTop: "#4A4A50", gradientBottom: "#25252F")
-fillCircle(cx: 54, cy: 54, r: rLabel, fill: "#327345")
+fillCircle(cx: 54, cy: 54, r: rLabel, fill: "#8A4FB8")
 fillCircle(cx: 54, cy: 54, r: rSpindle, fill: "#4A4A4F")
 
 guard let image = ctx.makeImage() else { fatalError("image") }
