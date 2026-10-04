@@ -24,6 +24,15 @@ enum IIDXRankRecognizer {
         return prediction.identifier
     }
 
+    static func resolveAFamily(_ grade: String?, aspectRatio: CGFloat) -> String? {
+        guard let grade, ["A", "AA", "AAA"].contains(grade) else { return grade }
+        switch aspectRatio {
+        case ..<2.0: return "A"
+        case ..<3.1: return "AA"
+        default: return "AAA"
+        }
+    }
+
     private struct Prediction: Sendable {
         let identifier: String
         let confidence: Float

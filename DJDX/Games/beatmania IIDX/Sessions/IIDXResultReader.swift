@@ -123,7 +123,10 @@ enum IIDXResultReader {
     private static func read(_ detection: RawDetection, in image: CGImage) async -> (text: String, failed: Bool) {
         guard let crop = crop(detection.box, from: image) else { return ("", false) }
         if detection.label == "dj_level_now" {
-            return (await IIDXRankRecognizer.classify(cgImage: crop) ?? "", false)
+            let aspectRatio = (detection.box.width * CGFloat(image.width))
+                / max(1, detection.box.height * CGFloat(image.height))
+            let grade = await IIDXRankRecognizer.classify(cgImage: crop)
+            return (IIDXRankRecognizer.resolveAFamily(grade, aspectRatio: aspectRatio) ?? "", false)
         }
         if titleLabels.contains(detection.label) {
             return await ocrText(crop, languages: IIDXSessionTextRecognizer.titleLanguages)
