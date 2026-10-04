@@ -131,20 +131,21 @@ enum IIDXResultParser {
         if let value = headlineNumber(text("judge_bad")) { parse.bad = value }
         if let value = headlineNumber(text("judge_poor")) { parse.poor = value }
 
+        let judgesVerified = parse.exScore > 0 && pgRead != nil && greatRead != nil
+            && parse.exScore == 2 * parse.perfectGreat + parse.great
         let classified = text("dj_level_now").flatMap(gradeOf)
         let derived = derivedGrade(exScore: parse.exScore, notes: notes, parse: parse)
-        let djResolution = resolveDJLevel(classified: classified, derived: derived)
+        let djResolution = resolveDJLevel(
+            classified: classified, derived: derived,
+            derivedIsTrusted: judgesVerified && chartMatch?.noteCounts[parse.level] != nil
+        )
         if let grade = djResolution.grade {
             parse.djLevel = grade
             hits += 1
         }
         let djLevelConflict = djResolution.conflict
 
-        var bonus = 0.0
-        if parse.exScore > 0, pgRead != nil, greatRead != nil,
-           parse.exScore == 2 * parse.perfectGreat + parse.great {
-            bonus = 1.0
-        }
+        let bonus = judgesVerified ? 1.0 : 0.0
         parse.confidence = min(1.0, (Double(hits) + bonus) / 8.0)
         if djLevelConflict || clearTypeAmbiguous { parse.confidence = min(parse.confidence, 0.5) }
         return parse
@@ -196,8 +197,9 @@ enum IIDXResultParser {
         return derivedDJLevel(exScore: exScore, notes: notes)
     }
 
-    private static func resolveDJLevel(classified: String?, derived: String?)
+    private static func resolveDJLevel(classified: String?, derived: String?, derivedIsTrusted: Bool)
     -> (grade: String?, conflict: Bool) {
+        if derivedIsTrusted, let derived { return (derived, false) }
         guard let classified else { return (derived, false) }
         let conflict = derived.map { gradeDistance(classified, $0) > 1 } ?? false
         return (classified, conflict)
