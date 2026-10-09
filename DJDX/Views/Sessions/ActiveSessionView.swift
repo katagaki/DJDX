@@ -28,12 +28,7 @@ struct ActiveSessionView: View {
                     }
             }
             .background {
-                LinearGradient(
-                    colors: [.backgroundGradientTop, .backgroundGradientBottom],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                AppBackgroundGradient()
             }
             .navigationTitle("Sessions.Active.Title")
             .navigationBarTitleDisplayMode(.inline)

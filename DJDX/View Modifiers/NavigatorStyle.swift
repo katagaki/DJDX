@@ -19,13 +19,9 @@ struct NavigatorStyle: ViewModifier {
         }
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(isInline ? .inline : .automatic)
-        .background(
-            .linearGradient(
-                colors: [.backgroundGradientTop, .backgroundGradientBottom],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
+        .background {
+            AppBackgroundGradient()
+        }
     }
 }
 

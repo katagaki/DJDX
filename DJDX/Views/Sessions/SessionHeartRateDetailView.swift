@@ -20,12 +20,7 @@ struct SessionHeartRateDetailView: View {
         }
         .scrollContentBackground(.hidden)
         .background {
-            LinearGradient(
-                colors: [.backgroundGradientTop, .backgroundGradientBottom],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppBackgroundGradient()
         }
         .navigationTitle("Sessions.Detail.HeartRate")
         .navigationBarTitleDisplayMode(.inline)

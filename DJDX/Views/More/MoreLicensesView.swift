@@ -18,13 +18,9 @@ struct MoreLicensesView: View {
         .navigationTitle("More.Attributions")
         .navigationBarTitleDisplayMode(.inline)
         .scrollContentBackground(.hidden)
-        .background(
-            .linearGradient(
-                colors: [.backgroundGradientTop, .backgroundGradientBottom],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
+        .background {
+            AppBackgroundGradient()
+        }
     }
 }
 

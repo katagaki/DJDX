@@ -217,12 +217,7 @@ struct IIDXScoresView<Header: View>: View {
             }
             .scrollContentBackground(.hidden)
             .background {
-                LinearGradient(
-                    colors: [.backgroundGradientTop, .backgroundGradientBottom],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                AppBackgroundGradient()
             }
             .toolbar {
                 if #available(iOS 26.0, *) {

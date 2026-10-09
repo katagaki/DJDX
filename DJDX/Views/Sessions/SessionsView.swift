@@ -77,12 +77,7 @@ struct SessionsView: View {
             .padding(.bottom, 8.0)
         }
         .background {
-            LinearGradient(
-                colors: [.backgroundGradientTop, .backgroundGradientBottom],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppBackgroundGradient()
         }
         .searchable(text: $searchTerm,
                     placement: searchPlacement,

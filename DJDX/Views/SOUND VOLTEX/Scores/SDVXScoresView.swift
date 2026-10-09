@@ -167,12 +167,7 @@ struct SDVXScoresView<Header: View>: View {
         }
         .scrollContentBackground(.hidden)
         .background {
-            LinearGradient(
-                colors: [.backgroundGradientTop, .backgroundGradientBottom],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppBackgroundGradient()
         }
         .searchable(text: $searchTerm, prompt: "Scores.Search.Prompt")
         .refreshable {

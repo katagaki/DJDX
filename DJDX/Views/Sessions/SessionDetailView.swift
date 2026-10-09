@@ -37,12 +37,7 @@ struct SessionDetailView: View {
         }
         .scrollContentBackground(.hidden)
         .background {
-            LinearGradient(
-                colors: [.backgroundGradientTop, .backgroundGradientBottom],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppBackgroundGradient()
         }
         .navigationTitle(Text(session.startDate, format: .dateTime.year().month().day()))
         .navigationBarTitleDisplayMode(.inline)

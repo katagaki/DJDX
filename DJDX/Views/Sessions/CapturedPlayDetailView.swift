@@ -34,12 +34,7 @@ struct CapturedPlayDetailView: View {
             responsiveLayout(in: proxy)
         }
         .background {
-            LinearGradient(
-                colors: [.backgroundGradientTop, .backgroundGradientBottom],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppBackgroundGradient()
         }
         .navigationTitle("Sessions.Detail.Title")
         .navigationBarTitleDisplayMode(.inline)
