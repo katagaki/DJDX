@@ -164,6 +164,12 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         }
     }
 
+    var color: Color {
+        Color(uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark ? darkModeColor : lightModeColor
+        })
+    }
+
     // swiftlint:disable line_length
     func loginPageRedirectURL() -> URL {
         return URL(string: """

@@ -38,16 +38,21 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         }
     }
 
-    var accentColor: Color {
+    func accentColor(
+        iidxVersion: IIDXVersion,
+        sdvxVersion: SDVXVersion,
+        polarisChordVersion: PolarisChordVersion,
+        ddrVersion: DDRVersion
+    ) -> Color {
         switch self {
-        case .iidxArcade, .iidxInfinitas: .accent
-        case .soundVoltex: Color(red: 0.93, green: 0.27, blue: 0.64)
-        case .polarisChord: Color(red: 0.26, green: 0.62, blue: 0.96)
-        case .danceDanceRevolution: Color(red: 0.98, green: 0.55, blue: 0.13)
+        case .iidxArcade, .iidxInfinitas: iidxVersion.color
+        case .soundVoltex: sdvxVersion.color
+        case .polarisChord: polarisChordVersion.color
+        case .danceDanceRevolution: ddrVersion.color
         }
     }
 
-    var backgroundGradientColors: [Color] {
+    func backgroundGradientColors(accentColor: Color) -> [Color] {
         [accentColor.opacity(0.18), accentColor.opacity(0.06), .clear]
     }
 

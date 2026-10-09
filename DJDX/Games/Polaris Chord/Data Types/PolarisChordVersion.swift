@@ -1,4 +1,5 @@
-import Foundation
+import SwiftUI
+import UIKit
 
 enum PolarisChordVersion: Int, Codable, CaseIterable {
     case polarisChord = 1
@@ -17,6 +18,24 @@ enum PolarisChordVersion: Int, Codable, CaseIterable {
 
     static var supportedVersions: [PolarisChordVersion] {
         [.polarisChord]
+    }
+
+    var lightModeColor: UIColor {
+        switch self {
+        case .polarisChord: UIColor(red: 0 / 255, green: 150 / 255, blue: 220 / 255, alpha: 1.0)
+        }
+    }
+
+    var darkModeColor: UIColor {
+        switch self {
+        case .polarisChord: UIColor(red: 100 / 255, green: 200 / 255, blue: 255 / 255, alpha: 1.0)
+        }
+    }
+
+    var color: Color {
+        Color(uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark ? darkModeColor : lightModeColor
+        })
     }
 
     func loginPageRedirectURL() -> URL {
