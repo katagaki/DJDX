@@ -118,9 +118,9 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .bistrover: return UIColor(red: 4 / 255, green: 33 / 255, blue: 146 / 255, alpha: 1.0)
         case .castHour: return UIColor(red: 239 / 255, green: 64 / 255, blue: 3 / 255, alpha: 1.0)
         case .resident: return UIColor(red: 0 / 255, green: 33 / 255, blue: 41 / 255, alpha: 1.0)
-        case .epolis: return UIColor(red: 50 / 255, green: 50 / 255, blue: 50 / 255, alpha: 1.0)
+        case .epolis: return UIColor(red: 176 / 255, green: 160 / 255, blue: 0 / 255, alpha: 1.0)
         case .pinkyCrush: return UIColor(red: 249 / 255, green: 87 / 255, blue: 142 / 255, alpha: 1.0)
-        case .sparkleShower: return UIColor(red: 67 / 255, green: 143 / 255, blue: 82 / 255, alpha: 1.0)
+        case .sparkleShower: return UIColor(red: 120 / 255, green: 190 / 255, blue: 20 / 255, alpha: 1.0)
         case .zinrai: return UIColor(red: 138 / 255, green: 43 / 255, blue: 226 / 255, alpha: 1.0)
         }
     }
@@ -159,7 +159,7 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         case .resident: return UIColor(red: 127 / 255, green: 158 / 255, blue: 166 / 255, alpha: 1.0)
         case .epolis: return UIColor(red: 240 / 255, green: 254 / 255, blue: 0 / 255, alpha: 1.0)
         case .pinkyCrush: return UIColor(red: 1.0, green: 97 / 255, blue: 178 / 255, alpha: 1.0)
-        case .sparkleShower: return UIColor(red: 173 / 255, green: 227 / 255, blue: 77 / 255, alpha: 1.0)
+        case .sparkleShower: return UIColor(red: 190 / 255, green: 240 / 255, blue: 40 / 255, alpha: 1.0)
         case .zinrai: return UIColor(red: 198 / 255, green: 109 / 255, blue: 1.0, alpha: 1.0)
         }
     }
