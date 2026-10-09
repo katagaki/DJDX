@@ -28,6 +28,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case towerRecent
     case towerTotals
     case newHighScores
+    case newClearLamps
+    case newScoreUpdates
     case newAAA
     case newAA
     case newA
@@ -63,6 +65,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .towerRecent: return Text("Tower.ChartMode.Recent")
         case .towerTotals: return Text("Shared.IIDX.Tower")
         case .newHighScores: return Text("Analytics.NewHighScores")
+        case .newClearLamps: return Text(verbatim: "NEW CLEAR")
+        case .newScoreUpdates: return Text(verbatim: "NEW HIGH SCORE")
         case .newFullComboClear: return Text(verbatim: "FULLCOMBO CLEAR")
         case .newClears: return Text(verbatim: "CLEAR")
         case .newEasyClears: return Text(verbatim: "EASY CLEAR")
@@ -83,6 +87,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .towerRecent: return "Tower.ChartMode.Recent"
         case .towerTotals: return "Shared.IIDX.Tower"
         case .newHighScores: return "Analytics.NewHighScores"
+        case .newClearLamps: return "NEW CLEAR"
+        case .newScoreUpdates: return "NEW HIGH SCORE"
         case .newFullComboClear: return "FULLCOMBO CLEAR"
         case .newClears: return "CLEAR"
         case .newEasyClears: return "EASY CLEAR"
@@ -103,6 +109,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .towerRecent: return "calendar"
         case .towerTotals: return "building.2"
         case .newHighScores: return "trophy"
+        case .newClearLamps: return "checkmark.seal"
+        case .newScoreUpdates: return "arrow.up.circle"
         case .newFullComboClear: return "star.circle"
         case .newClears: return "checkmark.circle"
         case .newEasyClears: return "checkmark.shield"
@@ -123,6 +131,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         case .towerRecent: return .red
         case .towerTotals: return .red
         case .newHighScores: return .primary
+        case .newClearLamps: return .teal
+        case .newScoreUpdates: return .green
         case .newFullComboClear: return .blue
         case .newClears: return .cyan
         case .newEasyClears: return .green
@@ -149,6 +159,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
              .newExHardClear,
              .newFailed,
              .newHighScores,
+             .newClearLamps,
+             .newScoreUpdates,
              .newAAA,
              .newAA,
              .newA:
@@ -174,6 +186,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
             .towerTotals,
             .towerRecent,
             .newHighScores,
+            .newClearLamps,
+            .newScoreUpdates,
             .newAAA,
             .newAA,
             .newA,
@@ -189,6 +203,10 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
 
     /// Default visible cards
     static var defaultVisible: Set<AnalyticsCardType> {
-        [.gradeBreakdown, .towerTotals, .newHighScores, .newClears, .newAssistClears]
+        [
+            .gradeBreakdown, .towerTotals,
+            .newHighScores, .newClearLamps, .newScoreUpdates,
+            .newClears, .newAssistClears
+        ]
     }
 }

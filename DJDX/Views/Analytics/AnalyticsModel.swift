@@ -23,6 +23,8 @@ final class AnalyticsModel {
     var newExHardClears: [NewClearEntry] = []
     var newFailed: [NewClearEntry] = []
     var newHighScores: [NewHighScoreEntry] = []
+    var newClearLamps: [NewClearEntry] = []
+    var newScoreUpdates: [NewHighScoreEntry] = []
     var newAAA: [NewDJLevelEntry] = []
     var newAA: [NewDJLevelEntry] = []
     var newA: [NewDJLevelEntry] = []
@@ -164,6 +166,8 @@ final class AnalyticsModel {
                 self.newExHardClears = []
                 self.newFailed = []
                 self.newHighScores = []
+                self.newClearLamps = []
+                self.newScoreUpdates = []
                 self.newAAA = []
                 self.newAA = []
                 self.newA = []
@@ -199,6 +203,8 @@ final class AnalyticsModel {
             self.newExHardClears = computed.clears["EX HARD CLEAR"]!
             self.newFailed = computed.clears["FAILED"]!
             self.newHighScores = computed.highScores
+            self.newClearLamps = computed.clearLamps
+            self.newScoreUpdates = computed.scoreUpdates
             self.newAAA = computed.djLevels["AAA"]!
             self.newAA = computed.djLevels["AA"]!
             self.newA = computed.djLevels["A"]!
@@ -214,6 +220,8 @@ final class AnalyticsModel {
     ) -> (
         clears: [String: [NewClearEntry]],
         highScores: [NewHighScoreEntry],
+        clearLamps: [NewClearEntry],
+        scoreUpdates: [NewHighScoreEntry],
         djLevels: [String: [NewDJLevelEntry]]
     ) {
         var previousByTitle: [String: IIDXSongRecord] = [:]
@@ -231,6 +239,7 @@ final class AnalyticsModel {
             "FAILED": []
         ]
         var computedNewHighScores: [NewHighScoreEntry] = []
+        var computedClearLamps: [NewClearEntry] = []
         var computedDJLevels: [String: [NewDJLevelEntry]] = [
             "AAA": [],
             "AA": [],
@@ -270,6 +279,15 @@ final class AnalyticsModel {
                     ))
                 }
 
+                if Self.isClearLampImprovement(from: previousClearType, to: latestScore.clearType) {
+                    computedClearLamps.append(NewClearEntry(
+                        songRecord: latestRecord,
+                        level: level,
+                        score: latestScore,
+                        previousClearType: previousClearType
+                    ))
+                }
+
                 let previousDJLevel = previousScore?.djLevel ?? "---"
                 if let djLevel = latestScore.djLevel as String?,
                    computedDJLevels.keys.contains(djLevel),
@@ -293,11 +311,22 @@ final class AnalyticsModel {
             }
         }
 
-        return (computedClears, computedNewHighScores, computedDJLevels)
+        return (
+            computedClears, computedNewHighScores, computedClearLamps,
+            computedNewHighScores.filter { $0.previousScore > 0 }, computedDJLevels
+        )
     }
     // swiftlint:enable function_body_length
 
     // MARK: - Helpers
+
+    nonisolated static func isClearLampImprovement(from previous: String, to latest: String) -> Bool {
+        let ranked = IIDXClearType.sortedStrings
+        guard let latestRank = ranked.firstIndex(of: latest),
+              latestRank < ranked.firstIndex(of: IIDXClearType.failed.rawValue)! else { return false }
+        let previousRank = ranked.firstIndex(of: previous) ?? ranked.count
+        return latestRank < previousRank
+    }
 
     nonisolated static func score(_ score: IIDXLevelScore, level: IIDXLevel, matches filters: FilterOptions) -> Bool {
         if !filters.levels.isEmpty, !filters.levels.contains(level) { return false }

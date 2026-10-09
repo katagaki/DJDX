@@ -9,11 +9,24 @@ extension AnalyticsView {
         if let decoded = try? JSONDecoder().decode([AnalyticsCardType].self, from: cardOrderData),
            !decoded.isEmpty {
             var order = decoded
-            for cardType in AnalyticsCardType.defaultOrder where !order.contains(cardType) {
-                order.append(cardType)
+            var addedCards: [AnalyticsCardType] = []
+            for (index, cardType) in AnalyticsCardType.defaultOrder.enumerated() where !order.contains(cardType) {
+                if index > 0,
+                   let predecessorIndex = order.firstIndex(of: AnalyticsCardType.defaultOrder[index - 1]) {
+                    order.insert(cardType, at: predecessorIndex + 1)
+                } else {
+                    order.append(cardType)
+                }
+                addedCards.append(cardType)
             }
             order.removeAll { !AnalyticsCardType.defaultOrder.contains($0) }
             cardOrder = order
+            let addedVisibleCards = addedCards.filter { AnalyticsCardType.defaultVisible.contains($0) }
+            if !addedVisibleCards.isEmpty {
+                visibleCards.formUnion(addedVisibleCards)
+                saveCardOrder()
+                saveVisibleCards()
+            }
         }
     }
 

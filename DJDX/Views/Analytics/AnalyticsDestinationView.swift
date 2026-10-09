@@ -110,6 +110,20 @@ struct AnalyticsDestinationView: View {
                 scoreDelta: { $0.score.score - $0.previousScore }
             )
             .automaticNavigationTransition(id: "NewHighScores", in: analyticsNamespace)
+        case .newClearLampsDetail:
+            NewEntryDetailView(
+                entries: model.newClearLamps,
+                title: AnalyticsCardType.newClearLamps.titleKey
+            )
+            .automaticNavigationTransition(id: "NewClearLamps", in: analyticsNamespace)
+        case .newScoreUpdatesDetail:
+            NewEntryDetailView(
+                entries: model.newScoreUpdates,
+                title: AnalyticsCardType.newScoreUpdates.titleKey,
+                showsClearTypeBreakdown: true,
+                scoreDelta: { $0.score.score - $0.previousScore }
+            )
+            .automaticNavigationTransition(id: "NewScoreUpdates", in: analyticsNamespace)
         case .newAAADetail:
             NewEntryDetailView(
                 entries: model.newAAA,

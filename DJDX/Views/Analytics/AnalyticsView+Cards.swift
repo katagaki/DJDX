@@ -28,6 +28,10 @@ extension AnalyticsView {
             newFailedCard
         case .newHighScores:
             newHighScoresCard
+        case .newClearLamps:
+            newClearLampsCard
+        case .newScoreUpdates:
+            newScoreUpdatesCard
         case .newAAA:
             newAAACard
         case .newAA:
@@ -147,6 +151,34 @@ extension AnalyticsView {
         }
         .buttonStyle(AnalyticsCardButtonStyle())
         .automaticMatchedTransitionSource(id: "NewHighScores", in: analyticsNamespace)
+    }
+
+    var newClearLampsCard: some View {
+        Button {
+            if !isEditingCards {
+                navigationManager.push(AnalyticsPath.newClearLampsDetail)
+            }
+        } label: {
+            AnalyticsCardView(cardType: .newClearLamps, headerPlacement: .bottom) {
+                NewClearsCard(newClears: $model.newClearLamps)
+            }
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "NewClearLamps", in: analyticsNamespace)
+    }
+
+    var newScoreUpdatesCard: some View {
+        Button {
+            if !isEditingCards {
+                navigationManager.push(AnalyticsPath.newScoreUpdatesDetail)
+            }
+        } label: {
+            AnalyticsCardView(cardType: .newScoreUpdates, headerPlacement: .bottom) {
+                NewHighScoresCard(newHighScores: $model.newScoreUpdates)
+            }
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "NewScoreUpdates", in: analyticsNamespace)
     }
 
     var newAAACard: some View {

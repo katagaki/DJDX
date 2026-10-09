@@ -44,6 +44,8 @@ extension AnalyticsModel {
             newExHardClears = computed.clears["EX HARD CLEAR"]!
             newFailed = computed.clears["FAILED"]!
             newHighScores = computed.highScores
+            newClearLamps = computed.clearLamps
+            newScoreUpdates = computed.scoreUpdates
             newAAA = computed.djLevels["AAA"]!
             newAA = computed.djLevels["AA"]!
             newA = computed.djLevels["A"]!
@@ -88,6 +90,8 @@ extension AnalyticsModel {
         newExHardClears = []
         newFailed = []
         newHighScores = []
+        newClearLamps = []
+        newScoreUpdates = []
         newAAA = []
         newAA = []
         newA = []

@@ -319,8 +319,8 @@ struct AnalyticsView: View {
                 containerWidth = newWidth
             }
             .task {
-                loadCardOrder()
                 loadVisibleCards()
+                loadCardOrder()
                 loadPerLevelCardOrder()
                 loadVisiblePerLevelCards()
                 loadCollapsedSections()

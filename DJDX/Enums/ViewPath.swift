@@ -20,6 +20,8 @@ enum AnalyticsPath: Hashable {
     case newExHardClearDetail
     case newFailedDetail
     case newHighScoresDetail
+    case newClearLampsDetail
+    case newScoreUpdatesDetail
     case newAAADetail
     case newAADetail
     case newADetail
