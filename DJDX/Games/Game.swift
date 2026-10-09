@@ -52,8 +52,9 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         }
     }
 
-    func backgroundGradientColors(accentColor: Color) -> [Color] {
-        [accentColor.opacity(0.18), accentColor.opacity(0.06), .clear]
+    func backgroundGradientColors(accentColor: Color, colorScheme: ColorScheme) -> [Color] {
+        let colors = [accentColor.opacity(0.18), accentColor.opacity(0.06), .clear]
+        return colorScheme == .dark ? colors.reversed() : colors
     }
 
     // Only IIDX AC ships in Phase 0; the other games become selectable as their phases land.

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct AppBackgroundGradient: View {
+    @Environment(\.colorScheme) var colorScheme
     @AppStorage(wrappedValue: Game.iidxArcade, "Global.SelectedGame") var selectedGame: Game
     @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
@@ -25,7 +26,9 @@ struct AppBackgroundGradient: View {
                 endPoint: .bottom
             )
             LinearGradient(
-                colors: selectedGame.backgroundGradientColors(accentColor: accentColor),
+                colors: selectedGame.backgroundGradientColors(
+                    accentColor: accentColor, colorScheme: colorScheme
+                ),
                 startPoint: .top,
                 endPoint: .bottom
             )
