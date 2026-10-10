@@ -94,14 +94,13 @@ struct PolarisChordScoresView<Header: View>: View {
             sorted = base.sorted { lhs, rhs in
                 let lhsRank = clearRank(lhs)
                 let rhsRank = clearRank(rhs)
-                if lhsRank != rhsRank { return lhsRank < rhsRank }
+                if lhsRank != rhsRank { return lhsRank > rhsRank }
                 return lhs.achievementRateValue > rhs.achievementRateValue
             }
         }
         return sortOrder == .ascending ? sorted : sorted.reversed()
     }
 
-    // Lower rank is a better clear, so an ascending sort lists better clears first.
     func clearRank(_ record: PolarisChordSongRecord) -> Int {
         PolarisChordClearType.sorted.firstIndex(of: record.clearTypeEnum)
             ?? PolarisChordClearType.sorted.count

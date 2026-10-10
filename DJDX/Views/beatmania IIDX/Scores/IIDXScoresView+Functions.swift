@@ -116,7 +116,7 @@ extension IIDXScoresView {
             entries.sort { isAscending ? $0.songRecord.title < $1.songRecord.title
                 : $0.songRecord.title > $1.songRecord.title }
         case .clearType:
-            let order = IIDXClearType.sortedStrings
+            let order = IIDXClearType.ascending.map(\.rawValue)
             entries.sort { lhs, rhs in
                 let lhsIndex = order.firstIndex(of: lhs.score.clearType)
                 let rhsIndex = order.firstIndex(of: rhs.score.clearType)

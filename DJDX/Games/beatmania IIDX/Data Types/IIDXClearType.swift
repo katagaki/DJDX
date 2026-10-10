@@ -33,6 +33,17 @@ enum IIDXClearType: String, Codable {
         .failed
     ]
 
+    static let ascending: [IIDXClearType] = [
+        .noPlay,
+        .failed,
+        .assistClear,
+        .easyClear,
+        .clear,
+        .hardClear,
+        .exHardClear,
+        .fullComboClear
+    ]
+
     static var sortedStrings: [String] {
         sorted.map({ $0.rawValue })
     }

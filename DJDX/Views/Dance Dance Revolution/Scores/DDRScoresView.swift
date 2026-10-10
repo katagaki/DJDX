@@ -79,7 +79,7 @@ struct DDRScoresView<Header: View>: View {
         case .clearLamp:
             sorted = base.sorted { lhs, rhs in
                 if lhs.clearLampSortIndex != rhs.clearLampSortIndex {
-                    return lhs.clearLampSortIndex < rhs.clearLampSortIndex
+                    return lhs.clearLampSortIndex > rhs.clearLampSortIndex
                 }
                 return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
             }

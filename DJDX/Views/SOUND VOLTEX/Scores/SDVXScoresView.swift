@@ -76,7 +76,7 @@ struct SDVXScoresView<Header: View>: View {
             sorted = base.sorted { lhs, rhs in
                 let lhsRank = clearRank(lhs)
                 let rhsRank = clearRank(rhs)
-                if lhsRank != rhsRank { return lhsRank < rhsRank }
+                if lhsRank != rhsRank { return lhsRank > rhsRank }
                 return lhs.highScore > rhs.highScore
             }
         case .score:
