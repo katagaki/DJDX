@@ -46,7 +46,7 @@ extension SessionsView {
         case .title:
             plays.sort { isAscending ? title($0) < title($1) : title($0) > title($1) }
         case .clearType:
-            let order = IIDXClearType.ascending.map(\.rawValue)
+            let order = IIDXClearType.ascending.filter { $0 != .noPlay }.map(\.rawValue)
             plays.sort { lhs, rhs in
                 let leftIndex = order.firstIndex(of: lhs.clearType)
                 let rightIndex = order.firstIndex(of: rhs.clearType)
