@@ -94,11 +94,16 @@ struct PolarisChordScoresView<Header: View>: View {
             sorted = base.sorted { lhs, rhs in
                 let lhsRank = clearRank(lhs)
                 let rhsRank = clearRank(rhs)
-                if lhsRank != rhsRank { return lhsRank < rhsRank }
+                if lhsRank != rhsRank { return lhsRank > rhsRank }
                 return lhs.achievementRateValue > rhs.achievementRateValue
             }
         }
-        return sortOrder == .ascending ? sorted : sorted.reversed()
+        let ordered = sortOrder == .ascending ? sorted : sorted.reversed()
+        guard sortMode == .clearType else { return ordered }
+        let hasClear = { (record: PolarisChordSongRecord) in
+            clearRank(record) < PolarisChordClearType.sortedWithoutNoPlay.count
+        }
+        return ordered.filter(hasClear) + ordered.filter { !hasClear($0) }
     }
 
     func clearRank(_ record: PolarisChordSongRecord) -> Int {

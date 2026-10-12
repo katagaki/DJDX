@@ -76,7 +76,7 @@ struct SDVXScoresView<Header: View>: View {
             sorted = base.sorted { lhs, rhs in
                 let lhsRank = clearRank(lhs)
                 let rhsRank = clearRank(rhs)
-                if lhsRank != rhsRank { return lhsRank < rhsRank }
+                if lhsRank != rhsRank { return lhsRank > rhsRank }
                 return lhs.highScore > rhs.highScore
             }
         case .score:
@@ -92,7 +92,12 @@ struct SDVXScoresView<Header: View>: View {
                 return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
             }
         }
-        return sortOrder == .ascending ? sorted : sorted.reversed()
+        let ordered = sortOrder == .ascending ? sorted : sorted.reversed()
+        guard sortMode == .clearType else { return ordered }
+        let hasClear = { (record: SDVXSongRecord) in
+            clearRank(record) < SDVXClearType.sortedWithoutNoPlay.count
+        }
+        return ordered.filter(hasClear) + ordered.filter { !hasClear($0) }
     }
 
     func clearRank(_ record: SDVXSongRecord) -> Int {

@@ -79,7 +79,7 @@ struct DDRScoresView<Header: View>: View {
         case .clearLamp:
             sorted = base.sorted { lhs, rhs in
                 if lhs.clearLampSortIndex != rhs.clearLampSortIndex {
-                    return lhs.clearLampSortIndex < rhs.clearLampSortIndex
+                    return lhs.clearLampSortIndex > rhs.clearLampSortIndex
                 }
                 return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
             }
@@ -89,7 +89,12 @@ struct DDRScoresView<Header: View>: View {
                 return titleThenDifficulty(lhs, rhs)
             }
         }
-        return sortOrder == .ascending ? sorted : sorted.reversed()
+        let ordered = sortOrder == .ascending ? sorted : sorted.reversed()
+        guard sortMode == .clearLamp else { return ordered }
+        let hasClearLamp = { (record: DDRSongRecord) in
+            record.clearLampSortIndex < DDRSongRecord.clearLampOrder.count
+        }
+        return ordered.filter(hasClearLamp) + ordered.filter { !hasClearLamp($0) }
     }
 
     func titleThenDifficulty(_ lhs: DDRSongRecord, _ rhs: DDRSongRecord) -> Bool {

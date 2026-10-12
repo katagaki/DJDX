@@ -246,7 +246,7 @@ actor IIDXReader {
                     isAscending ? lhs.title < rhs.title : lhs.title > rhs.title
                 }
             case .clearType:
-                let clearTypes = IIDXClearType.ascending.reversed().map(\.rawValue)
+                let clearTypes = IIDXClearType.ascending.filter { $0 != .noPlay }.map(\.rawValue)
                 sortedSongRecords = songLevelScores
                     .sorted(by: { lhs, rhs in
                         let lhsIndex = clearTypes.firstIndex(of: lhs.value.clearType)
