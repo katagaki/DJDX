@@ -17,7 +17,7 @@ struct SessionsView: View {
     @State var isShowingFilterSheet: Bool = false
     @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
     @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
-    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
     @AppStorage(wrappedValue: [], "SessionsView.LevelFilters") var levelsToShow: Set<IIDXLevel>
     @AppStorage(wrappedValue: [], "SessionsView.DifficultyFilters") var difficultiesToShow: Set<IIDXDifficulty>

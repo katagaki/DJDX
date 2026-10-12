@@ -60,7 +60,7 @@ struct ScoreFilterSheet: View {
     @Binding var isLastPlayDateVisible: Bool
     var onReset: () -> Void
 
-    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
     @Environment(\.dismiss) var dismiss
 

@@ -3,7 +3,7 @@ import SwiftUI
 struct IIDXScoreViewer: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-    @AppStorage(wrappedValue: false, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+    @AppStorage(wrappedValue: true, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
     @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     var songRecord: IIDXSongRecord
