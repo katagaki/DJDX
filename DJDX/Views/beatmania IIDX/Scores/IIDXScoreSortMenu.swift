@@ -117,7 +117,7 @@ struct ScoreFilterSheet: View {
                                               countLabel: LocalizedStringResource("Shared.Filter.Count.Difficulties"))
                     }
                     DisclosureGroup {
-                        ForEach(IIDXClearType.sorted, id: \.self) { clearType in
+                        ForEach(IIDXClearType.ascending.reversed(), id: \.self) { clearType in
                             SelectableRow(
                                 isSelected: clearTypesToShow.contains(clearType)
                             ) {
