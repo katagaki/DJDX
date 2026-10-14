@@ -18,6 +18,7 @@ struct MoreMenu: View {
     @State var isPresentingRadarMaker: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingResetLayout: Bool = false
+    @State var isPresentingFreeUpSpace: Bool = false
     @State var isPromptingScoreDeleteCode: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
     @State var isPresentingDisclaimer: Bool = false
@@ -76,6 +77,9 @@ struct MoreMenu: View {
                 Button("More.ManageData.Backup", systemImage: "icloud") {
                     isPresentingICloudBackup = true
                 }
+                Button("More.ManageData.FreeUpSpace", systemImage: "externaldrive.badge.minus") {
+                    isPresentingFreeUpSpace = true
+                }
                 Menu("More.ManageData.DeleteOrReset", systemImage: "trash") {
                     Button("More.ManageData.ResetLayout", systemImage: "arrow.counterclockwise") {
                         isConfirmingResetLayout = true
@@ -128,6 +132,19 @@ struct MoreMenu: View {
             }
         } message: {
             Text("Alert.DeleteData.Web.Subtitle")
+        }
+        .alert("Alert.FreeUpSpace.Title", isPresented: $isPresentingFreeUpSpace) {
+            Button("Alert.FreeUpSpace.CleanUp") {
+                Task { _ = await StoragePruner.prune() }
+            }
+            Button("Alert.FreeUpSpace.CompressPhotos") {
+                Task { _ = await StoragePruner.compressSessionImages() }
+            }
+            Button("Shared.Cancel", role: .cancel) {
+                // Dismisses the alert; no further action needed
+            }
+        } message: {
+            Text("Alert.FreeUpSpace.Subtitle")
         }
         .alert("Alert.ResetLayout.Title", isPresented: $isConfirmingResetLayout) {
             Button("Alert.ResetLayout.Confirm", role: .destructive) {

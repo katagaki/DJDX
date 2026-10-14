@@ -39,6 +39,28 @@ enum StoragePruner {
         }.value
     }
 
+    static func compressSessionImages() async -> Int64 {
+        await Task.detached(priority: .utility) { () -> Int64 in
+            guard let referenced = IIDXPlaySessionsDatabase.shared.referencedImageFilenames() else { return 0 }
+            let store = IIDXSessionImageStore.shared
+            var reclaimed: Int64 = 0
+            for filename in Set(referenced) {
+                reclaimed += autoreleasepool { () -> Int64 in
+                    let url = store.url(for: filename)
+                    guard let original = try? Data(contentsOf: url),
+                          let compressed = IIDXSessionImageStore.encode(
+                            original, maxDimension: 1600, compressionQuality: 0.6
+                          ),
+                          Double(compressed.count) < Double(original.count) * 0.9 else { return 0 }
+                    let before = size(of: url)
+                    guard (try? compressed.write(to: url, options: .atomic)) != nil else { return 0 }
+                    return max(0, before - size(of: url))
+                }
+            }
+            return reclaimed
+        }.value
+    }
+
     // MARK: Web data
 
     @MainActor

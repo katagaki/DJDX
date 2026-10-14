@@ -48,7 +48,11 @@ final class IIDXSessionImageStore: Sendable {
         }
     }
 
-    static func encode(_ imageData: Data) -> Data? {
+    static func encode(
+        _ imageData: Data,
+        maxDimension: Int = maxDimension,
+        compressionQuality: Double = compressionQuality
+    ) -> Data? {
         guard let source = CGImageSourceCreateWithData(imageData as CFData, nil) else { return nil }
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
