@@ -11,6 +11,7 @@ struct IIDXScoreRow: View {
     @AppStorage(wrappedValue: true, "ScoresView.ScoreRateVisible") var isScoreRateVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.ScoreVisible") var isScoreVisible: Bool
     @AppStorage(wrappedValue: false, "ScoresView.LastPlayDateVisible") var isLastPlayDateVisible: Bool
+    @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     var namespace: Namespace.ID
 
@@ -62,14 +63,14 @@ struct IIDXScoreRow: View {
                             .fontWidth(.condensed)
                     }
                     if level == .leggendaria {
-                        Text(songRecord.title)
-                            .bold()
-                            .fontWidth(.condensed)
+                        titleText
                             .foregroundStyle(IIDXVersion.leggendariaSongTitleRowColor)
+                    } else if songRecord.version == iidxVersion.marketingName {
+                        titleText
+                            .foregroundStyle(iidxVersion.songTitleTextColor(for: songRecord.version))
+                            .strokeText(color: iidxVersion.songTitleStrokeColor(for: songRecord.version), width: 0.5)
                     } else {
-                        Text(songRecord.title)
-                            .bold()
-                            .fontWidth(.condensed)
+                        titleText
                     }
                     if isArtistVisible {
                         Text(songRecord.artist)
@@ -157,5 +158,11 @@ struct IIDXScoreRow: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.trailing)
+    }
+
+    var titleText: some View {
+        Text(songRecord.title)
+            .bold()
+            .fontWidth(.condensed)
     }
 }
