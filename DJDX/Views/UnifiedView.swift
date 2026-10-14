@@ -68,7 +68,6 @@ struct UnifiedView: View {
     }
 
     var body: some View {
-        @Bindable var migrationProgress = migrationProgress
         NavigationStack(path: $navigationManager.path) {
             ZStack {
                 if isSessionsMode {
@@ -226,14 +225,7 @@ struct UnifiedView: View {
                 Text("Alert.ICloudBackup.Restore.Subtitle.\(availableBackupDate ?? .now, format: .dateTime)")
             }
         }
-        .fullScreenCover(isPresented: $migrationProgress.isShowing) {
-            ProgressCard(
-                title: migrationProgress.title,
-                message: migrationProgress.message,
-                percentage: migrationProgress.percentage
-            )
-            .presentationBackground(.clear)
-        }
+        .progressCover(migrationProgress)
         .onOpenURL { url in
 #if DEBUG
             if url.scheme == "djdx", url.host == "max300" {

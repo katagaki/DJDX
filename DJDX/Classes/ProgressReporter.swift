@@ -9,10 +9,12 @@ final class ProgressReporter {
     var title: String = ""
     var message: String = ""
     var percentage: Int = 0
+    var isIndeterminate: Bool = false
 
-    func show(title: String, message: String) {
+    func show(title: String, message: String, isIndeterminate: Bool = false) {
         self.title = title
         self.message = message
+        self.isIndeterminate = isIndeterminate
         percentage = 0
         UIApplication.shared.isIdleTimerDisabled = true
         withAnimation {
@@ -24,10 +26,6 @@ final class ProgressReporter {
         UIApplication.shared.isIdleTimerDisabled = false
         withAnimation {
             isShowing = false
-        } completion: {
-            self.title = ""
-            self.message = ""
-            self.percentage = 0
         }
     }
 
