@@ -27,15 +27,14 @@ struct DDRScoreRow: View {
                     if !record.rankDisplay.isEmpty {
                         Divider().frame(maxHeight: 14.0)
                         Text(record.rankDisplay)
-                            .foregroundStyle(LinearGradient(colors: [.yellow, .orange],
-                                                            startPoint: .top, endPoint: .bottom))
+                            .foregroundStyle(DDRSongRecord.rankColor(forStem: record.rank))
                             .fontWidth(.expanded)
                             .fontWeight(.black)
                     }
                     if !record.clearDisplay.isEmpty {
                         Divider().frame(maxHeight: 14.0)
                         Text(record.clearDisplay)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(DDRSongRecord.clearColor(for: record.clearKind))
                             .fontWidth(.expanded)
                             .fontWeight(.bold)
                     }

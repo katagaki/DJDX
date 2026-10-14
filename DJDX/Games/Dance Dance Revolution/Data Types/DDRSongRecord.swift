@@ -103,7 +103,7 @@ final class DDRSongRecord: Equatable, Hashable, @unchecked Sendable {
         case "b": return .red
         case "c": return .yellow
         case "d": return .blue
-        case "e": return .black
+        case "e": return .primary
         default: return .gray
         }
     }
