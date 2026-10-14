@@ -121,10 +121,14 @@ struct IIDXScoreViewer: View {
                         .fontWidth(.compressed)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(
+                            selectedLevel == .leggendaria ?
+                            IIDXVersion.leggendariaSongTitleTextColor :
                             iidxVersion.songTitleTextColor(for: songRecord.version)
                         )
                         .strokeText(
-                            color: iidxVersion.songTitleStrokeColor(for: songRecord.version),
+                            color: selectedLevel == .leggendaria ?
+                            IIDXVersion.leggendariaSongTitleStrokeColor :
+                            iidxVersion.songTitleStrokeColor(for: songRecord.version),
                             width: 0.5
                         )
                         .textSelection(.enabled)

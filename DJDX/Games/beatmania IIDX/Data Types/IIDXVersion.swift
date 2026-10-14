@@ -267,6 +267,26 @@ https://bemaniwiki.com/?beatmania+IIDX+34+ZINRAI/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%
 
 extension IIDXVersion {
 
+    static let leggendariaSongTitleTextColor = LinearGradient(
+        stops: [
+            .init(color: Color(red: 1.0, green: 236 / 255, blue: 248 / 255), location: 0.0),
+            .init(color: Color(red: 1.0, green: 92 / 255, blue: 182 / 255), location: 1.0)
+        ],
+        startPoint: .top,
+        endPoint: .bottom
+    )
+
+    static let leggendariaSongTitleStrokeColor = Color(red: 112 / 255, green: 12 / 255, blue: 72 / 255)
+
+    static let leggendariaSongTitleRowColor = LinearGradient(
+        colors: [
+            Color(red: 1.0, green: 102 / 255, blue: 186 / 255),
+            Color(red: 214 / 255, green: 28 / 255, blue: 132 / 255)
+        ],
+        startPoint: .top,
+        endPoint: .bottom
+    )
+
     func songTitleTextColor(for versionString: String) -> LinearGradient {
         var topColor: Color = .white
         var bottomColor: Color = .gray

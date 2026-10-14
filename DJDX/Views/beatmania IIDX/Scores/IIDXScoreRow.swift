@@ -61,9 +61,16 @@ struct IIDXScoreRow: View {
                             .font(.caption2)
                             .fontWidth(.condensed)
                     }
-                    Text(songRecord.title)
-                        .bold()
-                        .fontWidth(.condensed)
+                    if level == .leggendaria {
+                        Text(songRecord.title)
+                            .bold()
+                            .fontWidth(.condensed)
+                            .foregroundStyle(IIDXVersion.leggendariaSongTitleRowColor)
+                    } else {
+                        Text(songRecord.title)
+                            .bold()
+                            .fontWidth(.condensed)
+                    }
                     if isArtistVisible {
                         Text(songRecord.artist)
                             .font(.caption)
