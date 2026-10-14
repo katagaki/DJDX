@@ -26,11 +26,6 @@ final class ProgressReporter {
         UIApplication.shared.isIdleTimerDisabled = false
         withAnimation {
             isShowing = false
-        } completion: {
-            self.title = ""
-            self.message = ""
-            self.percentage = 0
-            self.isIndeterminate = false
         }
     }
 

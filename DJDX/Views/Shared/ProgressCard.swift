@@ -8,23 +8,31 @@ struct ProgressCard: View {
     let message: String
     let percentage: Int
     var isIndeterminate: Bool = false
+    var isVisible: Bool = true
 
     var body: some View {
         ZStack(alignment: .center) {
             Color.black.opacity(colorScheme == .dark ? 0.5 : 0.2)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .opacity(isVisible ? 1.0 : 0.0)
             if #available(iOS 26.0, *) {
-                contentView
-                    .padding(20.0)
-                    .glassEffect(.regular.interactive(),
-                                 in: .rect(cornerRadius: 20.0))
-                    .padding(.all, 24.0)
-            } else {
+                GlassEffectContainer {
+                    if isVisible {
+                        contentView
+                            .padding(20.0)
+                            .glassEffect(.regular.interactive(),
+                                         in: .rect(cornerRadius: 20.0))
+                            .glassEffectTransition(.materialize)
+                    }
+                }
+                .padding(.all, 24.0)
+            } else if isVisible {
                 contentView
                     .padding()
                     .background(.thickMaterial)
                     .clipShape(.rect(cornerRadius: 16.0))
                     .padding(.all, 32.0)
+                    .transition(.opacity)
             }
         }
         .ignoresSafeArea(.all)
@@ -49,6 +57,7 @@ struct ProgressCard: View {
                 .multilineTextAlignment(.center)
             }
         }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -110,9 +119,9 @@ private struct ProgressCoverContent: View {
             title: reporter.title,
             message: reporter.message,
             percentage: reporter.percentage,
-            isIndeterminate: reporter.isIndeterminate
+            isIndeterminate: reporter.isIndeterminate,
+            isVisible: isVisible
         )
-        .opacity(isVisible ? 1.0 : 0.0)
         .onAppear {
             withAnimation(.smooth(duration: 0.25)) { isVisible = true }
         }
