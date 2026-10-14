@@ -70,3 +70,65 @@ extension View {
         }
     }
 }
+
+struct ProgressCoverModifier: ViewModifier {
+
+    let reporter: ProgressReporter
+
+    @State private var isPresented: Bool = false
+
+    func body(content: Content) -> some View {
+        content
+            .fullScreenCover(isPresented: $isPresented) {
+                ProgressCoverContent(reporter: reporter) {
+                    setPresented(false)
+                }
+                .presentationBackground(.clear)
+                .interactiveDismissDisabled()
+            }
+            .onChange(of: reporter.isShowing, initial: true) { _, isShowing in
+                if isShowing { setPresented(true) }
+            }
+    }
+
+    private func setPresented(_ presented: Bool) {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) { isPresented = presented }
+    }
+}
+
+private struct ProgressCoverContent: View {
+
+    let reporter: ProgressReporter
+    let onHidden: () -> Void
+
+    @State private var isVisible: Bool = false
+
+    var body: some View {
+        ProgressCard(
+            title: reporter.title,
+            message: reporter.message,
+            percentage: reporter.percentage,
+            isIndeterminate: reporter.isIndeterminate
+        )
+        .opacity(isVisible ? 1.0 : 0.0)
+        .onAppear {
+            withAnimation(.smooth(duration: 0.25)) { isVisible = true }
+        }
+        .onChange(of: reporter.isShowing) { _, isShowing in
+            guard !isShowing else { return }
+            withAnimation(.smooth(duration: 0.25)) {
+                isVisible = false
+            } completion: {
+                onHidden()
+            }
+        }
+    }
+}
+
+extension View {
+    func progressCover(_ reporter: ProgressReporter) -> some View {
+        modifier(ProgressCoverModifier(reporter: reporter))
+    }
+}

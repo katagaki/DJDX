@@ -151,16 +151,7 @@ struct MoreMenu: View {
         } message: {
             Text("Alert.FreeUpSpace.Subtitle")
         }
-        .fullScreenCover(isPresented: $freeUpSpaceProgress.isShowing) {
-            ProgressCard(
-                title: freeUpSpaceProgress.title,
-                message: freeUpSpaceProgress.message,
-                percentage: freeUpSpaceProgress.percentage,
-                isIndeterminate: freeUpSpaceProgress.isIndeterminate
-            )
-            .presentationBackground(.clear)
-            .interactiveDismissDisabled()
-        }
+        .progressCover(freeUpSpaceProgress)
         .alert("Alert.ResetLayout.Title", isPresented: $isConfirmingResetLayout) {
             Button("Alert.ResetLayout.Confirm", role: .destructive) {
                 resetLayout()
