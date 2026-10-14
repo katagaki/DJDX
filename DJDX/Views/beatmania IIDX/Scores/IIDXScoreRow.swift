@@ -64,7 +64,8 @@ struct IIDXScoreRow: View {
                     }
                     if level == .leggendaria {
                         titleText
-                            .foregroundStyle(IIDXVersion.leggendariaSongTitleRowColor)
+                            .foregroundStyle(IIDXVersion.leggendariaSongTitleTextColor)
+                            .strokeText(color: IIDXVersion.leggendariaSongTitleStrokeColor, width: 0.5)
                     } else if songRecord.version == iidxVersion.marketingName {
                         titleText
                             .foregroundStyle(iidxVersion.songTitleTextColor(for: songRecord.version))
