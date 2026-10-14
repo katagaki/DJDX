@@ -19,6 +19,7 @@ struct MoreMenu: View {
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingResetLayout: Bool = false
     @State var isPresentingFreeUpSpace: Bool = false
+    @State var freeUpSpaceProgress = ProgressReporter()
     @State var isPromptingScoreDeleteCode: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
     @State var isPresentingDisclaimer: Bool = false
@@ -135,16 +136,30 @@ struct MoreMenu: View {
         }
         .alert("Alert.FreeUpSpace.Title", isPresented: $isPresentingFreeUpSpace) {
             Button("Alert.FreeUpSpace.CleanUp") {
-                Task { _ = await StoragePruner.prune() }
+                freeUpSpace(title: "Alert.FreeUpSpace.CleaningUp") {
+                    _ = await StoragePruner.prune()
+                }
             }
             Button("Alert.FreeUpSpace.CompressPhotos") {
-                Task { _ = await StoragePruner.compressSessionImages() }
+                freeUpSpace(title: "Alert.FreeUpSpace.CompressingPhotos") {
+                    _ = await StoragePruner.compressSessionImages()
+                }
             }
             Button("Shared.Cancel", role: .cancel) {
                 // Dismisses the alert; no further action needed
             }
         } message: {
             Text("Alert.FreeUpSpace.Subtitle")
+        }
+        .fullScreenCover(isPresented: $freeUpSpaceProgress.isShowing) {
+            ProgressCard(
+                title: freeUpSpaceProgress.title,
+                message: freeUpSpaceProgress.message,
+                percentage: freeUpSpaceProgress.percentage,
+                isIndeterminate: freeUpSpaceProgress.isIndeterminate
+            )
+            .presentationBackground(.clear)
+            .interactiveDismissDisabled()
         }
         .alert("Alert.ResetLayout.Title", isPresented: $isConfirmingResetLayout) {
             Button("Alert.ResetLayout.Confirm", role: .destructive) {
@@ -186,6 +201,16 @@ struct MoreMenu: View {
             }
         } message: {
             Text("More.Disclaimer.NotAffiliated")
+        }
+    }
+
+    func freeUpSpace(title: String, operation: @escaping () async -> Void) {
+        freeUpSpaceProgress.show(title: title, message: "", isIndeterminate: true)
+        Task {
+            async let minimumDuration: Void? = try? Task.sleep(for: .seconds(1))
+            await operation()
+            _ = await minimumDuration
+            freeUpSpaceProgress.hide()
         }
     }
 

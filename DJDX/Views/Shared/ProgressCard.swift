@@ -7,6 +7,7 @@ struct ProgressCard: View {
     let title: String
     let message: String
     let percentage: Int
+    var isIndeterminate: Bool = false
 
     var body: some View {
         ZStack(alignment: .center) {
@@ -35,12 +36,18 @@ struct ProgressCard: View {
             Text(LocalizedStringKey(title))
                 .bold()
                 .multilineTextAlignment(.center)
-            ProgressView(value: min(Float(percentage), 100.0), total: 100.0)
-                .progressViewStyle(.linear)
-            Text(NSLocalizedString(message, comment: "")
-                .replacingOccurrences(of: "%1", with: String(percentage)))
-            .font(.subheadline)
-            .multilineTextAlignment(.center)
+            if isIndeterminate {
+                ProgressView()
+            } else {
+                ProgressView(value: min(Float(percentage), 100.0), total: 100.0)
+                    .progressViewStyle(.linear)
+            }
+            if !message.isEmpty {
+                Text(NSLocalizedString(message, comment: "")
+                    .replacingOccurrences(of: "%1", with: String(percentage)))
+                .font(.subheadline)
+                .multilineTextAlignment(.center)
+            }
         }
     }
 }
@@ -53,7 +60,8 @@ extension View {
                 ProgressCard(
                     title: reporter.title,
                     message: reporter.message,
-                    percentage: reporter.percentage
+                    percentage: reporter.percentage,
+                    isIndeterminate: reporter.isIndeterminate
                 )
             } else {
                 // HACK: DO NOT REMOVE. Removing this will cause a freeze when isShowing is false.

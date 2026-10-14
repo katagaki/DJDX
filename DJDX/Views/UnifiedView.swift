@@ -230,7 +230,8 @@ struct UnifiedView: View {
             ProgressCard(
                 title: migrationProgress.title,
                 message: migrationProgress.message,
-                percentage: migrationProgress.percentage
+                percentage: migrationProgress.percentage,
+                isIndeterminate: migrationProgress.isIndeterminate
             )
             .presentationBackground(.clear)
         }
