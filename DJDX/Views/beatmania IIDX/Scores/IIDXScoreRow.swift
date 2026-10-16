@@ -58,9 +58,10 @@ struct IIDXScoreRow: View {
                 VStack(alignment: .leading, spacing: 2.0) {
                     if isGenreVisible {
                         Text(songRecord.genre)
-                            .foregroundStyle(.secondary)
                             .font(.caption2)
                             .fontWeight(.heavy)
+                            .foregroundStyle(.white)
+                            .strokeText(color: .black.opacity(0.7), width: 0.5)
                             .squashedHorizontally()
                     }
                     Text(songRecord.title)
@@ -82,6 +83,8 @@ struct IIDXScoreRow: View {
                         Text(songRecord.artist)
                             .font(.caption)
                             .fontWeight(.heavy)
+                            .foregroundStyle(.white)
+                            .strokeText(color: .black.opacity(0.7), width: 0.5)
                             .squashedHorizontally()
                     }
                     // Metadata Row
