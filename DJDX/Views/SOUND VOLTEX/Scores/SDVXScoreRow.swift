@@ -18,7 +18,7 @@ struct SDVXScoreRow: View {
                 Text(record.title)
                     .bold()
                     .fontWidth(.condensed)
-                    .lineLimit(2)
+                    .squashedHorizontally()
                 HStack(alignment: .center, spacing: 6.0) {
                     if record.gradeEnum != .none && record.gradeEnum != .unknown {
                         Text(verbatim: record.grade)

@@ -15,7 +15,7 @@ struct DDRScoreRow: View {
                 Text(record.title)
                     .bold()
                     .fontWidth(.condensed)
-                    .lineLimit(2)
+                    .squashedHorizontally()
                 HStack(alignment: .center, spacing: 6.0) {
                     if record.score > 0 {
                         Text(String(record.score))

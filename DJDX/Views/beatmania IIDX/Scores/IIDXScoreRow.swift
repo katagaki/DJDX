@@ -61,6 +61,7 @@ struct IIDXScoreRow: View {
                             .foregroundStyle(.secondary)
                             .font(.caption2)
                             .fontWidth(.condensed)
+                            .squashedHorizontally()
                     }
                     Text(songRecord.title)
                         .bold()
@@ -76,10 +77,12 @@ struct IIDXScoreRow: View {
                             iidxVersion.songTitleStrokeColor(for: songRecord.version),
                             width: 0.5
                         )
+                        .squashedHorizontally()
                     if isArtistVisible {
                         Text(songRecord.artist)
                             .font(.caption)
                             .fontWidth(.condensed)
+                            .squashedHorizontally()
                     }
                     // Metadata Row
                     if isDJLevelVisible || isScoreRateVisible || isScoreVisible || isLastPlayDateVisible {
