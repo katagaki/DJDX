@@ -62,17 +62,20 @@ struct IIDXScoreRow: View {
                             .font(.caption2)
                             .fontWidth(.condensed)
                     }
-                    if level == .leggendaria {
-                        titleText
-                            .foregroundStyle(IIDXVersion.leggendariaSongTitleTextColor)
-                            .strokeText(color: IIDXVersion.leggendariaSongTitleStrokeColor, width: 0.5)
-                    } else if songRecord.version == iidxVersion.marketingName {
-                        titleText
-                            .foregroundStyle(iidxVersion.songTitleTextColor(for: songRecord.version))
-                            .strokeText(color: iidxVersion.songTitleStrokeColor(for: songRecord.version), width: 0.5)
-                    } else {
-                        titleText
-                    }
+                    Text(songRecord.title)
+                        .bold()
+                        .fontWidth(.condensed)
+                        .foregroundStyle(
+                            level == .leggendaria ?
+                            IIDXVersion.leggendariaSongTitleTextColor :
+                            iidxVersion.songTitleTextColor(for: songRecord.version)
+                        )
+                        .strokeText(
+                            color: level == .leggendaria ?
+                            IIDXVersion.leggendariaSongTitleStrokeColor :
+                            iidxVersion.songTitleStrokeColor(for: songRecord.version),
+                            width: 0.5
+                        )
                     if isArtistVisible {
                         Text(songRecord.artist)
                             .font(.caption)
@@ -159,11 +162,5 @@ struct IIDXScoreRow: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.trailing)
-    }
-
-    var titleText: some View {
-        Text(songRecord.title)
-            .bold()
-            .fontWidth(.condensed)
     }
 }
