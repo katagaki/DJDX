@@ -72,12 +72,7 @@ struct IIDXScoreRow: View {
                             IIDXVersion.leggendariaSongTitleTextColor :
                             iidxVersion.songTitleTextColor(for: songRecord.version)
                         )
-                        .strokeText(
-                            color: level == .leggendaria ?
-                            IIDXVersion.leggendariaSongTitleStrokeColor :
-                            iidxVersion.songTitleStrokeColor(for: songRecord.version),
-                            width: 0.5
-                        )
+                        .strokeText(color: titleStrokeColor, width: 0.5)
                         .squashedHorizontally()
                     if isArtistVisible {
                         Text(songRecord.artist)
@@ -168,5 +163,15 @@ struct IIDXScoreRow: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.trailing)
+    }
+
+    var titleStrokeColor: Color {
+        if level == .leggendaria {
+            return IIDXVersion.leggendariaSongTitleStrokeColor
+        } else if colorScheme == .dark && songRecord.version != iidxVersion.marketingName {
+            return Color(red: 32 / 255, green: 32 / 255, blue: 32 / 255)
+        } else {
+            return iidxVersion.songTitleStrokeColor(for: songRecord.version)
+        }
     }
 }
