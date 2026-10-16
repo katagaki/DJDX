@@ -16,7 +16,6 @@ struct PolarisChordScoreRow: View {
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(record.title)
                     .bold()
-                    .fontWidth(.condensed)
                     .squashedHorizontally()
                 HStack(alignment: .center, spacing: 6.0) {
                     if !record.achievementRate.isEmpty {
