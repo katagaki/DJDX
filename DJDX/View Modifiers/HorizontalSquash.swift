@@ -19,7 +19,7 @@ struct HorizontalSquash: ViewModifier {
                 naturalWidth = width
             }
             .scaleEffect(x: scale, y: 1.0, anchor: .leading)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(minWidth: .zero, maxWidth: .infinity, alignment: .leading)
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.size.width
             } action: { width in
