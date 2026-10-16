@@ -61,7 +61,7 @@ struct IIDXScoreRow: View {
                             .font(.caption2)
                             .fontWeight(.heavy)
                             .foregroundStyle(.white)
-                            .strokeText(color: .black.opacity(0.7), width: 0.5)
+                            .strokeText(color: .black.opacity(0.7), width: 0.35)
                             .squashedHorizontally()
                     }
                     Text(songRecord.title)
@@ -72,14 +72,14 @@ struct IIDXScoreRow: View {
                             IIDXVersion.leggendariaSongTitleTextColor :
                             iidxVersion.songTitleTextColor(for: songRecord.version)
                         )
-                        .strokeText(color: titleStrokeColor, width: 0.5)
+                        .strokeText(color: titleStrokeColor, width: 0.35)
                         .squashedHorizontally()
                     if isArtistVisible {
                         Text(songRecord.artist)
                             .font(.caption)
                             .fontWeight(.heavy)
                             .foregroundStyle(.white)
-                            .strokeText(color: .black.opacity(0.7), width: 0.5)
+                            .strokeText(color: .black.opacity(0.7), width: 0.35)
                             .squashedHorizontally()
                     }
                     // Metadata Row
