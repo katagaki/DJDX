@@ -165,6 +165,7 @@ let otpAutofillUserScript = """
 (function() {
     function isOtpBox(el) {
         if (!el || el.tagName !== 'INPUT') { return false; }
+        if (el.hasAttribute('data-djdx-otp')) { return true; }
         var type = (el.getAttribute('type') || 'text').toLowerCase();
         if (type !== 'text' && type !== 'tel' && type !== 'number') { return false; }
         var autocomplete = (el.getAttribute('autocomplete') || '').toLowerCase();
@@ -207,37 +208,45 @@ let otpAutofillUserScript = """
         return index === -1 ? 0 : index;
     }
 
+    document.addEventListener('focusin', function(event) {
+        var target = event.target;
+        if (!isOtpBox(target)) { return; }
+        otpBoxes(target).forEach(function(box) {
+            box.setAttribute('data-djdx-otp', '');
+            box.removeAttribute('maxlength');
+        });
+    }, true);
+
+    function fill(target, data) {
+        var paste = new Event('paste', { bubbles: true, cancelable: true });
+        Object.defineProperty(paste, 'clipboardData', {
+            value: { getData: function() { return data; } }
+        });
+        target.dispatchEvent(paste);
+        if (!paste.defaultPrevented) {
+            var boxes = otpBoxes(target);
+            distribute(boxes, indexOfTarget(boxes, target), data);
+        }
+    }
+
     document.addEventListener('beforeinput', function(event) {
         var target = event.target;
         if (!isOtpBox(target)) { return; }
-        var data = event.data;
+        var data = event.data || (event.dataTransfer ? event.dataTransfer.getData('text/plain') : '');
         if (data && data.length > 1) {
-            var boxes = otpBoxes(target);
             event.preventDefault();
-            distribute(boxes, indexOfTarget(boxes, target), data);
+            event.stopImmediatePropagation();
+            fill(target, data);
         }
     }, true);
 
     document.addEventListener('input', function(event) {
         var target = event.target;
         if (!isOtpBox(target)) { return; }
-        if (target.value && target.value.length > 1) {
-            var boxes = otpBoxes(target);
-            var data = target.value;
-            setValue(target, '');
-            distribute(boxes, indexOfTarget(boxes, target), data);
-        }
-    }, true);
-
-    document.addEventListener('paste', function(event) {
-        var target = event.target;
-        if (!isOtpBox(target)) { return; }
-        var clipboard = event.clipboardData || window.clipboardData;
-        var text = clipboard ? clipboard.getData('text') : '';
-        if (text && text.length > 1) {
-            var boxes = otpBoxes(target);
-            event.preventDefault();
-            distribute(boxes, indexOfTarget(boxes, target), text);
+        var data = target.value || '';
+        if (data.length > 1 && data.length >= otpBoxes(target).length) {
+            event.stopImmediatePropagation();
+            fill(target, data);
         }
     }, true);
 })();
