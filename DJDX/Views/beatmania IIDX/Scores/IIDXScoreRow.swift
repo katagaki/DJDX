@@ -60,10 +60,12 @@ struct IIDXScoreRow: View {
                         Text(songRecord.genre)
                             .foregroundStyle(.secondary)
                             .font(.caption2)
+                            .fontWeight(.heavy)
                             .squashedHorizontally()
                     }
                     Text(songRecord.title)
-                        .bold()
+                        .fontWeight(.heavy)
+                        .fontWidth(.compressed)
                         .foregroundStyle(
                             level == .leggendaria ?
                             IIDXVersion.leggendariaSongTitleTextColor :
@@ -79,6 +81,7 @@ struct IIDXScoreRow: View {
                     if isArtistVisible {
                         Text(songRecord.artist)
                             .font(.caption)
+                            .fontWeight(.heavy)
                             .squashedHorizontally()
                     }
                     // Metadata Row
