@@ -741,7 +741,7 @@ private fun MoreMenu(
             text = { Text(stringResource(R.string.more_github)) },
             onClick = {
                 onDismiss()
-                context.startActivity(Intent(Intent.ACTION_VIEW, "https://github.com/katagaki/DJDXGo".toUri()))
+                context.startActivity(Intent(Intent.ACTION_VIEW, "https://github.com/katagaki/DJDX".toUri()))
             }
         )
         DropdownMenuItem(
