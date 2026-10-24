@@ -1,4 +1,4 @@
-name: Android - Build and Deploy to Play Store
+name: Build and Deploy to Play Store
 
 on:
   push:
