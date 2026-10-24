@@ -1,0 +1,52 @@
+[project]
+name = "djdx-peak-training"
+version = "0.1.0"
+description = "Trains the CoreML models that extract structured score data from IIDX result-screen photos."
+requires-python = ">=3.13,<3.14"   # 3.14 has no coremltools wheel (native libs unbuilt-from-source)
+dependencies = [
+    # Core ML pipeline
+    "ultralytics>=8.3.0",        # YOLOv8 detection + classification, built-in CoreML export
+    "coremltools>=8.0",          # Custom CoreML conversions, model surgery
+    "torch>=2.2.0",              # YOLO backbone
+    "torchvision>=0.17.0",
+
+    # Image / data handling
+    "pillow>=10.0.0",
+    "opencv-python>=4.9.0",
+    "numpy>=1.24.0",
+    "pyyaml>=6.0",
+
+    # Notebook / inspection helpers
+    "matplotlib>=3.8.0",
+    "tqdm>=4.66.0",
+]
+
+[tool.uv]
+# Keep the venv inside training/ so it's easy to find / nuke.
+managed = true
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+# Pragmatic ruleset for a CLI training pipeline:
+# - pyflakes, pycodestyle (basic correctness + style)
+# - bugbear (real bugs)
+# - simplify, comprehensions, return (clarity)
+# - isort (import order)
+# - pyupgrade (modern syntax)
+select = ["F", "E", "W", "B", "SIM", "C4", "RET", "I", "UP"]
+ignore = [
+    "E501",  # line length handled by formatter, soft cap above
+    "B008",  # default argument calls are fine in CLI parsers
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Scripts use print() for user-facing output and module-level argparse — both fine here.
+"scripts/*.py" = ["T201"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.17",
+]

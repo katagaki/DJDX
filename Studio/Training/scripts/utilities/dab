@@ -1,0 +1,28 @@
+#!/bin/bash
+# dab — one entry point for the whole digit-detector loop, so every step is a
+# single stable command (allowlist `Training/scripts/utilities/dab` once, no per-call prompts).
+# Activates the Training venv, then dispatches:
+#
+#   Training/scripts/utilities/dab status
+#   Training/scripts/utilities/dab sheet -n 10 --out /tmp/b.png
+#   Training/scripts/utilities/dab zoom --names IMG_x__5.jpg IMG_x__6.jpg --boxes --out /tmp/v.png
+#   Training/scripts/utilities/dab apply /tmp/assign.json
+#   Training/scripts/utilities/dab prepare                 # prepare_dataset.py --target digits
+#   Training/scripts/utilities/dab train  [--epochs 120]   # train_detector.py  --target digits
+#   Training/scripts/utilities/dab export [--digits-name DJDXDigitsDetector-stg-200]
+#
+set -euo pipefail
+HERE="$(cd "$(dirname "$0")" && pwd)"        # Training/scripts/utilities
+SCRIPTS="$(cd "$HERE/.." && pwd)"            # Training/scripts (pipeline scripts live here)
+TRAINING="$(cd "$HERE/../.." && pwd)"        # Training (venv)
+# shellcheck disable=SC1091
+source "$TRAINING/.venv/bin/activate"
+
+cmd="${1:-status}"; shift || true
+case "$cmd" in
+  prepare) exec python3 "$SCRIPTS/prepare_dataset.py" --target digits "$@" ;;
+  train)   exec python3 "$SCRIPTS/train_detector.py"  --target digits "$@" ;;
+  export)  exec python3 "$SCRIPTS/export_coreml.py"   --only   digits "$@" ;;
+  # digit_autobox subcommands (sheet/zoom/apply/status/...) — mute lib stderr so JSON stays clean
+  *)       exec python3 "$HERE/digit_autobox.py" "$cmd" "$@" 2>/dev/null ;;
+esac

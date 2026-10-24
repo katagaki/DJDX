@@ -1,0 +1,142 @@
+# Single source of truth for the DJDX PEAK training pipeline.
+# Every script imports this — change names here, not in scripts.
+
+# ---------------------------------------------------------------------------
+# Object detector: regions of interest on the result screen.
+# Order matters; YOLO class indices follow this list.
+# ---------------------------------------------------------------------------
+detector:
+  classes:
+    - dj_level_now          # current-play rank glyph in the score table (right column)
+    - dj_level_prev         # small rank glyph (previous best)
+    - clear_type_now        # CLEAR / H-CLEAR / FAILED / A-CLEAR text pill
+    - clear_type_prev
+    - score_now             # 4-digit EX score
+    - score_prev
+    - score_delta           # +/-NNNN below score_now
+    - miss_count_now
+    - miss_count_prev
+    - miss_count_delta
+    - pacemaker_aa          # PACEMAKER AA bar score
+    - judge_pgreat          # top row of judgement table (the bright "GREAT")
+    - judge_great
+    - judge_good
+    - judge_bad
+    - judge_poor
+    - song_title
+    - song_artist
+    - difficulty_label      # HYPER / ANOTHER / LEGGENDARIA
+    - notes_count           # SP <N> NOTES
+    - stage_label           # FINAL STAGE RESULT / EXTRA STAGE RESULT
+    - combo_break           # COMBO BREAK NNN
+
+# ---------------------------------------------------------------------------
+# Image classifier #1: DJ level rank glyph.
+# Cropped from dj_level_now / dj_level_prev detections.
+# ---------------------------------------------------------------------------
+rank_classifier:
+  classes: [F, E, D, C, B, A, AA, AAA]
+
+# ---------------------------------------------------------------------------
+# Image classifier #2: clear-type pill.
+# Cropped from clear_type_now / clear_type_prev detections.
+# ---------------------------------------------------------------------------
+clear_type_classifier:
+  classes:
+    - NO_PLAY
+    - FAILED
+    - ASSIST_CLEAR
+    - EASY_CLEAR
+    - CLEAR
+    - HARD_CLEAR        # rendered "H-CLEAR" on screen
+    - EX_HARD_CLEAR
+    - FULLCOMBO
+
+# ---------------------------------------------------------------------------
+# Object detector #2 (DigitDetector): per-digit reader for numeric fields.
+# Cropped from every numeric detection (score_*, miss_count_*, judge_*,
+# pacemaker_aa, notes_count, combo_break). Each crop is a multi-digit number;
+# detect each glyph, then read left-to-right. Quoted so YAML keeps them strings.
+# ---------------------------------------------------------------------------
+digit_detector:
+  classes: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "minus", "plus"]
+
+# ---------------------------------------------------------------------------
+# Training hyperparameters
+# ---------------------------------------------------------------------------
+training:
+  detector:
+    base_weights: yolov9t.pt   # YOLOv9-tiny (~2.1M): its GELAN/PGI backbone localises the tiny
+                               # score-table dj_level_now glyph better than yolov8n (AP50 0.50 vs
+                               # 0.42). Standard Detect head → exports to the same CoreML NMS
+                               # pipeline the Swift app consumes (unlike the end2end v10/v26 heads).
+    image_size: 1280           # 1280 (was 768): the score-table dj_level_now glyph is tiny and
+                               # sits right above its "+NNNN" subtitle; 768 caps its AP50 ~0.36,
+                               # 1280 reaches ~0.50 (v9t). Export + inference must match this size.
+    epochs: 200
+    batch: 4                   # yolov9t @1280 with PGI aux branches needs a small batch on MPS
+                               # (~8 GB at b4; b8+ OOMs the ~30 GB unified-memory limit)
+    cache: ram                 # 80 imgs fit in RAM — skip disk reads every epoch
+    workers: 8
+    patience: 40               # v9t's best epoch was late (~159); give the small glyph room to converge
+    augmentations:
+      mosaic: 0.5
+      mixup: 0.0
+      hsv_h: 0.015             # photo white-balance varies
+      hsv_s: 0.4
+      hsv_v: 0.4
+      degrees: 5               # phone tilt
+      translate: 0.05
+      scale: 0.2
+      perspective: 0.0005      # mild keystoning from off-angle shots
+      fliplr: 0.0              # never flip — score digits become unreadable
+  rank_classifier:
+    base_weights: yolov8n-cls.pt
+    image_size: 128
+    epochs: 100
+    batch: 32
+  clear_type_classifier:
+    base_weights: yolov8n-cls.pt
+    image_size: 160
+    epochs: 100
+    batch: 32
+  digit_detector:
+    base_weights: yolov8n.pt   # same YOLO detector machinery as the result detector
+    image_size: 320            # digit crops are small / aspect-varied; 320 is plenty
+    epochs: 200
+    batch: 32
+    cache: ram
+    workers: 8
+    patience: 20
+    augmentations:
+      mosaic: 0.0              # numbers are read as a sequence — don't stitch crops
+      mixup: 0.0
+      hsv_h: 0.015
+      hsv_s: 0.4
+      hsv_v: 0.4
+      degrees: 3
+      translate: 0.05
+      scale: 0.1
+      perspective: 0.0
+      fliplr: 0.0              # never flip — digits become unreadable
+
+# ---------------------------------------------------------------------------
+# Dataset split
+# ---------------------------------------------------------------------------
+split:
+  train: 0.80
+  val: 0.15
+  test: 0.05
+  seed: 1729
+
+# ---------------------------------------------------------------------------
+# CoreML export
+# ---------------------------------------------------------------------------
+coreml:
+  # All exports target macOS 14+ / iOS 17+ (ML Program format, FP16 compute).
+  minimum_deployment_target: iOS17
+  compute_precision: float16
+  detector_output_name: DJDXResultDetector
+  rank_output_name: DJDXRankClassifier
+  clear_type_output_name: DJDXClearTypeClassifier
+  digit_output_name: DJDXDigitsDetector
