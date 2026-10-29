@@ -22,6 +22,65 @@ enum IIDXProgressGraphStyle: String, CaseIterable, Identifiable {
     }
 }
 
+enum IIDXProgressKind: String, Hashable {
+    case clears
+    case highScores
+
+    var series: [String] {
+        switch self {
+        case .clears:
+            IIDXClearType.ascending
+                .filter { $0 != .noPlay && $0 != .failed }
+                .reversed()
+                .map(\.rawValue)
+        case .highScores:
+            IIDXDJLevel.sortedStrings.reversed()
+        }
+    }
+
+    var cardType: AnalyticsCardType {
+        switch self {
+        case .clears: .progressTrend
+        case .highScores: .scoreProgressTrend
+        }
+    }
+
+    var transitionID: String {
+        switch self {
+        case .clears: "Progress"
+        case .highScores: "ScoreProgress"
+        }
+    }
+
+    var hiddenSeriesKey: String {
+        switch self {
+        case .clears: "Analytics.Progress.HiddenSeries"
+        case .highScores: "Analytics.ScoreProgress.HiddenSeries"
+        }
+    }
+
+    var styleKey: String {
+        switch self {
+        case .clears: "Analytics.Progress.Style"
+        case .highScores: "Analytics.ScoreProgress.Style"
+        }
+    }
+
+    func label(for series: String) -> String {
+        switch self {
+        case .clears: IIDXClearType.abbreviation(for: series)
+        case .highScores: series
+        }
+    }
+
+    func color(for series: String) -> Color {
+        switch self {
+        case .clears: IIDXClearType.color(for: series)
+        case .highScores: IIDXDJLevel.color(for: series)
+        }
+    }
+}
+
 struct IIDXProgressMark: Identifiable {
     let series: String
     let date: Date
@@ -33,28 +92,22 @@ struct IIDXProgressMark: Identifiable {
 
 struct IIDXProgressGraph: View {
     let points: [IIDXProgressPoint]
-    var symbolSize: CGFloat = 30.0
+    let kind: IIDXProgressKind
+    var symbolSize: CGFloat
 
-    @AppStorage(wrappedValue: [], "Analytics.Progress.HiddenSeries") var hiddenSeries: Set<String>
-    @AppStorage(wrappedValue: .lines, "Analytics.Progress.Style") var style: IIDXProgressGraphStyle
+    @AppStorage var hiddenSeries: Set<String>
+    @AppStorage var style: IIDXProgressGraphStyle
 
-    static let highScoresSeries = "NEW HIGH SCORE"
-
-    static let allSeries: [String] = IIDXClearType.ascending
-        .filter { $0 != .noPlay && $0 != .failed }
-        .reversed()
-        .map(\.rawValue) + [highScoresSeries]
-
-    static func color(for series: String) -> Color {
-        series == highScoresSeries ? .orange : IIDXClearType.color(for: series)
-    }
-
-    static func label(for series: String) -> String {
-        series == highScoresSeries ? "HIGH SCORE" : IIDXClearType.abbreviation(for: series)
+    init(points: [IIDXProgressPoint], kind: IIDXProgressKind, symbolSize: CGFloat = 30.0) {
+        self.points = points
+        self.kind = kind
+        self.symbolSize = symbolSize
+        _hiddenSeries = AppStorage(wrappedValue: [], kind.hiddenSeriesKey)
+        _style = AppStorage(wrappedValue: .lines, kind.styleKey)
     }
 
     var visibleSeries: [String] {
-        Self.allSeries.filter { !hiddenSeries.contains($0) }
+        kind.series.filter { !hiddenSeries.contains($0) }
     }
 
     var marks: [IIDXProgressMark] {
@@ -62,7 +115,7 @@ struct IIDXProgressGraph: View {
         return points.flatMap { point in
             var base = 0
             return visibleSeries.map { series in
-                let count = point.count(for: series)
+                let count = point.count(for: series, kind: kind)
                 let start = isStacked ? base : 0
                 base += count
                 return IIDXProgressMark(series: series, date: point.date, start: start, end: start + count)
@@ -77,26 +130,26 @@ struct IIDXProgressGraph: View {
                     x: .value("Shared.Date", mark.date),
                     yStart: .value("Shared.ClearCount", mark.start),
                     yEnd: .value("Shared.ClearCount", mark.end),
-                    series: .value("Analytics.Progress", Self.label(for: mark.series))
+                    series: .value("Analytics.Progress", kind.label(for: mark.series))
                 )
-                .foregroundStyle(by: .value("Analytics.Progress", Self.label(for: mark.series)))
+                .foregroundStyle(by: .value("Analytics.Progress", kind.label(for: mark.series)))
             } else {
                 LineMark(
                     x: .value("Shared.Date", mark.date),
                     y: .value("Shared.ClearCount", mark.end),
-                    series: .value("Analytics.Progress", Self.label(for: mark.series))
+                    series: .value("Analytics.Progress", kind.label(for: mark.series))
                 )
-                .foregroundStyle(by: .value("Analytics.Progress", Self.label(for: mark.series)))
-                .symbol(by: .value("Analytics.Progress", Self.label(for: mark.series)))
+                .foregroundStyle(by: .value("Analytics.Progress", kind.label(for: mark.series)))
+                .symbol(by: .value("Analytics.Progress", kind.label(for: mark.series)))
                 .symbolSize(symbolSize)
             }
         }
         .chartForegroundStyleScale(
-            domain: visibleSeries.map { Self.label(for: $0) },
-            range: visibleSeries.map { Self.color(for: $0) }
+            domain: visibleSeries.map { kind.label(for: $0) },
+            range: visibleSeries.map { kind.color(for: $0) }
         )
         .chartSymbolScale(
-            domain: visibleSeries.map { Self.label(for: $0) },
+            domain: visibleSeries.map { kind.label(for: $0) },
             range: visibleSeries.map { _ in BasicChartSymbolShape.circle }
         )
     }
@@ -104,12 +157,20 @@ struct IIDXProgressGraph: View {
 
 struct IIDXProgressDetailView: View {
     let points: [IIDXProgressPoint]
+    let kind: IIDXProgressKind
 
-    @AppStorage(wrappedValue: [], "Analytics.Progress.HiddenSeries") var hiddenSeries: Set<String>
-    @AppStorage(wrappedValue: .lines, "Analytics.Progress.Style") var style: IIDXProgressGraphStyle
+    @AppStorage var hiddenSeries: Set<String>
+    @AppStorage var style: IIDXProgressGraphStyle
+
+    init(points: [IIDXProgressPoint], kind: IIDXProgressKind) {
+        self.points = points
+        self.kind = kind
+        _hiddenSeries = AppStorage(wrappedValue: [], kind.hiddenSeriesKey)
+        _style = AppStorage(wrappedValue: .lines, kind.styleKey)
+    }
 
     var visibleSeries: [String] {
-        IIDXProgressGraph.allSeries.filter { !hiddenSeries.contains($0) }
+        kind.series.filter { !hiddenSeries.contains($0) }
     }
 
     var body: some View {
@@ -120,7 +181,7 @@ struct IIDXProgressDetailView: View {
                     .listRowBackground(Color.clear)
             } else {
                 Section {
-                    IIDXProgressGraph(points: points)
+                    IIDXProgressGraph(points: points, kind: kind)
                         .chartLegend(position: .bottom, alignment: .leading)
                         .frame(height: 240.0)
                         .listRowBackground(Color.clear)
@@ -136,7 +197,7 @@ struct IIDXProgressDetailView: View {
                                 spacing: 4.0
                             ) {
                                 ForEach(visibleSeries, id: \.self) { series in
-                                    seriesCount(series, count: point.count(for: series))
+                                    seriesCount(series, count: point.count(for: series, kind: kind))
                                 }
                             }
                         }
@@ -170,7 +231,7 @@ struct IIDXProgressDetailView: View {
                 .pickerStyle(.inline)
             }
             Section("Analytics.Progress.Series") {
-                ForEach(IIDXProgressGraph.allSeries, id: \.self) { series in
+                ForEach(kind.series, id: \.self) { series in
                     Toggle(isOn: isShowing(series)) {
                         Text(verbatim: series)
                     }
@@ -196,8 +257,8 @@ struct IIDXProgressDetailView: View {
 
     func seriesCount(_ series: String, count: Int) -> some View {
         HStack(spacing: 3.0) {
-            Text(verbatim: IIDXProgressGraph.label(for: series))
-                .foregroundStyle(IIDXProgressGraph.color(for: series))
+            Text(verbatim: kind.label(for: series))
+                .foregroundStyle(kind.color(for: series))
                 .fontWeight(.heavy)
             Text(verbatim: "\(count)")
                 .foregroundStyle(count > 0 ? .primary : .secondary)

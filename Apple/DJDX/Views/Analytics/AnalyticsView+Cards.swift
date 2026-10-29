@@ -10,7 +10,7 @@ extension AnalyticsView {
     // swiftlint:disable:next cyclomatic_complexity
     func cardView(for cardType: AnalyticsCardType) -> some View {
         switch cardType {
-        case .clearTypeOverall, .gradeBreakdown, .progressTrend, .towerRecent, .towerTotals:
+        case .clearTypeOverall, .gradeBreakdown, .progressTrend, .scoreProgressTrend, .towerRecent, .towerTotals:
             EmptyView()
         case .newClears:
             newClearsCard
@@ -41,14 +41,14 @@ extension AnalyticsView {
         }
     }
 
-    var progressCard: some View {
+    func progressCard(_ kind: IIDXProgressKind) -> some View {
         Button {
             if !isEditingCards && !model.progressPerImportGroup.isEmpty {
-                navigationManager.push(AnalyticsPath.progressDetail)
+                navigationManager.push(AnalyticsPath.progressDetail(kind: kind))
             }
         } label: {
-            AnalyticsCardView(cardType: .progressTrend, showsHeader: false) {
-                IIDXProgressGraph(points: model.progressPerImportGroup, symbolSize: 12.0)
+            AnalyticsCardView(cardType: kind.cardType, showsHeader: false) {
+                IIDXProgressGraph(points: model.progressPerImportGroup, kind: kind, symbolSize: 12.0)
                     .chartLegend(.hidden)
                     .chartXAxis(.hidden)
                     .chartYAxis { AxisMarks { AxisGridLine() } }
@@ -61,10 +61,10 @@ extension AnalyticsView {
                         }
                     }
             }
-            .perLevelCaption("Analytics.Progress")
+            .perLevelCaption(LocalizedStringKey(kind.cardType.titleKey))
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "Progress", in: analyticsNamespace)
+        .automaticMatchedTransitionSource(id: kind.transitionID, in: analyticsNamespace)
     }
 
     var newClearsCard: some View {

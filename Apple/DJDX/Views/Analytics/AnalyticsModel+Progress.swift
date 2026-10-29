@@ -3,18 +3,21 @@ import SwiftUI
 struct IIDXProgressPoint: Identifiable, Hashable {
     let date: Date
     let newClears: [String: Int]
-    let newHighScores: Int
+    let newHighScores: [String: Int]
 
     var id: Date { date }
 
     init(date: Date, newClears: [NewClearEntry], newHighScores: [NewHighScoreEntry]) {
         self.date = date
         self.newClears = newClears.reduce(into: [:]) { $0[$1.score.clearType, default: 0] += 1 }
-        self.newHighScores = newHighScores.count
+        self.newHighScores = newHighScores.reduce(into: [:]) { $0[$1.score.djLevel, default: 0] += 1 }
     }
 
-    func count(for series: String) -> Int {
-        series == IIDXProgressGraph.highScoresSeries ? newHighScores : newClears[series] ?? 0
+    func count(for series: String, kind: IIDXProgressKind) -> Int {
+        switch kind {
+        case .clears: newClears[series] ?? 0
+        case .highScores: newHighScores[series] ?? 0
+        }
     }
 }
 

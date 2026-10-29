@@ -140,8 +140,8 @@ struct AnalyticsView: View {
             }
             .buttonStyle(AnalyticsCardButtonStyle())
             .automaticMatchedTransitionSource(id: "DJLevel.Overall", in: analyticsNamespace)
-        case .progressTrend:
-            progressCard
+        case .progressTrend, .scoreProgressTrend:
+            progressCard(cardType == .progressTrend ? .clears : .highScores)
         case .towerRecent, .towerTotals:
             let transitionID = cardType == .towerRecent ? "Tower.Recent" : "Tower.Totals"
             let caption: LocalizedStringKey = cardType == .towerRecent

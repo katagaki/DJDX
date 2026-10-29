@@ -1862,19 +1862,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Updates Over Time"
+            "value" : "Clear Updates"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更新数の推移"
+            "value" : "クリア更新の推移"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更新數趨勢"
+            "value" : "通關更新趨勢"
           }
         }
       }
@@ -1898,6 +1898,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自訂"
+          }
+        }
+      }
+    },
+    "Analytics.Progress.HighScores" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High Score Updates"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ハイスコア更新の推移"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高分更新趨勢"
           }
         }
       }
