@@ -38,6 +38,17 @@ enum IIDXProgressKind: String, Hashable {
         }
     }
 
+    var defaultVisibleSeries: Set<String> {
+        switch self {
+        case .clears: [IIDXClearType.clear.rawValue, IIDXClearType.easyClear.rawValue]
+        case .highScores: [IIDXDJLevel.djAAA.rawValue, IIDXDJLevel.djAA.rawValue, IIDXDJLevel.djA.rawValue]
+        }
+    }
+
+    var defaultHiddenSeries: Set<String> {
+        Set(series).subtracting(defaultVisibleSeries)
+    }
+
     var cardType: AnalyticsCardType {
         switch self {
         case .clears: .progressTrend
@@ -102,8 +113,8 @@ struct IIDXProgressGraph: View {
         self.points = points
         self.kind = kind
         self.symbolSize = symbolSize
-        _hiddenSeries = AppStorage(wrappedValue: [], kind.hiddenSeriesKey)
-        _style = AppStorage(wrappedValue: .lines, kind.styleKey)
+        _hiddenSeries = AppStorage(wrappedValue: kind.defaultHiddenSeries, kind.hiddenSeriesKey)
+        _style = AppStorage(wrappedValue: .stacked, kind.styleKey)
     }
 
     var visibleSeries: [String] {
@@ -165,8 +176,8 @@ struct IIDXProgressDetailView: View {
     init(points: [IIDXProgressPoint], kind: IIDXProgressKind) {
         self.points = points
         self.kind = kind
-        _hiddenSeries = AppStorage(wrappedValue: [], kind.hiddenSeriesKey)
-        _style = AppStorage(wrappedValue: .lines, kind.styleKey)
+        _hiddenSeries = AppStorage(wrappedValue: kind.defaultHiddenSeries, kind.hiddenSeriesKey)
+        _style = AppStorage(wrappedValue: .stacked, kind.styleKey)
     }
 
     var visibleSeries: [String] {
