@@ -80,7 +80,6 @@ struct IIDXProgressGraph: View {
                 )
                 .foregroundStyle(by: .value("Analytics.Progress", Self.label(for: mark.series)))
                 .opacity(0.3)
-                .interpolationMethod(.monotone)
             }
             LineMark(
                 x: .value("Shared.Date", mark.date),
@@ -90,7 +89,6 @@ struct IIDXProgressGraph: View {
             .foregroundStyle(by: .value("Analytics.Progress", Self.label(for: mark.series)))
             .symbol(by: .value("Analytics.Progress", Self.label(for: mark.series)))
             .symbolSize(symbolSize)
-            .interpolationMethod(.monotone)
         }
         .chartForegroundStyleScale(
             domain: visibleSeries.map { Self.label(for: $0) },

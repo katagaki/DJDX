@@ -73,7 +73,6 @@ struct SessionHeartRateGraph: View {
                 )
                 .foregroundStyle(.red)
                 .lineStyle(StrokeStyle(lineWidth: 2.0))
-                .interpolationMethod(.catmullRom)
             }
             selectionRule
         }
@@ -91,7 +90,6 @@ struct SessionHeartRateGraph: View {
                     yEnd: .value("Sessions.Detail.HeartRate", point.max)
                 )
                 .foregroundStyle(.red.opacity(0.12))
-                .interpolationMethod(.catmullRom)
 
                 LineMark(
                     x: .value("Shared.Date", point.date),
@@ -99,7 +97,6 @@ struct SessionHeartRateGraph: View {
                 )
                 .foregroundStyle(.red)
                 .lineStyle(StrokeStyle(lineWidth: 2.0))
-                .interpolationMethod(.catmullRom)
 
                 PointMark(
                     x: .value("Shared.Date", point.date),

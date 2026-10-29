@@ -58,7 +58,6 @@ struct WidgetDJLevelTrendChart: View {
                         y: .value("Count", count)
                     )
                     .foregroundStyle(by: .value("DJ Level", djLevel))
-                    .interpolationMethod(.monotone)
                 }
             }
             .chartForegroundStyleScale(WidgetDJLevelColors.scale)

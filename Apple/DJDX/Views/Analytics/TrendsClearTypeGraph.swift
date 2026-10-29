@@ -15,7 +15,6 @@ struct TrendsClearTypeGraph: View {
                     y: .value("Shared.ClearCount", count)
                 )
                 .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
-                .interpolationMethod(.monotone)
             }
         }
         .chartForegroundStyleScale([
