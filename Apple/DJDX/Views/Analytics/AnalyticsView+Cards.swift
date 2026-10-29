@@ -48,7 +48,7 @@ extension AnalyticsView {
             }
         } label: {
             AnalyticsCardView(cardType: kind.cardType, showsHeader: false) {
-                IIDXProgressGraph(points: model.progressPerImportGroup, kind: kind, symbolSize: 12.0)
+                IIDXProgressGraph(points: model.progressPerImportGroup, kind: kind, usesDateAxis: false)
                     .chartLegend(.hidden)
                     .chartXAxis(.hidden)
                     .chartYAxis { AxisMarks { AxisGridLine() } }

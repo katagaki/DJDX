@@ -2,21 +2,21 @@ import Charts
 import SwiftUI
 
 enum IIDXProgressGraphStyle: String, CaseIterable, Identifiable {
-    case lines
+    case bars
     case stacked
 
     var id: String { rawValue }
 
     var titleKey: LocalizedStringKey {
         switch self {
-        case .lines: "Analytics.Progress.Style.Lines"
+        case .bars: "Analytics.Progress.Style.Bars"
         case .stacked: "Analytics.Progress.Style.Stacked"
         }
     }
 
     var systemImage: String {
         switch self {
-        case .lines: "chart.xyaxis.line"
+        case .bars: "chart.bar.xaxis"
         case .stacked: "chart.line.uptrend.xyaxis"
         }
     }
@@ -94,6 +94,7 @@ enum IIDXProgressKind: String, Hashable {
 
 struct IIDXProgressMark: Identifiable {
     let series: String
+    let index: Int
     let date: Date
     let start: Int
     let end: Int
@@ -104,15 +105,15 @@ struct IIDXProgressMark: Identifiable {
 struct IIDXProgressGraph: View {
     let points: [IIDXProgressPoint]
     let kind: IIDXProgressKind
-    var symbolSize: CGFloat
+    var usesDateAxis: Bool
 
     @AppStorage var hiddenSeries: Set<String>
     @AppStorage var style: IIDXProgressGraphStyle
 
-    init(points: [IIDXProgressPoint], kind: IIDXProgressKind, symbolSize: CGFloat = 30.0) {
+    init(points: [IIDXProgressPoint], kind: IIDXProgressKind, usesDateAxis: Bool = true) {
         self.points = points
         self.kind = kind
-        self.symbolSize = symbolSize
+        self.usesDateAxis = usesDateAxis
         _hiddenSeries = AppStorage(wrappedValue: kind.defaultHiddenSeries, kind.hiddenSeriesKey)
         _style = AppStorage(wrappedValue: .stacked, kind.styleKey)
     }
@@ -123,46 +124,56 @@ struct IIDXProgressGraph: View {
 
     var marks: [IIDXProgressMark] {
         let isStacked = style == .stacked
-        return points.flatMap { point in
+        return points.enumerated().flatMap { index, point in
             var base = 0
             return visibleSeries.map { series in
                 let count = point.count(for: series, kind: kind)
                 let start = isStacked ? base : 0
                 base += count
-                return IIDXProgressMark(series: series, date: point.date, start: start, end: start + count)
+                return IIDXProgressMark(
+                    series: series, index: index, date: point.date, start: start, end: start + count
+                )
             }
         }
     }
 
     var body: some View {
-        Chart(marks) { mark in
-            if style == .stacked {
-                AreaMark(
-                    x: .value("Shared.Date", mark.date),
-                    yStart: .value("Shared.ClearCount", mark.start),
-                    yEnd: .value("Shared.ClearCount", mark.end),
-                    series: .value("Analytics.Progress", kind.label(for: mark.series))
-                )
-                .foregroundStyle(by: .value("Analytics.Progress", kind.label(for: mark.series)))
+        Group {
+            if usesDateAxis {
+                Chart(marks) { mark in
+                    seriesMark(mark, xValue: .value("Shared.Date", mark.date, unit: .day))
+                }
             } else {
-                LineMark(
-                    x: .value("Shared.Date", mark.date),
-                    y: .value("Shared.ClearCount", mark.end),
-                    series: .value("Analytics.Progress", kind.label(for: mark.series))
-                )
-                .foregroundStyle(by: .value("Analytics.Progress", kind.label(for: mark.series)))
-                .symbol(by: .value("Analytics.Progress", kind.label(for: mark.series)))
-                .symbolSize(symbolSize)
+                Chart(marks) { mark in
+                    seriesMark(mark, xValue: .value("Shared.Date", mark.index))
+                }
             }
         }
         .chartForegroundStyleScale(
             domain: visibleSeries.map { kind.label(for: $0) },
             range: visibleSeries.map { kind.color(for: $0) }
         )
-        .chartSymbolScale(
-            domain: visibleSeries.map { kind.label(for: $0) },
-            range: visibleSeries.map { _ in BasicChartSymbolShape.circle }
-        )
+        .chartXScale(range: .plotDimension(startPadding: 8.0, endPadding: 8.0))
+    }
+
+    @ChartContentBuilder
+    func seriesMark<X: Plottable>(_ mark: IIDXProgressMark, xValue: PlottableValue<X>) -> some ChartContent {
+        let series = kind.label(for: mark.series)
+        if style == .stacked {
+            BarMark(
+                x: xValue,
+                yStart: .value("Shared.ClearCount", mark.start),
+                yEnd: .value("Shared.ClearCount", mark.end)
+            )
+            .foregroundStyle(by: .value("Analytics.Progress", series))
+        } else {
+            BarMark(
+                x: xValue,
+                y: .value("Shared.ClearCount", mark.end)
+            )
+            .foregroundStyle(by: .value("Analytics.Progress", series))
+            .position(by: .value("Analytics.Progress", series))
+        }
     }
 }
 
