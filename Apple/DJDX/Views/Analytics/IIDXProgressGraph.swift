@@ -96,8 +96,7 @@ struct IIDXProgressMark: Identifiable {
     let series: String
     let index: Int
     let date: Date
-    let start: Int
-    let end: Int
+    let count: Int
 
     var id: String { "\(series)\u{1}\(date.timeIntervalSince1970)" }
 }
@@ -123,15 +122,10 @@ struct IIDXProgressGraph: View {
     }
 
     var marks: [IIDXProgressMark] {
-        let isStacked = style == .stacked
-        return points.enumerated().flatMap { index, point in
-            var base = 0
-            return visibleSeries.map { series in
-                let count = point.count(for: series, kind: kind)
-                let start = isStacked ? base : 0
-                base += count
-                return IIDXProgressMark(
-                    series: series, index: index, date: point.date, start: start, end: start + count
+        points.enumerated().flatMap { index, point in
+            visibleSeries.map { series in
+                IIDXProgressMark(
+                    series: series, index: index, date: point.date, count: point.count(for: series, kind: kind)
                 )
             }
         }
@@ -162,14 +156,14 @@ struct IIDXProgressGraph: View {
         if style == .stacked {
             BarMark(
                 x: xValue,
-                yStart: .value("Shared.ClearCount", mark.start),
-                yEnd: .value("Shared.ClearCount", mark.end)
+                y: .value("Shared.ClearCount", mark.count),
+                stacking: .standard
             )
             .foregroundStyle(by: .value("Analytics.Progress", series))
         } else {
             BarMark(
                 x: xValue,
-                y: .value("Shared.ClearCount", mark.end)
+                y: .value("Shared.ClearCount", mark.count)
             )
             .foregroundStyle(by: .value("Analytics.Progress", series))
             .position(by: .value("Analytics.Progress", series))
