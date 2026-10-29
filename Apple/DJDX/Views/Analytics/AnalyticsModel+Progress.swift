@@ -2,10 +2,20 @@ import SwiftUI
 
 struct IIDXProgressPoint: Identifiable, Hashable {
     let date: Date
-    let newClears: Int
+    let newClears: [String: Int]
     let newHighScores: Int
 
     var id: Date { date }
+
+    init(date: Date, newClears: [NewClearEntry], newHighScores: [NewHighScoreEntry]) {
+        self.date = date
+        self.newClears = newClears.reduce(into: [:]) { $0[$1.score.clearType, default: 0] += 1 }
+        self.newHighScores = newHighScores.count
+    }
+
+    func count(for series: String) -> Int {
+        series == IIDXProgressGraph.highScoresSeries ? newHighScores : newClears[series] ?? 0
+    }
 }
 
 extension AnalyticsModel {
@@ -24,8 +34,8 @@ extension AnalyticsModel {
                 )
                 points.append(IIDXProgressPoint(
                     date: importGroup.importDate,
-                    newClears: computed.clearLamps.count,
-                    newHighScores: computed.scoreUpdates.count
+                    newClears: computed.clearLamps,
+                    newHighScores: computed.scoreUpdates
                 ))
             }
             previousRecords = records
@@ -51,8 +61,8 @@ extension AnalyticsModel {
             )
             points.append(IIDXProgressPoint(
                 date: session.startDate,
-                newClears: computed.clearLamps.count,
-                newHighScores: computed.scoreUpdates.count
+                newClears: computed.clearLamps,
+                newHighScores: computed.scoreUpdates
             ))
             baseline = Self.latestPlaysPerChart(baseline + plays)
         }
