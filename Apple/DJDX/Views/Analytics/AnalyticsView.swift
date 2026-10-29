@@ -140,6 +140,8 @@ struct AnalyticsView: View {
             }
             .buttonStyle(AnalyticsCardButtonStyle())
             .automaticMatchedTransitionSource(id: "DJLevel.Overall", in: analyticsNamespace)
+        case .progressTrend:
+            progressCard
         case .towerRecent, .towerTotals:
             let transitionID = cardType == .towerRecent ? "Tower.Recent" : "Tower.Totals"
             let caption: LocalizedStringKey = cardType == .towerRecent
@@ -211,8 +213,7 @@ struct AnalyticsView: View {
         VStack(spacing: 20.0) {
                 // MARK: Overview section
                 let overviewCards = cardOrder.filter {
-                    $0 == .clearTypeOverall || $0 == .gradeBreakdown ||
-                    (selectedGame.supportsTower && $0.isTowerCard)
+                    $0.isOverviewCard && (selectedGame.supportsTower || !$0.isTowerCard)
                 }
                 let shownOverviewCards = isEditing ? overviewCards : overviewCards.filter { visibleCards.contains($0) }
                 if !shownOverviewCards.isEmpty {

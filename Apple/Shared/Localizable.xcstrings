@@ -1856,6 +1856,29 @@
         }
       }
     },
+    "Analytics.Progress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates Over Time"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新数の推移"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新數趨勢"
+          }
+        }
+      }
+    },
     "Analytics.SDVX.ClearBreakdown" : {
       "extractionState" : "manual",
       "localizations" : {

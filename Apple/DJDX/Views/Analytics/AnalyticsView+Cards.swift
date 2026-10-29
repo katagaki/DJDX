@@ -10,7 +10,7 @@ extension AnalyticsView {
     // swiftlint:disable:next cyclomatic_complexity
     func cardView(for cardType: AnalyticsCardType) -> some View {
         switch cardType {
-        case .clearTypeOverall, .gradeBreakdown, .towerRecent, .towerTotals:
+        case .clearTypeOverall, .gradeBreakdown, .progressTrend, .towerRecent, .towerTotals:
             EmptyView()
         case .newClears:
             newClearsCard
@@ -39,6 +39,32 @@ extension AnalyticsView {
         case .newA:
             newACard
         }
+    }
+
+    var progressCard: some View {
+        Button {
+            if !isEditingCards && !model.progressPerImportGroup.isEmpty {
+                navigationManager.push(AnalyticsPath.progressDetail)
+            }
+        } label: {
+            AnalyticsCardView(cardType: .progressTrend, showsHeader: false) {
+                IIDXProgressGraph(points: model.progressPerImportGroup, symbolSize: 12.0)
+                    .chartLegend(.hidden)
+                    .chartXAxis(.hidden)
+                    .chartYAxis { AxisMarks { AxisGridLine() } }
+                    .opacity(model.progressPerImportGroup.isEmpty ? 0.25 : 1.0)
+                    .overlay {
+                        if model.progressPerImportGroup.isEmpty {
+                            Text("Shared.NoData")
+                                .font(.caption.bold())
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+            }
+            .perLevelCaption("Analytics.Progress")
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .automaticMatchedTransitionSource(id: "Progress", in: analyticsNamespace)
     }
 
     var newClearsCard: some View {

@@ -25,6 +25,10 @@ struct AnalyticsDestinationView: View {
                 IIDXGradeBreakdownDetailView(djLevelPerDifficulty: model.djLevelPerDifficulty)
                     .navigationTitle("Analytics.DJLevel.Overall")
                     .automaticNavigationTransition(id: "DJLevel.Overall", in: analyticsNamespace)
+            case .progressDetail:
+                IIDXProgressDetailView(points: model.progressPerImportGroup)
+                    .navigationTitle("Analytics.Progress")
+                    .automaticNavigationTransition(id: "Progress", in: analyticsNamespace)
             case .clearTypeForLevel(let difficulty):
                 ClearTypePerLevelDetailView(model: model, difficulty: difficulty)
                     .navigationTitle(perLevelTitle(difficulty, .clearRate))
