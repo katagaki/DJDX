@@ -42,6 +42,7 @@ struct IIDXProgressGraph: View {
 
     static let allSeries: [String] = IIDXClearType.ascending
         .filter { $0 != .noPlay && $0 != .failed }
+        .reversed()
         .map(\.rawValue) + [highScoresSeries]
 
     static func color(for series: String) -> Color {
