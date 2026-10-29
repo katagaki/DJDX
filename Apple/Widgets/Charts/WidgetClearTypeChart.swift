@@ -70,7 +70,6 @@ struct WidgetClearTypeTrendChart: View {
                         y: .value("Count", count)
                     )
                     .foregroundStyle(by: .value("Clear Type", clearType))
-                    .interpolationMethod(.monotone)
                 }
             }
             .chartForegroundStyleScale(WidgetClearTypeColors.scale)

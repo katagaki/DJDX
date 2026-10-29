@@ -13,6 +13,7 @@ final class AnalyticsModel {
     // Trends
     var clearTypePerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
     var djLevelPerImportGroup: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
+    var progressPerImportGroup: [IIDXProgressPoint] = []
 
     // New Clears & High Scores
     var newClears: [NewClearEntry] = []
@@ -73,6 +74,7 @@ final class AnalyticsModel {
         await reloadOverview(playType: playType, iidxVersion: iidxVersion, filters: filters)
         await reloadTrends(playType: playType, iidxVersion: iidxVersion, filters: filters)
         await reloadNewClearsAndHighScores(playType: playType, iidxVersion: iidxVersion, filters: filters)
+        await reloadProgress(playType: playType, iidxVersion: iidxVersion, filters: filters)
         towerEntries = await fetcher.allTowerEntries()
         await WidgetDataPublisher.shared.publishClearTypeAndDJLevel(
             playType: playType, iidxVersion: iidxVersion

@@ -15,7 +15,6 @@ struct TrendsDJLevelGraph: View {
                     y: .value("Shared.ClearCount", count)
                 )
                 .foregroundStyle(by: .value("Shared.IIDX.DJLevel", djLevel))
-                .interpolationMethod(.monotone)
             }
         }
         .chartForegroundStyleScale([

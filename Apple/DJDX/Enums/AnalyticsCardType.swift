@@ -25,6 +25,8 @@ enum AnalyticsSection: String, Codable, Hashable, CaseIterable {
 enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case clearTypeOverall
     case gradeBreakdown
+    case progressTrend
+    case scoreProgressTrend
     case towerRecent
     case towerTotals
     case newHighScores
@@ -43,9 +45,17 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var isOverviewCard: Bool {
+        self == .clearTypeOverall || self == .gradeBreakdown || isProgressCard || isTowerCard
+    }
+
+    var isProgressCard: Bool {
+        self == .progressTrend || self == .scoreProgressTrend
+    }
+
     /// Summary cards are the count-based cards (not clearTypeOverall or tower cards)
     var isSummaryCard: Bool {
-        self != .clearTypeOverall && self != .gradeBreakdown && !isTowerCard
+        !isOverviewCard
     }
 
     /// Tower cards are IIDX-AC-only full-width chart cards
@@ -62,6 +72,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .clearTypeOverall: return Text("Analytics.ClearType.Overall")
         case .gradeBreakdown: return Text("Analytics.DJLevel.Overall")
+        case .progressTrend: return Text("Analytics.Progress")
+        case .scoreProgressTrend: return Text("Analytics.Progress.HighScores")
         case .towerRecent: return Text("Tower.ChartMode.Recent")
         case .towerTotals: return Text("Shared.IIDX.Tower")
         case .newHighScores: return Text("Analytics.NewHighScores")
@@ -84,6 +96,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .clearTypeOverall: return "Analytics.ClearType.Overall"
         case .gradeBreakdown: return "Analytics.DJLevel.Overall"
+        case .progressTrend: return "Analytics.Progress"
+        case .scoreProgressTrend: return "Analytics.Progress.HighScores"
         case .towerRecent: return "Tower.ChartMode.Recent"
         case .towerTotals: return "Shared.IIDX.Tower"
         case .newHighScores: return "Analytics.NewHighScores"
@@ -106,6 +120,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .clearTypeOverall: return "chart.bar"
         case .gradeBreakdown: return "chart.bar"
+        case .progressTrend: return "chart.line.uptrend.xyaxis"
+        case .scoreProgressTrend: return "chart.line.uptrend.xyaxis"
         case .towerRecent: return "calendar"
         case .towerTotals: return "building.2"
         case .newHighScores: return "trophy"
@@ -128,6 +144,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .clearTypeOverall: return .blue
         case .gradeBreakdown: return .orange
+        case .progressTrend: return .teal
+        case .scoreProgressTrend: return .green
         case .towerRecent: return .red
         case .towerTotals: return .red
         case .newHighScores: return .primary
@@ -149,7 +167,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     /// Fixed content height for the card body (excluding header)
     var cardContentHeight: CGFloat {
         switch self {
-        case .clearTypeOverall, .gradeBreakdown: return 120.0
+        case .clearTypeOverall, .gradeBreakdown, .progressTrend, .scoreProgressTrend: return 120.0
         case .towerRecent, .towerTotals: return 120.0
         case .newFullComboClear,
              .newClears,
@@ -183,6 +201,8 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         [
             .clearTypeOverall,
             .gradeBreakdown,
+            .progressTrend,
+            .scoreProgressTrend,
             .towerTotals,
             .towerRecent,
             .newHighScores,
@@ -204,7 +224,7 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     /// Default visible cards
     static var defaultVisible: Set<AnalyticsCardType> {
         [
-            .gradeBreakdown, .towerTotals,
+            .gradeBreakdown, .progressTrend, .scoreProgressTrend, .towerTotals,
             .newHighScores, .newClearLamps, .newScoreUpdates,
             .newClears, .newAssistClears
         ]

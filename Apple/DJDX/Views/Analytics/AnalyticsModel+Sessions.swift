@@ -23,6 +23,7 @@ extension AnalyticsModel {
         let cumulativePlays = Self.latestPlaysPerChart(baseline + lastPlays)
 
         let trends = cumulativeTrends(store: store, playType: playType, sessions: sessions)
+        let progress = sessionProgress(store: store, playType: playType, sessions: sessions)
 
         let computed = Self.computeNewEntries(
             latestRecords: Self.mergedSongRecords(lastPlays),
@@ -36,6 +37,7 @@ extension AnalyticsModel {
             )
             clearTypePerImportGroup = trends.clearType
             djLevelPerImportGroup = trends.djLevel
+            progressPerImportGroup = progress
             newClears = computed.clears["CLEAR"]!
             newEasyClears = computed.clears["EASY CLEAR"]!
             newAssistClears = computed.clears["ASSIST CLEAR"]!
@@ -82,6 +84,7 @@ extension AnalyticsModel {
         djLevelPerDifficulty.removeAll()
         clearTypePerImportGroup.removeAll()
         djLevelPerImportGroup.removeAll()
+        progressPerImportGroup = []
         newClears = []
         newEasyClears = []
         newAssistClears = []
@@ -97,7 +100,7 @@ extension AnalyticsModel {
         newA = []
     }
 
-    private func validPlays(_ plays: [IIDXCapturedPlay], playType: IIDXPlayType) -> [IIDXCapturedPlay] {
+    func validPlays(_ plays: [IIDXCapturedPlay], playType: IIDXPlayType) -> [IIDXCapturedPlay] {
         plays.filter { play in
             (play.state == .done || play.state == .needsReview) &&
             play.playType == playType &&
