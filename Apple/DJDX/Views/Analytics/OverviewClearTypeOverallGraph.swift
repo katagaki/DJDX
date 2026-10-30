@@ -10,6 +10,10 @@ struct OverviewClearTypeOverallGraph: View {
     var levelLimit: Int?
     var shownLevels: Set<Int> = []
 
+    var hasFullCombo: Bool {
+        graphData.values.contains { ($0["FULLCOMBO CLEAR"] ?? 0) > 0 }
+    }
+
     var populatedDifficulties: [Int] {
         graphData.filter { _, counts in
             counts.values.contains(where: { $0 > 0 })
@@ -47,16 +51,6 @@ struct OverviewClearTypeOverallGraph: View {
         return (lower...upper).map(Double.init)
     }
 
-    let clearTypeColorScale: KeyValuePairs<String, Color> = [
-        "FULLCOMBO CLEAR": .blue,
-        "CLEAR": .cyan,
-        "EASY CLEAR": .green,
-        "ASSIST CLEAR": .purple,
-        "HARD CLEAR": .pink,
-        "EX HARD CLEAR": .yellow,
-        "FAILED": .red
-    ]
-
     var body: some View {
         if isHorizontal {
             horizontalChart
@@ -67,53 +61,63 @@ struct OverviewClearTypeOverallGraph: View {
 
     @ViewBuilder
     var verticalChart: some View {
-        Chart(graphData.keys.sorted(), id: \.self) { difficulty in
-            ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
-                let count = graphData[difficulty]![clearType]!
-                BarMark(
-                    x: .value("LEVEL", Double(difficulty)),
-                    y: .value("Shared.ClearCount", count),
-                    width: .inset(8.0),
-                    stacking: .standard
-                )
-                .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
-            }
-        }
-        .chartXAxis {
-            AxisMarks(values: axisValues) { value in
-                AxisGridLine()
-                AxisTick()
-                if let level = value.as(Double.self) {
-                    AxisValueLabel { Text(verbatim: "\(Int(level))") }
+        FullComboRainbowTimeline(isActive: hasFullCombo) { phase in
+            Chart(graphData.keys.sorted(), id: \.self) { difficulty in
+                ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
+                    let count = graphData[difficulty]![clearType]!
+                    BarMark(
+                        x: .value("LEVEL", Double(difficulty)),
+                        y: .value("Shared.ClearCount", count),
+                        width: .inset(8.0),
+                        stacking: .standard
+                    )
+                    .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
                 }
             }
+            .chartXAxis {
+                AxisMarks(values: axisValues) { value in
+                    AxisGridLine()
+                    AxisTick()
+                    if let level = value.as(Double.self) {
+                        AxisValueLabel { Text(verbatim: "\(Int(level))") }
+                    }
+                }
+            }
+            .chartPlotStyle { plotArea in
+                plotArea.padding(.horizontal, 0.0)
+            }
+            .chartXScale(domain: levelDomain)
+            .chartForegroundStyleScale(
+                domain: IIDXClearType.chartColorDomain,
+                range: IIDXClearType.chartColorRange(phase: phase)
+            )
         }
-        .chartPlotStyle { plotArea in
-            plotArea.padding(.horizontal, 0.0)
-        }
-        .chartXScale(domain: levelDomain)
-        .chartForegroundStyleScale(clearTypeColorScale)
     }
 
     @ViewBuilder
     var horizontalChart: some View {
-        Chart(shownDifficulties, id: \.self) { difficulty in
-            ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
-                let count = graphData[difficulty]![clearType]!
-                BarMark(
-                    x: .value("Shared.ClearCount", count),
-                    y: .value("LEVEL", "\(difficulty)"),
-                    stacking: .standard
-                )
-                .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
+        FullComboRainbowTimeline(isActive: hasFullCombo) { phase in
+            Chart(shownDifficulties, id: \.self) { difficulty in
+                ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
+                    let count = graphData[difficulty]![clearType]!
+                    BarMark(
+                        x: .value("Shared.ClearCount", count),
+                        y: .value("LEVEL", "\(difficulty)"),
+                        stacking: .standard
+                    )
+                    .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
+                }
             }
-        }
-        .chartYAxis {
-            AxisMarks(preset: .extended, position: .leading) {
-                AxisValueLabel()
+            .chartYAxis {
+                AxisMarks(preset: .extended, position: .leading) {
+                    AxisValueLabel()
+                }
             }
+            .chartYScale(domain: shownDifficulties.map { "\($0)" })
+            .chartForegroundStyleScale(
+                domain: IIDXClearType.chartColorDomain,
+                range: IIDXClearType.chartColorRange(phase: phase)
+            )
         }
-        .chartYScale(domain: shownDifficulties.map { "\($0)" })
-        .chartForegroundStyleScale(clearTypeColorScale)
     }
 }

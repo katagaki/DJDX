@@ -84,8 +84,14 @@ struct ClearTypeLevelRow: View {
             GeometryReader { geometry in
                 HStack(spacing: 0.0) {
                     ForEach(segments, id: \.type) { segment in
-                        IIDXClearType.color(for: segment.type)
-                            .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
+                        Group {
+                            if segment.type == IIDXClearType.fullComboClear.rawValue {
+                                FullComboRainbowFill()
+                            } else {
+                                IIDXClearType.color(for: segment.type)
+                            }
+                        }
+                        .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
                     }
                 }
                 .clipShape(.rect(cornerRadius: 4.0))

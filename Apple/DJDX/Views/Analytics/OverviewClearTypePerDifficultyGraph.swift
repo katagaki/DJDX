@@ -9,21 +9,18 @@ struct OverviewClearTypePerDifficultyGraph: View {
     var body: some View {
         VStack {
             if let clearData = graphData[difficulty], clearData.keys.count > 0 {
-                Chart(clearData.keys, id: \.self) { clearType in
-                    SectorMark(angle: .value(clearType, clearData[clearType] ?? 0))
-                        .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
+                FullComboRainbowTimeline(isActive: (clearData["FULLCOMBO CLEAR"] ?? 0) > 0) { phase in
+                    Chart(clearData.keys, id: \.self) { clearType in
+                        SectorMark(angle: .value(clearType, clearData[clearType] ?? 0))
+                            .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
+                    }
+                    .chartXScale(domain: IIDXClearType.sortedStrings.reversed())
+                    .chartForegroundStyleScale(
+                        domain: IIDXClearType.chartColorDomain,
+                        range: IIDXClearType.chartColorRange(phase: phase)
+                    )
+                    .chartLegend(.hidden)
                 }
-                .chartXScale(domain: IIDXClearType.sortedStrings.reversed())
-                      .chartForegroundStyleScale([
-                        "FULLCOMBO CLEAR": .blue,
-                        "CLEAR": .cyan,
-                        "EASY CLEAR": .green,
-                        "ASSIST CLEAR": .purple,
-                        "HARD CLEAR": .pink,
-                        "EX HARD CLEAR": .yellow,
-                        "FAILED": .red
-                      ])
-                      .chartLegend(.hidden)
             } else {
                 Spacer()
             }

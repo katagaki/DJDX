@@ -90,6 +90,13 @@ enum IIDXProgressKind: String, Hashable {
         case .highScores: IIDXDJLevel.color(for: series)
         }
     }
+
+    func color(for series: String, phase: Double) -> Color {
+        if self == .clears && series == IIDXClearType.fullComboClear.rawValue {
+            return FullComboRainbow.color(phase: phase)
+        }
+        return color(for: series)
+    }
 }
 
 struct IIDXProgressMark: Identifiable {
@@ -129,6 +136,10 @@ struct IIDXProgressGraph: View {
         kind.series.filter { !hiddenSeries.contains($0) }
     }
 
+    var hasFullCombo: Bool {
+        kind == .clears && visibleSeries.contains(IIDXClearType.fullComboClear.rawValue)
+    }
+
     var marks: [IIDXProgressMark] {
         points.enumerated().flatMap { index, point in
             var stackStart = 0
@@ -158,33 +169,35 @@ struct IIDXProgressGraph: View {
     }
 
     var body: some View {
-        Chart(marks) { mark in
-            seriesMark(mark)
-        }
-        .chartXScale(domain: -0.5...(Double(points.count) - 0.5))
-        .chartXAxis {
-            AxisMarks(values: labeledIndices.map { Double($0) - groupHalfWidth }) { value in
-                if let position = value.as(Double.self),
-                   case let index = Int((position + groupHalfWidth).rounded()),
-                   points.indices.contains(index) {
-                    AxisValueLabel {
-                        Text(points[index].date, format: .dateTime.month().day())
+        FullComboRainbowTimeline(isActive: hasFullCombo) { phase in
+            Chart(marks) { mark in
+                seriesMark(mark)
+            }
+            .chartXScale(domain: -0.5...(Double(points.count) - 0.5))
+            .chartXAxis {
+                AxisMarks(values: labeledIndices.map { Double($0) - groupHalfWidth }) { value in
+                    if let position = value.as(Double.self),
+                       case let index = Int((position + groupHalfWidth).rounded()),
+                       points.indices.contains(index) {
+                        AxisValueLabel {
+                            Text(points[index].date, format: .dateTime.month().day())
+                        }
                     }
                 }
             }
-        }
-        .chartForegroundStyleScale(
-            domain: visibleSeries.map { kind.label(for: $0) },
-            range: visibleSeries.map { kind.color(for: $0) }
-        )
-        .chartScrollableAxes(visibleImportCount < points.count ? .horizontal : [])
-        .chartXVisibleDomain(length: max(visibleImportCount, 1))
-        .chartScrollPosition(x: $scrollPosition)
-        .onAppear {
-            scrollPosition = initialScrollPosition
-        }
-        .onChange(of: visibleImportCount) {
-            scrollPosition = initialScrollPosition
+            .chartForegroundStyleScale(
+                domain: visibleSeries.map { kind.label(for: $0) },
+                range: visibleSeries.map { kind.color(for: $0, phase: phase) }
+            )
+            .chartScrollableAxes(visibleImportCount < points.count ? .horizontal : [])
+            .chartXVisibleDomain(length: max(visibleImportCount, 1))
+            .chartScrollPosition(x: $scrollPosition)
+            .onAppear {
+                scrollPosition = initialScrollPosition
+            }
+            .onChange(of: visibleImportCount) {
+                scrollPosition = initialScrollPosition
+            }
         }
     }
 

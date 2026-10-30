@@ -85,11 +85,10 @@ struct IIDXScoreRow: View {
                                 Group {
                                     if isDJLevelVisible {
                                         Text(score.djLevel)
-                                            .foregroundStyle(
-                                                IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme)
-                                            )
+                                            .foregroundStyle(IIDXDJLevel.style(for: score.djLevel))
                                             .fontWidth(.expanded)
                                             .fontWeight(.black)
+                                            .strokeText(color: .black, width: 0.3)
                                     }
                                     if isScoreRateVisible, let scoreRate {
                                         if isDJLevelVisible {
@@ -111,11 +110,10 @@ struct IIDXScoreRow: View {
                                                 .frame(maxHeight: 14.0)
                                         }
                                         Text(String(score.score))
-                                            .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
-                                                                            startPoint: .top,
-                                                                            endPoint: .bottom))
+                                            .foregroundStyle(Color.iidxScore)
                                             .fontWidth(.expanded)
                                             .fontWeight(.heavy)
+                                            .strokeText(color: .iidxScoreOutline, width: 0.3)
                                         if let scoreDelta, scoreDelta > 0 {
                                             Text("Analytics.NewHighScore.\(scoreDelta)")
                                                 .foregroundStyle(.orange)

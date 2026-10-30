@@ -3,12 +3,10 @@ import SwiftUI
 struct IIDXClearTypeDetailRow: View {
     var title: String
     var value: String
-    var style: any ShapeStyle
 
-    init(_ title: String, value: String, style: any ShapeStyle) {
+    init(_ title: String, value: String) {
         self.title = title
         self.value = value
-        self.style = style
     }
 
     var body: some View {
@@ -16,8 +14,11 @@ struct IIDXClearTypeDetailRow: View {
             Text(title)
                 .fontWidth(.expanded)
             Spacer()
-            Text(value)
-                .foregroundStyle(style)
+            FullComboRainbowTimeline(isActive: value == IIDXClearType.fullComboClear.rawValue) { phase in
+                Text(value)
+                    .foregroundStyle(IIDXClearType.style(for: value, phase: phase))
+                    .strokeText(color: .black, width: 0.3)
+            }
         }
         .font(.caption)
         .fontWeight(.heavy)

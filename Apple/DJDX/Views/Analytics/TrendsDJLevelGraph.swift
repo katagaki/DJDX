@@ -17,15 +17,9 @@ struct TrendsDJLevelGraph: View {
                 .foregroundStyle(by: .value("Shared.IIDX.DJLevel", djLevel))
             }
         }
-        .chartForegroundStyleScale([
-            "AAA": Color.primary,
-            "AA": .orange,
-            "A": .yellow,
-            "B": .green,
-            "C": .teal,
-            "D": .blue,
-            "E": .indigo,
-            "F": .red
-        ])
+        .chartForegroundStyleScale(
+            domain: IIDXDJLevel.chartColorDomain,
+            range: IIDXDJLevel.chartColorRange
+        )
     }
 }

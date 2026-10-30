@@ -275,7 +275,8 @@ extension AnalyticsView {
             PerLevelSegment(
                 label: IIDXClearType.abbreviation(for: clearType),
                 color: IIDXClearType.color(for: clearType),
-                count: counts[clearType] ?? 0
+                count: counts[clearType] ?? 0,
+                isFullCombo: clearType == IIDXClearType.fullComboClear.rawValue
             )
         }
     }

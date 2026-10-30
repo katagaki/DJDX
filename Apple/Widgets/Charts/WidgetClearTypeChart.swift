@@ -82,12 +82,12 @@ struct WidgetClearTypeTrendChart: View {
 
 enum WidgetClearTypeColors {
     static let scale: KeyValuePairs<String, Color> = [
-        "FULLCOMBO CLEAR": .blue,
-        "CLEAR": .cyan,
-        "EASY CLEAR": .green,
-        "ASSIST CLEAR": .purple,
-        "HARD CLEAR": .pink,
-        "EX HARD CLEAR": .yellow,
-        "FAILED": .red
+        "FULLCOMBO CLEAR": Color(red: 0.45, green: 0.85, blue: 1.0),
+        "CLEAR": Color(red: 0.3, green: 0.85, blue: 0.98),
+        "EASY CLEAR": Color(red: 0.7, green: 0.93, blue: 0.3),
+        "ASSIST CLEAR": Color(red: 0.7, green: 0.5, blue: 1.0),
+        "HARD CLEAR": Color(red: 1.0, green: 0.28, blue: 0.32),
+        "EX HARD CLEAR": Color(red: 1.0, green: 0.82, blue: 0.22),
+        "FAILED": Color(red: 0.98, green: 0.4, blue: 0.27)
     ]
 }

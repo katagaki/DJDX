@@ -2,8 +2,6 @@ import SwiftUI
 
 struct CapturedPlayScoreView: View {
 
-    @Environment(\.colorScheme) private var colorScheme: ColorScheme
-
     var store: IIDXSessionStore
     var play: IIDXCapturedPlay
     var history: [IIDXCapturedPlay] = []
@@ -129,19 +127,9 @@ struct CapturedPlayScoreView: View {
         if score.djLevelEnum() != .none {
             HStack {
                 Group {
-                    switch colorScheme {
-                    case .light:
-                        Text(score.djLevel)
-                            .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
-                            .conditionalShadow(.blue.opacity(0.2), radius: 3.0)
-                    case .dark:
-                        Text(score.djLevel)
-                            .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
-                            .drawingGroup()
-                            .shadow(color: .cyan, radius: 5.0)
-                    @unknown default:
-                        Text(score.djLevel)
-                    }
+                    Text(score.djLevel)
+                        .foregroundStyle(IIDXDJLevel.style(for: score.djLevel))
+                        .strokeText(color: .black, width: 0.6)
                     Spacer()
                     if let scoreRate {
                         Text(scoreRate, format: .percent.precision(.fractionLength(1)))
@@ -167,8 +155,9 @@ struct CapturedPlayScoreView: View {
     @ViewBuilder
     private func detailRows() -> some View {
         VStack(alignment: .leading, spacing: 8.0) {
-            IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
-            IIDXDetailRow("SCORE", value: score.score, style: scoreStyle())
+            IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
+            IIDXDetailRow("SCORE", value: score.score, style: Color.iidxScore,
+                          outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
             if let matchedNoteCount {
                 IIDXDetailRow("NOTES", value: matchedNoteCount, style: Color.secondary)
             }
@@ -201,29 +190,27 @@ struct CapturedPlayScoreView: View {
                 Text(play.captureDate, format: .dateTime.year().month().day().hour().minute())
                     .font(.subheadline)
                 HStack(spacing: 6.0) {
-                    Text(verbatim: IIDXClearType.abbreviation(for: play.clearType))
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(IIDXClearType.style(for: play.clearType, colorScheme: colorScheme))
+                    let isFullCombo = play.clearType == IIDXClearType.fullComboClear.rawValue
+                    FullComboRainbowTimeline(isActive: isFullCombo) { phase in
+                        Text(verbatim: IIDXClearType.abbreviation(for: play.clearType))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(IIDXClearType.style(for: play.clearType, phase: phase))
+                            .strokeText(color: .black, width: 0.3)
+                    }
                     Text(verbatim: play.djLevel)
                         .font(.caption.weight(.black))
                         .fontWidth(.expanded)
-                        .foregroundStyle(IIDXDJLevel.style(for: play.djLevel, colorScheme: colorScheme))
+                        .foregroundStyle(IIDXDJLevel.style(for: play.djLevel))
+                        .strokeText(color: .black, width: 0.3)
                 }
             }
             Spacer(minLength: 0.0)
             Text(verbatim: "\(play.exScore)")
                 .font(.body.monospacedDigit().weight(.heavy))
                 .fontWidth(.expanded)
-                .foregroundStyle(LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom))
+                .foregroundStyle(Color.iidxScore)
+                .strokeText(color: .iidxScoreOutline, width: 0.4)
         }
-    }
-
-    private func clearTypeStyle() -> any ShapeStyle {
-        IIDXClearType.style(for: score.clearType, colorScheme: colorScheme)
-    }
-
-    private func scoreStyle() -> any ShapeStyle {
-        LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom)
     }
 
     private var levelColor: Color {

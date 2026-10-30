@@ -5,7 +5,6 @@ import SwiftUI
 // swiftlint:disable:next type_body_length
 struct IIDXScoreSection: View {
 
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
     @Environment(\.openURL) var openURL
     @EnvironmentObject var navigationManager: NavigationManager
 
@@ -32,19 +31,9 @@ struct IIDXScoreSection: View {
             if score.djLevelEnum() != .none {
                 HStack {
                     Group {
-                        switch colorScheme {
-                        case .light:
-                            Text(score.djLevel)
-                                .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
-                                .conditionalShadow(.blue.opacity(0.2), radius: 3.0)
-                        case .dark:
-                            Text(score.djLevel)
-                                .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
-                                .drawingGroup()
-                                .shadow(color: .cyan, radius: 5.0)
-                        @unknown default:
-                            Text(score.djLevel)
-                        }
+                        Text(score.djLevel)
+                            .foregroundStyle(IIDXDJLevel.style(for: score.djLevel))
+                            .strokeText(color: .black, width: 0.6)
                         Spacer()
                         if let noteCount {
                             Text(Float(score.score) / Float(noteCount * 2),
@@ -61,9 +50,11 @@ struct IIDXScoreSection: View {
                     .fontWeight(.black)
                 }
                 VStack(alignment: .leading, spacing: 8.0) {
-                    IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
-                    IIDXDetailRow("SCORE", value: score.score, style: scoreStyle())
-                    IIDXDetailRow("MISS COUNT", value: score.missCount, style: scoreStyle())
+                    IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
+                    IIDXDetailRow("SCORE", value: score.score, style: Color.iidxScore,
+                                  outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
+                    IIDXDetailRow("MISS COUNT", value: score.missCount, style: Color.iidxScore,
+                                  outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
                 }
                 HStack(spacing: 0.0) {
                     IIDXNoteTypeDetailRow("P-GREAT", value: score.perfectGreatCount, style: Color.cyan)
@@ -76,7 +67,7 @@ struct IIDXScoreSection: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 if score.clearType != "NO PLAY" {
-                    IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
+                    IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
                 }
             }
             if score.djLevelEnum() != .none, scoreHistory.count >= 2 {
@@ -277,10 +268,6 @@ struct IIDXScoreSection: View {
         .contentShape(.rect)
     }
 
-    func clearTypeStyle() -> any ShapeStyle {
-        IIDXClearType.style(for: score.clearType, colorScheme: colorScheme)
-    }
-
     func reloadScoreHistory() async {
         // Get list of scores for this song
         let songRecordsForSong = await fetcher.songRecordsForSong(title: songTitle)
@@ -338,9 +325,5 @@ struct IIDXScoreSection: View {
                 .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
             openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
         }
-    }
-
-    func scoreStyle() -> any ShapeStyle {
-        return LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom)
     }
 }
