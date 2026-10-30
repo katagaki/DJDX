@@ -198,6 +198,7 @@ struct IIDXProgressGraph: View {
                 yEnd: .value("Shared.ClearCount", mark.stackStart + mark.count)
             )
             .foregroundStyle(by: .value("Analytics.Progress", series))
+            .cornerRadius(4.0)
         } else {
             let barWidth = groupHalfWidth * 2.0 / Double(max(visibleSeries.count, 1))
             let barStart = groupStart + barWidth * Double(mark.seriesIndex)
@@ -208,6 +209,7 @@ struct IIDXProgressGraph: View {
                 yEnd: .value("Shared.ClearCount", mark.count)
             )
             .foregroundStyle(by: .value("Analytics.Progress", series))
+            .cornerRadius(4.0)
         }
     }
 }
