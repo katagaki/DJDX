@@ -82,37 +82,37 @@ enum IIDXClearType: String, Codable {
 
     static func style(for clearType: String) -> any ShapeStyle {
         switch clearType {
-        case "FULLCOMBO CLEAR": return metallic(
+        case "FULLCOMBO CLEAR": return LinearGradient.metallic(
             highlight: Color(red: 0.92, green: 1.0, blue: 1.0),
             base: Color(red: 0.45, green: 0.85, blue: 1.0),
             shade: Color(red: 0.62, green: 0.42, blue: 1.0)
         )
-        case "FAILED": return metallic(
+        case "FAILED": return LinearGradient.metallic(
             highlight: Color(red: 1.0, green: 0.72, blue: 0.6),
             base: Color(red: 0.98, green: 0.4, blue: 0.27),
             shade: Color(red: 0.86, green: 0.25, blue: 0.14)
         )
-        case "EASY CLEAR": return metallic(
+        case "EASY CLEAR": return LinearGradient.metallic(
             highlight: Color(red: 0.93, green: 1.0, blue: 0.75),
             base: Color(red: 0.7, green: 0.93, blue: 0.3),
             shade: Color(red: 0.5, green: 0.8, blue: 0.12)
         )
-        case "ASSIST CLEAR": return metallic(
+        case "ASSIST CLEAR": return LinearGradient.metallic(
             highlight: Color(red: 0.9, green: 0.82, blue: 1.0),
             base: Color(red: 0.7, green: 0.5, blue: 1.0),
             shade: Color(red: 0.52, green: 0.3, blue: 0.92)
         )
-        case "CLEAR": return metallic(
+        case "CLEAR": return LinearGradient.metallic(
             highlight: Color(red: 0.82, green: 1.0, blue: 1.0),
             base: Color(red: 0.3, green: 0.85, blue: 0.98),
             shade: Color(red: 0.1, green: 0.66, blue: 0.9)
         )
-        case "HARD CLEAR": return metallic(
+        case "HARD CLEAR": return LinearGradient.metallic(
             highlight: Color(red: 1.0, green: 0.72, blue: 0.74),
             base: Color(red: 1.0, green: 0.28, blue: 0.32),
             shade: Color(red: 0.86, green: 0.06, blue: 0.16)
         )
-        case "EX HARD CLEAR": return metallic(
+        case "EX HARD CLEAR": return LinearGradient.metallic(
             highlight: Color(red: 1.0, green: 0.97, blue: 0.72),
             base: Color(red: 1.0, green: 0.82, blue: 0.22),
             shade: Color(red: 0.93, green: 0.56, blue: 0.05)
@@ -121,17 +121,4 @@ enum IIDXClearType: String, Codable {
         }
     }
 
-    private static func metallic(highlight: Color, base: Color, shade: Color) -> LinearGradient {
-        LinearGradient(
-            stops: [
-                .init(color: highlight, location: 0.0),
-                .init(color: highlight, location: 0.2),
-                .init(color: base, location: 0.48),
-                .init(color: shade, location: 0.52),
-                .init(color: base, location: 0.85),
-                .init(color: highlight, location: 1.0)
-            ],
-            startPoint: .top, endPoint: .bottom
-        )
-    }
 }

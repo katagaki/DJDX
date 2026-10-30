@@ -2,8 +2,6 @@ import SwiftUI
 
 struct CapturedPlayScoreView: View {
 
-    @Environment(\.colorScheme) private var colorScheme: ColorScheme
-
     var store: IIDXSessionStore
     var play: IIDXCapturedPlay
     var history: [IIDXCapturedPlay] = []
@@ -129,19 +127,9 @@ struct CapturedPlayScoreView: View {
         if score.djLevelEnum() != .none {
             HStack {
                 Group {
-                    switch colorScheme {
-                    case .light:
-                        Text(score.djLevel)
-                            .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
-                            .conditionalShadow(.blue.opacity(0.2), radius: 3.0)
-                    case .dark:
-                        Text(score.djLevel)
-                            .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
-                            .drawingGroup()
-                            .shadow(color: .cyan, radius: 5.0)
-                    @unknown default:
-                        Text(score.djLevel)
-                    }
+                    Text(score.djLevel)
+                        .foregroundStyle(IIDXDJLevel.style(for: score.djLevel))
+                        .strokeText(color: .black, width: 0.6)
                     Spacer()
                     if let scoreRate {
                         Text(scoreRate, format: .percent.precision(.fractionLength(1)))
@@ -208,7 +196,8 @@ struct CapturedPlayScoreView: View {
                     Text(verbatim: play.djLevel)
                         .font(.caption.weight(.black))
                         .fontWidth(.expanded)
-                        .foregroundStyle(IIDXDJLevel.style(for: play.djLevel, colorScheme: colorScheme))
+                        .foregroundStyle(IIDXDJLevel.style(for: play.djLevel))
+                        .strokeText(color: .black, width: 0.3)
                 }
             }
             Spacer(minLength: 0.0)

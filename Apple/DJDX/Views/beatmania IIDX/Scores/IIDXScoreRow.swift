@@ -85,11 +85,10 @@ struct IIDXScoreRow: View {
                                 Group {
                                     if isDJLevelVisible {
                                         Text(score.djLevel)
-                                            .foregroundStyle(
-                                                IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme)
-                                            )
+                                            .foregroundStyle(IIDXDJLevel.style(for: score.djLevel))
                                             .fontWidth(.expanded)
                                             .fontWeight(.black)
+                                            .strokeText(color: .black, width: 0.3)
                                     }
                                     if isScoreRateVisible, let scoreRate {
                                         if isDJLevelVisible {

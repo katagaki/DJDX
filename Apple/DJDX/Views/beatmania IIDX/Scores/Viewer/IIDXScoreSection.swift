@@ -5,7 +5,6 @@ import SwiftUI
 // swiftlint:disable:next type_body_length
 struct IIDXScoreSection: View {
 
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
     @Environment(\.openURL) var openURL
     @EnvironmentObject var navigationManager: NavigationManager
 
@@ -32,19 +31,9 @@ struct IIDXScoreSection: View {
             if score.djLevelEnum() != .none {
                 HStack {
                     Group {
-                        switch colorScheme {
-                        case .light:
-                            Text(score.djLevel)
-                                .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
-                                .conditionalShadow(.blue.opacity(0.2), radius: 3.0)
-                        case .dark:
-                            Text(score.djLevel)
-                                .foregroundStyle(IIDXDJLevel.style(for: score.djLevel, colorScheme: colorScheme))
-                                .drawingGroup()
-                                .shadow(color: .cyan, radius: 5.0)
-                        @unknown default:
-                            Text(score.djLevel)
-                        }
+                        Text(score.djLevel)
+                            .foregroundStyle(IIDXDJLevel.style(for: score.djLevel))
+                            .strokeText(color: .black, width: 0.6)
                         Spacer()
                         if let noteCount {
                             Text(Float(score.score) / Float(noteCount * 2),
