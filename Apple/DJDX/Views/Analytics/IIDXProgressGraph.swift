@@ -98,6 +98,7 @@ struct IIDXProgressMark: Identifiable {
     let index: Int
     let date: Date
     let stackStart: Int
+    let stackTotal: Int
     let count: Int
 
     var id: String { "\(series)\u{1}\(date.timeIntervalSince1970)" }
@@ -131,12 +132,13 @@ struct IIDXProgressGraph: View {
     var marks: [IIDXProgressMark] {
         points.enumerated().flatMap { index, point in
             var stackStart = 0
+            let stackTotal = visibleSeries.reduce(0) { $0 + point.count(for: $1, kind: kind) }
             return visibleSeries.enumerated().map { seriesIndex, series in
                 let count = point.count(for: series, kind: kind)
                 defer { stackStart += count }
                 return IIDXProgressMark(
                     series: series, seriesIndex: seriesIndex, index: index,
-                    date: point.date, stackStart: stackStart, count: count
+                    date: point.date, stackStart: stackStart, stackTotal: stackTotal, count: count
                 )
             }
         }
@@ -198,7 +200,15 @@ struct IIDXProgressGraph: View {
                 yEnd: .value("Shared.ClearCount", mark.stackStart + mark.count)
             )
             .foregroundStyle(by: .value("Analytics.Progress", series))
-            .cornerRadius(4.0)
+            .mask {
+                RectangleMark(
+                    xStart: .value("Shared.Date", groupStart),
+                    xEnd: .value("Shared.Date", groupStart + groupHalfWidth * 2.0),
+                    yStart: .value("Shared.ClearCount", 0),
+                    yEnd: .value("Shared.ClearCount", mark.stackTotal)
+                )
+                .cornerRadius(4.0)
+            }
         } else {
             let barWidth = groupHalfWidth * 2.0 / Double(max(visibleSeries.count, 1))
             let barStart = groupStart + barWidth * Double(mark.seriesIndex)
