@@ -29,10 +29,7 @@ struct SDVXScoreRow: View {
                     if record.highScore > 0 {
                         Divider().frame(maxHeight: 14.0)
                         Text(String(record.highScore))
-                            .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
-                                                            startPoint: .top, endPoint: .bottom))
-                            .fontWidth(.expanded)
-                            .fontWeight(.heavy)
+                            .sdvxScoreText()
                     }
                     Divider().frame(maxHeight: 14.0)
                     Text(verbatim: record.clearTypeEnum.abbreviation)

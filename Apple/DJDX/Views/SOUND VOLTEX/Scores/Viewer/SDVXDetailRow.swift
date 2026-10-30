@@ -30,6 +30,28 @@ struct SDVXDetailRow: View {
     }
 }
 
+struct SDVXScoreDetailRow: View {
+    var title: String
+    var value: Int
+
+    init(_ title: String, value: Int) {
+        self.title = title
+        self.value = value
+    }
+
+    var body: some View {
+        HStack {
+            Text(verbatim: title)
+                .fontWidth(.expanded)
+                .fontWeight(.heavy)
+            Spacer()
+            Text(value, format: .number)
+                .sdvxScoreText()
+        }
+        .font(.caption)
+    }
+}
+
 struct SDVXNoteTypeDetailRow: View {
     var title: String
     var value: String

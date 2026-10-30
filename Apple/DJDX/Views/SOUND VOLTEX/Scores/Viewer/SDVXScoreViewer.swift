@@ -38,8 +38,8 @@ struct SDVXScoreViewer: View {
                                   value: songRecord.clearTypeEnum.abbreviation,
                                   style: songRecord.clearTypeEnum.color)
                     SDVXDetailRow("GRADE", value: songRecord.grade, style: gradeStyle)
-                    SDVXDetailRow("HIGH SCORE", value: songRecord.highScore, style: scoreStyle)
-                    SDVXDetailRow("EX SCORE", value: songRecord.exScore, style: scoreStyle)
+                    SDVXScoreDetailRow("HIGH SCORE", value: songRecord.highScore)
+                    SDVXScoreDetailRow("EX SCORE", value: songRecord.exScore)
                 }
                 HStack(spacing: 0.0) {
                     SDVXNoteTypeDetailRow("PLAYS", value: songRecord.playCount, style: Color.secondary)
@@ -120,7 +120,7 @@ struct SDVXScoreViewer: View {
             }
             Spacer()
             Text(songRecord.highScore, format: .number)
-                .foregroundStyle(scoreStyle)
+                .sdvxScoreText(outlineWidth: 0.6)
         }
         .font(.title)
         .fontWidth(.expanded)
@@ -164,10 +164,6 @@ struct SDVXScoreViewer: View {
         .foregroundStyle(.secondary)
         .frame(maxWidth: .infinity)
         .contentShape(.rect)
-    }
-
-    var scoreStyle: any ShapeStyle {
-        LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom)
     }
 
     var gradeStyle: any ShapeStyle {
