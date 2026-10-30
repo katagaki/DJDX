@@ -5,6 +5,7 @@ struct PerLevelSegment: Identifiable {
     let label: String
     let color: Color
     let count: Int
+    let metallicLabel: IIDXMetallicText
     var isFullCombo: Bool = false
 }
 
@@ -24,9 +25,8 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
         segments.reduce(0) { $0 + $1.count }
     }
 
-    // All non-empty segments, kept in the original segment order.
     var visibleSegments: [PerLevelSegment] {
-        segments.filter { $0.count > 0 }
+        Array(segments.filter { $0.count > 0 }.prefix(4))
     }
 
     var body: some View {
@@ -84,8 +84,7 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
         HStack(spacing: 10.0) {
             ForEach(visibleSegments) { segment in
                 HStack(spacing: 3.0) {
-                    Text(verbatim: segment.label)
-                        .foregroundStyle(segment.color)
+                    segment.metallicLabel
                         .fontWeight(.heavy)
                     Text(verbatim: "\(segment.count)")
                         .foregroundStyle(.primary)

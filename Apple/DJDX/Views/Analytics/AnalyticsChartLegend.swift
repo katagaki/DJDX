@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AnalyticsChartLegend: View {
 
-    let items: [(label: String, color: Color)]
+    let items: [(label: IIDXMetallicText, color: Color)]
 
     let columns = [
         GridItem(.flexible(), alignment: .leading),
@@ -11,14 +11,13 @@ struct AnalyticsChartLegend: View {
 
     var body: some View {
         LazyVGrid(columns: columns, alignment: .leading, spacing: 4.0) {
-            ForEach(items, id: \.label) { item in
+            ForEach(items, id: \.label.text) { item in
                 HStack(spacing: 6.0) {
                     Circle()
                         .fill(item.color)
                         .frame(width: 8.0, height: 8.0)
-                    Text(verbatim: item.label)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                    item.label
+                        .font(.caption2.weight(.heavy))
                         .lineLimit(1)
                     Spacer(minLength: 0.0)
                 }
@@ -32,7 +31,7 @@ struct ClearTypeLegend: View {
     var body: some View {
         AnalyticsChartLegend(
             items: IIDXClearType.sortedWithoutNoPlay.map {
-                ($0.rawValue, IIDXClearType.color(for: $0.rawValue))
+                (.clearType($0.rawValue), IIDXClearType.color(for: $0.rawValue))
             }
         )
     }
@@ -42,7 +41,7 @@ struct DJLevelLegend: View {
     var body: some View {
         AnalyticsChartLegend(
             items: IIDXDJLevel.sorted.reversed().map {
-                ($0.rawValue, IIDXDJLevel.color(for: $0.rawValue))
+                (.djLevel($0.rawValue), IIDXDJLevel.color(for: $0.rawValue))
             }
         )
     }
