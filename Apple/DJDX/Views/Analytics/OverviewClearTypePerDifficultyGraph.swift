@@ -17,7 +17,7 @@ struct OverviewClearTypePerDifficultyGraph: View {
                     .chartXScale(domain: IIDXClearType.sortedStrings.reversed())
                     .chartForegroundStyleScale(
                         domain: IIDXClearType.chartColorDomain,
-                        range: IIDXClearType.chartStyleRange(phase: phase)
+                        range: IIDXClearType.chartColorRange(phase: phase)
                     )
                     .chartLegend(.hidden)
                 }

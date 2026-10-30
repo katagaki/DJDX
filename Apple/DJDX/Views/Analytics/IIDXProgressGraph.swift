@@ -91,11 +91,11 @@ enum IIDXProgressKind: String, Hashable {
         }
     }
 
-    func style(for series: String, phase: Double) -> AnyShapeStyle {
+    func color(for series: String, phase: Double) -> Color {
         if self == .clears && series == IIDXClearType.fullComboClear.rawValue {
-            return AnyShapeStyle(FullComboRainbow.gradient(phase: phase))
+            return FullComboRainbow.color(phase: phase)
         }
-        return AnyShapeStyle(color(for: series))
+        return color(for: series)
     }
 }
 
@@ -185,7 +185,7 @@ struct IIDXProgressGraph: View {
             }
             .chartForegroundStyleScale(
                 domain: visibleSeries.map { kind.label(for: $0) },
-                range: visibleSeries.map { kind.style(for: $0, phase: phase) }
+                range: visibleSeries.map { kind.color(for: $0, phase: phase) }
             )
             .chartScrollableAxes(visibleImportCount < points.count ? .horizontal : [])
             .chartXVisibleDomain(length: max(visibleImportCount, 1))

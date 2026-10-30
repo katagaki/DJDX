@@ -28,7 +28,7 @@ struct OverviewClearTypeBarGraph: View {
                     .chartXScale(domain: IIDXClearType.sortedStringsWithoutNoPlay.reversed())
                     .chartForegroundStyleScale(
                         domain: IIDXClearType.chartColorDomain,
-                        range: IIDXClearType.chartStyleRange(phase: phase)
+                        range: IIDXClearType.chartColorRange(phase: phase)
                     )
                     .chartLegend(.hidden)
                 }

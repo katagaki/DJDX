@@ -24,7 +24,7 @@ struct TrendsClearTypeGraph: View {
             }
             .chartForegroundStyleScale(
                 domain: IIDXClearType.chartColorDomain,
-                range: IIDXClearType.chartStyleRange(phase: phase)
+                range: IIDXClearType.chartColorRange(phase: phase)
             )
         }
     }

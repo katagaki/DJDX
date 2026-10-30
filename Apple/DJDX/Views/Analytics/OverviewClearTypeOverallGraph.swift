@@ -89,7 +89,7 @@ struct OverviewClearTypeOverallGraph: View {
             .chartXScale(domain: levelDomain)
             .chartForegroundStyleScale(
                 domain: IIDXClearType.chartColorDomain,
-                range: IIDXClearType.chartStyleRange(phase: phase)
+                range: IIDXClearType.chartColorRange(phase: phase)
             )
         }
     }
@@ -116,7 +116,7 @@ struct OverviewClearTypeOverallGraph: View {
             .chartYScale(domain: shownDifficulties.map { "\($0)" })
             .chartForegroundStyleScale(
                 domain: IIDXClearType.chartColorDomain,
-                range: IIDXClearType.chartStyleRange(phase: phase)
+                range: IIDXClearType.chartColorRange(phase: phase)
             )
         }
     }

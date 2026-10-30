@@ -3,17 +3,8 @@ import SwiftUI
 enum FullComboRainbow {
     static let period: TimeInterval = 3.0
 
-    static func gradient(phase: Double) -> LinearGradient {
-        let count = 6
-        let stops = (0...count).map { index in
-            let location = Double(index) / Double(count)
-            let hue = (location - phase + 1.0).truncatingRemainder(dividingBy: 1.0)
-            return Gradient.Stop(
-                color: Color(hue: hue, saturation: 0.6, brightness: 1.0),
-                location: location
-            )
-        }
-        return LinearGradient(stops: stops, startPoint: .topLeading, endPoint: .bottomTrailing)
+    static func color(phase: Double) -> Color {
+        Color(hue: phase, saturation: 0.6, brightness: 1.0)
     }
 }
 
@@ -46,7 +37,7 @@ struct FullComboRainbowFill: View {
     var body: some View {
         FullComboRainbowTimeline { phase in
             Rectangle()
-                .fill(FullComboRainbow.gradient(phase: phase))
+                .fill(FullComboRainbow.color(phase: phase))
         }
     }
 }
