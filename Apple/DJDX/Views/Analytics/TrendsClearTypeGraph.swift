@@ -17,14 +17,9 @@ struct TrendsClearTypeGraph: View {
                 .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
             }
         }
-        .chartForegroundStyleScale([
-            "FULLCOMBO CLEAR": .blue,
-            "CLEAR": .cyan,
-            "EASY CLEAR": .green,
-            "ASSIST CLEAR": .purple,
-            "HARD CLEAR": .pink,
-            "EX HARD CLEAR": .yellow,
-            "FAILED": .red
-        ])
+        .chartForegroundStyleScale(
+            domain: IIDXClearType.chartColorDomain,
+            range: IIDXClearType.chartColorRange
+        )
     }
 }

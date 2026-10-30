@@ -25,15 +25,10 @@ struct OverviewClearTypeBarGraph: View {
                     .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
                 }
                 .chartXScale(domain: IIDXClearType.sortedStringsWithoutNoPlay.reversed())
-                .chartForegroundStyleScale([
-                    "FULLCOMBO CLEAR": .blue,
-                    "CLEAR": .cyan,
-                    "EASY CLEAR": .green,
-                    "ASSIST CLEAR": .purple,
-                    "HARD CLEAR": .pink,
-                    "EX HARD CLEAR": .yellow,
-                    "FAILED": .red
-                ])
+                .chartForegroundStyleScale(
+                    domain: IIDXClearType.chartColorDomain,
+                    range: IIDXClearType.chartColorRange
+                )
                 .chartLegend(.hidden)
             } else {
                 Spacer()

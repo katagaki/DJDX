@@ -70,13 +70,13 @@ struct WidgetDJLevelTrendChart: View {
 
 enum WidgetDJLevelColors {
     static let scale: KeyValuePairs<String, Color> = [
-        "AAA": .primary,
-        "AA": .orange,
-        "A": .yellow,
-        "B": .green,
-        "C": .teal,
-        "D": .blue,
-        "E": .indigo,
-        "F": .red
+        "AAA": Color(red: 1.0, green: 0.8, blue: 0.16),
+        "AA": Color(red: 0.62, green: 0.65, blue: 0.68),
+        "A": Color(red: 0.4, green: 0.9, blue: 0.8),
+        "B": Color(red: 0.32, green: 0.84, blue: 0.92),
+        "C": Color(red: 0.24, green: 0.7, blue: 0.96),
+        "D": Color(red: 0.24, green: 0.56, blue: 0.98),
+        "E": Color(red: 0.2, green: 0.44, blue: 0.96),
+        "F": Color(red: 0.16, green: 0.34, blue: 0.92)
     ]
 }

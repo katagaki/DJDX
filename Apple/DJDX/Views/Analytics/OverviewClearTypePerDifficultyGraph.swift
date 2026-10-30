@@ -14,16 +14,11 @@ struct OverviewClearTypePerDifficultyGraph: View {
                         .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
                 }
                 .chartXScale(domain: IIDXClearType.sortedStrings.reversed())
-                      .chartForegroundStyleScale([
-                        "FULLCOMBO CLEAR": .blue,
-                        "CLEAR": .cyan,
-                        "EASY CLEAR": .green,
-                        "ASSIST CLEAR": .purple,
-                        "HARD CLEAR": .pink,
-                        "EX HARD CLEAR": .yellow,
-                        "FAILED": .red
-                      ])
-                      .chartLegend(.hidden)
+                .chartForegroundStyleScale(
+                    domain: IIDXClearType.chartColorDomain,
+                    range: IIDXClearType.chartColorRange
+                )
+                .chartLegend(.hidden)
             } else {
                 Spacer()
             }

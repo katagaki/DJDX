@@ -21,16 +21,10 @@ struct OverviewDJLevelPieGraph: View {
                         SectorMark(angle: .value(djLevel.rawValue, levelData[djLevel] ?? 0))
                             .foregroundStyle(by: .value("Shared.IIDX.DJLevel", djLevel.rawValue))
                     }
-                    .chartForegroundStyleScale([
-                        "AAA": Color.primary,
-                        "AA": .orange,
-                        "A": .yellow,
-                        "B": .green,
-                        "C": .teal,
-                        "D": .blue,
-                        "E": .indigo,
-                        "F": .red
-                    ])
+                    .chartForegroundStyleScale(
+                        domain: IIDXDJLevel.chartColorDomain,
+                        range: IIDXDJLevel.chartColorRange
+                    )
                     .chartLegend(.hidden)
                 } else {
                     Spacer()

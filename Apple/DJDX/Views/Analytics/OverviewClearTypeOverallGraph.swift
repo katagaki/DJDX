@@ -47,16 +47,6 @@ struct OverviewClearTypeOverallGraph: View {
         return (lower...upper).map(Double.init)
     }
 
-    let clearTypeColorScale: KeyValuePairs<String, Color> = [
-        "FULLCOMBO CLEAR": .blue,
-        "CLEAR": .cyan,
-        "EASY CLEAR": .green,
-        "ASSIST CLEAR": .purple,
-        "HARD CLEAR": .pink,
-        "EX HARD CLEAR": .yellow,
-        "FAILED": .red
-    ]
-
     var body: some View {
         if isHorizontal {
             horizontalChart
@@ -92,7 +82,10 @@ struct OverviewClearTypeOverallGraph: View {
             plotArea.padding(.horizontal, 0.0)
         }
         .chartXScale(domain: levelDomain)
-        .chartForegroundStyleScale(clearTypeColorScale)
+        .chartForegroundStyleScale(
+            domain: IIDXClearType.chartColorDomain,
+            range: IIDXClearType.chartColorRange
+        )
     }
 
     @ViewBuilder
@@ -114,6 +107,9 @@ struct OverviewClearTypeOverallGraph: View {
             }
         }
         .chartYScale(domain: shownDifficulties.map { "\($0)" })
-        .chartForegroundStyleScale(clearTypeColorScale)
+        .chartForegroundStyleScale(
+            domain: IIDXClearType.chartColorDomain,
+            range: IIDXClearType.chartColorRange
+        )
     }
 }

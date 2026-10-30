@@ -66,18 +66,25 @@ enum IIDXClearType: String, Codable {
         }
     }
 
-    // Solid colors matching the clear-type chart palette.
     static func color(for clearType: String) -> Color {
         switch clearType {
-        case "FULLCOMBO CLEAR": return .blue
-        case "CLEAR": return .cyan
-        case "EASY CLEAR": return .green
-        case "ASSIST CLEAR": return .purple
-        case "HARD CLEAR": return .pink
-        case "EX HARD CLEAR": return .yellow
-        case "FAILED": return .red
-        default: return .gray
+        case "FULLCOMBO CLEAR": return Color(red: 0.45, green: 0.85, blue: 1.0)
+        case "CLEAR": return Color(red: 0.3, green: 0.85, blue: 0.98)
+        case "EASY CLEAR": return Color(red: 0.7, green: 0.93, blue: 0.3)
+        case "ASSIST CLEAR": return Color(red: 0.7, green: 0.5, blue: 1.0)
+        case "HARD CLEAR": return Color(red: 1.0, green: 0.28, blue: 0.32)
+        case "EX HARD CLEAR": return Color(red: 1.0, green: 0.82, blue: 0.22)
+        case "FAILED": return Color(red: 0.98, green: 0.4, blue: 0.27)
+        default: return Color(red: 0.66, green: 0.67, blue: 0.7)
         }
+    }
+
+    static var chartColorDomain: [String] {
+        sortedStrings
+    }
+
+    static var chartColorRange: [Color] {
+        sortedStrings.map { color(for: $0) }
     }
 
     static func style(for clearType: String) -> any ShapeStyle {

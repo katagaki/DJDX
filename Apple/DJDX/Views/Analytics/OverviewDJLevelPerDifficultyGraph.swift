@@ -25,13 +25,10 @@ struct OverviewDJLevelPerDifficultyGraph: View {
             .foregroundStyle(by: .value("Shared.IIDX.DJLevel", djLevel.rawValue))
         }
               .chartXScale(domain: Self.visibleLevelStrings)
-              .chartForegroundStyleScale([
-                "AAA": Color.primary,
-                "AA": .orange,
-                "A": .yellow,
-                "B": .green,
-                "C": .teal
-              ])
+              .chartForegroundStyleScale(
+                  domain: IIDXDJLevel.chartColorDomain,
+                  range: IIDXDJLevel.chartColorRange
+              )
               .chartLegend(.hidden)
     }
 }
