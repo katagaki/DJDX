@@ -15,33 +15,47 @@ struct TextStroke: ViewModifier {
         if width > .zero {
             content
                 .padding(width * 2)
-                .background(
-                    Rectangle()
-                        .foregroundColor(color)
-                        .mask {
-                            Canvas { context, size in
-                                guard let resolvedView = context.resolveSymbol(id: id) else { return }
-                                let center = CGPoint(x: size.width / 2, y: size.height / 2)
-                                let radius = width * 2
-                                let steps = 16
-                                for step in 0..<steps {
-                                    let angle = Double(step) / Double(steps) * 2 * .pi
-                                    context.draw(
-                                        resolvedView,
-                                        at: CGPoint(
-                                            x: center.x + radius * cos(angle),
-                                            y: center.y + radius * sin(angle)
-                                        )
-                                    )
+                .hidden()
+                .overlay {
+                    Canvas { context, size in
+                        guard let resolvedView = context.resolveSymbol(id: id) else { return }
+                        let center = CGPoint(x: size.width / 2, y: size.height / 2)
+                        let outerRadius = width * 1.5
+                        let innerRadius = width * 0.5
+                        context.drawLayer { layer in
+                            layer.clipToLayer { mask in
+                                for point in offsets(around: center, radius: outerRadius) {
+                                    mask.draw(resolvedView, at: point)
                                 }
-                            } symbols: {
-                                content
-                                    .tag(id)
                             }
+                            layer.fill(Path(CGRect(origin: .zero, size: size)), with: .color(color))
                         }
-                )
+                        context.drawLayer { layer in
+                            for point in offsets(around: center, radius: innerRadius) {
+                                layer.clipToLayer { mask in
+                                    mask.draw(resolvedView, at: point)
+                                }
+                            }
+                            layer.draw(resolvedView, at: center)
+                        }
+                    } symbols: {
+                        content
+                            .tag(id)
+                    }
+                }
+                .accessibilityRepresentation {
+                    content
+                }
         } else {
             content
+        }
+    }
+
+    func offsets(around center: CGPoint, radius: CGFloat) -> [CGPoint] {
+        let steps = 16
+        return (0..<steps).map { step in
+            let angle = Double(step) / Double(steps) * 2 * .pi
+            return CGPoint(x: center.x + radius * cos(angle), y: center.y + radius * sin(angle))
         }
     }
 }
