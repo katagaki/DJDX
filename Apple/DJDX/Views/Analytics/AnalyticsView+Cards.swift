@@ -276,6 +276,7 @@ extension AnalyticsView {
                 label: IIDXClearType.abbreviation(for: clearType),
                 color: IIDXClearType.color(for: clearType),
                 count: counts[clearType] ?? 0,
+                metallicLabel: .clearType(clearType, label: IIDXClearType.abbreviation(for: clearType)),
                 isFullCombo: clearType == IIDXClearType.fullComboClear.rawValue
             )
         }
@@ -287,7 +288,8 @@ extension AnalyticsView {
             PerLevelSegment(
                 label: djLevel.rawValue,
                 color: IIDXDJLevel.color(for: djLevel.rawValue),
-                count: counts[djLevel] ?? 0
+                count: counts[djLevel] ?? 0,
+                metallicLabel: .djLevel(djLevel.rawValue)
             )
         }
     }

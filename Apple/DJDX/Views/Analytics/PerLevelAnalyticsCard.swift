@@ -5,6 +5,7 @@ struct PerLevelSegment: Identifiable {
     let label: String
     let color: Color
     let count: Int
+    let metallicLabel: IIDXMetallicText
     var isFullCombo: Bool = false
 }
 
@@ -84,8 +85,7 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
         HStack(spacing: 10.0) {
             ForEach(visibleSegments) { segment in
                 HStack(spacing: 3.0) {
-                    Text(verbatim: segment.label)
-                        .foregroundStyle(segment.color)
+                    segment.metallicLabel
                         .fontWeight(.heavy)
                     Text(verbatim: "\(segment.count)")
                         .foregroundStyle(.primary)

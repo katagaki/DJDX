@@ -91,6 +91,13 @@ enum IIDXProgressKind: String, Hashable {
         }
     }
 
+    func metallicLabel(for series: String) -> IIDXMetallicText {
+        switch self {
+        case .clears: .clearType(series, label: label(for: series))
+        case .highScores: .djLevel(series)
+        }
+    }
+
     func color(for series: String, phase: Double) -> Color {
         if self == .clears && series == IIDXClearType.fullComboClear.rawValue {
             return FullComboRainbow.color(phase: phase)
@@ -278,7 +285,19 @@ struct IIDXProgressDetailView: View {
             } else {
                 Section {
                     IIDXProgressGraph(points: points, kind: kind, scrollsBars: true)
-                        .chartLegend(position: .bottom, alignment: .leading)
+                        .chartLegend(position: .bottom, alignment: .leading) {
+                            HStack(spacing: 10.0) {
+                                ForEach(visibleSeries, id: \.self) { series in
+                                    HStack(spacing: 4.0) {
+                                        Circle()
+                                            .fill(kind.color(for: series))
+                                            .frame(width: 8.0, height: 8.0)
+                                        kind.metallicLabel(for: series)
+                                            .font(.caption2.weight(.heavy))
+                                    }
+                                }
+                            }
+                        }
                         .frame(height: 240.0)
                         .listRowBackground(Color.clear)
                 }
@@ -353,8 +372,7 @@ struct IIDXProgressDetailView: View {
 
     func seriesCount(_ series: String, count: Int) -> some View {
         HStack(spacing: 3.0) {
-            Text(verbatim: kind.label(for: series))
-                .foregroundStyle(kind.color(for: series))
+            kind.metallicLabel(for: series)
                 .fontWeight(.heavy)
             Text(verbatim: "\(count)")
                 .foregroundStyle(count > 0 ? .primary : .secondary)
