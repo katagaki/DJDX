@@ -110,11 +110,10 @@ struct IIDXScoreRow: View {
                                                 .frame(maxHeight: 14.0)
                                         }
                                         Text(String(score.score))
-                                            .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
-                                                                            startPoint: .top,
-                                                                            endPoint: .bottom))
+                                            .foregroundStyle(LinearGradient.iidxScore)
                                             .fontWidth(.expanded)
                                             .fontWeight(.heavy)
+                                            .strokeText(color: .black, width: 0.3)
                                         if let scoreDelta, scoreDelta > 0 {
                                             Text("Analytics.NewHighScore.\(scoreDelta)")
                                                 .foregroundStyle(.orange)

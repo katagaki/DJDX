@@ -51,8 +51,8 @@ struct IIDXScoreSection: View {
                 }
                 VStack(alignment: .leading, spacing: 8.0) {
                     IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
-                    IIDXDetailRow("SCORE", value: score.score, style: scoreStyle())
-                    IIDXDetailRow("MISS COUNT", value: score.missCount, style: scoreStyle())
+                    IIDXDetailRow("SCORE", value: score.score, style: scoreStyle(), outlineWidth: 0.3)
+                    IIDXDetailRow("MISS COUNT", value: score.missCount, style: scoreStyle(), outlineWidth: 0.3)
                 }
                 HStack(spacing: 0.0) {
                     IIDXNoteTypeDetailRow("P-GREAT", value: score.perfectGreatCount, style: Color.cyan)
@@ -330,6 +330,6 @@ struct IIDXScoreSection: View {
     }
 
     func scoreStyle() -> any ShapeStyle {
-        return LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom)
+        LinearGradient.iidxScore
     }
 }
