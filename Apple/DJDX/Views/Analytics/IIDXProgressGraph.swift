@@ -193,21 +193,16 @@ struct IIDXProgressGraph: View {
         let series = kind.label(for: mark.series)
         let groupStart = Double(mark.index) - groupHalfWidth
         if style == .stacked {
+            let groupEnd = groupStart + groupHalfWidth * 2.0
             RectangleMark(
                 xStart: .value("Shared.Date", groupStart),
-                xEnd: .value("Shared.Date", groupStart + groupHalfWidth * 2.0),
+                xEnd: .value("Shared.Date", groupEnd),
                 yStart: .value("Shared.ClearCount", mark.stackStart),
                 yEnd: .value("Shared.ClearCount", mark.stackStart + mark.count)
             )
             .foregroundStyle(by: .value("Analytics.Progress", series))
             .mask {
-                RectangleMark(
-                    xStart: .value("Shared.Date", groupStart),
-                    xEnd: .value("Shared.Date", groupStart + groupHalfWidth * 2.0),
-                    yStart: .value("Shared.ClearCount", 0),
-                    yEnd: .value("Shared.ClearCount", mark.stackTotal)
-                )
-                .cornerRadius(2.0)
+                topRoundedMask(xStart: groupStart, xEnd: groupEnd, height: mark.stackTotal)
             }
         } else {
             let barWidth = groupHalfWidth * 2.0 / Double(max(visibleSeries.count, 1))
@@ -219,8 +214,27 @@ struct IIDXProgressGraph: View {
                 yEnd: .value("Shared.ClearCount", mark.count)
             )
             .foregroundStyle(by: .value("Analytics.Progress", series))
-            .cornerRadius(2.0)
+            .mask {
+                topRoundedMask(xStart: barStart, xEnd: barStart + barWidth, height: mark.count)
+            }
         }
+    }
+
+    @ChartContentBuilder
+    func topRoundedMask(xStart: Double, xEnd: Double, height: Int) -> some ChartContent {
+        RectangleMark(
+            xStart: .value("Shared.Date", xStart),
+            xEnd: .value("Shared.Date", xEnd),
+            yStart: .value("Shared.ClearCount", 0),
+            yEnd: .value("Shared.ClearCount", height)
+        )
+        .cornerRadius(2.0)
+        RectangleMark(
+            xStart: .value("Shared.Date", xStart),
+            xEnd: .value("Shared.Date", xEnd),
+            yStart: .value("Shared.ClearCount", 0),
+            yEnd: .value("Shared.ClearCount", Double(height) / 2.0)
+        )
     }
 }
 
