@@ -16,20 +16,22 @@ struct OverviewClearTypeBarGraph: View {
     var body: some View {
         VStack {
             if let clearData = graphData[difficulty], clearData.keys.count > 0 {
-                Chart(clearData.keys, id: \.self) { clearType in
-                    BarMark(
-                        x: .value("Shared.IIDX.ClearType", clearType),
-                        y: .value("Shared.ClearCount", clearData[clearType] ?? 0),
-                        width: .inset(8.0)
+                FullComboRainbowTimeline(isActive: (clearData["FULLCOMBO CLEAR"] ?? 0) > 0) { phase in
+                    Chart(clearData.keys, id: \.self) { clearType in
+                        BarMark(
+                            x: .value("Shared.IIDX.ClearType", clearType),
+                            y: .value("Shared.ClearCount", clearData[clearType] ?? 0),
+                            width: .inset(8.0)
+                        )
+                        .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
+                    }
+                    .chartXScale(domain: IIDXClearType.sortedStringsWithoutNoPlay.reversed())
+                    .chartForegroundStyleScale(
+                        domain: IIDXClearType.chartColorDomain,
+                        range: IIDXClearType.chartStyleRange(phase: phase)
                     )
-                    .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
+                    .chartLegend(.hidden)
                 }
-                .chartXScale(domain: IIDXClearType.sortedStringsWithoutNoPlay.reversed())
-                .chartForegroundStyleScale(
-                    domain: IIDXClearType.chartColorDomain,
-                    range: IIDXClearType.chartColorRange
-                )
-                .chartLegend(.hidden)
             } else {
                 Spacer()
             }

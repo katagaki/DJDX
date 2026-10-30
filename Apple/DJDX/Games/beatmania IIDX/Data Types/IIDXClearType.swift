@@ -87,13 +87,17 @@ enum IIDXClearType: String, Codable {
         sortedStrings.map { color(for: $0) }
     }
 
-    static func style(for clearType: String) -> any ShapeStyle {
+    static func chartStyleRange(phase: Double) -> [AnyShapeStyle] {
+        sortedStrings.map { clearType in
+            clearType == "FULLCOMBO CLEAR" ?
+                AnyShapeStyle(FullComboRainbow.gradient(phase: phase)) :
+                AnyShapeStyle(color(for: clearType))
+        }
+    }
+
+    static func style(for clearType: String, phase: Double = 0.0) -> any ShapeStyle {
         switch clearType {
-        case "FULLCOMBO CLEAR": return LinearGradient.metallic(
-            highlight: Color(red: 0.92, green: 1.0, blue: 1.0),
-            base: Color(red: 0.45, green: 0.85, blue: 1.0),
-            shade: Color(red: 0.62, green: 0.42, blue: 1.0)
-        )
+        case "FULLCOMBO CLEAR": return FullComboRainbow.gradient(phase: phase)
         case "FAILED": return LinearGradient.metallic(
             highlight: Color(red: 1.0, green: 0.72, blue: 0.6),
             base: Color(red: 0.98, green: 0.4, blue: 0.27),

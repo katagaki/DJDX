@@ -155,7 +155,7 @@ struct CapturedPlayScoreView: View {
     @ViewBuilder
     private func detailRows() -> some View {
         VStack(alignment: .leading, spacing: 8.0) {
-            IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
+            IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
             IIDXDetailRow("SCORE", value: score.score, style: Color.iidxScore,
                           outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
             if let matchedNoteCount {
@@ -190,10 +190,13 @@ struct CapturedPlayScoreView: View {
                 Text(play.captureDate, format: .dateTime.year().month().day().hour().minute())
                     .font(.subheadline)
                 HStack(spacing: 6.0) {
-                    Text(verbatim: IIDXClearType.abbreviation(for: play.clearType))
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(IIDXClearType.style(for: play.clearType))
-                        .strokeText(color: .black, width: 0.3)
+                    let isFullCombo = play.clearType == IIDXClearType.fullComboClear.rawValue
+                    FullComboRainbowTimeline(isActive: isFullCombo) { phase in
+                        Text(verbatim: IIDXClearType.abbreviation(for: play.clearType))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(IIDXClearType.style(for: play.clearType, phase: phase))
+                            .strokeText(color: .black, width: 0.3)
+                    }
                     Text(verbatim: play.djLevel)
                         .font(.caption.weight(.black))
                         .fontWidth(.expanded)
@@ -208,10 +211,6 @@ struct CapturedPlayScoreView: View {
                 .foregroundStyle(Color.iidxScore)
                 .strokeText(color: .iidxScoreOutline, width: 0.4)
         }
-    }
-
-    private func clearTypeStyle() -> any ShapeStyle {
-        IIDXClearType.style(for: score.clearType)
     }
 
     private var levelColor: Color {

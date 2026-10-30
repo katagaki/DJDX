@@ -50,7 +50,7 @@ struct IIDXScoreSection: View {
                     .fontWeight(.black)
                 }
                 VStack(alignment: .leading, spacing: 8.0) {
-                    IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
+                    IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
                     IIDXDetailRow("SCORE", value: score.score, style: Color.iidxScore,
                                   outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
                     IIDXDetailRow("MISS COUNT", value: score.missCount, style: Color.iidxScore,
@@ -67,7 +67,7 @@ struct IIDXScoreSection: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 if score.clearType != "NO PLAY" {
-                    IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
+                    IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
                 }
             }
             if score.djLevelEnum() != .none, scoreHistory.count >= 2 {
@@ -266,10 +266,6 @@ struct IIDXScoreSection: View {
         .foregroundStyle(.secondary)
         .frame(maxWidth: .infinity)
         .contentShape(.rect)
-    }
-
-    func clearTypeStyle() -> any ShapeStyle {
-        IIDXClearType.style(for: score.clearType)
     }
 
     func reloadScoreHistory() async {

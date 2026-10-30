@@ -5,6 +5,7 @@ struct PerLevelSegment: Identifiable {
     let label: String
     let color: Color
     let count: Int
+    var isFullCombo: Bool = false
 }
 
 struct PerLevelAnalyticsCard<TrendChart: View>: View {
@@ -64,8 +65,14 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
         GeometryReader { geometry in
             HStack(spacing: 0.0) {
                 ForEach(segments.filter { $0.count > 0 }) { segment in
-                    segment.color
-                        .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
+                    Group {
+                        if segment.isFullCombo {
+                            FullComboRainbowFill()
+                        } else {
+                            segment.color
+                        }
+                    }
+                    .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
                 }
             }
             .clipShape(.rect(cornerRadius: 3.0))
