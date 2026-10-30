@@ -20,16 +20,23 @@ struct TextStroke: ViewModifier {
                         .foregroundColor(color)
                         .mask {
                             Canvas { context, size in
-                                context.addFilter(.alphaThreshold(min: 0.01))
-                                context.drawLayer { ctx in
-                                    if let resolvedView = context.resolveSymbol(id: id) {
-                                        ctx.draw(resolvedView, at: .init(x: size.width / 2, y: size.height / 2))
-                                    }
+                                guard let resolvedView = context.resolveSymbol(id: id) else { return }
+                                let center = CGPoint(x: size.width / 2, y: size.height / 2)
+                                let radius = width * 2
+                                let steps = 16
+                                for step in 0..<steps {
+                                    let angle = Double(step) / Double(steps) * 2 * .pi
+                                    context.draw(
+                                        resolvedView,
+                                        at: CGPoint(
+                                            x: center.x + radius * cos(angle),
+                                            y: center.y + radius * sin(angle)
+                                        )
+                                    )
                                 }
                             } symbols: {
                                 content
                                     .tag(id)
-                                    .blur(radius: width)
                             }
                         }
                 )
