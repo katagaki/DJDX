@@ -94,6 +94,7 @@ enum IIDXProgressKind: String, Hashable {
 
 struct IIDXProgressMark: Identifiable {
     let series: String
+    let seriesIndex: Int
     let index: Int
     let date: Date
     let count: Int
@@ -104,17 +105,22 @@ struct IIDXProgressMark: Identifiable {
 struct IIDXProgressGraph: View {
     let points: [IIDXProgressPoint]
     let kind: IIDXProgressKind
-    var usesDateAxis: Bool
+    var scrollsBars: Bool
 
     @AppStorage var hiddenSeries: Set<String>
     @AppStorage var style: IIDXProgressGraphStyle
+    @State var scrollPosition: Double = 0.0
 
-    init(points: [IIDXProgressPoint], kind: IIDXProgressKind, usesDateAxis: Bool = true) {
+    init(points: [IIDXProgressPoint], kind: IIDXProgressKind, scrollsBars: Bool = false) {
         self.points = points
         self.kind = kind
-        self.usesDateAxis = usesDateAxis
+        self.scrollsBars = scrollsBars
         _hiddenSeries = AppStorage(wrappedValue: kind.defaultHiddenSeries, kind.hiddenSeriesKey)
         _style = AppStorage(wrappedValue: .stacked, kind.styleKey)
+    }
+
+    var visibleImportCount: Int {
+        scrollsBars && style == .bars ? min(points.count, 6) : points.count
     }
 
     var visibleSeries: [String] {
@@ -123,23 +129,36 @@ struct IIDXProgressGraph: View {
 
     var marks: [IIDXProgressMark] {
         points.enumerated().flatMap { index, point in
-            visibleSeries.map { series in
+            visibleSeries.enumerated().map { seriesIndex, series in
                 IIDXProgressMark(
-                    series: series, index: index, date: point.date, count: point.count(for: series, kind: kind)
+                    series: series, seriesIndex: seriesIndex, index: index,
+                    date: point.date, count: point.count(for: series, kind: kind)
                 )
             }
         }
     }
 
+    var labeledIndices: [Int] {
+        let step = max(1, Int((Double(visibleImportCount) / 4.0).rounded(.up)))
+        return Array(stride(from: 0, to: points.count, by: step))
+    }
+
+    var initialScrollPosition: Double {
+        Double(max(points.count - visibleImportCount, 0)) - 0.5
+    }
+
     var body: some View {
-        Group {
-            if usesDateAxis {
-                Chart(marks) { mark in
-                    seriesMark(mark, xValue: .value("Shared.Date", mark.date, unit: .day))
-                }
-            } else {
-                Chart(marks) { mark in
-                    seriesMark(mark, xValue: .value("Shared.Date", mark.index))
+        Chart(marks) { mark in
+            seriesMark(mark)
+        }
+        .chartXScale(domain: -0.5...(Double(points.count) - 0.5))
+        .chartXAxis {
+            AxisMarks(values: labeledIndices) { value in
+                AxisGridLine()
+                if let index = value.as(Int.self), points.indices.contains(index) {
+                    AxisValueLabel {
+                        Text(points[index].date, format: .dateTime.month().day())
+                    }
                 }
             }
         }
@@ -147,12 +166,21 @@ struct IIDXProgressGraph: View {
             domain: visibleSeries.map { kind.label(for: $0) },
             range: visibleSeries.map { kind.color(for: $0) }
         )
-        .chartXScale(range: .plotDimension(startPadding: 8.0, endPadding: 8.0))
+        .chartScrollableAxes(visibleImportCount < points.count ? .horizontal : [])
+        .chartXVisibleDomain(length: max(visibleImportCount, 1))
+        .chartScrollPosition(x: $scrollPosition)
+        .onAppear {
+            scrollPosition = initialScrollPosition
+        }
+        .onChange(of: visibleImportCount) {
+            scrollPosition = initialScrollPosition
+        }
     }
 
     @ChartContentBuilder
-    func seriesMark<X: Plottable>(_ mark: IIDXProgressMark, xValue: PlottableValue<X>) -> some ChartContent {
+    func seriesMark(_ mark: IIDXProgressMark) -> some ChartContent {
         let series = kind.label(for: mark.series)
+        let xValue = PlottableValue.value("Shared.Date", mark.index)
         if style == .stacked {
             BarMark(
                 x: xValue,
@@ -161,12 +189,15 @@ struct IIDXProgressGraph: View {
             )
             .foregroundStyle(by: .value("Analytics.Progress", series))
         } else {
-            BarMark(
-                x: xValue,
-                y: .value("Shared.ClearCount", mark.count)
+            let barWidth = 0.8 / Double(max(visibleSeries.count, 1))
+            let barStart = Double(mark.index) - 0.4 + barWidth * Double(mark.seriesIndex)
+            RectangleMark(
+                xStart: .value("Shared.Date", barStart),
+                xEnd: .value("Shared.Date", barStart + barWidth),
+                yStart: .value("Shared.ClearCount", 0),
+                yEnd: .value("Shared.ClearCount", mark.count)
             )
             .foregroundStyle(by: .value("Analytics.Progress", series))
-            .position(by: .value("Analytics.Progress", series))
         }
     }
 }
@@ -197,7 +228,7 @@ struct IIDXProgressDetailView: View {
                     .listRowBackground(Color.clear)
             } else {
                 Section {
-                    IIDXProgressGraph(points: points, kind: kind)
+                    IIDXProgressGraph(points: points, kind: kind, scrollsBars: true)
                         .chartLegend(position: .bottom, alignment: .leading)
                         .frame(height: 240.0)
                         .listRowBackground(Color.clear)
