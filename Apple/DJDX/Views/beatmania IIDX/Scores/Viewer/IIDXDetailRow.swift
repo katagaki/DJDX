@@ -4,19 +4,24 @@ struct IIDXDetailRow: View {
     var title: String
     var value: String
     var style: any ShapeStyle
+    var outlineColor: Color
     var outlineWidth: CGFloat
 
-    init(_ title: String, value: String, style: any ShapeStyle, outlineWidth: CGFloat = 0.0) {
+    init(_ title: String, value: String, style: any ShapeStyle,
+         outlineColor: Color = .clear, outlineWidth: CGFloat = 0.0) {
         self.title = title
         self.value = value
         self.style = style
+        self.outlineColor = outlineColor
         self.outlineWidth = outlineWidth
     }
 
-    init(_ title: String, value: Int, style: any ShapeStyle, outlineWidth: CGFloat = 0.0) {
+    init(_ title: String, value: Int, style: any ShapeStyle,
+         outlineColor: Color = .clear, outlineWidth: CGFloat = 0.0) {
         self.title = title
         self.value = String(value)
         self.style = style
+        self.outlineColor = outlineColor
         self.outlineWidth = outlineWidth
     }
 
@@ -26,7 +31,7 @@ struct IIDXDetailRow: View {
             Spacer()
             Text(value)
                 .foregroundStyle(style)
-                .strokeText(color: .black, width: outlineWidth)
+                .strokeText(color: outlineColor, width: outlineWidth)
         }
         .fontWidth(.expanded)
         .font(.caption)

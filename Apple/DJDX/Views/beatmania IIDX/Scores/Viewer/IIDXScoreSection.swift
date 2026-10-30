@@ -51,8 +51,10 @@ struct IIDXScoreSection: View {
                 }
                 VStack(alignment: .leading, spacing: 8.0) {
                     IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
-                    IIDXDetailRow("SCORE", value: score.score, style: scoreStyle(), outlineWidth: 0.3)
-                    IIDXDetailRow("MISS COUNT", value: score.missCount, style: scoreStyle(), outlineWidth: 0.3)
+                    IIDXDetailRow("SCORE", value: score.score, style: Color.iidxScore,
+                                  outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
+                    IIDXDetailRow("MISS COUNT", value: score.missCount, style: Color.iidxScore,
+                                  outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
                 }
                 HStack(spacing: 0.0) {
                     IIDXNoteTypeDetailRow("P-GREAT", value: score.perfectGreatCount, style: Color.cyan)
@@ -327,9 +329,5 @@ struct IIDXScoreSection: View {
                 .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
             openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
         }
-    }
-
-    func scoreStyle() -> any ShapeStyle {
-        LinearGradient.iidxScore
     }
 }

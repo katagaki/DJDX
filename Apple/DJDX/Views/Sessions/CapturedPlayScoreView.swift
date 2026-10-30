@@ -156,7 +156,8 @@ struct CapturedPlayScoreView: View {
     private func detailRows() -> some View {
         VStack(alignment: .leading, spacing: 8.0) {
             IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType, style: clearTypeStyle())
-            IIDXDetailRow("SCORE", value: score.score, style: scoreStyle(), outlineWidth: 0.3)
+            IIDXDetailRow("SCORE", value: score.score, style: Color.iidxScore,
+                          outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
             if let matchedNoteCount {
                 IIDXDetailRow("NOTES", value: matchedNoteCount, style: Color.secondary)
             }
@@ -204,17 +205,13 @@ struct CapturedPlayScoreView: View {
             Text(verbatim: "\(play.exScore)")
                 .font(.body.monospacedDigit().weight(.heavy))
                 .fontWidth(.expanded)
-                .foregroundStyle(LinearGradient.iidxScore)
-                .strokeText(color: .black, width: 0.4)
+                .foregroundStyle(Color.iidxScore)
+                .strokeText(color: .iidxScoreOutline, width: 0.4)
         }
     }
 
     private func clearTypeStyle() -> any ShapeStyle {
         IIDXClearType.style(for: score.clearType)
-    }
-
-    private func scoreStyle() -> any ShapeStyle {
-        LinearGradient.iidxScore
     }
 
     private var levelColor: Color {

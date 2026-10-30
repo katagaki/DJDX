@@ -14,10 +14,4 @@ extension LinearGradient {
             startPoint: .top, endPoint: .bottom
         )
     }
-
-    static let iidxScore = LinearGradient.metallic(
-        highlight: Color(red: 0.72, green: 0.93, blue: 1.0),
-        base: Color(red: 0.4, green: 0.82, blue: 0.98),
-        shade: Color(red: 0.28, green: 0.72, blue: 0.95)
-    )
 }
