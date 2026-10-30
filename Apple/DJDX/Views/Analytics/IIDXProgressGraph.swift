@@ -278,7 +278,9 @@ struct IIDXProgressDetailView: View {
             } else {
                 Section {
                     IIDXProgressGraph(points: points, kind: kind, scrollsBars: true)
-                        .chartLegend(position: .bottom, alignment: .leading)
+                        .chartLegend(position: .bottom, alignment: .leading) {
+                            legend
+                        }
                         .frame(height: 240.0)
                         .listRowBackground(Color.clear)
                 }
@@ -349,6 +351,24 @@ struct IIDXProgressDetailView: View {
                 hiddenSeries.insert(series)
             }
         }
+    }
+
+    var legend: some View {
+        FlowLayout(horizontalSpacing: 10.0, verticalSpacing: 4.0) {
+            ForEach(visibleSeries, id: \.self) { series in
+                HStack(spacing: 4.0) {
+                    Circle()
+                        .fill(kind.color(for: series))
+                        .frame(width: 8.0, height: 8.0)
+                    Text(verbatim: kind.label(for: series))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .fixedSize()
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     func seriesCount(_ series: String, count: Int) -> some View {
