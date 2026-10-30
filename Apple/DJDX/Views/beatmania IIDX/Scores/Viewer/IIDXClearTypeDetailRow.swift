@@ -18,6 +18,7 @@ struct IIDXClearTypeDetailRow: View {
             Spacer()
             Text(value)
                 .foregroundStyle(style)
+                .strokeText(color: .black, width: 0.3)
         }
         .font(.caption)
         .fontWeight(.heavy)

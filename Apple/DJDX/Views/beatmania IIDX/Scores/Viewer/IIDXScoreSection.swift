@@ -278,7 +278,7 @@ struct IIDXScoreSection: View {
     }
 
     func clearTypeStyle() -> any ShapeStyle {
-        IIDXClearType.style(for: score.clearType, colorScheme: colorScheme)
+        IIDXClearType.style(for: score.clearType)
     }
 
     func reloadScoreHistory() async {

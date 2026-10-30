@@ -203,7 +203,8 @@ struct CapturedPlayScoreView: View {
                 HStack(spacing: 6.0) {
                     Text(verbatim: IIDXClearType.abbreviation(for: play.clearType))
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(IIDXClearType.style(for: play.clearType, colorScheme: colorScheme))
+                        .foregroundStyle(IIDXClearType.style(for: play.clearType))
+                        .strokeText(color: .black, width: 0.3)
                     Text(verbatim: play.djLevel)
                         .font(.caption.weight(.black))
                         .fontWidth(.expanded)
@@ -219,7 +220,7 @@ struct CapturedPlayScoreView: View {
     }
 
     private func clearTypeStyle() -> any ShapeStyle {
-        IIDXClearType.style(for: score.clearType, colorScheme: colorScheme)
+        IIDXClearType.style(for: score.clearType)
     }
 
     private func scoreStyle() -> any ShapeStyle {
