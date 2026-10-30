@@ -25,9 +25,8 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
         segments.reduce(0) { $0 + $1.count }
     }
 
-    // All non-empty segments, kept in the original segment order.
     var visibleSegments: [PerLevelSegment] {
-        segments.filter { $0.count > 0 }
+        Array(segments.filter { $0.count > 0 }.prefix(4))
     }
 
     var body: some View {
