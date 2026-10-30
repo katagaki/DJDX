@@ -155,6 +155,19 @@ struct AnalyticsDestinationView: View {
 struct IIDXGradeBreakdownDetailView: View {
     let djLevelPerDifficulty: [Int: [IIDXDJLevel: Int]]
 
+    @AppStorage(wrappedValue: [], "Analytics.DJLevel.Overall.CardLevels") var cardLevels: Set<String>
+
+    var djLevels: [String] {
+        Array(IIDXDJLevel.sortedStrings.reversed())
+    }
+
+    var automaticCardLevels: [String] {
+        let levelsWithCounts = djLevels.filter { level in
+            djLevelPerDifficulty.values.contains { ($0[IIDXDJLevel(rawValue: level) ?? .none] ?? 0) > 0 }
+        }
+        return Array(levelsWithCounts.prefix(3))
+    }
+
     var populatedDifficulties: [Int] {
         djLevelPerDifficulty.keys.filter { difficulty in
             (djLevelPerDifficulty[difficulty]?.values.contains(where: { $0 > 0 })) ?? false
@@ -188,6 +201,15 @@ struct IIDXGradeBreakdownDetailView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                AnalyticsCardItemsMenu(
+                    items: djLevels,
+                    automaticItems: automaticCardLevels,
+                    selection: $cardLevels
+                ) { $0 }
+            }
+        }
     }
 
     func gradeElements(for difficulty: Int) -> [(key: String, value: Int)] {

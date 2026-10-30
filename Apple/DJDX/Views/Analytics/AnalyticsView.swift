@@ -25,6 +25,8 @@ struct AnalyticsView: View {
 
     // Card ordering
     @AppStorage(wrappedValue: Data(), "Analytics.CardOrder") var cardOrderData: Data
+    @AppStorage(wrappedValue: [], "Analytics.ClearType.Overall.CardLevels") var clearTypeCardLevels: Set<String>
+    @AppStorage(wrappedValue: [], "Analytics.DJLevel.Overall.CardLevels") var djLevelCardLevels: Set<String>
     @State var cardOrder: [AnalyticsCardType] = AnalyticsCardType.defaultOrder
     @Binding var isEditing: Bool
 
@@ -105,7 +107,8 @@ struct AnalyticsView: View {
                 AnalyticsCardView(cardType: .clearTypeOverall, showsHeader: false) {
                     OverviewClearTypeOverallGraph(graphData: .constant(model.clearTypePerDifficulty),
                                                   isHorizontal: true,
-                                                  levelLimit: 3)
+                                                  levelLimit: 3,
+                                                  shownLevels: Set(clearTypeCardLevels.compactMap(Int.init)))
                         .chartLegend(.hidden)
                         .chartXAxis { AxisMarks { AxisGridLine() } }
                 }
@@ -120,7 +123,9 @@ struct AnalyticsView: View {
                 }
             } label: {
                 AnalyticsCardView(cardType: .gradeBreakdown, showsHeader: false) {
-                    let counts = Array(totalDJLevelCounts.elements.filter { $0.value > 0 }.prefix(3))
+                    let counts = djLevelCardLevels.isEmpty
+                        ? Array(totalDJLevelCounts.elements.filter { $0.value > 0 }.prefix(3))
+                        : totalDJLevelCounts.elements.filter { djLevelCardLevels.contains($0.key) }
                     Chart(counts, id: \.key) { element in
                         BarMark(
                             x: .value("Shared.ClearCount", element.value),

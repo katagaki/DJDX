@@ -8,6 +8,7 @@ struct OverviewClearTypeOverallGraph: View {
     @State var isInteractive: Bool = false
     var isHorizontal: Bool = false
     var levelLimit: Int?
+    var shownLevels: Set<Int> = []
 
     var populatedDifficulties: [Int] {
         graphData.filter { _, counts in
@@ -17,6 +18,9 @@ struct OverviewClearTypeOverallGraph: View {
 
     var shownDifficulties: [Int] {
         guard let levelLimit else { return populatedDifficulties }
+        if !shownLevels.isEmpty {
+            return shownLevels.filter { graphData[$0] != nil }.sorted()
+        }
         return Array(populatedDifficulties.suffix(levelLimit))
     }
 

@@ -5,6 +5,8 @@ struct ClearTypeOverviewListView: View {
 
     @Binding var graphData: [Int: OrderedDictionary<String, Int>]
 
+    @AppStorage(wrappedValue: [], "Analytics.ClearType.Overall.CardLevels") var cardLevels: Set<String>
+
     var populatedDifficulties: [Int] {
         graphData.filter { _, counts in
             counts.values.contains(where: { $0 > 0 })
@@ -39,6 +41,15 @@ struct ClearTypeOverviewListView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                AnalyticsCardItemsMenu(
+                    items: (1...12).reversed().map(String.init),
+                    automaticItems: populatedDifficulties.suffix(3).map(String.init),
+                    selection: $cardLevels
+                ) { "LEVEL \($0)" }
+            }
+        }
     }
 }
 
