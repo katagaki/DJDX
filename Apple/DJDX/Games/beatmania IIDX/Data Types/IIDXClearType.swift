@@ -117,8 +117,12 @@ enum IIDXClearType: String, Codable {
             base: Color(red: 1.0, green: 0.82, blue: 0.22),
             shade: Color(red: 0.93, green: 0.56, blue: 0.05)
         )
+        case "NO PLAY": return LinearGradient.metallic(
+            highlight: Color(red: 0.9, green: 0.91, blue: 0.92),
+            base: Color(red: 0.66, green: 0.67, blue: 0.7),
+            shade: Color(red: 0.5, green: 0.51, blue: 0.54)
+        )
         default: return Color.primary
         }
     }
-
 }
