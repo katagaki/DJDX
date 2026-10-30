@@ -97,6 +97,7 @@ struct IIDXProgressMark: Identifiable {
     let seriesIndex: Int
     let index: Int
     let date: Date
+    let stackStart: Int
     let count: Int
 
     var id: String { "\(series)\u{1}\(date.timeIntervalSince1970)" }
@@ -129,18 +130,25 @@ struct IIDXProgressGraph: View {
 
     var marks: [IIDXProgressMark] {
         points.enumerated().flatMap { index, point in
-            visibleSeries.enumerated().map { seriesIndex, series in
-                IIDXProgressMark(
+            var stackStart = 0
+            return visibleSeries.enumerated().map { seriesIndex, series in
+                let count = point.count(for: series, kind: kind)
+                defer { stackStart += count }
+                return IIDXProgressMark(
                     series: series, seriesIndex: seriesIndex, index: index,
-                    date: point.date, count: point.count(for: series, kind: kind)
+                    date: point.date, stackStart: stackStart, count: count
                 )
             }
         }
     }
 
+    var groupHalfWidth: Double {
+        style == .stacked ? 0.3 : 0.4
+    }
+
     var labeledIndices: [Int] {
         let step = max(1, Int((Double(visibleImportCount) / 4.0).rounded(.up)))
-        return Array(stride(from: 0, to: points.count, by: step))
+        return Array(stride(from: points.count - 1, through: 0, by: -step))
     }
 
     var initialScrollPosition: Double {
@@ -153,9 +161,10 @@ struct IIDXProgressGraph: View {
         }
         .chartXScale(domain: -0.5...(Double(points.count) - 0.5))
         .chartXAxis {
-            AxisMarks(values: labeledIndices) { value in
-                AxisGridLine()
-                if let index = value.as(Int.self), points.indices.contains(index) {
+            AxisMarks(values: labeledIndices.map { Double($0) - groupHalfWidth }) { value in
+                if let position = value.as(Double.self),
+                   case let index = Int((position + groupHalfWidth).rounded()),
+                   points.indices.contains(index) {
                     AxisValueLabel {
                         Text(points[index].date, format: .dateTime.month().day())
                     }
@@ -180,17 +189,18 @@ struct IIDXProgressGraph: View {
     @ChartContentBuilder
     func seriesMark(_ mark: IIDXProgressMark) -> some ChartContent {
         let series = kind.label(for: mark.series)
-        let xValue = PlottableValue.value("Shared.Date", mark.index)
+        let groupStart = Double(mark.index) - groupHalfWidth
         if style == .stacked {
-            BarMark(
-                x: xValue,
-                y: .value("Shared.ClearCount", mark.count),
-                stacking: .standard
+            RectangleMark(
+                xStart: .value("Shared.Date", groupStart),
+                xEnd: .value("Shared.Date", groupStart + groupHalfWidth * 2.0),
+                yStart: .value("Shared.ClearCount", mark.stackStart),
+                yEnd: .value("Shared.ClearCount", mark.stackStart + mark.count)
             )
             .foregroundStyle(by: .value("Analytics.Progress", series))
         } else {
-            let barWidth = 0.8 / Double(max(visibleSeries.count, 1))
-            let barStart = Double(mark.index) - 0.4 + barWidth * Double(mark.seriesIndex)
+            let barWidth = groupHalfWidth * 2.0 / Double(max(visibleSeries.count, 1))
+            let barStart = groupStart + barWidth * Double(mark.seriesIndex)
             RectangleMark(
                 xStart: .value("Shared.Date", barStart),
                 xEnd: .value("Shared.Date", barStart + barWidth),
