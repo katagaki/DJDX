@@ -16,6 +16,7 @@ struct IIDXClearTypeDetailRow: View {
             Spacer()
             FullComboRainbowTimeline(isActive: value == IIDXClearType.fullComboClear.rawValue) { phase in
                 Text(value)
+                    .fontWeight(.black)
                     .foregroundStyle(IIDXClearType.style(for: value, phase: phase))
                     .strokeText(color: .black, width: 0.3)
             }

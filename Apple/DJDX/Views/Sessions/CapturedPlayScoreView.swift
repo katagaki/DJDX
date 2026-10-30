@@ -193,7 +193,7 @@ struct CapturedPlayScoreView: View {
                     let isFullCombo = play.clearType == IIDXClearType.fullComboClear.rawValue
                     FullComboRainbowTimeline(isActive: isFullCombo) { phase in
                         Text(verbatim: IIDXClearType.abbreviation(for: play.clearType))
-                            .font(.caption.weight(.semibold))
+                            .font(.caption.weight(.black))
                             .foregroundStyle(IIDXClearType.style(for: play.clearType, phase: phase))
                             .strokeText(color: .black, width: 0.3)
                     }
