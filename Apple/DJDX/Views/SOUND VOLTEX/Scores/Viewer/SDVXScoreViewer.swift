@@ -37,7 +37,8 @@ struct SDVXScoreViewer: View {
                     SDVXDetailRow("CLEAR TYPE",
                                   value: songRecord.clearTypeEnum.abbreviation,
                                   style: songRecord.clearTypeEnum.color)
-                    SDVXDetailRow("GRADE", value: songRecord.grade, style: gradeStyle)
+                    SDVXDetailRow("GRADE", value: songRecord.grade, style: LinearGradient.sdvxGrade,
+                                  outlineColor: .sdvxGradeOutline, outlineWidth: 0.3)
                     SDVXScoreDetailRow("HIGH SCORE", value: songRecord.highScore)
                     SDVXScoreDetailRow("EX SCORE", value: songRecord.exScore)
                 }
@@ -116,7 +117,7 @@ struct SDVXScoreViewer: View {
         HStack(spacing: 16.0) {
             if songRecord.gradeEnum != .none, songRecord.gradeEnum != .unknown {
                 Text(verbatim: songRecord.grade)
-                    .foregroundStyle(gradeStyle)
+                    .sdvxGradeText(outlineWidth: 0.6)
             }
             Spacer()
             Text(songRecord.highScore, format: .number)
@@ -164,10 +165,6 @@ struct SDVXScoreViewer: View {
         .foregroundStyle(.secondary)
         .frame(maxWidth: .infinity)
         .contentShape(.rect)
-    }
-
-    var gradeStyle: any ShapeStyle {
-        LinearGradient(colors: [.yellow, .orange], startPoint: .top, endPoint: .bottom)
     }
 
     func openYouTube() {
