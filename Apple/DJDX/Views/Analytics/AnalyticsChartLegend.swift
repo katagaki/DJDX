@@ -17,7 +17,7 @@ struct AnalyticsChartLegend: View {
                         .fill(item.color)
                         .frame(width: 8.0, height: 8.0)
                     item.label
-                        .font(.caption2.weight(.heavy))
+                        .font(.caption2)
                         .lineLimit(1)
                     Spacer(minLength: 0.0)
                 }

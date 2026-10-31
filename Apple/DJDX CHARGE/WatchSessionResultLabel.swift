@@ -25,6 +25,7 @@ struct WatchSessionResultLabel: View {
                     VStack(alignment: .leading, spacing: 1.0) {
                         if let clearType {
                             Text(verbatim: clearTypeAbbreviation(clearType))
+                                .kerning(-0.3)
                                 .foregroundStyle(clearTypeStyle(clearType))
                         }
                         if let score {
@@ -34,6 +35,7 @@ struct WatchSessionResultLabel: View {
                         }
                     }
                     .font(.caption2.weight(.heavy))
+                    .fontWidth(.expanded)
                     .lineLimit(1)
                 }
             } else if let fallbackSummary {
