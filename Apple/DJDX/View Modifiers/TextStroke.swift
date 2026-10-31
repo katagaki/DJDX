@@ -20,7 +20,7 @@ struct TextStroke: ViewModifier {
                         Canvas { context, size in
                             guard let resolvedView = context.resolveSymbol(id: id) else { return }
                             let center = CGPoint(x: size.width / 2, y: size.height / 2)
-                            let radius = width * 1.5
+                            let radius = width * 2.0
                             context.drawLayer { layer in
                                 layer.clipToLayer { mask in
                                     for point in offsets(around: center, radius: radius) {
@@ -35,7 +35,7 @@ struct TextStroke: ViewModifier {
                                 .frame(width: proxy.size.width, height: proxy.size.height)
                                 .tag(id)
                         }
-                        .padding(-width * 2)
+                        .padding(-width * 3)
                     }
                 }
                 .accessibilityRepresentation {
