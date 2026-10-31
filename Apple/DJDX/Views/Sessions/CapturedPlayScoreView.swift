@@ -190,13 +190,8 @@ struct CapturedPlayScoreView: View {
                 Text(play.captureDate, format: .dateTime.year().month().day().hour().minute())
                     .font(.subheadline)
                 HStack(spacing: 6.0) {
-                    let isFullCombo = play.clearType == IIDXClearType.fullComboClear.rawValue
-                    FullComboRainbowTimeline(isActive: isFullCombo) { phase in
-                        Text(verbatim: IIDXClearType.abbreviation(for: play.clearType))
-                            .font(.caption.weight(.black))
-                            .foregroundStyle(IIDXClearType.style(for: play.clearType, phase: phase))
-                            .strokeText(color: .black, width: 0.3)
-                    }
+                    IIDXMetallicText.clearType(play.clearType, label: IIDXClearType.abbreviation(for: play.clearType))
+                        .font(.caption.weight(.black))
                     Text(verbatim: play.djLevel)
                         .font(.caption.weight(.black))
                         .fontWidth(.expanded)

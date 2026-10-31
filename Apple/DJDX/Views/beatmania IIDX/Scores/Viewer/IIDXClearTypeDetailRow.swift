@@ -14,12 +14,8 @@ struct IIDXClearTypeDetailRow: View {
             Text(title)
                 .fontWidth(.expanded)
             Spacer()
-            FullComboRainbowTimeline(isActive: value == IIDXClearType.fullComboClear.rawValue) { phase in
-                Text(value)
-                    .fontWeight(.black)
-                    .foregroundStyle(IIDXClearType.style(for: value, phase: phase))
-                    .strokeText(color: .black, width: 0.3)
-            }
+            IIDXMetallicText.clearType(value)
+                .fontWeight(.black)
         }
         .font(.caption)
         .fontWeight(.heavy)
