@@ -368,7 +368,7 @@ struct IIDXProgressDetailView: View {
                         .fill(kind.color(for: series))
                         .frame(width: 8.0, height: 8.0)
                     kind.metallicLabel(for: series)
-                        .font(.caption2.weight(.heavy))
+                        .font(.caption2)
                         .lineLimit(1)
                         .fixedSize()
                 }
@@ -380,7 +380,6 @@ struct IIDXProgressDetailView: View {
     func seriesCount(_ series: String, count: Int) -> some View {
         HStack(spacing: 3.0) {
             kind.metallicLabel(for: series)
-                .fontWeight(.heavy)
             Text(verbatim: "\(count)")
                 .foregroundStyle(count > 0 ? .primary : .secondary)
                 .fontWeight(.semibold)

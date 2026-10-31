@@ -85,7 +85,6 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
             ForEach(visibleSegments) { segment in
                 HStack(spacing: 3.0) {
                     segment.metallicLabel
-                        .fontWeight(.heavy)
                     Text(verbatim: "\(segment.count)")
                         .foregroundStyle(.primary)
                         .fontWeight(.semibold)

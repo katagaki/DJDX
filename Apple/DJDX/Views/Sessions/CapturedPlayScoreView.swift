@@ -191,7 +191,7 @@ struct CapturedPlayScoreView: View {
                     .font(.subheadline)
                 HStack(spacing: 6.0) {
                     IIDXMetallicText.clearType(play.clearType, label: IIDXClearType.abbreviation(for: play.clearType))
-                        .font(.caption.weight(.black))
+                        .font(.caption)
                     Text(verbatim: play.djLevel)
                         .font(.caption.weight(.black))
                         .fontWidth(.expanded)

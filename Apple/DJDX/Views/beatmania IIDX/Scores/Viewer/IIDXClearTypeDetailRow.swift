@@ -15,7 +15,6 @@ struct IIDXClearTypeDetailRow: View {
                 .fontWidth(.expanded)
             Spacer()
             IIDXMetallicText.clearType(value)
-                .fontWeight(.black)
         }
         .font(.caption)
         .fontWeight(.heavy)

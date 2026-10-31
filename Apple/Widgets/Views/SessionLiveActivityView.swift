@@ -172,6 +172,7 @@ struct SessionResultLabel: View {
             }
             if let clearType {
                 Text(verbatim: clearTypeAbbreviation(clearType))
+                    .kerning(-0.3)
                     .foregroundStyle(clearTypeStyle(clearType))
             }
             if clearType != nil, score != nil {
@@ -197,6 +198,7 @@ struct SessionResultLabel: View {
             VStack(alignment: .leading, spacing: 3.0) {
                 if let clearType {
                     Text(verbatim: clearTypeAbbreviation(clearType))
+                        .kerning(-0.3)
                         .foregroundStyle(clearTypeStyle(clearType))
                 }
                 if let score {

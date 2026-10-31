@@ -4,13 +4,14 @@ struct IIDXMetallicText: View {
     let text: String
     let isFullCombo: Bool
     let style: (Double) -> any ShapeStyle
-    var width: Font.Width = .standard
-    var kerning: CGFloat = 0.0
+    let weight: Font.Weight
+    let kerning: CGFloat
 
     var body: some View {
         FullComboRainbowTimeline(isActive: isFullCombo) { phase in
             Text(verbatim: text)
-                .fontWidth(width)
+                .fontWeight(weight)
+                .fontWidth(.expanded)
                 .kerning(kerning)
                 .foregroundStyle(style(phase))
                 .strokeText(color: .black, width: 0.3)
@@ -22,7 +23,7 @@ struct IIDXMetallicText: View {
             text: label ?? clearType,
             isFullCombo: clearType == IIDXClearType.fullComboClear.rawValue,
             style: { IIDXClearType.style(for: clearType, phase: $0) },
-            width: .expanded,
+            weight: .heavy,
             kerning: -0.3
         )
     }
@@ -31,7 +32,9 @@ struct IIDXMetallicText: View {
         IIDXMetallicText(
             text: djLevel,
             isFullCombo: false,
-            style: { _ in IIDXDJLevel.style(for: djLevel) }
+            style: { _ in IIDXDJLevel.style(for: djLevel) },
+            weight: .black,
+            kerning: 0.0
         )
     }
 }
