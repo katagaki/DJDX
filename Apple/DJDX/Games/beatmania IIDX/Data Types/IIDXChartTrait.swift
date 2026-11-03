@@ -12,6 +12,7 @@ enum IIDXChartTrait: String, Codable, Sendable, CaseIterable {
     case scratchCombo
     case legacyNotes
     case chargeCombo
+    case chargeChords
     case gradualSoflan
     case suddenSoflan
 }

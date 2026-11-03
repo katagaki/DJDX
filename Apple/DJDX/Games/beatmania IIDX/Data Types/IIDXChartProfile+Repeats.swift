@@ -2,15 +2,19 @@ import Foundation
 
 extension IIDXChartProfile {
 
-    static func hasRapidRepeats(notes: [IIDXChartNote], bpmChanges: [IIDXChartBPMChange],
-                                scratchLanes: Set<Int>) -> Bool {
+    static func beatLengthLookup(_ bpmChanges: [IIDXChartBPMChange]) -> (Double) -> Double {
         let changes = bpmChanges.sorted { $0.time < $1.time }
         let changeTimes = changes.map(\.time)
-        func beatLength(at time: Double) -> Double {
+        return { time in
             guard !changes.isEmpty else { return 400.0 }
             let bpm = changes[max(lowerBound(changeTimes, time + 1.0) - 1, 0)].bpm
             return bpm > 0.0 ? 60000.0 / bpm : 400.0
         }
+    }
+
+    static func hasRapidRepeats(notes: [IIDXChartNote], bpmChanges: [IIDXChartBPMChange],
+                                scratchLanes: Set<Int>) -> Bool {
+        let beatLength = beatLengthLookup(bpmChanges)
         let notesByLane = Dictionary(grouping: notes.indices.filter { !scratchLanes.contains(notes[$0].lane) }) {
             notes[$0].lane
         }
@@ -25,7 +29,7 @@ extension IIDXChartProfile {
                 }
                 let previousNote = notes[previous]
                 let gap = notes[index].time - (previousNote.endTime ?? previousNote.time)
-                let beat = beatLength(at: previousNote.time)
+                let beat = beatLength(previousNote.time)
                 if gap <= 5.0 { continue }
                 if gap <= min(beat * 0.26 + 1.0, 200.0) {
                     marked.formUnion([previous, index])
@@ -64,5 +68,19 @@ extension IIDXChartProfile {
             let index = lowerBound(keys, note.time - 2.0)
             return index < keys.count && keys[index] <= note.time + 2.0
         }.count
+    }
+
+    static func hasChargeChords(notes: [IIDXChartNote], bpmChanges: [IIDXChartBPMChange],
+                                scratchLanes: Set<Int>) -> Bool {
+        let beatLength = beatLengthLookup(bpmChanges)
+        let keyTimes = notes.filter { !scratchLanes.contains($0.lane) }.map(\.time).sorted()
+        let chordedCharges = notes.filter { note in
+            guard note.type != "normal", !scratchLanes.contains(note.lane), let end = note.endTime,
+                  end - note.time <= beatLength(note.time) * 1.05 else { return false }
+            let lower = lowerBound(keyTimes, note.time - 2.0)
+            let upper = lowerBound(keyTimes, note.time + 2.0 + 1e-9)
+            return upper - lower >= 2
+        }.count
+        return chordedCharges >= 60 && Double(chordedCharges) / Double(notes.count) >= 0.05
     }
 }

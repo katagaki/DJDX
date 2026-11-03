@@ -33,6 +33,9 @@ struct IIDXChartTraitIcon: View {
         case .chargeCombo:
             ChargeComboGlyph()
                 .frame(width: size * 0.62, height: size * 0.54)
+        case .chargeChords:
+            ChargeChordsGlyph()
+                .frame(width: size * 0.66, height: size * 0.54)
         case .scratchCombo:
             ScratchComboGlyph()
                 .frame(width: size * 0.6, height: size * 0.46)
@@ -144,6 +147,23 @@ struct ChargeComboGlyph: Shape {
     }
 }
 
+struct ChargeChordsGlyph: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let columnWidth = rect.width / 3.0
+        let noteWidth = columnWidth * 0.82
+        let noteHeight = rect.height * 0.2
+        let corner = CGSize(width: noteHeight * 0.4, height: noteHeight * 0.4)
+        for column in 0..<3 {
+            let originX = rect.minX + columnWidth * CGFloat(column) + (columnWidth - noteWidth) / 2.0
+            let height = column == 1 ? rect.height : noteHeight
+            path.addRoundedRect(in: CGRect(x: originX, y: rect.maxY - height, width: noteWidth, height: height),
+                                cornerSize: corner)
+        }
+        return path
+    }
+}
+
 struct NoteGridGlyph: Shape {
     var columns: Int
     var rows: [[Int]]
@@ -229,6 +249,7 @@ extension IIDXChartTrait {
         case .scratchCombo: "Scores.Viewer.ChartType.ScratchCombo"
         case .legacyNotes: "Scores.Viewer.ChartType.LegacyNotes"
         case .chargeCombo: "Scores.Viewer.ChartType.ChargeCombo"
+        case .chargeChords: "Scores.Viewer.ChartType.ChargeChords"
         case .gradualSoflan: "Scores.Viewer.ChartType.GradualSoflan"
         case .suddenSoflan: "Scores.Viewer.ChartType.SuddenSoflan"
         }
@@ -266,6 +287,7 @@ extension IIDXChartTrait {
         case .scratchCombo: .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255)
         case .legacyNotes: .init(red: 150 / 255, green: 40 / 255, blue: 70 / 255)
         case .chargeCombo: .init(red: 137 / 255, green: 87 / 255, blue: 221 / 255)
+        case .chargeChords: .init(red: 20 / 255, green: 140 / 255, blue: 120 / 255)
         case .gradualSoflan: .init(red: 0 / 255, green: 134 / 255, blue: 229 / 255)
         case .suddenSoflan: .init(red: 88 / 255, green: 86 / 255, blue: 214 / 255)
         }

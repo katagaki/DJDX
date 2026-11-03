@@ -5210,6 +5210,28 @@
         }
       }
     },
+    "Scores.Viewer.ChartType.ChargeChords" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Charge Chords"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CN混じり同時押し"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CN混合同時押"
+          }
+        }
+      }
+    },
     "Scores.Viewer.ChartType.ChargeCombo" : {
       "localizations" : {
         "en" : {

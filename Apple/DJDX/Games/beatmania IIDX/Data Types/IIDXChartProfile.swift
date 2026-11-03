@@ -49,6 +49,9 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
         if Self.isChargeCombo(notes: notes, scratchLanes: scratchLanes) {
             traits.append(.chargeCombo)
         }
+        if Self.hasChargeChords(notes: notes, bpmChanges: bpmChanges, scratchLanes: scratchLanes) {
+            traits.append(.chargeChords)
+        }
         traits += Self.soflanTraits(bpmChanges: bpmChanges, noteTimes: notes.map(\.time).sorted())
         self.traits = traits
     }
