@@ -12,8 +12,8 @@ extension IIDXChartProfile {
         }
     }
 
-    static func hasRapidRepeats(notes: [IIDXChartNote], bpmChanges: [IIDXChartBPMChange],
-                                scratchLanes: Set<Int>) -> Bool {
+    static func hasJacks(notes: [IIDXChartNote], bpmChanges: [IIDXChartBPMChange],
+                         scratchLanes: Set<Int>) -> Bool {
         let beatLength = beatLengthLookup(bpmChanges)
         let notesByLane = Dictionary(grouping: notes.indices.filter { !scratchLanes.contains(notes[$0].lane) }) {
             notes[$0].lane

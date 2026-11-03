@@ -14,7 +14,7 @@ struct IIDXChartBPMChange: Codable, Sendable {
 
 struct IIDXChartProfile: Codable, Sendable, Hashable {
 
-    static let currentVersion = 9
+    static let currentVersion = 10
 
     let version: Int
     let traits: [IIDXChartTrait]
@@ -51,8 +51,8 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
             traits.append(.chaotic)
         }
         traits += Self.keyPatternTraits(onsets)
-        if Self.hasRapidRepeats(notes: notes, bpmChanges: bpmChanges, scratchLanes: scratchLanes) {
-            traits.append(.rapidRepeats)
+        if Self.hasJacks(notes: notes, bpmChanges: bpmChanges, scratchLanes: scratchLanes) {
+            traits.append(.jacks)
         }
         traits += Self.scratchComboTraits(notes: notes, playType: playType)
         if Self.hasLegacyNotes(notes: notes, playType: playType) {

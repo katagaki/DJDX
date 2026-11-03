@@ -5320,6 +5320,28 @@
         }
       }
     },
+    "Scores.Viewer.ChartType.Jacks" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jacks"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連打"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連打"
+          }
+        }
+      }
+    },
     "Scores.Viewer.ChartType.LegacyNotes" : {
       "localizations" : {
         "en" : {
@@ -5360,28 +5382,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無明顯特徵"
-          }
-        }
-      }
-    },
-    "Scores.Viewer.ChartType.RapidRepeats" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rapid Repeats"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "連打"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "連打"
           }
         }
       }

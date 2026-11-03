@@ -9,7 +9,7 @@ enum IIDXChartTrait: String, Codable, Sendable, CaseIterable {
     case stairs
     case consecutiveChords
     case adjacentPairs
-    case rapidRepeats
+    case jacks
     case scratchCombo
     case legacyNotes
     case chargeCombo
