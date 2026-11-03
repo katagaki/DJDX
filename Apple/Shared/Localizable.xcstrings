@@ -5276,50 +5276,6 @@
         }
       }
     },
-    "Scores.Viewer.ChartType.ScratchCombo.1P" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scratch Combos (1P)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "皿複合 (1P)"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "皿複合 (1P)"
-          }
-        }
-      }
-    },
-    "Scores.Viewer.ChartType.ScratchCombo.2P" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scratch Combos (2P)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "皿複合 (2P)"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "皿複合 (2P)"
-          }
-        }
-      }
-    },
     "Scores.Viewer.ChartType.Stamina" : {
       "localizations" : {
         "en" : {

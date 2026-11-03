@@ -4,7 +4,7 @@ actor IIDXChartAnalyzer {
 
     static let shared = IIDXChartAnalyzer()
 
-    private static let cacheVersion = 2
+    private static let cacheVersion = 3
     private static let endpoint = URL(string: "https://textage-chart-viewer.vercel.app/api/chart")!
 
     private var profiles: [String: IIDXChartProfile] = [:]

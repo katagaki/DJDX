@@ -123,12 +123,7 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
         case .single:
             let side1P = qualifies(scratchComboHits(notes: notes, scratchLane: 0, keyLanes: [1, 2, 3]))
             let side2P = qualifies(scratchComboHits(notes: notes, scratchLane: 0, keyLanes: [5, 6, 7]))
-            switch (side1P, side2P) {
-            case (true, true): return [.scratchCombo]
-            case (true, false): return [.scratchCombo1P]
-            case (false, true): return [.scratchCombo2P]
-            case (false, false): return []
-            }
+            return side1P || side2P ? [.scratchCombo] : []
         }
     }
 

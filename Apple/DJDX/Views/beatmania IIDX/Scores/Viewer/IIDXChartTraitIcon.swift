@@ -33,12 +33,8 @@ struct IIDXChartTraitIcon: View {
         case .chargeCombo:
             ChargeComboGlyph()
                 .frame(width: size * 0.54, height: size * 0.52)
-        case .scratchCombo, .scratchCombo1P:
+        case .scratchCombo:
             ScratchComboGlyph()
-                .frame(width: size * 0.6, height: size * 0.46)
-        case .scratchCombo2P:
-            ScratchComboGlyph()
-                .scaleEffect(x: -1.0)
                 .frame(width: size * 0.6, height: size * 0.46)
         case .burst:
             symbolGlyph("bolt.fill")
@@ -184,8 +180,6 @@ extension IIDXChartTrait {
         case .stamina: "Scores.Viewer.ChartType.Stamina"
         case .chaotic: "Scores.Viewer.ChartType.Chaotic"
         case .scratchCombo: "Scores.Viewer.ChartType.ScratchCombo"
-        case .scratchCombo1P: "Scores.Viewer.ChartType.ScratchCombo.1P"
-        case .scratchCombo2P: "Scores.Viewer.ChartType.ScratchCombo.2P"
         case .chargeCombo: "Scores.Viewer.ChartType.ChargeCombo"
         case .gradualSoflan: "Scores.Viewer.ChartType.GradualSoflan"
         case .suddenSoflan: "Scores.Viewer.ChartType.SuddenSoflan"
@@ -198,7 +192,7 @@ extension IIDXChartTrait {
         case .burst: .init(red: 230 / 255, green: 175 / 255, blue: 0 / 255)
         case .stamina: .pink
         case .chaotic: .init(red: 52 / 255, green: 178 / 255, blue: 89 / 255)
-        case .scratchCombo, .scratchCombo1P, .scratchCombo2P: .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255)
+        case .scratchCombo: .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255)
         case .chargeCombo: .init(red: 137 / 255, green: 87 / 255, blue: 221 / 255)
         case .gradualSoflan: .init(red: 0 / 255, green: 134 / 255, blue: 229 / 255)
         case .suddenSoflan: .init(red: 88 / 255, green: 86 / 255, blue: 214 / 255)
