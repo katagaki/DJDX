@@ -258,6 +258,7 @@ struct ExternalDataReloader {
                           let charge = row[7] as? Double,
                           let scratch = row[8] as? Double,
                           let soflan = row[9] as? Double else { return 0 }
+                    guard notes + chord + peak + charge + scratch + soflan > 0.0 else { continue }
                     allEntries.append(ChartRadarData(
                         title: title,
                         playType: playType,

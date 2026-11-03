@@ -417,12 +417,19 @@ actor IIDXReader {
 
     // MARK: BM2DX Notes Radar
 
+    private static var hasRadarValues: SQLite.Expression<Bool> {
+        let col = BM2DXDatabase.self
+        return col.nrNotes > 0.0 || col.nrChord > 0.0 || col.nrPeak > 0.0 ||
+            col.nrCharge > 0.0 || col.nrScratch > 0.0 || col.nrSoflan > 0.0
+    }
+
     func fetchChartRadarData(title: String, playType: IIDXPlayType, difficulty: Int) -> ChartRadarData? {
         guard let database = try? BM2DXDatabase.shared.getReadConnection() else { return nil }
         let col = BM2DXDatabase.self
         let playTypeString = playType == .single ? "SP" : "DP"
         let query = col.notesRadarTable
             .filter(col.nrTitle == title && col.nrPlayType == playTypeString && col.nrDifficulty == difficulty)
+            .filter(Self.hasRadarValues)
             .limit(1)
         guard let row = try? database.pluck(query) else { return nil }
         return ChartRadarData(
@@ -444,7 +451,7 @@ actor IIDXReader {
     func fetchAllChartRadarData() -> [ChartRadarData] {
         guard let database = try? BM2DXDatabase.shared.getReadConnection() else { return [] }
         let col = BM2DXDatabase.self
-        let query = col.notesRadarTable.order(col.nrTitle.asc)
+        let query = col.notesRadarTable.filter(Self.hasRadarValues).order(col.nrTitle.asc)
         return (try? database.prepare(query).map { row in
             ChartRadarData(
                 title: row[col.nrTitle],
@@ -470,7 +477,7 @@ actor IIDXReader {
 
     func chartRadarDataCount() -> Int {
         guard let database = try? BM2DXDatabase.shared.getReadConnection() else { return 0 }
-        return (try? database.scalar(BM2DXDatabase.notesRadarTable.count)) ?? 0
+        return (try? database.scalar(BM2DXDatabase.notesRadarTable.filter(Self.hasRadarValues).count)) ?? 0
     }
 
     func textageChartCount() -> Int {
