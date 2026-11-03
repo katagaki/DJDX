@@ -9,6 +9,7 @@ actor IIDXChartAnalyzer {
 
     private var profiles: [String: IIDXChartProfile] = [:]
     private var inFlight: [String: Task<IIDXChartProfile?, Never>] = [:]
+    private var hasRemovedStaleProfiles = false
 
     private let cacheDirectory: URL = FileManager.default
         .urls(for: .cachesDirectory, in: .userDomainMask)[0]
@@ -27,6 +28,7 @@ actor IIDXChartAnalyzer {
         if let profile = profiles[key] {
             return profile
         }
+        removeStaleProfilesIfNeeded()
         if let profile = readCachedProfile(key: key) {
             profiles[key] = profile
             return profile
@@ -62,6 +64,17 @@ actor IIDXChartAnalyzer {
                                 bpmChanges: decoded.data.bpmChanges,
                                 playType: playType,
                                 level: level)
+    }
+
+    private func removeStaleProfilesIfNeeded() {
+        guard !hasRemovedStaleProfiles else { return }
+        hasRemovedStaleProfiles = true
+        let currentPrefix = "v\(Self.cacheVersion)_".addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
+        let files = (try? FileManager.default.contentsOfDirectory(at: cacheDirectory,
+                                                                  includingPropertiesForKeys: nil)) ?? []
+        for file in files where !file.lastPathComponent.hasPrefix(currentPrefix) {
+            try? FileManager.default.removeItem(at: file)
+        }
     }
 
     private func cacheFileURL(key: String) -> URL {
