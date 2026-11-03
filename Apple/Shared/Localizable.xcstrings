@@ -5188,24 +5188,46 @@
         }
       }
     },
-    "Scores.Viewer.ChartType.Charge" : {
+    "Scores.Viewer.ChartType.ChargeCombo" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Charge Notes"
+            "value" : "CN Combos"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CN"
+            "value" : "CN複合"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CN"
+            "value" : "CN複合"
+          }
+        }
+      }
+    },
+    "Scores.Viewer.ChartType.GradualSoflan" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gradual Soflan"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加減速ソフラン"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "漸變變速"
           }
         }
       }
@@ -5232,46 +5254,68 @@
         }
       }
     },
-    "Scores.Viewer.ChartType.Scratch" : {
+    "Scores.Viewer.ChartType.ScratchCombo" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scratch"
+            "value" : "Scratch Combos"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "皿"
+            "value" : "皿複合"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "皿"
+            "value" : "皿複合"
           }
         }
       }
     },
-    "Scores.Viewer.ChartType.Soflan" : {
+    "Scores.Viewer.ChartType.ScratchCombo.1P" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BPM Changes"
+            "value" : "Scratch Combos (1P)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ソフラン"
+            "value" : "皿複合 (1P)"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "變速"
+            "value" : "皿複合 (1P)"
+          }
+        }
+      }
+    },
+    "Scores.Viewer.ChartType.ScratchCombo.2P" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scratch Combos (2P)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "皿複合 (2P)"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "皿複合 (2P)"
           }
         }
       }
@@ -5294,6 +5338,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "物量"
+          }
+        }
+      }
+    },
+    "Scores.Viewer.ChartType.SuddenSoflan" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sudden Soflan"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "急変ソフラン"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "急變變速"
           }
         }
       }
