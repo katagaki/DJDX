@@ -36,18 +36,13 @@ struct IIDXChartTraitIcon: View {
         case .scratchCombo:
             ScratchComboGlyph()
                 .frame(width: size * 0.6, height: size * 0.46)
-        case .burst:
-            symbolGlyph("bolt.fill")
-        case .stamina:
-            symbolGlyph("flame.fill")
-        case .chaotic:
-            symbolGlyph("shuffle")
+        case .stairs, .consecutiveChords, .adjacentPairs:
+            NoteGridGlyph(columns: 4, rows: trait.noteGridRows)
+                .frame(width: size * 0.7, height: size * 0.56)
+        case .burst, .stamina, .chaotic:
+            Image(systemName: trait.symbolName)
+                .font(.system(size: size * 0.5, weight: .bold))
         }
-    }
-
-    private func symbolGlyph(_ systemName: String) -> some View {
-        Image(systemName: systemName)
-            .font(.system(size: size * 0.5, weight: .bold))
     }
 
     private func graphGlyph<Glyph: GraphGlyph>(_ glyph: Glyph.Type) -> some View {
@@ -146,6 +141,28 @@ struct ChargeComboGlyph: Shape {
     }
 }
 
+struct NoteGridGlyph: Shape {
+    var columns: Int
+    var rows: [[Int]]
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let columnWidth = rect.width / CGFloat(columns)
+        let rowHeight = rect.height / CGFloat(rows.count)
+        let noteWidth = columnWidth * 0.9
+        let noteHeight = min(rowHeight * 0.7, noteWidth * 0.5)
+        for (rowIndex, rowColumns) in rows.enumerated() {
+            let originY = rect.minY + rowHeight * CGFloat(rowIndex) + (rowHeight - noteHeight) / 2.0
+            for column in rowColumns {
+                let originX = rect.minX + columnWidth * CGFloat(column) + (columnWidth - noteWidth) / 2.0
+                path.addRoundedRect(in: CGRect(x: originX, y: originY, width: noteWidth, height: noteHeight),
+                                    cornerSize: CGSize(width: noteHeight * 0.35, height: noteHeight * 0.35))
+            }
+        }
+        return path
+    }
+}
+
 struct ScratchComboGlyph: View {
     var body: some View {
         GeometryReader { geometry in
@@ -180,10 +197,31 @@ extension IIDXChartTrait {
         case .burst: "Scores.Viewer.ChartType.Burst"
         case .stamina: "Scores.Viewer.ChartType.Stamina"
         case .chaotic: "Scores.Viewer.ChartType.Chaotic"
+        case .stairs: "Scores.Viewer.ChartType.Stairs"
+        case .consecutiveChords: "Scores.Viewer.ChartType.ConsecutiveChords"
+        case .adjacentPairs: "Scores.Viewer.ChartType.AdjacentPairs"
         case .scratchCombo: "Scores.Viewer.ChartType.ScratchCombo"
         case .chargeCombo: "Scores.Viewer.ChartType.ChargeCombo"
         case .gradualSoflan: "Scores.Viewer.ChartType.GradualSoflan"
         case .suddenSoflan: "Scores.Viewer.ChartType.SuddenSoflan"
+        }
+    }
+
+    var noteGridRows: [[Int]] {
+        switch self {
+        case .stairs: [[0], [1], [2], [3]]
+        case .consecutiveChords: [[0, 2], [1, 3], [0, 2]]
+        case .adjacentPairs: [[2, 3], [0, 1], [1, 2]]
+        default: []
+        }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .burst: "bolt.fill"
+        case .stamina: "flame.fill"
+        case .chaotic: "shuffle"
+        default: ""
         }
     }
 
@@ -193,6 +231,9 @@ extension IIDXChartTrait {
         case .burst: .init(red: 230 / 255, green: 175 / 255, blue: 0 / 255)
         case .stamina: .pink
         case .chaotic: .init(red: 52 / 255, green: 178 / 255, blue: 89 / 255)
+        case .stairs: .init(red: 0 / 255, green: 168 / 255, blue: 196 / 255)
+        case .consecutiveChords: .init(red: 162 / 255, green: 126 / 255, blue: 84 / 255)
+        case .adjacentPairs: .init(red: 200 / 255, green: 64 / 255, blue: 170 / 255)
         case .scratchCombo: .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255)
         case .chargeCombo: .init(red: 137 / 255, green: 87 / 255, blue: 221 / 255)
         case .gradualSoflan: .init(red: 0 / 255, green: 134 / 255, blue: 229 / 255)

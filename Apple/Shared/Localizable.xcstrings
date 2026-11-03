@@ -5100,6 +5100,28 @@
         }
       }
     },
+    "Scores.Viewer.ChartType.AdjacentPairs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adjacent Pairs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隣接2個押し"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "相鄰雙押"
+          }
+        }
+      }
+    },
     "Scores.Viewer.ChartType.Analyzing" : {
       "localizations" : {
         "en" : {
@@ -5210,6 +5232,28 @@
         }
       }
     },
+    "Scores.Viewer.ChartType.ConsecutiveChords" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consecutive Chords"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連続同時押し"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連續同時押"
+          }
+        }
+      }
+    },
     "Scores.Viewer.ChartType.GradualSoflan" : {
       "localizations" : {
         "en" : {
@@ -5272,6 +5316,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "皿複合"
+          }
+        }
+      }
+    },
+    "Scores.Viewer.ChartType.Stairs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stairs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "階段"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "階梯"
           }
         }
       }

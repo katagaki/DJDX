@@ -34,9 +34,11 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
         let scratchLanes: Set<Int> = playType == .double ? [0, 8] : [0]
         var traits: [IIDXChartTrait] = []
         traits += Self.densityTraits(times: times, first: first, last: last, playType: playType, level: level)
-        if Self.isChaotic(notes: notes, scratchLanes: scratchLanes) {
+        let onsets = Self.onsets(notes: notes, scratchLanes: scratchLanes)
+        if Self.isChaotic(onsets) {
             traits.append(.chaotic)
         }
+        traits += Self.keyPatternTraits(onsets)
         traits += Self.scratchComboTraits(notes: notes, playType: playType)
         if Self.isChargeCombo(notes: notes, scratchLanes: scratchLanes) {
             traits.append(.chargeCombo)
@@ -87,12 +89,23 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
 
     // MARK: Patterns
 
-    private static func isChaotic(notes: [IIDXChartNote], scratchLanes: Set<Int>) -> Bool {
-        var onsets: [Int: Set<Int>] = [:]
+    private struct Onset {
+        let time: Int
+        let lanes: Set<Int>
+    }
+
+    private static func onsets(notes: [IIDXChartNote], scratchLanes: Set<Int>) -> [Onset] {
+        var lanesByTime: [Int: Set<Int>] = [:]
         for note in notes where !scratchLanes.contains(note.lane) {
-            onsets[Int(note.time.rounded()), default: []].insert(note.lane)
+            lanesByTime[Int(note.time.rounded()), default: []].insert(note.lane)
         }
-        let patterns = onsets.keys.sorted().compactMap { onsets[$0] }
+        return lanesByTime.keys.sorted().compactMap { time in
+            lanesByTime[time].map { Onset(time: time, lanes: $0) }
+        }
+    }
+
+    private static func isChaotic(_ onsets: [Onset]) -> Bool {
+        let patterns = onsets.map(\.lanes)
         guard patterns.count >= 50 else { return false }
         var structured = 0
         for index in 2..<patterns.count {
@@ -108,6 +121,64 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
             }
         }
         return Double(structured) / Double(patterns.count - 2) <= 0.10
+    }
+
+    private static func keyPatternTraits(_ onsets: [Onset]) -> [IIDXChartTrait] {
+        guard onsets.count >= 50 else { return [] }
+        var traits: [IIDXChartTrait] = []
+        let stairNotes = stairOnsetCount(onsets, chainLength: 7)
+        if stairNotes >= 40 && Double(stairNotes) / Double(onsets.count) >= 0.07 {
+            traits.append(.stairs)
+        }
+        let chordRuns = runLengths(onsets) { $0.lanes.count >= 2 }
+        if (chordRuns.max() ?? 0) >= 80 {
+            traits.append(.consecutiveChords)
+        }
+        let pairRuns = runLengths(onsets) { onset in
+            onset.lanes.count == 2 && (onset.lanes.max() ?? 0) - (onset.lanes.min() ?? 0) == 1
+        }
+        if pairRuns.filter({ $0 >= 6 }).reduce(0, +) >= 12 {
+            traits.append(.adjacentPairs)
+        }
+        return traits
+    }
+
+    private static func stairOnsetCount(_ onsets: [Onset], chainLength: Int) -> Int {
+        var ascending: [Int: Int] = [:]
+        var descending: [Int: Int] = [:]
+        var marked = Set<Int>()
+        for (index, onset) in onsets.enumerated() {
+            let isConnected = index > 0 && onset.time - onsets[index - 1].time <= 250
+            var nextAscending: [Int: Int] = [:]
+            var nextDescending: [Int: Int] = [:]
+            for lane in onset.lanes {
+                nextAscending[lane] = isConnected ? (ascending[lane - 1] ?? 0) + 1 : 1
+                nextDescending[lane] = isConnected ? (descending[lane + 1] ?? 0) + 1 : 1
+                let length = max(nextAscending[lane] ?? 0, nextDescending[lane] ?? 0)
+                if length >= chainLength {
+                    marked.formUnion((index - length + 1)...index)
+                }
+            }
+            ascending = nextAscending
+            descending = nextDescending
+        }
+        return marked.count
+    }
+
+    private static func runLengths(_ onsets: [Onset], matching predicate: (Onset) -> Bool) -> [Int] {
+        var lengths: [Int] = []
+        var current = 0
+        for (index, onset) in onsets.enumerated() {
+            if predicate(onset) {
+                let isConnected = index > 0 && onset.time - onsets[index - 1].time <= 250
+                current = current > 0 && isConnected ? current + 1 : 1
+            } else {
+                if current > 0 { lengths.append(current) }
+                current = 0
+            }
+        }
+        if current > 0 { lengths.append(current) }
+        return lengths
     }
 
     private static func scratchComboTraits(notes: [IIDXChartNote], playType: IIDXPlayType) -> [IIDXChartTrait] {
@@ -157,67 +228,6 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
         let end: Double
     }
 
-    // MARK: Soflan
-
-    private struct BPMSegment {
-        let bpm: Double
-        let duration: Double
-        let noteCount: Int
-    }
-
-    private static func soflanTraits(bpmChanges: [IIDXChartBPMChange], noteTimes: [Double]) -> [IIDXChartTrait] {
-        guard let lastNote = noteTimes.last else { return [] }
-        let changes = bpmChanges.sorted { $0.time < $1.time }
-        var segments: [BPMSegment] = []
-        for (index, change) in changes.enumerated() {
-            let end = index + 1 < changes.count ? changes[index + 1].time : lastNote
-            guard change.bpm > 0.0, end > change.time else { continue }
-            let noteCount = lowerBound(noteTimes, end) - lowerBound(noteTimes, change.time)
-            segments.append(BPMSegment(bpm: change.bpm, duration: end - change.time, noteCount: noteCount))
-        }
-        guard segments.count >= 2 else { return [] }
-        var traits: [IIDXChartTrait] = []
-        if hasGradualSoflan(segments) {
-            traits.append(.gradualSoflan)
-        }
-        let hasSuddenSoflan = zip(segments, segments.dropFirst()).contains { previous, next in
-            max(previous.bpm, next.bpm) / min(previous.bpm, next.bpm) >= 1.3 &&
-                previous.noteCount >= 3 && next.noteCount >= 3
-        }
-        if hasSuddenSoflan {
-            traits.append(.suddenSoflan)
-        }
-        return traits
-    }
-
-    private static func hasGradualSoflan(_ segments: [BPMSegment]) -> Bool {
-        var start = 0
-        while start < segments.count - 1 {
-            var end = start
-            var direction = 0.0
-            while end + 1 < segments.count {
-                let ratio = segments[end + 1].bpm / segments[end].bpm
-                let step = max(ratio, 1.0 / ratio)
-                let stepDirection: Double = ratio > 1.0 ? 1.0 : (ratio < 1.0 ? -1.0 : 0.0)
-                if stepDirection == 0.0 || step > 1.3 || (direction != 0.0 && stepDirection != direction) ||
-                    (end > start && segments[end].duration > 4000.0) {
-                    break
-                }
-                direction = stepDirection
-                end += 1
-            }
-            if end - start >= 3 {
-                let total = max(segments[start].bpm, segments[end].bpm) / min(segments[start].bpm, segments[end].bpm)
-                let noteCount = segments[(start + 1)...end].reduce(0) { $0 + $1.noteCount }
-                if total >= 1.2 && noteCount >= 8 {
-                    return true
-                }
-            }
-            start = max(end, start + 1)
-        }
-        return false
-    }
-
     // MARK: Helpers
 
     private static func densities(_ times: [Double], window: Double) -> [(start: Double, value: Double)] {
@@ -235,7 +245,7 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
         return results
     }
 
-    private static func lowerBound(_ values: [Double], _ target: Double) -> Int {
+    static func lowerBound(_ values: [Double], _ target: Double) -> Int {
         var low = 0
         var high = values.count
         while low < high {
