@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.iidx
 
+import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
 import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -111,12 +112,9 @@ fun IIDXScoreRow(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (djLevelVisible) {
-                        Text(
-                            text = score.djLevel,
-                            style = MaterialTheme.typography.labelMedium.merge(
-                                TextStyle(brush = IIDXColors.djLevelBrush(darkTheme))
-                            ),
-                            fontWeight = FontWeight.Black
+                        IIDXDJLevelText(
+                            djLevel = score.djLevel,
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
                     if (scoreRateVisible && scoreRate != null) {
@@ -128,12 +126,13 @@ fun IIDXScoreRow(
                         )
                     }
                     if (scoreVisible) {
-                        Text(
+                        OutlinedText(
                             text = score.score.toString(),
-                            style = MaterialTheme.typography.labelMedium.merge(
-                                TextStyle(brush = IIDXColors.scoreBrush)
-                            ),
-                            fontWeight = FontWeight.ExtraBold
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.ExtraBold,
+                            fill = IIDXColors.scoreColor,
+                            outline = IIDXColors.scoreOutlineColor,
+                            outlineWidth = 0.3.dp
                         )
                         if (scoreDelta != null && scoreDelta > 0) {
                             Text(

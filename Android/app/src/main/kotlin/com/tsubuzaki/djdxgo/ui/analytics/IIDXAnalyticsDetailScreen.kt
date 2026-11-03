@@ -1,6 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.analytics
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
+import com.tsubuzaki.djdxgo.ui.common.IIDXClearTypeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -131,13 +132,18 @@ private fun clearTypeSegments(counts: Map<String, Int>): List<ChartSegment> =
 
 @Composable
 internal fun ClearTypeLegend() {
-    ChartLegend(items = IIDXClearType.sortedWithoutNoPlay.map { it.value to IIDXColors.clearTypeColor(it.value) })
+    ChartLegend(
+        items = IIDXClearType.sortedWithoutNoPlay.map { it.value to IIDXColors.clearTypeColor(it.value) },
+        label = { IIDXClearTypeText(it, MaterialTheme.typography.labelSmall) }
+    )
 }
 
 @Composable
 internal fun DJLevelLegend() {
-    val darkTheme = isSystemInDarkTheme()
-    ChartLegend(items = IIDXDJLevel.sorted.reversed().map { it.value to IIDXColors.djLevelColor(it.value, darkTheme) })
+    ChartLegend(
+        items = IIDXDJLevel.sorted.reversed().map { it.value to IIDXColors.djLevelColor(it.value) },
+        label = { IIDXDJLevelText(it, MaterialTheme.typography.labelSmall) }
+    )
 }
 
 @Composable
@@ -200,7 +206,6 @@ internal fun LevelBreakdownRow(label: String, total: Int, segments: List<ChartSe
 
 @Composable
 private fun GradeBreakdownDetail(analytics: IIDXAnalyticsData, modifier: Modifier) {
-    val darkTheme = isSystemInDarkTheme()
     val populated = analytics.djLevelPerDifficulty
         .filter { (_, counts) -> counts.values.any { it > 0 } }
         .keys.sorted()
@@ -222,7 +227,7 @@ private fun GradeBreakdownDetail(analytics: IIDXAnalyticsData, modifier: Modifie
                                 ChartSegment(
                                     djLevel.value,
                                     counts[djLevel.value] ?: 0,
-                                    IIDXColors.djLevelColor(djLevel.value, darkTheme)
+                                    IIDXColors.djLevelColor(djLevel.value)
                                 )
                             )
                         )
@@ -244,13 +249,12 @@ private fun PerLevelDetail(
     showsPieChart: Boolean,
     modifier: Modifier
 ) {
-    val darkTheme = isSystemInDarkTheme()
     val segments = if (isClearType) {
         clearTypeSegments(analytics.clearTypePerDifficulty[difficulty].orEmpty())
     } else {
         val counts = analytics.djLevelPerDifficulty[difficulty].orEmpty()
         IIDXDJLevel.sorted.reversed().map {
-            ChartSegment(it.value, counts[it.value] ?: 0, IIDXColors.djLevelColor(it.value, darkTheme))
+            ChartSegment(it.value, counts[it.value] ?: 0, IIDXColors.djLevelColor(it.value))
         }
     }
     val trend = if (isClearType) {
@@ -259,7 +263,7 @@ private fun PerLevelDetail(
         }
     } else {
         trendPoints(analytics.djLevelTrends.map { it.date to it.counts[difficulty].orEmpty() }) {
-            IIDXColors.djLevelColor(it, darkTheme)
+            IIDXColors.djLevelColor(it)
         }
     }
     LazyColumn(

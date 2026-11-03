@@ -1,5 +1,8 @@
 package com.tsubuzaki.djdxgo.ui.iidx
 
+import com.tsubuzaki.djdxgo.ui.common.OutlinedText
+import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
+import com.tsubuzaki.djdxgo.ui.common.IIDXClearTypeText
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.clickable
@@ -29,7 +32,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -344,20 +346,13 @@ private fun ScoreSection(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = score.djLevel,
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Black,
-                style = if (darkTheme) {
-                    TextStyle(
-                        brush = IIDXColors.djLevelBrush(true),
-                        shadow = Shadow(color = Palette.cyan, blurRadius = 16f)
-                    )
-                } else {
-                    TextStyle(brush = IIDXColors.djLevelBrush(false))
-                },
-                modifier = Modifier.weight(1f)
-            )
+            Box(modifier = Modifier.weight(1f)) {
+                IIDXDJLevelText(
+                    djLevel = score.djLevel,
+                    style = TextStyle(fontSize = 40.sp),
+                    outlineWidth = 0.6.dp
+                )
+            }
             val rate = scoreRate(score.score, noteCount)
             if (rate != null) {
                 Text(
@@ -381,28 +376,29 @@ private fun ScoreSection(
                 DetailRow(
                     label = stringResource(R.string.scores_viewer_clear_type)
                 ) {
-                    Text(
-                        text = score.clearType,
-                        fontWeight = FontWeight.Bold,
-                        color = IIDXColors.clearTypeColor(score.clearType)
+                    IIDXClearTypeText(
+                        clearType = score.clearType,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
                 DetailRow(label = stringResource(R.string.scores_viewer_score)) {
-                    Text(
+                    OutlinedText(
                         text = score.score.toString(),
+                        style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyLarge.merge(
-                            TextStyle(brush = IIDXColors.scoreBrush)
-                        )
+                        fill = IIDXColors.scoreColor,
+                        outline = IIDXColors.scoreOutlineColor,
+                        outlineWidth = 0.3.dp
                     )
                 }
                 DetailRow(label = stringResource(R.string.scores_viewer_miss_count)) {
-                    Text(
+                    OutlinedText(
                         text = score.missCount.toString(),
+                        style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyLarge.merge(
-                            TextStyle(brush = IIDXColors.scoreBrush)
-                        )
+                        fill = IIDXColors.scoreColor,
+                        outline = IIDXColors.scoreOutlineColor,
+                        outlineWidth = 0.3.dp
                     )
                 }
                 HorizontalDivider()
@@ -453,10 +449,9 @@ private fun ScoreSection(
                     label = stringResource(R.string.scores_viewer_clear_type),
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text(
-                        text = score.clearType,
-                        fontWeight = FontWeight.Bold,
-                        color = IIDXColors.clearTypeColor(score.clearType)
+                    IIDXClearTypeText(
+                        clearType = score.clearType,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }

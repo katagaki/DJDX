@@ -1,6 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.analytics
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
+import com.tsubuzaki.djdxgo.ui.common.IIDXClearTypeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -317,7 +318,6 @@ private fun OverviewCardContent(
     isEditing: Boolean,
     onNavigate: (String) -> Unit
 ) {
-    val darkTheme = isSystemInDarkTheme()
     val nowEpoch = System.currentTimeMillis() / 1000L
     when (id) {
         CARD_CLEAR_TYPE_OVERALL -> OverviewCard(
@@ -356,7 +356,7 @@ private fun OverviewCardContent(
         ) {
             HorizontalBarChart(
                 entries = analytics.totalDJLevelCounts.filter { it.second > 0 }.take(3),
-                colorFor = { IIDXColors.djLevelColor(it, darkTheme) }
+                colorFor = { IIDXColors.djLevelColor(it) }
             )
         }
         CARD_TOWER_TOTALS, CARD_TOWER_RECENT -> {
@@ -416,13 +416,14 @@ private fun PerLevelCard(
     analytics: IIDXAnalyticsData,
     onClick: (() -> Unit)?
 ) {
-    val darkTheme = isSystemInDarkTheme()
     val segments = if (category.isClearType) {
         IIDXClearType.sortedWithoutNoPlay.map { clearType ->
             ChartSegment(
                 clearType.abbreviation,
                 analytics.clearTypePerDifficulty[difficulty]?.get(clearType.value) ?: 0,
-                IIDXColors.clearTypeColor(clearType.value)
+                IIDXColors.clearTypeColor(clearType.value),
+                key = clearType.value,
+                isFullCombo = clearType == IIDXClearType.FULL_COMBO_CLEAR
             )
         }
     } else {
@@ -430,7 +431,7 @@ private fun PerLevelCard(
             ChartSegment(
                 djLevel.value,
                 analytics.djLevelPerDifficulty[difficulty]?.get(djLevel.value) ?: 0,
-                IIDXColors.djLevelColor(djLevel.value, darkTheme)
+                IIDXColors.djLevelColor(djLevel.value)
             )
         }
     }
@@ -440,7 +441,7 @@ private fun PerLevelCard(
         }
     } else {
         trendPoints(analytics.djLevelTrends.map { it.date to it.counts[difficulty].orEmpty() }) {
-            IIDXColors.djLevelColor(it, darkTheme)
+            IIDXColors.djLevelColor(it)
         }
     }
     val shape = RoundedCornerShape(16.dp)
@@ -493,14 +494,20 @@ private fun PerLevelCard(
                         modifier = Modifier.padding(top = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        segments.filter { it.count > 0 }.forEach { segment ->
+                        segments.filter { it.count > 0 }.take(4).forEach { segment ->
                             Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-                                Text(
-                                    text = segment.label,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = segment.color
-                                )
+                                if (category.isClearType) {
+                                    IIDXClearTypeText(
+                                        clearType = segment.key,
+                                        label = segment.label,
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                } else {
+                                    IIDXDJLevelText(
+                                        djLevel = segment.key,
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
                                 Text(
                                     text = segment.count.toString(),
                                     style = MaterialTheme.typography.labelSmall,
