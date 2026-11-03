@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import com.tsubuzaki.djdxgo.ui.common.OutlinedText
@@ -431,13 +433,15 @@ internal fun ViewerWithSelector(
             )
         }
     ) { padding ->
+        val density = LocalDensity.current
+        var selectorHeight by remember { mutableStateOf(0.dp) }
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp)
-                    .padding(bottom = if (selector != null) 104.dp else 24.dp),
+                    .padding(bottom = if (selector != null) selectorHeight + 24.dp else 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 content = content
             )
@@ -445,6 +449,7 @@ internal fun ViewerWithSelector(
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
+                        .onSizeChanged { selectorHeight = with(density) { it.height.toDp() } }
                         .navigationBarsPadding()
                         .padding(horizontal = 20.dp, vertical = 12.dp)
                 ) {
