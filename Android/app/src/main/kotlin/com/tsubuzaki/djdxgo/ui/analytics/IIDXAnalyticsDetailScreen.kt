@@ -87,6 +87,22 @@ fun IIDXAnalyticsDetailScreen(
             if (detail == Routes.IIDX_DETAIL_PROGRESS) {
                 IIDXProgressCustomizeMenu(progressKind)
             }
+            if (detail == Routes.IIDX_DETAIL_CLEAR_TYPE_OVERVIEW) {
+                AnalyticsCardItemsMenu(
+                    items = (12 downTo 1).map { it.toString() },
+                    automaticItems = analytics.clearTypePerDifficulty
+                        .filter { (_, counts) -> counts.values.any { it > 0 } }
+                        .keys.sorted().takeLast(3).map { it.toString() },
+                    selectionKey = SettingsKeys.iidxClearTypeCardLevels
+                ) { "LEVEL $it" }
+            }
+            if (detail == Routes.IIDX_DETAIL_GRADE_BREAKDOWN) {
+                AnalyticsCardItemsMenu(
+                    items = IIDXDJLevel.sorted.reversed().map { it.value },
+                    automaticItems = analytics.totalDJLevelCounts.filter { it.second > 0 }.take(3).map { it.first },
+                    selectionKey = SettingsKeys.iidxDJLevelCardLevels
+                ) { it }
+            }
             if (detail == Routes.IIDX_DETAIL_CLEAR_TYPE_LEVEL || detail == Routes.IIDX_DETAIL_DJ_LEVEL_LEVEL) {
                 IconButton(onClick = { showsPieChart = !showsPieChart }) {
                     Icon(

@@ -323,6 +323,8 @@ private fun OverviewCardContent(
     onNavigate: (String) -> Unit
 ) {
     val nowEpoch = System.currentTimeMillis() / 1000L
+    val clearTypeCardLevels by rememberSetting(SettingsKeys.iidxClearTypeCardLevels, emptySet())
+    val djLevelCardLevels by rememberSetting(SettingsKeys.iidxDJLevelCardLevels, emptySet())
     when (id) {
         CARD_CLEAR_TYPE_OVERALL -> OverviewCard(
             caption = stringResource(R.string.analytics_clear_type_overall),
@@ -332,9 +334,15 @@ private fun OverviewCardContent(
                 { onNavigate(Routes.iidxAnalytics(Routes.IIDX_DETAIL_CLEAR_TYPE_OVERVIEW)) }
             }
         ) {
-            val populated = analytics.clearTypePerDifficulty
-                .filter { (_, counts) -> counts.values.any { it > 0 } }
-                .keys.sorted().takeLast(3)
+            val populated = if (clearTypeCardLevels.isNotEmpty()) {
+                clearTypeCardLevels.mapNotNull { it.toIntOrNull() }
+                    .filter { it in analytics.clearTypePerDifficulty }
+                    .sorted()
+            } else {
+                analytics.clearTypePerDifficulty
+                    .filter { (_, counts) -> counts.values.any { it > 0 } }
+                    .keys.sorted().takeLast(3)
+            }
             StackedBarChart(
                 rows = populated.map { difficulty ->
                     StackedRow(
@@ -359,7 +367,11 @@ private fun OverviewCardContent(
             }
         ) {
             HorizontalBarChart(
-                entries = analytics.totalDJLevelCounts.filter { it.second > 0 }.take(3),
+                entries = if (djLevelCardLevels.isEmpty()) {
+                    analytics.totalDJLevelCounts.filter { it.second > 0 }.take(3)
+                } else {
+                    analytics.totalDJLevelCounts.filter { it.first in djLevelCardLevels }
+                },
                 colorFor = { IIDXColors.djLevelColor(it) }
             )
         }

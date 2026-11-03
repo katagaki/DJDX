@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.analytics
 
+import androidx.datastore.preferences.core.Preferences
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -442,6 +443,39 @@ internal fun IIDXProgressDetail(
                 }
             }
             HorizontalDivider()
+        }
+    }
+}
+
+@Composable
+internal fun AnalyticsCardItemsMenu(
+    items: List<String>,
+    automaticItems: List<String>,
+    selectionKey: Preferences.Key<Set<String>>,
+    limit: Int = 3,
+    label: (String) -> String
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val selection by rememberSetting(selectionKey, emptySet())
+    val effectiveSelection = selection.ifEmpty { automaticItems.toSet() }
+    var expanded by remember { mutableStateOf(false) }
+    IconButton(onClick = { expanded = true }) {
+        Icon(Icons.Outlined.Tune, contentDescription = stringResource(R.string.analytics_progress_customize))
+    }
+    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        MenuHeader(stringResource(R.string.analytics_card_items))
+        items.forEach { item ->
+            val isShowing = item in effectiveSelection
+            DropdownMenuItem(
+                text = { Text(label(item)) },
+                leadingIcon = { CheckSlot(isShowing) },
+                enabled = isShowing || effectiveSelection.size < limit,
+                onClick = {
+                    val newSelection = if (isShowing) effectiveSelection - item else effectiveSelection + item
+                    scope.launch { context.setSetting(selectionKey, newSelection) }
+                }
+            )
         }
     }
 }
