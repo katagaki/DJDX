@@ -350,11 +350,11 @@ private fun DDRScoreRow(record: DDRSongRecord) {
                     )
                     if (record.rank.isNotEmpty()) {
                         MetadataDivider()
-                        BrushedText(
+                        Text(
                             text = DDRRank.display(record.rank),
-                            brush = rankGradientBrush,
-                            style = MaterialTheme.typography.labelSmall
-                                .copy(fontWeight = FontWeight.Black)
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Black,
+                            color = DDRColors.rankColor(record.rank, darkTheme)
                         )
                     }
                     if (record.clearKind.isNotEmpty()) {
@@ -363,7 +363,7 @@ private fun DDRScoreRow(record: DDRSongRecord) {
                             text = DDRClearLamp.display(record.clearKind),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = DDRColors.clearColor(record.clearKind, darkTheme)
                         )
                     }
                 }

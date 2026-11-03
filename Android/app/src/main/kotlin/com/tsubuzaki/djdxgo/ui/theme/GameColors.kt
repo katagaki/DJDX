@@ -235,14 +235,14 @@ object DDRColors {
     fun clearLampColor(clearKind: String, darkTheme: Boolean): Color =
         if (clearKind == "noclear") Palette.gray else clearColor(clearKind, darkTheme)
 
-    fun rankColor(rankStem: String): Color = when {
+    fun rankColor(rankStem: String, darkTheme: Boolean): Color = when {
         rankStem.startsWith("aaa") -> Palette.yellow
         rankStem.startsWith("aa") -> Palette.gray
         rankStem.startsWith("a") -> Palette.red
         rankStem.startsWith("b") -> Palette.red
         rankStem.startsWith("c") -> Palette.yellow
         rankStem.startsWith("d") -> Palette.blue
-        rankStem.startsWith("e") -> Color.Black
+        rankStem.startsWith("e") -> if (darkTheme) Color.White else Color.Black
         else -> Palette.gray
     }
 }

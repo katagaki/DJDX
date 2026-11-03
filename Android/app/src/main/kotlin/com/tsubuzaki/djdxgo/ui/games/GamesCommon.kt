@@ -73,7 +73,6 @@ import com.tsubuzaki.djdxgo.ui.theme.Palette
 import java.net.URLEncoder
 
 internal val scoreGradientBrush = Brush.horizontalGradient(listOf(Palette.cyan, Palette.blue))
-internal val rankGradientBrush = Brush.horizontalGradient(listOf(Palette.yellow, Palette.orange))
 
 internal fun youTubeSearchURL(query: String): String =
     "https://www.youtube.com/results?search_query=" + URLEncoder.encode(query, "UTF-8")
