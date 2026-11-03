@@ -215,7 +215,7 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
                 title: songRecord.title,
                 playType: playType,
                 difficulty: bm2dxDifficulty
-            ) {
+            ), data.radarData.sum() > 0.0 {
                 results[radarKey(playType, bm2dxDifficulty)] = data
             }
         }
