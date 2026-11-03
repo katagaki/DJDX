@@ -150,7 +150,7 @@ fun IIDXScoreFilterSheet(onDismiss: () -> Unit) {
 
             SectionLabel(stringResource(R.string.scores_filter_clear_type))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                IIDXClearType.sorted.forEach { clearType ->
+                IIDXClearType.ascending.reversed().forEach { clearType ->
                     FilterChip(
                         selected = clearType.value in clearTypeFilters,
                         onClick = {

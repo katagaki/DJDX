@@ -61,6 +61,16 @@ enum class IIDXClearType(val value: String) {
 
         val sortedWithoutNoPlay: List<IIDXClearType> = sorted.dropLast(1)
 
+        val ascending: List<IIDXClearType> = listOf(
+            NO_PLAY, FAILED, ASSIST_CLEAR, EASY_CLEAR,
+            CLEAR, HARD_CLEAR, EX_HARD_CLEAR, FULL_COMBO_CLEAR
+        )
+
+        fun clearedIndex(value: String): Int? {
+            val type = fromValue(value) ?: return null
+            return if (type == NO_PLAY) null else ascending.indexOf(type)
+        }
+
         fun fromValue(value: String): IIDXClearType? =
             entries.firstOrNull { it.value == value }
 

@@ -291,16 +291,19 @@ private fun ddrDisplayRecords(
     }
     val primary: Comparator<DDRSongRecord> = when (sortMode) {
         SORT_SCORE -> compareBy { it.score }
-        SORT_CLEAR_LAMP -> compareBy { DDRClearLamp.sortIndex(it.clearKind) }
+        SORT_CLEAR_LAMP -> compareByDescending { DDRClearLamp.sortIndex(it.clearKind) }
         SORT_LEVEL -> compareBy { it.level }
         else -> compareBy { it.title.compact }
     }
     val directed = if (sortDescending) primary.reversed() else primary
-    return filtered.sortedWith(
+    val sorted = filtered.sortedWith(
         directed
             .thenBy { it.title.compact }
             .thenBy { it.level }
     )
+    if (sortMode != SORT_CLEAR_LAMP) return sorted
+    val (cleared, uncleared) = sorted.partition { DDRClearLamp.sortIndex(it.clearKind) < DDRClearLamp.order.size }
+    return cleared + uncleared
 }
 
 @Composable

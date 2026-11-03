@@ -246,17 +246,20 @@ private fun sdvxDisplayRecords(
             (grades.isEmpty() || record.grade in grades)
     }
     val primary: Comparator<SDVXSongRecord> = when (sortMode) {
-        SORT_CLEAR_TYPE -> compareBy { SDVXClearType.sortIndex(it.clearType) }
+        SORT_CLEAR_TYPE -> compareByDescending { SDVXClearType.sortIndex(it.clearType) }
         SORT_SCORE -> compareBy { it.highScore }
         SORT_LEVEL -> compareBy { it.level.toDoubleOrNull() ?: 0.0 }
         else -> compareBy { it.title.compact }
     }
     val directed = if (sortDescending) primary.reversed() else primary
-    return filtered.sortedWith(
+    val sorted = filtered.sortedWith(
         directed
             .thenBy { it.title.compact }
             .thenBy { it.level.toDoubleOrNull() ?: 0.0 }
     )
+    if (sortMode != SORT_CLEAR_TYPE) return sorted
+    val (cleared, uncleared) = sorted.partition { SDVXClearType.sortIndex(it.clearType) < SDVXClearType.sorted.size - 1 }
+    return cleared + uncleared
 }
 
 @Composable

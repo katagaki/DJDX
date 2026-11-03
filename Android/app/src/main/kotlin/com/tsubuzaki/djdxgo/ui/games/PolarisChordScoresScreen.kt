@@ -245,15 +245,18 @@ private fun polarisChordDisplayRecords(
     val primary: Comparator<PolarisChordSongRecord> = when (sortMode) {
         SORT_RATE -> compareBy { it.achievementRate.toDoubleOrNull() ?: 0.0 }
         SORT_LEVEL -> compareBy { it.level.toIntOrNull() ?: 0 }
-        SORT_CLEAR_TYPE -> compareBy { PolarisChordClearType.sortIndex(it.clearType) }
+        SORT_CLEAR_TYPE -> compareByDescending { PolarisChordClearType.sortIndex(it.clearType) }
         else -> compareBy { it.title.compact }
     }
     val directed = if (sortDescending) primary.reversed() else primary
-    return filtered.sortedWith(
+    val sorted = filtered.sortedWith(
         directed
             .thenBy { it.title.compact }
             .thenBy { it.level.toIntOrNull() ?: 0 }
     )
+    if (sortMode != SORT_CLEAR_TYPE) return sorted
+    val (cleared, uncleared) = sorted.partition { PolarisChordClearType.sortIndex(it.clearType) < PolarisChordClearType.sorted.size - 1 }
+    return cleared + uncleared
 }
 
 @Composable
