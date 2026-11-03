@@ -5078,6 +5078,28 @@
         }
       }
     },
+    "Scores.Viewer.Characteristics" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Characteristics"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面の特徴"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "譜面特徵"
+          }
+        }
+      }
+    },
     "Scores.Viewer.ChartType.Analyzing" : {
       "localizations" : {
         "en" : {
