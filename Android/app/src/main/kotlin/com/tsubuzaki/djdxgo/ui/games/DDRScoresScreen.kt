@@ -1,5 +1,8 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.GameFonts
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -345,14 +348,14 @@ private fun DDRScoreRow(record: DDRSongRecord) {
                     BrushedText(
                         text = record.score.toString(),
                         brush = scoreGradientBrush,
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall.gameFont()
                             .copy(fontWeight = FontWeight.ExtraBold)
                     )
                     if (record.rank.isNotEmpty()) {
                         MetadataDivider()
                         Text(
                             text = DDRRank.display(record.rank),
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelSmall.gameFont(),
                             fontWeight = FontWeight.Black,
                             color = DDRColors.rankColor(record.rank, darkTheme)
                         )
@@ -361,7 +364,7 @@ private fun DDRScoreRow(record: DDRSongRecord) {
                         MetadataDivider()
                         Text(
                             text = DDRClearLamp.display(record.clearKind),
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelSmall.gameFont(),
                             fontWeight = FontWeight.Bold,
                             color = DDRColors.clearColor(record.clearKind, darkTheme)
                         )
@@ -388,6 +391,7 @@ private fun DDRScoreRow(record: DDRSongRecord) {
                 Text(
                     text = record.difficulty,
                     fontSize = 10.sp,
+                    fontFamily = GameFonts.family(GameFontWidth.CONDENSED),
                     fontWeight = FontWeight.Black,
                     color = DDRColors.difficultyColor(record.difficulty),
                     maxLines = 1
@@ -395,6 +399,7 @@ private fun DDRScoreRow(record: DDRSongRecord) {
                 Text(
                     text = if (record.level > 0) record.level.toString() else "-",
                     fontSize = 18.sp,
+                    fontFamily = GameFonts.family(GameFontWidth.CONDENSED),
                     fontWeight = FontWeight.ExtraBold,
                     maxLines = 1
                 )

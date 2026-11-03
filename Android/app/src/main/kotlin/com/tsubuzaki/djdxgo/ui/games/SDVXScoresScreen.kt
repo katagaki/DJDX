@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -304,7 +306,7 @@ private fun SDVXScoreRow(record: SDVXSongRecord, onClick: () -> Unit) {
                     if (grade != null && grade != SDVXGrade.NONE) {
                         OutlinedText(
                             text = record.grade,
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelSmall.gameFont(),
                             fontWeight = FontWeight.Black,
                             fill = SDVXColors.gradeBrush,
                             outline = SDVXColors.gradeOutlineColor,
@@ -314,7 +316,7 @@ private fun SDVXScoreRow(record: SDVXSongRecord, onClick: () -> Unit) {
                     }
                     OutlinedText(
                         text = record.highScore.toString(),
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall.gameFont(GameFontWidth.STANDARD),
                         fontWeight = FontWeight.SemiBold,
                         fill = SDVXColors.scoreBrush,
                         outline = SDVXColors.scoreOutlineColor,
@@ -323,7 +325,7 @@ private fun SDVXScoreRow(record: SDVXSongRecord, onClick: () -> Unit) {
                     MetadataDivider()
                     Text(
                         text = clearType?.abbreviation ?: record.clearType,
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall.gameFont(),
                         fontWeight = FontWeight.Bold,
                         color = SDVXColors.clearTypeColor(record.clearType)
                     )

@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.iidx
 
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
 import android.text.format.DateUtils
 import androidx.compose.foundation.background
@@ -86,7 +88,7 @@ fun IIDXScoreRow(
             }
             OutlinedText(
                 text = record.title,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.gameFont(GameFontWidth.COMPRESSED),
                 fontWeight = FontWeight.ExtraBold,
                 fill = IIDXColors.rowTitleBrush(record.version, level, darkTheme),
                 outline = IIDXColors.rowTitleStrokeColor(record.version, level, darkTheme),
@@ -120,7 +122,7 @@ fun IIDXScoreRow(
                     if (scoreRateVisible && scoreRate != null) {
                         Text(
                             text = String.format(Locale.ROOT, "%.1f%%", scoreRate * 100f),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelMedium.gameFont(),
                             fontWeight = FontWeight.Black,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -128,7 +130,7 @@ fun IIDXScoreRow(
                     if (scoreVisible) {
                         OutlinedText(
                             text = score.score.toString(),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelMedium.gameFont(),
                             fontWeight = FontWeight.ExtraBold,
                             fill = IIDXColors.scoreColor,
                             outline = IIDXColors.scoreOutlineColor,
@@ -137,7 +139,7 @@ fun IIDXScoreRow(
                         if (scoreDelta != null && scoreDelta > 0) {
                             Text(
                                 text = stringResource(R.string.analytics_new_high_score_delta, scoreDelta),
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.labelMedium.gameFont(),
                                 fontWeight = FontWeight.ExtraBold,
                                 color = Palette.orange
                             )
@@ -148,7 +150,7 @@ fun IIDXScoreRow(
                             text = DateUtils.getRelativeTimeSpanString(
                                 record.lastPlayDate * 1000L
                             ).toString(),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelMedium.gameFont(GameFontWidth.CONDENSED),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

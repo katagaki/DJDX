@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.iidx
 
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
 import com.tsubuzaki.djdxgo.ui.common.IIDXClearTypeText
@@ -289,7 +291,7 @@ private fun ViewerHeader(record: IIDXSongRecord) {
         }
         StrokedText(
             text = record.title,
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineMedium.gameFont(GameFontWidth.COMPRESSED),
             fontWeight = FontWeight.Black,
             fillBrush = IIDXColors.songTitleBrush(record.version),
             strokeColor = IIDXColors.songTitleStrokeColor(record.version)
@@ -357,6 +359,7 @@ private fun ScoreSection(
             if (rate != null) {
                 Text(
                     text = String.format(Locale.ROOT, "%.1f%%", rate * 100f),
+                    style = TextStyle().gameFont(),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -384,7 +387,7 @@ private fun ScoreSection(
                 DetailRow(label = stringResource(R.string.scores_viewer_score)) {
                     OutlinedText(
                         text = score.score.toString(),
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyLarge.gameFont(),
                         fontWeight = FontWeight.Bold,
                         fill = IIDXColors.scoreColor,
                         outline = IIDXColors.scoreOutlineColor,
@@ -394,7 +397,7 @@ private fun ScoreSection(
                 DetailRow(label = stringResource(R.string.scores_viewer_miss_count)) {
                     OutlinedText(
                         text = score.missCount.toString(),
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyLarge.gameFont(),
                         fontWeight = FontWeight.Bold,
                         fill = IIDXColors.scoreColor,
                         outline = IIDXColors.scoreOutlineColor,
@@ -563,7 +566,7 @@ private fun DetailRow(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelLarge.gameFont(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f)
         )
@@ -585,13 +588,13 @@ private fun NoteTypeColumn(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelSmall.gameFont(),
             fontWeight = FontWeight.Bold,
             color = color
         )
         Text(
             text = value.toString(),
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleMedium.gameFont(),
             fontWeight = FontWeight.Bold
         )
     }

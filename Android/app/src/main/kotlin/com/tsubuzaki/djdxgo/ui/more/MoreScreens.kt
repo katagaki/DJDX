@@ -40,7 +40,8 @@ private val attributions = listOf(
     Attribution("AndroidX WebKit", "Apache License 2.0", "https://developer.android.com/jetpack/androidx/releases/webkit"),
     Attribution("Kotlin Coroutines", "Apache License 2.0", "https://github.com/Kotlin/kotlinx.coroutines"),
     Attribution("kotlinx.serialization", "Apache License 2.0", "https://github.com/Kotlin/kotlinx.serialization"),
-    Attribution("jsoup", "MIT License", "https://jsoup.org")
+    Attribution("jsoup", "MIT License", "https://jsoup.org"),
+    Attribution("Roboto Flex", "SIL Open Font License 1.1", "https://github.com/googlefonts/roboto-flex")
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

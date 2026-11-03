@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -457,7 +459,7 @@ internal fun ViewerWithSelector(
 internal fun ViewerTitle(title: String) {
     Text(
         text = title,
-        style = MaterialTheme.typography.headlineSmall,
+        style = MaterialTheme.typography.headlineSmall.gameFont(GameFontWidth.COMPRESSED),
         fontWeight = FontWeight.Black,
         textAlign = TextAlign.Center,
         modifier = Modifier
@@ -538,11 +540,11 @@ internal fun DetailRow(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelMedium.gameFont(),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.weight(1f))
-        val style = (valueStyle ?: MaterialTheme.typography.titleMedium)
+        val style = (valueStyle ?: MaterialTheme.typography.titleMedium.gameFont())
             .copy(fontWeight = FontWeight.Black)
         if (brush != null && outline != null) {
             OutlinedText(text = value, style = style, fill = brush, outline = outline, outlineWidth = 0.3.dp)

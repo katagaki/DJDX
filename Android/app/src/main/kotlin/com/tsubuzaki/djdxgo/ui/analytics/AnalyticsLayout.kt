@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.analytics
 
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -310,7 +311,7 @@ internal fun CountCard(
         ) {
             Text(
                 text = count.toString(),
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineSmall.gameFont(),
                 fontWeight = FontWeight.Black,
                 color = if (count > 0) {
                     MaterialTheme.colorScheme.onSurface

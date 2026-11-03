@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.common
 
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -49,7 +50,7 @@ fun IIDXClearTypeText(
     val phase = rememberFullComboPhase(IIDXClearType.fromValue(clearType) == IIDXClearType.FULL_COMBO_CLEAR)
     OutlinedText(
         text = label,
-        style = style.merge(TextStyle(letterSpacing = (-0.3).sp)),
+        style = style.gameFont().merge(TextStyle(letterSpacing = (-0.3).sp)),
         fill = IIDXColors.clearTypeBrush(clearType, phase),
         outline = Color.Black,
         outlineWidth = outlineWidth,
@@ -67,7 +68,7 @@ fun IIDXDJLevelText(
 ) {
     OutlinedText(
         text = djLevel,
-        style = style,
+        style = style.gameFont(),
         fill = IIDXColors.djLevelBrush(djLevel),
         outline = Color.Black,
         outlineWidth = outlineWidth,

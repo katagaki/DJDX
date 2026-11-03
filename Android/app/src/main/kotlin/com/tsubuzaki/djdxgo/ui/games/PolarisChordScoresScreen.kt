@@ -1,5 +1,8 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.GameFonts
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -300,7 +303,7 @@ private fun PolarisChordScoreRow(record: PolarisChordSongRecord) {
                         BrushedText(
                             text = "${record.achievementRate}%",
                             brush = scoreGradientBrush,
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelSmall.gameFont()
                                 .copy(fontWeight = FontWeight.ExtraBold)
                         )
                         MetadataDivider()
@@ -310,21 +313,21 @@ private fun PolarisChordScoreRow(record: PolarisChordSongRecord) {
                         BrushedText(
                             text = record.grade,
                             brush = PolarisChordColors.gradeBrush(record.grade, darkTheme),
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelSmall.gameFont()
                                 .copy(fontWeight = FontWeight.Black)
                         )
                         MetadataDivider()
                     }
                     Text(
                         text = clearType?.abbreviation ?: record.clearType,
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall.gameFont(),
                         fontWeight = FontWeight.Bold,
                         color = PolarisChordColors.clearTypeColor(record.clearType)
                     )
                     MetadataDivider()
                     Text(
                         text = record.score.toString(),
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall.gameFont(),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -349,12 +352,14 @@ private fun PolarisChordScoreRow(record: PolarisChordSongRecord) {
                 Text(
                     text = record.level,
                     fontSize = 18.sp,
+                    fontFamily = GameFonts.family(GameFontWidth.CONDENSED),
                     fontWeight = FontWeight.ExtraBold,
                     maxLines = 1
                 )
                 Text(
                     text = record.difficulty,
                     fontSize = 10.sp,
+                    fontFamily = GameFonts.family(GameFontWidth.CONDENSED),
                     fontWeight = FontWeight.Black,
                     color = PolarisChordColors.difficultyColor(record.difficulty),
                     maxLines = 1
