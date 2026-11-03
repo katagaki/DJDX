@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -528,7 +529,8 @@ internal fun DetailRow(
     value: String,
     color: Color = Color.Unspecified,
     brush: Brush? = null,
-    valueStyle: TextStyle? = null
+    valueStyle: TextStyle? = null,
+    outline: Color? = null
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -542,7 +544,9 @@ internal fun DetailRow(
         Spacer(modifier = Modifier.weight(1f))
         val style = (valueStyle ?: MaterialTheme.typography.titleMedium)
             .copy(fontWeight = FontWeight.Black)
-        if (brush != null) {
+        if (brush != null && outline != null) {
+            OutlinedText(text = value, style = style, fill = brush, outline = outline, outlineWidth = 0.3.dp)
+        } else if (brush != null) {
             Text(text = value, style = style.merge(TextStyle(brush = brush)))
         } else {
             Text(text = value, style = style, color = color)

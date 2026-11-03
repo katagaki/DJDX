@@ -199,7 +199,13 @@ object SDVXColors {
         else -> Palette.gray
     }
 
-    val gradeBrush = Brush.horizontalGradient(listOf(Palette.yellow, Palette.orange))
+    val scoreBrush = twoToneBrush(Color(0xFFB5C9E0), Color(0xFFDBE8F5), Color(0xFFF2F7FA))
+    val scoreOutlineColor = Color(0xFF1C3352)
+    val gradeBrush = twoToneBrush(Color(0xFFEBD6A3), Color(0xFFF0B81F), Color(0xFFEDC23D))
+    val gradeOutlineColor = Color(0xFF42290F)
+
+    private fun twoToneBrush(top: Color, bottom: Color, bottomEdge: Color): Brush =
+        Brush.verticalGradient(0f to top, 0.52f to top, 0.56f to bottom, 1f to bottomEdge)
 }
 
 object PolarisChordColors {

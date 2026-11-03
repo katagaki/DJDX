@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -301,19 +302,23 @@ private fun SDVXScoreRow(record: SDVXSongRecord, onClick: () -> Unit) {
                 ) {
                     val grade = SDVXGrade.fromValue(record.grade)
                     if (grade != null && grade != SDVXGrade.NONE) {
-                        BrushedText(
+                        OutlinedText(
                             text = record.grade,
-                            brush = SDVXColors.gradeBrush,
-                            style = MaterialTheme.typography.labelSmall
-                                .copy(fontWeight = FontWeight.Black)
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Black,
+                            fill = SDVXColors.gradeBrush,
+                            outline = SDVXColors.gradeOutlineColor,
+                            outlineWidth = 0.3.dp
                         )
                         MetadataDivider()
                     }
-                    BrushedText(
+                    OutlinedText(
                         text = record.highScore.toString(),
-                        brush = scoreGradientBrush,
-                        style = MaterialTheme.typography.labelSmall
-                            .copy(fontWeight = FontWeight.ExtraBold)
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        fill = SDVXColors.scoreBrush,
+                        outline = SDVXColors.scoreOutlineColor,
+                        outlineWidth = 0.3.dp
                     )
                     MetadataDivider()
                     Text(

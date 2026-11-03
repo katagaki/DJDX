@@ -120,18 +120,21 @@ fun SDVXScoreViewerScreen(
                         DetailRow(
                             label = stringResource(R.string.sdvx_grade),
                             value = current.grade,
-                            brush = SDVXColors.gradeBrush
+                            brush = SDVXColors.gradeBrush,
+                            outline = SDVXColors.gradeOutlineColor
                         )
                     }
                     DetailRow(
                         label = stringResource(R.string.sdvx_high_score),
                         value = current.highScore.toString(),
-                        brush = scoreGradientBrush
+                        brush = SDVXColors.scoreBrush,
+                        outline = SDVXColors.scoreOutlineColor
                     )
                     DetailRow(
                         label = stringResource(R.string.sdvx_ex_score),
                         value = current.exScore.toString(),
-                        brush = scoreGradientBrush
+                        brush = SDVXColors.scoreBrush,
+                        outline = SDVXColors.scoreOutlineColor
                     )
                 }
                 Card(modifier = Modifier.fillMaxWidth()) {
