@@ -31,6 +31,8 @@ data class IIDXFilterOptions(
 
 enum class IIDXNewEntryKind(val key: String) {
     HIGH_SCORES("newHighScores"),
+    CLEAR_LAMPS("newClearLamps"),
+    SCORE_UPDATES("newScoreUpdates"),
     AAA("newAAA"),
     AA("newAA"),
     A("newA"),
@@ -219,6 +221,13 @@ object IIDXAnalytics {
         return computeNewEntries(latestRecords, previousRecords, filters)
     }
 
+    private fun isClearLampImprovement(previous: String, latest: String): Boolean {
+        val latestIndex = IIDXClearType.clearedIndex(latest) ?: return false
+        if (latest == IIDXClearType.FAILED.value) return false
+        val previousIndex = IIDXClearType.clearedIndex(previous) ?: return true
+        return latestIndex > previousIndex
+    }
+
     fun matchKey(record: IIDXSongRecord): String =
         record.title.compact + "\u0001" + record.artist.compact
 
@@ -249,6 +258,10 @@ object IIDXAnalytics {
                 }
                 if (score.score > previousScoreValue) {
                     result.getValue(IIDXNewEntryKind.HIGH_SCORES).add(entry)
+                    if (previousScoreValue > 0) result.getValue(IIDXNewEntryKind.SCORE_UPDATES).add(entry)
+                }
+                if (isClearLampImprovement(previousClearType, score.clearType)) {
+                    result.getValue(IIDXNewEntryKind.CLEAR_LAMPS).add(entry)
                 }
             }
         }

@@ -372,7 +372,7 @@ private fun IIDXAnalyticsDetailNewEntries(
                         onToggle = { isLevelBreakdownExpanded = !isLevelBreakdownExpanded },
                         items = levelItems
                     )
-                    if (kind == IIDXNewEntryKind.HIGH_SCORES) {
+                    if (kind == IIDXNewEntryKind.HIGH_SCORES || kind == IIDXNewEntryKind.SCORE_UPDATES) {
                         BreakdownSection(
                             title = stringResource(R.string.analytics_breakdown_clear_type),
                             isExpanded = isClearTypeBreakdownExpanded,
@@ -399,7 +399,7 @@ private fun IIDXAnalyticsDetailNewEntries(
                     scoreRateVisible = scoreRateVisible,
                     scoreVisible = scoreVisible,
                     lastPlayDateVisible = lastPlayDateVisible,
-                    scoreDelta = if (kind == IIDXNewEntryKind.HIGH_SCORES) {
+                    scoreDelta = if (kind == IIDXNewEntryKind.HIGH_SCORES || kind == IIDXNewEntryKind.SCORE_UPDATES) {
                         entry.score.score - entry.previousScore
                     } else {
                         null

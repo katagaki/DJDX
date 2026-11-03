@@ -17,12 +17,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowCircleUp
 import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.Report
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.material.icons.outlined.Whatshot
 import androidx.compose.material.icons.outlined.WorkspacePremium
@@ -68,7 +70,8 @@ private val overviewCards = listOf(
     CARD_CLEAR_TYPE_OVERALL, CARD_GRADE_BREAKDOWN, CARD_TOWER_TOTALS, CARD_TOWER_RECENT
 )
 private val summaryCards = listOf(
-    IIDXNewEntryKind.HIGH_SCORES, IIDXNewEntryKind.AAA, IIDXNewEntryKind.AA, IIDXNewEntryKind.A,
+    IIDXNewEntryKind.HIGH_SCORES, IIDXNewEntryKind.CLEAR_LAMPS, IIDXNewEntryKind.SCORE_UPDATES,
+    IIDXNewEntryKind.AAA, IIDXNewEntryKind.AA, IIDXNewEntryKind.A,
     IIDXNewEntryKind.FULL_COMBO_CLEAR, IIDXNewEntryKind.CLEAR, IIDXNewEntryKind.EASY_CLEAR,
     IIDXNewEntryKind.ASSIST_CLEAR, IIDXNewEntryKind.HARD_CLEAR, IIDXNewEntryKind.EX_HARD_CLEAR,
     IIDXNewEntryKind.FAILED
@@ -76,7 +79,8 @@ private val summaryCards = listOf(
 private val defaultCardOrder = overviewCards + summaryCards.map { it.key }
 private val defaultVisibleCards = setOf(
     CARD_GRADE_BREAKDOWN, CARD_TOWER_TOTALS,
-    IIDXNewEntryKind.HIGH_SCORES.key, IIDXNewEntryKind.CLEAR.key, IIDXNewEntryKind.ASSIST_CLEAR.key
+    IIDXNewEntryKind.HIGH_SCORES.key, IIDXNewEntryKind.CLEAR_LAMPS.key, IIDXNewEntryKind.SCORE_UPDATES.key,
+    IIDXNewEntryKind.CLEAR.key, IIDXNewEntryKind.ASSIST_CLEAR.key
 )
 
 enum class PerLevelCategory(val key: String) {
@@ -526,6 +530,8 @@ internal fun trendPoints(
 @Composable
 internal fun newEntryTitle(kind: IIDXNewEntryKind): String = when (kind) {
     IIDXNewEntryKind.HIGH_SCORES -> stringResource(R.string.analytics_new_record)
+    IIDXNewEntryKind.CLEAR_LAMPS -> "NEW CLEAR"
+    IIDXNewEntryKind.SCORE_UPDATES -> "NEW HIGH SCORE"
     IIDXNewEntryKind.AAA -> "AAA"
     IIDXNewEntryKind.AA -> "AA"
     IIDXNewEntryKind.A -> "A"
@@ -540,6 +546,8 @@ internal fun newEntryTitle(kind: IIDXNewEntryKind): String = when (kind) {
 
 private fun newEntryIcon(kind: IIDXNewEntryKind): ImageVector = when (kind) {
     IIDXNewEntryKind.HIGH_SCORES -> Icons.Outlined.EmojiEvents
+    IIDXNewEntryKind.CLEAR_LAMPS -> Icons.Outlined.Verified
+    IIDXNewEntryKind.SCORE_UPDATES -> Icons.Outlined.ArrowCircleUp
     IIDXNewEntryKind.AAA, IIDXNewEntryKind.AA, IIDXNewEntryKind.A -> Icons.Outlined.WorkspacePremium
     IIDXNewEntryKind.FULL_COMBO_CLEAR -> Icons.Outlined.StarOutline
     IIDXNewEntryKind.CLEAR -> Icons.Outlined.CheckCircle
@@ -553,6 +561,8 @@ private fun newEntryIcon(kind: IIDXNewEntryKind): ImageVector = when (kind) {
 @Composable
 private fun newEntryColor(kind: IIDXNewEntryKind): Color = when (kind) {
     IIDXNewEntryKind.HIGH_SCORES -> MaterialTheme.colorScheme.onSurface
+    IIDXNewEntryKind.CLEAR_LAMPS -> Palette.teal
+    IIDXNewEntryKind.SCORE_UPDATES -> Palette.green
     IIDXNewEntryKind.AAA, IIDXNewEntryKind.AA, IIDXNewEntryKind.A -> Palette.orange
     IIDXNewEntryKind.FULL_COMBO_CLEAR -> Palette.blue
     IIDXNewEntryKind.CLEAR -> Palette.cyan
