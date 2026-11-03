@@ -24,6 +24,7 @@ object Routes {
     const val IIDX_DETAIL_CLEAR_TYPE_LEVEL = "clearTypeLevel"
     const val IIDX_DETAIL_DJ_LEVEL_LEVEL = "djLevelLevel"
     const val IIDX_DETAIL_NEW_ENTRIES = "newEntries"
+    const val IIDX_DETAIL_PROGRESS = "progress"
 
     const val CHART_DETAIL_CLEAR_BREAKDOWN = "clearBreakdown"
     const val CHART_DETAIL_GRADE_BREAKDOWN = "gradeBreakdown"

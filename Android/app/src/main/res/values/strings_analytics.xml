@@ -40,4 +40,12 @@
         <item quantity="one">%1$d song</item>
         <item quantity="other">%1$d songs</item>
     </plurals>
+    <string name="analytics_progress">Clear Updates</string>
+    <string name="analytics_progress_high_scores">High Score Updates</string>
+    <string name="analytics_progress_customize">Customize</string>
+    <string name="analytics_progress_series">Show</string>
+    <string name="analytics_progress_style">Graph Style</string>
+    <string name="analytics_progress_style_bars">Bars</string>
+    <string name="analytics_progress_style_stacked">Stacked</string>
+    <string name="analytics_card_items">Shown on Card (Up to 3)</string>
 </resources>

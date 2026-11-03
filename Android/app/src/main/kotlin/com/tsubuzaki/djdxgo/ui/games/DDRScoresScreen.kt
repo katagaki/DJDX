@@ -1,5 +1,8 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.GameFonts
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -291,16 +294,19 @@ private fun ddrDisplayRecords(
     }
     val primary: Comparator<DDRSongRecord> = when (sortMode) {
         SORT_SCORE -> compareBy { it.score }
-        SORT_CLEAR_LAMP -> compareBy { DDRClearLamp.sortIndex(it.clearKind) }
+        SORT_CLEAR_LAMP -> compareByDescending { DDRClearLamp.sortIndex(it.clearKind) }
         SORT_LEVEL -> compareBy { it.level }
         else -> compareBy { it.title.compact }
     }
     val directed = if (sortDescending) primary.reversed() else primary
-    return filtered.sortedWith(
+    val sorted = filtered.sortedWith(
         directed
             .thenBy { it.title.compact }
             .thenBy { it.level }
     )
+    if (sortMode != SORT_CLEAR_LAMP) return sorted
+    val (cleared, uncleared) = sorted.partition { DDRClearLamp.sortIndex(it.clearKind) < DDRClearLamp.order.size }
+    return cleared + uncleared
 }
 
 @Composable
@@ -342,25 +348,25 @@ private fun DDRScoreRow(record: DDRSongRecord) {
                     BrushedText(
                         text = record.score.toString(),
                         brush = scoreGradientBrush,
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall.gameFont()
                             .copy(fontWeight = FontWeight.ExtraBold)
                     )
                     if (record.rank.isNotEmpty()) {
                         MetadataDivider()
-                        BrushedText(
+                        Text(
                             text = DDRRank.display(record.rank),
-                            brush = rankGradientBrush,
-                            style = MaterialTheme.typography.labelSmall
-                                .copy(fontWeight = FontWeight.Black)
+                            style = MaterialTheme.typography.labelSmall.gameFont(),
+                            fontWeight = FontWeight.Black,
+                            color = DDRColors.rankColor(record.rank, darkTheme)
                         )
                     }
                     if (record.clearKind.isNotEmpty()) {
                         MetadataDivider()
                         Text(
                             text = DDRClearLamp.display(record.clearKind),
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelSmall.gameFont(),
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = DDRColors.clearColor(record.clearKind, darkTheme)
                         )
                     }
                 }
@@ -385,6 +391,7 @@ private fun DDRScoreRow(record: DDRSongRecord) {
                 Text(
                     text = record.difficulty,
                     fontSize = 10.sp,
+                    fontFamily = GameFonts.family(GameFontWidth.CONDENSED),
                     fontWeight = FontWeight.Black,
                     color = DDRColors.difficultyColor(record.difficulty),
                     maxLines = 1
@@ -392,6 +399,7 @@ private fun DDRScoreRow(record: DDRSongRecord) {
                 Text(
                     text = if (record.level > 0) record.level.toString() else "-",
                     fontSize = 18.sp,
+                    fontFamily = GameFonts.family(GameFontWidth.CONDENSED),
                     fontWeight = FontWeight.ExtraBold,
                     maxLines = 1
                 )

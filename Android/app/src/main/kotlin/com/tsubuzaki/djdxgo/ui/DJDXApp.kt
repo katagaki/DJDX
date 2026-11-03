@@ -98,6 +98,7 @@ import com.tsubuzaki.djdxgo.ui.iidx.IIDXScoresScreen
 import com.tsubuzaki.djdxgo.ui.importer.ImportScreen
 import com.tsubuzaki.djdxgo.ui.more.AttributionsScreen
 import com.tsubuzaki.djdxgo.ui.more.DeleteScoreDataDialog
+import com.tsubuzaki.djdxgo.ui.more.FreeUpSpaceDialog
 import com.tsubuzaki.djdxgo.ui.more.ExternalDataSourcesScreen
 import com.tsubuzaki.djdxgo.ui.more.RadarMakerScreen
 import com.tsubuzaki.djdxgo.ui.onboarding.OnboardingScreen
@@ -113,7 +114,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private enum class PendingDialog { DELETE_WEB, DELETE_SCORE_CODE, DELETE_SCORE, RESET_LAYOUT, DISCLAIMER }
+private enum class PendingDialog { FREE_UP_SPACE, DELETE_WEB, DELETE_SCORE_CODE, DELETE_SCORE, RESET_LAYOUT, DISCLAIMER }
 
 private fun gameIconRes(game: Game): Int = when (game) {
     Game.IIDX_ARCADE -> R.drawable.ic_game_iidx
@@ -621,6 +622,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
     }
 
     when (pendingDialog) {
+        PendingDialog.FREE_UP_SPACE -> FreeUpSpaceDialog(onDismiss = { pendingDialog = null })
         PendingDialog.DELETE_WEB -> ConfirmDialog(
             title = stringResource(R.string.more_delete_web_data_title),
             message = stringResource(R.string.more_delete_web_data_message),
@@ -724,6 +726,10 @@ private fun MoreMenu(
             onClick = { onNavigate(Routes.RADAR_MAKER) }
         )
         HorizontalDivider()
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.more_free_up_space)) },
+            onClick = { onShowDialog(PendingDialog.FREE_UP_SPACE) }
+        )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.more_reset_layout)) },
             onClick = { onShowDialog(PendingDialog.RESET_LAYOUT) }

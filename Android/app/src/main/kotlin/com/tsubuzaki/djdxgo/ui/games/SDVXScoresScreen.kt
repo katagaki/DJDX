@@ -1,5 +1,8 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
+import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -246,17 +249,20 @@ private fun sdvxDisplayRecords(
             (grades.isEmpty() || record.grade in grades)
     }
     val primary: Comparator<SDVXSongRecord> = when (sortMode) {
-        SORT_CLEAR_TYPE -> compareBy { SDVXClearType.sortIndex(it.clearType) }
+        SORT_CLEAR_TYPE -> compareByDescending { SDVXClearType.sortIndex(it.clearType) }
         SORT_SCORE -> compareBy { it.highScore }
         SORT_LEVEL -> compareBy { it.level.toDoubleOrNull() ?: 0.0 }
         else -> compareBy { it.title.compact }
     }
     val directed = if (sortDescending) primary.reversed() else primary
-    return filtered.sortedWith(
+    val sorted = filtered.sortedWith(
         directed
             .thenBy { it.title.compact }
             .thenBy { it.level.toDoubleOrNull() ?: 0.0 }
     )
+    if (sortMode != SORT_CLEAR_TYPE) return sorted
+    val (cleared, uncleared) = sorted.partition { SDVXClearType.sortIndex(it.clearType) < SDVXClearType.sorted.size - 1 }
+    return cleared + uncleared
 }
 
 @Composable
@@ -298,24 +304,28 @@ private fun SDVXScoreRow(record: SDVXSongRecord, onClick: () -> Unit) {
                 ) {
                     val grade = SDVXGrade.fromValue(record.grade)
                     if (grade != null && grade != SDVXGrade.NONE) {
-                        BrushedText(
+                        OutlinedText(
                             text = record.grade,
-                            brush = SDVXColors.gradeBrush,
-                            style = MaterialTheme.typography.labelSmall
-                                .copy(fontWeight = FontWeight.Black)
+                            style = MaterialTheme.typography.labelSmall.gameFont(),
+                            fontWeight = FontWeight.Black,
+                            fill = SDVXColors.gradeBrush,
+                            outline = SDVXColors.gradeOutlineColor,
+                            outlineWidth = 0.3.dp
                         )
                         MetadataDivider()
                     }
-                    BrushedText(
+                    OutlinedText(
                         text = record.highScore.toString(),
-                        brush = scoreGradientBrush,
-                        style = MaterialTheme.typography.labelSmall
-                            .copy(fontWeight = FontWeight.ExtraBold)
+                        style = MaterialTheme.typography.labelSmall.gameFont(GameFontWidth.STANDARD),
+                        fontWeight = FontWeight.SemiBold,
+                        fill = SDVXColors.scoreBrush,
+                        outline = SDVXColors.scoreOutlineColor,
+                        outlineWidth = 0.3.dp
                     )
                     MetadataDivider()
                     Text(
                         text = clearType?.abbreviation ?: record.clearType,
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall.gameFont(),
                         fontWeight = FontWeight.Bold,
                         color = SDVXColors.clearTypeColor(record.clearType)
                     )

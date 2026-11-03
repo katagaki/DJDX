@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.analytics
 
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -41,8 +43,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import com.tsubuzaki.djdxgo.data.optionalSettingFlow
 import com.tsubuzaki.djdxgo.data.setSetting
+import com.tsubuzaki.djdxgo.data.settingsDataStore
 import kotlinx.coroutines.launch
 
 class CardLayoutController(
@@ -89,6 +93,16 @@ class CardLayoutController(
     }
 }
 
+private fun insertingMissing(order: List<String>, defaultOrder: List<String>): List<String> {
+    val result = order.toMutableList()
+    defaultOrder.forEachIndexed { index, id ->
+        if (id in result) return@forEachIndexed
+        val predecessor = if (index > 0) result.indexOf(defaultOrder[index - 1]) else -1
+        if (predecessor >= 0) result.add(predecessor + 1, id) else result.add(id)
+    }
+    return result
+}
+
 @Composable
 fun rememberCardLayout(
     orderKey: Preferences.Key<String>,
@@ -105,11 +119,26 @@ fun rememberCardLayout(
         .collectAsState(initial = null)
     val storedCollapsed by remember(collapsedKey) { context.optionalSettingFlow(collapsedKey) }
         .collectAsState(initial = null)
+    LaunchedEffect(orderKey, visibleKey) {
+        context.settingsDataStore.edit { preferences ->
+            val stored = preferences[orderKey]?.split(",")
+                ?.filter { it in defaultOrder }
+                ?.distinct()
+                ?.takeIf { it.isNotEmpty() } ?: return@edit
+            val added = defaultOrder.filter { it !in stored }
+            if (added.isEmpty()) return@edit
+            preferences[orderKey] = insertingMissing(stored, defaultOrder).joinToString(",")
+            val addedVisible = added.filter { it in defaultVisible }
+            if (addedVisible.isNotEmpty()) {
+                preferences[visibleKey] = (preferences[visibleKey] ?: defaultVisible) + addedVisible
+            }
+        }
+    }
     val order = storedOrder
         ?.split(",")
         ?.filter { it in defaultOrder }
         ?.distinct()
-        ?.let { decoded -> decoded + defaultOrder.filter { it !in decoded } }
+        ?.let { decoded -> insertingMissing(decoded, defaultOrder) }
         ?.takeIf { it.isNotEmpty() }
         ?: defaultOrder
     return CardLayoutController(
@@ -282,7 +311,7 @@ internal fun CountCard(
         ) {
             Text(
                 text = count.toString(),
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineSmall.gameFont(),
                 fontWeight = FontWeight.Black,
                 color = if (count > 0) {
                     MaterialTheme.colorScheme.onSurface

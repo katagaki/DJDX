@@ -1,5 +1,8 @@
 package com.tsubuzaki.djdxgo.ui.iidx
 
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
+import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
 import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,7 +30,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
@@ -36,6 +38,7 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXLevelScore
 import com.tsubuzaki.djdxgo.data.iidx.IIDXSongRecord
 import androidx.compose.ui.res.stringResource
 import com.tsubuzaki.djdxgo.R
+import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
 import com.tsubuzaki.djdxgo.ui.theme.Palette
 import java.util.Locale
@@ -73,25 +76,34 @@ fun IIDXScoreRow(
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             if (genreVisible && record.genre.isNotEmpty()) {
-                Text(
+                OutlinedText(
                     text = record.genre,
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    fontWeight = FontWeight.ExtraBold,
+                    fill = Color.White,
+                    outline = Color.Black.copy(alpha = 0.7f),
+                    outlineWidth = 0.35.dp,
+                    squashed = true
                 )
             }
-            Text(
+            OutlinedText(
                 text = record.title,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.bodyLarge.gameFont(GameFontWidth.COMPRESSED),
+                fontWeight = FontWeight.ExtraBold,
+                fill = IIDXColors.rowTitleBrush(record.version, level, darkTheme),
+                outline = IIDXColors.rowTitleStrokeColor(record.version, level, darkTheme),
+                outlineWidth = if (darkTheme) 0.35.dp else 0.5.dp,
+                squashed = true
             )
             if (artistVisible && record.artist.isNotEmpty()) {
-                Text(
+                OutlinedText(
                     text = record.artist,
                     style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    fontWeight = FontWeight.ExtraBold,
+                    fill = Color.White,
+                    outline = Color.Black.copy(alpha = 0.7f),
+                    outlineWidth = 0.35.dp,
+                    squashed = true
                 )
             }
             if (score.score != 0 &&
@@ -102,34 +114,32 @@ fun IIDXScoreRow(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (djLevelVisible) {
-                        Text(
-                            text = score.djLevel,
-                            style = MaterialTheme.typography.labelMedium.merge(
-                                TextStyle(brush = IIDXColors.djLevelBrush(darkTheme))
-                            ),
-                            fontWeight = FontWeight.Black
+                        IIDXDJLevelText(
+                            djLevel = score.djLevel,
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
                     if (scoreRateVisible && scoreRate != null) {
                         Text(
                             text = String.format(Locale.ROOT, "%.1f%%", scoreRate * 100f),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelMedium.gameFont(),
                             fontWeight = FontWeight.Black,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     if (scoreVisible) {
-                        Text(
+                        OutlinedText(
                             text = score.score.toString(),
-                            style = MaterialTheme.typography.labelMedium.merge(
-                                TextStyle(brush = IIDXColors.scoreBrush)
-                            ),
-                            fontWeight = FontWeight.ExtraBold
+                            style = MaterialTheme.typography.labelMedium.gameFont(),
+                            fontWeight = FontWeight.ExtraBold,
+                            fill = IIDXColors.scoreColor,
+                            outline = IIDXColors.scoreOutlineColor,
+                            outlineWidth = 0.3.dp
                         )
                         if (scoreDelta != null && scoreDelta > 0) {
                             Text(
                                 text = stringResource(R.string.analytics_new_high_score_delta, scoreDelta),
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.labelMedium.gameFont(),
                                 fontWeight = FontWeight.ExtraBold,
                                 color = Palette.orange
                             )
@@ -140,7 +150,7 @@ fun IIDXScoreRow(
                             text = DateUtils.getRelativeTimeSpanString(
                                 record.lastPlayDate * 1000L
                             ).toString(),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelMedium.gameFont(GameFontWidth.CONDENSED),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

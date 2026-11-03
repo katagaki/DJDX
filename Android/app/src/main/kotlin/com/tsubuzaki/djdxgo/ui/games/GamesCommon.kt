@@ -1,5 +1,10 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
+import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -73,7 +78,6 @@ import com.tsubuzaki.djdxgo.ui.theme.Palette
 import java.net.URLEncoder
 
 internal val scoreGradientBrush = Brush.horizontalGradient(listOf(Palette.cyan, Palette.blue))
-internal val rankGradientBrush = Brush.horizontalGradient(listOf(Palette.yellow, Palette.orange))
 
 internal fun youTubeSearchURL(query: String): String =
     "https://www.youtube.com/results?search_query=" + URLEncoder.encode(query, "UTF-8")
@@ -429,13 +433,15 @@ internal fun ViewerWithSelector(
             )
         }
     ) { padding ->
+        val density = LocalDensity.current
+        var selectorHeight by remember { mutableStateOf(0.dp) }
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp)
-                    .padding(bottom = if (selector != null) 104.dp else 24.dp),
+                    .padding(bottom = if (selector != null) selectorHeight + 24.dp else 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 content = content
             )
@@ -443,6 +449,7 @@ internal fun ViewerWithSelector(
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
+                        .onSizeChanged { selectorHeight = with(density) { it.height.toDp() } }
                         .navigationBarsPadding()
                         .padding(horizontal = 20.dp, vertical = 12.dp)
                 ) {
@@ -457,7 +464,7 @@ internal fun ViewerWithSelector(
 internal fun ViewerTitle(title: String) {
     Text(
         text = title,
-        style = MaterialTheme.typography.headlineSmall,
+        style = MaterialTheme.typography.headlineSmall.gameFont(GameFontWidth.COMPRESSED),
         fontWeight = FontWeight.Black,
         textAlign = TextAlign.Center,
         modifier = Modifier
@@ -529,7 +536,8 @@ internal fun DetailRow(
     value: String,
     color: Color = Color.Unspecified,
     brush: Brush? = null,
-    valueStyle: TextStyle? = null
+    valueStyle: TextStyle? = null,
+    outline: Color? = null
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -537,13 +545,15 @@ internal fun DetailRow(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelMedium.gameFont(),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.weight(1f))
-        val style = (valueStyle ?: MaterialTheme.typography.titleMedium)
+        val style = (valueStyle ?: MaterialTheme.typography.titleMedium.gameFont())
             .copy(fontWeight = FontWeight.Black)
-        if (brush != null) {
+        if (brush != null && outline != null) {
+            OutlinedText(text = value, style = style, fill = brush, outline = outline, outlineWidth = 0.3.dp)
+        } else if (brush != null) {
             Text(text = value, style = style.merge(TextStyle(brush = brush)))
         } else {
             Text(text = value, style = style, color = color)

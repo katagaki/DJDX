@@ -56,7 +56,7 @@ fun IIDXScoreFilterSheet(onDismiss: () -> Unit) {
     val djLevelFilters by rememberSetting(SettingsKeys.iidxDJLevelFilters, emptySet())
     val versionFilters by rememberSetting(SettingsKeys.iidxVersionFilters, emptySet())
     val scoreAvailableOnly by rememberSetting(SettingsKeys.iidxScoreAvailableOnly, true)
-    val beginnerHidden by rememberSetting(SettingsKeys.iidxBeginnerLevelHidden, false)
+    val beginnerHidden by rememberSetting(SettingsKeys.iidxBeginnerLevelHidden, true)
     val genreVisible by rememberSetting(SettingsKeys.iidxGenreVisible, false)
     val artistVisible by rememberSetting(SettingsKeys.iidxArtistVisible, true)
     val levelVisible by rememberSetting(SettingsKeys.iidxLevelVisible, true)
@@ -150,7 +150,7 @@ fun IIDXScoreFilterSheet(onDismiss: () -> Unit) {
 
             SectionLabel(stringResource(R.string.scores_filter_clear_type))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                IIDXClearType.sorted.forEach { clearType ->
+                IIDXClearType.ascending.reversed().forEach { clearType ->
                     FilterChip(
                         selected = clearType.value in clearTypeFilters,
                         onClick = {

@@ -39,4 +39,12 @@
     <plurals name="analytics_song_count">
         <item quantity="other">%1$d曲</item>
     </plurals>
+    <string name="analytics_progress">クリア更新の推移</string>
+    <string name="analytics_progress_high_scores">ハイスコア更新の推移</string>
+    <string name="analytics_progress_customize">カスタマイズ</string>
+    <string name="analytics_progress_series">表示する項目</string>
+    <string name="analytics_progress_style">グラフの種類</string>
+    <string name="analytics_progress_style_bars">棒グラフ</string>
+    <string name="analytics_progress_style_stacked">積み上げ</string>
+    <string name="analytics_card_items">カードに表示する項目（3つまで）</string>
 </resources>

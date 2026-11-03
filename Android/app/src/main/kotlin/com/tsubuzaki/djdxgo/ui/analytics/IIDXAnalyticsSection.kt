@@ -1,6 +1,8 @@
 package com.tsubuzaki.djdxgo.ui.analytics
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.tsubuzaki.djdxgo.data.analytics.IIDXProgressKind
+import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
+import com.tsubuzaki.djdxgo.ui.common.IIDXClearTypeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,12 +19,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowCircleUp
 import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.Report
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.material.icons.outlined.Whatshot
 import androidx.compose.material.icons.outlined.WorkspacePremium
@@ -61,22 +65,27 @@ private const val SECTION_PER_LEVEL = "perLevel"
 
 private const val CARD_CLEAR_TYPE_OVERALL = "clearTypeOverall"
 private const val CARD_GRADE_BREAKDOWN = "gradeBreakdown"
+private const val CARD_PROGRESS = "progressTrend"
+private const val CARD_SCORE_PROGRESS = "scoreProgressTrend"
 private const val CARD_TOWER_RECENT = "towerRecent"
 private const val CARD_TOWER_TOTALS = "towerTotals"
 
 private val overviewCards = listOf(
-    CARD_CLEAR_TYPE_OVERALL, CARD_GRADE_BREAKDOWN, CARD_TOWER_TOTALS, CARD_TOWER_RECENT
+    CARD_CLEAR_TYPE_OVERALL, CARD_GRADE_BREAKDOWN, CARD_PROGRESS, CARD_SCORE_PROGRESS,
+    CARD_TOWER_TOTALS, CARD_TOWER_RECENT
 )
 private val summaryCards = listOf(
-    IIDXNewEntryKind.HIGH_SCORES, IIDXNewEntryKind.AAA, IIDXNewEntryKind.AA, IIDXNewEntryKind.A,
+    IIDXNewEntryKind.HIGH_SCORES, IIDXNewEntryKind.CLEAR_LAMPS, IIDXNewEntryKind.SCORE_UPDATES,
+    IIDXNewEntryKind.AAA, IIDXNewEntryKind.AA, IIDXNewEntryKind.A,
     IIDXNewEntryKind.FULL_COMBO_CLEAR, IIDXNewEntryKind.CLEAR, IIDXNewEntryKind.EASY_CLEAR,
     IIDXNewEntryKind.ASSIST_CLEAR, IIDXNewEntryKind.HARD_CLEAR, IIDXNewEntryKind.EX_HARD_CLEAR,
     IIDXNewEntryKind.FAILED
 )
 private val defaultCardOrder = overviewCards + summaryCards.map { it.key }
 private val defaultVisibleCards = setOf(
-    CARD_GRADE_BREAKDOWN, CARD_TOWER_TOTALS,
-    IIDXNewEntryKind.HIGH_SCORES.key, IIDXNewEntryKind.CLEAR.key, IIDXNewEntryKind.ASSIST_CLEAR.key
+    CARD_GRADE_BREAKDOWN, CARD_PROGRESS, CARD_SCORE_PROGRESS, CARD_TOWER_TOTALS,
+    IIDXNewEntryKind.HIGH_SCORES.key, IIDXNewEntryKind.CLEAR_LAMPS.key, IIDXNewEntryKind.SCORE_UPDATES.key,
+    IIDXNewEntryKind.CLEAR.key, IIDXNewEntryKind.ASSIST_CLEAR.key
 )
 
 enum class PerLevelCategory(val key: String) {
@@ -313,8 +322,9 @@ private fun OverviewCardContent(
     isEditing: Boolean,
     onNavigate: (String) -> Unit
 ) {
-    val darkTheme = isSystemInDarkTheme()
     val nowEpoch = System.currentTimeMillis() / 1000L
+    val clearTypeCardLevels by rememberSetting(SettingsKeys.iidxClearTypeCardLevels, emptySet())
+    val djLevelCardLevels by rememberSetting(SettingsKeys.iidxDJLevelCardLevels, emptySet())
     when (id) {
         CARD_CLEAR_TYPE_OVERALL -> OverviewCard(
             caption = stringResource(R.string.analytics_clear_type_overall),
@@ -324,9 +334,15 @@ private fun OverviewCardContent(
                 { onNavigate(Routes.iidxAnalytics(Routes.IIDX_DETAIL_CLEAR_TYPE_OVERVIEW)) }
             }
         ) {
-            val populated = analytics.clearTypePerDifficulty
-                .filter { (_, counts) -> counts.values.any { it > 0 } }
-                .keys.sorted().takeLast(3)
+            val populated = if (clearTypeCardLevels.isNotEmpty()) {
+                clearTypeCardLevels.mapNotNull { it.toIntOrNull() }
+                    .filter { it in analytics.clearTypePerDifficulty }
+                    .sorted()
+            } else {
+                analytics.clearTypePerDifficulty
+                    .filter { (_, counts) -> counts.values.any { it > 0 } }
+                    .keys.sorted().takeLast(3)
+            }
             StackedBarChart(
                 rows = populated.map { difficulty ->
                     StackedRow(
@@ -351,9 +367,42 @@ private fun OverviewCardContent(
             }
         ) {
             HorizontalBarChart(
-                entries = analytics.totalDJLevelCounts.filter { it.second > 0 }.take(3),
-                colorFor = { IIDXColors.djLevelColor(it, darkTheme) }
+                entries = if (djLevelCardLevels.isEmpty()) {
+                    analytics.totalDJLevelCounts.filter { it.second > 0 }.take(3)
+                } else {
+                    analytics.totalDJLevelCounts.filter { it.first in djLevelCardLevels }
+                },
+                colorFor = { IIDXColors.djLevelColor(it) }
             )
+        }
+        CARD_PROGRESS, CARD_SCORE_PROGRESS -> {
+            val kind = if (id == CARD_PROGRESS) IIDXProgressKind.CLEARS else IIDXProgressKind.HIGH_SCORES
+            OverviewCard(
+                caption = stringResource(kind.titleRes),
+                onClick = if (isEditing || analytics.progress.isEmpty()) {
+                    null
+                } else {
+                    { onNavigate(Routes.iidxAnalytics(Routes.IIDX_DETAIL_PROGRESS, kind.key)) }
+                }
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    IIDXProgressGraph(
+                        points = analytics.progress,
+                        kind = kind,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .alpha(if (analytics.progress.isEmpty()) 0.25f else 1f)
+                    )
+                    if (analytics.progress.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.analytics_no_data),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
         }
         CARD_TOWER_TOTALS, CARD_TOWER_RECENT -> {
             val isRecent = id == CARD_TOWER_RECENT
@@ -412,13 +461,14 @@ private fun PerLevelCard(
     analytics: IIDXAnalyticsData,
     onClick: (() -> Unit)?
 ) {
-    val darkTheme = isSystemInDarkTheme()
     val segments = if (category.isClearType) {
         IIDXClearType.sortedWithoutNoPlay.map { clearType ->
             ChartSegment(
                 clearType.abbreviation,
                 analytics.clearTypePerDifficulty[difficulty]?.get(clearType.value) ?: 0,
-                IIDXColors.clearTypeColor(clearType.value)
+                IIDXColors.clearTypeColor(clearType.value),
+                key = clearType.value,
+                isFullCombo = clearType == IIDXClearType.FULL_COMBO_CLEAR
             )
         }
     } else {
@@ -426,7 +476,7 @@ private fun PerLevelCard(
             ChartSegment(
                 djLevel.value,
                 analytics.djLevelPerDifficulty[difficulty]?.get(djLevel.value) ?: 0,
-                IIDXColors.djLevelColor(djLevel.value, darkTheme)
+                IIDXColors.djLevelColor(djLevel.value)
             )
         }
     }
@@ -436,7 +486,7 @@ private fun PerLevelCard(
         }
     } else {
         trendPoints(analytics.djLevelTrends.map { it.date to it.counts[difficulty].orEmpty() }) {
-            IIDXColors.djLevelColor(it, darkTheme)
+            IIDXColors.djLevelColor(it)
         }
     }
     val shape = RoundedCornerShape(16.dp)
@@ -489,14 +539,20 @@ private fun PerLevelCard(
                         modifier = Modifier.padding(top = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        segments.filter { it.count > 0 }.forEach { segment ->
+                        segments.filter { it.count > 0 }.take(4).forEach { segment ->
                             Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-                                Text(
-                                    text = segment.label,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = segment.color
-                                )
+                                if (category.isClearType) {
+                                    IIDXClearTypeText(
+                                        clearType = segment.key,
+                                        label = segment.label,
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                } else {
+                                    IIDXDJLevelText(
+                                        djLevel = segment.key,
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
                                 Text(
                                     text = segment.count.toString(),
                                     style = MaterialTheme.typography.labelSmall,
@@ -526,6 +582,8 @@ internal fun trendPoints(
 @Composable
 internal fun newEntryTitle(kind: IIDXNewEntryKind): String = when (kind) {
     IIDXNewEntryKind.HIGH_SCORES -> stringResource(R.string.analytics_new_record)
+    IIDXNewEntryKind.CLEAR_LAMPS -> "NEW CLEAR"
+    IIDXNewEntryKind.SCORE_UPDATES -> "NEW HIGH SCORE"
     IIDXNewEntryKind.AAA -> "AAA"
     IIDXNewEntryKind.AA -> "AA"
     IIDXNewEntryKind.A -> "A"
@@ -540,6 +598,8 @@ internal fun newEntryTitle(kind: IIDXNewEntryKind): String = when (kind) {
 
 private fun newEntryIcon(kind: IIDXNewEntryKind): ImageVector = when (kind) {
     IIDXNewEntryKind.HIGH_SCORES -> Icons.Outlined.EmojiEvents
+    IIDXNewEntryKind.CLEAR_LAMPS -> Icons.Outlined.Verified
+    IIDXNewEntryKind.SCORE_UPDATES -> Icons.Outlined.ArrowCircleUp
     IIDXNewEntryKind.AAA, IIDXNewEntryKind.AA, IIDXNewEntryKind.A -> Icons.Outlined.WorkspacePremium
     IIDXNewEntryKind.FULL_COMBO_CLEAR -> Icons.Outlined.StarOutline
     IIDXNewEntryKind.CLEAR -> Icons.Outlined.CheckCircle
@@ -553,6 +613,8 @@ private fun newEntryIcon(kind: IIDXNewEntryKind): ImageVector = when (kind) {
 @Composable
 private fun newEntryColor(kind: IIDXNewEntryKind): Color = when (kind) {
     IIDXNewEntryKind.HIGH_SCORES -> MaterialTheme.colorScheme.onSurface
+    IIDXNewEntryKind.CLEAR_LAMPS -> Palette.teal
+    IIDXNewEntryKind.SCORE_UPDATES -> Palette.green
     IIDXNewEntryKind.AAA, IIDXNewEntryKind.AA, IIDXNewEntryKind.A -> Palette.orange
     IIDXNewEntryKind.FULL_COMBO_CLEAR -> Palette.blue
     IIDXNewEntryKind.CLEAR -> Palette.cyan

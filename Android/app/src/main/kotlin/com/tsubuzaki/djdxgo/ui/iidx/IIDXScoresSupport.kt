@@ -119,10 +119,14 @@ fun filterAndSortEntries(
             val base = compareBy<IIDXScoreEntry> { it.record.title.compact }
             if (sortDescending) base.reversed() else base
         }
-        IIDXSortMode.CLEAR_TYPE -> directional(
-            compareBy { IIDXClearType.sortIndex(it.score.clearType) },
-            sortDescending,
-            titleComparator
+        IIDXSortMode.CLEAR_TYPE -> compareBy<IIDXScoreEntry> {
+            IIDXClearType.clearedIndex(it.score.clearType) == null
+        }.then(
+            directional(
+                compareBy { IIDXClearType.clearedIndex(it.score.clearType) ?: 0 },
+                sortDescending,
+                titleComparator
+            )
         )
         IIDXSortMode.DJ_LEVEL -> directional(
             compareBy { IIDXDJLevel.sortIndex(it.score.djLevel) },

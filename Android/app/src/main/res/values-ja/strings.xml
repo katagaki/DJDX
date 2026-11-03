@@ -42,6 +42,12 @@
     <string name="more_reset_layout">レイアウトをリセット</string>
     <string name="more_reset_layout_title">レイアウトをリセットしますか？</string>
     <string name="more_reset_layout_message">カードの表示と並び順が初期状態に戻ります。</string>
+    <string name="more_free_up_space">空き容量を増やす…</string>
+    <string name="more_free_up_space_title">空き容量を増やす</string>
+    <string name="more_free_up_space_message">キャッシュなどの未使用のデータを整理して、%1$sが使用するストレージを減らすことができます。</string>
+    <string name="more_free_up_space_clean_up">未使用のデータを整理</string>
+    <string name="more_free_up_space_cleaning_up">整理中…</string>
+    <string name="more_free_up_space_done">%1$sの空き容量を確保しました。</string>
     <string name="more_delete_web_data_title">Webデータがすべて削除されます</string>
     <string name="more_delete_web_data_message">次にWebでのインポートを行う際に、再度ログインする必要があります。</string>
     <string name="more_delete_web_data_confirm_button">Webデータを消去</string>

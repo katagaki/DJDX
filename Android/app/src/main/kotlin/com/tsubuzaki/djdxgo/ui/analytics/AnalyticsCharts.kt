@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.analytics
 
+import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
+import com.tsubuzaki.djdxgo.ui.common.rememberFullComboPhase
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -228,14 +230,15 @@ internal fun StackedBarChart(
 @Composable
 internal fun ChartLegend(
     items: List<Pair<String, Color>>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    label: (@Composable (String) -> Unit)? = null
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items.forEach { (label, color) ->
+        items.forEach { (text, color) ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -245,11 +248,15 @@ internal fun ChartLegend(
                         .size(8.dp)
                         .background(color, CircleShape)
                 )
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                if (label != null) {
+                    label(text)
+                } else {
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }
@@ -353,7 +360,13 @@ internal fun BigTotalsBarChart(
     }
 }
 
-internal data class ChartSegment(val label: String, val count: Int, val color: Color)
+internal data class ChartSegment(
+    val label: String,
+    val count: Int,
+    val color: Color,
+    val key: String = label,
+    val isFullCombo: Boolean = false
+)
 
 @Composable
 internal fun SegmentedBar(
@@ -363,6 +376,7 @@ internal fun SegmentedBar(
     cornerRadius: Dp = 3.dp
 ) {
     val total = segments.sumOf { it.count }.coerceAtLeast(1)
+    val phase = rememberFullComboPhase(segments.any { it.isFullCombo && it.count > 0 })
     Canvas(
         modifier = modifier
             .fillMaxWidth()
@@ -375,7 +389,11 @@ internal fun SegmentedBar(
             var x = 0f
             segments.filter { it.count > 0 }.forEach { segment ->
                 val width = segment.count.toFloat() / total * size.width
-                drawRect(segment.color, topLeft = Offset(x, 0f), size = Size(width, size.height))
+                drawRect(
+                    if (segment.isFullCombo) IIDXColors.fullComboRainbowColor(phase) else segment.color,
+                    topLeft = Offset(x, 0f),
+                    size = Size(width, size.height)
+                )
                 x += width
             }
         }

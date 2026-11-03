@@ -1,6 +1,8 @@
 package com.tsubuzaki.djdxgo.ui.analytics
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.tsubuzaki.djdxgo.data.analytics.IIDXProgressKind
+import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
+import com.tsubuzaki.djdxgo.ui.common.IIDXClearTypeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -67,6 +69,7 @@ fun IIDXAnalyticsDetailScreen(
     val difficulty = param.toIntOrNull() ?: 0
     val separator = stringResource(R.string.analytics_per_level_title_separator)
     var showsPieChart by rememberSaveable(detail) { mutableStateOf(detail == Routes.IIDX_DETAIL_CLEAR_TYPE_LEVEL) }
+    val progressKind = IIDXProgressKind.fromKey(param) ?: IIDXProgressKind.CLEARS
     val title = when (detail) {
         Routes.IIDX_DETAIL_CLEAR_TYPE_OVERVIEW -> stringResource(R.string.analytics_clear_type_overall)
         Routes.IIDX_DETAIL_GRADE_BREAKDOWN -> stringResource(R.string.analytics_dj_level_overall)
@@ -74,12 +77,32 @@ fun IIDXAnalyticsDetailScreen(
             "LEVEL $difficulty$separator${stringResource(R.string.analytics_clear_type)}"
         Routes.IIDX_DETAIL_DJ_LEVEL_LEVEL ->
             "LEVEL $difficulty$separator${stringResource(R.string.analytics_dj_level)}"
+        Routes.IIDX_DETAIL_PROGRESS -> stringResource(progressKind.titleRes)
         else -> IIDXNewEntryKind.fromKey(param)?.let { newEntryTitle(it) }.orEmpty()
     }
     DetailScaffold(
         title = title,
         onBack = onBack,
         actions = {
+            if (detail == Routes.IIDX_DETAIL_PROGRESS) {
+                IIDXProgressCustomizeMenu(progressKind)
+            }
+            if (detail == Routes.IIDX_DETAIL_CLEAR_TYPE_OVERVIEW) {
+                AnalyticsCardItemsMenu(
+                    items = (12 downTo 1).map { it.toString() },
+                    automaticItems = analytics.clearTypePerDifficulty
+                        .filter { (_, counts) -> counts.values.any { it > 0 } }
+                        .keys.sorted().takeLast(3).map { it.toString() },
+                    selectionKey = SettingsKeys.iidxClearTypeCardLevels
+                ) { "LEVEL $it" }
+            }
+            if (detail == Routes.IIDX_DETAIL_GRADE_BREAKDOWN) {
+                AnalyticsCardItemsMenu(
+                    items = IIDXDJLevel.sorted.reversed().map { it.value },
+                    automaticItems = analytics.totalDJLevelCounts.filter { it.second > 0 }.take(3).map { it.first },
+                    selectionKey = SettingsKeys.iidxDJLevelCardLevels
+                ) { it }
+            }
             if (detail == Routes.IIDX_DETAIL_CLEAR_TYPE_LEVEL || detail == Routes.IIDX_DETAIL_DJ_LEVEL_LEVEL) {
                 IconButton(onClick = { showsPieChart = !showsPieChart }) {
                     Icon(
@@ -96,6 +119,7 @@ fun IIDXAnalyticsDetailScreen(
         when (detail) {
             Routes.IIDX_DETAIL_CLEAR_TYPE_OVERVIEW -> ClearTypeOverviewDetail(analytics, modifier)
             Routes.IIDX_DETAIL_GRADE_BREAKDOWN -> GradeBreakdownDetail(analytics, modifier)
+            Routes.IIDX_DETAIL_PROGRESS -> IIDXProgressDetail(analytics.progress, progressKind, modifier)
             Routes.IIDX_DETAIL_CLEAR_TYPE_LEVEL, Routes.IIDX_DETAIL_DJ_LEVEL_LEVEL -> PerLevelDetail(
                 analytics = analytics,
                 difficulty = difficulty,
@@ -131,13 +155,18 @@ private fun clearTypeSegments(counts: Map<String, Int>): List<ChartSegment> =
 
 @Composable
 internal fun ClearTypeLegend() {
-    ChartLegend(items = IIDXClearType.sortedWithoutNoPlay.map { it.value to IIDXColors.clearTypeColor(it.value) })
+    ChartLegend(
+        items = IIDXClearType.sortedWithoutNoPlay.map { it.value to IIDXColors.clearTypeColor(it.value) },
+        label = { IIDXClearTypeText(it, MaterialTheme.typography.labelSmall) }
+    )
 }
 
 @Composable
 internal fun DJLevelLegend() {
-    val darkTheme = isSystemInDarkTheme()
-    ChartLegend(items = IIDXDJLevel.sorted.reversed().map { it.value to IIDXColors.djLevelColor(it.value, darkTheme) })
+    ChartLegend(
+        items = IIDXDJLevel.sorted.reversed().map { it.value to IIDXColors.djLevelColor(it.value) },
+        label = { IIDXDJLevelText(it, MaterialTheme.typography.labelSmall) }
+    )
 }
 
 @Composable
@@ -200,7 +229,6 @@ internal fun LevelBreakdownRow(label: String, total: Int, segments: List<ChartSe
 
 @Composable
 private fun GradeBreakdownDetail(analytics: IIDXAnalyticsData, modifier: Modifier) {
-    val darkTheme = isSystemInDarkTheme()
     val populated = analytics.djLevelPerDifficulty
         .filter { (_, counts) -> counts.values.any { it > 0 } }
         .keys.sorted()
@@ -222,7 +250,7 @@ private fun GradeBreakdownDetail(analytics: IIDXAnalyticsData, modifier: Modifie
                                 ChartSegment(
                                     djLevel.value,
                                     counts[djLevel.value] ?: 0,
-                                    IIDXColors.djLevelColor(djLevel.value, darkTheme)
+                                    IIDXColors.djLevelColor(djLevel.value)
                                 )
                             )
                         )
@@ -244,13 +272,12 @@ private fun PerLevelDetail(
     showsPieChart: Boolean,
     modifier: Modifier
 ) {
-    val darkTheme = isSystemInDarkTheme()
     val segments = if (isClearType) {
         clearTypeSegments(analytics.clearTypePerDifficulty[difficulty].orEmpty())
     } else {
         val counts = analytics.djLevelPerDifficulty[difficulty].orEmpty()
         IIDXDJLevel.sorted.reversed().map {
-            ChartSegment(it.value, counts[it.value] ?: 0, IIDXColors.djLevelColor(it.value, darkTheme))
+            ChartSegment(it.value, counts[it.value] ?: 0, IIDXColors.djLevelColor(it.value))
         }
     }
     val trend = if (isClearType) {
@@ -259,7 +286,7 @@ private fun PerLevelDetail(
         }
     } else {
         trendPoints(analytics.djLevelTrends.map { it.date to it.counts[difficulty].orEmpty() }) {
-            IIDXColors.djLevelColor(it, darkTheme)
+            IIDXColors.djLevelColor(it)
         }
     }
     LazyColumn(
@@ -372,7 +399,7 @@ private fun IIDXAnalyticsDetailNewEntries(
                         onToggle = { isLevelBreakdownExpanded = !isLevelBreakdownExpanded },
                         items = levelItems
                     )
-                    if (kind == IIDXNewEntryKind.HIGH_SCORES) {
+                    if (kind == IIDXNewEntryKind.HIGH_SCORES || kind == IIDXNewEntryKind.SCORE_UPDATES) {
                         BreakdownSection(
                             title = stringResource(R.string.analytics_breakdown_clear_type),
                             isExpanded = isClearTypeBreakdownExpanded,
@@ -399,7 +426,7 @@ private fun IIDXAnalyticsDetailNewEntries(
                     scoreRateVisible = scoreRateVisible,
                     scoreVisible = scoreVisible,
                     lastPlayDateVisible = lastPlayDateVisible,
-                    scoreDelta = if (kind == IIDXNewEntryKind.HIGH_SCORES) {
+                    scoreDelta = if (kind == IIDXNewEntryKind.HIGH_SCORES || kind == IIDXNewEntryKind.SCORE_UPDATES) {
                         entry.score.score - entry.previousScore
                     } else {
                         null
