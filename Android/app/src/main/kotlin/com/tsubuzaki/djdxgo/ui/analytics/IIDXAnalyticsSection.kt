@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.analytics
 
+import com.tsubuzaki.djdxgo.data.analytics.IIDXProgressKind
 import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
 import com.tsubuzaki.djdxgo.ui.common.IIDXClearTypeText
 import androidx.compose.foundation.layout.Arrangement
@@ -64,11 +65,14 @@ private const val SECTION_PER_LEVEL = "perLevel"
 
 private const val CARD_CLEAR_TYPE_OVERALL = "clearTypeOverall"
 private const val CARD_GRADE_BREAKDOWN = "gradeBreakdown"
+private const val CARD_PROGRESS = "progressTrend"
+private const val CARD_SCORE_PROGRESS = "scoreProgressTrend"
 private const val CARD_TOWER_RECENT = "towerRecent"
 private const val CARD_TOWER_TOTALS = "towerTotals"
 
 private val overviewCards = listOf(
-    CARD_CLEAR_TYPE_OVERALL, CARD_GRADE_BREAKDOWN, CARD_TOWER_TOTALS, CARD_TOWER_RECENT
+    CARD_CLEAR_TYPE_OVERALL, CARD_GRADE_BREAKDOWN, CARD_PROGRESS, CARD_SCORE_PROGRESS,
+    CARD_TOWER_TOTALS, CARD_TOWER_RECENT
 )
 private val summaryCards = listOf(
     IIDXNewEntryKind.HIGH_SCORES, IIDXNewEntryKind.CLEAR_LAMPS, IIDXNewEntryKind.SCORE_UPDATES,
@@ -79,7 +83,7 @@ private val summaryCards = listOf(
 )
 private val defaultCardOrder = overviewCards + summaryCards.map { it.key }
 private val defaultVisibleCards = setOf(
-    CARD_GRADE_BREAKDOWN, CARD_TOWER_TOTALS,
+    CARD_GRADE_BREAKDOWN, CARD_PROGRESS, CARD_SCORE_PROGRESS, CARD_TOWER_TOTALS,
     IIDXNewEntryKind.HIGH_SCORES.key, IIDXNewEntryKind.CLEAR_LAMPS.key, IIDXNewEntryKind.SCORE_UPDATES.key,
     IIDXNewEntryKind.CLEAR.key, IIDXNewEntryKind.ASSIST_CLEAR.key
 )
@@ -358,6 +362,35 @@ private fun OverviewCardContent(
                 entries = analytics.totalDJLevelCounts.filter { it.second > 0 }.take(3),
                 colorFor = { IIDXColors.djLevelColor(it) }
             )
+        }
+        CARD_PROGRESS, CARD_SCORE_PROGRESS -> {
+            val kind = if (id == CARD_PROGRESS) IIDXProgressKind.CLEARS else IIDXProgressKind.HIGH_SCORES
+            OverviewCard(
+                caption = stringResource(kind.titleRes),
+                onClick = if (isEditing || analytics.progress.isEmpty()) {
+                    null
+                } else {
+                    { onNavigate(Routes.iidxAnalytics(Routes.IIDX_DETAIL_PROGRESS, kind.key)) }
+                }
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    IIDXProgressGraph(
+                        points = analytics.progress,
+                        kind = kind,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .alpha(if (analytics.progress.isEmpty()) 0.25f else 1f)
+                    )
+                    if (analytics.progress.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.analytics_no_data),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
         }
         CARD_TOWER_TOTALS, CARD_TOWER_RECENT -> {
             val isRecent = id == CARD_TOWER_RECENT

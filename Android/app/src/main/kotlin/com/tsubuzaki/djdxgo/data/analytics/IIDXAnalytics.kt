@@ -76,12 +76,47 @@ data class IIDXNewEntry(
 
 data class IIDXTrendPoint(val date: Long, val counts: Map<Int, Map<String, Int>>)
 
+enum class IIDXProgressKind(val key: String, val series: List<String>, val defaultVisibleSeries: Set<String>) {
+    CLEARS(
+        "clears",
+        IIDXClearType.ascending
+            .filter { it != IIDXClearType.NO_PLAY && it != IIDXClearType.FAILED }
+            .reversed()
+            .map { it.value },
+        setOf(IIDXClearType.CLEAR.value, IIDXClearType.EASY_CLEAR.value)
+    ),
+    HIGH_SCORES(
+        "highScores",
+        IIDXDJLevel.sorted.reversed().map { it.value },
+        setOf(IIDXDJLevel.AAA.value, IIDXDJLevel.AA.value, IIDXDJLevel.A.value)
+    );
+
+    val defaultHiddenSeries: Set<String>
+        get() = series.toSet() - defaultVisibleSeries
+
+    companion object {
+        fun fromKey(key: String): IIDXProgressKind? = entries.firstOrNull { it.key == key }
+    }
+}
+
+data class IIDXProgressPoint(
+    val date: Long,
+    val newClears: Map<String, Int>,
+    val newHighScores: Map<String, Int>
+) {
+    fun count(series: String, kind: IIDXProgressKind): Int = when (kind) {
+        IIDXProgressKind.CLEARS -> newClears[series] ?: 0
+        IIDXProgressKind.HIGH_SCORES -> newHighScores[series] ?: 0
+    }
+}
+
 data class IIDXAnalyticsData(
     val clearTypePerDifficulty: Map<Int, Map<String, Int>> = emptyMap(),
     val djLevelPerDifficulty: Map<Int, Map<String, Int>> = emptyMap(),
     val clearTypeTrends: List<IIDXTrendPoint> = emptyList(),
     val djLevelTrends: List<IIDXTrendPoint> = emptyList(),
     val newEntries: Map<IIDXNewEntryKind, List<IIDXNewEntry>> = emptyMap(),
+    val progress: List<IIDXProgressPoint> = emptyList(),
     val towerEntries: List<IIDXTowerEntry> = emptyList()
 ) {
     fun newEntries(kind: IIDXNewEntryKind): List<IIDXNewEntry> = newEntries[kind].orEmpty()
@@ -162,6 +197,7 @@ object IIDXAnalytics {
             clearTypeTrends = clearTypeTrends,
             djLevelTrends = djLevelTrends,
             newEntries = newEntries(dao, groups, playType, filters),
+            progress = progress(dao, groups, playType, filters),
             towerEntries = towerEntries
         )
     }
@@ -226,6 +262,34 @@ object IIDXAnalytics {
         if (latest == IIDXClearType.FAILED.value) return false
         val previousIndex = IIDXClearType.clearedIndex(previous) ?: return true
         return latestIndex > previousIndex
+    }
+
+    private suspend fun progress(
+        dao: IIDXDao,
+        groups: List<IIDXImportGroup>,
+        playType: IIDXPlayType,
+        filters: IIDXFilterOptions
+    ): List<IIDXProgressPoint> {
+        val points = mutableListOf<IIDXProgressPoint>()
+        var previousRecords: List<IIDXSongRecord>? = null
+        for (group in groups) {
+            val records = dao.songRecords(group.id, playType.value)
+            if (records.isEmpty()) continue
+            previousRecords?.let { previous ->
+                val computed = computeNewEntries(records, previous, filters)
+                points.add(
+                    IIDXProgressPoint(
+                        date = group.importDate,
+                        newClears = computed.getValue(IIDXNewEntryKind.CLEAR_LAMPS)
+                            .groupingBy { it.score.clearType }.eachCount(),
+                        newHighScores = computed.getValue(IIDXNewEntryKind.SCORE_UPDATES)
+                            .groupingBy { it.score.djLevel }.eachCount()
+                    )
+                )
+            }
+            previousRecords = records
+        }
+        return points
     }
 
     fun matchKey(record: IIDXSongRecord): String =

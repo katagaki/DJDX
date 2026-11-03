@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.analytics
 
+import com.tsubuzaki.djdxgo.data.analytics.IIDXProgressKind
 import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
 import com.tsubuzaki.djdxgo.ui.common.IIDXClearTypeText
 import androidx.compose.foundation.layout.Arrangement
@@ -68,6 +69,7 @@ fun IIDXAnalyticsDetailScreen(
     val difficulty = param.toIntOrNull() ?: 0
     val separator = stringResource(R.string.analytics_per_level_title_separator)
     var showsPieChart by rememberSaveable(detail) { mutableStateOf(detail == Routes.IIDX_DETAIL_CLEAR_TYPE_LEVEL) }
+    val progressKind = IIDXProgressKind.fromKey(param) ?: IIDXProgressKind.CLEARS
     val title = when (detail) {
         Routes.IIDX_DETAIL_CLEAR_TYPE_OVERVIEW -> stringResource(R.string.analytics_clear_type_overall)
         Routes.IIDX_DETAIL_GRADE_BREAKDOWN -> stringResource(R.string.analytics_dj_level_overall)
@@ -75,12 +77,16 @@ fun IIDXAnalyticsDetailScreen(
             "LEVEL $difficulty$separator${stringResource(R.string.analytics_clear_type)}"
         Routes.IIDX_DETAIL_DJ_LEVEL_LEVEL ->
             "LEVEL $difficulty$separator${stringResource(R.string.analytics_dj_level)}"
+        Routes.IIDX_DETAIL_PROGRESS -> stringResource(progressKind.titleRes)
         else -> IIDXNewEntryKind.fromKey(param)?.let { newEntryTitle(it) }.orEmpty()
     }
     DetailScaffold(
         title = title,
         onBack = onBack,
         actions = {
+            if (detail == Routes.IIDX_DETAIL_PROGRESS) {
+                IIDXProgressCustomizeMenu(progressKind)
+            }
             if (detail == Routes.IIDX_DETAIL_CLEAR_TYPE_LEVEL || detail == Routes.IIDX_DETAIL_DJ_LEVEL_LEVEL) {
                 IconButton(onClick = { showsPieChart = !showsPieChart }) {
                     Icon(
@@ -97,6 +103,7 @@ fun IIDXAnalyticsDetailScreen(
         when (detail) {
             Routes.IIDX_DETAIL_CLEAR_TYPE_OVERVIEW -> ClearTypeOverviewDetail(analytics, modifier)
             Routes.IIDX_DETAIL_GRADE_BREAKDOWN -> GradeBreakdownDetail(analytics, modifier)
+            Routes.IIDX_DETAIL_PROGRESS -> IIDXProgressDetail(analytics.progress, progressKind, modifier)
             Routes.IIDX_DETAIL_CLEAR_TYPE_LEVEL, Routes.IIDX_DETAIL_DJ_LEVEL_LEVEL -> PerLevelDetail(
                 analytics = analytics,
                 difficulty = difficulty,
