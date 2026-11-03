@@ -4,16 +4,15 @@ actor IIDXChartAnalyzer {
 
     static let shared = IIDXChartAnalyzer()
 
-    private static let cacheVersion = 4
     private static let endpoint = URL(string: "https://textage-chart-viewer.vercel.app/api/chart")!
 
     private var profiles: [String: IIDXChartProfile] = [:]
-    private var inFlight: [String: Task<IIDXChartProfile?, Never>] = [:]
-    private var hasRemovedStaleProfiles = false
+    private var inFlight: [String: Task<(IIDXChartProfile, IIDXChartData)?, Never>] = [:]
+    private var hasRemovedLegacyCache = false
 
-    private let cacheDirectory: URL = FileManager.default
-        .urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        .appendingPathComponent("IIDXChartProfiles", isDirectory: true)
+    private let cachesDirectory: URL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    private var profileDirectory: URL { cachesDirectory.appendingPathComponent("IIDXChartTraits", isDirectory: true) }
+    private var chartDirectory: URL { cachesDirectory.appendingPathComponent("IIDXCharts", isDirectory: true) }
 
     func profile(for chart: TextageChartViewerChart,
                  difficulty: IIDXLevel,
@@ -21,36 +20,46 @@ actor IIDXChartAnalyzer {
         guard let scoreURL = chart.textageScoreURL(for: difficulty, playType: playType) else { return nil }
         let level = chart.level(for: difficulty, playType: playType)
         let key = [
-            "v\(Self.cacheVersion)", String(chart.version), chart.songId,
+            String(chart.version), chart.songId,
             playType == .double ? "DP" : "SP", difficulty.code(), String(level)
         ].joined(separator: "_")
 
-        if let profile = profiles[key] {
+        if let profile = profiles[key], profile.isCurrent {
             return profile
         }
-        removeStaleProfilesIfNeeded()
-        if let profile = readCachedProfile(key: key) {
+        removeLegacyCacheIfNeeded()
+        if let profile = read(IIDXChartProfile.self, from: profileDirectory, key: key), profile.isCurrent {
             profiles[key] = profile
             return profile
         }
         if let task = inFlight[key] {
-            return await task.value
+            return await task.value?.0
         }
 
-        let task = Task.detached {
-            await Self.analyze(scoreURL: scoreURL, playType: playType, level: level)
+        let cachedChart = read(IIDXChartData.self, from: chartDirectory, key: key)
+        let task = Task.detached { () -> (IIDXChartProfile, IIDXChartData)? in
+            var chartData = cachedChart
+            if chartData == nil {
+                chartData = await Self.fetchChart(scoreURL: scoreURL)
+            }
+            guard let chartData else { return nil }
+            let profile = IIDXChartProfile(notes: chartData.notes, bpmChanges: chartData.bpmChanges,
+                                           playType: playType, level: level)
+            return (profile, chartData)
         }
         inFlight[key] = task
-        let profile = await task.value
+        let result = await task.value
         inFlight[key] = nil
-        if let profile {
-            profiles[key] = profile
-            writeCachedProfile(profile, key: key)
+        guard let (profile, chartData) = result else { return nil }
+        profiles[key] = profile
+        write(profile, to: profileDirectory, key: key)
+        if cachedChart == nil {
+            write(chartData, to: chartDirectory, key: key)
         }
         return profile
     }
 
-    private static func analyze(scoreURL: URL, playType: IIDXPlayType, level: Int) async -> IIDXChartProfile? {
+    private static func fetchChart(scoreURL: URL) async -> IIDXChartData? {
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -60,44 +69,38 @@ actor IIDXChartAnalyzer {
               let decoded = try? JSONDecoder().decode(ChartResponse.self, from: data) else {
             return nil
         }
-        return IIDXChartProfile(notes: decoded.data.notes,
-                                bpmChanges: decoded.data.bpmChanges,
-                                playType: playType,
-                                level: level)
+        return decoded.data
     }
 
-    private func removeStaleProfilesIfNeeded() {
-        guard !hasRemovedStaleProfiles else { return }
-        hasRemovedStaleProfiles = true
-        let currentPrefix = "v\(Self.cacheVersion)_".addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
-        let files = (try? FileManager.default.contentsOfDirectory(at: cacheDirectory,
-                                                                  includingPropertiesForKeys: nil)) ?? []
-        for file in files where !file.lastPathComponent.hasPrefix(currentPrefix) {
-            try? FileManager.default.removeItem(at: file)
-        }
+    private func removeLegacyCacheIfNeeded() {
+        guard !hasRemovedLegacyCache else { return }
+        hasRemovedLegacyCache = true
+        try? FileManager.default.removeItem(at: cachesDirectory.appendingPathComponent("IIDXChartProfiles",
+                                                                                       isDirectory: true))
     }
 
-    private func cacheFileURL(key: String) -> URL {
-        cacheDirectory.appendingPathComponent(key.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? key)
+    private func cacheFileURL(in directory: URL, key: String) -> URL {
+        directory.appendingPathComponent(key.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? key)
             .appendingPathExtension("json")
     }
 
-    private func readCachedProfile(key: String) -> IIDXChartProfile? {
-        guard let data = try? Data(contentsOf: cacheFileURL(key: key)) else { return nil }
-        return try? JSONDecoder().decode(IIDXChartProfile.self, from: data)
+    private func read<Value: Decodable>(_ type: Value.Type, from directory: URL, key: String) -> Value? {
+        guard let data = try? Data(contentsOf: cacheFileURL(in: directory, key: key)) else { return nil }
+        return try? JSONDecoder().decode(type, from: data)
     }
 
-    private func writeCachedProfile(_ profile: IIDXChartProfile, key: String) {
-        try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
-        guard let data = try? JSONEncoder().encode(profile) else { return }
-        try? data.write(to: cacheFileURL(key: key), options: .atomic)
+    private func write<Value: Encodable>(_ value: Value, to directory: URL, key: String) {
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        guard let data = try? JSONEncoder().encode(value) else { return }
+        try? data.write(to: cacheFileURL(in: directory, key: key), options: .atomic)
     }
 }
 
+struct IIDXChartData: Codable, Sendable {
+    let notes: [IIDXChartNote]
+    let bpmChanges: [IIDXChartBPMChange]
+}
+
 private struct ChartResponse: Decodable {
-    struct ChartData: Decodable {
-        let notes: [IIDXChartNote]
-        let bpmChanges: [IIDXChartBPMChange]
-    }
-    let data: ChartData
+    let data: IIDXChartData
 }

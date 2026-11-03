@@ -26,6 +26,8 @@ struct IIDXChartTraitIcon: View {
         switch trait {
         case .backloaded:
             graphGlyph(BackloadedGlyph.self)
+        case .buildUp:
+            graphGlyph(BuildUpGlyph.self)
         case .gradualSoflan:
             graphGlyph(GradualSoflanGlyph.self)
         case .suddenSoflan:
@@ -33,10 +35,16 @@ struct IIDXChartTraitIcon: View {
         case .chargeCombo:
             ChargeComboGlyph()
                 .frame(width: size * 0.62, height: size * 0.54)
+        case .chargeChords:
+            ChargeChordsGlyph()
+                .frame(width: size * 0.66, height: size * 0.54)
         case .scratchCombo:
             ScratchComboGlyph()
                 .frame(width: size * 0.6, height: size * 0.46)
-        case .stairs, .consecutiveChords, .adjacentPairs:
+        case .legacyNotes:
+            LegacyNotesGlyph()
+                .frame(width: size * 0.66, height: size * 0.46)
+        case .stairs, .consecutiveChords, .adjacentPairs, .jacks:
             NoteGridGlyph(columns: 4, rows: trait.noteGridRows)
                 .frame(width: size * 0.7, height: size * 0.56)
         case .burst, .stamina, .chaotic:
@@ -95,6 +103,23 @@ struct BackloadedGlyph: GraphGlyph {
     }
 }
 
+struct BuildUpGlyph: GraphGlyph {
+    var closed: Bool
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: point(0.0, 0.86, in: rect))
+        path.addLine(to: point(0.2, 0.66, in: rect))
+        path.addLine(to: point(0.32, 0.74, in: rect))
+        path.addLine(to: point(0.52, 0.46, in: rect))
+        path.addLine(to: point(0.64, 0.54, in: rect))
+        path.addLine(to: point(0.84, 0.24, in: rect))
+        path.addLine(to: point(1.0, 0.08, in: rect))
+        closing(&path, in: rect, from: 0.0)
+        return path
+    }
+}
+
 struct GradualSoflanGlyph: GraphGlyph {
     var closed: Bool
 
@@ -136,6 +161,23 @@ struct ChargeComboGlyph: Shape {
             let originY = rect.minY + rect.height * (0.06 + Double(index) * 0.36)
             path.addRoundedRect(in: CGRect(x: originX, y: originY, width: noteWidth, height: noteHeight),
                                 cornerSize: CGSize(width: noteHeight * 0.4, height: noteHeight * 0.4))
+        }
+        return path
+    }
+}
+
+struct ChargeChordsGlyph: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let columnWidth = rect.width / 3.0
+        let noteWidth = columnWidth * 0.82
+        let noteHeight = rect.height * 0.2
+        let corner = CGSize(width: noteHeight * 0.4, height: noteHeight * 0.4)
+        for column in 0..<3 {
+            let originX = rect.minX + columnWidth * CGFloat(column) + (columnWidth - noteWidth) / 2.0
+            let height = column == 1 ? rect.height : noteHeight
+            path.addRoundedRect(in: CGRect(x: originX, y: rect.maxY - height, width: noteWidth, height: height),
+                                cornerSize: corner)
         }
         return path
     }
@@ -188,20 +230,46 @@ struct ScratchComboGlyph: View {
     }
 }
 
+struct LegacyNotesGlyph: View {
+    var body: some View {
+        GeometryReader { geometry in
+            let diameter = min(geometry.size.height, geometry.size.width * 0.5)
+            let lineWidth = diameter * 0.16
+            HStack(spacing: geometry.size.width * 0.1) {
+                Circle()
+                    .strokeBorder(lineWidth: lineWidth)
+                    .overlay {
+                        Circle()
+                            .frame(width: diameter * 0.26, height: diameter * 0.26)
+                    }
+                    .frame(width: diameter, height: diameter)
+                Text(verbatim: "3")
+                    .font(.system(size: diameter * 1.05, weight: .heavy, design: .rounded))
+                    .minimumScaleFactor(0.5)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+}
+
 // MARK: - Trait Display
 
 extension IIDXChartTrait {
     var localizedName: LocalizedStringKey {
         switch self {
         case .backloaded: "Scores.Viewer.ChartType.Backloaded"
+        case .buildUp: "Scores.Viewer.ChartType.BuildUp"
         case .burst: "Scores.Viewer.ChartType.Burst"
         case .stamina: "Scores.Viewer.ChartType.Stamina"
         case .chaotic: "Scores.Viewer.ChartType.Chaotic"
         case .stairs: "Scores.Viewer.ChartType.Stairs"
         case .consecutiveChords: "Scores.Viewer.ChartType.ConsecutiveChords"
         case .adjacentPairs: "Scores.Viewer.ChartType.AdjacentPairs"
+        case .jacks: "Scores.Viewer.ChartType.Jacks"
         case .scratchCombo: "Scores.Viewer.ChartType.ScratchCombo"
+        case .legacyNotes: "Scores.Viewer.ChartType.LegacyNotes"
         case .chargeCombo: "Scores.Viewer.ChartType.ChargeCombo"
+        case .chargeChords: "Scores.Viewer.ChartType.ChargeChords"
         case .gradualSoflan: "Scores.Viewer.ChartType.GradualSoflan"
         case .suddenSoflan: "Scores.Viewer.ChartType.SuddenSoflan"
         }
@@ -212,6 +280,7 @@ extension IIDXChartTrait {
         case .stairs: [[0], [1], [2], [3]]
         case .consecutiveChords: [[0, 2], [1, 3], [0, 2]]
         case .adjacentPairs: [[2, 3], [0, 1], [1, 2]]
+        case .jacks: [[1], [1], [2], [2]]
         default: []
         }
     }
@@ -228,14 +297,18 @@ extension IIDXChartTrait {
     var color: Color {
         switch self {
         case .backloaded: .orange
+        case .buildUp: .init(red: 124 / 255, green: 168 / 255, blue: 20 / 255)
         case .burst: .init(red: 230 / 255, green: 175 / 255, blue: 0 / 255)
         case .stamina: .pink
         case .chaotic: .init(red: 52 / 255, green: 178 / 255, blue: 89 / 255)
         case .stairs: .init(red: 0 / 255, green: 168 / 255, blue: 196 / 255)
         case .consecutiveChords: .init(red: 162 / 255, green: 126 / 255, blue: 84 / 255)
         case .adjacentPairs: .init(red: 200 / 255, green: 64 / 255, blue: 170 / 255)
+        case .jacks: .init(red: 96 / 255, green: 112 / 255, blue: 140 / 255)
         case .scratchCombo: .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255)
+        case .legacyNotes: .init(red: 150 / 255, green: 40 / 255, blue: 70 / 255)
         case .chargeCombo: .init(red: 137 / 255, green: 87 / 255, blue: 221 / 255)
+        case .chargeChords: .init(red: 20 / 255, green: 140 / 255, blue: 120 / 255)
         case .gradualSoflan: .init(red: 0 / 255, green: 134 / 255, blue: 229 / 255)
         case .suddenSoflan: .init(red: 88 / 255, green: 86 / 255, blue: 214 / 255)
         }

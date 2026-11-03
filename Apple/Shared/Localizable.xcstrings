@@ -5166,6 +5166,28 @@
         }
       }
     },
+    "Scores.Viewer.ChartType.BuildUp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Build-up"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尻上がり"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "漸強"
+          }
+        }
+      }
+    },
     "Scores.Viewer.ChartType.Burst" : {
       "localizations" : {
         "en" : {
@@ -5206,6 +5228,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "亂打"
+          }
+        }
+      }
+    },
+    "Scores.Viewer.ChartType.ChargeChords" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Charge Chords"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CN混じり同時押し"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CN混合同時押"
           }
         }
       }
@@ -5272,6 +5316,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "漸變變速"
+          }
+        }
+      }
+    },
+    "Scores.Viewer.ChartType.Jacks" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jacks"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連打"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連打"
+          }
+        }
+      }
+    },
+    "Scores.Viewer.ChartType.LegacyNotes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legacy Notes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "皿+3"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "皿+3"
           }
         }
       }
