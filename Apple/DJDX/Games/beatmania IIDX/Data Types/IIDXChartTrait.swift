@@ -2,6 +2,7 @@ import Foundation
 
 enum IIDXChartTrait: String, Codable, Sendable, CaseIterable {
     case backloaded
+    case buildUp
     case burst
     case stamina
     case chaotic

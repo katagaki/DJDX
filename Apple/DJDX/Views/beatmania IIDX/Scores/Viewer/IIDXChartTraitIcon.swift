@@ -26,6 +26,8 @@ struct IIDXChartTraitIcon: View {
         switch trait {
         case .backloaded:
             graphGlyph(BackloadedGlyph.self)
+        case .buildUp:
+            graphGlyph(BuildUpGlyph.self)
         case .gradualSoflan:
             graphGlyph(GradualSoflanGlyph.self)
         case .suddenSoflan:
@@ -96,6 +98,23 @@ struct BackloadedGlyph: GraphGlyph {
                       control1: point(0.64, 0.72, in: rect), control2: point(0.70, 0.06, in: rect))
         path.addCurve(to: point(1.0, 0.82, in: rect),
                       control1: point(0.88, 0.06, in: rect), control2: point(0.90, 0.80, in: rect))
+        closing(&path, in: rect, from: 0.0)
+        return path
+    }
+}
+
+struct BuildUpGlyph: GraphGlyph {
+    var closed: Bool
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: point(0.0, 0.86, in: rect))
+        path.addLine(to: point(0.2, 0.66, in: rect))
+        path.addLine(to: point(0.32, 0.74, in: rect))
+        path.addLine(to: point(0.52, 0.46, in: rect))
+        path.addLine(to: point(0.64, 0.54, in: rect))
+        path.addLine(to: point(0.84, 0.24, in: rect))
+        path.addLine(to: point(1.0, 0.08, in: rect))
         closing(&path, in: rect, from: 0.0)
         return path
     }
@@ -239,6 +258,7 @@ extension IIDXChartTrait {
     var localizedName: LocalizedStringKey {
         switch self {
         case .backloaded: "Scores.Viewer.ChartType.Backloaded"
+        case .buildUp: "Scores.Viewer.ChartType.BuildUp"
         case .burst: "Scores.Viewer.ChartType.Burst"
         case .stamina: "Scores.Viewer.ChartType.Stamina"
         case .chaotic: "Scores.Viewer.ChartType.Chaotic"
@@ -277,6 +297,7 @@ extension IIDXChartTrait {
     var color: Color {
         switch self {
         case .backloaded: .orange
+        case .buildUp: .init(red: 124 / 255, green: 168 / 255, blue: 20 / 255)
         case .burst: .init(red: 230 / 255, green: 175 / 255, blue: 0 / 255)
         case .stamina: .pink
         case .chaotic: .init(red: 52 / 255, green: 178 / 255, blue: 89 / 255)

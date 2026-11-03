@@ -14,7 +14,7 @@ struct IIDXChartBPMChange: Codable, Sendable {
 
 struct IIDXChartProfile: Codable, Sendable, Hashable {
 
-    static let currentVersion = 7
+    static let currentVersion = 8
 
     let version: Int
     let traits: [IIDXChartTrait]
@@ -43,6 +43,9 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
         let scratchLanes: Set<Int> = playType == .double ? [0, 8] : [0]
         var traits: [IIDXChartTrait] = []
         traits += Self.densityTraits(times: times, first: first, last: last, playType: playType, level: level)
+        if Self.isBuildUp(times: times) {
+            traits.append(.buildUp)
+        }
         let onsets = Self.onsets(notes: notes, scratchLanes: scratchLanes)
         if Self.isChaotic(onsets) {
             traits.append(.chaotic)

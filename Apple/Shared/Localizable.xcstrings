@@ -5166,6 +5166,28 @@
         }
       }
     },
+    "Scores.Viewer.ChartType.BuildUp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Build-up"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尻上がり"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "漸強"
+          }
+        }
+      }
+    },
     "Scores.Viewer.ChartType.Burst" : {
       "localizations" : {
         "en" : {
