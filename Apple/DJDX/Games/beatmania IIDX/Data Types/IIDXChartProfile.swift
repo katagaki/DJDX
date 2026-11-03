@@ -39,6 +39,9 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
             traits.append(.chaotic)
         }
         traits += Self.keyPatternTraits(onsets)
+        if Self.hasRapidRepeats(notes: notes, bpmChanges: bpmChanges, scratchLanes: scratchLanes) {
+            traits.append(.rapidRepeats)
+        }
         traits += Self.scratchComboTraits(notes: notes, playType: playType)
         if Self.isChargeCombo(notes: notes, scratchLanes: scratchLanes) {
             traits.append(.chargeCombo)

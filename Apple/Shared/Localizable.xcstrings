@@ -5298,6 +5298,28 @@
         }
       }
     },
+    "Scores.Viewer.ChartType.RapidRepeats" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapid Repeats"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連打"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連打"
+          }
+        }
+      }
+    },
     "Scores.Viewer.ChartType.ScratchCombo" : {
       "localizations" : {
         "en" : {

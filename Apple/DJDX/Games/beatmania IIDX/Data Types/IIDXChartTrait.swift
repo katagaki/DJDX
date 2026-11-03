@@ -8,6 +8,7 @@ enum IIDXChartTrait: String, Codable, Sendable, CaseIterable {
     case stairs
     case consecutiveChords
     case adjacentPairs
+    case rapidRepeats
     case scratchCombo
     case chargeCombo
     case gradualSoflan

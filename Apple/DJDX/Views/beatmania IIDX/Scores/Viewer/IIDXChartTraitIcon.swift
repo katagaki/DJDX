@@ -36,7 +36,7 @@ struct IIDXChartTraitIcon: View {
         case .scratchCombo:
             ScratchComboGlyph()
                 .frame(width: size * 0.6, height: size * 0.46)
-        case .stairs, .consecutiveChords, .adjacentPairs:
+        case .stairs, .consecutiveChords, .adjacentPairs, .rapidRepeats:
             NoteGridGlyph(columns: 4, rows: trait.noteGridRows)
                 .frame(width: size * 0.7, height: size * 0.56)
         case .burst, .stamina, .chaotic:
@@ -200,6 +200,7 @@ extension IIDXChartTrait {
         case .stairs: "Scores.Viewer.ChartType.Stairs"
         case .consecutiveChords: "Scores.Viewer.ChartType.ConsecutiveChords"
         case .adjacentPairs: "Scores.Viewer.ChartType.AdjacentPairs"
+        case .rapidRepeats: "Scores.Viewer.ChartType.RapidRepeats"
         case .scratchCombo: "Scores.Viewer.ChartType.ScratchCombo"
         case .chargeCombo: "Scores.Viewer.ChartType.ChargeCombo"
         case .gradualSoflan: "Scores.Viewer.ChartType.GradualSoflan"
@@ -212,6 +213,7 @@ extension IIDXChartTrait {
         case .stairs: [[0], [1], [2], [3]]
         case .consecutiveChords: [[0, 2], [1, 3], [0, 2]]
         case .adjacentPairs: [[2, 3], [0, 1], [1, 2]]
+        case .rapidRepeats: [[1], [1], [2], [2]]
         default: []
         }
     }
@@ -234,6 +236,7 @@ extension IIDXChartTrait {
         case .stairs: .init(red: 0 / 255, green: 168 / 255, blue: 196 / 255)
         case .consecutiveChords: .init(red: 162 / 255, green: 126 / 255, blue: 84 / 255)
         case .adjacentPairs: .init(red: 200 / 255, green: 64 / 255, blue: 170 / 255)
+        case .rapidRepeats: .init(red: 96 / 255, green: 112 / 255, blue: 140 / 255)
         case .scratchCombo: .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255)
         case .chargeCombo: .init(red: 137 / 255, green: 87 / 255, blue: 221 / 255)
         case .gradualSoflan: .init(red: 0 / 255, green: 134 / 255, blue: 229 / 255)
