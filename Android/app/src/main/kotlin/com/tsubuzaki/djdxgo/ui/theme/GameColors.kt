@@ -102,6 +102,19 @@ object IIDXColors {
     fun songTitleStrokeColor(version: String): Color =
         if (version == IIDXVersion.current.marketingName) Color(0xFF3C126C) else Color(0xFF4D4D4D)
 
+    fun rowTitleBrush(version: String, level: IIDXLevel, darkTheme: Boolean): Brush = when {
+        level == IIDXLevel.LEGGENDARIA -> Brush.verticalGradient(listOf(Color(0xFFFFECF8), Color(0xFFFF5CB6)))
+        !darkTheme && version != IIDXVersion.current.marketingName ->
+            Brush.verticalGradient(listOf(Color.White, Color(0xFFDBDBE0)))
+        else -> songTitleBrush(version)
+    }
+
+    fun rowTitleStrokeColor(version: String, level: IIDXLevel, darkTheme: Boolean): Color = when {
+        level == IIDXLevel.LEGGENDARIA -> Color(0xFF700C48)
+        version != IIDXVersion.current.marketingName -> if (darkTheme) Color(0xFF202020) else Color(0xFF38383D)
+        else -> songTitleStrokeColor(version)
+    }
+
     fun versionColor(version: String, darkTheme: Boolean): Color? =
         IIDXVersion.fromMarketingName(version)?.let {
             Color(if (darkTheme) it.darkColor else it.lightColor)

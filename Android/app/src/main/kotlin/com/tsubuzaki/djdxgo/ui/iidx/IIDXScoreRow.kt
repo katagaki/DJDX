@@ -27,7 +27,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
@@ -36,6 +35,7 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXLevelScore
 import com.tsubuzaki.djdxgo.data.iidx.IIDXSongRecord
 import androidx.compose.ui.res.stringResource
 import com.tsubuzaki.djdxgo.R
+import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
 import com.tsubuzaki.djdxgo.ui.theme.Palette
 import java.util.Locale
@@ -73,25 +73,34 @@ fun IIDXScoreRow(
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             if (genreVisible && record.genre.isNotEmpty()) {
-                Text(
+                OutlinedText(
                     text = record.genre,
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    fontWeight = FontWeight.ExtraBold,
+                    fill = Color.White,
+                    outline = Color.Black.copy(alpha = 0.7f),
+                    outlineWidth = 0.35.dp,
+                    squashed = true
                 )
             }
-            Text(
+            OutlinedText(
                 text = record.title,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.ExtraBold,
+                fill = IIDXColors.rowTitleBrush(record.version, level, darkTheme),
+                outline = IIDXColors.rowTitleStrokeColor(record.version, level, darkTheme),
+                outlineWidth = if (darkTheme) 0.35.dp else 0.5.dp,
+                squashed = true
             )
             if (artistVisible && record.artist.isNotEmpty()) {
-                Text(
+                OutlinedText(
                     text = record.artist,
                     style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    fontWeight = FontWeight.ExtraBold,
+                    fill = Color.White,
+                    outline = Color.Black.copy(alpha = 0.7f),
+                    outlineWidth = 0.35.dp,
+                    squashed = true
                 )
             }
             if (score.score != 0 &&
