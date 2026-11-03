@@ -44,6 +44,12 @@
     <string name="more_reset_layout">Reset Layout</string>
     <string name="more_reset_layout_title">Reset Layout?</string>
     <string name="more_reset_layout_message">Card visibility and order will be restored to their defaults.</string>
+    <string name="more_free_up_space">Free Up Space…</string>
+    <string name="more_free_up_space_title">Free Up Space</string>
+    <string name="more_free_up_space_message">Clean up unused data such as caches to reduce the storage %1$s uses.</string>
+    <string name="more_free_up_space_clean_up">Clean Up Unused Data</string>
+    <string name="more_free_up_space_cleaning_up">Cleaning Up…</string>
+    <string name="more_free_up_space_done">Freed up %1$s.</string>
     <string name="more_delete_web_data_title">All Website Data Will Be Deleted</string>
     <string name="more_delete_web_data_message">You will need to login again when you next import your data.</string>
     <string name="more_delete_web_data_confirm_button">Delete Website Data</string>
