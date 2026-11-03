@@ -85,7 +85,7 @@ fun IIDXScoreViewerScreen(
 ) {
     val darkTheme = isSystemInDarkTheme()
     val playTypeEnum = IIDXPlayType.fromValue(playType)
-    val beginnerHidden by rememberSetting(SettingsKeys.iidxBeginnerLevelHidden, false)
+    val beginnerHidden by rememberSetting(SettingsKeys.iidxBeginnerLevelHidden, true)
 
     var record by remember { mutableStateOf<IIDXSongRecord?>(null) }
     var song by remember { mutableStateOf<IIDXSong?>(null) }

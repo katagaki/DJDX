@@ -56,7 +56,7 @@ fun IIDXScoreFilterSheet(onDismiss: () -> Unit) {
     val djLevelFilters by rememberSetting(SettingsKeys.iidxDJLevelFilters, emptySet())
     val versionFilters by rememberSetting(SettingsKeys.iidxVersionFilters, emptySet())
     val scoreAvailableOnly by rememberSetting(SettingsKeys.iidxScoreAvailableOnly, true)
-    val beginnerHidden by rememberSetting(SettingsKeys.iidxBeginnerLevelHidden, false)
+    val beginnerHidden by rememberSetting(SettingsKeys.iidxBeginnerLevelHidden, true)
     val genreVisible by rememberSetting(SettingsKeys.iidxGenreVisible, false)
     val artistVisible by rememberSetting(SettingsKeys.iidxArtistVisible, true)
     val levelVisible by rememberSetting(SettingsKeys.iidxLevelVisible, true)
