@@ -32,7 +32,7 @@ struct IIDXChartTraitIcon: View {
             graphGlyph(SuddenSoflanGlyph.self)
         case .chargeCombo:
             ChargeComboGlyph()
-                .frame(width: size * 0.54, height: size * 0.52)
+                .frame(width: size * 0.62, height: size * 0.54)
         case .scratchCombo:
             ScratchComboGlyph()
                 .frame(width: size * 0.6, height: size * 0.46)
@@ -130,15 +130,16 @@ struct SuddenSoflanGlyph: GraphGlyph {
 struct ChargeComboGlyph: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let chargeWidth = rect.width * 0.26
-        path.addRoundedRect(in: CGRect(x: rect.minX, y: rect.minY, width: chargeWidth, height: rect.height),
+        let chargeWidth = rect.width * 0.24
+        path.addRoundedRect(in: CGRect(x: rect.midX - chargeWidth / 2.0, y: rect.minY,
+                                       width: chargeWidth, height: rect.height),
                             cornerSize: CGSize(width: chargeWidth * 0.35, height: chargeWidth * 0.35))
-        let noteHeight = rect.height * 0.17
-        let noteWidth = rect.width * 0.5
-        for (index, offset) in [0.42, 0.5, 0.42].enumerated() {
-            let originY = rect.minY + rect.height * (0.08 + Double(index) * 0.34)
-            path.addRoundedRect(in: CGRect(x: rect.minX + rect.width * offset, y: originY,
-                                           width: noteWidth, height: noteHeight),
+        let noteWidth = rect.width * 0.3
+        let noteHeight = rect.height * 0.16
+        for (index, isLeft) in [true, false, true].enumerated() {
+            let originX = isLeft ? rect.minX : rect.maxX - noteWidth
+            let originY = rect.minY + rect.height * (0.06 + Double(index) * 0.36)
+            path.addRoundedRect(in: CGRect(x: originX, y: originY, width: noteWidth, height: noteHeight),
                                 cornerSize: CGSize(width: noteHeight * 0.4, height: noteHeight * 0.4))
         }
         return path
