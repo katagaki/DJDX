@@ -14,7 +14,7 @@ struct IIDXChartBPMChange: Codable, Sendable {
 
 struct IIDXChartProfile: Codable, Sendable, Hashable {
 
-    static let currentVersion = 8
+    static let currentVersion = 9
 
     let version: Int
     let traits: [IIDXChartTrait]
@@ -153,7 +153,7 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
             traits.append(.stairs)
         }
         let chordRuns = runLengths(onsets) { $0.lanes.count >= 2 }
-        if (chordRuns.max() ?? 0) >= 80 {
+        if (chordRuns.max() ?? 0) >= 45 {
             traits.append(.consecutiveChords)
         }
         let pairRuns = runLengths(onsets) { onset in
