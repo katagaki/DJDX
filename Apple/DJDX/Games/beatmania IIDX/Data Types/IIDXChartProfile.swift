@@ -1,19 +1,22 @@
 import Foundation
 
-struct IIDXChartNote: Decodable, Sendable {
+struct IIDXChartNote: Codable, Sendable {
     let lane: Int
     let time: Double
     let type: String
     let endTime: Double?
 }
 
-struct IIDXChartBPMChange: Decodable, Sendable {
+struct IIDXChartBPMChange: Codable, Sendable {
     let time: Double
     let bpm: Double
 }
 
 struct IIDXChartProfile: Codable, Sendable, Hashable {
 
+    static let currentVersion = 7
+
+    let version: Int
     let traits: [IIDXChartTrait]
 
     private static let staminaBaselines: [Int: Double] = [
@@ -21,13 +24,19 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
         7: 6.5, 8: 7.3, 9: 8.3, 10: 10.0, 11: 11.6, 12: 15.3
     ]
 
+    var isCurrent: Bool {
+        version == Self.currentVersion
+    }
+
     init(traits: [IIDXChartTrait]) {
+        self.version = Self.currentVersion
         self.traits = traits
     }
 
     init(notes: [IIDXChartNote], bpmChanges: [IIDXChartBPMChange], playType: IIDXPlayType, level: Int) {
         let times = notes.map { $0.time / 1000.0 }.sorted()
         guard times.count >= 50, let first = times.first, let last = times.last, last - first >= 20.0 else {
+            self.version = Self.currentVersion
             self.traits = []
             return
         }
@@ -53,6 +62,7 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
             traits.append(.chargeChords)
         }
         traits += Self.soflanTraits(bpmChanges: bpmChanges, noteTimes: notes.map(\.time).sorted())
+        self.version = Self.currentVersion
         self.traits = traits
     }
 
