@@ -43,6 +43,9 @@ struct IIDXChartProfile: Codable, Sendable, Hashable {
             traits.append(.rapidRepeats)
         }
         traits += Self.scratchComboTraits(notes: notes, playType: playType)
+        if Self.hasLegacyNotes(notes: notes, playType: playType) {
+            traits.append(.legacyNotes)
+        }
         if Self.isChargeCombo(notes: notes, scratchLanes: scratchLanes) {
             traits.append(.chargeCombo)
         }

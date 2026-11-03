@@ -5276,6 +5276,28 @@
         }
       }
     },
+    "Scores.Viewer.ChartType.LegacyNotes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legacy Notes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "皿+3"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "皿+3"
+          }
+        }
+      }
+    },
     "Scores.Viewer.ChartType.None" : {
       "localizations" : {
         "en" : {

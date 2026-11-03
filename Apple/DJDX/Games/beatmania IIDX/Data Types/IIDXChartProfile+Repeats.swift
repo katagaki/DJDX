@@ -41,4 +41,28 @@ extension IIDXChartProfile {
         }
         return marked.count >= 100 && Double(marked.count) / Double(notes.count) >= 0.10
     }
+
+    static func hasLegacyNotes(notes: [IIDXChartNote], playType: IIDXPlayType) -> Bool {
+        let noteCount = Double(notes.count)
+        func qualifies(_ hits: Int) -> Bool {
+            hits >= 50 && Double(hits) / noteCount >= 0.04
+        }
+        switch playType {
+        case .double:
+            return qualifies(legacyNoteHits(notes: notes, scratchLane: 0, keyLane: 3) +
+                             legacyNoteHits(notes: notes, scratchLane: 8, keyLane: 13))
+        case .single:
+            return qualifies(legacyNoteHits(notes: notes, scratchLane: 0, keyLane: 3)) ||
+                qualifies(legacyNoteHits(notes: notes, scratchLane: 0, keyLane: 5))
+        }
+    }
+
+    private static func legacyNoteHits(notes: [IIDXChartNote], scratchLane: Int, keyLane: Int) -> Int {
+        let keys = notes.filter { $0.lane == keyLane }.map(\.time).sorted()
+        guard !keys.isEmpty else { return 0 }
+        return notes.filter { $0.lane == scratchLane }.filter { note in
+            let index = lowerBound(keys, note.time - 2.0)
+            return index < keys.count && keys[index] <= note.time + 2.0
+        }.count
+    }
 }

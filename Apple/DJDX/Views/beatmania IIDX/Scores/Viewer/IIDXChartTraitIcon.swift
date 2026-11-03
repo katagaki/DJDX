@@ -36,6 +36,9 @@ struct IIDXChartTraitIcon: View {
         case .scratchCombo:
             ScratchComboGlyph()
                 .frame(width: size * 0.6, height: size * 0.46)
+        case .legacyNotes:
+            LegacyNotesGlyph()
+                .frame(width: size * 0.66, height: size * 0.46)
         case .stairs, .consecutiveChords, .adjacentPairs, .rapidRepeats:
             NoteGridGlyph(columns: 4, rows: trait.noteGridRows)
                 .frame(width: size * 0.7, height: size * 0.56)
@@ -188,6 +191,28 @@ struct ScratchComboGlyph: View {
     }
 }
 
+struct LegacyNotesGlyph: View {
+    var body: some View {
+        GeometryReader { geometry in
+            let diameter = min(geometry.size.height, geometry.size.width * 0.5)
+            let lineWidth = diameter * 0.16
+            HStack(spacing: geometry.size.width * 0.1) {
+                Circle()
+                    .strokeBorder(lineWidth: lineWidth)
+                    .overlay {
+                        Circle()
+                            .frame(width: diameter * 0.26, height: diameter * 0.26)
+                    }
+                    .frame(width: diameter, height: diameter)
+                Text(verbatim: "3")
+                    .font(.system(size: diameter * 1.05, weight: .heavy, design: .rounded))
+                    .minimumScaleFactor(0.5)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+}
+
 // MARK: - Trait Display
 
 extension IIDXChartTrait {
@@ -202,6 +227,7 @@ extension IIDXChartTrait {
         case .adjacentPairs: "Scores.Viewer.ChartType.AdjacentPairs"
         case .rapidRepeats: "Scores.Viewer.ChartType.RapidRepeats"
         case .scratchCombo: "Scores.Viewer.ChartType.ScratchCombo"
+        case .legacyNotes: "Scores.Viewer.ChartType.LegacyNotes"
         case .chargeCombo: "Scores.Viewer.ChartType.ChargeCombo"
         case .gradualSoflan: "Scores.Viewer.ChartType.GradualSoflan"
         case .suddenSoflan: "Scores.Viewer.ChartType.SuddenSoflan"
@@ -238,6 +264,7 @@ extension IIDXChartTrait {
         case .adjacentPairs: .init(red: 200 / 255, green: 64 / 255, blue: 170 / 255)
         case .rapidRepeats: .init(red: 96 / 255, green: 112 / 255, blue: 140 / 255)
         case .scratchCombo: .init(red: 221 / 255, green: 0 / 255, blue: 0 / 255)
+        case .legacyNotes: .init(red: 150 / 255, green: 40 / 255, blue: 70 / 255)
         case .chargeCombo: .init(red: 137 / 255, green: 87 / 255, blue: 221 / 255)
         case .gradualSoflan: .init(red: 0 / 255, green: 134 / 255, blue: 229 / 255)
         case .suddenSoflan: .init(red: 88 / 255, green: 86 / 255, blue: 214 / 255)
