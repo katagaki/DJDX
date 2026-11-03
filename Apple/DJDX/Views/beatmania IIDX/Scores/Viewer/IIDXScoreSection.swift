@@ -23,10 +23,30 @@ struct IIDXScoreSection: View {
 
     @State private var textageChart: TextageChart?
     @State private var textageChartViewerChart: TextageChartViewerChart?
+    @State private var chartTraits: [IIDXChartTrait]?
+
+    @AppStorage(wrappedValue: false, "ExternalData.TextageChartViewer.Enabled") var isTextageChartViewerEnabled: Bool
 
     private let fetcher = IIDXReader()
 
     var body: some View {
+        scoreSection()
+            .task {
+                if score.djLevelEnum() != .none {
+                    await reloadScoreHistory()
+                }
+                if score.level != .beginner {
+                    textageChart = await fetcher.textageChart(title: songTitle)
+                    textageChartViewerChart = await fetcher.textageChartViewerChart(title: songTitle)
+                    await reloadChartTraits()
+                }
+            }
+        chartSection()
+        referenceSection()
+    }
+
+    @ViewBuilder
+    func scoreSection() -> some View {
         Section {
             if score.djLevelEnum() != .none {
                 HStack {
@@ -73,48 +93,76 @@ struct IIDXScoreSection: View {
             if score.djLevelEnum() != .none, scoreHistory.count >= 2 {
                 historyRow()
             }
-            if let chartRadarData {
-                Button {
-                    isShowingRadarValues.toggle()
-                } label: {
-                    Group {
-                        if isShowingRadarValues {
-                            VStack(spacing: 4.0) {
-                                ForEach(chartRadarData.radarData.displayPoints(), id: \.label) { point in
-                                    HStack {
-                                        Text(verbatim: point.label)
-                                            .font(.system(size: 12, weight: .bold))
-                                            .fontWidth(.expanded)
-                                            .foregroundStyle(point.color)
-                                        Spacer()
-                                        Text(verbatim: String(format: "%.2f", point.value))
-                                            .font(.system(size: 12, weight: .semibold).monospacedDigit())
-                                            .foregroundStyle(.primary)
+        }
+    }
+
+    @ViewBuilder
+    func chartSection() -> some View {
+        if isChartTraitsAvailable || chartRadarData != nil {
+            Section {
+                if isChartTraitsAvailable {
+                    IIDXChartTraitRow(traits: chartTraits)
+                }
+                if let chartRadarData {
+                    Button {
+                        isShowingRadarValues.toggle()
+                    } label: {
+                        Group {
+                            if isShowingRadarValues {
+                                VStack(spacing: 4.0) {
+                                    ForEach(chartRadarData.radarData.displayPoints(), id: \.label) { point in
+                                        HStack {
+                                            Text(verbatim: point.label)
+                                                .font(.system(size: 12, weight: .bold))
+                                                .fontWidth(.expanded)
+                                                .foregroundStyle(point.color)
+                                            Spacer()
+                                            Text(verbatim: String(format: "%.2f", point.value))
+                                                .font(.system(size: 12, weight: .semibold).monospacedDigit())
+                                                .foregroundStyle(.primary)
+                                        }
                                     }
                                 }
-                            }
-                            .padding(.vertical, 4.0)
-                        } else {
-                            RadarChartView(chartRadarData.radarData)
-                                .frame(height: 200.0)
                                 .padding(.vertical, 4.0)
+                            } else {
+                                RadarChartView(chartRadarData.radarData)
+                                    .frame(height: 200.0)
+                                    .padding(.vertical, 4.0)
+                            }
                         }
+                        .contentShape(Rectangle())
                     }
-                    .contentShape(Rectangle())
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
+            } header: {
+                ListSectionHeader(text: "Scores.Viewer.Section.Chart")
+                    .font(.body)
             }
+        }
+    }
+
+    @ViewBuilder
+    func referenceSection() -> some View {
+        Section {
             chartActions()
+        } header: {
+            ListSectionHeader(text: "Scores.Viewer.Section.Reference")
+                .font(.body)
         }
-        .task {
-            if score.djLevelEnum() != .none {
-                await reloadScoreHistory()
-            }
-            if score.level != .beginner {
-                textageChart = await fetcher.textageChart(title: songTitle)
-                textageChartViewerChart = await fetcher.textageChartViewerChart(title: songTitle)
-            }
-        }
+    }
+
+    private var isChartTraitsAvailable: Bool {
+        isTextageChartViewerEnabled && score.level != .beginner && textageChartViewerChart?.textageScoreURL(
+            for: score.level, playType: playType
+        ) != nil
+    }
+
+    func reloadChartTraits() async {
+        guard isChartTraitsAvailable, let textageChartViewerChart else { return }
+        let profile = await IIDXChartAnalyzer.shared.profile(for: textageChartViewerChart,
+                                                             difficulty: score.level,
+                                                             playType: playType)
+        chartTraits = profile?.traits ?? []
     }
 
     @ViewBuilder

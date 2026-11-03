@@ -15,7 +15,7 @@ struct TextageChart: Sendable, Hashable {
     var dpAnother: Int
     var dpLeggendaria: Int
 
-    private static let base36 = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    static let base36 = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
     func level(for difficulty: IIDXLevel, playType: IIDXPlayType) -> Int {
         switch (playType, difficulty) {
@@ -53,7 +53,7 @@ struct TextageChart: Sendable, Hashable {
         return URL(string: "https://textage.cc/score/\(folder)/\(tag).html?\(query)")
     }
 
-    private static func difficultyChar(for difficulty: IIDXLevel) -> String? {
+    static func difficultyChar(for difficulty: IIDXLevel) -> String? {
         switch difficulty {
         case .normal: return "N"
         case .hyper: return "H"
