@@ -50,6 +50,16 @@ struct TextageChartViewerChart: Sendable, Hashable {
         return URL(string: "https://textage-chart-viewer.vercel.app/\(path)")
     }
 
+    func textageScoreURL(for difficulty: IIDXLevel, playType: IIDXPlayType) -> URL? {
+        let levelValue = level(for: difficulty, playType: playType)
+        guard levelValue > 0, levelValue < TextageChart.base36.count,
+              let difficultyChar = TextageChart.difficultyChar(for: difficulty) else { return nil }
+        let folder = version == 35 ? "s" : String(version)
+        let sideChar = playType == .double ? "D" : "1"
+        let query = "\(sideChar)\(difficultyChar)\(TextageChart.base36[levelValue])00"
+        return URL(string: "https://textage.cc/score/\(folder)/\(songId).html?\(query)")
+    }
+
     private static func difficultyCode(for difficulty: IIDXLevel) -> String? {
         switch difficulty {
         case .beginner: return "b"
