@@ -3,7 +3,6 @@ package com.tsubuzaki.djdxgo.ui.common
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -13,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,6 +27,7 @@ fun RadarValuesList(
     data: RadarData,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 12.sp,
+    lineHeight: TextUnit = TextUnit.Unspecified,
     showsTotal: Boolean = false
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -35,14 +36,20 @@ fun RadarValuesList(
                 Text(
                     text = axis.label,
                     fontSize = fontSize,
+                    lineHeight = lineHeight,
                     fontWeight = FontWeight.Bold,
-                    color = RadarColors.axisColor(axis)
+                    color = RadarColors.axisColor(axis),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
-                Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = String.format(Locale.ROOT, "%.2f", data.value(axis)),
                     fontSize = fontSize,
-                    fontWeight = FontWeight.SemiBold
+                    lineHeight = lineHeight,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    softWrap = false
                 )
             }
         }
@@ -52,14 +59,20 @@ fun RadarValuesList(
                 Text(
                     text = stringResource(R.string.radar_total),
                     fontSize = fontSize,
+                    lineHeight = lineHeight,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
-                Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = String.format(Locale.ROOT, "%.2f", data.sum()),
                     fontSize = fontSize,
-                    fontWeight = FontWeight.Bold
+                    lineHeight = lineHeight,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    softWrap = false
                 )
             }
         }

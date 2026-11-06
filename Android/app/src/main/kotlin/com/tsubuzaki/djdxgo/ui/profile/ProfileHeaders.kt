@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -56,6 +57,7 @@ fun IIDXProfileHeader(container: AppContainer, playType: IIDXPlayType, modifier:
         ?.takeIf { it != "--" }
     val radar = if (playType == IIDXPlayType.SINGLE) profile.spRadar else profile.dpRadar
     var isShowingValues by remember { mutableStateOf(false) }
+    val density = LocalDensity.current
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -87,7 +89,7 @@ fun IIDXProfileHeader(container: AppContainer, playType: IIDXPlayType, modifier:
         if (radar != null) {
             Box(
                 modifier = Modifier
-                    .weight(1.2f)
+                    .weight(1.6f)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(16.dp))
                     .clickable { isShowingValues = !isShowingValues },
@@ -101,9 +103,10 @@ fun IIDXProfileHeader(container: AppContainer, playType: IIDXPlayType, modifier:
                     ) {
                         RadarValuesList(
                             data = radar,
-                            fontSize = 10.sp,
+                            fontSize = with(density) { 10.dp.toSp() },
+                            lineHeight = with(density) { 12.dp.toSp() },
                             showsTotal = true,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                         )
                     }
                 } else {
