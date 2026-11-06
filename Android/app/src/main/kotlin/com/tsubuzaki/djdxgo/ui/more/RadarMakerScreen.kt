@@ -56,6 +56,7 @@ import com.tsubuzaki.djdxgo.data.RadarAxis
 import com.tsubuzaki.djdxgo.data.RadarData
 import com.tsubuzaki.djdxgo.ui.common.DetailScaffold
 import com.tsubuzaki.djdxgo.ui.common.RadarChart
+import com.tsubuzaki.djdxgo.ui.common.rememberRadarLabelTypeface
 import com.tsubuzaki.djdxgo.ui.common.renderRadarBitmap
 import com.tsubuzaki.djdxgo.ui.theme.RadarColors
 import java.io.File
@@ -71,6 +72,7 @@ fun RadarMakerScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current.density
+    val labelTypeface = rememberRadarLabelTypeface()
     var notes by rememberSaveable { mutableDoubleStateOf(100.0) }
     var chord by rememberSaveable { mutableDoubleStateOf(80.0) }
     var peak by rememberSaveable { mutableDoubleStateOf(120.0) }
@@ -93,7 +95,7 @@ fun RadarMakerScreen(onBack: () -> Unit) {
         scope.launch {
             val uri = withContext(Dispatchers.IO) {
                 runCatching {
-                    val bitmap = renderRadarBitmap(radar, selectedColor, density)
+                    val bitmap = renderRadarBitmap(radar, selectedColor, density, labelTypeface)
                     val directory = File(context.cacheDir, "exports").apply { mkdirs() }
                     val file = File(directory, "NotesRadar-${System.currentTimeMillis() / 1000}.png")
                     file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
