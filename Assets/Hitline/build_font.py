@@ -234,7 +234,14 @@ fb.setupCharacterMap(cmap)
 fb.setupGlyf(glyphs)
 fb.setupHorizontalMetrics(metrics)
 fb.setupHorizontalHeader(ascent=850, descent=-150)
-fb.setupNameTable({"familyName": "Hitline", "styleName": "Black"})
+fb.setupNameTable({
+    "familyName": "Hitline",
+    "styleName": "Black",
+    "uniqueFontIdentifier": "Hitline-Black",
+    "fullName": "Hitline Black",
+    "version": "Version 1.000",
+    "psName": "Hitline-Black",
+})
 fb.setupOS2(sTypoAscender=850, sTypoDescender=-150, usWinAscent=850, usWinDescent=150, sCapHeight=CAP, usWeightClass=900)
 fb.setupPost()
 fb.save("Hitline-Black.ttf")
