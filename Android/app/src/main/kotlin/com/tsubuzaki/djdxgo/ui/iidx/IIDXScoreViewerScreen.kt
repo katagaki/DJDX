@@ -1,6 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.iidx
 
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.GameFonts
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
@@ -344,23 +345,27 @@ private fun ScoreSection(
 
     if (hasDJLevel) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(modifier = Modifier.weight(1f)) {
                 IIDXDJLevelText(
                     djLevel = score.djLevel,
                     style = TextStyle(fontSize = 40.sp),
-                    outlineWidth = 0.6.dp
+                    outlineWidth = 0.6.dp,
+                    fontWidth = GameFontWidth.EXTRA_EXPANDED,
+                    fontWeight = GameFonts.maximumWeight
                 )
             }
             val rate = scoreRate(score.score, noteCount)
             if (rate != null) {
                 Text(
                     text = String.format(Locale.ROOT, "%.1f%%", rate * 100f),
-                    style = TextStyle().gameFont(),
+                    style = TextStyle().gameFont(GameFontWidth.EXTRA_EXPANDED),
                     fontSize = 32.sp,
-                    fontWeight = FontWeight.Black,
+                    fontWeight = GameFonts.maximumWeight,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -380,14 +385,16 @@ private fun ScoreSection(
                 ) {
                     IIDXClearTypeText(
                         clearType = score.clearType,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWidth = GameFontWidth.EXTRA_EXPANDED,
+                        fontWeight = GameFonts.maximumWeight
                     )
                 }
                 DetailRow(label = stringResource(R.string.scores_viewer_score)) {
                     OutlinedText(
                         text = score.score.toString(),
-                        style = MaterialTheme.typography.bodyLarge.gameFont(),
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyLarge.gameFont(GameFontWidth.EXTRA_EXPANDED),
+                        fontWeight = GameFonts.maximumWeight,
                         fill = IIDXColors.scoreColor,
                         outline = IIDXColors.scoreOutlineColor,
                         outlineWidth = 0.3.dp
@@ -396,8 +403,8 @@ private fun ScoreSection(
                 DetailRow(label = stringResource(R.string.scores_viewer_miss_count)) {
                     OutlinedText(
                         text = score.missCount.toString(),
-                        style = MaterialTheme.typography.bodyLarge.gameFont(),
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyLarge.gameFont(GameFontWidth.EXTRA_EXPANDED),
+                        fontWeight = GameFonts.maximumWeight,
                         fill = IIDXColors.scoreColor,
                         outline = IIDXColors.scoreOutlineColor,
                         outlineWidth = 0.3.dp
@@ -440,7 +447,9 @@ private fun ScoreSection(
                 ) {
                     IIDXClearTypeText(
                         clearType = score.clearType,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWidth = GameFontWidth.EXTRA_EXPANDED,
+                        fontWeight = GameFonts.maximumWeight
                     )
                 }
             }
@@ -552,7 +561,8 @@ private fun DetailRow(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelLarge.gameFont(),
+            style = MaterialTheme.typography.labelLarge.gameFont(GameFontWidth.EXTRA_EXPANDED),
+            fontWeight = GameFonts.maximumWeight,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f)
         )
