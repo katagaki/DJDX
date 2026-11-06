@@ -1,6 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.iidx
 
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.GameFonts
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
 import android.text.format.DateUtils
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
@@ -79,7 +81,7 @@ fun IIDXScoreRow(
                 OutlinedText(
                     text = record.genre,
                     style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontWeight = FontWeight.Black,
                     fill = Color.White,
                     outline = Color.Black.copy(alpha = 0.7f),
                     outlineWidth = 0.35.dp,
@@ -89,7 +91,7 @@ fun IIDXScoreRow(
             OutlinedText(
                 text = record.title,
                 style = MaterialTheme.typography.bodyLarge.gameFont(GameFontWidth.COMPRESSED),
-                fontWeight = FontWeight.ExtraBold,
+                fontWeight = FontWeight.Black,
                 fill = IIDXColors.rowTitleBrush(record.version, level, darkTheme),
                 outline = IIDXColors.rowTitleStrokeColor(record.version, level, darkTheme),
                 outlineWidth = if (darkTheme) 0.35.dp else 0.5.dp,
@@ -99,7 +101,7 @@ fun IIDXScoreRow(
                 OutlinedText(
                     text = record.artist,
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontWeight = FontWeight.Black,
                     fill = Color.White,
                     outline = Color.Black.copy(alpha = 0.7f),
                     outlineWidth = 0.35.dp,
@@ -116,22 +118,24 @@ fun IIDXScoreRow(
                     if (djLevelVisible) {
                         IIDXDJLevelText(
                             djLevel = score.djLevel,
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWidth = GameFontWidth.EXTRA_EXPANDED,
+                            fontWeight = GameFonts.maximumWeight
                         )
                     }
                     if (scoreRateVisible && scoreRate != null) {
                         Text(
                             text = String.format(Locale.ROOT, "%.1f%%", scoreRate * 100f),
-                            style = MaterialTheme.typography.labelMedium.gameFont(),
-                            fontWeight = FontWeight.Black,
+                            style = MaterialTheme.typography.labelMedium.gameFont(GameFontWidth.EXTRA_EXPANDED),
+                            fontWeight = GameFonts.maximumWeight,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     if (scoreVisible) {
                         OutlinedText(
                             text = score.score.toString(),
-                            style = MaterialTheme.typography.labelMedium.gameFont(),
-                            fontWeight = FontWeight.ExtraBold,
+                            style = MaterialTheme.typography.labelMedium.gameFont(GameFontWidth.EXTRA_EXPANDED),
+                            fontWeight = GameFonts.maximumWeight,
                             fill = IIDXColors.scoreColor,
                             outline = IIDXColors.scoreOutlineColor,
                             outlineWidth = 0.3.dp
@@ -139,8 +143,8 @@ fun IIDXScoreRow(
                         if (scoreDelta != null && scoreDelta > 0) {
                             Text(
                                 text = stringResource(R.string.analytics_new_high_score_delta, scoreDelta),
-                                style = MaterialTheme.typography.labelMedium.gameFont(),
-                                fontWeight = FontWeight.ExtraBold,
+                                style = MaterialTheme.typography.labelMedium.gameFont(GameFontWidth.EXTRA_EXPANDED),
+                                fontWeight = GameFonts.maximumWeight,
                                 color = Palette.orange
                             )
                         }
@@ -151,7 +155,9 @@ fun IIDXScoreRow(
                                 record.lastPlayDate * 1000L
                             ).toString(),
                             style = MaterialTheme.typography.labelMedium.gameFont(GameFontWidth.CONDENSED),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }

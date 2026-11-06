@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.common
 
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -45,17 +46,19 @@ fun IIDXClearTypeText(
     style: TextStyle,
     modifier: Modifier = Modifier,
     label: String = clearType,
-    outlineWidth: Dp = 0.3.dp
+    outlineWidth: Dp = 0.3.dp,
+    fontWidth: GameFontWidth = GameFontWidth.EXPANDED,
+    fontWeight: FontWeight = FontWeight.ExtraBold
 ) {
     val phase = rememberFullComboPhase(IIDXClearType.fromValue(clearType) == IIDXClearType.FULL_COMBO_CLEAR)
     OutlinedText(
         text = label,
-        style = style.gameFont().merge(TextStyle(letterSpacing = (-0.3).sp)),
+        style = style.gameFont(fontWidth).merge(TextStyle(letterSpacing = (-0.3).sp)),
         fill = IIDXColors.clearTypeBrush(clearType, phase),
         outline = Color.Black,
         outlineWidth = outlineWidth,
         modifier = modifier,
-        fontWeight = FontWeight.ExtraBold
+        fontWeight = fontWeight
     )
 }
 
@@ -64,15 +67,17 @@ fun IIDXDJLevelText(
     djLevel: String,
     style: TextStyle,
     modifier: Modifier = Modifier,
-    outlineWidth: Dp = 0.3.dp
+    outlineWidth: Dp = 0.3.dp,
+    fontWidth: GameFontWidth = GameFontWidth.EXPANDED,
+    fontWeight: FontWeight = FontWeight.Black
 ) {
     OutlinedText(
         text = djLevel,
-        style = style.gameFont(),
+        style = style.gameFont(fontWidth),
         fill = IIDXColors.djLevelBrush(djLevel),
         outline = Color.Black,
         outlineWidth = outlineWidth,
         modifier = modifier,
-        fontWeight = FontWeight.Black
+        fontWeight = fontWeight
     )
 }

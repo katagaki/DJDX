@@ -13,14 +13,17 @@ enum class GameFontWidth(val width: Float, val counterWidth: Float) {
     COMPRESSED(40f, 360f),
     CONDENSED(75f, 420f),
     STANDARD(100f, 468f),
-    EXPANDED(125f, 520f)
+    EXPANDED(125f, 520f),
+    EXTRA_EXPANDED(151f, 603f)
 }
 
 @OptIn(ExperimentalTextApi::class)
 object GameFonts {
+    val maximumWeight = FontWeight(1000)
+
     private val weights = listOf(
         FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold,
-        FontWeight.Bold, FontWeight.ExtraBold, FontWeight.Black
+        FontWeight.Bold, FontWeight.ExtraBold, FontWeight.Black, maximumWeight
     )
 
     private val families: Map<GameFontWidth, FontFamily> = GameFontWidth.entries.associateWith { width ->

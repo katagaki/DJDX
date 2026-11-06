@@ -1,6 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.iidx
 
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.GameFonts
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
@@ -65,7 +66,6 @@ import com.tsubuzaki.djdxgo.ui.games.ChartActionButton
 import com.tsubuzaki.djdxgo.ui.games.ExpressiveLevelSelector
 import com.tsubuzaki.djdxgo.ui.games.ViewerWithSelector
 import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
-import com.tsubuzaki.djdxgo.ui.theme.Palette
 import com.tsubuzaki.djdxgo.ui.theme.RadarColors
 import java.net.URLEncoder
 import java.time.Instant
@@ -345,23 +345,27 @@ private fun ScoreSection(
 
     if (hasDJLevel) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(modifier = Modifier.weight(1f)) {
                 IIDXDJLevelText(
                     djLevel = score.djLevel,
                     style = TextStyle(fontSize = 40.sp),
-                    outlineWidth = 0.6.dp
+                    outlineWidth = 0.6.dp,
+                    fontWidth = GameFontWidth.EXTRA_EXPANDED,
+                    fontWeight = GameFonts.maximumWeight
                 )
             }
             val rate = scoreRate(score.score, noteCount)
             if (rate != null) {
                 Text(
                     text = String.format(Locale.ROOT, "%.1f%%", rate * 100f),
-                    style = TextStyle().gameFont(),
+                    style = TextStyle().gameFont(GameFontWidth.EXTRA_EXPANDED),
                     fontSize = 32.sp,
-                    fontWeight = FontWeight.Black,
+                    fontWeight = GameFonts.maximumWeight,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -381,14 +385,16 @@ private fun ScoreSection(
                 ) {
                     IIDXClearTypeText(
                         clearType = score.clearType,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWidth = GameFontWidth.EXTRA_EXPANDED,
+                        fontWeight = GameFonts.maximumWeight
                     )
                 }
                 DetailRow(label = stringResource(R.string.scores_viewer_score)) {
                     OutlinedText(
                         text = score.score.toString(),
-                        style = MaterialTheme.typography.bodyLarge.gameFont(),
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyLarge.gameFont(GameFontWidth.EXTRA_EXPANDED),
+                        fontWeight = GameFonts.maximumWeight,
                         fill = IIDXColors.scoreColor,
                         outline = IIDXColors.scoreOutlineColor,
                         outlineWidth = 0.3.dp
@@ -397,34 +403,21 @@ private fun ScoreSection(
                 DetailRow(label = stringResource(R.string.scores_viewer_miss_count)) {
                     OutlinedText(
                         text = score.missCount.toString(),
-                        style = MaterialTheme.typography.bodyLarge.gameFont(),
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyLarge.gameFont(GameFontWidth.EXTRA_EXPANDED),
+                        fontWeight = GameFonts.maximumWeight,
                         fill = IIDXColors.scoreColor,
                         outline = IIDXColors.scoreOutlineColor,
                         outlineWidth = 0.3.dp
                     )
                 }
                 HorizontalDivider()
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    NoteTypeColumn(
-                        label = stringResource(R.string.scores_viewer_pgreat),
-                        value = score.perfectGreatCount,
-                        color = Palette.cyan,
-                        modifier = Modifier.weight(1f)
+                IIDXJudgmentBreakdown(
+                    entries = listOf(
+                        IIDXJudgment.PERFECT_GREAT to score.perfectGreatCount,
+                        IIDXJudgment.GREAT to score.greatCount,
+                        IIDXJudgment.MISS to score.missCount
                     )
-                    NoteTypeColumn(
-                        label = stringResource(R.string.scores_viewer_great),
-                        value = score.greatCount,
-                        color = Palette.yellow,
-                        modifier = Modifier.weight(1f)
-                    )
-                    NoteTypeColumn(
-                        label = stringResource(R.string.scores_viewer_miss),
-                        value = score.missCount,
-                        color = Palette.red,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                )
             }
         }
     } else {
@@ -454,7 +447,9 @@ private fun ScoreSection(
                 ) {
                     IIDXClearTypeText(
                         clearType = score.clearType,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWidth = GameFontWidth.EXTRA_EXPANDED,
+                        fontWeight = GameFonts.maximumWeight
                     )
                 }
             }
@@ -566,36 +561,11 @@ private fun DetailRow(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelLarge.gameFont(),
+            style = MaterialTheme.typography.labelLarge.gameFont(GameFontWidth.EXTRA_EXPANDED),
+            fontWeight = GameFonts.maximumWeight,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f)
         )
         value()
-    }
-}
-
-@Composable
-private fun NoteTypeColumn(
-    label: String,
-    value: Int,
-    color: androidx.compose.ui.graphics.Color,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall.gameFont(),
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
-        Text(
-            text = value.toString(),
-            style = MaterialTheme.typography.titleMedium.gameFont(),
-            fontWeight = FontWeight.Bold
-        )
     }
 }
