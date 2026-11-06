@@ -1,11 +1,8 @@
 import Charts
-import Komponents
 import SwiftUI
 
-// swiftlint:disable:next type_body_length
 struct IIDXScoreSection: View {
 
-    @Environment(\.openURL) var openURL
     @EnvironmentObject var navigationManager: NavigationManager
 
     var songTitle: String
@@ -14,18 +11,10 @@ struct IIDXScoreSection: View {
     var playType: IIDXPlayType
     var chartRadarData: ChartRadarData?
 
-    @State private var isShowingRadarValues: Bool = false
-
     @State private var isShowingHistory: Bool = false
     @State private var scoreHistory: [Date: Int] = [:]
     @State private var earliestDate: Date = Calendar.current.date(byAdding: .day, value: -1, to: .now)!
     @State private var latestDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: .now)!
-
-    @State private var textageChart: TextageChart?
-    @State private var textageChartViewerChart: TextageChartViewerChart?
-    @State private var chartTraits: [IIDXChartTrait]?
-
-    @AppStorage(wrappedValue: false, "ExternalData.TextageChartViewer.Enabled") var isTextageChartViewerEnabled: Bool
 
     private let fetcher = IIDXReader()
 
@@ -35,14 +24,16 @@ struct IIDXScoreSection: View {
                 if score.djLevelEnum() != .none {
                     await reloadScoreHistory()
                 }
-                if score.level != .beginner {
-                    textageChart = await fetcher.textageChart(title: songTitle)
-                    textageChartViewerChart = await fetcher.textageChartViewerChart(title: songTitle)
-                    await reloadChartTraits()
-                }
             }
-        chartSection()
-        referenceSection()
+        IIDXChartInfoSections(
+            songTitle: songTitle,
+            level: score.level,
+            playType: playType,
+            chartRadarData: chartRadarData
+        ) { legacyURL, chartViewerURL in
+            navigationManager.push(ScoresPath.textageViewer(legacyURL: legacyURL,
+                                                            chartViewerURL: chartViewerURL))
+        }
     }
 
     @ViewBuilder
@@ -76,11 +67,11 @@ struct IIDXScoreSection: View {
                     IIDXDetailRow("MISS COUNT", value: score.missCount, style: Color.iidxScore,
                                   outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
                 }
-                HStack(spacing: 0.0) {
-                    IIDXNoteTypeDetailRow("P-GREAT", value: score.perfectGreatCount, style: Color.cyan)
-                    IIDXNoteTypeDetailRow("GREAT", value: score.greatCount, style: Color.yellow)
-                    IIDXNoteTypeDetailRow("MISS", value: score.missCount, style: Color.red)
-                }
+                IIDXJudgmentBreakdown(entries: [
+                    (.perfectGreat, score.perfectGreatCount),
+                    (.great, score.greatCount),
+                    (.miss, score.missCount)
+                ])
                 .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
             } else {
                 Text("Scores.Viewer.NoDataForCurrentVersion")
@@ -94,75 +85,6 @@ struct IIDXScoreSection: View {
                 historyRow()
             }
         }
-    }
-
-    @ViewBuilder
-    func chartSection() -> some View {
-        if isChartTraitsAvailable || chartRadarData != nil {
-            Section {
-                if isChartTraitsAvailable {
-                    IIDXChartTraitRow(traits: chartTraits)
-                }
-                if let chartRadarData {
-                    Button {
-                        isShowingRadarValues.toggle()
-                    } label: {
-                        Group {
-                            if isShowingRadarValues {
-                                VStack(spacing: 4.0) {
-                                    ForEach(chartRadarData.radarData.displayPoints(), id: \.label) { point in
-                                        HStack {
-                                            Text(verbatim: point.label)
-                                                .font(.system(size: 12, weight: .bold))
-                                                .fontWidth(.expanded)
-                                                .foregroundStyle(point.color)
-                                            Spacer()
-                                            Text(verbatim: String(format: "%.2f", point.value))
-                                                .font(.system(size: 12, weight: .semibold).monospacedDigit())
-                                                .foregroundStyle(.primary)
-                                        }
-                                    }
-                                }
-                                .padding(.vertical, 4.0)
-                            } else {
-                                RadarChartView(chartRadarData.radarData)
-                                    .frame(height: 200.0)
-                                    .padding(.vertical, 4.0)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                }
-            } header: {
-                ListSectionHeader(text: "Scores.Viewer.Section.Chart")
-                    .font(.body)
-            }
-        }
-    }
-
-    @ViewBuilder
-    func referenceSection() -> some View {
-        Section {
-            chartActions()
-        } header: {
-            ListSectionHeader(text: "Scores.Viewer.Section.Reference")
-                .font(.body)
-        }
-    }
-
-    private var isChartTraitsAvailable: Bool {
-        isTextageChartViewerEnabled && score.level != .beginner && textageChartViewerChart?.textageScoreURL(
-            for: score.level, playType: playType
-        ) != nil
-    }
-
-    func reloadChartTraits() async {
-        guard isChartTraitsAvailable, let textageChartViewerChart else { return }
-        let profile = await IIDXChartAnalyzer.shared.profile(for: textageChartViewerChart,
-                                                             difficulty: score.level,
-                                                             playType: playType)
-        chartTraits = profile?.traits ?? []
     }
 
     @ViewBuilder
@@ -254,68 +176,6 @@ struct IIDXScoreSection: View {
         return max(scoreHistory.values.max() ?? 1, 1)
     }
 
-    @ViewBuilder
-    func chartActions() -> some View {
-        HStack(spacing: 0.0) {
-            Button {
-                openYouTube()
-            } label: {
-                chartActionLabel(image: Image(.listIconYouTube), label: "YouTube")
-            }
-            .buttonStyle(.plain)
-            if score.level != .beginner, textageChart != nil || textageChartViewerChart != nil {
-                switch playType {
-                case .single:
-                    textageButton(playSide: .side1P,
-                                  image: Image(.listIconTextage),
-                                  label: "Scores.Viewer.OpenTextage.1P")
-                    textageButton(playSide: .side2P,
-                                  image: Image(.listIconTextageFlipped),
-                                  label: "Scores.Viewer.OpenTextage.2P")
-                case .double:
-                    textageButton(playSide: .notApplicable,
-                                  image: Image(.listIconTextage),
-                                  label: "Scores.Viewer.OpenTextage.DP")
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    func textageButton(playSide: IIDXPlaySide,
-                       image: Image,
-                       label: LocalizedStringKey) -> some View {
-        let legacyURL = textageChart?.pageURL(for: score.level, playType: playType, playSide: playSide)
-        let chartViewerURL = textageChartViewerChart?.pageURL(for: score.level, playType: playType)
-        if legacyURL != nil || chartViewerURL != nil {
-            Divider()
-            Button {
-                navigationManager.push(ScoresPath.textageViewer(legacyURL: legacyURL,
-                                                                chartViewerURL: chartViewerURL))
-            } label: {
-                chartActionLabel(image: image, label: label)
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    @ViewBuilder
-    private func chartActionLabel(image: Image, label: LocalizedStringKey) -> some View {
-        VStack(spacing: 8.0) {
-            image
-                .resizable()
-                .scaledToFit()
-                .frame(width: 26.0, height: 26.0)
-            Text(label)
-                .font(.caption)
-                .fontWeight(.semibold)
-                .multilineTextAlignment(.center)
-        }
-        .foregroundStyle(.secondary)
-        .frame(maxWidth: .infinity)
-        .contentShape(.rect)
-    }
-
     func reloadScoreHistory() async {
         // Get list of scores for this song
         let songRecordsForSong = await fetcher.songRecordsForSong(title: songTitle)
@@ -360,18 +220,5 @@ struct IIDXScoreSection: View {
         }
         earliestDate = Calendar.current.date(byAdding: .day, value: -1, to: newEarliestDate)!
         latestDate = Calendar.current.date(byAdding: .day, value: 1, to: newLatestDate)!
-    }
-
-    func openYouTube() {
-        switch playType {
-        case .single:
-            let searchQuery: String = "IIDX SP\(score.level.code()) \(songTitle)"
-                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-            openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
-        case .double:
-            let searchQuery: String = "IIDX DP\(score.level.code()) \(songTitle)"
-                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-            openURL(URL(string: "https://youtube.com/results?search_query=\(searchQuery)")!)
-        }
     }
 }

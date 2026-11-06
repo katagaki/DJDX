@@ -4,7 +4,6 @@ struct IIDXScoreViewer: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @AppStorage(wrappedValue: true, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
-    @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     var songRecord: IIDXSongRecord
     var noteCount: (IIDXSongRecord, IIDXLevel) -> Int?
@@ -107,43 +106,13 @@ struct IIDXScoreViewer: View {
     @ViewBuilder
     private func header() -> some View {
         VStack(alignment: .center, spacing: 8.0) {
-            VStack(alignment: .center, spacing: 4.0) {
-                Group {
-                    Text(songRecord.genre)
-                        .font(.subheadline)
-                        .fontWeight(.heavy)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.white)
-                        .strokeText(color: .black.opacity(0.7), width: 0.5)
-                    Text(songRecord.title)
-                        .font(.title)
-                        .fontWeight(.heavy)
-                        .fontWidth(.compressed)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(
-                            selectedLevel == .leggendaria ?
-                            IIDXVersion.leggendariaSongTitleTextColor :
-                            iidxVersion.songTitleTextColor(for: songRecord.version)
-                        )
-                        .strokeText(
-                            color: selectedLevel == .leggendaria ?
-                            IIDXVersion.leggendariaSongTitleStrokeColor :
-                            iidxVersion.songTitleStrokeColor(for: songRecord.version),
-                            width: 0.5
-                        )
-                        .textSelection(.enabled)
-                        .padding(.bottom, 2.0)
-                    Text(songRecord.artist)
-                        .font(.subheadline)
-                        .fontWeight(.heavy)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.white)
-                        .strokeText(color: .black.opacity(0.7), width: 0.5)
-                }
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-            }
-            .frame(maxWidth: .infinity)
+            IIDXSongTitleBlock(
+                genre: songRecord.genre,
+                title: songRecord.title,
+                artist: songRecord.artist,
+                version: songRecord.version,
+                isLeggendaria: selectedLevel == .leggendaria
+            )
             Divider()
             HStack {
                 Text("""

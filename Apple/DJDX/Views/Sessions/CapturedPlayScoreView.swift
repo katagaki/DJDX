@@ -8,6 +8,10 @@ struct CapturedPlayScoreView: View {
 
     @State private var matchedSong: IIDXSong?
     @State private var matchedNoteCount: Int?
+    @State private var matchedRecord: IIDXSongRecord?
+    @State private var chartRadarData: ChartRadarData?
+    @State private var hasLoadedSongInfo: Bool = false
+    @State private var textageDestination: TextageDestination?
 
     private let reader = IIDXReader()
 
@@ -17,6 +21,13 @@ struct CapturedPlayScoreView: View {
         if let songTitle = play.songTitle, !songTitle.isEmpty { return songTitle }
         if let matchedSong { return matchedSong.title }
         return String(localized: "Sessions.UnknownSong")
+    }
+
+    private var chartTitle: String? {
+        guard play.level != .unknown else { return nil }
+        if let matchedSong { return matchedSong.title }
+        if let songTitle = play.songTitle, !songTitle.isEmpty { return songTitle }
+        return nil
     }
 
     var body: some View {
@@ -45,6 +56,17 @@ struct CapturedPlayScoreView: View {
                     }
                 }
             }
+
+            if hasLoadedSongInfo, let chartTitle {
+                IIDXChartInfoSections(
+                    songTitle: chartTitle,
+                    level: play.level,
+                    playType: play.playType,
+                    chartRadarData: chartRadarData
+                ) { legacyURL, chartViewerURL in
+                    textageDestination = TextageDestination(legacyURL: legacyURL, chartViewerURL: chartViewerURL)
+                }
+            }
         }
         .listSectionSpacing(.compact)
         .scrollContentBackground(.hidden)
@@ -63,6 +85,9 @@ struct CapturedPlayScoreView: View {
             }
         }
         .toolbar(.hidden, for: .bottomBar)
+        .navigationDestination(item: $textageDestination) { destination in
+            TextageViewer(legacyURL: destination.legacyURL, chartViewerURL: destination.chartViewerURL)
+        }
         .task(id: play.id) { await loadSongInfo() }
     }
 
@@ -73,22 +98,32 @@ struct CapturedPlayScoreView: View {
         let noteCount = song.flatMap { song in
             (play.playType == .single ? song.spNoteCount : song.dpNoteCount)?.noteCount(for: play.level)
         }
+        let resolvedTitle = song?.title ?? title
+        let records = await reader.songRecordsForSong(title: resolvedTitle)
         matchedSong = song
         matchedNoteCount = noteCount
+        matchedRecord = records.first { $0.playType == play.playType } ?? records.first
+        chartRadarData = await radarData(title: resolvedTitle)
+        hasLoadedSongInfo = true
+    }
+
+    private func radarData(title: String) async -> ChartRadarData? {
+        let difficulties: [IIDXLevel: Int] = [.beginner: 0, .normal: 1, .hyper: 2, .another: 3, .leggendaria: 4]
+        guard let difficulty = difficulties[play.level] else { return nil }
+        return await reader.fetchChartRadarData(title: title, playType: play.playType, difficulty: difficulty)
     }
 
     @ViewBuilder
     private func header() -> some View {
         VStack(alignment: .center, spacing: 8.0) {
             VStack(alignment: .center, spacing: 8.0) {
-                Text(verbatim: displayTitle)
-                    .font(.title)
-                    .fontWeight(.heavy)
-                    .fontWidth(.compressed)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.5)
-                    .textSelection(.enabled)
+                IIDXSongTitleBlock(
+                    genre: matchedRecord?.genre,
+                    title: displayTitle,
+                    artist: matchedRecord?.artist,
+                    version: matchedRecord?.version,
+                    isLeggendaria: play.level == .leggendaria
+                )
                 difficultyChip()
             }
             .frame(maxWidth: .infinity)
@@ -174,13 +209,13 @@ struct CapturedPlayScoreView: View {
 
     @ViewBuilder
     private func noteBreakdown() -> some View {
-        HStack(spacing: 0.0) {
-            IIDXNoteTypeDetailRow("P-GREAT", value: play.perfectGreat, style: Color.cyan)
-            IIDXNoteTypeDetailRow("GREAT", value: play.great, style: Color.yellow)
-            IIDXNoteTypeDetailRow("GOOD", value: play.good, style: Color.green)
-            IIDXNoteTypeDetailRow("BAD", value: play.bad, style: Color.orange)
-            IIDXNoteTypeDetailRow("POOR", value: play.poor, style: Color.red)
-        }
+        IIDXJudgmentBreakdown(entries: [
+            (.perfectGreat, play.perfectGreat),
+            (.great, play.great),
+            (.good, play.good),
+            (.bad, play.bad),
+            (.poor, play.poor)
+        ])
         .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
     }
 
@@ -218,4 +253,9 @@ struct CapturedPlayScoreView: View {
         default: .accent
         }
     }
+}
+
+private struct TextageDestination: Hashable {
+    let legacyURL: URL?
+    let chartViewerURL: URL?
 }
