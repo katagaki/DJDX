@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -13,10 +14,14 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.djdxgo.data.RadarAxis
 import com.tsubuzaki.djdxgo.data.RadarData
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.GameFonts
 import com.tsubuzaki.djdxgo.ui.theme.RadarColors
 import kotlin.math.PI
 import kotlin.math.cos
@@ -30,6 +35,14 @@ private fun angle(axis: RadarAxis): Double =
     -PI / 2 - RadarAxis.chartOrder.indexOf(axis) * PI / 3
 
 @Composable
+fun rememberRadarLabelTypeface(): Typeface {
+    val resolver = LocalFontFamilyResolver.current
+    return remember(resolver) {
+        resolver.resolve(GameFonts.family(GameFontWidth.EXPANDED), FontWeight.Black).value as Typeface
+    }
+}
+
+@Composable
 fun RadarChart(
     data: RadarData,
     color: Color,
@@ -41,6 +54,7 @@ fun RadarChart(
     val labelSizePx = with(density) { labelSize.toPx() }
     val lineWidthPx = with(density) { lineWidth.toPx() }
     val insetPx = with(density) { 30.dp.toPx() }
+    val labelTypeface = rememberRadarLabelTypeface()
     Canvas(modifier = modifier) {
         drawIntoCanvas { canvas ->
             drawRadar(
@@ -50,6 +64,7 @@ fun RadarChart(
                 data = data,
                 color = color,
                 labelSizePx = labelSizePx,
+                labelTypeface = labelTypeface,
                 lineWidthPx = lineWidthPx,
                 insetPx = insetPx
             )
@@ -64,6 +79,7 @@ fun drawRadar(
     data: RadarData,
     color: Color,
     labelSizePx: Float,
+    labelTypeface: Typeface,
     lineWidthPx: Float,
     insetPx: Float
 ) {
@@ -98,7 +114,7 @@ fun drawRadar(
 
     val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textSize = labelSizePx
-        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        typeface = labelTypeface
         letterSpacing = 0.05f
     }
     val metrics = textPaint.fontMetrics
@@ -111,11 +127,13 @@ fun drawRadar(
         textPaint.setShadowLayer(labelSizePx / 3f, 0f, 0f, axisColor.toArgb())
         val textWidth = textPaint.measureText(axis.label)
         val horizontalCos = cos(theta)
-        val x = when {
+        val anchoredX = when {
             horizontalCos > 0.1 -> tipX
             horizontalCos < -0.1 -> tipX - textWidth
             else -> tipX - textWidth / 2f
         }
+        val glowRadius = labelSizePx / 3f
+        val x = anchoredX.coerceIn(glowRadius, (width - textWidth - glowRadius).coerceAtLeast(glowRadius))
         val baseline = if (sin(theta) < 0) tipY - metrics.descent else tipY - metrics.ascent
         canvas.drawText(axis.label, x, baseline, textPaint)
     }
@@ -140,7 +158,8 @@ fun drawRadar(
 fun renderRadarBitmap(
     data: RadarData,
     color: Color,
-    density: Float
+    density: Float,
+    labelTypeface: Typeface
 ): Bitmap {
     val width = (640 * density).toInt()
     val height = (600 * density).toInt()
@@ -157,6 +176,7 @@ fun renderRadarBitmap(
         data = data,
         color = color,
         labelSizePx = 20f * density,
+        labelTypeface = labelTypeface,
         lineWidthPx = 2.5f * density,
         insetPx = 30f * density
     )

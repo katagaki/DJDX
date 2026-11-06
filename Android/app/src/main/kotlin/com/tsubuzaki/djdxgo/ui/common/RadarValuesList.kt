@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.sp
 import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.data.RadarAxis
 import com.tsubuzaki.djdxgo.data.RadarData
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.GameFonts
 import com.tsubuzaki.djdxgo.ui.theme.RadarColors
 import java.util.Locale
 
@@ -30,6 +32,7 @@ fun RadarValuesList(
     lineHeight: TextUnit = TextUnit.Unspecified,
     showsTotal: Boolean = false
 ) {
+    val fontFamily = GameFonts.family(GameFontWidth.EXPANDED)
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
         RadarAxis.displayOrder.forEach { axis ->
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -37,6 +40,7 @@ fun RadarValuesList(
                     text = axis.label,
                     fontSize = fontSize,
                     lineHeight = lineHeight,
+                    fontFamily = fontFamily,
                     fontWeight = FontWeight.Bold,
                     color = RadarColors.axisColor(axis),
                     maxLines = 1,
@@ -47,6 +51,7 @@ fun RadarValuesList(
                     text = String.format(Locale.ROOT, "%.2f", data.value(axis)),
                     fontSize = fontSize,
                     lineHeight = lineHeight,
+                    fontFamily = fontFamily,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     softWrap = false
@@ -60,6 +65,7 @@ fun RadarValuesList(
                     text = stringResource(R.string.radar_total),
                     fontSize = fontSize,
                     lineHeight = lineHeight,
+                    fontFamily = fontFamily,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
@@ -70,6 +76,7 @@ fun RadarValuesList(
                     text = String.format(Locale.ROOT, "%.2f", data.sum()),
                     fontSize = fontSize,
                     lineHeight = lineHeight,
+                    fontFamily = fontFamily,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     softWrap = false
