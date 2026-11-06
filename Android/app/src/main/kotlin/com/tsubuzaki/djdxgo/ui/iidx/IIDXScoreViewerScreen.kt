@@ -65,7 +65,6 @@ import com.tsubuzaki.djdxgo.ui.games.ChartActionButton
 import com.tsubuzaki.djdxgo.ui.games.ExpressiveLevelSelector
 import com.tsubuzaki.djdxgo.ui.games.ViewerWithSelector
 import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
-import com.tsubuzaki.djdxgo.ui.theme.Palette
 import com.tsubuzaki.djdxgo.ui.theme.RadarColors
 import java.net.URLEncoder
 import java.time.Instant
@@ -405,26 +404,13 @@ private fun ScoreSection(
                     )
                 }
                 HorizontalDivider()
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    NoteTypeColumn(
-                        label = stringResource(R.string.scores_viewer_pgreat),
-                        value = score.perfectGreatCount,
-                        color = Palette.cyan,
-                        modifier = Modifier.weight(1f)
+                IIDXJudgmentBreakdown(
+                    entries = listOf(
+                        IIDXJudgment.PERFECT_GREAT to score.perfectGreatCount,
+                        IIDXJudgment.GREAT to score.greatCount,
+                        IIDXJudgment.MISS to score.missCount
                     )
-                    NoteTypeColumn(
-                        label = stringResource(R.string.scores_viewer_great),
-                        value = score.greatCount,
-                        color = Palette.yellow,
-                        modifier = Modifier.weight(1f)
-                    )
-                    NoteTypeColumn(
-                        label = stringResource(R.string.scores_viewer_miss),
-                        value = score.missCount,
-                        color = Palette.red,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                )
             }
         }
     } else {
@@ -571,31 +557,5 @@ private fun DetailRow(
             modifier = Modifier.weight(1f)
         )
         value()
-    }
-}
-
-@Composable
-private fun NoteTypeColumn(
-    label: String,
-    value: Int,
-    color: androidx.compose.ui.graphics.Color,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall.gameFont(),
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
-        Text(
-            text = value.toString(),
-            style = MaterialTheme.typography.titleMedium.gameFont(),
-            fontWeight = FontWeight.Bold
-        )
     }
 }

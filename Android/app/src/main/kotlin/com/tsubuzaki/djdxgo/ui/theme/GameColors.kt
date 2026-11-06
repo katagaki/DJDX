@@ -160,6 +160,84 @@ object IIDXColors {
         )
 }
 
+class HitlineJudgmentStyle(
+    val edge: Color,
+    val glow: Color,
+    private val stops: List<Pair<Float, Color>>,
+    private val rising: Boolean
+) {
+    fun fillBrush(height: Float): Brush = Brush.verticalGradient(
+        *stops.toTypedArray(),
+        startY = if (rising) height else 0f,
+        endY = if (rising) 0f else height
+    )
+
+    companion object {
+        fun rainbow(hue: Float): HitlineJudgmentStyle {
+            val degrees = hue * 360f
+            return HitlineJudgmentStyle(
+                edge = Color.hsv(degrees, 0.79f, 0.48f),
+                glow = Color.hsv(degrees, 0.70f, 1f, 0.53f),
+                stops = listOf(
+                    0f to Color.White,
+                    0.30f to Color.White,
+                    0.52f to Color.hsv(degrees, 0.28f, 1f),
+                    1f to Color.hsv(degrees, 0.64f, 0.85f)
+                ),
+                rising = true
+            )
+        }
+
+        val great = HitlineJudgmentStyle(
+            edge = Color(0xFFB34700),
+            glow = Color(0x88FFB000),
+            stops = listOf(
+                0f to Color(0xFFFFFDE8),
+                0.28f to Color(0xFFFFFDE8),
+                0.55f to Color(0xFFFFE14D),
+                1f to Color(0xFFFF9500)
+            ),
+            rising = true
+        )
+
+        val good = HitlineJudgmentStyle(
+            edge = Color(0xFFB34700),
+            glow = Color(0x66FF9500),
+            stops = listOf(
+                0f to Color(0xFFFFF4C2),
+                0.25f to Color(0xFFFFF4C2),
+                0.60f to Color(0xFFFFC21A),
+                1f to Color(0xFFE06A00)
+            ),
+            rising = true
+        )
+
+        val bad = HitlineJudgmentStyle(
+            edge = Color(0xFF6E0000),
+            glow = Color(0x66FF3000),
+            stops = listOf(
+                0f to Color(0xFFF06A0A),
+                0.45f to Color(0xFFFF9A1A),
+                0.80f to Color(0xFFFFD23A),
+                1f to Color(0xFFFFF07A)
+            ),
+            rising = false
+        )
+
+        val poor = HitlineJudgmentStyle(
+            edge = Color(0xFF6E0000),
+            glow = Color(0x66FF3000),
+            stops = listOf(
+                0f to Color(0xFFD81A0A),
+                0.40f to Color(0xFFF04410),
+                0.75f to Color(0xFFFF7A18),
+                1f to Color(0xFFFFA030)
+            ),
+            rising = false
+        )
+    }
+}
+
 object SDVXColors {
     fun difficultyColor(difficulty: String): Color = when (SDVXDifficulty.fromValue(difficulty)) {
         SDVXDifficulty.NOVICE -> Palette.purple
