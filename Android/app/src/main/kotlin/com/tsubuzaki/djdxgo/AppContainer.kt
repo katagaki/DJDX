@@ -6,6 +6,7 @@ import com.tsubuzaki.djdxgo.data.DJDXDatabase
 import com.tsubuzaki.djdxgo.data.analytics.AnalyticsStore
 import com.tsubuzaki.djdxgo.data.ddr.DDRRepository
 import com.tsubuzaki.djdxgo.data.external.ExternalDataReloader
+import com.tsubuzaki.djdxgo.data.iidx.IIDXChartAnalyzer
 import com.tsubuzaki.djdxgo.data.iidx.IIDXRepository
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordRepository
 import com.tsubuzaki.djdxgo.data.profile.ProfileRepository
@@ -29,6 +30,7 @@ class AppContainer(context: Context) {
     val externalDataReloader = ExternalDataReloader(externalDataDao)
     val analyticsStore = AnalyticsStore(database, ddrRepository)
     val profileRepository = ProfileRepository(context.applicationContext)
+    val chartAnalyzer = IIDXChartAnalyzer(context.applicationContext.cacheDir)
 
     private val dataVersionState = MutableStateFlow(0)
     val dataVersion: StateFlow<Int> = dataVersionState.asStateFlow()
