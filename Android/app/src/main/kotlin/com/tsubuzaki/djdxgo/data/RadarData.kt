@@ -1,7 +1,9 @@
 package com.tsubuzaki.djdxgo.data
 
 import com.tsubuzaki.djdxgo.data.external.NotesRadarEntry
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RadarData(
     val notes: Double = 0.0,
     val chord: Double = 0.0,

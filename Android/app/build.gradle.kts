@@ -85,6 +85,9 @@ dependencies {
     // DataStore
     implementation(libs.datastore.preferences)
 
+    // Glance
+    implementation(libs.glance.appwidget)
+
     // WebView
     implementation(libs.webkit)
 

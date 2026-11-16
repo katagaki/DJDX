@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_qpro_name">Qpro (IIDX)</string>
+    <string name="widget_qpro_description">Shows your Qpro image</string>
+    <string name="widget_qpro_not_loaded">Open the app to load your Qpro</string>
+    <string name="widget_notes_radar_name">Notes Radar (IIDX)</string>
+    <string name="widget_notes_radar_description">Shows your notes radar chart</string>
+    <string name="widget_notes_radar_show_table">Show Numbers</string>
+    <string name="widget_clear_type_name">Clear Type (IIDX)</string>
+    <string name="widget_clear_type_description">Shows clear type distribution</string>
+    <string name="widget_dj_level_name">DJ LEVEL (IIDX)</string>
+    <string name="widget_dj_level_description">Shows DJ level distribution</string>
+    <string name="widget_tower_name">IIDX Tower</string>
+    <string name="widget_tower_description">Shows your IIDX Tower progress</string>
+    <string name="widget_chart_style">Display</string>
+    <string name="widget_chart_style_pie">Latest Data (Pie)</string>
+    <string name="widget_chart_style_bar">Latest Data (Bar)</string>
+    <string name="widget_chart_style_trend">Trend</string>
+    <string name="widget_level">Level</string>
+    <string name="widget_level_value">Level %1$d</string>
+    <string name="widget_configure_title">Widget Settings</string>
+    <string name="widget_configure_done">Done</string>
+</resources>
