@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_qpro_name">クプロ（IIDX）</string>
+    <string name="widget_qpro_description">クプロを表示します</string>
+    <string name="widget_qpro_not_loaded">アプリを開いてクプロを読み込んでください</string>
+    <string name="widget_notes_radar_name">ノーツレーダー（IIDX）</string>
+    <string name="widget_notes_radar_description">ノーツレーダーを表示します</string>
+    <string name="widget_notes_radar_show_table">数値を表示</string>
+    <string name="widget_clear_type_name">クリアランプ（IIDX）</string>
+    <string name="widget_clear_type_description">クリアタイプの分布を表示します</string>
+    <string name="widget_dj_level_name">DJ LEVEL（IIDX）</string>
+    <string name="widget_dj_level_description">DJレベルの分布を表示します</string>
+    <string name="widget_tower_name">IIDXタワー</string>
+    <string name="widget_tower_description">IIDXタワーの進捗を表示します</string>
+    <string name="widget_chart_style">表示</string>
+    <string name="widget_chart_style_pie">最新データ（円グラフ）</string>
+    <string name="widget_chart_style_bar">最新データ（棒グラフ）</string>
+    <string name="widget_chart_style_trend">推移</string>
+    <string name="widget_level">レベル</string>
+    <string name="widget_level_value">レベル%1$d</string>
+    <string name="widget_configure_title">ウィジェット設定</string>
+    <string name="widget_configure_done">完了</string>
+</resources>

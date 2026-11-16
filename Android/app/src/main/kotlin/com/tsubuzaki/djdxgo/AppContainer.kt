@@ -10,6 +10,7 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXRepository
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordRepository
 import com.tsubuzaki.djdxgo.data.profile.ProfileRepository
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXRepository
+import com.tsubuzaki.djdxgo.widget.WidgetDataPublisher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,6 +45,10 @@ class AppContainer(context: Context) {
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val deepLinks: SharedFlow<Uri> = deepLinkEvents.asSharedFlow()
+
+    val widgetDataPublisher = WidgetDataPublisher(context, database.iidxDao(), profileRepository).also {
+        it.start(dataVersion)
+    }
 
     fun notifyDataChanged() {
         dataVersionState.update { it + 1 }

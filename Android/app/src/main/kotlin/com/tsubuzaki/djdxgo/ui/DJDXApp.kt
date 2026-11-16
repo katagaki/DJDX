@@ -311,7 +311,7 @@ private suspend fun handleDeepLink(
             if (container.externalDataReloader.reload(source).isSuccess) container.notifyDataChanged()
         }
         "open" -> {
-            val game = value("game")?.let(::gameNamed)
+            val game = (value("game") ?: uri.pathSegments.firstOrNull())?.let(::gameNamed)
             if (value("type")?.lowercase() == "detail") {
                 val songName = value("songName")
                 if (game != Game.IIDX_ARCADE || songName.isNullOrEmpty()) return

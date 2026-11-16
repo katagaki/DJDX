@@ -128,6 +128,12 @@ class ProfileRepository(private val context: Context) {
         )
     }
 
+    val iidxQproFile: File
+        get() = File(imagesDirectory, QPRO_FILE)
+
+    suspend fun cachedIIDXRadar(playType: String): RadarData? =
+        radar(context.settingsDataStore.data.first(), playType)
+
     suspend fun refreshIIDX() = withContext(Dispatchers.IO) {
         runCatching {
             val document = fetchDocument(IIDXVersionInfo.statusPageURL)
