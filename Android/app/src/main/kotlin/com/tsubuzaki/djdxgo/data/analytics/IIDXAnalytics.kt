@@ -152,6 +152,27 @@ object IIDXAnalytics {
         filters: IIDXFilterOptions
     ): IIDXAnalyticsData {
         val groups = dao.importGroups(IIDXVersionInfo.NUMBER).sortedBy { it.importDate }
+        return levelCounts(dao, groups, playType, filters).copy(
+            newEntries = newEntries(dao, groups, playType, filters),
+            progress = progress(dao, groups, playType, filters)
+        )
+    }
+
+    suspend fun levelCounts(
+        dao: IIDXDao,
+        playType: IIDXPlayType,
+        filters: IIDXFilterOptions
+    ): IIDXAnalyticsData {
+        val groups = dao.importGroups(IIDXVersionInfo.NUMBER).sortedBy { it.importDate }
+        return levelCounts(dao, groups, playType, filters)
+    }
+
+    private suspend fun levelCounts(
+        dao: IIDXDao,
+        groups: List<IIDXImportGroup>,
+        playType: IIDXPlayType,
+        filters: IIDXFilterOptions
+    ): IIDXAnalyticsData {
         val towerEntries = dao.towerEntries()
         if (groups.isEmpty()) return IIDXAnalyticsData(towerEntries = towerEntries)
 
@@ -196,8 +217,6 @@ object IIDXAnalytics {
             },
             clearTypeTrends = clearTypeTrends,
             djLevelTrends = djLevelTrends,
-            newEntries = newEntries(dao, groups, playType, filters),
-            progress = progress(dao, groups, playType, filters),
             towerEntries = towerEntries
         )
     }
