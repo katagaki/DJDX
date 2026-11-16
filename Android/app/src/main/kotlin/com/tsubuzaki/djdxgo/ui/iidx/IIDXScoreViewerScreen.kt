@@ -52,6 +52,9 @@ import com.tsubuzaki.djdxgo.data.external.IIDXPlaySide
 import com.tsubuzaki.djdxgo.data.external.TextageChart
 import com.tsubuzaki.djdxgo.data.external.TextageChartViewerChart
 import com.tsubuzaki.djdxgo.data.external.pageURL
+import com.tsubuzaki.djdxgo.data.external.textageScoreURL
+import com.tsubuzaki.djdxgo.data.iidx.IIDXChartAnalyzer
+import com.tsubuzaki.djdxgo.data.iidx.IIDXChartTrait
 import com.tsubuzaki.djdxgo.data.toRadarData
 import com.tsubuzaki.djdxgo.ui.common.RadarChart
 import com.tsubuzaki.djdxgo.ui.common.RadarValuesList
@@ -90,6 +93,7 @@ fun IIDXScoreViewerScreen(
     val darkTheme = isSystemInDarkTheme()
     val playTypeEnum = IIDXPlayType.fromValue(playType)
     val beginnerHidden by rememberSetting(SettingsKeys.iidxBeginnerLevelHidden, true)
+    val isChartViewerEnabled by rememberSetting(SettingsKeys.externalTextageChartViewerEnabled, false)
 
     var record by remember { mutableStateOf<IIDXSongRecord?>(null) }
     var song by remember { mutableStateOf<IIDXSong?>(null) }
@@ -224,6 +228,8 @@ fun IIDXScoreViewerScreen(
                     radarEntry = radarEntries[level.code],
                     textageChart = textageChart,
                     legacyTextageChart = legacyTextageChart,
+                    chartAnalyzer = container.chartAnalyzer,
+                    isChartViewerEnabled = isChartViewerEnabled,
                     onOpenTextage = onOpenTextage
                 )
             }
@@ -338,6 +344,8 @@ private fun ScoreSection(
     radarEntry: NotesRadarEntry?,
     textageChart: TextageChartViewerChart?,
     legacyTextageChart: TextageChart?,
+    chartAnalyzer: IIDXChartAnalyzer,
+    isChartViewerEnabled: Boolean,
     onOpenTextage: (String?, String?) -> Unit
 ) {
     val hasDJLevel = IIDXDJLevel.fromValue(score.djLevel)
@@ -474,6 +482,24 @@ private fun ScoreSection(
                 )
                 IIDXScoreHistoryChart(scores = history, noteCount = noteCount)
             }
+        }
+    }
+
+    val traitsChart = textageChart?.takeIf {
+        isChartViewerEnabled && level != IIDXLevel.BEGINNER && it.textageScoreURL(level, playTypeEnum) != null
+    }
+    if (traitsChart != null) {
+        var traits by remember(traitsChart, level, playTypeEnum) { mutableStateOf<List<IIDXChartTrait>?>(null) }
+        LaunchedEffect(traitsChart, level, playTypeEnum) {
+            traits = chartAnalyzer.profile(traitsChart, level, playTypeEnum)?.traits.orEmpty()
+        }
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+            )
+        ) {
+            IIDXChartTraitsRow(traits = traits, modifier = Modifier.padding(16.dp))
         }
     }
 

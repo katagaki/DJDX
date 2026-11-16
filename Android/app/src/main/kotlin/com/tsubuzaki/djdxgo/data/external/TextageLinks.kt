@@ -73,3 +73,18 @@ fun TextageChartViewerChart.pageURL(level: IIDXLevel, playType: IIDXPlayType): S
     val playTypeCode = if (playType == IIDXPlayType.SINGLE) "sp" else "dp"
     return "https://textage-chart-viewer.vercel.app/chart/${textageFolder(version)}/$songId/$difficultyCode/$playTypeCode"
 }
+
+fun TextageChartViewerChart.textageScoreURL(level: IIDXLevel, playType: IIDXPlayType): String? {
+    val levelValue = level(level, playType)
+    if (levelValue <= 0 || levelValue >= BASE36.length) return null
+    val difficultyChar = when (level) {
+        IIDXLevel.NORMAL -> "N"
+        IIDXLevel.HYPER -> "H"
+        IIDXLevel.ANOTHER -> "A"
+        IIDXLevel.LEGGENDARIA -> "X"
+        IIDXLevel.BEGINNER -> return null
+    }
+    val sideChar = if (playType == IIDXPlayType.DOUBLE) "D" else "1"
+    val query = "$sideChar$difficultyChar${BASE36[levelValue]}00"
+    return "https://textage.cc/score/${textageFolder(version)}/$songId.html?$query"
+}
