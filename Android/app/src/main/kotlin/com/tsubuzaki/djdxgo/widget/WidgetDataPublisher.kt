@@ -31,6 +31,7 @@ class WidgetDataPublisher(
 
     @OptIn(FlowPreview::class)
     fun start(dataVersion: StateFlow<Int>) {
+        scope.launch { WidgetPreviews.publish(context) }
         scope.launch {
             combine(
                 context.settingFlow(SettingsKeys.iidxPlayType, IIDXPlayType.SINGLE.value).distinctUntilChanged(),

@@ -12,6 +12,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -60,6 +62,18 @@ class QproWidget : GlanceAppWidget() {
             }
         }
     }
+
+    override suspend fun providePreview(context: Context, widgetCategory: Int) {
+        provideContent {
+            WidgetContainer {
+                Image(
+                    provider = ImageProvider(R.drawable.ic_launcher_foreground),
+                    contentDescription = null,
+                    modifier = GlanceModifier.fillMaxSize()
+                )
+            }
+        }
+    }
 }
 
 class QproWidgetReceiver : GlanceAppWidgetReceiver() {
@@ -78,6 +92,12 @@ class NotesRadarWidget : GlanceAppWidget() {
             WidgetContainer {
                 if (radar == null) WidgetNoData() else NotesRadarContent(radar, showTable)
             }
+        }
+    }
+
+    override suspend fun providePreview(context: Context, widgetCategory: Int) {
+        provideContent {
+            WidgetContainer { NotesRadarContent(WidgetPreviews.snapshot.radar ?: RadarData(), showTable = true) }
         }
     }
 }
@@ -170,6 +190,21 @@ class ClearTypeWidget : GlanceAppWidget() {
         }
     }
 
+    override suspend fun providePreview(context: Context, widgetCategory: Int) {
+        provideContent {
+            WidgetContainer {
+                CountsContent(
+                    counts = WidgetPreviews.snapshot.clearType,
+                    style = WidgetChartStyle.PIE,
+                    level = WidgetKeys.DEFAULT_LEVEL,
+                    order = clearTypeOrder,
+                    barKeys = null,
+                    color = IIDXColors::clearTypeColor
+                )
+            }
+        }
+    }
+
     companion object {
         val clearTypeOrder = IIDXClearType.sortedWithoutNoPlay.map { it.value }
     }
@@ -191,6 +226,21 @@ class DJLevelWidget : GlanceAppWidget() {
                     counts = counts,
                     style = WidgetChartStyle.fromValue(state[WidgetKeys.chartStyle], WidgetChartStyle.BAR),
                     level = state[WidgetKeys.level] ?: WidgetKeys.DEFAULT_LEVEL,
+                    order = djLevelOrder,
+                    barKeys = djLevelBarKeys,
+                    color = IIDXColors::djLevelColor
+                )
+            }
+        }
+    }
+
+    override suspend fun providePreview(context: Context, widgetCategory: Int) {
+        provideContent {
+            WidgetContainer {
+                CountsContent(
+                    counts = WidgetPreviews.snapshot.djLevel,
+                    style = WidgetChartStyle.BAR,
+                    level = WidgetKeys.DEFAULT_LEVEL,
                     order = djLevelOrder,
                     barKeys = djLevelBarKeys,
                     color = IIDXColors::djLevelColor
@@ -264,6 +314,12 @@ class TowerWidget : GlanceAppWidget() {
             WidgetContainer {
                 if (tower == null) WidgetNoData() else TowerContent(tower)
             }
+        }
+    }
+
+    override suspend fun providePreview(context: Context, widgetCategory: Int) {
+        provideContent {
+            WidgetContainer { WidgetPreviews.snapshot.tower?.let { TowerContent(it) } }
         }
     }
 }
