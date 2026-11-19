@@ -28,7 +28,7 @@ final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
         self.cachedTitleCompact = self.title.compact
         self.genre = csvRowData["ジャンル"] as? String ?? ""
         self.artist = csvRowData["アーティスト"] as? String ?? ""
-        self.playCount = Int(csvRowData["プレー回数"] as? String ?? "0") ?? 0
+        self.playCount = Self.playCount(from: csvRowData)
 
         for songLevelCSVHeader in songLevelCSVHeaders {
             let songLevel = IIDXLevel(csvValue: songLevelCSVHeader)
@@ -54,18 +54,33 @@ final class IIDXSongRecord: Equatable, Hashable, @unchecked Sendable {
             }
         }
 
-        if let lastPlayDate = csvRowData["最終プレー日時"] as? String {
-            let dateFormatter = DateFormatter()
-            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
-            self.lastPlayDate = dateFormatter.date(from: lastPlayDate) ?? .distantPast
-        } else {
-            self.lastPlayDate = .distantPast
-        }
+        self.lastPlayDate = Self.lastPlayDate(from: csvRowData)
 
         if let playType {
             self.playType = playType
         }
+    }
+
+    private static func playCount(from csvRowData: [String: Any]) -> Int {
+        if let playCount = csvRowData["プレー回数"] as? String {
+            return Int(playCount) ?? 0
+        }
+        return songLevelCSVHeaders.reduce(0) { total, header in
+            total + (Int(csvRowData["\(header) プレー回数"] as? String ?? "0") ?? 0)
+        }
+    }
+
+    private static func lastPlayDate(from csvRowData: [String: Any]) -> Date {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+        if let lastPlayDate = csvRowData["最終プレー日時"] as? String {
+            return dateFormatter.date(from: lastPlayDate) ?? .distantPast
+        }
+        return songLevelCSVHeaders
+            .compactMap { csvRowData["\($0) 最終プレー日時"] as? String }
+            .compactMap { dateFormatter.date(from: $0) }
+            .max() ?? .distantPast
     }
 
     func scores() -> [IIDXLevelScore] {
