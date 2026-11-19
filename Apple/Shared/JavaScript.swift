@@ -639,8 +639,12 @@ let konamiIDLoginAutofillUserScript = """
     }
 
     function submitButton(scope) {
-        var candidates = scope.querySelectorAll('button[type="submit"], input[type="submit"], button:not([type])');
-        return Array.prototype.slice.call(candidates).find(isVisible) || null;
+        var candidates = Array.prototype.slice.call(scope.querySelectorAll('button, input[type="submit"]'))
+            .filter(function(el) { return isVisible(el) && !/passkey|パスキー/i.test(el.id + labelOf(el)); });
+        return candidates.find(function(el) { return /login-button/i.test(el.id); })
+            || candidates.find(function(el) { return /ログイン|login|次へ|next/i.test(labelOf(el)); })
+            || candidates.find(function(el) { return el.type === 'submit'; })
+            || null;
     }
 
     function otpSendButton() {
@@ -695,7 +699,7 @@ let konamiIDLoginAutofillUserScript = """
         step();
         if (state() === '' || state() === 'email') {
             observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true });
-            setTimeout(function() { observer.disconnect(); }, 60000);
+            setTimeout(function() { observer.disconnect(); }, 600000);
         }
     }
 
