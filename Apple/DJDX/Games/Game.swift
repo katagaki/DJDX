@@ -2,8 +2,8 @@ import SwiftUI
 
 enum Game: Int, Codable, CaseIterable, Identifiable {
     case iidxArcade = 0
-    case soundVoltex = 1
     case iidxInfinitas = 2
+    case soundVoltex = 1
     case polarisChord = 3
     case danceDanceRevolution = 4
 
