@@ -87,6 +87,10 @@ actor IIDXReader {
 
     // MARK: Song Records
 
+    func invalidateCachedRecords() {
+        importGroupID = nil
+    }
+
     func songRecords(for importGroupID: String) -> [IIDXSongRecord] {
         guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return [] }
         let query = IIDXPlayDataDatabase.songRecordTable
