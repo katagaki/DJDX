@@ -133,7 +133,7 @@ actor IIDXImporter {
         from version: IIDXVersion,
         continuation: AsyncStream<ImportProgress>.Continuation
     ) {
-        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? IIDXPlayDataDatabase.current.getWriteConnection() else { return }
         let importGroupID = prepareImportGroupForPartialImport(
             database: database,
             importToDate: importToDate,
@@ -200,7 +200,7 @@ actor IIDXImporter {
         _ = try? database.run(col.importGroupTable.insert(
             col.igID <- newID,
             col.igImportDate <- importToDate.timeIntervalSince1970,
-            col.igIIDXVersion <- version.rawValue
+            col.igIIDXVersion <- IIDXPlayDataDatabase.current.isVersionless ? nil : version.rawValue
         ))
         return newID
     }
@@ -308,7 +308,7 @@ actor IIDXImporter {
     // MARK: Tower Import
 
     func importTowerCSV(_ keyedRows: [[String: String]]) {
-        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? IIDXPlayDataDatabase.current.getWriteConnection() else { return }
 
         // Delete all existing tower entries
         _ = try? database.run(IIDXPlayDataDatabase.towerEntryTable.delete())
@@ -336,7 +336,7 @@ actor IIDXImporter {
     // MARK: Delete Helpers
 
     func deleteImportGroup(id: String) {
-        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? IIDXPlayDataDatabase.current.getWriteConnection() else { return }
         let col = IIDXPlayDataDatabase.self
         try? database.transaction {
             try database.run(col.songRecordTable.filter(col.srImportGroupID == id).delete())
@@ -345,7 +345,7 @@ actor IIDXImporter {
     }
 
     func deleteAllScoreData() {
-        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? IIDXPlayDataDatabase.current.getWriteConnection() else { return }
         let col = IIDXPlayDataDatabase.self
         try? database.transaction {
             try database.run(col.songRecordTable.delete())
