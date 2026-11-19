@@ -59,6 +59,11 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     let loadingState: WebImporterLoadingState
 
     @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: Game.iidxArcade, "Global.SelectedGame") var selectedGame: Game
+
+    var scoreSource: IIDXScoreSource {
+        selectedGame == .iidxInfinitas ? .infinitas : .arcade(iidxVersion)
+    }
 
     let webView: WKWebView = {
         let contentController = WKUserContentController()
@@ -77,18 +82,10 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
         return WKWebView(frame: .zero, configuration: configuration)
     }()
 
-    var initialStyle: String {
-        switch importMode {
-        case .single: return "SP"
-        case .double: return "DP"
-        case .tower: return "tower"
-        }
-    }
-
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
         webView.layer.opacity = 0.0
-        webView.load(URLRequest(url: iidxVersion.loginPageRedirectURL(style: initialStyle)))
+        webView.load(URLRequest(url: scoreSource.loginPageRedirectURL(style: scoreSource.style(for: importMode))))
         #if DEBUG
         webView.isInspectable = true
         #endif
@@ -96,7 +93,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
     }
 
     func makeCoordinator() -> CoordinatorForImporter {
-        Coordinator(delegate: self, importMode: importMode, version: iidxVersion, loadingState: loadingState)
+        Coordinator(delegate: self, importMode: importMode, source: scoreSource, loadingState: loadingState)
     }
 
     func updateUIView(_: WKWebView, context _: Context) {
@@ -161,7 +158,7 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
 
     var delegate: UpdateScoreDataDelegate
     var importMode: IIDXImportMode
-    var version: IIDXVersion
+    var source: IIDXScoreSource
     let loadingState: WebImporterLoadingState
 
     var hasStartedExtraction: Bool = false
@@ -173,12 +170,12 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
     init(
         delegate: UpdateScoreDataDelegate,
         importMode: IIDXImportMode = .single,
-        version: IIDXVersion,
+        source: IIDXScoreSource,
         loadingState: WebImporterLoadingState
     ) {
         self.delegate = delegate
         self.importMode = importMode
-        self.version = version
+        self.source = source
         self.loadingState = loadingState
         super.init()
     }
@@ -204,7 +201,7 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         debugPrint("[IIDXWebImporter] didFinish ->", urlString)
         #endif
         webView.evaluateJavaScript(self.cleanupJS) { _, _ in
-            if urlString.starts(with: self.version.downloadPageURL().absoluteString) {
+            if urlString.starts(with: self.source.downloadPageURL().absoluteString) {
                 webView.layer.opacity = 0.0
                 webView.isUserInteractionEnabled = false
                 self.activeWebView = webView
@@ -215,9 +212,9 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
                 if urlString.contains("style=") {
                     self.handleStyledPageLoaded(webView, urlString: urlString)
                 } else {
-                    self.loadStyledPage(webView, style: self.currentStyle)
+                    self.loadStyledPage(webView, style: self.source.style(for: self.importMode))
                 }
-            } else if urlString.starts(with: self.version.errorPageURL().absoluteString) {
+            } else if urlString.starts(with: self.source.errorPageURL().absoluteString) {
                 webView.layer.opacity = 0.0
                 self.resolveFailure(with: Self.failureReason(forErrorPageURL: urlString))
             } else {
@@ -226,17 +223,8 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
         }
     }
 
-    // The style we want to load next for this page navigation.
-    var currentStyle: String {
-        switch importMode {
-        case .single: return "SP"
-        case .double: return "DP"
-        case .tower: return "tower"
-        }
-    }
-
     func loadStyledPage(_ webView: WKWebView, style: String) {
-        webView.load(URLRequest(url: version.downloadPageURL(style: style)))
+        webView.load(URLRequest(url: source.downloadPageURL(style: style)))
     }
 
     func handleStyledPageLoaded(_ webView: WKWebView, urlString: String) {
@@ -271,7 +259,10 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
                 self.resolveFailure(with: Self.failureReason(forSentinel: String(value.dropFirst(4))))
                 return
             }
-            // Score read succeeded; chain a tower fetch in the same session.
+            guard self.source.supportsTower else {
+                self.resolveSuccess(with: value)
+                return
+            }
             self.pendingScoreCSV = value
             self.startExtractionWatchdog()
             self.loadStyledPage(webView, style: "tower")
@@ -337,6 +328,7 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
     static func failureReason(forSentinel sentinel: String) -> ImportFailedReason {
         switch sentinel {
         case "1", "5": return .noPremiumCourse
+        case "premiumPass": return .noPremiumPass
         case "2": return .noEAmusementPass
         case "3": return .noPlayData
         case "maintenance": return .maintenance

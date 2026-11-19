@@ -15,7 +15,7 @@ actor IIDXImporter {
         let (stream, continuation) = AsyncStream.makeStream(of: ImportProgress.self)
         continuation.yield(.init(0, 1, 1, 1))
         importCSV(
-            url: Bundle.main.url(forResource: "SampleData", withExtension: "csv"),
+            url: Bundle.main.url(forResource: IIDXPlayDataDatabase.current.sampleDataResourceName, withExtension: "csv"),
             to: importToDate,
             for: playType,
             from: .zinrai,
@@ -133,7 +133,8 @@ actor IIDXImporter {
         from version: IIDXVersion,
         continuation: AsyncStream<ImportProgress>.Continuation
     ) {
-        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? IIDXPlayDataDatabase.current.getWriteConnection() else { return }
+        let chartLookup = IIDXChartLookup.forCurrentDatabase()
         let importGroupID = prepareImportGroupForPartialImport(
             database: database,
             importToDate: importToDate,
@@ -148,6 +149,7 @@ actor IIDXImporter {
             for keyedRow in keyedRows {
                 let songRecord = IIDXSongRecord(csvRowData: keyedRow)
                 songRecord.playType = playType
+                chartLookup?.enrich(songRecord)
                 Self.insertSongRecord(database: database, record: songRecord, importGroupID: importGroupID)
                 numberOfKeyedRowsProcessed += 1
                 continuation.yield(.init(nil, nil, numberOfKeyedRowsProcessed, totalNumberOfKeyedRows))
@@ -188,19 +190,17 @@ actor IIDXImporter {
 
         if let row = try? database.pluck(query) {
             let existingID = row[col.igID]
-            // Delete existing records for this playType
             let deleteQuery = col.songRecordTable
                 .filter(col.srImportGroupID == existingID && col.srPlayType == playType.rawValue)
             _ = try? database.run(deleteQuery.delete())
             return existingID
         }
 
-        // Create new import group
         let newID = UUID().uuidString
         _ = try? database.run(col.importGroupTable.insert(
             col.igID <- newID,
             col.igImportDate <- importToDate.timeIntervalSince1970,
-            col.igIIDXVersion <- version.rawValue
+            col.igIIDXVersion <- IIDXPlayDataDatabase.current.isVersionless ? nil : version.rawValue
         ))
         return newID
     }
@@ -308,7 +308,7 @@ actor IIDXImporter {
     // MARK: Tower Import
 
     func importTowerCSV(_ keyedRows: [[String: String]]) {
-        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? IIDXPlayDataDatabase.current.getWriteConnection() else { return }
 
         // Delete all existing tower entries
         _ = try? database.run(IIDXPlayDataDatabase.towerEntryTable.delete())
@@ -336,7 +336,7 @@ actor IIDXImporter {
     // MARK: Delete Helpers
 
     func deleteImportGroup(id: String) {
-        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? IIDXPlayDataDatabase.current.getWriteConnection() else { return }
         let col = IIDXPlayDataDatabase.self
         try? database.transaction {
             try database.run(col.songRecordTable.filter(col.srImportGroupID == id).delete())
@@ -345,7 +345,7 @@ actor IIDXImporter {
     }
 
     func deleteAllScoreData() {
-        guard let database = try? IIDXPlayDataDatabase.shared.getWriteConnection() else { return }
+        guard let database = try? IIDXPlayDataDatabase.current.getWriteConnection() else { return }
         let col = IIDXPlayDataDatabase.self
         try? database.transaction {
             try database.run(col.songRecordTable.delete())

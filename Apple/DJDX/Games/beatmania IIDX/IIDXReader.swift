@@ -19,7 +19,7 @@ actor IIDXReader {
     // MARK: Import Groups
 
     func importGroup(for selectedDate: Date) -> ImportGroup? {
-        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return nil }
+        guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return nil }
         let table = IIDXPlayDataDatabase.importGroupTable
         let col = IIDXPlayDataDatabase.self
 
@@ -74,21 +74,25 @@ actor IIDXReader {
     }
 
     func allImportGroups() -> [ImportGroup] {
-        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return [] }
         let query = IIDXPlayDataDatabase.importGroupTable.order(IIDXPlayDataDatabase.igImportDate.asc)
         return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
     }
 
     func allImportGroupsSortedByDateDescending() -> [ImportGroup] {
-        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return [] }
         let query = IIDXPlayDataDatabase.importGroupTable.order(IIDXPlayDataDatabase.igImportDate.desc)
         return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
     }
 
     // MARK: Song Records
 
+    func invalidateCachedRecords() {
+        importGroupID = nil
+    }
+
     func songRecords(for importGroupID: String) -> [IIDXSongRecord] {
-        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return [] }
         let query = IIDXPlayDataDatabase.songRecordTable
             .filter(IIDXPlayDataDatabase.srImportGroupID == importGroupID)
             .order(IIDXPlayDataDatabase.srTitle.asc)
@@ -96,7 +100,7 @@ actor IIDXReader {
     }
 
     func songRecords(for importGroupID: String, playType: IIDXPlayType) -> [IIDXSongRecord] {
-        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return [] }
         let query = IIDXPlayDataDatabase.songRecordTable
             .filter(IIDXPlayDataDatabase.srImportGroupID == importGroupID
                     && IIDXPlayDataDatabase.srPlayType == playType.rawValue)
@@ -105,14 +109,14 @@ actor IIDXReader {
     }
 
     func songRecordsForSong(title: String) -> [IIDXSongRecord] {
-        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return [] }
         let query = IIDXPlayDataDatabase.songRecordTable
             .filter(IIDXPlayDataDatabase.srTitle == title)
         return (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
     }
 
     func songRecordImportGroupIDs(for title: String) -> [String] {
-        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return [] }
         let query = IIDXPlayDataDatabase.songRecordTable
             .select(IIDXPlayDataDatabase.srImportGroupID)
             .filter(IIDXPlayDataDatabase.srTitle == title)
@@ -568,7 +572,7 @@ actor IIDXReader {
         playType: IIDXPlayType,
         filters: FilterOptions? = nil
     ) -> (clearType: [String: [Int: [String: Int]]], djLevel: [String: [Int: [String: Int]]]) {
-        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else {
+        guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else {
             return ([:], [:])
         }
         let cols = IIDXPlayDataDatabase.self
@@ -640,17 +644,20 @@ actor IIDXReader {
     }
 
     func importGroups(for version: IIDXVersion) -> [ImportGroup] {
-        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
-        let query = IIDXPlayDataDatabase.importGroupTable
-            .filter(IIDXPlayDataDatabase.igIIDXVersion == version.rawValue)
+        let playData = IIDXPlayDataDatabase.current
+        guard let database = try? playData.getReadConnection() else { return [] }
+        var query = IIDXPlayDataDatabase.importGroupTable
             .order(IIDXPlayDataDatabase.igImportDate.asc)
+        if !playData.isVersionless {
+            query = query.filter(IIDXPlayDataDatabase.igIIDXVersion == version.rawValue)
+        }
         return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
     }
 
     // MARK: Tower Entries
 
     func allTowerEntries() -> [IIDXTowerEntry] {
-        guard let database = try? IIDXPlayDataDatabase.shared.getReadConnection() else { return [] }
+        guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return [] }
         let query = IIDXPlayDataDatabase.towerEntryTable.order(IIDXPlayDataDatabase.tePlayDate.desc)
         return (try? database.prepare(query).map { Self.towerEntry(from: $0) }) ?? []
     }

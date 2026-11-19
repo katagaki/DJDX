@@ -4,6 +4,7 @@ import SQLite
 final class IIDXPlayDataDatabase: Sendable {
 
     static let shared = IIDXPlayDataDatabase()
+    static let infinitas = IIDXPlayDataDatabase(fileName: "PlayDataInfinitas.db")
 
     let databasePath: String
 

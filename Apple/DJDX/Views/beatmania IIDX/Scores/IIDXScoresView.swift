@@ -318,7 +318,10 @@ struct IIDXScoresView<Header: View>: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
                 dataState = .initializing
-                reloadDisplay()
+                Task {
+                    await actor.invalidateCachedRecords()
+                    reloadDisplay()
+                }
             }
             .onReceive(NotificationCenter.default.publisher(for: .externalDataChanged)) { _ in
                 dataState = .initializing

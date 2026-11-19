@@ -22,13 +22,21 @@ struct ExternalDataReloader {
         progress: Progress = { _, _ in }
     ) async -> Int {
         switch id {
-        case .textage: await reloadTextage(progress: progress)
+        case .textage: await refreshingInfinitasCharts(await reloadTextage(progress: progress))
         case .textageChartViewer: await reloadTextageChartViewer(progress: progress)
         case .sdvxIn: await reloadSDVXIn(progress: progress)
-        case .wikiIidx: await reloadWikiIIDX(version: iidxVersion, progress: progress)
+        case .wikiIidx: await refreshingInfinitasCharts(await reloadWikiIIDX(version: iidxVersion, progress: progress))
         case .bm2dx: await reloadBM2DX(progress: progress)
         case .wikiDdr: await reloadWikiDDR(progress: progress)
         }
+    }
+
+    private static func refreshingInfinitasCharts(_ count: Int) async -> Int {
+        await IIDXImporter().refreshInfinitasChartData()
+        await MainActor.run {
+            NotificationCenter.default.post(name: .dataImported, object: nil)
+        }
+        return count
     }
 
     // MARK: - Textage

@@ -499,6 +499,9 @@ function readScoreData() {
         const match = location.href.match(/[?&]err=([0-9]+)/);
         return 'ERR:' + (match ? match[1] : 'server');
     }
+    if (document.querySelector('#dl-data a[href*="coop/mall.html"]')) {
+        return 'ERR:premiumPass';
+    }
     return 'ERR:empty';
 }
 return readScoreData();

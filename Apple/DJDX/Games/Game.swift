@@ -2,8 +2,8 @@ import SwiftUI
 
 enum Game: Int, Codable, CaseIterable, Identifiable {
     case iidxArcade = 0
-    case soundVoltex = 1
     case iidxInfinitas = 2
+    case soundVoltex = 1
     case polarisChord = 3
     case danceDanceRevolution = 4
 
@@ -57,11 +57,9 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         return colorScheme == .dark ? colors.reversed() : colors
     }
 
-    // Only IIDX AC ships in Phase 0; the other games become selectable as their phases land.
     var isAvailable: Bool {
         switch self {
-        case .iidxArcade, .soundVoltex, .polarisChord, .danceDanceRevolution: true
-        case .iidxInfinitas: false
+        case .iidxArcade, .iidxInfinitas, .soundVoltex, .polarisChord, .danceDanceRevolution: true
         }
     }
 
