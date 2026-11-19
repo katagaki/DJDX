@@ -87,6 +87,7 @@ struct WebViewForImporter: UIViewRepresentable, @preconcurrency UpdateScoreDataD
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
+        webView.addKonamiIDLoginAutofill()
         webView.layer.opacity = 0.0
         webView.load(URLRequest(url: iidxVersion.loginPageRedirectURL(style: initialStyle)))
         #if DEBUG

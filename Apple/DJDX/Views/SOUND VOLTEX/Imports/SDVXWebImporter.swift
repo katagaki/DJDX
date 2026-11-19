@@ -61,6 +61,7 @@ struct SDVXWebViewForImporter: UIViewRepresentable, @preconcurrency SDVXUpdateSc
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
+        webView.addKonamiIDLoginAutofill()
         webView.layer.opacity = 0.0
         webView.load(URLRequest(url: sdvxVersion.loginPageRedirectURL()))
         #if DEBUG
