@@ -346,6 +346,9 @@ struct AnalyticsView: View {
                     debugPrint("Reloaded on change of version")
                 }
             }
+            .onChange(of: selectedGame) { _, _ in
+                Task { await reload() }
+            }
             .onChange(of: filters) { _, _ in
                 if model.sessionStore == nil {
                     Task { await reload() }

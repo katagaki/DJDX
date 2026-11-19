@@ -92,6 +92,7 @@ struct UnifiedView: View {
                     IIDXScoresView(isEditingAnalytics: $isEditingAnalytics) {
                         iidxHeader
                     }
+                    .id(selectedGame)
                 }
             }
             .navigationTitle(isSessionsMode ? "ViewTitle.Sessions" : "ViewTitle.Scores")

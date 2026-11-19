@@ -47,38 +47,40 @@ extension UnifiedView {
                     }
                 }
             }
-            Section("Shared.Version") {
-                if selectedGame == .soundVoltex {
-                    Picker("Shared.Version", selection: $sdvxVersion) {
-                        ForEach(SDVXVersion.supportedVersions.reversed(), id: \.self) { version in
-                            Text(version.marketingName).tag(version)
+            if selectedGame != .iidxInfinitas {
+                Section("Shared.Version") {
+                    if selectedGame == .soundVoltex {
+                        Picker("Shared.Version", selection: $sdvxVersion) {
+                            ForEach(SDVXVersion.supportedVersions.reversed(), id: \.self) { version in
+                                Text(version.marketingName).tag(version)
+                            }
                         }
-                    }
-                    .pickerStyle(.inline)
-                } else if selectedGame == .polarisChord {
-                    Picker("Shared.Version", selection: $polarisChordVersion) {
-                        ForEach(PolarisChordVersion.supportedVersions, id: \.self) { version in
-                            Text(version.marketingName).tag(version)
+                        .pickerStyle(.inline)
+                    } else if selectedGame == .polarisChord {
+                        Picker("Shared.Version", selection: $polarisChordVersion) {
+                            ForEach(PolarisChordVersion.supportedVersions, id: \.self) { version in
+                                Text(version.marketingName).tag(version)
+                            }
                         }
-                    }
-                    .pickerStyle(.inline)
-                } else if selectedGame == .danceDanceRevolution {
-                    Picker("Shared.Version", selection: $ddrVersion) {
-                        ForEach(DDRVersion.supportedVersions, id: \.self) { version in
-                            Text(version.marketingName).tag(version)
+                        .pickerStyle(.inline)
+                    } else if selectedGame == .danceDanceRevolution {
+                        Picker("Shared.Version", selection: $ddrVersion) {
+                            ForEach(DDRVersion.supportedVersions, id: \.self) { version in
+                                Text(version.marketingName).tag(version)
+                            }
                         }
-                    }
-                    .pickerStyle(.inline)
-                } else {
-                    Picker("Shared.Version", selection: $iidxVersion) {
-                        ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
-                            Text(version.marketingName).tag(version)
+                        .pickerStyle(.inline)
+                    } else {
+                        Picker("Shared.Version", selection: $iidxVersion) {
+                            ForEach(IIDXVersion.supportedVersions.reversed(), id: \.self) { version in
+                                Text(version.marketingName).tag(version)
+                            }
                         }
+                        .pickerStyle(.inline)
                     }
-                    .pickerStyle(.inline)
                 }
+                .labelsVisibility(.visible)
             }
-            .labelsVisibility(.visible)
         } label: {
             HStack(spacing: 4.0) {
                 if let icon = selectedGame.iconResource {
