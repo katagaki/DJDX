@@ -4280,19 +4280,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "KONAMI ID Email"
+            "value" : "Email Autofill"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "KONAMI IDメールアドレス"
+            "value" : "メールアドレス自動入力"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "KONAMI ID 電子郵件"
+            "value" : "電子郵件自動填入"
           }
         }
       }
