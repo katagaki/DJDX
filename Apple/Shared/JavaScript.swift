@@ -648,6 +648,8 @@ let konamiIDLoginAutofillUserScript = """
     }
 
     function otpSendButton() {
+        var issueButton = document.querySelector('[id*="confirmation-code-issue"]');
+        if (isUsable(issueButton)) { return issueButton; }
         var candidates = document.querySelectorAll(
             'button, input[type="submit"], input[type="button"], a[role="button"]'
         );
