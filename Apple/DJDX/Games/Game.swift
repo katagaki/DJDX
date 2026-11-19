@@ -73,6 +73,14 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
 
     var supportsPlayType: Bool { isIIDXFamily }
 
+    var iidxFilterKeyPrefix: String {
+        self == .iidxInfinitas ? "ScoresView.Infinitas" : "ScoresView"
+    }
+
+    static var stored: Game {
+        (UserDefaults.standard.object(forKey: "Global.SelectedGame") as? Int).flatMap(Game.init) ?? .iidxArcade
+    }
+
     var supportsSessions: Bool {
         self == .iidxArcade
     }
