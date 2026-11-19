@@ -12,4 +12,8 @@ extension IIDXPlayDataDatabase {
     var isVersionless: Bool {
         self === Self.infinitas
     }
+
+    var sampleDataResourceName: String {
+        isVersionless ? "SampleDataInfinitas" : "SampleData"
+    }
 }

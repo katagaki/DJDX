@@ -15,6 +15,7 @@ struct IIDXImportView: View {
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var importPlayType: IIDXPlayType
     @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: Game.iidxArcade, "Global.SelectedGame") var selectedGame: Game
 
     @State var importPath = NavigationPath()
     @State var importGroups: [ImportGroup] = []
@@ -270,6 +271,8 @@ struct IIDXImportView: View {
         switch reason {
         case .noPremiumCourse:
             return NSLocalizedString("Alert.Import.Error.Subtitle.NoPremiumCourse", comment: "")
+        case .noPremiumPass:
+            return NSLocalizedString("Alert.Import.Error.Subtitle.NoPremiumPass", comment: "")
         case .noEAmusementPass:
             return NSLocalizedString("Alert.Import.Error.Subtitle.NoEAmusementPass", comment: "")
         case .noPlayData:
@@ -298,9 +301,8 @@ struct IIDXImportView: View {
     }
 
     func openCSVDownloadPage() {
-        openURL(URL(
-            string: "https://p.eagate.573.jp/game/2dx/\(iidxVersion.rawValue)/djdata/score_download.html"
-        )!)
+        let source: IIDXScoreSource = selectedGame == .iidxInfinitas ? .infinitas : .arcade(iidxVersion)
+        openURL(source.downloadPageURL())
     }
 
     func importSampleCSV() {

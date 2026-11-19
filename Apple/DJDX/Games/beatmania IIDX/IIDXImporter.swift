@@ -15,7 +15,7 @@ actor IIDXImporter {
         let (stream, continuation) = AsyncStream.makeStream(of: ImportProgress.self)
         continuation.yield(.init(0, 1, 1, 1))
         importCSV(
-            url: Bundle.main.url(forResource: "SampleData", withExtension: "csv"),
+            url: Bundle.main.url(forResource: IIDXPlayDataDatabase.current.sampleDataResourceName, withExtension: "csv"),
             to: importToDate,
             for: playType,
             from: .zinrai,

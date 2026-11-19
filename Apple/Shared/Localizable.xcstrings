@@ -985,6 +985,29 @@
         }
       }
     },
+    "Alert.Import.Error.Subtitle.NoPremiumPass" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The import could not be completed as the account does not have an active \"beatmania IIDX INFINITAS プレミアムパス\"."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "beatmania IIDX INFINITAS プレミアムパスが有効になっていないため、インポートが失敗しました。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由於帳號未啟用「beatmania IIDX INFINITAS プレミアムパス」，因此無法完成匯入。"
+          }
+        }
+      }
+    },
     "Alert.Import.Error.Subtitle.ServerError" : {
       "extractionState" : "manual",
       "localizations" : {

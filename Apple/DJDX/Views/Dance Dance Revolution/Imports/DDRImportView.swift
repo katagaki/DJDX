@@ -175,6 +175,7 @@ struct DDRImportView: View {
     func errorMessage(for reason: ImportFailedReason) -> String {
         switch reason {
         case .noPremiumCourse: return NSLocalizedString("Alert.Import.Error.Subtitle.NoPremiumCourse", comment: "")
+        case .noPremiumPass: return NSLocalizedString("Alert.Import.Error.Subtitle.NoPremiumPass", comment: "")
         case .noEAmusementPass: return NSLocalizedString("Alert.Import.Error.Subtitle.NoEAmusementPass", comment: "")
         case .noPlayData: return NSLocalizedString("Alert.Import.Error.Subtitle.NoPlayData", comment: "")
         case .serverError: return NSLocalizedString("Alert.Import.Error.Subtitle.ServerError", comment: "")
