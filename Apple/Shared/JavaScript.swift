@@ -578,3 +578,140 @@ var injectedCSS = `
 style.appendChild(document.createTextNode(injectedCSS))
 head.appendChild(style)
 """
+
+let konamiIDLoginAutofillUserScript = """
+(function() {
+    var email = DJDX_KONAMI_ID_EMAIL;
+    var stateKey = 'djdx-konami-id-autologin';
+    if (!email || location.hostname.indexOf('konami.net') === -1) { return; }
+
+    function state() {
+        try { return sessionStorage.getItem(stateKey) || ''; } catch (error) { return 'blocked'; }
+    }
+
+    function setState(value) {
+        try { sessionStorage.setItem(stateKey, value); } catch (error) {}
+    }
+
+    function isVisible(el) {
+        return !!el && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden';
+    }
+
+    function isUsable(el) {
+        return isVisible(el) && !el.disabled && !el.readOnly && el.getAttribute('aria-disabled') !== 'true';
+    }
+
+    function setValue(el, value) {
+        var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+        setter.call(el, value);
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+    }
+
+    function labelOf(el) {
+        return ((el.innerText || el.value || el.getAttribute('aria-label') || '') + '').replace(/\\s/g, '');
+    }
+
+    function clickWhenEnabled(el, attempts) {
+        if (!el) { return; }
+        if (isUsable(el)) { el.click(); return; }
+        if (attempts > 0) { setTimeout(function() { clickWhenEnabled(el, attempts - 1); }, 250); }
+    }
+
+    function hasOtpBoxes() {
+        return Array.prototype.slice.call(document.querySelectorAll('input')).some(function(el) {
+            if (!isVisible(el)) { return false; }
+            if (el.hasAttribute('data-djdx-otp')) { return true; }
+            var autocomplete = (el.getAttribute('autocomplete') || '').toLowerCase();
+            return autocomplete.indexOf('one-time-code') !== -1 || el.getAttribute('maxlength') === '1';
+        });
+    }
+
+    function emailInput() {
+        var candidates = document.querySelectorAll(
+            'input[type="email"], input[autocomplete~="username"], input[autocomplete~="email"], '
+            + 'input[name*="mail" i], input[id*="mail" i]'
+        );
+        return Array.prototype.slice.call(candidates).find(isUsable) || null;
+    }
+
+    function hasPasswordInput() {
+        var inputs = document.querySelectorAll('input[type="password"]');
+        return Array.prototype.slice.call(inputs).some(isVisible);
+    }
+
+    function submitButton(scope) {
+        var candidates = Array.prototype.slice.call(scope.querySelectorAll('button, input[type="submit"]'))
+            .filter(function(el) { return isVisible(el) && !/passkey|パスキー/i.test(el.id + labelOf(el)); });
+        return candidates.find(function(el) { return /login-button/i.test(el.id); })
+            || candidates.find(function(el) { return /ログイン|login|次へ|next/i.test(labelOf(el)); })
+            || candidates.find(function(el) { return el.type === 'submit'; })
+            || null;
+    }
+
+    function otpSendButton() {
+        var issueButton = document.querySelector('[id*="confirmation-code-issue"]');
+        if (isUsable(issueButton)) { return issueButton; }
+        var candidates = document.querySelectorAll(
+            'button, input[type="submit"], input[type="button"], a[role="button"]'
+        );
+        return Array.prototype.slice.call(candidates).find(function(el) {
+            if (!isUsable(el)) { return false; }
+            var label = labelOf(el);
+            if (/再送|resend/i.test(label)) { return false; }
+            return /ワンタイム|送信|one-time|onetime|sendcode|send/i.test(label);
+        }) || null;
+    }
+
+    function fillEmail() {
+        var input = emailInput();
+        if (!input || (input.value && input.value !== email)) { return false; }
+        setValue(input, email);
+        if (hasPasswordInput()) {
+            setState('filled');
+            return true;
+        }
+        setState('email');
+        var button = submitButton(input.form || input.closest('form') || document);
+        setTimeout(function() { clickWhenEnabled(button, 8); }, 300);
+        return true;
+    }
+
+    function sendOtp() {
+        if (hasOtpBoxes() || emailInput()) { return false; }
+        var button = otpSendButton();
+        if (!button) { return false; }
+        setState('sent');
+        clickWhenEnabled(button, 8);
+        return true;
+    }
+
+    function step() {
+        var current = state();
+        if (current === '') { return fillEmail(); }
+        if (current === 'email') { return sendOtp(); }
+        return true;
+    }
+
+    var observer = new MutationObserver(function() {
+        var current = state();
+        if (current !== '' && current !== 'email') { observer.disconnect(); return; }
+        step();
+    });
+
+    function start() {
+        step();
+        if (state() === '' || state() === 'email') {
+            observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true });
+            setTimeout(function() { observer.disconnect(); }, 600000);
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start);
+    } else {
+        start();
+    }
+})();
+"""

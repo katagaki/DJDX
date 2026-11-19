@@ -61,6 +61,7 @@ struct DDRWebViewForImporter: UIViewRepresentable, @preconcurrency DDRUpdateScor
 
     func makeUIView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
+        webView.addKonamiIDLoginAutofill()
         webView.configuration.userContentController.add(context.coordinator, name: "ddrProgress")
         webView.layer.opacity = 0.0
         webView.load(URLRequest(url: ddrVersion.loginPageRedirectURL()))

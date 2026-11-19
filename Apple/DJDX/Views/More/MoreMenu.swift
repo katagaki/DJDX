@@ -23,6 +23,8 @@ struct MoreMenu: View {
     @State var isPromptingScoreDeleteCode: Bool = false
     @State var isConfirmingScoreDataDelete: Bool = false
     @State var isPresentingDisclaimer: Bool = false
+    @State var isEditingKonamiIDEmail: Bool = false
+    @State var konamiIDEmailEntry: String = ""
     @State var scoreDeleteCode: String = ""
     @State var scoreDeleteCodeEntry: String = ""
 
@@ -44,6 +46,12 @@ struct MoreMenu: View {
                 }
                 Toggle("More.General.ShowProfileHeader", systemImage: "person.crop.circle", isOn: $showProfileHeader)
                 Toggle("More.General.ShowAnalytics", systemImage: "chart.xyaxis.line", isOn: $showAnalytics)
+            }
+            Section {
+                Button("More.KonamiIDEmail", systemImage: "envelope") {
+                    konamiIDEmailEntry = UserDefaults.standard.string(forKey: "Global.KonamiID.Email") ?? ""
+                    isEditingKonamiIDEmail = true
+                }
             }
             Section {
                 Menu("More.General.AppIcon", systemImage: "app.dashed") {
@@ -186,6 +194,7 @@ struct MoreMenu: View {
         } message: {
             Text("Alert.DeleteData.Score.Subtitle")
         }
+        .konamiIDEmailAlert(isPresented: $isEditingKonamiIDEmail, entry: $konamiIDEmailEntry)
         .alert("More.Disclaimer", isPresented: $isPresentingDisclaimer) {
             Button("Shared.OK", role: .cancel) {
                 // Dismisses the alert; no further action needed

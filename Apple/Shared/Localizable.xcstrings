@@ -1168,6 +1168,121 @@
         }
       }
     },
+    "Alert.KonamiIDEmail.Clear" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Email"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メールアドレスを消去"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除電子郵件"
+          }
+        }
+      }
+    },
+    "Alert.KonamiIDEmail.Placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メールアドレス"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "電子郵件"
+          }
+        }
+      }
+    },
+    "Alert.KonamiIDEmail.Save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存"
+          }
+        }
+      }
+    },
+    "Alert.KonamiIDEmail.Subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When your login session expires during a web import, this email will be entered automatically to try logging in. It is stored only on this device and is not sent anywhere else."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webインポート中にログインセッションが切れた場合、このメールアドレスを自動で入力してログインを試みます。メールアドレスはこの端末にのみ保存され、他の場所に送信されることはありません。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "當網頁匯入時登入工作階段過期，將自動輸入此電子郵件以嘗試登入。電子郵件僅儲存在此裝置上，不會傳送至其他任何地方。"
+          }
+        }
+      }
+    },
+    "Alert.KonamiIDEmail.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KONAMI ID Email"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KONAMI IDメールアドレス"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KONAMI ID 電子郵件"
+          }
+        }
+      }
+    },
     "Alert.Prune.Completed.Title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4178,6 +4293,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "查看原始碼"
+          }
+        }
+      }
+    },
+    "More.KonamiIDEmail" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email Autofill"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メールアドレス自動入力"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "電子郵件自動填入"
           }
         }
       }
