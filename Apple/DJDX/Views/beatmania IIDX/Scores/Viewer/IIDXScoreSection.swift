@@ -64,12 +64,12 @@ struct IIDXScoreSection: View {
                     IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
                     IIDXDetailRow("SCORE", value: score.score, style: Color.iidxScore,
                                   outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
-                    IIDXDetailRow("MISS COUNT", value: score.missCount, style: Color.iidxScore,
-                                  outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
                 }
-                IIDXJudgmentBreakdown(entries: [
+                IIDXJudgmentBreakdown(entries: score.perfectGreatCount + score.greatCount > 0 ? [
                     (.perfectGreat, score.perfectGreatCount),
                     (.great, score.greatCount),
+                    (.miss, score.missCount)
+                ] : [
                     (.miss, score.missCount)
                 ])
                 .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
