@@ -7,6 +7,7 @@
     <string name="analytics_clear_breakdown">Clear Breakdown</string>
     <string name="analytics_grade_breakdown">Grade Breakdown</string>
     <string name="analytics_rank_breakdown">Rank Breakdown</string>
+    <string name="popn_medal_breakdown">Medal Breakdown</string>
     <string name="analytics_no_data">No data</string>
     <string name="tower_title">Tower</string>
     <string name="tower_recent">Recent</string>

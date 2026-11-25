@@ -9,6 +9,7 @@ import com.tsubuzaki.djdxgo.data.external.ExternalDataReloader
 import com.tsubuzaki.djdxgo.data.iidx.IIDXChartAnalyzer
 import com.tsubuzaki.djdxgo.data.iidx.IIDXRepository
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordRepository
+import com.tsubuzaki.djdxgo.data.popn.PopnRepository
 import com.tsubuzaki.djdxgo.data.profile.ProfileRepository
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXRepository
 import com.tsubuzaki.djdxgo.widget.WidgetDataPublisher
@@ -26,6 +27,7 @@ class AppContainer(context: Context) {
     val iidxRepository = IIDXRepository(database.iidxDao())
     val sdvxRepository = SDVXRepository(database.sdvxDao())
     val polarisChordRepository = PolarisChordRepository(database.polarisChordDao())
+    val popnRepository = PopnRepository(database.popnDao())
     val externalDataDao = database.externalDataDao()
     val ddrRepository = DDRRepository(database.ddrDao(), externalDataDao)
     val externalDataReloader = ExternalDataReloader(externalDataDao)

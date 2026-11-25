@@ -18,11 +18,13 @@ class AnalyticsStore(
     private val sdvxState = MutableStateFlow<ChartAnalyticsData?>(null)
     private val polarisChordState = MutableStateFlow<ChartAnalyticsData?>(null)
     private val ddrState = MutableStateFlow<ChartAnalyticsData?>(null)
+    private val popnState = MutableStateFlow<ChartAnalyticsData?>(null)
 
     val iidx: StateFlow<IIDXAnalyticsData?> = iidxState.asStateFlow()
     val sdvx: StateFlow<ChartAnalyticsData?> = sdvxState.asStateFlow()
     val polarisChord: StateFlow<ChartAnalyticsData?> = polarisChordState.asStateFlow()
     val ddr: StateFlow<ChartAnalyticsData?> = ddrState.asStateFlow()
+    val popn: StateFlow<ChartAnalyticsData?> = popnState.asStateFlow()
 
     suspend fun reloadIIDX(playType: IIDXPlayType, filters: IIDXFilterOptions) {
         iidxState.value = withContext(Dispatchers.IO) {
@@ -47,6 +49,16 @@ class AnalyticsStore(
             val latest = groups.getOrNull(0)?.let { dao.songRecords(it.id) }.orEmpty()
             val previous = groups.getOrNull(1)?.let { dao.songRecords(it.id) }
             ChartAnalytics.polarisChord(latest, previous, filters)
+        }
+    }
+
+    suspend fun reloadPopn(filters: PopnFilterOptions) {
+        popnState.value = withContext(Dispatchers.IO) {
+            val dao = database.popnDao()
+            val groups = dao.importGroups()
+            val latest = groups.getOrNull(0)?.let { dao.songRecords(it.id) }.orEmpty()
+            val previous = groups.getOrNull(1)?.let { dao.songRecords(it.id) }
+            ChartAnalytics.popn(latest, previous, filters)
         }
     }
 

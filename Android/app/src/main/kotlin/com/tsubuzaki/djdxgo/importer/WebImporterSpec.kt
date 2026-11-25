@@ -4,6 +4,7 @@ import com.tsubuzaki.djdxgo.data.ddr.DDRVersionInfo
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordVersionInfo
+import com.tsubuzaki.djdxgo.data.popn.PopnVersionInfo
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVersion
 
 sealed interface WebImportResult {
@@ -64,6 +65,13 @@ object WebImporterSpecs {
         "5" to ImportFailedReason.NO_PREMIUM_COURSE
     )
 
+    private val popnErrorCodes = mapOf(
+        "1" to ImportFailedReason.NO_PREMIUM_COURSE,
+        "2" to ImportFailedReason.NO_EAMUSEMENT_PASS,
+        "3" to ImportFailedReason.NO_PLAY_DATA,
+        "5" to ImportFailedReason.NO_PREMIUM_COURSE
+    )
+
     fun iidx(playType: IIDXPlayType): WebImporterSpec = WebImporterSpec(
         startURL = IIDXVersionInfo.loginPageRedirectURL(playType.code),
         isTargetPage = { it.contains("/djdata/score_download.html") },
@@ -96,6 +104,16 @@ object WebImporterSpecs {
         extractionScript = ImporterJavaScript::polarisChordScoreDataFetch,
         watchdogSeconds = 25,
         errorCodeReasons = polarisChordErrorCodes,
+        emptyReason = ImportFailedReason.NO_PLAY_DATA
+    )
+
+    fun popn(): WebImporterSpec = WebImporterSpec(
+        startURL = PopnVersionInfo.loginPageRedirectURL(),
+        isTargetPage = { it.startsWith(PopnVersionInfo.profilePageURL) },
+        isErrorPage = { it.startsWith(PopnVersionInfo.errorPagePrefix) },
+        extractionScript = ImporterJavaScript::popnScoreDataFetch,
+        watchdogSeconds = 300,
+        errorCodeReasons = popnErrorCodes,
         emptyReason = ImportFailedReason.NO_PLAY_DATA
     )
 

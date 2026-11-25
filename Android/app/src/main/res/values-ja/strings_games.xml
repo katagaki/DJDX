@@ -46,6 +46,9 @@
     <string name="games_search_no_results">検索結果がありません。</string>
     <string name="polaris_pa_class">PA CLASS</string>
     <string name="polaris_pa_skill">PA SKILL</string>
+    <string name="popn_class">ポップンクラス</string>
+    <string name="popn_medal">クリアメダル</string>
+    <string name="popn_rank">ランク</string>
     <string name="ddr_data_source_warning_title">レベルが表示されない場合があります</string>
     <string name="ddr_data_source_warning_message">BEMANIWikiデータをオフにしていると、譜面のレベルが取得されず、表示されません。</string>
     <string name="ddr_data_source_warning_action">外部データソースを開く</string>
