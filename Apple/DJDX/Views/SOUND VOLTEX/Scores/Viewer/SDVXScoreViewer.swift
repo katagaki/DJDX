@@ -51,6 +51,9 @@ struct SDVXScoreViewer: View {
                 .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                 chartActions()
             }
+            if selectedDifficulty != .unknown {
+                ChartNotesSection(game: .soundVoltex, title: title, chart: difficulty.rawValue)
+            }
         }
         .listSectionSpacing(.compact)
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
