@@ -3,6 +3,7 @@ package com.tsubuzaki.djdxgo.data.ddr
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.tsubuzaki.djdxgo.data.ScoreHistoryPoint
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -40,6 +41,14 @@ interface DDRDao {
 
     @Query("SELECT * FROM DDRSongRecord WHERE importGroupID = :groupID AND songIndex = :songIndex ORDER BY id")
     suspend fun songRecordsForIndex(groupID: String, songIndex: String): List<DDRSongRecord>
+
+    @Query(
+        "SELECT g.importDate AS date, r.score AS score FROM DDRSongRecord r " +
+            "JOIN DDRImportGroup g ON r.importGroupID = g.id " +
+            "WHERE r.songIndex = :songIndex AND r.style = :style AND r.difficulty = :difficulty " +
+            "AND r.score > 0 ORDER BY g.importDate"
+    )
+    suspend fun scoreHistory(songIndex: String, style: String, difficulty: String): List<ScoreHistoryPoint>
 
     @Query("DELETE FROM DDRSongRecord")
     suspend fun deleteAllScoreData()

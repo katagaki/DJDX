@@ -98,6 +98,14 @@ class DDRRepository(
     suspend fun songRecordsForGroup(groupID: String, style: DDRPlayStyle): List<DDRSongRecord> =
         applyMetadata(dao.songRecords(groupID, style.value))
 
+    suspend fun songRecordsForSong(date: Long, songIndex: String, style: DDRPlayStyle): List<DDRSongRecord> {
+        val group = importGroupFor(date) ?: return emptyList()
+        val order = DDRDifficulty.entries
+        return applyMetadata(
+            dao.songRecordsForIndex(group.id, songIndex).filter { it.style == style.value }
+        ).sortedBy { DDRDifficulty.fromValue(it.difficulty)?.let(order::indexOf) ?: Int.MAX_VALUE }
+    }
+
     private suspend fun applyMetadata(records: List<DDRSongRecord>): List<DDRSongRecord> {
         if (records.isEmpty()) return records
         val metaByTitle = externalDao.allDDRSongMetas().associateBy { it.titleCompact }

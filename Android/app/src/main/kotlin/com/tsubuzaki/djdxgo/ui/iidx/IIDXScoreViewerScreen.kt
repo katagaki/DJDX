@@ -3,6 +3,8 @@ package com.tsubuzaki.djdxgo.ui.iidx
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
 import com.tsubuzaki.djdxgo.ui.theme.GameFonts
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
+import com.tsubuzaki.djdxgo.ui.common.HistoryGuide
+import com.tsubuzaki.djdxgo.ui.common.ScoreHistoryCard
 import com.tsubuzaki.djdxgo.ui.common.OutlinedText
 import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
 import com.tsubuzaki.djdxgo.ui.common.IIDXClearTypeText
@@ -72,6 +74,7 @@ import com.tsubuzaki.djdxgo.ui.games.ChartActionButton
 import com.tsubuzaki.djdxgo.ui.games.ExpressiveLevelSelector
 import com.tsubuzaki.djdxgo.ui.games.ViewerWithSelector
 import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
+import com.tsubuzaki.djdxgo.ui.theme.Palette
 import com.tsubuzaki.djdxgo.ui.theme.RadarColors
 import java.net.URLEncoder
 import java.time.Instant
@@ -474,25 +477,22 @@ private fun ScoreSection(
         }
     }
 
-    if (hasDJLevel && history.size >= 2) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.scores_viewer_history),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
+    if (hasDJLevel) {
+        val maxScore = noteCount?.takeIf { it > 0 }?.let { it * 2 } ?: (history.maxOrNull() ?: 0)
+        ScoreHistoryCard(
+            scores = history,
+            minScore = 0,
+            maxScore = maxScore,
+            guides = if (noteCount != null && noteCount > 0) {
+                listOf(
+                    HistoryGuide(maxScore * 8f / 9f, Palette.orange, 0.7f),
+                    HistoryGuide(maxScore * 7f / 9f, Palette.gray, 0.55f),
+                    HistoryGuide(maxScore * 6f / 9f, Palette.teal, 0.4f)
                 )
-                IIDXScoreHistoryChart(scores = history, noteCount = noteCount)
+            } else {
+                emptyList()
             }
-        }
+        )
     }
 
     val traitsChart = textageChart?.takeIf {
