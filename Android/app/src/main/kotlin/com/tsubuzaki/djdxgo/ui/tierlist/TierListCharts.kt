@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.tsubuzaki.djdxgo.AppContainer
 import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.ddr.DDRPlayStyle
+import com.tsubuzaki.djdxgo.data.iidx.IIDXLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordDifficulty
@@ -23,7 +24,8 @@ data class TierListChart(
     val difficultyColor: Color,
     val lampColor: Color,
     val grade: String,
-    val gradeColor: Color
+    val gradeColor: Color,
+    val iidxLevel: IIDXLevel? = null
 )
 
 val Game.tierListCode: String
@@ -76,7 +78,8 @@ suspend fun loadTierListCharts(
                         difficultyColor = IIDXColors.levelColor(level),
                         lampColor = IIDXColors.clearTypeColor(score.clearType),
                         grade = djLevel,
-                        gradeColor = IIDXColors.djLevelColor(djLevel)
+                        gradeColor = IIDXColors.djLevelColor(djLevel),
+                        iidxLevel = level
                     )
                 }
             }
@@ -139,7 +142,7 @@ suspend fun loadTierListCharts(
     }
 }
 
-fun placeholderTierListChart(id: String, level: String): TierListChart {
+fun placeholderTierListChart(id: String, level: String, game: Game): TierListChart {
     val title = id.substringBefore("|")
     val difficulty = id.substringAfter("|", "")
     return TierListChart(
@@ -150,7 +153,8 @@ fun placeholderTierListChart(id: String, level: String): TierListChart {
         difficultyColor = Palette.gray,
         lampColor = Palette.gray.copy(alpha = 0.4f),
         grade = "",
-        gradeColor = Palette.gray
+        gradeColor = Palette.gray,
+        iidxLevel = if (game == Game.IIDX_ARCADE) IIDXLevel.entries.firstOrNull { it.csvPrefix == difficulty } else null
     )
 }
 

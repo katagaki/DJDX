@@ -82,6 +82,8 @@ import com.tsubuzaki.djdxgo.data.tierlist.TierListKey
 import com.tsubuzaki.djdxgo.data.tierlist.TierListShare
 import com.tsubuzaki.djdxgo.data.tierlist.TierListTier
 import com.tsubuzaki.djdxgo.ui.common.DetailScaffold
+import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
+import com.tsubuzaki.djdxgo.ui.iidx.IIDXLevelBadge
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -281,7 +283,7 @@ fun TierListScreen(
                         TierRow(
                             tier = tier,
                             charts = list.charts(tier)
-                                .map { chartsAtLevel[it] ?: placeholderTierListChart(it, level) }
+                                .map { chartsAtLevel[it] ?: placeholderTierListChart(it, level, game) }
                                 .filter(matchesSearch),
                             onPlace = ::place
                         )
@@ -486,10 +488,12 @@ private fun TierTile(
     modifier: Modifier = Modifier
 ) {
     var isMenuExpanded by remember { mutableStateOf(false) }
+    val darkTheme = isSystemInDarkTheme()
     Box(modifier = modifier) {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .width(104.dp)
+                .width(156.dp)
                 .height(IntrinsicSize.Min)
                 .clip(RoundedCornerShape(6.dp))
                 .background(MaterialTheme.colorScheme.surfaceContainerHighest)
@@ -502,16 +506,19 @@ private fun TierTile(
                     .fillMaxHeight()
                     .background(chart.lampColor)
             )
-            Column(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {
-                Text(
-                    chart.title,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    minLines = 2,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+            val iidxLevel = chart.iidxLevel
+            if (iidxLevel != null) {
+                IIDXLevelBadge(
+                    level = iidxLevel,
+                    difficulty = chart.level.toIntOrNull() ?: 0,
+                    darkTheme = darkTheme,
+                    modifier = Modifier.padding(4.dp).width(56.dp)
                 )
-                Row(modifier = Modifier.fillMaxWidth()) {
+            } else {
+                Column(
+                    modifier = Modifier.padding(4.dp).width(56.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         chart.difficultyLabel,
                         color = chart.difficultyColor,
@@ -519,16 +526,35 @@ private fun TierTile(
                         fontWeight = FontWeight.Black,
                         maxLines = 1
                     )
-                    Spacer(Modifier.weight(1f))
-                    if (chart.grade.isNotEmpty()) {
-                        Text(
-                            chart.grade,
-                            color = chart.gradeColor,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Black,
-                            maxLines = 1
-                        )
-                    }
+                    Text(chart.level, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                }
+            }
+            Text(
+                chart.title,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 4.dp),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (chart.grade.isNotEmpty()) {
+                if (iidxLevel != null) {
+                    IIDXDJLevelText(
+                        djLevel = chart.grade,
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(horizontal = 6.dp)
+                    )
+                } else {
+                    Text(
+                        chart.grade,
+                        modifier = Modifier.padding(horizontal = 6.dp),
+                        color = chart.gradeColor,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Black,
+                        maxLines = 1
+                    )
                 }
             }
         }

@@ -290,7 +290,8 @@ struct TierListView: View {
             lampLabel: "",
             lampColor: Color(.systemGray3),
             grade: "",
-            gradeColor: .secondary
+            gradeColor: .secondary,
+            iidxLevel: game.isIIDXFamily ? IIDXLevel(csvValue: difficulty) : nil
         )
     }
 

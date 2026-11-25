@@ -10,6 +10,7 @@ struct TierListChart: Identifiable, Hashable {
     let lampColor: Color
     let grade: String
     let gradeColor: Color
+    var iidxLevel: IIDXLevel?
 
     static func chartID(title: String, difficulty: String) -> String {
         "\(title)|\(difficulty)"
@@ -101,7 +102,8 @@ enum TierListChartProvider {
                     lampLabel: IIDXClearType.abbreviation(for: score.clearType),
                     lampColor: IIDXClearType.color(for: score.clearType),
                     grade: djLevel,
-                    gradeColor: IIDXDJLevel.color(for: djLevel)
+                    gradeColor: IIDXDJLevel.color(for: djLevel),
+                    iidxLevel: level
                 )
             }
         }
