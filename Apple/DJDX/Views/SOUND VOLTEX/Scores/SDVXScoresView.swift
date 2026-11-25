@@ -158,6 +158,11 @@ struct SDVXScoresView<Header: View>: View {
                     }
                 }
                 if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
+                    let sortedRecords = sortedRecords
+                    if !records.isEmpty {
+                        ScoreCountRow(count: sortedRecords.count)
+                        Divider()
+                    }
                     ForEach(sortedRecords, id: \.self) { record in
                         Button {
                             navigationManager.push(SDVXScoresPath.scoreViewer(songRecord: record))

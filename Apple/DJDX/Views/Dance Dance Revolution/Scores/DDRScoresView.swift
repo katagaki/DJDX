@@ -143,6 +143,11 @@ struct DDRScoresView<Header: View>: View {
                     header
                 }
                 if !isEditingAnalytics {
+                    let sortedRecords = sortedRecords
+                    if !records.isEmpty {
+                        ScoreCountRow(count: sortedRecords.count)
+                        Divider()
+                    }
                     ForEach(sortedRecords, id: \.self) { record in
                         DDRScoreRow(record: record)
                         Divider()
