@@ -75,10 +75,27 @@ struct AnalyticsGoalEditorView: View {
                         }
                     }
                     if kind != .rating {
-                        Picker("Goals.Level", selection: $level) {
-                            Text("Goals.Level.All").tag(0)
-                            ForEach(AnalyticsGoal.levelOptions(for: game), id: \.self) { level in
-                                Text(verbatim: "☆\(level)").tag(level)
+                        FilterLevelDisclosure {
+                            FilterLevelGrid(
+                                items: AnalyticsGoal.levelOptions(for: game),
+                                selection: level > 0 ? [level] : [],
+                                title: { String($0) },
+                                onToggle: { tapped in
+                                    level = level == tapped ? 0 : tapped
+                                }
+                            )
+                        } label: {
+                            HStack {
+                                Text("Goals.Level")
+                                Spacer()
+                                Group {
+                                    if level > 0 {
+                                        Text(verbatim: "☆\(level)")
+                                    } else {
+                                        Text("Goals.Level.All")
+                                    }
+                                }
+                                .foregroundStyle(.secondary)
                             }
                         }
                         Picker(kind == .clearCount ? "Goals.ClearType" : "Goals.Grade", selection: $threshold) {

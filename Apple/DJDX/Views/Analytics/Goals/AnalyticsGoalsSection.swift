@@ -115,22 +115,17 @@ struct AnalyticsGoalCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
             HStack(spacing: 6.0) {
-                Text(verbatim: progress.goal.title)
-                    .font(.subheadline.bold())
-                    .lineLimit(1)
-                if let subtitle = progress.goal.subtitle {
-                    Text(verbatim: subtitle)
-                        .font(.caption2.bold())
-                        .foregroundStyle(.secondary)
-                }
+                AnalyticsGoalTitle(goal: progress.goal)
+                    .font(.caption)
                 Spacer(minLength: 4.0)
                 AnalyticsGoalStatusBadge(status: progress.status)
             }
             HStack(alignment: .firstTextBaseline, spacing: 4.0) {
                 Text(verbatim: progress.goal.formatted(progress.current))
-                    .font(.title2.bold().monospacedDigit())
+                    .goalNumberFont(size: 20.0)
                 Text(verbatim: "/ \(progress.goal.formatted(progress.goal.target))")
-                    .font(.subheadline.monospacedDigit())
+                    .font(.subheadline.weight(.bold).monospacedDigit())
+                    .fontWidth(.expanded)
                     .foregroundStyle(.secondary)
                 Spacer()
                 Text("Goals.DaysLeft.\(progress.daysLeft)")
@@ -159,7 +154,8 @@ struct AnalyticsGoalStatusBadge: View {
 
     var body: some View {
         Label(status.titleKey, systemImage: status.systemImage)
-            .font(.caption2.bold())
+            .font(.caption2.weight(.heavy))
+            .fontWidth(.expanded)
             .foregroundStyle(status.color)
             .padding(.horizontal, 8.0)
             .padding(.vertical, 3.0)

@@ -19,6 +19,9 @@ struct AnalyticsGoalDetailView: View {
         List {
             if let progress {
                 Section {
+                    header(progress)
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: 8.0, leading: 16.0, bottom: 0.0, trailing: 16.0))
                     chart(progress)
                         .frame(height: 220.0)
                         .listRowBackground(Color.clear)
@@ -37,8 +40,10 @@ struct AnalyticsGoalDetailView: View {
                     row("Goals.Remaining", progress.goal.formatted(progress.remaining))
                 }
                 Section {
-                    row("Goals.StartDate", progress.goal.startDate.formatted(date: .long, time: .omitted))
-                    row("Goals.Deadline", progress.goal.deadline.formatted(date: .long, time: .omitted))
+                    row("Goals.StartDate", progress.goal.startDate.formatted(date: .long, time: .omitted),
+                        isNumeric: false)
+                    row("Goals.Deadline", progress.goal.deadline.formatted(date: .long, time: .omitted),
+                        isNumeric: false)
                     HStack {
                         Text("Goals.TimeLeft")
                         Spacer()
@@ -54,7 +59,8 @@ struct AnalyticsGoalDetailView: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .navigationTitle(Text(verbatim: progress?.goal.title ?? ""))
+        .navigationTitle("Goals.Title")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Shared.Edit", systemImage: "pencil") {
@@ -85,14 +91,32 @@ struct AnalyticsGoalDetailView: View {
         }
     }
 
-    func row(_ title: LocalizedStringKey, _ value: String) -> some View {
+    func row(_ title: LocalizedStringKey, _ value: String, isNumeric: Bool = true) -> some View {
         HStack {
             Text(title)
             Spacer()
             Text(verbatim: value)
+                .fontWeight(isNumeric ? .semibold : .regular)
+                .fontWidth(isNumeric ? .expanded : .standard)
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
         }
+    }
+
+    func header(_ progress: AnalyticsGoalProgress) -> some View {
+        VStack(alignment: .leading, spacing: 4.0) {
+            AnalyticsGoalTitle(goal: progress.goal)
+                .font(.subheadline)
+            HStack(alignment: .firstTextBaseline, spacing: 4.0) {
+                Text(verbatim: progress.goal.formatted(progress.current))
+                    .goalNumberFont(size: 34.0)
+                Text(verbatim: "/ \(progress.goal.formatted(progress.goal.target))")
+                    .font(.title3.weight(.bold).monospacedDigit())
+                    .fontWidth(.expanded)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     func chart(_ progress: AnalyticsGoalProgress) -> some View {
