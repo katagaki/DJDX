@@ -29,6 +29,7 @@ struct PolarisChordScoresView<Header: View>: View {
     @State var records: [PolarisChordSongRecord] = []
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
+    @State var isShowingShareCard: Bool = false
 
     @Namespace var polarisChordNamespace
 
@@ -134,6 +135,12 @@ struct PolarisChordScoresView<Header: View>: View {
         .menuActionDismissBehavior(.disabled)
     }
 
+    @ViewBuilder var shareControl: some View {
+        Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
+            isShowingShareCard = true
+        }
+    }
+
     @ViewBuilder var filterControl: some View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
@@ -188,14 +195,23 @@ struct PolarisChordScoresView<Header: View>: View {
                 ToolbarItemGroup(placement: .bottomBar) {
                     sortControl
                     filterControl
+                    shareControl
                 }
             } else {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Spacer()
                     sortControl
                     filterControl
+                    shareControl
                 }
             }
+        }
+        .sheet(isPresented: $isShowingShareCard) {
+            ShareCardComposer(
+                game: .polarisChord,
+                profile: .polarisChord(),
+                entries: sortedRecords.map { ShareCardEntry(polarisChordSongRecord: $0) }
+            )
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             PolarisChordScoreFilterSheet(

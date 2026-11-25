@@ -33,6 +33,7 @@ struct IIDXScoresView<Header: View>: View {
 
     @State var isSystemChangingFilterAndSort: Bool = false
     @State var isShowingFilterSheet: Bool = false
+    @State var isShowingShareCard: Bool = false
     @State var isSystemChangingCalendarDate: Bool = false
     @State var isSystemChangingAllRecords: Bool = false
 
@@ -169,6 +170,12 @@ struct IIDXScoresView<Header: View>: View {
         )
     }
 
+    @ViewBuilder var shareControl: some View {
+        Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
+            isShowingShareCard = true
+        }
+    }
+
     @ViewBuilder var filterControl: some View {
         ScoreFilterButton(
             isShowingFilterSheet: $isShowingFilterSheet,
@@ -239,6 +246,7 @@ struct IIDXScoresView<Header: View>: View {
                     ToolbarItemGroup(placement: .bottomBar) {
                         sortControl
                         filterControl
+                        shareControl
                     }
                 } else {
                     ToolbarItemGroup(placement: .bottomBar) {
@@ -246,6 +254,7 @@ struct IIDXScoresView<Header: View>: View {
                         Spacer()
                         sortControl
                         filterControl
+                        shareControl
                     }
                 }
             }
@@ -282,6 +291,16 @@ struct IIDXScoresView<Header: View>: View {
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.hidden)
                 .interactiveDismissDisabled()
+            }
+            .sheet(isPresented: $isShowingShareCard) {
+                ShareCardComposer(
+                    game: Game.stored,
+                    profile: Game.stored == .iidxArcade ? .iidx(playType: playTypeToShow) : ShareCardProfile(),
+                    entries: levelEntries(from: searchResults ?? songRecords ?? []).map {
+                        ShareCardEntry(iidxSongRecord: $0.songRecord, level: $0.level,
+                                       score: $0.score, scoreRate: $0.scoreRate)
+                    }
+                )
             }
             .onAppear {
                 if dataState == .initializing {

@@ -22,6 +22,7 @@ struct SDVXScoresView<Header: View>: View {
     @State var records: [SDVXSongRecord] = []
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
+    @State var isShowingShareCard: Bool = false
 
     @Namespace var sdvxNamespace
 
@@ -127,6 +128,12 @@ struct SDVXScoresView<Header: View>: View {
         .menuActionDismissBehavior(.disabled)
     }
 
+    @ViewBuilder var shareControl: some View {
+        Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
+            isShowingShareCard = true
+        }
+    }
+
     @ViewBuilder var filterControl: some View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
@@ -186,12 +193,14 @@ struct SDVXScoresView<Header: View>: View {
                 ToolbarItemGroup(placement: .bottomBar) {
                     sortControl
                     filterControl
+                    shareControl
                 }
             } else {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Spacer()
                     sortControl
                     filterControl
+                    shareControl
                 }
             }
         }
@@ -215,6 +224,13 @@ struct SDVXScoresView<Header: View>: View {
             if dataState == .presenting && records.isEmpty {
                 ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
             }
+        }
+        .sheet(isPresented: $isShowingShareCard) {
+            ShareCardComposer(
+                game: .soundVoltex,
+                profile: .sdvx(),
+                entries: sortedRecords.map { ShareCardEntry(sdvxSongRecord: $0) }
+            )
         }
         .navigationDestination(for: SDVXScoresPath.self) { viewPath in
             switch viewPath {
