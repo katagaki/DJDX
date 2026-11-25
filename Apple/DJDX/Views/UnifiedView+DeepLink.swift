@@ -68,6 +68,10 @@ extension UnifiedView {
                 }
             }
 
+        case "tierlist":
+            guard let share = TierListShare.decode(url.absoluteString) else { return }
+            tierListShare = share
+
         case "reonboard":
             isPresentingOnboarding = true
 

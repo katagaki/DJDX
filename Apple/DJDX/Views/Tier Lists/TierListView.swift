@@ -1,0 +1,339 @@
+import SwiftUI
+
+// swiftlint:disable:next type_body_length
+struct TierListView: View {
+
+    @Environment(\.dismiss) var dismiss
+
+    @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
+    @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
+    var polarisChordVersion: PolarisChordVersion
+    @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
+
+    var store = TierListStore.shared
+    let initialShare: TierListShare?
+
+    @State var game: Game
+    @State var playType: TierListPlayType
+    @State var level: String = ""
+    @State var charts: [TierListChart] = []
+    @State var isLoading: Bool = true
+
+    @State var isEnteringShareCode: Bool = false
+    @State var shareCodeEntry: String = ""
+    @State var pendingShare: TierListShare?
+    @State var isConfirmingImport: Bool = false
+    @State var isImportFailed: Bool = false
+    @State var isConfirmingReset: Bool = false
+
+    init(game: Game, playType: IIDXPlayType? = nil, initialShare: TierListShare? = nil) {
+        let playType = playType ?? UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter")
+            .flatMap(IIDXPlayType.init) ?? .single
+        self.initialShare = initialShare
+        let initialGame = initialShare.flatMap { Game(tierListCode: $0.game) } ?? game
+        _game = State(initialValue: initialGame)
+        let initialPlayType = initialShare.flatMap { TierListPlayType(rawValue: $0.playType) }
+            ?? (playType == .double ? .double : .single)
+        _playType = State(initialValue: initialPlayType)
+        _level = State(initialValue: initialShare?.level ?? "")
+    }
+
+    var key: TierListKey {
+        TierListKey(
+            game: game.tierListCode,
+            playType: game.supportsTierListPlayType ? playType.rawValue : "",
+            level: level
+        )
+    }
+
+    var list: TierList { store.list(for: key) }
+
+    var levels: [String] {
+        let prefix = "\(game.tierListCode)/\(key.playType)/"
+        let storedLevels = store.lists.keys
+            .filter { $0.hasPrefix(prefix) }
+            .map { String($0.dropFirst(prefix.count)) }
+        return Set(charts.map(\.level) + storedLevels)
+            .sorted { TierListChartProvider.levelSortKey($0) < TierListChartProvider.levelSortKey($1) }
+    }
+
+    var chartsAtLevel: [TierListChart] { charts.filter { $0.level == level } }
+
+    var chartsByID: [String: TierListChart] {
+        Dictionary(chartsAtLevel.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+    }
+
+    var unplacedCharts: [TierListChart] {
+        let list = list
+        return chartsAtLevel
+            .filter { list.tier(of: $0.id) == nil }
+            .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+    }
+
+    var loadTaskID: String {
+        [game.tierListCode, playType.rawValue, iidxVersion.rawValue, sdvxVersion.rawValue,
+         polarisChordVersion.rawValue, ddrVersion.rawValue].map { "\($0)" }.joined(separator: "/")
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 8.0) {
+                controls
+                if isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                } else if charts.isEmpty && list.isEmpty {
+                    ContentUnavailableView(
+                        "TierList.NoData.Title",
+                        systemImage: "square.stack.3d.up.slash",
+                        description: Text("TierList.NoData.Subtitle")
+                    )
+                } else {
+                    tiers
+                }
+            }
+            .padding()
+        }
+        .navigationTitle("TierList.Title")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                actionsMenu
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                if #available(iOS 26.0, *) {
+                    Button(role: .close) {
+                        dismiss()
+                    }
+                } else {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .tint(.primary)
+                            .font(.title2)
+                            .symbolRenderingMode(.hierarchical)
+                    }
+                }
+            }
+        }
+        .task(id: loadTaskID) {
+            await loadCharts()
+        }
+        .onAppear {
+            store.reload()
+            if let initialShare {
+                pendingShare = initialShare
+                isConfirmingImport = true
+            }
+        }
+        .alert("TierList.Import.EnterCode", isPresented: $isEnteringShareCode) {
+            TextField("TierList.Import.Placeholder", text: $shareCodeEntry)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+            Button("Shared.Import") {
+                beginImport(shareCodeEntry)
+            }
+            Button("Shared.Cancel", role: .cancel) {
+                shareCodeEntry = ""
+            }
+        }
+        .alert("TierList.Import.Confirm.Title", isPresented: $isConfirmingImport, presenting: pendingShare) { share in
+            Button("TierList.Import.Confirm.Replace", role: .destructive) {
+                applyImport(share)
+            }
+            Button("Shared.Cancel", role: .cancel) {
+                pendingShare = nil
+            }
+        } message: { share in
+            Text("TierList.Import.Confirm.Subtitle.\(description(of: share))")
+        }
+        .alert("TierList.Import.Failed", isPresented: $isImportFailed) {
+            Button("Shared.OK", role: .cancel) {
+                // Dismisses the alert; no further action needed
+            }
+        }
+        .alert("TierList.Reset.Title", isPresented: $isConfirmingReset) {
+            Button("TierList.Reset.Confirm", role: .destructive) {
+                store.replace(key, with: TierList())
+            }
+            Button("Shared.Cancel", role: .cancel) {
+                // Dismisses the alert; no further action needed
+            }
+        }
+    }
+
+    @ViewBuilder
+    var controls: some View {
+        HStack(spacing: 8.0) {
+            Picker("TierList.Game", selection: $game) {
+                ForEach(Game.allCases.filter(\.isAvailable)) { game in
+                    Text(game.shortName).tag(game)
+                }
+            }
+            .pickerStyle(.menu)
+            if game.supportsTierListPlayType {
+                Picker("TierList.PlayType", selection: $playType) {
+                    ForEach(TierListPlayType.allCases) { playType in
+                        Text(playType.rawValue).tag(playType)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .fixedSize()
+            }
+            Spacer(minLength: 0.0)
+        }
+        if !levels.isEmpty {
+            ScrollView(.horizontal) {
+                HStack(spacing: 6.0) {
+                    ForEach(levels, id: \.self) { value in
+                        Button {
+                            level = value
+                        } label: {
+                            Text(verbatim: "☆\(value)")
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                                .padding(.horizontal, 10.0)
+                                .padding(.vertical, 6.0)
+                                .foregroundStyle(level == value ? Color.white : Color.primary)
+                                .background(level == value ? Color.accentColor : Color(.secondarySystemFill))
+                                .clipShape(.capsule)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            .scrollIndicators(.hidden)
+        }
+    }
+
+    @ViewBuilder
+    var tiers: some View {
+        ForEach(TierListTier.allCases) { tier in
+            TierListRow(tier: tier, charts: charts(in: tier), onPlace: place) {
+                Text(tier.rawValue)
+                    .font(.title2)
+                    .fontWeight(.black)
+                    .foregroundStyle(.black)
+                    .frame(width: 44.0)
+                    .frame(maxHeight: .infinity)
+                    .background(tier.color)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+        }
+        Text("TierList.Unplaced.\(unplacedCharts.count)")
+            .font(.headline)
+            .padding(.top, 8.0)
+        TierListRow(tier: nil, charts: unplacedCharts, onPlace: place) {
+            EmptyView()
+        }
+        Text("TierList.Hint")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+    }
+
+    var actionsMenu: some View {
+        Menu {
+            if let share = TierListShare(key: key, list: list).url {
+                ShareLink(item: share) {
+                    Label("TierList.Share.Link", systemImage: "link")
+                }
+            }
+            Button("TierList.Share.CopyCode", systemImage: "doc.on.doc") {
+                UIPasteboard.general.string = TierListShare(key: key, list: list).code
+            }
+            .disabled(list.isEmpty)
+            Divider()
+            Button("TierList.Import.FromClipboard", systemImage: "doc.on.clipboard") {
+                beginImport(UIPasteboard.general.string ?? "")
+            }
+            Button("TierList.Import.EnterCode", systemImage: "keyboard") {
+                shareCodeEntry = ""
+                isEnteringShareCode = true
+            }
+            Divider()
+            Button("TierList.Reset", systemImage: "arrow.counterclockwise", role: .destructive) {
+                isConfirmingReset = true
+            }
+            .disabled(list.isEmpty)
+        } label: {
+            Label("TierList.Actions", systemImage: "square.and.arrow.up")
+        }
+    }
+
+    func charts(in tier: TierListTier) -> [TierListChart] {
+        let chartsByID = chartsByID
+        return list.charts(in: tier).map { id in
+            chartsByID[id] ?? placeholderChart(id: id)
+        }
+    }
+
+    func placeholderChart(id: String) -> TierListChart {
+        let parts = id.split(separator: "|", maxSplits: 1, omittingEmptySubsequences: false)
+        let difficulty = parts.count > 1 ? String(parts[1]) : ""
+        return TierListChart(
+            id: id,
+            title: parts.first.map(String.init) ?? id,
+            level: level,
+            difficultyLabel: String(difficulty.prefix(game.isIIDXFamily ? 1 : 3)),
+            difficultyColor: .secondary,
+            lampLabel: "",
+            lampColor: Color(.systemGray3),
+            grade: "",
+            gradeColor: .secondary
+        )
+    }
+
+    func place(_ id: String, in tier: TierListTier?, before targetID: String?) {
+        withAnimation(.smooth.speed(2.0)) {
+            store.update(key) { $0.place(id, in: tier, before: targetID) }
+        }
+    }
+
+    func loadCharts() async {
+        isLoading = true
+        let loaded = await TierListChartProvider.charts(
+            for: game,
+            playType: playType,
+            iidxVersion: iidxVersion,
+            sdvxVersion: sdvxVersion,
+            polarisChordVersion: polarisChordVersion,
+            ddrVersion: ddrVersion
+        )
+        charts = loaded
+        if !levels.contains(level) {
+            level = levels.last ?? ""
+        }
+        isLoading = false
+    }
+
+    func beginImport(_ input: String) {
+        guard let share = TierListShare.decode(input) else {
+            isImportFailed = true
+            return
+        }
+        pendingShare = share
+        isConfirmingImport = true
+    }
+
+    func applyImport(_ share: TierListShare) {
+        if let target = Game(tierListCode: share.game) {
+            game = target
+        }
+        if let target = TierListPlayType(rawValue: share.playType) {
+            playType = target
+        }
+        level = share.level
+        store.replace(share.key, with: TierList(tiers: share.tiers))
+        pendingShare = nil
+    }
+
+    func description(of share: TierListShare) -> String {
+        let gameName = Game(tierListCode: share.game)?.shortName ?? share.game
+        return [gameName, share.playType, "☆\(share.level)"]
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+    }
+}
