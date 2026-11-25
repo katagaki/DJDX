@@ -34,6 +34,7 @@ import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
@@ -168,7 +169,8 @@ internal fun <T> ScoresToolbar(
     onSortChange: (String, Boolean) -> Unit,
     onFilterClick: () -> Unit,
     modifier: Modifier = Modifier,
-    leadingContent: (@Composable () -> Unit)? = null
+    leadingContent: (@Composable () -> Unit)? = null,
+    onShareClick: (() -> Unit)? = null
 ) {
     var showSortMenu by remember { mutableStateOf(false) }
     var showSearchSheet by remember { mutableStateOf(false) }
@@ -243,6 +245,14 @@ internal fun <T> ScoresToolbar(
                 Icons.Outlined.Tune,
                 contentDescription = stringResource(R.string.games_filter)
             )
+        }
+        if (onShareClick != null) {
+            IconButton(onClick = onShareClick) {
+                Icon(
+                    Icons.Outlined.Share,
+                    contentDescription = stringResource(R.string.share_card_title)
+                )
+            }
         }
     }
 

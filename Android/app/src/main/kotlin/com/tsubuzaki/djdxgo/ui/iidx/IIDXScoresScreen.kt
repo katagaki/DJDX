@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.djdxgo.AppContainer
 import com.tsubuzaki.djdxgo.R
+import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.SettingsKeys
 import com.tsubuzaki.djdxgo.data.compact
 import com.tsubuzaki.djdxgo.data.external.IIDXSong
@@ -52,6 +53,9 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXSongRecord
 import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.ui.games.ScoresToolbar
 import com.tsubuzaki.djdxgo.ui.games.SortOption
+import com.tsubuzaki.djdxgo.ui.share.ShareCardSheet
+import com.tsubuzaki.djdxgo.ui.share.iidxShareCardEntry
+import com.tsubuzaki.djdxgo.ui.share.toShareCardProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -95,6 +99,7 @@ fun IIDXScoresScreen(
     var isDatePickerShown by rememberSaveable { mutableStateOf(false) }
     var searchTerm by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by rememberSaveable { mutableStateOf(false) }
+    var showShareSheet by rememberSaveable { mutableStateOf(false) }
 
     var records by remember { mutableStateOf<List<IIDXSongRecord>?>(null) }
     var songs by remember { mutableStateOf<Map<String, IIDXSong>>(emptyMap()) }
@@ -282,6 +287,7 @@ fun IIDXScoresScreen(
                 }
             },
             onFilterClick = { showFilterSheet = true },
+            onShareClick = { showShareSheet = true },
             leadingContent = {
                 if (isTimeTravelling) {
                     FilledIconButton(onClick = {
@@ -340,5 +346,26 @@ fun IIDXScoresScreen(
 
     if (showFilterSheet) {
         IIDXScoreFilterSheet(onDismiss = { showFilterSheet = false })
+    }
+
+    if (showShareSheet) {
+        val profile by container.profileRepository.iidx.collectAsState()
+        val shareSource = if (searchTerm.isEmpty()) entries else searchEntries
+        ShareCardSheet(
+            game = Game.IIDX_ARCADE,
+            profile = profile.toShareCardProfile(playType),
+            entries = shareSource.map { entry ->
+                iidxShareCardEntry(
+                    record = entry.record,
+                    level = entry.level,
+                    score = entry.score,
+                    scoreRate = scoreRate(
+                        entry.score.score,
+                        songs[entry.record.title.compact]?.noteCount(playType, entry.level)
+                    )
+                )
+            },
+            onDismiss = { showShareSheet = false }
+        )
     }
 }

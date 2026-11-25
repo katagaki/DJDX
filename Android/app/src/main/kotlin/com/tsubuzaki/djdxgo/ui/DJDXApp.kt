@@ -116,7 +116,7 @@ import kotlinx.coroutines.withContext
 
 private enum class PendingDialog { FREE_UP_SPACE, DELETE_WEB, DELETE_SCORE_CODE, DELETE_SCORE, RESET_LAYOUT, DISCLAIMER }
 
-private fun gameIconRes(game: Game): Int = when (game) {
+internal fun gameIconRes(game: Game): Int = when (game) {
     Game.IIDX_ARCADE -> R.drawable.ic_game_iidx
     Game.SOUND_VOLTEX -> R.drawable.ic_game_sdvx
     Game.POLARIS_CHORD -> R.drawable.ic_game_polaris

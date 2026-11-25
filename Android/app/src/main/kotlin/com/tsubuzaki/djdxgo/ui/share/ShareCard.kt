@@ -1,0 +1,297 @@
+package com.tsubuzaki.djdxgo.ui.share
+
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tsubuzaki.djdxgo.R
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.GameFonts
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+
+val ShareCardWidth = 360.dp
+
+@Composable
+fun ShareCard(
+    title: String,
+    @DrawableRes iconRes: Int,
+    profile: ShareCardProfile?,
+    entries: List<ShareCardEntry>,
+    totalCount: Int,
+    background: ShareCardBackground,
+    photo: ImageBitmap?,
+    accentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier.width(ShareCardWidth)) {
+        ShareCardBackdrop(
+            background = background,
+            photo = photo,
+            accentColor = accentColor,
+            modifier = Modifier.matchParentSize()
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            ShareCardHeader(title = title, iconRes = iconRes, profile = profile)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color.Black.copy(alpha = 0.4f))
+            ) {
+                entries.forEachIndexed { index, entry ->
+                    if (index > 0) {
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 18.dp)
+                                .fillMaxWidth()
+                                .height(0.5.dp)
+                                .background(Color.White.copy(alpha = 0.12f))
+                        )
+                    }
+                    ShareCardRow(entry)
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (totalCount > entries.size) {
+                    Text(
+                        text = stringResource(R.string.share_card_more, totalCount - entries.size),
+                        style = footerStyle
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Text(text = "DJDX", style = footerStyle.gameFont(GameFontWidth.EXTRA_EXPANDED))
+            }
+        }
+    }
+}
+
+private val footerStyle = TextStyle(
+    fontSize = 11.sp,
+    fontWeight = FontWeight.ExtraBold,
+    color = Color.White.copy(alpha = 0.7f)
+)
+
+@Composable
+private fun ShareCardBackdrop(
+    background: ShareCardBackground,
+    photo: ImageBitmap?,
+    accentColor: Color,
+    modifier: Modifier
+) {
+    when (background) {
+        is ShareCardBackground.Gradient -> Box(
+            modifier = modifier.background(
+                Brush.linearGradient(background.gradient.colors(accentColor))
+            )
+        )
+        is ShareCardBackground.Icon -> Box(modifier = modifier.background(Color.Black)) {
+            Image(
+                painter = painterResource(background.resId),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .matchParentSize()
+                    .blur(24.dp)
+            )
+            Box(modifier = Modifier.matchParentSize().background(Color.Black.copy(alpha = 0.25f)))
+        }
+        ShareCardBackground.Photo -> Box(modifier = modifier.background(Color.Black)) {
+            if (photo != null) {
+                Image(
+                    bitmap = photo,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize()
+                )
+            }
+            Box(modifier = Modifier.matchParentSize().background(Color.Black.copy(alpha = 0.35f)))
+        }
+    }
+}
+
+@Composable
+private fun ShareCardHeader(title: String, @DrawableRes iconRes: Int, profile: ShareCardProfile?) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Image(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            modifier = Modifier
+                .size(36.dp)
+                .clip(RoundedCornerShape(8.dp))
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                    .gameFont(GameFontWidth.EXPANDED),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = LocalDate.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
+                style = TextStyle(
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White.copy(alpha = 0.7f)
+                )
+            )
+        }
+        if (profile != null && !profile.isEmpty) {
+            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                profile.playerName?.takeIf { it.isNotEmpty() }?.let { name ->
+                    Text(
+                        text = name,
+                        style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                profile.ratings.forEach { rating ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = rating.label,
+                            style = ratingStyle.copy(color = Color.White.copy(alpha = 0.7f)),
+                            maxLines = 1
+                        )
+                        Text(text = rating.value, style = ratingStyle, maxLines = 1)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private val ratingStyle = TextStyle(
+    fontSize = 11.sp,
+    fontWeight = FontWeight.ExtraBold,
+    color = Color.White,
+    fontFamily = GameFonts.family(GameFontWidth.CONDENSED)
+)
+
+@Composable
+private fun ShareCardRow(entry: ShareCardEntry) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .padding(start = 8.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(6.dp)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(2.dp))
+                .background(entry.lamp)
+        )
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                text = entry.title,
+                style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            entry.subtitle?.takeIf { it.isNotEmpty() }?.let { subtitle ->
+                Text(
+                    text = subtitle,
+                    style = TextStyle(
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White.copy(alpha = 0.65f)
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            if (entry.metrics.isNotEmpty()) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    entry.metrics.forEach { metric ->
+                        Text(
+                            text = metric.text,
+                            style = TextStyle(
+                                brush = metric.brush,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold
+                            ).gameFont(GameFontWidth.EXPANDED),
+                            maxLines = 1
+                        )
+                    }
+                }
+            }
+        }
+        Column(
+            modifier = Modifier.width(60.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = entry.levelText,
+                style = TextStyle(
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Black,
+                    fontStyle = FontStyle.Italic,
+                    color = Color.White
+                ),
+                maxLines = 1
+            )
+            Text(
+                text = entry.difficultyText,
+                style = TextStyle(
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = entry.difficultyColor,
+                    fontFamily = GameFonts.family(GameFontWidth.CONDENSED)
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}

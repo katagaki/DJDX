@@ -62,4 +62,12 @@
     <string name="radar_maker_export_failed_title">レーダーを書き出せませんでした</string>
     <string name="radar_maker_export_failed_message">レーダー画像を作成できませんでした。もう一度お試しください。</string>
     <string name="radar_total">合計レーダースコア</string>
+    <string name="share_card_title">画像で共有</string>
+    <string name="share_card_share">共有</string>
+    <string name="share_card_background">背景</string>
+    <string name="share_card_photo">写真</string>
+    <string name="share_card_show_profile">プレイヤー情報を表示</string>
+    <string name="share_card_row_limit">表示する譜面数</string>
+    <string name="share_card_more">他%1$d譜面</string>
+    <string name="share_card_failed">画像を作成できませんでした。もう一度お試しください。</string>
 </resources>

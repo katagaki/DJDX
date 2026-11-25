@@ -64,4 +64,12 @@
     <string name="radar_maker_export_failed_title">Could Not Export Radar</string>
     <string name="radar_maker_export_failed_message">The radar image could not be created. Please try again.</string>
     <string name="radar_total">TOTAL</string>
+    <string name="share_card_title">Share as Image</string>
+    <string name="share_card_share">Share</string>
+    <string name="share_card_background">Background</string>
+    <string name="share_card_photo">Photo</string>
+    <string name="share_card_show_profile">Show Player Info</string>
+    <string name="share_card_row_limit">Charts Shown</string>
+    <string name="share_card_more">and %1$d more</string>
+    <string name="share_card_failed">The image could not be created. Please try again.</string>
 </resources>

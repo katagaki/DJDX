@@ -1,5 +1,9 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import com.tsubuzaki.djdxgo.data.Game
+import com.tsubuzaki.djdxgo.ui.share.ShareCardSheet
+import com.tsubuzaki.djdxgo.ui.share.toShareCardEntry
+import com.tsubuzaki.djdxgo.ui.share.toShareCardProfile
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
 import com.tsubuzaki.djdxgo.ui.theme.GameFonts
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
@@ -102,6 +106,7 @@ fun PolarisChordScoresScreen(
 
     var query by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by remember { mutableStateOf(false) }
+    var showShareSheet by remember { mutableStateOf(false) }
 
     val displayed = remember(
         records, sortMode, sortDescending,
@@ -177,7 +182,18 @@ fun PolarisChordScoresScreen(
                     context.setSetting(SettingsKeys.polarisChordSortDescending, descending)
                 }
             },
-            onFilterClick = { showFilterSheet = true }
+            onFilterClick = { showFilterSheet = true },
+            onShareClick = { showShareSheet = true }
+        )
+    }
+
+    if (showShareSheet) {
+        val profile by container.profileRepository.polarisChord.collectAsState()
+        ShareCardSheet(
+            game = Game.POLARIS_CHORD,
+            profile = profile.toShareCardProfile(),
+            entries = (if (query.isEmpty()) displayed else searchResults).map { it.toShareCardEntry() },
+            onDismiss = { showShareSheet = false }
         )
     }
 
