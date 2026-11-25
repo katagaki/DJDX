@@ -10,6 +10,7 @@ object Routes {
     const val EXTERNAL_DATA = "externalData"
     const val ATTRIBUTIONS = "attributions"
     const val RADAR_MAKER = "radarMaker"
+    const val TIER_LIST = "tierList?code={code}"
 
     const val IIDX_VIEWER = "viewer/iidx?title={title}&playType={playType}&level={level}&date={date}"
     const val SDVX_VIEWER = "viewer/sdvx?title={title}&date={date}&difficulty={difficulty}"
@@ -48,6 +49,8 @@ object Routes {
     fun sdvxInViewer(chart: SDVXInChart): String =
         "viewer/sdvxin?legacy=${Uri.encode(chart.legacyPageURL)}" +
             "&viewer=${Uri.encode(chart.viewerPageURL)}&data=${Uri.encode(chart.viewerDataURL)}"
+
+    fun tierList(code: String = ""): String = "tierList?code=${Uri.encode(code)}"
 
     fun tower(mode: String): String = "tower?mode=$mode"
 

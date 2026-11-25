@@ -11,6 +11,7 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXRepository
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordRepository
 import com.tsubuzaki.djdxgo.data.profile.ProfileRepository
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXRepository
+import com.tsubuzaki.djdxgo.data.tierlist.TierListStore
 import com.tsubuzaki.djdxgo.widget.WidgetDataPublisher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,6 +33,7 @@ class AppContainer(context: Context) {
     val analyticsStore = AnalyticsStore(database, ddrRepository)
     val profileRepository = ProfileRepository(context.applicationContext)
     val chartAnalyzer = IIDXChartAnalyzer(context.applicationContext.cacheDir)
+    val tierListStore = TierListStore(context.applicationContext)
 
     private val dataVersionState = MutableStateFlow(0)
     val dataVersion: StateFlow<Int> = dataVersionState.asStateFlow()
