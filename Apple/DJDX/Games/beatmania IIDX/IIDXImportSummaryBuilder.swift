@@ -88,12 +88,10 @@ enum IIDXImportSummaryBuilder {
                     previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                     score: isNewScore ? latest.score : nil,
                     lamp: isNewLamp ? ImportSummaryChange(
-                        previous: previousClearType.map { IIDXClearType.abbreviation(for: $0) },
                         current: latest.clearType,
                         style: .iidxClearType
                     ) : nil,
                     grade: isNewDJLevel ? ImportSummaryChange(
-                        previous: previousDJLevel,
                         current: latest.djLevel,
                         style: .iidxDJLevel
                     ) : nil

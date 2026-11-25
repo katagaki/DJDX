@@ -69,12 +69,10 @@ enum PolarisChordImportSummaryBuilder {
                 previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                 score: isNewScore ? record.score : nil,
                 lamp: isNewLamp ? ImportSummaryChange(
-                    previous: previousClearType.map { PolarisChordClearType(rawValue: $0)?.abbreviation ?? $0 },
                     current: clearType.abbreviation,
                     style: .color(clearType.color)
                 ) : nil,
                 grade: isNewGrade ? ImportSummaryChange(
-                    previous: previousGrade,
                     current: record.grade,
                     style: .polarisChordGrade
                 ) : nil

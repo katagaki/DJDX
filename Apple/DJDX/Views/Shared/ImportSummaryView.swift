@@ -126,14 +126,6 @@ struct ImportSummaryView: View {
                 }
             }
             HStack(alignment: .lastTextBaseline, spacing: 8.0) {
-                if let previousValue = rating.previousValue {
-                    Text(verbatim: format(previousValue, digits: rating.fractionDigits))
-                        .font(.title3)
-                        .foregroundStyle(.tertiary)
-                    Image(systemName: "arrow.right")
-                        .font(.subheadline)
-                        .foregroundStyle(.tertiary)
-                }
                 Spacer(minLength: 0.0)
                 ratingValue(format(rating.value, digits: rating.fractionDigits), game: game)
                     .font(.largeTitle)

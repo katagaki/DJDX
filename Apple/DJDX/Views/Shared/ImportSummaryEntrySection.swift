@@ -46,7 +46,7 @@ struct ImportSummaryEntrySection: View {
     func details() -> some View {
         VStack(alignment: .leading, spacing: 8.0) {
             if let score = entry.score {
-                detailRow("SCORE", previous: entry.previousScore.map { scoreString($0) }) {
+                detailRow("SCORE") {
                     scoreText(scoreString(score))
                     if let previousScore = entry.previousScore {
                         Text(verbatim: "+" + scoreString(score - previousScore))
@@ -55,12 +55,12 @@ struct ImportSummaryEntrySection: View {
                 }
             }
             if let lamp = entry.lamp {
-                detailRow("CLEAR TYPE", previous: lamp.previous) {
+                detailRow("CLEAR TYPE") {
                     styledValue(lamp)
                 }
             }
             if let grade = entry.grade {
-                detailRow(game.gradeTitle, previous: grade.previous) {
+                detailRow(game.gradeTitle) {
                     styledValue(grade)
                 }
             }
@@ -69,19 +69,12 @@ struct ImportSummaryEntrySection: View {
 
     @ViewBuilder
     func detailRow(
-        _ title: String, previous: String?, @ViewBuilder current: () -> some View
+        _ title: String, @ViewBuilder current: () -> some View
     ) -> some View {
         HStack(spacing: 6.0) {
             Text(verbatim: title)
             Spacer(minLength: 8.0)
-            HStack(spacing: 4.0) {
-                if let previous {
-                    Text(verbatim: previous)
-                        .foregroundStyle(.tertiary)
-                    Image(systemName: "arrow.right")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                }
+            HStack(spacing: 6.0) {
                 current()
             }
             .lineLimit(1)

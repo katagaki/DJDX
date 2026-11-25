@@ -45,7 +45,6 @@ enum ImportSummaryValueStyle: Hashable {
 }
 
 struct ImportSummaryChange: Hashable {
-    let previous: String?
     let current: String
     let style: ImportSummaryValueStyle
 }

@@ -93,12 +93,10 @@ enum DDRImportSummaryBuilder {
                 previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                 score: isNewScore ? record.score : nil,
                 lamp: isNewLamp ? ImportSummaryChange(
-                    previous: previousClearKind?.uppercased(),
                     current: record.clearDisplay,
                     style: .color(DDRSongRecord.clearColor(for: record.clearKind))
                 ) : nil,
                 grade: isNewRank ? ImportSummaryChange(
-                    previous: previousRank.map { DDRSongRecord.rankDisplay(forStem: $0) },
                     current: record.rankDisplay,
                     style: .color(DDRSongRecord.rankColor(forStem: record.rank))
                 ) : nil

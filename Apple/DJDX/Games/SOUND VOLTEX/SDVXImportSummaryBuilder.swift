@@ -75,12 +75,10 @@ enum SDVXImportSummaryBuilder {
                 previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                 score: isNewScore ? record.highScore : nil,
                 lamp: isNewLamp ? ImportSummaryChange(
-                    previous: previousClearType.map { SDVXClearType(rawValue: $0)?.abbreviation ?? $0 },
                     current: record.clearTypeEnum.abbreviation,
                     style: .color(record.clearTypeEnum.color)
                 ) : nil,
                 grade: isNewGrade ? ImportSummaryChange(
-                    previous: previousGrade,
                     current: record.grade,
                     style: .sdvxGrade
                 ) : nil
