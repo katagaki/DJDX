@@ -97,6 +97,7 @@ extension UnifiedView {
         case "sdvx", "soundvoltex": .soundVoltex
         case "polaris", "polarischord": .polarisChord
         case "ddr", "ddrworld", "dancedancerevolution": .danceDanceRevolution
+        case "gitadora", "gfdm", "guitarfreaks", "drummania": .gitadora
         default: nil
         }
     }

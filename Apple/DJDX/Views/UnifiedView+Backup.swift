@@ -5,6 +5,7 @@ extension UnifiedView {
         if await !IIDXReader().allImportGroups().isEmpty { return true }
         if await SDVXReader().latestImportGroupID() != nil { return true }
         if await PolarisChordReader().latestImportGroupID() != nil { return true }
+        if await GITADORAReader().latestImportGroupID() != nil { return true }
         return false
     }
 

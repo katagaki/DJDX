@@ -6,6 +6,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
     case soundVoltex = 1
     case polarisChord = 3
     case danceDanceRevolution = 4
+    case gitadora = 5
 
     var id: Int { rawValue }
 
@@ -16,6 +17,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         case .iidxInfinitas: "beatmania IIDX INFINITAS"
         case .polarisChord: "ポラリスコード"
         case .danceDanceRevolution: "DanceDanceRevolution"
+        case .gitadora: "GITADORA"
         }
     }
 
@@ -26,6 +28,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         case .iidxInfinitas: "INFINITAS"
         case .polarisChord: "ぽらりこ"
         case .danceDanceRevolution: "DDR"
+        case .gitadora: "GITADORA"
         }
     }
 
@@ -35,6 +38,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         case .soundVoltex: .iconSDVX
         case .polarisChord: .iconPolarisChord
         case .danceDanceRevolution: .iconDDR
+        case .gitadora: .iconGITADORA
         }
     }
 
@@ -42,13 +46,15 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         iidxVersion: IIDXVersion,
         sdvxVersion: SDVXVersion,
         polarisChordVersion: PolarisChordVersion,
-        ddrVersion: DDRVersion
+        ddrVersion: DDRVersion,
+        gitadoraVersion: GITADORAVersion
     ) -> Color {
         switch self {
         case .iidxArcade, .iidxInfinitas: iidxVersion.color
         case .soundVoltex: sdvxVersion.color
         case .polarisChord: polarisChordVersion.color
         case .danceDanceRevolution: ddrVersion.color
+        case .gitadora: gitadoraVersion.color
         }
     }
 
@@ -59,7 +65,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
 
     var isAvailable: Bool {
         switch self {
-        case .iidxArcade, .iidxInfinitas, .soundVoltex, .polarisChord, .danceDanceRevolution: true
+        case .iidxArcade, .iidxInfinitas, .soundVoltex, .polarisChord, .danceDanceRevolution, .gitadora: true
         }
     }
 
@@ -67,7 +73,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
     var isIIDXFamily: Bool {
         switch self {
         case .iidxArcade, .iidxInfinitas: true
-        case .soundVoltex, .polarisChord, .danceDanceRevolution: false
+        case .soundVoltex, .polarisChord, .danceDanceRevolution, .gitadora: false
         }
     }
 
@@ -88,7 +94,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
     var supportsTower: Bool {
         switch self {
         case .iidxArcade: true
-        case .soundVoltex, .iidxInfinitas, .polarisChord, .danceDanceRevolution: false
+        case .soundVoltex, .iidxInfinitas, .polarisChord, .danceDanceRevolution, .gitadora: false
         }
     }
 
@@ -104,6 +110,7 @@ enum Game: Int, Codable, CaseIterable, Identifiable {
         case .iidxInfinitas: "PlayDataInfinitas.db"
         case .polarisChord: "PlayDataPolarisChord.db"
         case .danceDanceRevolution: "PlayDataDDR.db"
+        case .gitadora: "PlayDataGITADORA.db"
         }
     }
 }
