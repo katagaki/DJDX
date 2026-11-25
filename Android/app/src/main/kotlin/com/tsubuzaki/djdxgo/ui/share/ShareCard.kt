@@ -221,18 +221,22 @@ private fun ShareCardRow(entry: ShareCardEntry) {
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .padding(start = 8.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+            .padding(end = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Box(
             modifier = Modifier
-                .width(6.dp)
+                .width(8.dp)
                 .fillMaxHeight()
-                .clip(RoundedCornerShape(2.dp))
                 .background(entry.lamp)
         )
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
             Text(
                 text = entry.title,
                 style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White),
@@ -268,7 +272,9 @@ private fun ShareCardRow(entry: ShareCardEntry) {
             }
         }
         Column(
-            modifier = Modifier.width(60.dp),
+            modifier = Modifier
+                .width(60.dp)
+                .padding(vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(

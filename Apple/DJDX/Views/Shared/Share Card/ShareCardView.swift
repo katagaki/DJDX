@@ -137,9 +137,9 @@ struct ShareCardRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 10.0) {
-            RoundedRectangle(cornerRadius: 2.0)
+            Rectangle()
                 .fill(entry.lampStyle)
-                .frame(width: 6.0)
+                .frame(width: 8.0)
                 .frame(maxHeight: .infinity)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(verbatim: entry.title)
@@ -164,6 +164,7 @@ struct ShareCardRow: View {
                     .lineLimit(1)
                 }
             }
+            .padding(.vertical, 8.0)
             Spacer(minLength: 0.0)
             VStack(spacing: 0.0) {
                 Text(verbatim: entry.levelText)
@@ -178,9 +179,8 @@ struct ShareCardRow: View {
                     .minimumScaleFactor(0.5)
             }
             .frame(width: 60.0)
+            .padding(.vertical, 8.0)
         }
-        .padding(.vertical, 8.0)
-        .padding(.leading, 8.0)
         .padding(.trailing, 6.0)
         .fixedSize(horizontal: false, vertical: true)
     }
