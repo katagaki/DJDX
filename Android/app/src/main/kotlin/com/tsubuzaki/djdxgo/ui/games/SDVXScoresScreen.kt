@@ -154,6 +154,12 @@ fun SDVXScoresScreen(
             if (isLoaded && displayed.isEmpty()) {
                 item(key = "empty") { EmptyStateCard() }
             }
+            if (records.isNotEmpty()) {
+                item(key = "count") {
+                    ScoreCountRow(count = displayed.size)
+                    HorizontalDivider()
+                }
+            }
             items(displayed, key = { it.id }) { record ->
                 SDVXScoreRow(record = record) {
                     onOpenSong(record.title, selectedDateEpoch, record.difficulty)
