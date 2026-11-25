@@ -87,6 +87,9 @@ class DDRRepository(
         return applyMetadata(dao.songRecords(group.id, style.value))
     }
 
+    suspend fun songRecordsForGroup(groupID: String, style: DDRPlayStyle): List<DDRSongRecord> =
+        applyMetadata(dao.songRecords(groupID, style.value))
+
     private suspend fun applyMetadata(records: List<DDRSongRecord>): List<DDRSongRecord> {
         if (records.isEmpty()) return records
         val metaByTitle = externalDao.allDDRSongMetas().associateBy { it.titleCompact }

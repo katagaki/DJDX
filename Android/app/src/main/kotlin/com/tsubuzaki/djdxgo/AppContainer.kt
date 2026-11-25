@@ -3,6 +3,7 @@ package com.tsubuzaki.djdxgo
 import android.content.Context
 import android.net.Uri
 import com.tsubuzaki.djdxgo.data.DJDXDatabase
+import com.tsubuzaki.djdxgo.data.analytics.AnalyticsGoalEvaluator
 import com.tsubuzaki.djdxgo.data.analytics.AnalyticsStore
 import com.tsubuzaki.djdxgo.data.ddr.DDRRepository
 import com.tsubuzaki.djdxgo.data.external.ExternalDataReloader
@@ -30,6 +31,7 @@ class AppContainer(context: Context) {
     val ddrRepository = DDRRepository(database.ddrDao(), externalDataDao)
     val externalDataReloader = ExternalDataReloader(externalDataDao)
     val analyticsStore = AnalyticsStore(database, ddrRepository)
+    val goalEvaluator = AnalyticsGoalEvaluator(database, ddrRepository)
     val profileRepository = ProfileRepository(context.applicationContext)
     val chartAnalyzer = IIDXChartAnalyzer(context.applicationContext.cacheDir)
 
