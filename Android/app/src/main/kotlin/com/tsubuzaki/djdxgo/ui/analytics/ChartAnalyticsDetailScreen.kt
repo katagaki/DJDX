@@ -66,6 +66,7 @@ fun ChartAnalyticsDetailScreen(
         Routes.CHART_DETAIL_GRADE_BREAKDOWN -> stringResource(spec.gradeCaptionRes)
         Routes.CHART_DETAIL_NEW_HIGH_SCORES -> stringResource(R.string.analytics_new_record)
         Routes.CHART_DETAIL_NEW_CLEARS -> spec.clearLabel(param)
+        Routes.CHART_DETAIL_TREND -> spec.trendCaptionRes?.let { stringResource(it) }.orEmpty()
         else -> param
     }
     DetailScaffold(title = title, onBack = onBack) { padding ->
@@ -77,6 +78,7 @@ fun ChartAnalyticsDetailScreen(
                 spec, analytics.clearTypePerLevel, spec.clearKeys, isClear = true, modifier = modifier
             )
             Routes.CHART_DETAIL_GRADE_BREAKDOWN -> DifficultyBreakdownDetail(spec, analytics, modifier)
+            Routes.CHART_DETAIL_TREND -> TrendDetail(analytics.trend, spec.trendColor, spec.trendFormat, modifier)
             Routes.CHART_DETAIL_NEW_HIGH_SCORES -> NewEntriesList(spec, analytics.newHighScores, modifier) { entry ->
                 ChangeRow(
                     previous = entry.previousScore.toString(),

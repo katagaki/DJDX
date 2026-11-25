@@ -49,6 +49,12 @@ interface SDVXDao {
     )
     suspend fun scoreHistory(title: String, difficulty: String): List<ScoreHistoryPoint>
 
+    @Query(
+        "SELECT g.importDate AS date, r.level, r.highScore, r.clearType FROM SDVXSongRecord r " +
+            "JOIN SDVXImportGroup g ON r.importGroupID = g.id WHERE r.highScore > 0"
+    )
+    suspend fun volforceRows(): List<SDVXVolforceRow>
+
     @Query("DELETE FROM SDVXSongRecord")
     suspend fun deleteAllScoreData()
 

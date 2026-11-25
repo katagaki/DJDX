@@ -7,6 +7,8 @@
     <string name="analytics_clear_breakdown">クリア内訳</string>
     <string name="analytics_grade_breakdown">グレード内訳</string>
     <string name="analytics_rank_breakdown">ランク内訳</string>
+    <string name="analytics_volforce_trend">VOLFORCEの推移</string>
+    <string name="analytics_flare_skill_trend">FLARE SKILLの推移</string>
     <string name="analytics_no_data">データなし</string>
     <string name="tower_title">タワー</string>
     <string name="tower_recent">最近</string>

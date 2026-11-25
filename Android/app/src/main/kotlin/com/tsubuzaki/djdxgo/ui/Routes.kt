@@ -34,6 +34,7 @@ object Routes {
     const val CHART_DETAIL_NEW_HIGH_SCORES = "newHighScores"
     const val CHART_DETAIL_NEW_CLEARS = "newClears"
     const val CHART_DETAIL_NEW_GRADES = "newGrades"
+    const val CHART_DETAIL_TREND = "trend"
 
     const val TOWER_RECENT = "recent"
     const val TOWER_TOTALS = "totals"

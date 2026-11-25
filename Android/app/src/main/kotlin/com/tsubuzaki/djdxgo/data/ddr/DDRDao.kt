@@ -50,6 +50,12 @@ interface DDRDao {
     )
     suspend fun scoreHistory(songIndex: String, style: String, difficulty: String): List<ScoreHistoryPoint>
 
+    @Query(
+        "SELECT g.importDate AS date, r.title, r.flareSkill FROM DDRSongRecord r " +
+            "JOIN DDRImportGroup g ON r.importGroupID = g.id WHERE r.style = :style AND r.flareSkill > 0"
+    )
+    suspend fun flareSkillRows(style: String): List<DDRFlareSkillRow>
+
     @Query("DELETE FROM DDRSongRecord")
     suspend fun deleteAllScoreData()
 
