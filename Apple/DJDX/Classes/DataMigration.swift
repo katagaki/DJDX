@@ -11,6 +11,7 @@ enum DataMigration {
         "PlayDataDDR.db",
         "PlayDataSDVX.db",
         "PlayDataPolarisChord.db",
+        "PlayDataPopn.db",
         "ExD_BEMANIWiki.db",
         "ExD_Textage.db",
         "ExD_SDVXIn.db",

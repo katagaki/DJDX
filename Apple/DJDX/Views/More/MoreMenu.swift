@@ -12,6 +12,7 @@ struct MoreMenu: View {
     let importer = IIDXImporter()
     let sdvxImporter = SDVXImporter()
     let polarisChordImporter = PolarisChordImporter()
+    let popnImporter = PopnImporter()
 
     @State var isPresentingExternalDataSources: Bool = false
     @State var isPresentingICloudBackup: Bool = false
@@ -240,6 +241,7 @@ struct MoreMenu: View {
             await importer.deleteAllScoreData()
             await sdvxImporter.deleteAllScoreData()
             await polarisChordImporter.deleteAllScoreData()
+            await popnImporter.deleteAllScoreData()
             await MainActor.run {
                 NotificationCenter.default.post(name: .dataImported, object: nil)
             }

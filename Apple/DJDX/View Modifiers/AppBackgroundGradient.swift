@@ -8,13 +8,15 @@ struct AppBackgroundGradient: View {
     @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
+    @AppStorage(wrappedValue: PopnVersion.highCheers, "Global.Popn.Version") var popnVersion: PopnVersion
 
     var accentColor: Color {
         selectedGame.accentColor(
             iidxVersion: iidxVersion,
             sdvxVersion: sdvxVersion,
             polarisChordVersion: polarisChordVersion,
-            ddrVersion: ddrVersion
+            ddrVersion: ddrVersion,
+            popnVersion: popnVersion
         )
     }
 

@@ -63,6 +63,13 @@ extension UnifiedView {
                             }
                         }
                         .pickerStyle(.inline)
+                    } else if selectedGame == .popn {
+                        Picker("Shared.Version", selection: $popnVersion) {
+                            ForEach(PopnVersion.supportedVersions, id: \.self) { version in
+                                Text(version.marketingName).tag(version)
+                            }
+                        }
+                        .pickerStyle(.inline)
                     } else if selectedGame == .danceDanceRevolution {
                         Picker("Shared.Version", selection: $ddrVersion) {
                             ForEach(DDRVersion.supportedVersions, id: \.self) { version in
