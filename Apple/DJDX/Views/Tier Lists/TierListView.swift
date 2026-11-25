@@ -19,6 +19,7 @@ struct TierListView: View {
     @State var level: String = ""
     @State var charts: [TierListChart] = []
     @State var isLoading: Bool = true
+    @State var searchTerm: String = ""
 
     @State var isEnteringShareCode: Bool = false
     @State var shareCodeEntry: String = ""
@@ -67,7 +68,7 @@ struct TierListView: View {
     var unplacedCharts: [TierListChart] {
         let list = list
         return chartsAtLevel
-            .filter { list.tier(of: $0.id) == nil }
+            .filter { list.tier(of: $0.id) == nil && matchesSearch($0) }
             .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
     }
 
@@ -96,6 +97,8 @@ struct TierListView: View {
             }
             .padding()
         }
+        .searchable(text: $searchTerm, placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: "Scores.Search.Prompt")
         .navigationTitle("TierList.Title")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -265,9 +268,14 @@ struct TierListView: View {
 
     func charts(in tier: TierListTier) -> [TierListChart] {
         let chartsByID = chartsByID
-        return list.charts(in: tier).map { id in
-            chartsByID[id] ?? placeholderChart(id: id)
-        }
+        return list.charts(in: tier)
+            .map { id in chartsByID[id] ?? placeholderChart(id: id) }
+            .filter(matchesSearch)
+    }
+
+    func matchesSearch(_ chart: TierListChart) -> Bool {
+        let term = searchTerm.trimmingCharacters(in: .whitespaces)
+        return term.isEmpty || chart.title.localizedStandardContains(term)
     }
 
     func placeholderChart(id: String) -> TierListChart {

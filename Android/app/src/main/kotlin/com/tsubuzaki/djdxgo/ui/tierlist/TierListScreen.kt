@@ -35,6 +35,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -119,6 +121,7 @@ fun TierListScreen(
     var isImportFailed by remember { mutableStateOf(false) }
     var isConfirmingReset by remember { mutableStateOf(false) }
     var isMenuExpanded by remember { mutableStateOf(false) }
+    var searchTerm by remember { mutableStateOf("") }
 
     val key = TierListKey(game.tierListCode, if (game.supportsTierListPlayType) playType else "", level)
     val list = lists[key.storageKey] ?: TierList()
@@ -128,7 +131,10 @@ fun TierListScreen(
         .distinct()
         .sortedWith(compareBy({ tierListLevelSortKey(it).first }, { it }))
     val chartsAtLevel = charts.filter { it.level == level }.associateBy { it.id }
-    val unplaced = chartsAtLevel.values.filter { list.tierOf(it.id) == null }.sortedBy { it.title.lowercase() }
+    val term = searchTerm.trim()
+    val matchesSearch: (TierListChart) -> Boolean = { term.isEmpty() || it.title.contains(term, ignoreCase = true) }
+    val unplaced = chartsAtLevel.values.filter { list.tierOf(it.id) == null && matchesSearch(it) }
+        .sortedBy { it.title.lowercase() }
 
     LaunchedEffect(game, playType, darkTheme) {
         isLoading = true
@@ -228,6 +234,21 @@ fun TierListScreen(
                     }
                 }
             }
+            OutlinedTextField(
+                value = searchTerm,
+                onValueChange = { searchTerm = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(stringResource(R.string.games_search_hint)) },
+                leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
+                trailingIcon = {
+                    if (searchTerm.isNotEmpty()) {
+                        IconButton(onClick = { searchTerm = "" }) {
+                            Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.games_clear_search))
+                        }
+                    }
+                },
+                singleLine = true
+            )
             if (levels.isNotEmpty()) {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     items(levels) { value ->
@@ -259,7 +280,9 @@ fun TierListScreen(
                     TierListTier.entries.forEach { tier ->
                         TierRow(
                             tier = tier,
-                            charts = list.charts(tier).map { chartsAtLevel[it] ?: placeholderTierListChart(it, level) },
+                            charts = list.charts(tier)
+                                .map { chartsAtLevel[it] ?: placeholderTierListChart(it, level) }
+                                .filter(matchesSearch),
                             onPlace = ::place
                         )
                     }
