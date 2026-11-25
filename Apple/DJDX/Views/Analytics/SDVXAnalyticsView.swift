@@ -163,6 +163,7 @@ struct SDVXAnalyticsView: View {
             switch cardType {
             case .clearBreakdown: clearBreakdownCard
             case .gradeBreakdown: gradeBreakdownCard
+            case .volforceTrend: volforceTrendCard
             default: EmptyView()
             }
         }
@@ -323,6 +324,18 @@ struct SDVXAnalyticsView: View {
             .chartXAxis { AxisMarks { AxisGridLine() } }
         }
         .perLevelCaption("Analytics.SDVX.GradeBreakdown")
+    }
+
+    var volforceTrendCard: some View {
+        AnalyticsCardView(title: "Analytics.SDVX.VolforceTrend",
+                          systemImage: "",
+                          iconColor: .clear,
+                          contentHeight: 160.0,
+                          showsHeader: false) {
+            TrendCardContent(points: model.volforceHistory, color: .purple,
+                             format: SDVXAnalyticsModel.formatVolforce)
+        }
+        .perLevelCaption("Analytics.SDVX.VolforceTrend")
     }
 
     func clearLabel(_ rawValue: String) -> String {

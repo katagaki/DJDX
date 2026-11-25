@@ -11,8 +11,13 @@ final class DDRAnalyticsModel {
     var rankPerLevel: [Int: OrderedDictionary<String, Int>] = [:]
 
     var totalCharts: Int = 0
+    var flareSkillHistory: [TrendPoint] = []
 
     var dataState: DataState = .initializing
+
+    nonisolated static func formatFlareSkill(_ value: Double) -> String {
+        Int(value).formatted(.number)
+    }
 
     let fetcher = DDRReader()
 
@@ -65,6 +70,7 @@ final class DDRAnalyticsModel {
         }
 
         let chartCount = records.count
+        let computedFlareSkillHistory = await fetcher.flareSkillHistory(for: version, style: style)
 
         withAnimation(.smooth.speed(2.0)) {
             self.clearTypePerDifficulty = clearByDiff
@@ -72,6 +78,7 @@ final class DDRAnalyticsModel {
             self.clearTypePerLevel = clearByLevel
             self.rankPerLevel = rankByLevel
             self.totalCharts = chartCount
+            self.flareSkillHistory = computedFlareSkillHistory
             self.dataState = .presenting
         }
     }

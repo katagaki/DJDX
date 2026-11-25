@@ -141,6 +141,30 @@ actor DDRReader {
         return history
     }
 
+    func flareSkillHistory(for version: DDRVersion, style: DDRPlayStyle) -> [TrendPoint] {
+        guard let database = try? DB.shared.getReadConnection() else { return [] }
+        let groups = importGroups(for: version)
+        guard !groups.isEmpty else { return [] }
+        let metaByTitle = loadMetaByTitle()
+        let query = DB.songRecordTable
+            .select(DB.srImportGroupID, DB.srTitle, DB.srFlareSkill)
+            .filter(groups.map(\.id).contains(DB.srImportGroupID)
+                    && DB.srStyle == style.rawValue && DB.srFlareSkill > 0)
+        guard let rows = try? database.prepare(query) else { return [] }
+        var recordsByGroup: [String: [DDRSongRecord]] = [:]
+        for row in rows {
+            let record = DDRSongRecord()
+            record.title = row[DB.srTitle]
+            record.flareSkill = row[DB.srFlareSkill]
+            record.version = metaByTitle[record.titleCompact()]?.version ?? 0
+            recordsByGroup[row[DB.srImportGroupID], default: []].append(record)
+        }
+        return groups.reversed().compactMap { group in
+            guard let records = recordsByGroup[group.id] else { return nil }
+            return TrendPoint(date: group.date, value: Double(DDRFlareSkill.total(records)))
+        }
+    }
+
     static func songRecord(from row: Row) -> DDRSongRecord {
         let record = DDRSongRecord()
         record.songIndex = row[DB.srSongIndex]

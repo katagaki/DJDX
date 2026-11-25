@@ -15,6 +15,7 @@ final class SDVXAnalyticsModel {
     var totalCharts: Int = 0
     var totalPlays: Int = 0
     var volforce: Double = 0.0
+    var volforceHistory: [TrendPoint] = []
 
     // "前回のプレー" (Last Play): improvements between the latest two import groups.
     var newHighScores: [SDVXNewHighScoreEntry] = []
@@ -39,6 +40,10 @@ final class SDVXAnalyticsModel {
     ]
 
     var dataState: DataState = .initializing
+
+    nonisolated static func formatVolforce(_ value: Double) -> String {
+        value.formatted(.number.precision(.fractionLength(3)))
+    }
 
     let fetcher = SDVXReader()
 
@@ -88,6 +93,7 @@ final class SDVXAnalyticsModel {
         }
 
         let computedVolforce = SDVXVolforce.total(allRecords)
+        let computedVolforceHistory = await fetcher.volforceHistory(for: version)
 
         let lastPlay = await computeLastPlay(version: version, filters: filters)
 
@@ -98,6 +104,7 @@ final class SDVXAnalyticsModel {
             self.totalCharts = records.count
             self.totalPlays = plays
             self.volforce = computedVolforce
+            self.volforceHistory = computedVolforceHistory
             self.newClears = lastPlay.clears
             self.newHighScores = lastPlay.highScores
             self.newGrades = lastPlay.grades

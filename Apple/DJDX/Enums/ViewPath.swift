@@ -44,6 +44,7 @@ enum DDRScoresPath: Hashable {
 enum SDVXAnalyticsPath: Hashable {
     case clearBreakdownDetail
     case gradeBreakdownDetail
+    case volforceTrendDetail
     case newHighScoresDetail
     case newClearsDetail(clearType: String)
     case newGradesDetail(grade: String)
