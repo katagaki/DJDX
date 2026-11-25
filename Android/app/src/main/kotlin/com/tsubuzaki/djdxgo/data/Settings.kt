@@ -52,6 +52,14 @@ object SettingsKeys {
     val polarisChordClearTypeFilters = stringSetPreferencesKey("PolarisChordScoresView.ClearTypeFilters")
     val polarisChordGradeFilters = stringSetPreferencesKey("PolarisChordScoresView.GradeFilters")
 
+    val gitadoraSortMode = stringPreferencesKey("GITADORAScoresView.SortMode")
+    val gitadoraSortDescending = booleanPreferencesKey("GITADORAScoresView.SortDescending")
+    val gitadoraInstrument = stringPreferencesKey("Global.GITADORA.Instrument")
+    val gitadoraDifficultyFilters = stringSetPreferencesKey("GITADORAScoresView.DifficultyFilters")
+    val gitadoraLevelFilters = stringSetPreferencesKey("GITADORAScoresView.LevelFilters")
+    val gitadoraClearTypeFilters = stringSetPreferencesKey("GITADORAScoresView.ClearTypeFilters")
+    val gitadoraRankFilters = stringSetPreferencesKey("GITADORAScoresView.RankFilters")
+
     val ddrSortMode = stringPreferencesKey("DDRScoresView.SortMode")
     val ddrSortDescending = booleanPreferencesKey("DDRScoresView.SortDescending")
     val ddrPlayStyle = stringPreferencesKey("Global.DDR.Style")
@@ -85,6 +93,9 @@ object SettingsKeys {
     val polarisChordCardOrder = stringPreferencesKey("Analytics.PolarisChord.CardOrder")
     val polarisChordVisibleCards = stringSetPreferencesKey("Analytics.PolarisChord.VisibleCards")
     val polarisChordCollapsedSections = stringSetPreferencesKey("Analytics.PolarisChord.CollapsedSections")
+    val gitadoraCardOrder = stringPreferencesKey("Analytics.GITADORA.CardOrder")
+    val gitadoraVisibleCards = stringSetPreferencesKey("Analytics.GITADORA.VisibleCards")
+    val gitadoraCollapsedSections = stringSetPreferencesKey("Analytics.GITADORA.CollapsedSections")
     val ddrCardOrder = stringPreferencesKey("Analytics.DDR.CardOrder")
     val ddrVisibleCards = stringSetPreferencesKey("Analytics.DDR.VisibleCards")
     val ddrCollapsedSections = stringSetPreferencesKey("Analytics.DDR.CollapsedSections")
@@ -104,6 +115,9 @@ val analyticsLayoutKeys: List<Preferences.Key<*>> = listOf(
     SettingsKeys.polarisChordCardOrder,
     SettingsKeys.polarisChordVisibleCards,
     SettingsKeys.polarisChordCollapsedSections,
+    SettingsKeys.gitadoraCardOrder,
+    SettingsKeys.gitadoraVisibleCards,
+    SettingsKeys.gitadoraCollapsedSections,
     SettingsKeys.ddrCardOrder,
     SettingsKeys.ddrVisibleCards,
     SettingsKeys.ddrCollapsedSections

@@ -420,6 +420,323 @@ for (let attempt = 0; attempt < 3; attempt++) {
 return 'ERR:network';
 """.trimIndent()
 
+    private val gitadoraScoreDataFetchBody = """
+async function fetchGITADORAScoreData() {
+    const base = new URL('./', location.href).href;
+    const diffNames = ['BASIC', 'ADVANCED', 'EXTREME', 'MASTER'];
+    const diffCodes = { BAS: 'BASIC', ADV: 'ADVANCED', EXT: 'EXTREME', MAS: 'MASTER' };
+    const partCodes = { G: 'GUITAR', B: 'BASS', D: 'DRUM' };
+    const rankSet = ['SS', 'S', 'A', 'B', 'C', 'D', 'E'];
+    const gameTypes = [{ gtype: 'gf', parts: ['GUITAR', 'BASS'] },
+                       { gtype: 'dm', parts: ['DRUM'] }];
+    const categoryCount = 37;
+    const totalSteps = 5 + categoryCount * gameTypes.length;
+    let step = 0;
+    let detailFailures = 0;
+    let detailsEnabled = true;
+
+    function report() {
+        step++;
+        if (window.webkit && window.webkit.messageHandlers
+            && window.webkit.messageHandlers.gitadoraProgress) {
+            window.webkit.messageHandlers.gitadoraProgress.postMessage({ step: step, total: totalSteps });
+        }
+        if (window.${BRIDGE_NAME} && window.${BRIDGE_NAME}.onScrapeStep) {
+            window.${BRIDGE_NAME}.onScrapeStep(step, totalSteps);
+        }
+    }
+
+    function sleep(ms) { return new Promise(function(resolve) { setTimeout(resolve, ms); }); }
+
+    async function decode(response) {
+        const buffer = await response.arrayBuffer();
+        let charset = ((response.headers.get('content-type') || '').match(/charset=([^;]+)/i) || [])[1];
+        if (!charset) {
+            const head = new TextDecoder('utf-8').decode(buffer.slice(0, 4096));
+            charset = (head.match(/charset=["']?([A-Za-z0-9_-]+)/i) || [])[1];
+        }
+        try {
+            return new TextDecoder((charset || 'utf-8').trim().toLowerCase()).decode(buffer);
+        } catch (error) {
+            return new TextDecoder('utf-8').decode(buffer);
+        }
+    }
+
+    async function fetchPage(url) {
+        const response = await fetch(url, { method: 'GET', credentials: 'same-origin' });
+        const finalURL = response.url || '';
+        if (finalURL.indexOf('/error/') !== -1 || finalURL.indexOf('login.html') !== -1) {
+            const match = finalURL.match(/[?&]err=([0-9]+)/);
+            return { error: match ? match[1] : 'server' };
+        }
+        if (!response.ok) { return { error: 'server' }; }
+        const html = await decode(response);
+        if (/メンテナンス/.test(html) && !/music_detail|skill_table|profile_name/.test(html)) {
+            return { error: 'maintenance' };
+        }
+        return { doc: new DOMParser().parseFromString(html, 'text/html'), url: finalURL || url };
+    }
+
+    function text(element) {
+        return element ? element.textContent.replace(/\s+/g, ' ').trim() : '';
+    }
+
+    function classOf(element) {
+        return (element && element.getAttribute && element.getAttribute('class')) || '';
+    }
+
+    function rankFromClass(className) {
+        const tokens = className.split(/\s+/);
+        for (const token of tokens) {
+            if (!token || token.indexOf('score_data') === 0 || token.indexOf('zebra') === 0) { continue; }
+            const value = (token.indexOf('icon') === 0 ? token.slice(4) : token).toUpperCase();
+            if (rankSet.indexOf(value) !== -1) { return value; }
+        }
+        return '';
+    }
+
+    function rankFromElement(element) {
+        if (!element) { return ''; }
+        const candidates = [element].concat(Array.prototype.slice.call(element.querySelectorAll('*')));
+        for (const candidate of candidates) {
+            const className = classOf(candidate);
+            if (className.indexOf('score_data_rank') !== -1) {
+                const rank = rankFromClass(className);
+                if (rank) { return rank; }
+            }
+            if (candidate.tagName === 'IMG') {
+                const stem = ((candidate.getAttribute('src') || '').split('/').pop() || '')
+                    .split('.')[0].replace(/^(rank_?|icon_?)/i, '').toUpperCase();
+                if (rankSet.indexOf(stem) !== -1) { return stem; }
+            }
+        }
+        return '';
+    }
+
+    function parseNumber(value) {
+        const match = value.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+        return match ? parseFloat(match[0]) : 0;
+    }
+
+    function parseList(doc, pageURL, gameType) {
+        const songs = [];
+        let current = null;
+        doc.querySelectorAll('tr').forEach(function(row) {
+            const link = row.querySelector('a[href*="music_detail.html"]');
+            const ranks = Array.prototype.slice.call(row.querySelectorAll('[class*="score_data_rank"]'))
+                .map(function(cell) { return rankFromClass(classOf(cell)); });
+            if (link) {
+                current = { title: text(link), detail: new URL(link.getAttribute('href'), pageURL).href, ranks: {} };
+                songs.push(current);
+                current.ranks[gameType.parts[0]] = ranks.slice(0, 4);
+                if (gameType.parts.length > 1 && ranks.length >= 8) {
+                    current.ranks[gameType.parts[1]] = ranks.slice(4, 8);
+                }
+            } else if (current && gameType.parts.length > 1 && !current.ranks[gameType.parts[1]]
+                       && ranks.length >= 4) {
+                current.ranks[gameType.parts[1]] = ranks.slice(0, 4);
+            }
+        });
+        return songs.filter(function(song) { return song.title; });
+    }
+
+    function parseDetail(doc, gameType) {
+        const charts = {};
+        let part = gameType.parts[0];
+        let hasPartMarkers = false;
+        let current = null;
+        const elements = doc.body ? doc.body.querySelectorAll('*') : [];
+        for (const element of elements) {
+            const className = classOf(element);
+            const partMatch = className.match(/md_part_(GUITAR|BASS|DRUM)/);
+            if (partMatch) {
+                part = partMatch[1];
+                hasPartMarkers = true;
+                current = null;
+                continue;
+            }
+            const diffMatch = className.match(/(?:^|\s)diff_(BASIC|ADVANCED|EXTREME|MASTER)(?:\s|$)/);
+            if (diffMatch) {
+                let key = part + '|' + diffMatch[1];
+                if (!hasPartMarkers && gameType.parts.length > 1 && part === gameType.parts[0]
+                    && charts[key] && charts[key].hasMetrics) {
+                    part = gameType.parts[1];
+                    key = part + '|' + diffMatch[1];
+                }
+                if (!charts[key]) {
+                    charts[key] = { level: '', rate: '', score: 0, playCount: 0, clearCount: 0,
+                                    rank: '', excellent: false, fullCombo: false, hasMetrics: false };
+                }
+                current = charts[key];
+                const levelMatch = text(element).match(/^(\d{1,2}\.\d{2})$/);
+                if (levelMatch && !current.level) { current.level = levelMatch[1]; }
+                continue;
+            }
+            if (!current || (element.tagName !== 'TD' && element.tagName !== 'TH')) { continue; }
+            const value = element.nextElementSibling;
+            if (!value) { continue; }
+            const label = text(element).replace(/\s+/g, '').toUpperCase();
+            const valueText = text(value);
+            const valueHTML = value.innerHTML || '';
+            if (label === 'プレー回数') {
+                current.playCount = parseNumber(valueText);
+                current.hasMetrics = true;
+            } else if (label === 'クリア回数') {
+                current.clearCount = parseNumber(valueText);
+                current.hasMetrics = true;
+            } else if (label === '最高ランク') {
+                current.rank = rankFromElement(value);
+                if (/excellent/i.test(valueHTML)) { current.excellent = true; }
+                if (/full[\s_-]?combo/i.test(valueHTML)) { current.fullCombo = true; }
+                current.hasMetrics = true;
+            } else if (label === '達成率') {
+                if (valueText.toUpperCase() === 'MAX') {
+                    current.rate = '100.00';
+                } else {
+                    const rateMatch = valueText.match(/(\d{1,3}(?:\.\d+)?)\s*%/);
+                    if (rateMatch) { current.rate = rateMatch[1]; }
+                }
+                current.hasMetrics = true;
+            } else if (label === 'ハイスコア' || label === 'HIGHSCORE') {
+                current.score = parseNumber(valueText);
+                current.hasMetrics = true;
+            } else if (label.indexOf('フルコンボ') !== -1 || label.indexOf('FULLCOMBO') !== -1) {
+                if (parseNumber(valueText) > 0) { current.fullCombo = true; }
+            } else if (label.indexOf('エクセレント') !== -1 || label.indexOf('EXCELLENT') !== -1) {
+                if (parseNumber(valueText) > 0) { current.excellent = true; }
+            }
+        }
+        return charts;
+    }
+
+    function parseSkill(doc) {
+        const charts = [];
+        const table = doc.querySelector('.skill_table_tb');
+        if (!table) { return charts; }
+        const body = table.querySelector('tbody') || table;
+        body.querySelectorAll('tr').forEach(function(row) {
+            const link = row.querySelector('a.text_link');
+            const icons = row.querySelectorAll('div.music_seq_box > div');
+            if (!link || icons.length < 2) { return; }
+            const part = partCodes[classOf(icons[0]).substring(14, 15)];
+            const difficulty = diffCodes[classOf(icons[1]).substring(14, 17)];
+            const skill = parseNumber(text(row.querySelector('td.skill_cell')));
+            const rateMatch = text(row.querySelector('td.achive_cell')).match(/\d+(?:\.\d+)?/);
+            const levelMatch = text(row.querySelector('td.diff_cell')).match(/\d+\.\d+/);
+            if (!part || !difficulty) { return; }
+            charts.push({ title: text(link), part: part, difficulty: difficulty, skill: skill,
+                          rate: rateMatch ? rateMatch[0] : '', level: levelMatch ? levelMatch[0] : '' });
+        });
+        return charts;
+    }
+
+    function clearTypeFor(chart, listRank) {
+        if (chart && chart.hasMetrics) {
+            if (chart.excellent || parseFloat(chart.rate) >= 100) { return 'EXCELLENT'; }
+            if (chart.fullCombo) { return 'FULL COMBO'; }
+            if (chart.clearCount > 0) { return 'CLEAR'; }
+            if (chart.playCount > 0) { return 'FAILED'; }
+        }
+        if (listRank) { return listRank === 'E' ? 'FAILED' : 'CLEAR'; }
+        return '';
+    }
+
+    const profilePage = await fetchPage(base + 'profile.html');
+    if (profilePage.error) { return 'ERR:' + profilePage.error; }
+    const profile = { name: text(profilePage.doc.querySelector('.profile_name_frame')), skill: {} };
+    report();
+
+    const skillCharts = {};
+    for (const gameType of gameTypes) {
+        let total = 0;
+        for (const skillType of [0, 1]) {
+            const page = await fetchPage(base + 'skill.html?gtype=' + gameType.gtype + '&stype=' + skillType);
+            report();
+            if (page.error) { continue; }
+            parseSkill(page.doc).forEach(function(chart) {
+                total += chart.skill;
+                skillCharts[chart.title + '|' + chart.part + '|' + chart.difficulty] = chart;
+            });
+        }
+        profile.skill[gameType.gtype] = Math.round(total * 100) / 100;
+    }
+
+    const rows = [];
+    for (const gameType of gameTypes) {
+        for (let category = 0; category < categoryCount; category++) {
+            const listURL = base + 'music.html?gtype=' + gameType.gtype + '&cat=' + category;
+            const list = await fetchPage(listURL);
+            if (list.error) {
+                if (category === 0 && gameType.gtype === 'gf') { return 'ERR:' + list.error; }
+                report();
+                continue;
+            }
+            const songs = parseList(list.doc, list.url, gameType);
+            for (const song of songs) {
+                const played = gameType.parts.some(function(part) {
+                    return (song.ranks[part] || []).some(function(rank) { return rank; });
+                }) || gameType.parts.some(function(part) {
+                    return diffNames.some(function(diff) { return skillCharts[song.title + '|' + part + '|' + diff]; });
+                });
+                if (!played) { continue; }
+                let detail = null;
+                if (detailsEnabled) {
+                    const detailURL = new URL(song.detail);
+                    if (category === 0) { detailURL.searchParams.set('cat', ''); }
+                    try {
+                        const page = await fetchPage(detailURL.href);
+                        if (page.doc) {
+                            detail = parseDetail(page.doc, gameType);
+                            detailFailures = 0;
+                        } else {
+                            detailFailures++;
+                        }
+                    } catch (error) {
+                        detailFailures++;
+                    }
+                    if (detailFailures >= 3) { detailsEnabled = false; }
+                    await sleep(80);
+                }
+                gameType.parts.forEach(function(part) {
+                    const ranks = song.ranks[part] || [];
+                    diffNames.forEach(function(diff, index) {
+                        const listRank = ranks[index] || '';
+                        const chart = detail ? detail[part + '|' + diff] : null;
+                        const skill = skillCharts[song.title + '|' + part + '|' + diff];
+                        const chartPlayed = chart && chart.hasMetrics && (chart.playCount > 0 || chart.rate);
+                        if (!listRank && !chartPlayed && !skill) { return; }
+                        rows.push({
+                            title: song.title,
+                            instrument: part,
+                            difficulty: diff,
+                            level: (chart && chart.level) || (skill && skill.level) || '',
+                            rate: (chart && chart.rate) || (skill && skill.rate) || '',
+                            score: chart ? chart.score : 0,
+                            rank: (chart && chart.rank) || listRank,
+                            clear: clearTypeFor(chart, listRank || (skill ? 'C' : ''))
+                        });
+                    });
+                });
+            }
+            report();
+        }
+    }
+
+    if (rows.length === 0) { return 'ERR:empty'; }
+    return JSON.stringify({ profile: profile, rows: rows });
+}
+
+for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+        return await fetchGITADORAScoreData();
+    } catch (error) {
+        if (attempt === 2) { return 'ERR:network'; }
+        await new Promise(function(resolve) { setTimeout(resolve, 800 * (attempt + 1)); });
+    }
+}
+return 'ERR:network';
+""".trimIndent()
+
     val cleanupScript = "$globalFunctions\n$globalCleanup\n$loginPageCleanup"
 
     fun extraction(body: String, token: String): String = """
@@ -436,4 +753,5 @@ $body
     fun sdvxScoreDataFetch(token: String) = extraction(sdvxScoreDataFetchBody, token)
     fun polarisChordScoreDataFetch(token: String) = extraction(polarisChordScoreDataFetchBody, token)
     fun ddrScoreDataFetch(token: String) = extraction(ddrScoreDataFetchBody, token)
+    fun gitadoraScoreDataFetch(token: String) = extraction(gitadoraScoreDataFetchBody, token)
 }

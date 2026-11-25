@@ -265,6 +265,14 @@ private class WebImporterController(
         }
 
         @JavascriptInterface
+        fun onScrapeStep(step: Int, total: Int) {
+            handler.post {
+                if (total > 0) onProgressChanged(min(90, step * 90 / total))
+                if (!hasResolved && hasStartedExtraction && !awaitingTower) startWatchdog(isTower = false)
+            }
+        }
+
+        @JavascriptInterface
         fun onScrapeProgress(pages: Int) {
             handler.post { onProgressChanged(min(90, pages * 90 / 52)) }
         }

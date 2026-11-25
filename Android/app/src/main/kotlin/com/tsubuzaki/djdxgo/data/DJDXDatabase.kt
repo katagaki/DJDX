@@ -16,6 +16,9 @@ import com.tsubuzaki.djdxgo.data.external.NotesRadarEntry
 import com.tsubuzaki.djdxgo.data.external.SDVXInChart
 import com.tsubuzaki.djdxgo.data.external.TextageChart
 import com.tsubuzaki.djdxgo.data.external.TextageChartViewerChart
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORADao
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAImportGroup
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORASongRecord
 import com.tsubuzaki.djdxgo.data.iidx.IIDXDao
 import com.tsubuzaki.djdxgo.data.iidx.IIDXImportGroup
 import com.tsubuzaki.djdxgo.data.iidx.IIDXSongRecord
@@ -38,6 +41,8 @@ import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
         PolarisChordSongRecord::class,
         DDRImportGroup::class,
         DDRSongRecord::class,
+        GITADORAImportGroup::class,
+        GITADORASongRecord::class,
         IIDXSong::class,
         TextageChartViewerChart::class,
         SDVXInChart::class,
@@ -45,7 +50,7 @@ import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
         DDRSongMeta::class,
         TextageChart::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class DJDXDatabase : RoomDatabase() {
@@ -53,6 +58,7 @@ abstract class DJDXDatabase : RoomDatabase() {
     abstract fun sdvxDao(): SDVXDao
     abstract fun polarisChordDao(): PolarisChordDao
     abstract fun ddrDao(): DDRDao
+    abstract fun gitadoraDao(): GITADORADao
     abstract fun externalDataDao(): ExternalDataDao
 
     companion object {
@@ -71,6 +77,25 @@ abstract class DJDXDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `GITADORAImportGroup` (`id` TEXT NOT NULL, " +
+                        "`importDate` INTEGER NOT NULL, `version` INTEGER, PRIMARY KEY(`id`))"
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `GITADORASongRecord` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`importGroupID` TEXT NOT NULL, `title` TEXT NOT NULL, `instrument` TEXT NOT NULL, " +
+                        "`difficulty` TEXT NOT NULL, `level` TEXT NOT NULL, `achievementRate` TEXT NOT NULL, " +
+                        "`score` INTEGER NOT NULL, `clearType` TEXT NOT NULL, `rank` TEXT NOT NULL)"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_GITADORASongRecord_importGroupID` " +
+                        "ON `GITADORASongRecord` (`importGroupID`)"
+                )
+            }
+        }
+
         @Volatile
         private var instance: DJDXDatabase? = null
 
@@ -80,7 +105,7 @@ abstract class DJDXDatabase : RoomDatabase() {
                     context.applicationContext,
                     DJDXDatabase::class.java,
                     "PlayData.db"
-                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
             }
     }
 }

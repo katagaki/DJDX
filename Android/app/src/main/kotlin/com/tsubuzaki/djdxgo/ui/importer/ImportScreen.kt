@@ -63,6 +63,7 @@ import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.SettingsKeys
 import com.tsubuzaki.djdxgo.data.ddr.DDRVersionInfo
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAVersionInfo
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordVersionInfo
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
@@ -220,6 +221,12 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                             Game.DANCE_DANCE_REVOLUTION -> container.ddrRepository.importJSON(
                                 result.payload, importDate
                             )
+                            Game.GITADORA -> {
+                                container.gitadoraRepository.importJSON(result.payload, importDate)
+                                container.gitadoraRepository.parsePayload(result.payload)?.profile?.let {
+                                    container.profileRepository.saveGITADORAProfile(it.name, it.skill)
+                                }
+                            }
                         }
                         container.notifyImportCompleted()
                         withContext(Dispatchers.Main) {
@@ -307,6 +314,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                                         Game.SOUND_VOLTEX -> WebImporterSpecs.sdvx(sdvxVersion)
                                         Game.POLARIS_CHORD -> WebImporterSpecs.polarisChord()
                                         Game.DANCE_DANCE_REVOLUTION -> WebImporterSpecs.ddr()
+                                        Game.GITADORA -> WebImporterSpecs.gitadora()
                                     },
                                     if (game == Game.IIDX_ARCADE) csvPlayType else null
                                 )
@@ -555,6 +563,8 @@ private fun importGroupRowsFlow(container: AppContainer, game: Game): Flow<List<
             }
         Game.DANCE_DANCE_REVOLUTION -> container.database.ddrDao().importGroupsFlow()
             .map { groups -> groups.map { ImportGroupRow(it.id, it.importDate, DDRVersionInfo.MARKETING_NAME) } }
+        Game.GITADORA -> container.database.gitadoraDao().importGroupsFlow()
+            .map { groups -> groups.map { ImportGroupRow(it.id, it.importDate, GITADORAVersionInfo.MARKETING_NAME) } }
     }
 
 private suspend fun deleteImportGroup(container: AppContainer, game: Game, groupID: String) {
@@ -563,6 +573,7 @@ private suspend fun deleteImportGroup(container: AppContainer, game: Game, group
         Game.SOUND_VOLTEX -> container.sdvxRepository.deleteImportGroup(groupID)
         Game.POLARIS_CHORD -> container.polarisChordRepository.deleteImportGroup(groupID)
         Game.DANCE_DANCE_REVOLUTION -> container.ddrRepository.deleteImportGroup(groupID)
+        Game.GITADORA -> container.gitadoraRepository.deleteImportGroup(groupID)
     }
 }
 

@@ -57,6 +57,7 @@ fun ChartAnalyticsDetailScreen(
     val flow = when (game) {
         Game.SOUND_VOLTEX -> container.analyticsStore.sdvx
         Game.POLARIS_CHORD -> container.analyticsStore.polarisChord
+        Game.GITADORA -> container.analyticsStore.gitadora
         else -> container.analyticsStore.ddr
     }
     val data by flow.collectAsState()
@@ -76,7 +77,11 @@ fun ChartAnalyticsDetailScreen(
             Routes.CHART_DETAIL_CLEAR_BREAKDOWN -> LevelBreakdownDetail(
                 spec, analytics.clearTypePerLevel, spec.clearKeys, isClear = true, modifier = modifier
             )
-            Routes.CHART_DETAIL_GRADE_BREAKDOWN -> DifficultyBreakdownDetail(spec, analytics, modifier)
+            Routes.CHART_DETAIL_GRADE_BREAKDOWN -> if (game == Game.GITADORA) {
+                LevelBreakdownDetail(spec, analytics.gradePerLevel, spec.gradeKeys, isClear = false, modifier = modifier)
+            } else {
+                DifficultyBreakdownDetail(spec, analytics, modifier)
+            }
             Routes.CHART_DETAIL_NEW_HIGH_SCORES -> NewEntriesList(spec, analytics.newHighScores, modifier) { entry ->
                 ChangeRow(
                     previous = entry.previousScore.toString(),

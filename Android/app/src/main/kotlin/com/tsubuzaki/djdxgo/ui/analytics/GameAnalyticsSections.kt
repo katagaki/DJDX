@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.Preferences
 import com.tsubuzaki.djdxgo.AppContainer
@@ -36,11 +39,15 @@ import com.tsubuzaki.djdxgo.data.SettingsKeys
 import com.tsubuzaki.djdxgo.data.analytics.ChartAnalytics
 import com.tsubuzaki.djdxgo.data.analytics.ChartAnalyticsData
 import com.tsubuzaki.djdxgo.data.analytics.DDRFilterOptions
+import com.tsubuzaki.djdxgo.data.analytics.GITADORAFilterOptions
 import com.tsubuzaki.djdxgo.data.analytics.PolarisChordFilterOptions
 import com.tsubuzaki.djdxgo.data.analytics.SDVXFilterOptions
 import com.tsubuzaki.djdxgo.data.ddr.DDRClearLamp
 import com.tsubuzaki.djdxgo.data.ddr.DDRPlayStyle
 import com.tsubuzaki.djdxgo.data.ddr.DDRRank
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAClearType
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORADifficulty
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAInstrument
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordDifficulty
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
@@ -48,6 +55,7 @@ import com.tsubuzaki.djdxgo.data.sdvx.SDVXDifficulty
 import com.tsubuzaki.djdxgo.ui.Routes
 import com.tsubuzaki.djdxgo.ui.iidx.rememberSetting
 import com.tsubuzaki.djdxgo.ui.theme.DDRColors
+import com.tsubuzaki.djdxgo.ui.theme.GITADORAColors
 import com.tsubuzaki.djdxgo.ui.theme.Palette
 import com.tsubuzaki.djdxgo.ui.theme.PolarisChordColors
 import com.tsubuzaki.djdxgo.ui.theme.SDVXColors
@@ -55,6 +63,7 @@ import com.tsubuzaki.djdxgo.ui.theme.SDVXColors
 internal const val CHART_CARD_CLEAR_BREAKDOWN = "clearBreakdown"
 internal const val CHART_CARD_GRADE_BREAKDOWN = "gradeBreakdown"
 internal const val CHART_CARD_NEW_HIGH_SCORES = "newHighScores"
+internal const val CHART_CARD_SKILL = "skill"
 private const val CHART_CARD_NEW_CLEAR_PREFIX = "newClear:"
 private const val CHART_CARD_NEW_GRADE_PREFIX = "newGrade:"
 private const val SECTION_OVERVIEW = "overview"
@@ -79,7 +88,8 @@ internal class ChartGameSpec(
     val difficultyColor: (String) -> Color,
     val clearCaptionRes: Int,
     val gradeCaptionRes: Int,
-    val clearIcon: (String) -> ImageVector
+    val clearIcon: (String) -> ImageVector,
+    val showsSkill: Boolean = false
 ) {
     val lastPlayCards: List<String> =
         if (trackedClearTypes.isEmpty() && trackedGrades.isEmpty()) {
@@ -90,7 +100,9 @@ internal class ChartGameSpec(
                 trackedGrades.map { CHART_CARD_NEW_GRADE_PREFIX + it }
         }
 
-    val overviewCards: List<String> = listOf(CHART_CARD_CLEAR_BREAKDOWN, CHART_CARD_GRADE_BREAKDOWN)
+    val overviewCards: List<String> =
+        (if (showsSkill) listOf(CHART_CARD_SKILL) else emptyList()) +
+            listOf(CHART_CARD_CLEAR_BREAKDOWN, CHART_CARD_GRADE_BREAKDOWN)
 
     val defaultOrder: List<String> = overviewCards + lastPlayCards
 }
@@ -165,9 +177,35 @@ internal val ddrSpec = ChartGameSpec(
     clearIcon = { Icons.Outlined.CheckCircle }
 )
 
+internal val gitadoraSpec = ChartGameSpec(
+    game = Game.GITADORA,
+    orderKey = SettingsKeys.gitadoraCardOrder,
+    visibleKey = SettingsKeys.gitadoraVisibleCards,
+    collapsedKey = SettingsKeys.gitadoraCollapsedSections,
+    clearKeys = ChartAnalytics.gitadoraClearKeys,
+    gradeKeys = ChartAnalytics.gitadoraRankKeys,
+    trackedClearTypes = ChartAnalytics.gitadoraTrackedClearTypes,
+    trackedGrades = ChartAnalytics.gitadoraTrackedRanks,
+    difficultyOrder = ChartAnalytics.gitadoraDifficultyOrder,
+    defaultVisible = { it.toSet() },
+    clearLabel = { GITADORAClearType.fromValue(it)?.abbreviation ?: it },
+    gradeLabel = { it },
+    clearColor = { value, _ -> GITADORAColors.clearTypeColor(value) },
+    gradeColor = { value, _ -> GITADORAColors.rankColor(value) },
+    difficultyLabel = { GITADORADifficulty.fromValue(it)?.abbreviation ?: it },
+    difficultyColor = { GITADORAColors.difficultyColor(it) },
+    clearCaptionRes = R.string.analytics_clear_breakdown,
+    gradeCaptionRes = R.string.analytics_rank_breakdown,
+    clearIcon = {
+        if (it == GITADORAClearType.CLEAR.value) Icons.Outlined.CheckCircle else Icons.Outlined.StarOutline
+    },
+    showsSkill = true
+)
+
 internal fun chartGameSpec(game: Game): ChartGameSpec = when (game) {
     Game.SOUND_VOLTEX -> sdvxSpec
     Game.POLARIS_CHORD -> polarisChordSpec
+    Game.GITADORA -> gitadoraSpec
     else -> ddrSpec
 }
 
@@ -195,6 +233,28 @@ fun PolarisChordAnalyticsSection(container: AppContainer, isEditing: Boolean, on
     LaunchedEffect(filters, dataVersion) { container.analyticsStore.reloadPolarisChord(filters) }
     val data by container.analyticsStore.polarisChord.collectAsState()
     ChartAnalyticsSection(polarisChordSpec, data ?: ChartAnalyticsData(), isEditing, onNavigate)
+}
+
+@Composable
+fun GITADORAAnalyticsSection(
+    container: AppContainer,
+    instrument: GITADORAInstrument,
+    isEditing: Boolean,
+    onNavigate: (String) -> Unit
+) {
+    val difficulties by rememberSetting(SettingsKeys.gitadoraDifficultyFilters, emptySet())
+    val levels by rememberSetting(SettingsKeys.gitadoraLevelFilters, emptySet())
+    val clearTypes by rememberSetting(SettingsKeys.gitadoraClearTypeFilters, emptySet())
+    val ranks by rememberSetting(SettingsKeys.gitadoraRankFilters, emptySet())
+    val dataVersion by container.dataVersion.collectAsState()
+    val profile by container.profileRepository.gitadora.collectAsState()
+    val skill = profile.skill[instrument.gameType]
+    val filters = GITADORAFilterOptions(difficulties, levels, clearTypes, ranks)
+    LaunchedEffect(instrument, filters, dataVersion, skill) {
+        container.analyticsStore.reloadGITADORA(instrument, filters, skill)
+    }
+    val data by container.analyticsStore.gitadora.collectAsState()
+    ChartAnalyticsSection(gitadoraSpec, data ?: ChartAnalyticsData(), isEditing, onNavigate)
 }
 
 @Composable
@@ -247,6 +307,22 @@ private fun ChartAnalyticsSection(
                         onMoveBackward = { layout.move(id, -1) { it in spec.overviewCards } },
                         onMoveForward = { layout.move(id, 1) { it in spec.overviewCards } }
                     ) {
+                        if (id == CHART_CARD_SKILL) {
+                            OverviewCard(
+                                caption = stringResource(R.string.gitadora_skill),
+                                contentHeight = 160.dp,
+                                onClick = null
+                            ) {
+                                Text(
+                                    text = data.skill ?: "-",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Black,
+                                    fontStyle = FontStyle.Italic,
+                                    color = GITADORAColors.accent
+                                )
+                            }
+                            return@EditableCard
+                        }
                         val isClear = id == CHART_CARD_CLEAR_BREAKDOWN
                         val totals = if (isClear) {
                             data.totalClearCounts(spec.clearKeys)

@@ -6,6 +6,9 @@ import androidx.compose.ui.graphics.SolidColor
 import com.tsubuzaki.djdxgo.data.RadarAxis
 import com.tsubuzaki.djdxgo.data.RadarData
 import com.tsubuzaki.djdxgo.data.ddr.DDRDifficulty
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAClearType
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORADifficulty
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORARank
 import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXDJLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXLevel
@@ -336,6 +339,46 @@ object PolarisChordColors {
                 Brush.horizontalGradient(listOf(Palette.yellow, Palette.orange))
             else -> Brush.horizontalGradient(listOf(Palette.cyan, Palette.blue))
         }
+    }
+}
+
+object GITADORAColors {
+    val accent = Color(0xFFEB7814)
+
+    fun difficultyColor(difficulty: String): Color = when (GITADORADifficulty.fromValue(difficulty)) {
+        GITADORADifficulty.BASIC -> Palette.blue
+        GITADORADifficulty.ADVANCED -> Color(0xFFF2A600)
+        GITADORADifficulty.EXTREME -> Palette.red
+        GITADORADifficulty.MASTER -> Palette.purple
+        else -> Palette.gray
+    }
+
+    fun clearTypeColor(clearType: String): Color = when (GITADORAClearType.fromValue(clearType)) {
+        GITADORAClearType.EXCELLENT -> Palette.yellow
+        GITADORAClearType.FULL_COMBO -> Palette.cyan
+        GITADORAClearType.CLEAR -> Palette.green
+        GITADORAClearType.FAILED -> Palette.red
+        else -> Palette.gray
+    }
+
+    fun rankColor(rank: String): Color = when (GITADORARank.fromValue(rank)) {
+        GITADORARank.SS -> Palette.yellow
+        GITADORARank.S -> Palette.orange
+        GITADORARank.A -> Palette.red
+        GITADORARank.B -> Palette.purple
+        GITADORARank.C -> Palette.blue
+        GITADORARank.D -> Palette.teal
+        else -> Palette.gray
+    }
+
+    fun rankBrush(rank: String, darkTheme: Boolean): Brush = when (GITADORARank.fromValue(rank)) {
+        GITADORARank.SS -> if (darkTheme) {
+            Brush.horizontalGradient(listOf(Palette.cyan, Color(0xFFFFF2A8), Palette.pink))
+        } else {
+            Brush.horizontalGradient(listOf(Palette.blue, Palette.yellow, Palette.pink))
+        }
+        GITADORARank.S -> Brush.horizontalGradient(listOf(Palette.yellow, Palette.orange))
+        else -> Brush.horizontalGradient(listOf(Palette.cyan, Palette.blue))
     }
 }
 

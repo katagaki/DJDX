@@ -1,6 +1,7 @@
 package com.tsubuzaki.djdxgo.importer
 
 import com.tsubuzaki.djdxgo.data.ddr.DDRVersionInfo
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAVersionInfo
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordVersionInfo
@@ -64,6 +65,12 @@ object WebImporterSpecs {
         "5" to ImportFailedReason.NO_PREMIUM_COURSE
     )
 
+    private val gitadoraErrorCodes = mapOf(
+        "1" to ImportFailedReason.NO_PREMIUM_COURSE,
+        "3" to ImportFailedReason.NO_EAMUSEMENT_PASS,
+        "4" to ImportFailedReason.NO_PLAY_DATA
+    )
+
     fun iidx(playType: IIDXPlayType): WebImporterSpec = WebImporterSpec(
         startURL = IIDXVersionInfo.loginPageRedirectURL(playType.code),
         isTargetPage = { it.contains("/djdata/score_download.html") },
@@ -96,6 +103,16 @@ object WebImporterSpecs {
         extractionScript = ImporterJavaScript::polarisChordScoreDataFetch,
         watchdogSeconds = 25,
         errorCodeReasons = polarisChordErrorCodes,
+        emptyReason = ImportFailedReason.NO_PLAY_DATA
+    )
+
+    fun gitadora(): WebImporterSpec = WebImporterSpec(
+        startURL = GITADORAVersionInfo.loginPageRedirectURL(),
+        isTargetPage = { it.startsWith(GITADORAVersionInfo.profilePageURL) },
+        isErrorPage = { it.contains(GITADORAVersionInfo.ERROR_PATH) },
+        extractionScript = ImporterJavaScript::gitadoraScoreDataFetch,
+        watchdogSeconds = 120,
+        errorCodeReasons = gitadoraErrorCodes,
         emptyReason = ImportFailedReason.NO_PLAY_DATA
     )
 

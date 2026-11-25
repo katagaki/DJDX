@@ -5,6 +5,10 @@ import com.tsubuzaki.djdxgo.data.ddr.DDRClearLamp
 import com.tsubuzaki.djdxgo.data.ddr.DDRDifficulty
 import com.tsubuzaki.djdxgo.data.ddr.DDRRank
 import com.tsubuzaki.djdxgo.data.ddr.DDRSongRecord
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAClearType
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORADifficulty
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORARank
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORASongRecord
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordDifficulty
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordGrade
@@ -35,7 +39,8 @@ data class ChartAnalyticsData(
     val gradePerLevel: Map<Int, Map<String, Int>> = emptyMap(),
     val newHighScores: List<ChartNewEntry> = emptyList(),
     val newClears: Map<String, List<ChartNewEntry>> = emptyMap(),
-    val newGrades: Map<String, List<ChartNewEntry>> = emptyMap()
+    val newGrades: Map<String, List<ChartNewEntry>> = emptyMap(),
+    val skill: String? = null
 ) {
     fun totalClearCounts(keys: List<String>): List<Pair<String, Int>> =
         keys.map { key -> key to clearTypePerDifficulty.values.sumOf { it[key] ?: 0 } }
@@ -73,6 +78,19 @@ data class PolarisChordFilterOptions(
             (levels.isEmpty() || record.level in levels) &&
             (clearTypes.isEmpty() || record.clearType in clearTypes) &&
             (grades.isEmpty() || record.grade in grades)
+}
+
+data class GITADORAFilterOptions(
+    val difficulties: Set<String> = emptySet(),
+    val levels: Set<String> = emptySet(),
+    val clearTypes: Set<String> = emptySet(),
+    val ranks: Set<String> = emptySet()
+) {
+    fun matches(record: GITADORASongRecord): Boolean =
+        (difficulties.isEmpty() || record.difficulty in difficulties) &&
+            (levels.isEmpty() || record.levelBucket in levels) &&
+            (clearTypes.isEmpty() || record.clearType in clearTypes) &&
+            (ranks.isEmpty() || record.rank in ranks)
 }
 
 data class DDRFilterOptions(
@@ -115,6 +133,15 @@ object ChartAnalytics {
     val polarisChordTrackedGrades = listOf(
         PolarisChordGrade.SSS_PLUS, PolarisChordGrade.SSS, PolarisChordGrade.SS, PolarisChordGrade.S
     ).map { it.value }
+
+    val gitadoraClearKeys = GITADORAClearType.sorted
+        .filter { it != GITADORAClearType.NO_PLAY }.map { it.value }
+    val gitadoraRankKeys = GITADORARank.sorted.map { it.value }
+    val gitadoraTrackedClearTypes = listOf(
+        GITADORAClearType.CLEAR, GITADORAClearType.FULL_COMBO, GITADORAClearType.EXCELLENT
+    ).map { it.value }
+    val gitadoraTrackedRanks = listOf(GITADORARank.SS, GITADORARank.S).map { it.value }
+    val gitadoraDifficultyOrder: List<String> = GITADORADifficulty.entries.map { it.value }
 
     const val DDR_NO_CLEAR = "noclear"
     val ddrClearKeys = DDRClearLamp.order + DDR_NO_CLEAR
@@ -233,6 +260,59 @@ object ChartAnalytics {
             newHighScores = lastPlay?.first.orEmpty(),
             newClears = lastPlay?.second.orEmpty(),
             newGrades = lastPlay?.third.orEmpty()
+        )
+    }
+
+    fun gitadora(
+        latestRecords: List<GITADORASongRecord>,
+        previousRecords: List<GITADORASongRecord>?,
+        filters: GITADORAFilterOptions,
+        skill: String?
+    ): ChartAnalyticsData {
+        val records = latestRecords.filter(filters::matches)
+        val clearByDifficulty = Counter(gitadoraClearKeys)
+        val rankByDifficulty = Counter(gitadoraRankKeys)
+        val clearByLevel = Counter(gitadoraClearKeys)
+        val rankByLevel = Counter(gitadoraRankKeys)
+        records.forEach { record ->
+            clearByDifficulty.ensure(record.difficulty)
+            rankByDifficulty.ensure(record.difficulty)
+            clearByDifficulty.add(record.difficulty, record.clearType)
+            rankByDifficulty.add(record.difficulty, record.rank)
+            val level = record.levelValue.toInt()
+            if (level > 0) {
+                clearByLevel.ensure(level)
+                clearByLevel.add(level, record.clearType)
+                rankByLevel.ensure(level)
+                rankByLevel.add(level, record.rank)
+            }
+        }
+        val lastPlay = previousRecords?.let { previous ->
+            newEntries(
+                latest = records,
+                previous = previous,
+                key = { "${it.title.compact}|${it.instrument}|${it.difficulty}" },
+                title = { it.title },
+                level = { it.level },
+                difficulty = { it.difficulty },
+                clearType = { it.clearType },
+                grade = { it.rank },
+                score = { it.score },
+                noPlay = GITADORAClearType.NO_PLAY.value,
+                noGrade = GITADORARank.NONE.value,
+                trackedClearTypes = gitadoraTrackedClearTypes,
+                trackedGrades = gitadoraTrackedRanks
+            )
+        }
+        return ChartAnalyticsData(
+            clearTypePerDifficulty = clearByDifficulty.result(),
+            gradePerDifficulty = rankByDifficulty.result(),
+            clearTypePerLevel = clearByLevel.result(),
+            gradePerLevel = rankByLevel.result(),
+            newHighScores = lastPlay?.first.orEmpty(),
+            newClears = lastPlay?.second.orEmpty(),
+            newGrades = lastPlay?.third.orEmpty(),
+            skill = skill
         )
     }
 
