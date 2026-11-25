@@ -44,6 +44,7 @@ object SettingsKeys {
     val sdvxLevelFilters = stringSetPreferencesKey("SDVXScoresView.LevelBucketFilters")
     val sdvxClearTypeFilters = stringSetPreferencesKey("SDVXScoresView.ClearTypeFilters")
     val sdvxGradeFilters = stringSetPreferencesKey("SDVXScoresView.GradeFilters")
+    val sdvxScoreBelowFilter = intPreferencesKey("SDVXScoresView.ScoreBelowFilter")
 
     val polarisChordSortMode = stringPreferencesKey("PolarisChordScoresView.SortMode")
     val polarisChordSortDescending = booleanPreferencesKey("PolarisChordScoresView.SortDescending")

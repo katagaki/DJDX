@@ -13,6 +13,9 @@
     <string name="games_filter_level">Level</string>
     <string name="games_filter_clear_type">Clear Type</string>
     <string name="games_filter_grade">Grade</string>
+    <string name="games_filter_score">Score</string>
+    <string name="games_filter_all">All</string>
+    <string name="games_filter_score_below">Under %1$s</string>
     <string name="games_filter_reset">Reset Filters</string>
     <string name="games_empty_title">No Score Data</string>
     <string name="games_empty_message">Import your play data to see your scores here.</string>

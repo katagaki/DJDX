@@ -13,6 +13,9 @@
     <string name="games_filter_level">レベル</string>
     <string name="games_filter_clear_type">クリアランク</string>
     <string name="games_filter_grade">グレード</string>
+    <string name="games_filter_score">スコア</string>
+    <string name="games_filter_all">すべて</string>
+    <string name="games_filter_score_below">%1$s未満</string>
     <string name="games_filter_reset">フィルターをリセット</string>
     <string name="games_empty_title">スコアデータなし</string>
     <string name="games_empty_message">プレーデータをインポートすると、ここにスコアが表示されます。</string>
