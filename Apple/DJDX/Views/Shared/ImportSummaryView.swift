@@ -14,39 +14,29 @@ struct ImportSummaryView: View {
             List {
                 if let summary {
                     Section {
-                        LabeledContent("ImportSummary.ImportDate") {
-                            Text(summary.importDate, style: .date)
-                        }
-                        LabeledContent("ImportSummary.ComparedWith") {
-                            if let previousImportDate = summary.previousImportDate {
-                                Text(previousImportDate, style: .date)
-                            } else {
-                                Text("ImportSummary.NoPreviousImport")
-                            }
-                        }
+                        header(summary)
                     }
-                    if !summary.ratings.isEmpty {
-                        Section("ImportSummary.Ratings") {
-                            ForEach(summary.ratings) { rating in
-                                ratingRow(rating)
-                            }
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    ForEach(summary.ratings) { rating in
+                        Section {
+                            ratingRow(rating, game: summary.game)
                         }
                     }
                     if summary.previousImportDate != nil {
                         Section {
-                            if summary.personalBests.isEmpty {
+                            countsRow(summary)
+                        }
+                        if summary.personalBests.isEmpty {
+                            Section {
                                 Text("ImportSummary.NoPersonalBests")
+                                    .font(.subheadline)
                                     .foregroundStyle(.secondary)
-                            } else {
-                                ForEach(summary.personalBests) { entry in
-                                    entryRow(entry)
-                                }
                             }
-                        } header: {
-                            HStack {
-                                Text("ImportSummary.PersonalBests")
-                                Spacer()
-                                Text(verbatim: "\(summary.personalBests.count)")
+                        } else {
+                            ForEach(summary.personalBests) { entry in
+                                ImportSummaryEntrySection(entry: entry, game: summary.game)
                             }
                         }
                     }
@@ -55,6 +45,7 @@ struct ImportSummaryView: View {
                         .listRowBackground(Color.clear)
                 }
             }
+            .listSectionSpacing(.compact)
             .overlay {
                 if isLoading {
                     ProgressView()
@@ -87,101 +78,115 @@ struct ImportSummaryView: View {
         }
     }
 
-    @ViewBuilder
-    func ratingRow(_ rating: ImportSummaryRating) -> some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text(verbatim: rating.name)
-                .fontWeight(.semibold)
-            Spacer()
-            if let previousValue = rating.previousValue {
-                Text(verbatim: format(previousValue, digits: rating.fractionDigits))
-                    .foregroundStyle(.secondary)
-                Image(systemName: "arrow.right")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Text(verbatim: format(rating.value, digits: rating.fractionDigits))
-                .fontWeight(.bold)
-            if let delta = rating.delta {
-                Text(verbatim: signed(delta, digits: rating.fractionDigits))
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(delta > 0 ? .green : delta < 0 ? .red : .secondary)
-            }
-        }
-        .monospacedDigit()
-    }
+    // MARK: Header
 
     @ViewBuilder
-    func entryRow(_ entry: ImportSummaryEntry) -> some View {
-        VStack(alignment: .leading, spacing: 6.0) {
-            HStack(alignment: .firstTextBaseline, spacing: 8.0) {
-                Text(verbatim: entry.chart)
+    func header(_ summary: ImportSummary) -> some View {
+        VStack(alignment: .center, spacing: 8.0) {
+            Text(summary.importDate, format: .dateTime.year().month().day())
+                .font(.title)
+                .fontWeight(.heavy)
+                .fontWidth(.compressed)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+            Divider()
+            HStack(spacing: 4.0) {
+                if let previousImportDate = summary.previousImportDate {
+                    Text("ImportSummary.ComparedWith")
+                    Text(previousImportDate, format: .dateTime.year().month().day())
+                } else {
+                    Text("ImportSummary.NoPreviousImport")
+                }
+            }
+            .font(.caption2)
+            .foregroundStyle(.tertiary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8.0)
+        .padding(.horizontal, 20.0)
+    }
+
+    // MARK: Ratings
+
+    @ViewBuilder
+    func ratingRow(_ rating: ImportSummaryRating, game: ImportSummaryGame) -> some View {
+        VStack(alignment: .leading, spacing: 4.0) {
+            HStack {
+                Text(verbatim: rating.name)
                     .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundStyle(entry.chartColor)
-                Text(verbatim: entry.title)
-                    .fontWeight(.semibold)
-                    .lineLimit(1)
-            }
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 12.0) {
-                    scoreChangeLabel(entry)
-                    rankChangeLabels(entry)
-                }
-                VStack(alignment: .leading, spacing: 4.0) {
-                    scoreChangeLabel(entry)
-                    HStack(spacing: 12.0) {
-                        rankChangeLabels(entry)
-                    }
+                    .fontWeight(.heavy)
+                    .fontWidth(.expanded)
+                Spacer()
+                if let delta = rating.delta {
+                    Text(verbatim: signed(delta, digits: rating.fractionDigits))
+                        .font(.caption)
+                        .fontWeight(.heavy)
+                        .fontWidth(.expanded)
+                        .foregroundStyle(delta > 0 ? .green : delta < 0 ? .red : .secondary)
                 }
             }
-            .font(.caption)
+            HStack(alignment: .lastTextBaseline, spacing: 8.0) {
+                if let previousValue = rating.previousValue {
+                    Text(verbatim: format(previousValue, digits: rating.fractionDigits))
+                        .font(.title3)
+                        .foregroundStyle(.tertiary)
+                    Image(systemName: "arrow.right")
+                        .font(.subheadline)
+                        .foregroundStyle(.tertiary)
+                }
+                Spacer(minLength: 0.0)
+                ratingValue(format(rating.value, digits: rating.fractionDigits), game: game)
+                    .font(.largeTitle)
+            }
+            .fontWidth(.expanded)
+            .fontWeight(.black)
             .monospacedDigit()
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
         }
     }
 
     @ViewBuilder
-    func scoreChangeLabel(_ entry: ImportSummaryEntry) -> some View {
-        if let score = entry.score {
-            changeLabel(
-                previous: entry.previousScore.map { String($0) },
-                current: String(score),
-                color: .primary,
-                delta: entry.previousScore.map { score - $0 }
-            )
+    func ratingValue(_ value: String, game: ImportSummaryGame) -> some View {
+        switch game {
+        case .sdvx:
+            Text(verbatim: value)
+                .sdvxGradeText(outlineWidth: 0.6)
+        default:
+            Text(verbatim: value)
+                .foregroundStyle(LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom))
         }
     }
 
+    // MARK: Counts
+
     @ViewBuilder
-    func rankChangeLabels(_ entry: ImportSummaryEntry) -> some View {
-        if let lamp = entry.lamp {
-            changeLabel(previous: lamp.previous, current: lamp.current, color: lamp.color)
+    func countsRow(_ summary: ImportSummary) -> some View {
+        HStack(spacing: 0.0) {
+            countColumn("SCORE", count: summary.personalBests.count { $0.score != nil }, color: .cyan)
+            countColumn("CLEAR TYPE", count: summary.personalBests.count { $0.lamp != nil }, color: .green)
+            countColumn(summary.game.gradeTitle,
+                        count: summary.personalBests.count { $0.grade != nil }, color: .yellow)
         }
-        if let grade = entry.grade {
-            changeLabel(previous: grade.previous, current: grade.current, color: grade.color)
-        }
+        .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
     }
 
     @ViewBuilder
-    func changeLabel(previous: String?, current: String, color: Color, delta: Int? = nil) -> some View {
-        HStack(spacing: 3.0) {
-            if let previous {
-                Text(verbatim: previous)
-                    .foregroundStyle(.secondary)
-                Image(systemName: "arrow.right")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-            Text(verbatim: current)
-                .fontWeight(.bold)
+    func countColumn(_ title: String, count: Int, color: Color) -> some View {
+        VStack(spacing: 4.0) {
+            Text(verbatim: title)
+                .font(.caption2)
                 .foregroundStyle(color)
-            if let delta {
-                Text(verbatim: "+\(delta)")
-                    .foregroundStyle(.green)
-            }
+            Text(verbatim: String(count))
+                .font(.title2)
+                .fontWeight(.black)
+                .monospacedDigit()
         }
-        .fixedSize()
+        .fontWidth(.expanded)
+        .fontWeight(.heavy)
+        .lineLimit(1)
+        .minimumScaleFactor(0.5)
+        .frame(maxWidth: .infinity)
     }
 
     func format(_ value: Double, digits: Int) -> String {

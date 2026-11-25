@@ -21,6 +21,7 @@ enum PolarisChordImportSummaryBuilder {
         }
 
         return ImportSummary(
+            game: .polarisChord,
             importDate: group.date,
             previousImportDate: previousGroup?.date,
             ratings: [],
@@ -61,31 +62,24 @@ enum PolarisChordImportSummaryBuilder {
             let clearType = PolarisChordClearType(rawValue: record.clearType) ?? .unknown
             entries.append(ImportSummaryEntry(
                 title: record.title,
-                chart: "\(difficulty.abbreviation) \(record.level)",
-                chartColor: difficulty.color,
+                difficulty: difficulty.rawValue,
+                level: record.level,
+                difficultyColor: difficulty.color,
                 levelValue: Double(record.level.filter { $0.isNumber || $0 == "." }) ?? 0.0,
                 previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                 score: isNewScore ? record.score : nil,
                 lamp: isNewLamp ? ImportSummaryChange(
                     previous: previousClearType.map { PolarisChordClearType(rawValue: $0)?.abbreviation ?? $0 },
                     current: clearType.abbreviation,
-                    color: clearType.color
+                    style: .color(clearType.color)
                 ) : nil,
                 grade: isNewGrade ? ImportSummaryChange(
                     previous: previousGrade,
                     current: record.grade,
-                    color: gradeColor(record.grade)
+                    style: .polarisChordGrade
                 ) : nil
             ))
         }
         return entries.sorted { ($0.levelValue, $1.title) > ($1.levelValue, $0.title) }
-    }
-
-    static func gradeColor(_ grade: String) -> Color {
-        switch PolarisChordGrade(rawValue: grade) {
-        case .sssPlusPlus, .sssPlus, .sss: return .cyan
-        case .ss, .s: return Color(red: 0.85, green: 0.6, blue: 0.13)
-        default: return .blue
-        }
     }
 }

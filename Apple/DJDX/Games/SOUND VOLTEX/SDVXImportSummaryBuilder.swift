@@ -27,6 +27,7 @@ enum SDVXImportSummaryBuilder {
         )
 
         return ImportSummary(
+            game: .sdvx,
             importDate: group.date,
             previousImportDate: previousGroup?.date,
             ratings: [volforce],
@@ -67,20 +68,21 @@ enum SDVXImportSummaryBuilder {
             let difficulty = record.difficultyEnum
             entries.append(ImportSummaryEntry(
                 title: record.title,
-                chart: "\(difficulty.abbreviation) \(record.level)",
-                chartColor: difficulty.color,
+                difficulty: difficulty.rawValue,
+                level: record.level,
+                difficultyColor: difficulty.color,
                 levelValue: Double(record.level) ?? 0.0,
                 previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                 score: isNewScore ? record.highScore : nil,
                 lamp: isNewLamp ? ImportSummaryChange(
                     previous: previousClearType.map { SDVXClearType(rawValue: $0)?.abbreviation ?? $0 },
                     current: record.clearTypeEnum.abbreviation,
-                    color: record.clearTypeEnum.color
+                    style: .color(record.clearTypeEnum.color)
                 ) : nil,
                 grade: isNewGrade ? ImportSummaryChange(
                     previous: previousGrade,
                     current: record.grade,
-                    color: SDVXGrade.color(for: record.grade)
+                    style: .sdvxGrade
                 ) : nil
             ))
         }

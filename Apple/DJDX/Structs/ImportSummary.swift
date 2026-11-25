@@ -1,6 +1,22 @@
 import SwiftUI
 
+enum ImportSummaryGame: Hashable {
+    case iidx
+    case sdvx
+    case polarisChord
+    case ddr
+
+    var gradeTitle: String {
+        switch self {
+        case .iidx: return "DJ LEVEL"
+        case .ddr: return "RANK"
+        case .sdvx, .polarisChord: return "GRADE"
+        }
+    }
+}
+
 struct ImportSummary {
+    let game: ImportSummaryGame
     let importDate: Date
     let previousImportDate: Date?
     let ratings: [ImportSummaryRating]
@@ -20,17 +36,26 @@ struct ImportSummaryRating: Identifiable, Hashable {
     }
 }
 
+enum ImportSummaryValueStyle: Hashable {
+    case iidxClearType
+    case iidxDJLevel
+    case sdvxGrade
+    case polarisChordGrade
+    case color(Color)
+}
+
 struct ImportSummaryChange: Hashable {
     let previous: String?
     let current: String
-    let color: Color
+    let style: ImportSummaryValueStyle
 }
 
 struct ImportSummaryEntry: Identifiable, Hashable {
     let id = UUID()
     let title: String
-    let chart: String
-    let chartColor: Color
+    let difficulty: String
+    let level: String
+    let difficultyColor: Color
     let levelValue: Double
     let previousScore: Int?
     let score: Int?

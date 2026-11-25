@@ -4,6 +4,15 @@ enum IIDXImportSummaryBuilder {
 
     static let lampOrder: [String] = IIDXClearType.ascending.reversed().dropLast(2).map(\.rawValue)
     static let djLevelOrder: [String] = IIDXDJLevel.sorted.reversed().map(\.rawValue)
+    static var levels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] {
+        [
+            (.beginner, \.beginnerScore),
+            (.normal, \.normalScore),
+            (.hyper, \.hyperScore),
+            (.another, \.anotherScore),
+            (.leggendaria, \.leggendariaScore)
+        ]
+    }
 
     static func summary(importGroupID: String) async -> ImportSummary? {
         let reader = IIDXReader()
@@ -33,6 +42,7 @@ enum IIDXImportSummaryBuilder {
         }
 
         return ImportSummary(
+            game: .iidx,
             importDate: group.importDate,
             previousImportDate: previousImportDate,
             ratings: [],
@@ -49,14 +59,6 @@ enum IIDXImportSummaryBuilder {
             previousRecords.map { (AnalyticsModel.matchKey(for: $0), $0) },
             uniquingKeysWith: { first, _ in first }
         )
-        let levels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] = [
-            (.beginner, \.beginnerScore),
-            (.normal, \.normalScore),
-            (.hyper, \.hyperScore),
-            (.another, \.anotherScore),
-            (.leggendaria, \.leggendariaScore)
-        ]
-
         var entries: [ImportSummaryEntry] = []
         for record in latestRecords {
             let previousRecord = previousByKey[AnalyticsModel.matchKey(for: record)]
@@ -79,25 +81,37 @@ enum IIDXImportSummaryBuilder {
 
                 entries.append(ImportSummaryEntry(
                     title: record.title,
-                    chart: "\(playType.displayName())\(level.code()) \(latest.difficulty)",
-                    chartColor: color(for: level),
+                    difficulty: "\(playType == .single ? "SP" : "DP") \(name(for: level))",
+                    level: String(latest.difficulty),
+                    difficultyColor: color(for: level),
                     levelValue: Double(latest.difficulty),
                     previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                     score: isNewScore ? latest.score : nil,
                     lamp: isNewLamp ? ImportSummaryChange(
                         previous: previousClearType.map { IIDXClearType.abbreviation(for: $0) },
-                        current: IIDXClearType.abbreviation(for: latest.clearType),
-                        color: IIDXClearType.color(for: latest.clearType)
+                        current: latest.clearType,
+                        style: .iidxClearType
                     ) : nil,
                     grade: isNewDJLevel ? ImportSummaryChange(
                         previous: previousDJLevel,
                         current: latest.djLevel,
-                        color: IIDXDJLevel.color(for: latest.djLevel)
+                        style: .iidxDJLevel
                     ) : nil
                 ))
             }
         }
         return entries
+    }
+
+    static func name(for level: IIDXLevel) -> String {
+        switch level {
+        case .beginner: return "BEGINNER"
+        case .normal: return "NORMAL"
+        case .hyper: return "HYPER"
+        case .another: return "ANOTHER"
+        case .leggendaria: return "LEGGENDARIA"
+        default: return ""
+        }
     }
 
     static func color(for level: IIDXLevel) -> Color {

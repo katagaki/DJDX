@@ -46,6 +46,7 @@ enum DDRImportSummaryBuilder {
         }
 
         return ImportSummary(
+            game: .ddr,
             importDate: group.date,
             previousImportDate: previousImportDate,
             ratings: ratings,
@@ -85,34 +86,24 @@ enum DDRImportSummaryBuilder {
             let difficulty = record.difficultyEnum
             entries.append(ImportSummaryEntry(
                 title: record.title,
-                chart: "\(chartPrefix(difficulty))\(style.abbreviation) \(record.level)",
-                chartColor: difficulty.color,
+                difficulty: "\(style.abbreviation) \(difficulty.rawValue)",
+                level: String(record.level),
+                difficultyColor: difficulty.color,
                 levelValue: Double(record.level),
                 previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                 score: isNewScore ? record.score : nil,
                 lamp: isNewLamp ? ImportSummaryChange(
                     previous: previousClearKind?.uppercased(),
                     current: record.clearDisplay,
-                    color: DDRSongRecord.clearColor(for: record.clearKind)
+                    style: .color(DDRSongRecord.clearColor(for: record.clearKind))
                 ) : nil,
                 grade: isNewRank ? ImportSummaryChange(
                     previous: previousRank.map { DDRSongRecord.rankDisplay(forStem: $0) },
                     current: record.rankDisplay,
-                    color: DDRSongRecord.rankColor(forStem: record.rank)
+                    style: .color(DDRSongRecord.rankColor(forStem: record.rank))
                 ) : nil
             ))
         }
         return entries
-    }
-
-    static func chartPrefix(_ difficulty: DDRDifficulty) -> String {
-        switch difficulty {
-        case .beginner: return "b"
-        case .basic: return "B"
-        case .difficult: return "D"
-        case .expert: return "E"
-        case .challenge: return "C"
-        case .unknown: return ""
-        }
     }
 }
