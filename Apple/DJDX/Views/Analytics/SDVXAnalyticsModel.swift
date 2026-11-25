@@ -42,12 +42,6 @@ final class SDVXAnalyticsModel {
 
     let fetcher = SDVXReader()
 
-    private func chartForce(_ record: SDVXSongRecord) -> Double {
-        let levelValue = Double(record.level) ?? 0.0
-        guard levelValue > 0, record.highScore > 0 else { return 0.0 }
-        return levelValue * 2.0 * (Double(record.highScore) / 10_000_000.0)
-    }
-
     func reload(version: SDVXVersion, filters: SDVXFilterOptions? = nil) async {
         dataState = .loading
         let allRecords = await fetcher.latestSongRecords(for: version)
@@ -93,8 +87,7 @@ final class SDVXAnalyticsModel {
             }
         }
 
-        let topForces = allRecords.map { chartForce($0) }.sorted(by: >).prefix(50)
-        let computedVolforce = (topForces.reduce(0.0, +) * 100).rounded() / 100
+        let computedVolforce = SDVXVolforce.total(allRecords)
 
         let lastPlay = await computeLastPlay(version: version, filters: filters)
 
