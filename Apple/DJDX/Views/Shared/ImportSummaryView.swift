@@ -124,24 +124,42 @@ struct ImportSummaryView: View {
                     .fontWeight(.semibold)
                     .lineLimit(1)
             }
-            HStack(spacing: 12.0) {
-                if let score = entry.score {
-                    changeLabel(
-                        previous: entry.previousScore.map { String($0) },
-                        current: String(score),
-                        color: .primary,
-                        delta: entry.previousScore.map { score - $0 }
-                    )
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12.0) {
+                    scoreChangeLabel(entry)
+                    rankChangeLabels(entry)
                 }
-                if let lamp = entry.lamp {
-                    changeLabel(previous: lamp.previous, current: lamp.current, color: lamp.color)
-                }
-                if let grade = entry.grade {
-                    changeLabel(previous: grade.previous, current: grade.current, color: grade.color)
+                VStack(alignment: .leading, spacing: 4.0) {
+                    scoreChangeLabel(entry)
+                    HStack(spacing: 12.0) {
+                        rankChangeLabels(entry)
+                    }
                 }
             }
             .font(.caption)
             .monospacedDigit()
+        }
+    }
+
+    @ViewBuilder
+    func scoreChangeLabel(_ entry: ImportSummaryEntry) -> some View {
+        if let score = entry.score {
+            changeLabel(
+                previous: entry.previousScore.map { String($0) },
+                current: String(score),
+                color: .primary,
+                delta: entry.previousScore.map { score - $0 }
+            )
+        }
+    }
+
+    @ViewBuilder
+    func rankChangeLabels(_ entry: ImportSummaryEntry) -> some View {
+        if let lamp = entry.lamp {
+            changeLabel(previous: lamp.previous, current: lamp.current, color: lamp.color)
+        }
+        if let grade = entry.grade {
+            changeLabel(previous: grade.previous, current: grade.current, color: grade.color)
         }
     }
 
@@ -163,6 +181,7 @@ struct ImportSummaryView: View {
                     .foregroundStyle(.green)
             }
         }
+        .fixedSize()
     }
 
     func format(_ value: Double, digits: Int) -> String {
