@@ -19,6 +19,10 @@ struct DDRAnalyticsDestinationView: View {
                 DDRRankBreakdownDetailView(rankPerLevel: model.rankPerLevel)
                     .navigationTitle("Analytics.DDR.RankBreakdown")
                     .automaticNavigationTransition(id: "DDR.rankBreakdown", in: namespace)
+            case .flareSkillSuggestionsDetail:
+                DDRFlareSkillSuggestionsDetailView(suggestions: model.flareSkillSuggestions)
+                    .navigationTitle(Text(verbatim: "FLARE SKILL"))
+                    .automaticNavigationTransition(id: "DDR.flareSkillSuggestions", in: namespace)
             }
         }
         .appBackgroundGradient()
@@ -139,5 +143,34 @@ struct DDRRankBreakdownDetailView: View {
             let count = counts[rank] ?? 0
             return count > 0 ? (rank, count) : nil
         }
+    }
+}
+
+struct DDRFlareSkillSuggestionsDetailView: View {
+    let suggestions: [DDRFlareSkillSuggestion]
+
+    var body: some View {
+        List {
+            if suggestions.isEmpty {
+                Text("Analytics.Suggestions.Empty")
+                    .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
+            } else {
+                ForEach(suggestions) { suggestion in
+                    AnalyticsSuggestionRow(
+                        title: suggestion.songTitle,
+                        current: suggestion.currentFlareRank.map { "FLARE \(DDRFlareSkill.rankLabel($0))" } ?? "---",
+                        target: "FLARE \(DDRFlareSkill.rankLabel(suggestion.targetFlareRank))",
+                        detail: "FLARE SKILL \(suggestion.currentFlareSkill) → \(suggestion.targetFlareSkill)",
+                        gain: "+\(suggestion.flareSkillGain)",
+                        difficulty: suggestion.difficulty.rawValue,
+                        difficultyColor: suggestion.difficulty.color,
+                        level: String(suggestion.level)
+                    )
+                }
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 }

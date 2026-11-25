@@ -33,6 +33,8 @@ struct SDVXAnalyticsView: View {
     @AppStorage(wrappedValue: false, "Analytics.SDVX.LastPlayCollapsed") var isLastPlayCollapsedStored: Bool
     @State var isLastPlayCollapsed: Bool = false
 
+    @AppStorage(wrappedValue: false, "Analytics.SDVX.SuggestionsCollapsed") var isSuggestionsCollapsed: Bool
+
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
         GridItem(.flexible(), spacing: 12.0)
@@ -42,6 +44,7 @@ struct SDVXAnalyticsView: View {
         VStack(spacing: 20.0) {
             overviewSection
             lastPlaySection
+            suggestionsSection
         }
         .padding(.top, 20.0)
         .onAppear {
@@ -147,6 +150,45 @@ struct SDVXAnalyticsView: View {
                         }
                         .padding(.horizontal)
                     }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    var suggestionsSection: some View {
+        if !isEditing {
+            VStack(spacing: 12.0) {
+                AnalyticsSectionHeader(
+                    title: AnalyticsSection.suggestions.titleKey,
+                    isCollapsible: true,
+                    isExpanded: !isSuggestionsCollapsed
+                ) {
+                    withAnimation(.smooth.speed(2.0)) { isSuggestionsCollapsed.toggle() }
+                }
+                if !isSuggestionsCollapsed {
+                    Button {
+                        navigationManager.push(SDVXAnalyticsPath.volforceSuggestionsDetail)
+                    } label: {
+                        AnalyticsSuggestionCard(
+                            title: Text(verbatim: "VOLFORCE"),
+                            systemImage: "arrow.up.right.circle",
+                            iconColor: .purple,
+                            count: model.volforceSuggestions.count,
+                            previews: model.volforceSuggestions.prefix(3).map { suggestion in
+                                AnalyticsSuggestionPreview(
+                                    id: suggestion.id,
+                                    title: suggestion.songTitle,
+                                    detail: "\(suggestion.difficulty.abbreviation) \(suggestion.level) · " +
+                                        suggestion.targetGrade,
+                                    value: SDVXVolforce.gainText(suggestion.volforceGain)
+                                )
+                            }
+                        )
+                    }
+                    .buttonStyle(AnalyticsCardButtonStyle())
+                    .automaticMatchedTransitionSource(id: "SDVX.volforceSuggestions", in: analyticsNamespace)
+                    .padding(.horizontal)
                 }
             }
         }

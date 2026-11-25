@@ -15,6 +15,7 @@ final class SDVXAnalyticsModel {
     var totalCharts: Int = 0
     var totalPlays: Int = 0
     var volforce: Double = 0.0
+    var volforceSuggestions: [SDVXVolforceSuggestion] = []
 
     // "前回のプレー" (Last Play): improvements between the latest two import groups.
     var newHighScores: [SDVXNewHighScoreEntry] = []
@@ -41,12 +42,6 @@ final class SDVXAnalyticsModel {
     var dataState: DataState = .initializing
 
     let fetcher = SDVXReader()
-
-    private func chartForce(_ record: SDVXSongRecord) -> Double {
-        let levelValue = Double(record.level) ?? 0.0
-        guard levelValue > 0, record.highScore > 0 else { return 0.0 }
-        return levelValue * 2.0 * (Double(record.highScore) / 10_000_000.0)
-    }
 
     func reload(version: SDVXVersion, filters: SDVXFilterOptions? = nil) async {
         dataState = .loading
@@ -93,9 +88,6 @@ final class SDVXAnalyticsModel {
             }
         }
 
-        let topForces = allRecords.map { chartForce($0) }.sorted(by: >).prefix(50)
-        let computedVolforce = (topForces.reduce(0.0, +) * 100).rounded() / 100
-
         let lastPlay = await computeLastPlay(version: version, filters: filters)
 
         withAnimation(.smooth.speed(2.0)) {
@@ -104,7 +96,8 @@ final class SDVXAnalyticsModel {
             self.clearTypePerLevel = clearByLevel
             self.totalCharts = records.count
             self.totalPlays = plays
-            self.volforce = computedVolforce
+            self.volforce = SDVXVolforce.total(allRecords)
+            self.volforceSuggestions = SDVXVolforce.suggestions(allRecords: allRecords, candidates: records)
             self.newClears = lastPlay.clears
             self.newHighScores = lastPlay.highScores
             self.newGrades = lastPlay.grades

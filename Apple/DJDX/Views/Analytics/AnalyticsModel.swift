@@ -30,6 +30,10 @@ final class AnalyticsModel {
     var newAA: [NewDJLevelEntry] = []
     var newA: [NewDJLevelEntry] = []
 
+    // Suggestions
+    var djLevelSuggestions: [IIDXDJLevelSuggestion] = []
+    var clearLampSuggestionCandidates: [IIDXClearLampSuggestion] = []
+
     // Tower
     var towerEntries: [IIDXTowerEntry] = []
 
@@ -75,6 +79,7 @@ final class AnalyticsModel {
         await reloadTrends(playType: playType, iidxVersion: iidxVersion, filters: filters)
         await reloadNewClearsAndHighScores(playType: playType, iidxVersion: iidxVersion, filters: filters)
         await reloadProgress(playType: playType, iidxVersion: iidxVersion, filters: filters)
+        await reloadSuggestions(playType: playType, iidxVersion: iidxVersion, filters: filters)
         towerEntries = await fetcher.allTowerEntries()
         await WidgetDataPublisher.shared.publishClearTypeAndDJLevel(
             playType: playType, iidxVersion: iidxVersion

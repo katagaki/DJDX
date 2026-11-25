@@ -30,6 +30,8 @@ struct DDRAnalyticsView: View {
     @AppStorage(wrappedValue: false, "Analytics.DDR.OverviewCollapsed") var isOverviewCollapsedStored: Bool
     @State var isOverviewCollapsed: Bool = false
 
+    @AppStorage(wrappedValue: false, "Analytics.DDR.SuggestionsCollapsed") var isSuggestionsCollapsed: Bool
+
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
         GridItem(.flexible(), spacing: 12.0)
@@ -38,6 +40,7 @@ struct DDRAnalyticsView: View {
     var body: some View {
         VStack(spacing: 20.0) {
             overviewSection
+            suggestionsSection
         }
         .padding(.top, 20.0)
         .onAppear {
@@ -107,6 +110,45 @@ struct DDRAnalyticsView: View {
                                                   onReorder: saveCardOrder)
                         }
                     }
+                    .padding(.horizontal)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    var suggestionsSection: some View {
+        if !isEditing {
+            VStack(spacing: 12.0) {
+                AnalyticsSectionHeader(
+                    title: AnalyticsSection.suggestions.titleKey,
+                    isCollapsible: true,
+                    isExpanded: !isSuggestionsCollapsed
+                ) {
+                    withAnimation(.smooth.speed(2.0)) { isSuggestionsCollapsed.toggle() }
+                }
+                if !isSuggestionsCollapsed {
+                    Button {
+                        navigationManager.push(DDRAnalyticsPath.flareSkillSuggestionsDetail)
+                    } label: {
+                        AnalyticsSuggestionCard(
+                            title: Text(verbatim: "FLARE SKILL"),
+                            systemImage: "flame",
+                            iconColor: .orange,
+                            count: model.flareSkillSuggestions.count,
+                            previews: model.flareSkillSuggestions.prefix(3).map { suggestion in
+                                AnalyticsSuggestionPreview(
+                                    id: suggestion.id,
+                                    title: suggestion.songTitle,
+                                    detail: "\(suggestion.difficulty.rawValue) \(suggestion.level) · " +
+                                        "FLARE \(DDRFlareSkill.rankLabel(suggestion.targetFlareRank))",
+                                    value: "+\(suggestion.flareSkillGain)"
+                                )
+                            }
+                        )
+                    }
+                    .buttonStyle(AnalyticsCardButtonStyle())
+                    .automaticMatchedTransitionSource(id: "DDR.flareSkillSuggestions", in: analyticsNamespace)
                     .padding(.horizontal)
                 }
             }

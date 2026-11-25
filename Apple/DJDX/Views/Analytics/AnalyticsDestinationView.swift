@@ -53,6 +53,14 @@ struct AnalyticsDestinationView: View {
                     .automaticNavigationTransition(
                         id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
                     )
+            case .djLevelSuggestionsDetail:
+                IIDXDJLevelSuggestionsDetailView(suggestions: model.djLevelSuggestions)
+                    .navigationTitle("Analytics.Suggestions.NextDJLevel")
+                    .automaticNavigationTransition(id: "Suggestions.DJLevel", in: analyticsNamespace)
+            case .clearLampSuggestionsDetail:
+                IIDXClearLampSuggestionsDetailView(model: model)
+                    .navigationTitle("Analytics.Suggestions.NextClearLamp")
+                    .automaticNavigationTransition(id: "Suggestions.ClearLamp", in: analyticsNamespace)
             default:
                 newEntryDestination
             }
