@@ -303,7 +303,7 @@ fun IIDXAnalyticsSection(
                     SuggestionPreview(
                         title = it.title,
                         detail = "${it.level.csvPrefix} · ${it.clearType}",
-                        value = "☆${it.difficulty}"
+                        value = "LEVEL ${it.difficulty}"
                     )
                 },
                 onClick = { onNavigate(Routes.iidxAnalytics(Routes.IIDX_DETAIL_CLEAR_LAMP_SUGGESTIONS)) }

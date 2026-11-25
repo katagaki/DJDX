@@ -62,7 +62,7 @@ extension AnalyticsView {
                         id: suggestion.id,
                         title: suggestion.songTitle,
                         detail: "\(suggestion.level.chartName) · \(suggestion.clearType)",
-                        value: "☆\(suggestion.difficulty)"
+                        value: "LEVEL \(suggestion.difficulty)"
                     )
                 }
             )
