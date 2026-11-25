@@ -44,39 +44,55 @@ struct AnalyticsSuggestionCard: View {
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.tertiary)
             }
-            if previews.isEmpty {
-                Text("Analytics.Suggestions.Empty")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 44.0, alignment: .center)
-            } else {
-                VStack(alignment: .leading, spacing: 6.0) {
-                    ForEach(previews) { preview in
-                        HStack(alignment: .firstTextBaseline, spacing: 8.0) {
-                            VStack(alignment: .leading, spacing: 0.0) {
-                                Text(preview.title)
-                                    .font(.subheadline.bold())
-                                    .fontWidth(.condensed)
-                                    .lineLimit(1)
-                                Text(verbatim: preview.detail)
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
-                            Spacer(minLength: 0.0)
-                            Text(verbatim: preview.value)
-                                .font(.subheadline.weight(.heavy))
-                                .fontWidth(.expanded)
-                                .monospacedDigit()
-                                .foregroundStyle(.orange)
-                        }
-                    }
+            ZStack(alignment: .top) {
+                previewRows(placeholders)
+                    .hidden()
+                if previews.isEmpty {
+                    Text("Analytics.Suggestions.Empty")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                } else {
+                    previewRows(previews)
                 }
             }
         }
         .padding(12.0)
         .frame(maxWidth: .infinity, alignment: .leading)
         .cardBackground(cornerRadius: cornerRadius)
+    }
+
+    private var placeholders: [AnalyticsSuggestionPreview] {
+        (0..<Self.previewLimit).map { _ in
+            AnalyticsSuggestionPreview(id: UUID(), title: " ", detail: " ", value: " ")
+        }
+    }
+
+    static let previewLimit = 3
+
+    private func previewRows(_ rows: [AnalyticsSuggestionPreview]) -> some View {
+        VStack(alignment: .leading, spacing: 6.0) {
+            ForEach(rows) { preview in
+                HStack(alignment: .firstTextBaseline, spacing: 8.0) {
+                    VStack(alignment: .leading, spacing: 0.0) {
+                        Text(preview.title)
+                            .font(.subheadline.bold())
+                            .fontWidth(.condensed)
+                            .lineLimit(1)
+                        Text(verbatim: preview.detail)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                    Spacer(minLength: 0.0)
+                    Text(verbatim: preview.value)
+                        .font(.subheadline.weight(.heavy))
+                        .fontWidth(.expanded)
+                        .monospacedDigit()
+                        .foregroundStyle(.orange)
+                }
+            }
+        }
     }
 }
 

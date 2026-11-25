@@ -1,11 +1,11 @@
 package com.tsubuzaki.djdxgo.ui.analytics
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -36,6 +37,7 @@ import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.ui.theme.Palette
 
 internal const val SECTION_SUGGESTIONS = "suggestions"
+internal const val SUGGESTION_PREVIEW_LIMIT = 3
 
 internal data class SuggestionPreview(val title: String, val detail: String, val value: String)
 
@@ -80,43 +82,54 @@ internal fun SuggestionCard(
                     modifier = Modifier.size(16.dp)
                 )
             }
-            if (previews.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.analytics_suggestions_empty),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 44.dp)
-                        .padding(vertical = 12.dp)
+            Box {
+                SuggestionPreviewRows(
+                    List(SUGGESTION_PREVIEW_LIMIT) { SuggestionPreview(" ", " ", " ") },
+                    modifier = Modifier.alpha(0f)
                 )
-            } else {
-                previews.forEach { preview ->
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = preview.title,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                text = preview.detail,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
+                if (previews.isEmpty()) {
+                    Box(modifier = Modifier.matchParentSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = preview.value,
+                            text = stringResource(R.string.analytics_suggestions_empty),
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Black,
-                            color = Palette.orange
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                } else {
+                    SuggestionPreviewRows(previews)
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SuggestionPreviewRows(previews: List<SuggestionPreview>, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        previews.forEach { preview ->
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = preview.title,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = preview.detail,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Text(
+                    text = preview.value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Black,
+                    color = Palette.orange
+                )
             }
         }
     }
