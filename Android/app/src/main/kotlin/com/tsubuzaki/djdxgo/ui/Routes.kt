@@ -25,12 +25,15 @@ object Routes {
     const val IIDX_DETAIL_DJ_LEVEL_LEVEL = "djLevelLevel"
     const val IIDX_DETAIL_NEW_ENTRIES = "newEntries"
     const val IIDX_DETAIL_PROGRESS = "progress"
+    const val IIDX_DETAIL_DJ_LEVEL_SUGGESTIONS = "djLevelSuggestions"
+    const val IIDX_DETAIL_CLEAR_LAMP_SUGGESTIONS = "clearLampSuggestions"
 
     const val CHART_DETAIL_CLEAR_BREAKDOWN = "clearBreakdown"
     const val CHART_DETAIL_GRADE_BREAKDOWN = "gradeBreakdown"
     const val CHART_DETAIL_NEW_HIGH_SCORES = "newHighScores"
     const val CHART_DETAIL_NEW_CLEARS = "newClears"
     const val CHART_DETAIL_NEW_GRADES = "newGrades"
+    const val CHART_DETAIL_SUGGESTIONS = "suggestions"
 
     const val TOWER_RECENT = "recent"
     const val TOWER_TOTALS = "totals"

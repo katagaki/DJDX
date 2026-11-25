@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowCircleUp
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material.icons.outlined.Whatshot
 import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -79,7 +81,10 @@ internal class ChartGameSpec(
     val difficultyColor: (String) -> Color,
     val clearCaptionRes: Int,
     val gradeCaptionRes: Int,
-    val clearIcon: (String) -> ImageVector
+    val clearIcon: (String) -> ImageVector,
+    val suggestionTitle: String? = null,
+    val suggestionIcon: ImageVector = Icons.Outlined.Whatshot,
+    val suggestionColor: Color = Palette.orange
 ) {
     val lastPlayCards: List<String> =
         if (trackedClearTypes.isEmpty() && trackedGrades.isEmpty()) {
@@ -116,7 +121,10 @@ internal val sdvxSpec = ChartGameSpec(
     difficultyColor = { SDVXColors.difficultyColor(it) },
     clearCaptionRes = R.string.analytics_clear_breakdown,
     gradeCaptionRes = R.string.analytics_grade_breakdown,
-    clearIcon = { Icons.Outlined.CheckCircle }
+    clearIcon = { Icons.Outlined.CheckCircle },
+    suggestionTitle = "VOLFORCE",
+    suggestionIcon = Icons.Outlined.ArrowCircleUp,
+    suggestionColor = Palette.purple
 )
 
 internal val polarisChordSpec = ChartGameSpec(
@@ -162,7 +170,8 @@ internal val ddrSpec = ChartGameSpec(
     difficultyColor = { DDRColors.difficultyColor(it) },
     clearCaptionRes = R.string.analytics_clear_breakdown,
     gradeCaptionRes = R.string.analytics_rank_breakdown,
-    clearIcon = { Icons.Outlined.CheckCircle }
+    clearIcon = { Icons.Outlined.CheckCircle },
+    suggestionTitle = "FLARE SKILL"
 )
 
 internal fun chartGameSpec(game: Game): ChartGameSpec = when (game) {
@@ -356,6 +365,25 @@ private fun ChartAnalyticsSection(
                         }
                     }
                 }
+            }
+        }
+
+        spec.suggestionTitle?.let { suggestionTitle ->
+            SuggestionSection(layout, isEditing) {
+                SuggestionCard(
+                    title = suggestionTitle,
+                    icon = spec.suggestionIcon,
+                    iconColor = spec.suggestionColor,
+                    count = data.suggestions.size,
+                    previews = data.suggestions.take(3).map {
+                        SuggestionPreview(
+                            title = it.title,
+                            detail = "${spec.difficultyLabel(it.difficulty)} ${it.level} · ${it.target}",
+                            value = it.gainText
+                        )
+                    },
+                    onClick = { onNavigate(Routes.chartAnalytics(spec.game, Routes.CHART_DETAIL_SUGGESTIONS)) }
+                )
             }
         }
     }

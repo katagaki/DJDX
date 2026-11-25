@@ -51,6 +51,7 @@ import com.tsubuzaki.djdxgo.data.SettingsKeys
 import com.tsubuzaki.djdxgo.data.analytics.IIDXAnalyticsData
 import com.tsubuzaki.djdxgo.data.analytics.IIDXFilterOptions
 import com.tsubuzaki.djdxgo.data.analytics.IIDXNewEntryKind
+import com.tsubuzaki.djdxgo.data.analytics.IIDXSuggestions
 import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXDJLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
@@ -271,6 +272,42 @@ fun IIDXAnalyticsSection(
                     }
                 }
             }
+        }
+
+        val targetValue by rememberSetting(
+            SettingsKeys.iidxSuggestionTargetClearType, IIDXClearType.HARD_CLEAR.value
+        )
+        val target = IIDXClearType.fromValue(targetValue) ?: IIDXClearType.HARD_CLEAR
+        SuggestionSection(layout, isEditing) {
+            SuggestionCard(
+                title = stringResource(R.string.analytics_suggestions_next_dj_level),
+                icon = Icons.Outlined.WorkspacePremium,
+                iconColor = Palette.orange,
+                count = analytics.djLevelSuggestions.size,
+                previews = analytics.djLevelSuggestions.take(3).map {
+                    SuggestionPreview(
+                        title = it.title,
+                        detail = "${it.level.csvPrefix} ${it.difficulty} · ${it.targetDJLevel}",
+                        value = "+${it.pointsNeeded}"
+                    )
+                },
+                onClick = { onNavigate(Routes.iidxAnalytics(Routes.IIDX_DETAIL_DJ_LEVEL_SUGGESTIONS)) }
+            )
+            val clearLamps = IIDXSuggestions.clearLampSuggestions(analytics.clearLampSuggestionCandidates, target)
+            SuggestionCard(
+                title = stringResource(R.string.analytics_suggestions_next_clear_lamp_target, target.value),
+                icon = Icons.Outlined.Verified,
+                iconColor = IIDXColors.clearTypeColor(target.value),
+                count = clearLamps.size,
+                previews = clearLamps.take(3).map {
+                    SuggestionPreview(
+                        title = it.title,
+                        detail = "${it.level.csvPrefix} · ${it.clearType}",
+                        value = "☆${it.difficulty}"
+                    )
+                },
+                onClick = { onNavigate(Routes.iidxAnalytics(Routes.IIDX_DETAIL_CLEAR_LAMP_SUGGESTIONS)) }
+            )
         }
     }
 }

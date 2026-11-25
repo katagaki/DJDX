@@ -26,7 +26,9 @@ class AnalyticsStore(
 
     suspend fun reloadIIDX(playType: IIDXPlayType, filters: IIDXFilterOptions) {
         iidxState.value = withContext(Dispatchers.IO) {
-            IIDXAnalytics.compute(database.iidxDao(), playType, filters)
+            IIDXAnalytics.compute(
+                database.iidxDao(), playType, filters, database.externalDataDao().allIIDXSongs()
+            )
         }
     }
 
@@ -54,7 +56,8 @@ class AnalyticsStore(
         ddrState.value = withContext(Dispatchers.IO) {
             ChartAnalytics.ddr(
                 ddrRepository.songRecords(System.currentTimeMillis() / 1000L, style),
-                filters
+                filters,
+                database.externalDataDao().allDDRSongMetas().associate { it.titleCompact to it.version }
             )
         }
     }

@@ -48,4 +48,11 @@
     <string name="analytics_progress_style_bars">Bars</string>
     <string name="analytics_progress_style_stacked">Stacked</string>
     <string name="analytics_card_items">Shown on Card (Up to 3)</string>
+    <string name="analytics_section_suggestions">Suggestions</string>
+    <string name="analytics_suggestions_empty">No charts to suggest</string>
+    <string name="analytics_suggestions_next_dj_level">Next DJ Level</string>
+    <string name="analytics_suggestions_next_clear_lamp">One Lamp Away</string>
+    <string name="analytics_suggestions_next_clear_lamp_target">One Lamp from %1$s</string>
+    <string name="analytics_suggestions_points_needed">%1$d points to go</string>
+    <string name="analytics_suggestions_target_clear_type">Target Clear Lamp</string>
 </resources>

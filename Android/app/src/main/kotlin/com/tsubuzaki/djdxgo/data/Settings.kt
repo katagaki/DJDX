@@ -79,6 +79,7 @@ object SettingsKeys {
     val iidxScoreProgressStyle = stringPreferencesKey("Analytics.ScoreProgress.Style")
     val iidxClearTypeCardLevels = stringSetPreferencesKey("Analytics.ClearType.Overall.CardLevels")
     val iidxDJLevelCardLevels = stringSetPreferencesKey("Analytics.DJLevel.Overall.CardLevels")
+    val iidxSuggestionTargetClearType = stringPreferencesKey("Analytics.Suggestions.TargetClearType")
     val sdvxCardOrder = stringPreferencesKey("Analytics.SDVX.CardOrder")
     val sdvxVisibleCards = stringSetPreferencesKey("Analytics.SDVX.VisibleCards")
     val sdvxCollapsedSections = stringSetPreferencesKey("Analytics.SDVX.CollapsedSections")
