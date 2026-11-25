@@ -114,6 +114,24 @@ actor SDVXReader {
         return record
     }
 
+    // MARK: History
+
+    func scoreHistory(title: String, difficulty: SDVXDifficulty) -> [Date: Int] {
+        guard let database = try? DB.shared.getReadConnection() else { return [:] }
+        let importDates = Dictionary(uniqueKeysWithValues: allImportGroups().map { ($0.id, $0.date) })
+        let query = DB.songRecordTable
+            .select(DB.srImportGroupID, DB.srHighScore)
+            .filter(DB.srTitle == title && DB.srDifficulty == difficulty.rawValue && DB.srHighScore > 0)
+        guard let rows = try? database.prepare(query) else { return [:] }
+        var history: [Date: Int] = [:]
+        for row in rows {
+            if let date = importDates[row[DB.srImportGroupID]] {
+                history[date] = row[DB.srHighScore]
+            }
+        }
+        return history
+    }
+
     // MARK: sdvx.in Chart Index (external data source)
 
     func sdvxInChartCount() -> Int {

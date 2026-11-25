@@ -120,6 +120,27 @@ actor DDRReader {
         return songRecords(for: importGroupID)
     }
 
+    // MARK: History
+
+    func scoreHistory(songIndex: String, title: String,
+                      style: DDRPlayStyle, difficulty: DDRDifficulty) -> [Date: Int] {
+        guard let database = try? DB.shared.getReadConnection() else { return [:] }
+        let importDates = Dictionary(uniqueKeysWithValues: allImportGroups().map { ($0.id, $0.date) })
+        let songFilter = songIndex.isEmpty ? DB.srTitle == title : DB.srSongIndex == songIndex
+        let query = DB.songRecordTable
+            .select(DB.srImportGroupID, DB.srScore)
+            .filter(songFilter && DB.srStyle == style.rawValue
+                    && DB.srDifficulty == difficulty.rawValue && DB.srScore > 0)
+        guard let rows = try? database.prepare(query) else { return [:] }
+        var history: [Date: Int] = [:]
+        for row in rows {
+            if let date = importDates[row[DB.srImportGroupID]] {
+                history[date] = row[DB.srScore]
+            }
+        }
+        return history
+    }
+
     static func songRecord(from row: Row) -> DDRSongRecord {
         let record = DDRSongRecord()
         record.songIndex = row[DB.srSongIndex]

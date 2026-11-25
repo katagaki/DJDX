@@ -22,7 +22,6 @@ struct DDRScoresView<Header: View>: View {
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
     @State var isShowingShareCard: Bool = false
-    @State private var chartNoteTarget: ChartNoteTarget?
 
     @Namespace var ddrNamespace
 
@@ -99,6 +98,16 @@ struct DDRScoresView<Header: View>: View {
         return ordered.filter(hasClearLamp) + ordered.filter { !hasClearLamp($0) }
     }
 
+    func siblingCharts(of record: DDRSongRecord) -> [DDRSongRecord] {
+        styleRecords
+            .filter { $0.titleCompact() == record.titleCompact() }
+            .sorted { lhs, rhs in
+                let lhsRank = DDRDifficulty.sorted.firstIndex(of: lhs.difficultyEnum) ?? Int.max
+                let rhsRank = DDRDifficulty.sorted.firstIndex(of: rhs.difficultyEnum) ?? Int.max
+                return lhsRank < rhsRank
+            }
+    }
+
     func titleThenDifficulty(_ lhs: DDRSongRecord, _ rhs: DDRSongRecord) -> Bool {
         if lhs.titleCompact() != rhs.titleCompact() {
             return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
@@ -152,7 +161,7 @@ struct DDRScoresView<Header: View>: View {
                     }
                     ForEach(sortedRecords, id: \.self) { record in
                         Button {
-                            chartNoteTarget = record.chartNoteTarget
+                            navigationManager.push(DDRScoresPath.scoreViewer(songRecord: record))
                         } label: {
                             DDRScoreRow(record: record)
                                 .contentShape(.rect)
@@ -192,11 +201,6 @@ struct DDRScoresView<Header: View>: View {
                 playStyle: ddrStyleToShow == .single ? "SP" : "DP"
             )
         }
-        .sheet(item: $chartNoteTarget) { target in
-            ChartNotesSheet(game: target.game, title: target.title,
-                            chart: target.chart, chartLabel: target.chartLabel)
-                .presentationDetents([.medium, .large])
-        }
         .sheet(isPresented: $isShowingFilterSheet) {
             DDRScoreFilterSheet(
                 isShowingOnlyPlayedCharts: $isShowingOnlyPlayedCharts.animation(.smooth.speed(2.0)),
@@ -218,6 +222,13 @@ struct DDRScoresView<Header: View>: View {
         .background {
             if dataState == .presenting && filteredRecords.isEmpty {
                 ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
+            }
+        }
+        .navigationDestination(for: DDRScoresPath.self) { viewPath in
+            switch viewPath {
+            case .scoreViewer(let songRecord):
+                DDRScoreViewer(songRecords: siblingCharts(of: songRecord),
+                               initialDifficulty: songRecord.difficultyEnum)
             }
         }
         .task {
