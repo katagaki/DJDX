@@ -83,6 +83,10 @@ class PolarisChordRepository(private val dao: PolarisChordDao) {
             ?: dao.closestImportGroupBefore(bucket.startOfNextDay)
     }
 
+    suspend fun importGroups(): List<PolarisChordImportGroup> = dao.importGroups()
+
+    suspend fun songRecords(groupID: String): List<PolarisChordSongRecord> = dao.songRecords(groupID)
+
     suspend fun songRecords(date: Long): List<PolarisChordSongRecord> {
         val group = importGroupFor(date) ?: return emptyList()
         return dao.songRecords(group.id)

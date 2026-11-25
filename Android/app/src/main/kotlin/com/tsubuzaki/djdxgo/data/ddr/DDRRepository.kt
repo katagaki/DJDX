@@ -82,6 +82,14 @@ class DDRRepository(
             ?: dao.closestImportGroupBefore(bucket.startOfNextDay)
     }
 
+    suspend fun importGroups(): List<DDRImportGroup> = dao.importGroups()
+
+    suspend fun songRecords(groupID: String, style: DDRPlayStyle): List<DDRSongRecord> =
+        applyMetadata(dao.songRecords(groupID, style.value))
+
+    suspend fun songVersions(): Map<String, Int> =
+        externalDao.allDDRSongMetas().associate { it.titleCompact to it.version }
+
     suspend fun songRecords(date: Long, style: DDRPlayStyle): List<DDRSongRecord> {
         val group = importGroupFor(date) ?: return emptyList()
         return applyMetadata(dao.songRecords(group.id, style.value))
