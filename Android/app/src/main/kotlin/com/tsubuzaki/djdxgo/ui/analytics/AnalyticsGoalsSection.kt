@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +32,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -62,7 +65,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.djdxgo.AppContainer
 import com.tsubuzaki.djdxgo.R
@@ -205,8 +207,8 @@ private fun StatusBadge(status: AnalyticsGoalStatus) {
     val color = status.color()
     Text(
         text = status.label(),
-        style = MaterialTheme.typography.labelSmall,
-        fontWeight = FontWeight.Bold,
+        style = MaterialTheme.typography.labelSmall.gameFont(),
+        fontWeight = FontWeight.ExtraBold,
         color = color,
         maxLines = 1,
         modifier = Modifier
@@ -248,22 +250,11 @@ private fun AnalyticsGoalCard(progress: AnalyticsGoalProgress, onClick: () -> Un
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = goal.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                AnalyticsGoalTitle(
+                    goal = goal,
+                    style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.weight(1f, fill = false)
                 )
-                goal.subtitle?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
                 Spacer(modifier = Modifier.weight(1f))
                 StatusBadge(progress.status)
             }
@@ -275,7 +266,8 @@ private fun AnalyticsGoalCard(progress: AnalyticsGoalProgress, onClick: () -> Un
                 )
                 Text(
                     text = "/ ${goal.formatted(goal.target)}",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMedium.gameFont(),
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 2.dp)
                 )
@@ -405,13 +397,7 @@ fun AnalyticsGoalEditorDialog(
                     ) { playStyle = it }
                 }
                 if (kind != AnalyticsGoalKind.RATING) {
-                    val levelAll = stringResource(R.string.goals_level_all)
-                    GoalDropdownRow(
-                        stringResource(R.string.goals_level),
-                        listOf(0) + AnalyticsGoal.levelOptions(game),
-                        level,
-                        { if (it == 0) levelAll else "☆$it" }
-                    ) { level = it }
+                    GoalLevelChips(game, level) { tapped -> level = if (level == tapped) 0 else tapped }
                     GoalDropdownRow(
                         stringResource(
                             if (kind == AnalyticsGoalKind.CLEAR_COUNT) R.string.goals_clear_type else R.string.goals_grade
@@ -529,7 +515,7 @@ fun AnalyticsGoalDetailScreen(container: AppContainer, goalID: String, onBack: (
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(goal?.title.orEmpty(), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                title = { Text(stringResource(R.string.goals_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.tower_back))
@@ -556,6 +542,26 @@ fun AnalyticsGoalDetailScreen(container: AppContainer, goalID: String, onBack: (
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             if (current != null) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    AnalyticsGoalTitle(goal = current.goal, style = MaterialTheme.typography.titleSmall)
+                    Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = current.goal.formatted(current.current),
+                            style = MaterialTheme.typography.displaySmall.gameFont(),
+                            fontWeight = FontWeight.Black
+                        )
+                        Text(
+                            text = "/ ${current.goal.formatted(current.goal.target)}",
+                            style = MaterialTheme.typography.titleMedium.gameFont(),
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                    }
+                }
                 GoalChart(
                     progress = current,
                     modifier = Modifier
@@ -583,11 +589,20 @@ fun AnalyticsGoalDetailScreen(container: AppContainer, goalID: String, onBack: (
                 DetailValueRow(stringResource(R.string.goals_expected), g.formatted(current.expected))
                 DetailValueRow(stringResource(R.string.goals_remaining), g.formatted(current.remaining))
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                DetailValueRow(stringResource(R.string.goals_start_date), g.startDate.toLocalDate().format(longDateFormatter))
-                DetailValueRow(stringResource(R.string.goals_deadline), g.deadline.toLocalDate().format(longDateFormatter))
+                DetailValueRow(
+                    stringResource(R.string.goals_start_date),
+                    g.startDate.toLocalDate().format(longDateFormatter),
+                    isNumeric = false
+                )
+                DetailValueRow(
+                    stringResource(R.string.goals_deadline),
+                    g.deadline.toLocalDate().format(longDateFormatter),
+                    isNumeric = false
+                )
                 DetailValueRow(
                     stringResource(R.string.goals_time_left),
-                    stringResource(R.string.goals_days_left, current.daysLeft)
+                    stringResource(R.string.goals_days_left, current.daysLeft),
+                    isNumeric = false
                 )
             }
         }
@@ -645,9 +660,40 @@ private fun DetailRow(label: String, trailing: @Composable () -> Unit) {
 }
 
 @Composable
-private fun DetailValueRow(label: String, value: String) {
+private fun DetailValueRow(label: String, value: String, isNumeric: Boolean = true) {
     DetailRow(label) {
-        Text(text = value, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text = value,
+            style = if (isNumeric) MaterialTheme.typography.bodyLarge.gameFont() else MaterialTheme.typography.bodyLarge,
+            fontWeight = if (isNumeric) FontWeight.SemiBold else null,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun GoalLevelChips(game: Game, level: Int, onToggle: (Int) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.goals_level),
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = if (level > 0) "☆$level" else stringResource(R.string.goals_level_all),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        AnalyticsGoal.levelOptions(game).forEach { option ->
+            FilterChip(
+                selected = option == level,
+                onClick = { onToggle(option) },
+                label = { Text(option.toString()) }
+            )
+        }
     }
 }
 
