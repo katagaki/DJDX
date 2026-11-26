@@ -53,6 +53,7 @@ import com.tsubuzaki.djdxgo.data.external.IIDXSong
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXSongRecord
 import com.tsubuzaki.djdxgo.data.setSetting
+import com.tsubuzaki.djdxgo.ui.games.ScoreCountRow
 import com.tsubuzaki.djdxgo.ui.games.ScoresToolbar
 import com.tsubuzaki.djdxgo.ui.games.SortOption
 import com.tsubuzaki.djdxgo.ui.share.ShareCardSheet
@@ -209,6 +210,12 @@ fun IIDXScoresScreen(
                             )
                         }
                     }
+                }
+            }
+            if (!records.isNullOrEmpty()) {
+                item(key = "count") {
+                    ScoreCountRow(count = entries.size)
+                    HorizontalDivider()
                 }
             }
             items(

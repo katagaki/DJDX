@@ -41,17 +41,8 @@ struct DifficultySegmentedPicker<Tag: Hashable>: View {
         .simultaneousGesture(dragGesture)
         .sensoryFeedback(.selection, trigger: selection)
 
-        if #available(iOS 26.0, *) {
-            content
-                .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 20.0))
-        } else {
-            content
-                .background(.ultraThinMaterial, in: .rect(cornerRadius: 20.0))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 20.0)
-                        .stroke(.secondary.opacity(0.2), lineWidth: 1.0)
-                }
-        }
+        content
+            .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 20.0))
     }
 
     @ViewBuilder

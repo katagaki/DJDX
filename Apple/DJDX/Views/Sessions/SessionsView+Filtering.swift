@@ -36,7 +36,6 @@ extension SessionsView {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     func sorted(_ plays: [IIDXCapturedPlay]) -> [IIDXCapturedPlay] {
         var plays = plays
         let isAscending = sortOrder == .ascending

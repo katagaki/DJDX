@@ -6,6 +6,9 @@ import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.ui.share.ShareCardSheet
 import com.tsubuzaki.djdxgo.ui.share.toShareCardEntry
 import com.tsubuzaki.djdxgo.ui.share.toShareCardProfile
+import androidx.compose.foundation.clickable
+import com.tsubuzaki.djdxgo.data.notes.ChartNoteTarget
+import com.tsubuzaki.djdxgo.ui.common.ChartNotesSheet
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
 import com.tsubuzaki.djdxgo.ui.theme.GameFonts
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
@@ -113,6 +116,7 @@ fun PolarisChordScoresScreen(
     LaunchedEffect(shareRequests) {
         shareRequests.collect { showShareSheet = true }
     }
+    var noteTarget by remember { mutableStateOf<ChartNoteTarget?>(null) }
 
     val displayed = remember(
         records, sortMode, sortDescending,
@@ -158,8 +162,14 @@ fun PolarisChordScoresScreen(
             if (isLoaded && displayed.isEmpty()) {
                 item(key = "empty") { EmptyStateCard() }
             }
+            if (records.isNotEmpty()) {
+                item(key = "count") {
+                    ScoreCountRow(count = displayed.size)
+                    HorizontalDivider()
+                }
+            }
             items(displayed, key = { it.id }) { record ->
-                PolarisChordScoreRow(record = record)
+                PolarisChordScoreRow(record = record, onClick = { noteTarget = record.chartNoteTarget() })
                 HorizontalDivider()
             }
         }
@@ -172,7 +182,7 @@ fun PolarisChordScoresScreen(
             onQueryChange = { query = it },
             searchResults = searchResults,
             searchResultContent = { record ->
-                PolarisChordScoreRow(record = record)
+                PolarisChordScoreRow(record = record, onClick = { noteTarget = record.chartNoteTarget() })
             },
             sortOptions = listOf(
                 SortOption(SORT_TITLE, stringResource(R.string.games_sort_title)),
@@ -199,6 +209,14 @@ fun PolarisChordScoresScreen(
             profile = profile.toShareCardProfile(),
             entries = (if (query.isEmpty()) displayed else searchResults).map { it.toShareCardEntry() },
             onDismiss = { showShareSheet = false }
+        )
+    }
+
+    noteTarget?.let { target ->
+        ChartNotesSheet(
+            repository = container.chartNotesRepository,
+            target = target,
+            onDismiss = { noteTarget = null }
         )
     }
 
@@ -284,11 +302,12 @@ private fun polarisChordDisplayRecords(
 }
 
 @Composable
-private fun PolarisChordScoreRow(record: PolarisChordSongRecord) {
+private fun PolarisChordScoreRow(record: PolarisChordSongRecord, onClick: () -> Unit) {
     val darkTheme = isSystemInDarkTheme()
     val clearType = PolarisChordClearType.fromValue(record.clearType)
     Row(
         modifier = Modifier
+            .clickable(onClick = onClick)
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .padding(end = 16.dp),
@@ -389,3 +408,10 @@ private fun PolarisChordScoreRow(record: PolarisChordSongRecord) {
         }
     }
 }
+
+private fun PolarisChordSongRecord.chartNoteTarget() = ChartNoteTarget(
+    game = Game.POLARIS_CHORD,
+    title = title,
+    chart = difficulty,
+    chartLabel = "$difficulty $level"
+)

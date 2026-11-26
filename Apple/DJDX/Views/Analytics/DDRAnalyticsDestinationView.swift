@@ -14,11 +14,11 @@ struct DDRAnalyticsDestinationView: View {
             case .clearBreakdownDetail:
                 DDRClearBreakdownDetailView(clearTypePerLevel: model.clearTypePerLevel)
                     .navigationTitle("Analytics.DDR.ClearBreakdown")
-                    .automaticNavigationTransition(id: "DDR.clearBreakdown", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "DDR.clearBreakdown", in: namespace))
             case .rankBreakdownDetail:
                 DDRRankBreakdownDetailView(rankPerLevel: model.rankPerLevel)
                     .navigationTitle("Analytics.DDR.RankBreakdown")
-                    .automaticNavigationTransition(id: "DDR.rankBreakdown", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "DDR.rankBreakdown", in: namespace))
             }
         }
         .appBackgroundGradient()

@@ -1,7 +1,6 @@
 import Foundation
 import SQLite
 
-// swiftlint:disable:next type_body_length
 final class IIDXPlaySessionsDatabase: Sendable {
 
     static let shared = IIDXPlaySessionsDatabase()
@@ -70,7 +69,6 @@ final class IIDXPlaySessionsDatabase: Sendable {
         return connection
     }
 
-    // swiftlint:disable:next function_body_length
     private func createTablesIfNeeded() {
         do {
             let database = try Connection(databasePath)

@@ -14,6 +14,7 @@ struct SDVXScoresView<Header: View>: View {
     @AppStorage(wrappedValue: [], "SDVXScoresView.LevelFilters") var levelBucketsToShow: Set<Double>
     @AppStorage(wrappedValue: [], "SDVXScoresView.ClearTypeFilters") var clearTypesToShow: Set<SDVXClearType>
     @AppStorage(wrappedValue: [], "SDVXScoresView.GradeFilters") var gradesToShow: Set<SDVXGrade>
+    @AppStorage(wrappedValue: 0, "SDVXScoresView.ScoreBelowFilter") var scoreBelow: Int
 
     var isScoreDataExpandedKey: String = "SDVXScoresView.ScoreDataExpanded"
     @State var isScoreDataExpanded: Bool
@@ -50,7 +51,8 @@ struct SDVXScoresView<Header: View>: View {
         SDVXFilterOptions(difficulties: difficultiesToShow,
                           levelBuckets: levelBucketsToShow,
                           clearTypes: clearTypesToShow,
-                          grades: gradesToShow)
+                          grades: gradesToShow,
+                          scoreBelow: scoreBelow)
     }
 
     func siblingCharts(of record: SDVXSongRecord) -> [SDVXSongRecord] {
@@ -132,7 +134,7 @@ struct SDVXScoresView<Header: View>: View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
-        .automaticSheetMatchedTransitionSource(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
+        .matchedTransitionSource(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
     }
 
     var body: some View {
@@ -157,6 +159,11 @@ struct SDVXScoresView<Header: View>: View {
                     }
                 }
                 if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
+                    let sortedRecords = sortedRecords
+                    if !records.isEmpty {
+                        ScoreCountRow(count: sortedRecords.count)
+                        Divider()
+                    }
                     ForEach(sortedRecords, id: \.self) { record in
                         Button {
                             navigationManager.push(SDVXScoresPath.scoreViewer(songRecord: record))
@@ -181,19 +188,11 @@ struct SDVXScoresView<Header: View>: View {
             await reload()
         }
         .toolbar {
-            if #available(iOS 26.0, *) {
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    sortControl
-                    filterControl
-                }
-            } else {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Spacer()
-                    sortControl
-                    filterControl
-                }
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                sortControl
+                filterControl
             }
         }
         .sheet(isPresented: $isShowingFilterSheet) {
@@ -202,12 +201,13 @@ struct SDVXScoresView<Header: View>: View {
                 levelBucketsToShow: $levelBucketsToShow.animation(.smooth.speed(2.0)),
                 clearTypesToShow: $clearTypesToShow.animation(.smooth.speed(2.0)),
                 gradesToShow: $gradesToShow.animation(.smooth.speed(2.0)),
+                scoreBelow: $scoreBelow.animation(.smooth.speed(2.0)),
                 availableLevelBuckets: availableLevelBuckets,
                 onReset: {
                     // No additional handling needed when filters are reset
                 }
             )
-            .automaticSheetNavigationTransition(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
+            .navigationTransition(.zoom(sourceID: "SDVXScoreFilterSheet", in: sdvxNamespace))
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
             .interactiveDismissDisabled()
@@ -232,8 +232,8 @@ struct SDVXScoresView<Header: View>: View {
             case .scoreViewer(let songRecord):
                 SDVXScoreViewer(songRecords: siblingCharts(of: songRecord),
                                 initialDifficulty: songRecord.difficultyEnum)
-                    .automaticNavigationTransition(id: "\(songRecord.title).\(songRecord.difficulty)",
-                                                   in: sdvxNamespace)
+                    .navigationTransition(.zoom(sourceID: "\(songRecord.title).\(songRecord.difficulty)",
+                                                   in: sdvxNamespace))
             case .chartViewer(let chart):
                 SDVXInChartViewer(chart: chart)
             }

@@ -143,7 +143,6 @@ struct PolarisChordProfileHeaderView: View {
 
     // PA SKILL rate tier, mirroring get_pa_skill_icon() in index_init.js. The
     // sub-1.00 tier uses none.png; the rest are A.png ... K.png.
-    // swiftlint:disable:next cyclomatic_complexity
     func paSkillIconName(forSkill skill: Double) -> String {
         switch skill {
         case ..<1.00: return "none"

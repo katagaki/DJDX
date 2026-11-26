@@ -22,6 +22,7 @@ struct DDRScoresView<Header: View>: View {
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
     @State var isShowingShareCard: Bool = false
+    @State private var chartNoteTarget: ChartNoteTarget?
 
     @Namespace var ddrNamespace
 
@@ -134,7 +135,7 @@ struct DDRScoresView<Header: View>: View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
-        .automaticSheetMatchedTransitionSource(id: "DDRScoreFilterSheet", in: ddrNamespace)
+        .matchedTransitionSource(id: "DDRScoreFilterSheet", in: ddrNamespace)
     }
 
     var body: some View {
@@ -144,8 +145,19 @@ struct DDRScoresView<Header: View>: View {
                     header
                 }
                 if !isEditingAnalytics {
+                    let sortedRecords = sortedRecords
+                    if !records.isEmpty {
+                        ScoreCountRow(count: sortedRecords.count)
+                        Divider()
+                    }
                     ForEach(sortedRecords, id: \.self) { record in
-                        DDRScoreRow(record: record)
+                        Button {
+                            chartNoteTarget = record.chartNoteTarget
+                        } label: {
+                            DDRScoreRow(record: record)
+                                .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                         Divider()
                             .padding(.leading, 16.0)
                     }
@@ -162,19 +174,11 @@ struct DDRScoresView<Header: View>: View {
             await reload()
         }
         .toolbar {
-            if #available(iOS 26.0, *) {
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    sortControl
-                    filterControl
-                }
-            } else {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Spacer()
-                    sortControl
-                    filterControl
-                }
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                sortControl
+                filterControl
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
@@ -187,6 +191,11 @@ struct DDRScoresView<Header: View>: View {
                 entries: sortedRecords.map { ShareCardEntry(ddrSongRecord: $0) },
                 playStyle: ddrStyleToShow == .single ? "SP" : "DP"
             )
+        }
+        .sheet(item: $chartNoteTarget) { target in
+            ChartNotesSheet(game: target.game, title: target.title,
+                            chart: target.chart, chartLabel: target.chartLabel)
+                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             DDRScoreFilterSheet(
@@ -201,7 +210,7 @@ struct DDRScoresView<Header: View>: View {
                 onReset: {
                 }
             )
-            .automaticSheetNavigationTransition(id: "DDRScoreFilterSheet", in: ddrNamespace)
+            .navigationTransition(.zoom(sourceID: "DDRScoreFilterSheet", in: ddrNamespace))
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
             .interactiveDismissDisabled()

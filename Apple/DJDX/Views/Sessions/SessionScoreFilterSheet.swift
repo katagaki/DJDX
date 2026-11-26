@@ -108,14 +108,8 @@ struct SessionScoreFilterSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    if #available(iOS 26.0, *) {
-                        Button(role: .confirm) {
-                            dismiss()
-                        }
-                    } else {
-                        Button(.sharedDone) {
-                            dismiss()
-                        }
+                    Button(role: .confirm) {
+                        dismiss()
                     }
                 }
             }

@@ -21,15 +21,10 @@ struct QproWidgetView: View {
     var body: some View {
         if let imageData = entry.imageData, let uiImage = UIImage(data: imageData) {
             Group {
-                if #available(iOS 18.0, *) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .widgetAccentedRenderingMode(.fullColor)
-                        .widgetAccentable(false)
-                } else {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                }
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .widgetAccentedRenderingMode(.fullColor)
+                    .widgetAccentable(false)
             }
             .scaledToFit()
         } else {
