@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.Flow
 import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.ui.share.ShareCardSheet
 import com.tsubuzaki.djdxgo.ui.share.toShareCardEntry
@@ -74,6 +76,7 @@ fun PolarisChordScoresScreen(
     container: AppContainer,
     contentPadding: PaddingValues,
     analyticsContent: (@Composable () -> Unit)? = null,
+    shareRequests: Flow<Unit> = emptyFlow(),
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -107,6 +110,9 @@ fun PolarisChordScoresScreen(
     var query by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by remember { mutableStateOf(false) }
     var showShareSheet by remember { mutableStateOf(false) }
+    LaunchedEffect(shareRequests) {
+        shareRequests.collect { showShareSheet = true }
+    }
 
     val displayed = remember(
         records, sortMode, sortDescending,
@@ -182,8 +188,7 @@ fun PolarisChordScoresScreen(
                     context.setSetting(SettingsKeys.polarisChordSortDescending, descending)
                 }
             },
-            onFilterClick = { showFilterSheet = true },
-            onShareClick = { showShareSheet = true }
+            onFilterClick = { showFilterSheet = true }
         )
     }
 

@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.Flow
 import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.ui.share.ShareCardSheet
 import com.tsubuzaki.djdxgo.ui.share.toShareCardEntry
@@ -75,6 +77,7 @@ fun SDVXScoresScreen(
     container: AppContainer,
     contentPadding: PaddingValues,
     analyticsContent: (@Composable () -> Unit)? = null,
+    shareRequests: Flow<Unit> = emptyFlow(),
     onOpenSong: (title: String, dateEpoch: Long, difficulty: String) -> Unit
 ) {
     val context = LocalContext.current
@@ -107,6 +110,9 @@ fun SDVXScoresScreen(
     var query by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by remember { mutableStateOf(false) }
     var showShareSheet by remember { mutableStateOf(false) }
+    LaunchedEffect(shareRequests) {
+        shareRequests.collect { showShareSheet = true }
+    }
 
     val displayed = remember(
         records, sortMode, sortDescending,
@@ -186,8 +192,7 @@ fun SDVXScoresScreen(
                     context.setSetting(SettingsKeys.sdvxSortDescending, descending)
                 }
             },
-            onFilterClick = { showFilterSheet = true },
-            onShareClick = { showShareSheet = true }
+            onFilterClick = { showFilterSheet = true }
         )
     }
 

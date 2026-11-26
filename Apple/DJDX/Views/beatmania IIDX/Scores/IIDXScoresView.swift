@@ -170,12 +170,6 @@ struct IIDXScoresView<Header: View>: View {
         )
     }
 
-    @ViewBuilder var shareControl: some View {
-        Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
-            isShowingShareCard = true
-        }
-    }
-
     @ViewBuilder var filterControl: some View {
         ScoreFilterButton(
             isShowingFilterSheet: $isShowingFilterSheet,
@@ -246,7 +240,6 @@ struct IIDXScoresView<Header: View>: View {
                     ToolbarItemGroup(placement: .bottomBar) {
                         sortControl
                         filterControl
-                        shareControl
                     }
                 } else {
                     ToolbarItemGroup(placement: .bottomBar) {
@@ -254,7 +247,6 @@ struct IIDXScoresView<Header: View>: View {
                         Spacer()
                         sortControl
                         filterControl
-                        shareControl
                     }
                 }
             }
@@ -291,6 +283,9 @@ struct IIDXScoresView<Header: View>: View {
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.hidden)
                 .interactiveDismissDisabled()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
+                isShowingShareCard = true
             }
             .sheet(isPresented: $isShowingShareCard) {
                 ShareCardComposer(

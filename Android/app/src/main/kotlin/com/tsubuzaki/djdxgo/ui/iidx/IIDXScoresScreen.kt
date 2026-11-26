@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.iidx
 
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.Flow
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -66,6 +68,7 @@ fun IIDXScoresScreen(
     container: AppContainer,
     contentPadding: PaddingValues,
     analyticsContent: (@Composable () -> Unit)? = null,
+    shareRequests: Flow<Unit> = emptyFlow(),
     onOpenSong: (title: String, playType: String, initialLevel: String, dateEpoch: Long) -> Unit
 ) {
     val context = LocalContext.current
@@ -100,6 +103,9 @@ fun IIDXScoresScreen(
     var searchTerm by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by rememberSaveable { mutableStateOf(false) }
     var showShareSheet by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(shareRequests) {
+        shareRequests.collect { showShareSheet = true }
+    }
 
     var records by remember { mutableStateOf<List<IIDXSongRecord>?>(null) }
     var songs by remember { mutableStateOf<Map<String, IIDXSong>>(emptyMap()) }
@@ -287,7 +293,6 @@ fun IIDXScoresScreen(
                 }
             },
             onFilterClick = { showFilterSheet = true },
-            onShareClick = { showShareSheet = true },
             leadingContent = {
                 if (isTimeTravelling) {
                     FilledIconButton(onClick = {

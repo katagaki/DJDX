@@ -130,12 +130,6 @@ struct DDRScoresView<Header: View>: View {
         .menuActionDismissBehavior(.disabled)
     }
 
-    @ViewBuilder var shareControl: some View {
-        Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
-            isShowingShareCard = true
-        }
-    }
-
     @ViewBuilder var filterControl: some View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
@@ -174,16 +168,17 @@ struct DDRScoresView<Header: View>: View {
                 ToolbarItemGroup(placement: .bottomBar) {
                     sortControl
                     filterControl
-                    shareControl
                 }
             } else {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Spacer()
                     sortControl
                     filterControl
-                    shareControl
                 }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
+            isShowingShareCard = true
         }
         .sheet(isPresented: $isShowingShareCard) {
             ShareCardComposer(
