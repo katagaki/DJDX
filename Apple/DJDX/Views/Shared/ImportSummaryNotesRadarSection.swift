@@ -9,26 +9,19 @@ struct ImportSummaryNotesRadarSection: View {
             VStack(alignment: .leading, spacing: 4.0) {
                 HStack {
                     Text(verbatim: "NOTES RADAR (\(notesRadar.playType))")
-                        .font(.caption)
-                        .fontWeight(.heavy)
-                        .fontWidth(.expanded)
+                        .font(.radarline(.caption, width: .expanded))
                     Spacer()
                     if let previousRadar = notesRadar.previousRadar {
                         Text(verbatim: signed(notesRadar.radar.sum() - previousRadar.sum()))
-                            .font(.caption)
-                            .fontWeight(.heavy)
-                            .fontWidth(.expanded)
+                            .font(.radarline(.caption, width: .expanded))
                             .foregroundStyle(.secondary)
                     }
                 }
                 HStack {
                     Spacer(minLength: 0.0)
                     Text(verbatim: format(notesRadar.radar.sum()))
-                        .font(.largeTitle)
-                        .fontWeight(.black)
-                        .fontWidth(.expanded)
+                        .font(.radarline(.largeTitle, width: .expanded))
                         .foregroundStyle(notesRadar.radar.color(isPlayerRadar: true).gradient)
-                        .monospacedDigit()
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                 }
@@ -63,20 +56,16 @@ struct ImportSummaryNotesRadarSection: View {
     func pointColumn(_ point: RadarPointConfig) -> some View {
         VStack(spacing: 2.0) {
             Text(verbatim: point.label)
-                .font(.caption2)
+                .font(.radarline(.caption2, width: .expanded))
                 .foregroundStyle(point.color)
             Text(verbatim: format(point.value))
-                .font(.subheadline)
-                .fontWeight(.black)
+                .font(.radarline(.subheadline, width: .expanded))
             if let previousValue = previousValue(for: point.label) {
                 Text(verbatim: signed(point.value - previousValue))
-                    .font(.caption2)
+                    .font(.radarline(.caption2, weight: .bold, width: .expanded))
                     .foregroundStyle(.secondary)
             }
         }
-        .fontWidth(.expanded)
-        .fontWeight(.heavy)
-        .monospacedDigit()
         .lineLimit(1)
         .minimumScaleFactor(0.6)
         .frame(maxWidth: .infinity)
