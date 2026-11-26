@@ -299,7 +299,8 @@ struct IIDXScoresView<Header: View>: View {
                     entries: levelEntries(from: searchResults ?? songRecords ?? []).map {
                         ShareCardEntry(iidxSongRecord: $0.songRecord, level: $0.level,
                                        score: $0.score, scoreRate: $0.scoreRate)
-                    }
+                    },
+                    playStyle: playTypeToShow.displayName()
                 )
             }
             .onAppear {

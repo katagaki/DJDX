@@ -189,7 +189,8 @@ struct DDRScoresView<Header: View>: View {
             ShareCardComposer(
                 game: .danceDanceRevolution,
                 profile: .ddr(style: ddrStyleToShow),
-                entries: sortedRecords.map { ShareCardEntry(ddrSongRecord: $0) }
+                entries: sortedRecords.map { ShareCardEntry(ddrSongRecord: $0) },
+                playStyle: ddrStyleToShow == .single ? "SP" : "DP"
             )
         }
         .sheet(isPresented: $isShowingFilterSheet) {

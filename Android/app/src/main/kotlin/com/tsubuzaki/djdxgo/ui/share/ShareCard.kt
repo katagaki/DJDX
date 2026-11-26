@@ -53,6 +53,7 @@ fun ShareCard(
     profile: ShareCardProfile?,
     entries: List<ShareCardEntry>,
     totalCount: Int,
+    playStyle: String?,
     background: ShareCardBackground,
     photo: ImageBitmap?,
     accentColor: Color,
@@ -71,7 +72,7 @@ fun ShareCard(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            ShareCardHeader(title = title, iconRes = iconRes, profile = profile)
+            ShareCardHeader(title = title, iconRes = iconRes, profile = profile, playStyle = playStyle)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -155,7 +156,12 @@ private fun ShareCardBackdrop(
 }
 
 @Composable
-private fun ShareCardHeader(title: String, @DrawableRes iconRes: Int, profile: ShareCardProfile?) {
+private fun ShareCardHeader(
+    title: String,
+    @DrawableRes iconRes: Int,
+    profile: ShareCardProfile?,
+    playStyle: String?
+) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -189,6 +195,17 @@ private fun ShareCardHeader(title: String, @DrawableRes iconRes: Int, profile: S
             if (profile != null && !profile.isEmpty && !profile.hasVisuals) {
                 ShareCardProfileText(profile, Alignment.End)
             }
+            playStyle?.let {
+                Text(
+                    text = it,
+                    style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Black, color = Color.White)
+                        .gameFont(GameFontWidth.EXPANDED),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(Color.White.copy(alpha = 0.2f))
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                )
+            }
         }
         if (profile != null && profile.hasVisuals) {
             ShareCardProfileBand(profile)
@@ -209,12 +226,14 @@ private fun ShareCardProfileText(profile: ShareCardProfile, alignment: Alignment
         }
         profile.ratings.forEach { rating ->
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = rating.label,
-                    style = ratingStyle.copy(color = Color.White.copy(alpha = 0.7f)),
-                    maxLines = 1,
-                    modifier = Modifier.alignByBaseline()
-                )
+                if (rating.label.isNotEmpty()) {
+                    Text(
+                        text = rating.label,
+                        style = ratingStyle.copy(color = Color.White.copy(alpha = 0.7f)),
+                        maxLines = 1,
+                        modifier = Modifier.alignByBaseline()
+                    )
+                }
                 Text(text = rating.value, style = ratingStyle, maxLines = 1, modifier = Modifier.alignByBaseline())
             }
         }

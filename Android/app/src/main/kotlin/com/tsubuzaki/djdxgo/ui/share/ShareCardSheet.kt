@@ -86,6 +86,7 @@ fun ShareCardSheet(
     game: Game,
     profile: ShareCardProfile,
     entries: List<ShareCardEntry>,
+    playStyle: String? = null,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
@@ -170,6 +171,7 @@ fun ShareCardSheet(
                     profile = if (isProfileVisible) profile else null,
                     entries = entries.take(rowLimit),
                     totalCount = entries.size,
+                    playStyle = playStyle,
                     background = background,
                     photo = photo,
                     accentColor = accentColor,

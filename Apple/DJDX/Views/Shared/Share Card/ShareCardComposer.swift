@@ -16,6 +16,7 @@ struct ShareCardComposer: View {
     let game: Game
     let profile: ShareCardProfile
     let entries: [ShareCardEntry]
+    var playStyle: String?
 
     static let rowLimits: [Int] = [10, 20, 30, 50]
 
@@ -210,6 +211,7 @@ struct ShareCardComposer: View {
             profile: isProfileVisible ? profile : nil,
             entries: Array(entries.prefix(rowLimit)),
             totalCount: entries.count,
+            playStyle: playStyle,
             background: background,
             photo: photo,
             accentColor: accentColor

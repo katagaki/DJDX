@@ -200,6 +200,7 @@ fun DDRScoresScreen(
         ShareCardSheet(
             game = Game.DANCE_DANCE_REVOLUTION,
             profile = profile.toShareCardProfile(playStyle),
+            playStyle = playStyle.displayName,
             entries = (if (query.isEmpty()) displayed else searchResults).map { it.toShareCardEntry() },
             onDismiss = { showShareSheet = false }
         )

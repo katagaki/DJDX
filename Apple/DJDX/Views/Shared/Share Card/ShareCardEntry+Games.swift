@@ -133,7 +133,7 @@ extension ShareCardProfile {
         var ratings: [ShareCardRating] = []
         let rankKey = playType == .single ? "Profile.IIDX.SPRank" : "Profile.IIDX.DPRank"
         if let rank = defaults.string(forKey: rankKey), !rank.isEmpty, rank != "--" {
-            ratings.append(ShareCardRating(label: playType.displayName(), value: rank))
+            ratings.append(ShareCardRating(label: "", value: rank))
         }
         let radarPrefix = playType == .single ? "NotesRadar.SP" : "NotesRadar.DP"
         let shared = SharedContainer.defaults

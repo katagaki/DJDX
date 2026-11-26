@@ -6,6 +6,7 @@ struct ShareCardView: View {
     let profile: ShareCardProfile?
     let entries: [ShareCardEntry]
     let totalCount: Int
+    var playStyle: String?
     let background: ShareCardBackground
     let photo: UIImage?
     let accentColor: Color
@@ -65,6 +66,14 @@ struct ShareCardView: View {
                 if let profile, !profile.isEmpty, !profile.hasVisuals {
                     profileText(profile, alignment: .trailing)
                 }
+                if let playStyle {
+                    Text(verbatim: playStyle)
+                        .font(.system(size: 13.0, weight: .black))
+                        .fontWidth(.expanded)
+                        .padding(.horizontal, 10.0)
+                        .padding(.vertical, 5.0)
+                        .background(.white.opacity(0.2), in: .capsule)
+                }
             }
             if let profile, profile.hasVisuals {
                 profileBand(profile)
@@ -82,8 +91,10 @@ struct ShareCardView: View {
             }
             ForEach(profile.ratings) { rating in
                 HStack(alignment: .firstTextBaseline, spacing: 4.0) {
-                    Text(verbatim: rating.label)
-                        .foregroundStyle(.white.opacity(0.7))
+                    if !rating.label.isEmpty {
+                        Text(verbatim: rating.label)
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
                     Text(verbatim: rating.value)
                         .monospacedDigit()
                 }

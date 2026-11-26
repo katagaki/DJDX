@@ -23,7 +23,7 @@ struct ShareCardEntry: Identifiable {
 }
 
 struct ShareCardRating: Identifiable {
-    var id: String { label }
+    var id: String { label + value }
     let label: String
     let value: String
 }

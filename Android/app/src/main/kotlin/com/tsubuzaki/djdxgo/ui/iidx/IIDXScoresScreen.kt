@@ -354,6 +354,7 @@ fun IIDXScoresScreen(
         ShareCardSheet(
             game = Game.IIDX_ARCADE,
             profile = profile.toShareCardProfile(playType),
+            playStyle = playType.displayName,
             entries = shareSource.map { entry ->
                 iidxShareCardEntry(
                     record = entry.record,

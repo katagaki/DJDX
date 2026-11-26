@@ -154,7 +154,7 @@ fun IIDXProfile.toShareCardProfile(playType: IIDXPlayType): ShareCardProfile {
     val rank = (if (playType == IIDXPlayType.SINGLE) spRank else dpRank)?.takeIf { it.isNotEmpty() && it != "--" }
     return ShareCardProfile(
         playerName = djName,
-        ratings = listOfNotNull(rank?.let { ShareCardRating(playType.displayName, it) }),
+        ratings = listOfNotNull(rank?.let { ShareCardRating("", it) }),
         avatar = qpro?.asImageBitmap(),
         radar = if (playType == IIDXPlayType.SINGLE) spRadar else dpRadar
     )
