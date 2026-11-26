@@ -53,7 +53,7 @@ struct ImportSummaryEntrySection: View {
                         if let previousScore = entry.previousScore {
                             Text(verbatim: "+" + scoreString(score - previousScore))
                                 .font(.caption2)
-                                .foregroundStyle(.green)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
