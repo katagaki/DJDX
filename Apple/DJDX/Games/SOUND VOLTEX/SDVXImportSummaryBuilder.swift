@@ -71,6 +71,7 @@ enum SDVXImportSummaryBuilder {
                 difficulty: difficulty.rawValue,
                 level: record.level,
                 difficultyColor: difficulty.color,
+                lampStyle: AnyShapeStyle(record.clearTypeEnum.color),
                 levelValue: Double(record.level) ?? 0.0,
                 previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                 score: isNewScore ? record.highScore : nil,
