@@ -15,25 +15,16 @@ struct ProgressCard: View {
             Color.black.opacity(colorScheme == .dark ? 0.5 : 0.2)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .opacity(isVisible ? 1.0 : 0.0)
-            if #available(iOS 26.0, *) {
-                GlassEffectContainer {
-                    if isVisible {
-                        contentView
-                            .padding(20.0)
-                            .glassEffect(.regular.interactive(),
-                                         in: .rect(cornerRadius: 20.0))
-                            .glassEffectTransition(.materialize)
-                    }
+            GlassEffectContainer {
+                if isVisible {
+                    contentView
+                        .padding(20.0)
+                        .glassEffect(.regular.interactive(),
+                                     in: .rect(cornerRadius: 20.0))
+                        .glassEffectTransition(.materialize)
                 }
-                .padding(.all, 24.0)
-            } else if isVisible {
-                contentView
-                    .padding()
-                    .background(.thickMaterial)
-                    .clipShape(.rect(cornerRadius: 16.0))
-                    .padding(.all, 32.0)
-                    .transition(.opacity)
             }
+            .padding(.all, 24.0)
         }
         .ignoresSafeArea(.all)
     }

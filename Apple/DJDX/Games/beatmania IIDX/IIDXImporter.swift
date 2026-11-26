@@ -63,7 +63,7 @@ actor IIDXImporter {
         continuation: AsyncStream<ImportProgress>.Continuation
     ) {
         if let urlOfData: URL = url,
-            let stringFromData: String = try? String(contentsOf: urlOfData) {
+            let stringFromData: String = try? String(contentsOf: urlOfData, encoding: .utf8) {
             let parsedCSV = CSwiftV(with: stringFromData)
             if let keyedRows = parsedCSV.keyedRows {
 

@@ -64,10 +64,10 @@ struct NewEntryDetailView<Entry: IIDXNewEntry>: View {
                                     noteCount: noteCount,
                                     initialLevel: entry.level
                                 )
-                                .automaticNavigationTransition(
-                                    id: "\(entry.songRecord.title).\(entry.level.rawValue)",
+                                .navigationTransition(.zoom(
+                                    sourceID: "\(entry.songRecord.title).\(entry.level.rawValue)",
                                     in: namespace
-                                )
+                                ))
                             } label: {
                                 IIDXScoreRow(
                                     namespace: namespace,

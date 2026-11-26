@@ -69,11 +69,7 @@ extension SessionsView {
 
     func sessionsCard<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
         let cornerRadius: CGFloat
-        if #available(iOS 26.0, *) {
-            cornerRadius = 20.0
-        } else {
-            cornerRadius = 12.0
-        }
+        cornerRadius = 20.0
         return content()
             .padding(12.0)
             .frame(maxWidth: .infinity, alignment: .leading)

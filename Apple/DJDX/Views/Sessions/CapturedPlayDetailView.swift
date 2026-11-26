@@ -150,17 +150,9 @@ struct CapturedPlayDetailView: View {
                 )
             }
         }
-        if #available(iOS 26.0, *) {
-            ToolbarItem(placement: .bottomBar) { reanalyzeButton }
-            ToolbarSpacer(.flexible, placement: .bottomBar)
-            ToolbarItem(placement: .bottomBar) { acceptAllButton }
-        } else {
-            ToolbarItemGroup(placement: .bottomBar) {
-                reanalyzeButton
-                Spacer()
-                acceptAllButton
-            }
-        }
+        ToolbarItem(placement: .bottomBar) { reanalyzeButton }
+        ToolbarSpacer(.flexible, placement: .bottomBar)
+        ToolbarItem(placement: .bottomBar) { acceptAllButton }
     }
 
     @ViewBuilder

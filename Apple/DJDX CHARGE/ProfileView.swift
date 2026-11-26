@@ -93,11 +93,7 @@ struct ProfileView: View {
                 .frame(maxWidth: .infinity)
         }
         .tint(.accentColor)
-        if #available(watchOS 26.0, *) {
-            button.buttonStyle(.glass)
-        } else {
-            button.buttonStyle(.bordered)
-        }
+        button.buttonStyle(.glass)
     }
 
     @ViewBuilder

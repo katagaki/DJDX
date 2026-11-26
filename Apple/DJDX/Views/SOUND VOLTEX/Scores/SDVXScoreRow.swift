@@ -39,7 +39,7 @@ struct SDVXScoreRow: View {
                 .font(.caption)
             }
             .padding([.top, .bottom], 8.0)
-            .automaticMatchedTransitionSource(id: "\(record.title).\(record.difficulty)", in: namespace)
+            .matchedTransitionSource(id: "\(record.title).\(record.difficulty)", in: namespace)
 
             Spacer(minLength: 0.0)
 

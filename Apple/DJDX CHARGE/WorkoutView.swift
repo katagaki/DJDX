@@ -115,11 +115,7 @@ struct WorkoutView: View {
             .frame(maxWidth: .infinity)
         }
         .tint(workoutManager.isPaused ? .green : .orange)
-        if #available(watchOS 26.0, *) {
-            button.buttonStyle(.glass)
-        } else {
-            button.buttonStyle(.bordered)
-        }
+        button.buttonStyle(.glass)
     }
 
     @ViewBuilder
@@ -131,10 +127,6 @@ struct WorkoutView: View {
                 .frame(maxWidth: .infinity)
         }
         .tint(.red)
-        if #available(watchOS 26.0, *) {
-            button.buttonStyle(.glass)
-        } else {
-            button.buttonStyle(.bordered)
-        }
+        button.buttonStyle(.glass)
     }
 }

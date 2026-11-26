@@ -48,19 +48,8 @@ struct MoreExternalDataSources: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                if #available(iOS 26.0, *) {
-                    Button(role: .close) {
-                        dismiss()
-                    }
-                } else {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .tint(.primary)
-                            .font(.title2)
-                            .symbolRenderingMode(.hierarchical)
-                    }
+                Button(role: .close) {
+                    dismiss()
                 }
             }
         }
@@ -168,9 +157,7 @@ struct MoreExternalDataSources: View {
             ListSectionHeader(text: "More.ExternalData.BemaniWiki2nd")
                 .font(.body)
         } footer: {
-            Text("More.ExternalData.BemaniWiki2nd.Footer") +
-            Text(" ") +
-            Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://bemaniwiki.com)")
+            sourceFooter("More.ExternalData.BemaniWiki2nd.Footer", url: "https://bemaniwiki.com")
         }
     }
 
@@ -190,9 +177,7 @@ struct MoreExternalDataSources: View {
             ListSectionHeader(text: "More.ExternalData.BM2DX")
                 .font(.body)
         } footer: {
-            Text("More.ExternalData.BM2DX.Footer") +
-            Text(" ") +
-            Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://bm2dx.com/IIDX/notes_radar/)")
+            sourceFooter("More.ExternalData.BM2DX.Footer", url: "https://bm2dx.com/IIDX/notes_radar/")
         }
     }
 
@@ -212,9 +197,7 @@ struct MoreExternalDataSources: View {
             ListSectionHeader(text: "More.ExternalData.SDVXIn")
                 .font(.body)
         } footer: {
-            Text("More.ExternalData.SDVXIn.Footer") +
-            Text(" ") +
-            Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://sdvx.in)")
+            sourceFooter("More.ExternalData.SDVXIn.Footer", url: "https://sdvx.in")
         }
     }
 
@@ -234,9 +217,7 @@ struct MoreExternalDataSources: View {
             ListSectionHeader(text: "More.ExternalData.Textage")
                 .font(.body)
         } footer: {
-            Text("More.ExternalData.Textage.Footer") +
-            Text(" ") +
-            Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://textage.cc)")
+            sourceFooter("More.ExternalData.Textage.Footer", url: "https://textage.cc")
         }
     }
 
@@ -256,9 +237,7 @@ struct MoreExternalDataSources: View {
             ListSectionHeader(text: "More.ExternalData.TextageChartViewer")
                 .font(.body)
         } footer: {
-            Text("More.ExternalData.TextageChartViewer.Footer") +
-            Text(" ") +
-            Text("[\(String(localized: "More.ExternalData.ViewSource"))](https://textage-chart-viewer.vercel.app)")
+            sourceFooter("More.ExternalData.TextageChartViewer.Footer", url: "https://textage-chart-viewer.vercel.app")
         }
     }
 
@@ -298,5 +277,10 @@ struct MoreExternalDataSources: View {
         ddrSongMetaCount = await ExternalDataReloader.reload(
             .wikiDdr, iidxVersion: iidxVersion, progress: progressHandler(for: .ddr)
         )
+    }
+
+    func sourceFooter(_ key: LocalizedStringKey, url: String) -> Text {
+        let link = LocalizedStringKey("[\(String(localized: "More.ExternalData.ViewSource"))](\(url))")
+        return Text("\(Text(key)) \(Text(link))")
     }
 }

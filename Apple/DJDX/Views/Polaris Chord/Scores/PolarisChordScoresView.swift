@@ -138,7 +138,7 @@ struct PolarisChordScoresView<Header: View>: View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
-        .automaticSheetMatchedTransitionSource(id: "PolarisChordScoreFilterSheet", in: polarisChordNamespace)
+        .matchedTransitionSource(id: "PolarisChordScoreFilterSheet", in: polarisChordNamespace)
     }
 
     var body: some View {
@@ -182,19 +182,11 @@ struct PolarisChordScoresView<Header: View>: View {
             await reload()
         }
         .toolbar {
-            if #available(iOS 26.0, *) {
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    sortControl
-                    filterControl
-                }
-            } else {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Spacer()
-                    sortControl
-                    filterControl
-                }
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                sortControl
+                filterControl
             }
         }
         .sheet(isPresented: $isShowingFilterSheet) {
@@ -206,7 +198,7 @@ struct PolarisChordScoresView<Header: View>: View {
                 availableLevels: availableLevels,
                 onReset: {}
             )
-            .automaticSheetNavigationTransition(id: "PolarisChordScoreFilterSheet", in: polarisChordNamespace)
+            .navigationTransition(.zoom(sourceID: "PolarisChordScoreFilterSheet", in: polarisChordNamespace))
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
             .interactiveDismissDisabled()

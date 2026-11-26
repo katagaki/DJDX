@@ -74,8 +74,8 @@ struct IIDXScoreViewer: View {
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
         .contentMargins(.top, 0.0, for: .scrollContent)
-        .softTopScrollEdgeEffect()
-        .softBottomScrollEdgeEffect()
+        .scrollEdgeEffectStyle(.soft, for: .top)
+        .scrollEdgeEffectStyle(.soft, for: .bottom)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -88,7 +88,6 @@ struct IIDXScoreViewer: View {
                 .padding(.horizontal, 20.0)
                 .padding(.bottom, 8.0)
         }
-        .conditionalBottomTabBarAccessory()
         .task {
             await loadRadarData()
         }
@@ -196,16 +195,10 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
 
     @ToolbarContentBuilder
     func versionNumberToolbarItem() -> some ToolbarContent {
-        if #available(iOS 26.0, *) {
-            ToolbarItem(placement: .topBarTrailing) {
-                versionNumberToolbarItemContent()
-            }
-            .sharedBackgroundVisibility(.hidden)
-        } else {
-            ToolbarItem(placement: .topBarTrailing) {
-                versionNumberToolbarItemContent()
-            }
+        ToolbarItem(placement: .topBarTrailing) {
+            versionNumberToolbarItemContent()
         }
+        .sharedBackgroundVisibility(.hidden)
     }
 
     @ViewBuilder

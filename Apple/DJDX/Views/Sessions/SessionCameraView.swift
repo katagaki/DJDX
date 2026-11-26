@@ -253,19 +253,12 @@ final class SessionCameraViewController: UIViewController {
 
     private func configureControls() {
         shutterButton.isEnabled = false
-        if #available(iOS 26.0, *) {
-            var shutterConfig = UIButton.Configuration.clearGlass()
-            shutterConfig.cornerStyle = .fixed
-            shutterConfig.background.cornerRadius = 40
-            shutterConfig.contentInsets = .zero
-            shutterConfig.image = circleImage(diameter: 72)
-            shutterButton.configuration = shutterConfig
-        } else {
-            shutterButton.layer.cornerRadius = 40
-            shutterButton.layer.borderWidth = 4
-            shutterButton.layer.borderColor = UIColor.white.cgColor
-            shutterButton.setImage(circleImage(diameter: 64), for: .normal)
-        }
+        var shutterConfig = UIButton.Configuration.clearGlass()
+        shutterConfig.cornerStyle = .fixed
+        shutterConfig.background.cornerRadius = 40
+        shutterConfig.contentInsets = .zero
+        shutterConfig.image = circleImage(diameter: 72)
+        shutterButton.configuration = shutterConfig
         shutterButton.addTarget(self, action: #selector(capture), for: .touchUpInside)
 
         var cancelConfig = glassButtonConfiguration()
@@ -312,12 +305,7 @@ final class SessionCameraViewController: UIViewController {
 
     private func glassButtonConfiguration() -> UIButton.Configuration {
         var config: UIButton.Configuration
-        if #available(iOS 26.0, *) {
-            config = .glass()
-        } else {
-            config = .plain()
-            config.background.visualEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
-        }
+        config = .glass()
         config.baseForegroundColor = .white
         config.cornerStyle = .capsule
         return config
