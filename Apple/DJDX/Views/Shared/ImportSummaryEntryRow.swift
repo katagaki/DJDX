@@ -46,13 +46,11 @@ struct ImportSummaryEntryRow: View {
                     separator()
                 }
                 scoreText(scoreString(score))
-                    .fontWidth(.expanded)
-                    .fontWeight(.heavy)
+                    .font(.scoreline(.caption))
                 if let previousScore = entry.previousScore {
                     Text(verbatim: "(+\(scoreString(score - previousScore)))")
                         .foregroundStyle(.orange)
-                        .fontWidth(.expanded)
-                        .fontWeight(.heavy)
+                        .font(.scoreline(.caption))
                 }
             }
             if let lamp = entry.lamp {

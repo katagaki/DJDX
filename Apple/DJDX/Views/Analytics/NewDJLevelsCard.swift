@@ -14,13 +14,11 @@ struct NewDJLevelsCard: View {
         VStack(alignment: .leading, spacing: 4.0) {
             if newDJLevels.isEmpty {
                 Text(verbatim: "0")
-                    .font(.system(size: 20.0, weight: .black))
-                    .fontWidth(.expanded)
+                    .font(.scoreline(size: 20.0))
                     .foregroundStyle(.secondary)
             } else {
                 Text("\(newDJLevels.count)")
-                    .font(.system(size: 20.0, weight: .black))
-                    .fontWidth(.expanded)
+                    .font(.scoreline(size: 20.0))
                     .foregroundStyle(.primary)
             }
             Spacer(minLength: 0)

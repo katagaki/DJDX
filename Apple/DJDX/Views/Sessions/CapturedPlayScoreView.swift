@@ -168,6 +168,7 @@ struct CapturedPlayScoreView: View {
                     Spacer()
                     if let scoreRate {
                         Text(scoreRate, format: .percent.precision(.fractionLength(1)))
+                            .font(.scoreline(.largeTitle))
                             .foregroundStyle(LinearGradient(
                                 colors: [.primary.opacity(0.35), .primary.opacity(0.2)],
                                 startPoint: .top,
@@ -236,8 +237,7 @@ struct CapturedPlayScoreView: View {
             }
             Spacer(minLength: 0.0)
             Text(verbatim: "\(play.exScore)")
-                .font(.body.monospacedDigit().weight(.heavy))
-                .fontWidth(.expanded)
+                .font(.scoreline(.body))
                 .foregroundStyle(Color.iidxScore)
                 .strokeText(color: .iidxScoreOutline, width: 0.4)
         }

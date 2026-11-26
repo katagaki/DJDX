@@ -45,6 +45,7 @@ struct IIDXScoreSection: View {
                         if let noteCount {
                             Text(Float(score.score) / Float(noteCount * 2),
                                  format: .percent.precision(.fractionLength(1)))
+                            .font(.scoreline(.largeTitle))
                             .foregroundStyle(LinearGradient(
                                 colors: [.primary.opacity(0.35), .primary.opacity(0.2)],
                                 startPoint: .top,

@@ -2,7 +2,11 @@ import SwiftUI
 
 extension Color {
     static let iidxScore = Color(red: 0.58, green: 0.92, blue: 0.94)
-    static let iidxScoreOutline = Color(red: 0.28, green: 0.6, blue: 0.93)
+    static let iidxScoreOutline = Color(UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0.28, green: 0.6, blue: 0.93, alpha: 1.0)
+            : UIColor(red: 0.05, green: 0.27, blue: 0.6, alpha: 1.0)
+    })
 }
 
 extension Color {
