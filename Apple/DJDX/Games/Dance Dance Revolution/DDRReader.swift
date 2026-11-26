@@ -3,7 +3,6 @@ import SQLite
 
 actor DDRReader {
 
-    // swiftlint:disable:next type_name
     typealias DB = DDRPlayDataDatabase
 
     // MARK: Import Groups

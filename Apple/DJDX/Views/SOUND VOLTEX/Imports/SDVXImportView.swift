@@ -2,7 +2,6 @@ import Komponents
 import SwiftUI
 import UniformTypeIdentifiers
 
-// swiftlint:disable:next type_body_length
 struct SDVXImportView: View {
 
     @Environment(\.openURL) var openURL
@@ -147,7 +146,6 @@ struct SDVXImportView: View {
     }
 
     @ViewBuilder
-    // swiftlint:disable:next function_body_length
     func bottomBar() -> some View {
         VStack(spacing: 16.0) {
             HStack(spacing: 8.0) {

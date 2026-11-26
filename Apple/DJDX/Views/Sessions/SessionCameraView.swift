@@ -2,7 +2,6 @@ import AVFoundation
 import SwiftUI
 import UIKit
 
-// swiftlint:disable file_length
 
 struct SessionCameraView: UIViewControllerRepresentable {
     var onCapture: (Data, [DetectedRegion]) -> Void
@@ -20,7 +19,6 @@ struct SessionCameraView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: SessionCameraViewController, context: Context) {}
 }
 
-// swiftlint:disable:next type_body_length
 final class SessionCameraViewController: UIViewController {
     var onCapture: ((Data, [DetectedRegion]) -> Void)?
     var onCancel: (() -> Void)?

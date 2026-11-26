@@ -1,7 +1,6 @@
 import CoreGraphics
 import Foundation
 
-// swiftlint:disable file_length
 
 struct OCRLine: Sendable {
     let text: String
@@ -49,12 +48,10 @@ struct IIDXResultParse: Sendable {
     var confidence: Double = 0.0
 }
 
-// swiftlint:disable:next type_body_length
 enum IIDXResultParser {
 
     private static let grades = ["AAA", "AA", "A", "B", "C", "D", "E", "F"]
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
     static func parse(regions: [DetectedRegion],
                       songs: [IIDXSongCandidate]) -> IIDXResultParse {
         var byLabel: [String: String] = [:]

@@ -1,7 +1,6 @@
 import SwiftUI
 
 enum PolarisChordGrade: String, Codable {
-    // swiftlint:disable identifier_name
     case all = "Shared.All"
     case sssPlusPlus = "SSS++"
     case sssPlus = "SSS+"
@@ -16,7 +15,6 @@ enum PolarisChordGrade: String, Codable {
     case d = "D"
     case none = "---"
     case unknown = ""
-    // swiftlint:enable identifier_name
 
     // Best-to-worst order (the S tier ranks above the A tier in Polaris Chord).
     static let sorted: [PolarisChordGrade] = [
@@ -59,7 +57,6 @@ enum PolarisChordGrade: String, Codable {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     init(achievementRate: Int) {
         switch achievementRate {
         case 10000...: self = .sssPlusPlus

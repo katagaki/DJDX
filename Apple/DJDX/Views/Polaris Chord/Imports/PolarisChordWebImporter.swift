@@ -256,9 +256,7 @@ class PolarisChordCoordinatorForImporter: NSObject, WKNavigationDelegate {
     }
 }
 
-// swiftlint:disable class_delegate_protocol
 protocol PolarisChordUpdateScoreDataDelegate: Sendable {
     func importScoreData(using newScoreData: String) async
     func stopProcessing(with reason: ImportFailedReason)
 }
-// swiftlint:enable class_delegate_protocol

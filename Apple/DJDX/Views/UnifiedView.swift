@@ -2,7 +2,6 @@ import StoreKit
 import SwiftUI
 import TipKit
 
-// swiftlint:disable:next type_body_length
 struct UnifiedView: View {
 
     @Environment(\.requestReview) var requestReview

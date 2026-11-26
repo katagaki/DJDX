@@ -4,10 +4,8 @@ import HealthKit
 import UIKit
 import WatchConnectivity
 
-// swiftlint:disable file_length
 
 @MainActor
-// swiftlint:disable:next type_body_length
 final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     static let shared = IIDXSessionWorkoutBridge()
 
@@ -395,7 +393,6 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         }
     }
 
-    // swiftlint:disable:next function_parameter_count
     func pushSessionInfo(
         sessionID: String,
         playCount: Int,

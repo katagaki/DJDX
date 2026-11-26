@@ -4,7 +4,6 @@ import OrderedCollections
 import SwiftUI
 import UniformTypeIdentifiers
 
-// swiftlint:disable type_body_length
 struct AnalyticsView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
@@ -112,7 +111,6 @@ struct AnalyticsView: View {
     }
 
     @ViewBuilder
-    // swiftlint:disable:next function_body_length
     func overviewCard(for cardType: AnalyticsCardType) -> some View {
         switch cardType {
         case .clearTypeOverall:
@@ -414,4 +412,3 @@ struct AnalyticsView: View {
     }
 
 }
-// swiftlint:enable type_body_length

@@ -3,7 +3,6 @@ import SQLite
 
 actor PolarisChordImporter {
 
-    // swiftlint:disable:next type_name
     typealias DB = PolarisChordPlayDataDatabase
 
     func importJSON(

@@ -2,7 +2,6 @@ import Charts
 import OrderedCollections
 import SwiftUI
 
-// swiftlint:disable type_body_length
 struct PolarisChordAnalyticsView: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -345,4 +344,3 @@ struct PolarisChordAnalyticsView: View {
         return AnyShapeStyle(grade.style(colorScheme: colorScheme))
     }
 }
-// swiftlint:enable type_body_length

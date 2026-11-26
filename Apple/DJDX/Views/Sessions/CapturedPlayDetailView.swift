@@ -1,6 +1,5 @@
 import SwiftUI
 
-// swiftlint:disable:next type_body_length
 struct CapturedPlayDetailView: View {
     var store: IIDXSessionStore
     var play: IIDXCapturedPlay

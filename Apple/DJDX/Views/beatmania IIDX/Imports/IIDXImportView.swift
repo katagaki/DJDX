@@ -1,7 +1,6 @@
 import Komponents
 import SwiftUI
 
-// swiftlint:disable:next type_body_length
 struct IIDXImportView: View {
 
     @Environment(\.openURL) var openURL
@@ -166,7 +165,6 @@ struct IIDXImportView: View {
         .progressOverlay(importProgress)
     }
 
-    // swiftlint:disable function_body_length
     @ViewBuilder
     func bottomBar() -> some View {
         VStack(spacing: 16.0) {
@@ -261,7 +259,6 @@ struct IIDXImportView: View {
         }
         .padding(12.0)
     }
-    // swiftlint:enable function_body_length
 
     func reloadImportGroups() async {
         importGroups = await fetcher.allImportGroupsSortedByDateDescending()

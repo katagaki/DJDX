@@ -3,7 +3,6 @@ import OrderedCollections
 import SwiftUI
 import UniformTypeIdentifiers
 
-// swiftlint:disable type_body_length
 struct SDVXAnalyticsView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
@@ -334,4 +333,3 @@ struct SDVXAnalyticsView: View {
         SDVXClearType(rawValue: rawValue)?.abbreviation ?? rawValue
     }
 }
-// swiftlint:enable type_body_length
