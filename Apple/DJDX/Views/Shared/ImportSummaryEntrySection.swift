@@ -47,10 +47,14 @@ struct ImportSummaryEntrySection: View {
         VStack(alignment: .leading, spacing: 8.0) {
             if let score = entry.score {
                 detailRow("SCORE") {
-                    scoreText(scoreString(score))
-                    if let previousScore = entry.previousScore {
-                        Text(verbatim: "+" + scoreString(score - previousScore))
-                            .foregroundStyle(.green)
+                    VStack(alignment: .trailing, spacing: 2.0) {
+                        scoreText(scoreString(score))
+                            .font(.subheadline)
+                        if let previousScore = entry.previousScore {
+                            Text(verbatim: "+" + scoreString(score - previousScore))
+                                .font(.caption2)
+                                .foregroundStyle(.green)
+                        }
                     }
                 }
             }
@@ -71,7 +75,7 @@ struct ImportSummaryEntrySection: View {
     func detailRow(
         _ title: String, @ViewBuilder current: () -> some View
     ) -> some View {
-        HStack(spacing: 6.0) {
+        HStack(alignment: .firstTextBaseline, spacing: 6.0) {
             Text(verbatim: title)
             Spacer(minLength: 8.0)
             HStack(spacing: 6.0) {
