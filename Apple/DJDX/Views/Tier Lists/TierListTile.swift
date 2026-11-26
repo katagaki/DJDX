@@ -2,6 +2,9 @@ import SwiftUI
 
 struct TierListTile: View {
 
+    @Environment(\.colorScheme) var colorScheme
+    @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+
     let chart: TierListChart
 
     static let width: CGFloat = 143.0
@@ -26,12 +29,7 @@ struct TierListTile: View {
                             .fixedSize()
                     }
                 }
-                Text(chart.title)
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .fontWidth(.compressed)
-                    .lineLimit(2, reservesSpace: true)
-                    .multilineTextAlignment(.leading)
+                title
             }
             .padding(.horizontal, 6.0)
             .padding(.vertical, 4.0)
@@ -69,6 +67,31 @@ struct TierListTile: View {
             .kerning(-0.2)
             .lineLimit(1)
             .modifier(LevelLabelGlow(color: chart.difficultyColor))
+        }
+    }
+
+    @ViewBuilder
+    var title: some View {
+        if let iidxLevel = chart.iidxLevel {
+            Text(chart.title)
+                .font(.subheadline)
+                .fontWeight(.heavy)
+                .fontWidth(.compressed)
+                .foregroundStyle(
+                    iidxVersion.rowTitleTextColor(for: chart.songVersion, level: iidxLevel, colorScheme: colorScheme)
+                )
+                .strokeText(
+                    color: iidxVersion.rowTitleStrokeColor(
+                        for: chart.songVersion, level: iidxLevel, colorScheme: colorScheme
+                    ),
+                    width: colorScheme == .light ? 0.5 : 0.35
+                )
+                .squashedHorizontally()
+        } else {
+            Text(chart.title)
+                .font(.subheadline)
+                .bold()
+                .squashedHorizontally()
         }
     }
 

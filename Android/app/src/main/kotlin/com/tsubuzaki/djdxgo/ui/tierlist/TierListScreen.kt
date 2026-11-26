@@ -86,6 +86,9 @@ import com.tsubuzaki.djdxgo.data.tierlist.TierListShare
 import com.tsubuzaki.djdxgo.data.tierlist.TierListTier
 import com.tsubuzaki.djdxgo.ui.common.DetailScaffold
 import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
+import com.tsubuzaki.djdxgo.ui.common.OutlinedText
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -526,14 +529,25 @@ private fun TierTile(
                         }
                     }
                 }
-                Text(
-                    chart.title,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    minLines = 2,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (iidxLevel != null) {
+                    OutlinedText(
+                        text = chart.title,
+                        style = MaterialTheme.typography.bodyMedium.gameFont(GameFontWidth.COMPRESSED),
+                        fontWeight = FontWeight.Black,
+                        fill = IIDXColors.rowTitleBrush(chart.songVersion, iidxLevel, darkTheme),
+                        outline = IIDXColors.rowTitleStrokeColor(chart.songVersion, iidxLevel, darkTheme),
+                        outlineWidth = if (darkTheme) 0.35.dp else 0.5.dp,
+                        squashed = true
+                    )
+                } else {
+                    Text(
+                        chart.title,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
         DropdownMenu(expanded = isMenuExpanded, onDismissRequest = { isMenuExpanded = false }) {

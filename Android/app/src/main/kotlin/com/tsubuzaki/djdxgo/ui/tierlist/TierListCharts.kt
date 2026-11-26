@@ -25,7 +25,8 @@ data class TierListChart(
     val lampColor: Color,
     val grade: String,
     val gradeColor: Color,
-    val iidxLevel: IIDXLevel? = null
+    val iidxLevel: IIDXLevel? = null,
+    val songVersion: String = ""
 )
 
 val Game.tierListCode: String
@@ -79,7 +80,8 @@ suspend fun loadTierListCharts(
                         lampColor = IIDXColors.clearTypeColor(score.clearType),
                         grade = djLevel,
                         gradeColor = IIDXColors.djLevelColor(djLevel),
-                        iidxLevel = level
+                        iidxLevel = level,
+                        songVersion = record.version
                     )
                 }
             }
