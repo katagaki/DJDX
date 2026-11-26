@@ -69,6 +69,7 @@
     <string name="share_card_color">カラー</string>
     <string name="share_card_show_profile">プレイヤー情報を表示</string>
     <string name="share_card_row_limit">表示する譜面数</string>
+    <string name="share_card_row_limit_today">今日</string>
     <string name="share_card_more">他%1$d譜面</string>
     <string name="share_card_failed">画像を作成できませんでした。もう一度お試しください。</string>
     <string name="tier_list_title">マイ難易度表</string>

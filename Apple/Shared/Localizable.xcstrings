@@ -4193,29 +4193,6 @@
         }
       }
     },
-    "ImportSummary.ComparedWith" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compared With"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "比較対象"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "比較對象"
-          }
-        }
-      }
-    },
     "ImportSummary.ImportDate" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4258,29 +4235,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自上次匯入以來沒有新的個人最佳紀錄。"
-          }
-        }
-      }
-    },
-    "ImportSummary.NoPreviousImport" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First Import"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "初回インポート"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "首次匯入"
           }
         }
       }
@@ -9492,6 +9446,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "顯示譜面數"
+          }
+        }
+      }
+    },
+    "ShareCard.RowLimit.Today" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日のみ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "僅今天"
           }
         }
       }

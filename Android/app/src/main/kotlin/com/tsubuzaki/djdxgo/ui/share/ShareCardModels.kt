@@ -3,6 +3,7 @@ package com.tsubuzaki.djdxgo.ui.share
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.lerp
 import com.tsubuzaki.djdxgo.data.RadarData
 
@@ -15,7 +16,10 @@ data class ShareCardEntry(
     val levelText: String,
     val difficultyText: String,
     val difficultyColor: Color,
-    val metrics: List<ShareCardMetric>
+    val metrics: List<ShareCardMetric>,
+    val titleBrush: Brush = SolidColor(Color.White),
+    val titleStrokeColor: Color? = null,
+    val playDateEpochSeconds: Long? = null
 )
 
 data class ShareCardRating(val label: String, val value: String)

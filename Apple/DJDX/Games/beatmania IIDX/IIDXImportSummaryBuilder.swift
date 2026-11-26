@@ -100,6 +100,7 @@ enum IIDXImportSummaryBuilder {
                     difficulty: "\(playType == .single ? "SP" : "DP") \(name(for: level))",
                     level: String(latest.difficulty),
                     difficultyColor: color(for: level),
+                    lampStyle: ShareCardEntry.iidxLampStyle(for: latest.clearType),
                     levelValue: Double(latest.difficulty),
                     previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                     score: isNewScore ? latest.score : nil,
@@ -110,7 +111,8 @@ enum IIDXImportSummaryBuilder {
                     grade: isNewDJLevel ? ImportSummaryChange(
                         current: latest.djLevel,
                         style: .iidxDJLevel
-                    ) : nil
+                    ) : nil,
+                    titleStyle: .iidx(version: record.version, level: level)
                 ))
             }
         }

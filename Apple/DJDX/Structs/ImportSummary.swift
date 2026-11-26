@@ -45,6 +45,11 @@ struct ImportSummaryRating: Identifiable, Hashable {
     }
 }
 
+enum ImportSummaryTitleStyle {
+    case iidx(version: String, level: IIDXLevel)
+    case plain
+}
+
 enum ImportSummaryValueStyle: Hashable {
     case iidxClearType
     case iidxDJLevel
@@ -64,11 +69,21 @@ struct ImportSummaryEntry: Identifiable, Hashable {
     let difficulty: String
     let level: String
     let difficultyColor: Color
+    let lampStyle: AnyShapeStyle
     let levelValue: Double
     let previousScore: Int?
     let score: Int?
     let lamp: ImportSummaryChange?
     let grade: ImportSummaryChange?
+    var titleStyle: ImportSummaryTitleStyle = .plain
+
+    static func == (lhs: ImportSummaryEntry, rhs: ImportSummaryEntry) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
 struct ImportSummaryTarget: Identifiable, Hashable {

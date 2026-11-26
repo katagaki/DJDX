@@ -274,7 +274,7 @@ struct IIDXScoresView<Header: View>: View {
                     profile: Game.stored == .iidxArcade ? .iidx(playType: playTypeToShow) : ShareCardProfile(),
                     entries: levelEntries(from: searchResults ?? songRecords ?? []).map {
                         ShareCardEntry(iidxSongRecord: $0.songRecord, level: $0.level,
-                                       score: $0.score, scoreRate: $0.scoreRate)
+                                       score: $0.score, scoreRate: $0.scoreRate, iidxVersion: iidxVersion)
                     },
                     playStyle: playTypeToShow.displayName()
                 )

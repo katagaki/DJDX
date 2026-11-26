@@ -38,8 +38,8 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
 
             VStack(alignment: .leading, spacing: 0.0) {
                 HStack(alignment: .center, spacing: 6.0) {
+                    LevelNumberBadge(level: String(difficulty))
                     Group {
-                        Text(verbatim: "LEVEL \(difficulty)")
                         Divider()
                             .frame(maxHeight: 14.0)
                         Text(subtitle)

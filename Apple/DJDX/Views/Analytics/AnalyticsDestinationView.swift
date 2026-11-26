@@ -202,7 +202,7 @@ struct IIDXGradeBreakdownDetailView: View {
                         .frame(height: 140.0)
                         .listRowBackground(Color.clear)
                     } header: {
-                        Text(verbatim: "LEVEL \(difficulty)")
+                        LevelNumberBadge(level: String(difficulty))
                     }
                 }
             }

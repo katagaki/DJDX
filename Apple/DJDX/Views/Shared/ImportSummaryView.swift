@@ -11,47 +11,62 @@ struct ImportSummaryView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                if let summary {
-                    Section {
+            ScrollView {
+                LazyVStack(spacing: 0.0) {
+                    if let summary {
                         header(summary)
-                    }
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                    ForEach(summary.notesRadars) { notesRadar in
-                        ImportSummaryNotesRadarSection(notesRadar: notesRadar)
-                    }
-                    ForEach(summary.ratings) { rating in
-                        Section {
-                            ratingRow(rating, game: summary.game)
+                        if !summary.notesRadars.isEmpty || !summary.ratings.isEmpty {
+                            AnalyticsSectionHeader(title: "ImportSummary.Ratings")
+                                .padding(.bottom, 12.0)
+                            VStack(spacing: 12.0) {
+                                ForEach(summary.notesRadars) { notesRadar in
+                                    ImportSummaryNotesRadarSection(notesRadar: notesRadar)
+                                        .padding()
+                                        .groupedInsetBackground()
+                                }
+                                ForEach(summary.ratings) { rating in
+                                    ratingRow(rating, game: summary.game)
+                                        .padding()
+                                        .groupedInsetBackground()
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.bottom, 24.0)
                         }
-                    }
-                    if summary.previousImportDate != nil {
-                        Section {
+                        if summary.previousImportDate != nil {
+                            AnalyticsSectionHeader(title: "ImportSummary.PersonalBests")
+                                .padding(.bottom, 12.0)
                             countsRow(summary)
-                        }
-                        if summary.personalBests.isEmpty {
-                            Section {
+                                .padding(.vertical, 12.0)
+                                .groupedInsetBackground()
+                                .padding(.horizontal)
+                                .padding(.bottom, 16.0)
+                            Divider()
+                            if summary.personalBests.isEmpty {
                                 Text("ImportSummary.NoPersonalBests")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
-                            }
-                        } else {
-                            ForEach(summary.personalBests) { entry in
-                                ImportSummaryEntrySection(entry: entry, game: summary.game)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding()
+                            } else {
+                                ForEach(summary.personalBests) { entry in
+                                    ImportSummaryEntryRow(entry: entry, game: summary.game)
+                                    Divider()
+                                }
                             }
                         }
                     }
-                } else if !isLoading {
-                    ContentUnavailableView("ImportSummary.Unavailable", systemImage: "tray")
-                        .listRowBackground(Color.clear)
                 }
             }
-            .listSectionSpacing(.compact)
+            .scrollContentBackground(.hidden)
+            .background {
+                AppBackgroundGradient()
+            }
             .overlay {
                 if isLoading {
                     ProgressView()
+                } else if summary == nil {
+                    ContentUnavailableView("ImportSummary.Unavailable", systemImage: "tray")
                 }
             }
             .navigationTitle("ImportSummary.Title")
@@ -88,27 +103,14 @@ struct ImportSummaryView: View {
 
     @ViewBuilder
     func header(_ summary: ImportSummary) -> some View {
-        VStack(alignment: .center, spacing: 8.0) {
-            Text(summary.importDate, format: .dateTime.year().month().day())
-                .font(.title)
-                .fontWeight(.heavy)
-                .fontWidth(.compressed)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-            Divider()
-            HStack(spacing: 4.0) {
-                if let previousImportDate = summary.previousImportDate {
-                    Text("ImportSummary.ComparedWith")
-                    Text(previousImportDate, format: .dateTime.year().month().day())
-                } else {
-                    Text("ImportSummary.NoPreviousImport")
-                }
-            }
-            .font(.caption2)
-            .foregroundStyle(.tertiary)
-        }
+        Text(summary.importDate, format: .dateTime.year().month().day())
+            .font(.title)
+            .fontWeight(.heavy)
+            .fontWidth(.compressed)
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 8.0)
+        .padding(.vertical, 16.0)
         .padding(.horizontal, 20.0)
     }
 
@@ -166,7 +168,6 @@ struct ImportSummaryView: View {
             countColumn(summary.game.gradeTitle,
                         count: summary.personalBests.count { $0.grade != nil }, color: .yellow)
         }
-        .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
     }
 
     @ViewBuilder
@@ -193,5 +194,11 @@ struct ImportSummaryView: View {
 
     func signed(_ value: Double, digits: Int) -> String {
         value.formatted(.number.precision(.fractionLength(digits)).sign(strategy: .always()))
+    }
+}
+
+private extension View {
+    func groupedInsetBackground() -> some View {
+        background(Color(uiColor: .secondarySystemGroupedBackground), in: .rect(cornerRadius: 26.0))
     }
 }
