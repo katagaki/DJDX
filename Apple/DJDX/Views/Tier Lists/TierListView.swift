@@ -176,7 +176,16 @@ struct TierListView: View {
             Menu {
                 Picker("TierList.Game", selection: $game) {
                     ForEach(Game.allCases.filter(\.isAvailable)) { game in
-                        Text(game.shortName).tag(game)
+                        if let iconResource = game.iconResource {
+                            Label {
+                                Text(game.shortName)
+                            } icon: {
+                                Image(iconResource)
+                            }
+                            .tag(game)
+                        } else {
+                            Text(game.shortName).tag(game)
+                        }
                     }
                 }
             } label: {
