@@ -45,7 +45,8 @@ struct IIDXScoreSection: View {
                         if let noteCount {
                             Text(Float(score.score) / Float(noteCount * 2),
                                  format: .percent.precision(.fractionLength(1)))
-                            .font(.scoreline(.largeTitle))
+                            .font(.scoreline(.largeTitle, width: .condensed))
+                            .fontWidth(.condensed)
                             .foregroundStyle(LinearGradient(
                                 colors: [.primary.opacity(0.35), .primary.opacity(0.2)],
                                 startPoint: .top,
@@ -59,8 +60,7 @@ struct IIDXScoreSection: View {
                 }
                 VStack(alignment: .leading, spacing: 8.0) {
                     IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
-                    IIDXDetailRow("SCORE", value: score.score, style: Color.iidxScore,
-                                  outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
+                    IIDXDetailRow("SCORE", score: score.score)
                 }
                 IIDXJudgmentBreakdown(entries: score.perfectGreatCount + score.greatCount > 0 ? [
                     (.perfectGreat, score.perfectGreatCount),

@@ -128,13 +128,10 @@ struct AnalyticsGoalCard: View {
                 Text(verbatim: progress.goal.formatted(progress.current))
                     .goalNumberFont(size: 20.0)
                 Text(verbatim: "/ \(progress.goal.formatted(progress.goal.target))")
-                    .font(.subheadline.weight(.bold).monospacedDigit())
-                    .fontWidth(.expanded)
+                    .font(.scoreline(.subheadline, weight: .bold))
+                    .fontWidth(.standard)
                     .foregroundStyle(.secondary)
                 Spacer()
-                Text("Goals.DaysLeft.\(progress.daysLeft)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
             AnalyticsGoalProgressBar(progress: progress.progressFraction,
                                      pace: progress.timeFraction,
@@ -142,7 +139,7 @@ struct AnalyticsGoalCard: View {
             HStack {
                 Text("Goals.Pace.\(progress.goal.formatted(progress.expected))")
                 Spacer()
-                Text("Goals.Due.\(progress.goal.deadline.formatted(date: .abbreviated, time: .omitted))")
+                Text("Goals.DaysLeft.\(progress.daysLeft)")
             }
             .font(.caption)
             .foregroundStyle(.secondary)

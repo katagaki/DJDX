@@ -23,6 +23,7 @@ struct PolarisChordScoreRow: View {
                             .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
                                                             startPoint: .top, endPoint: .bottom))
                             .font(.scoreline(.caption))
+                            .fontWidth(.standard)
                     }
                     if record.gradeEnum != .none && record.gradeEnum != .unknown {
                         Divider().frame(maxHeight: 14.0)
@@ -41,6 +42,7 @@ struct PolarisChordScoreRow: View {
                         Text(record.score.formatted(.number))
                             .foregroundStyle(.secondary)
                             .font(.scoreline(.caption, weight: .medium))
+                            .fontWidth(.standard)
                     }
                 }
                 .font(.caption)

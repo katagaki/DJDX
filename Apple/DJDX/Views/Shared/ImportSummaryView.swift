@@ -123,24 +123,18 @@ struct ImportSummaryView: View {
                 Text(verbatim: rating.name)
                     .font(.caption)
                     .fontWeight(.heavy)
-                    .fontWidth(.expanded)
                 Spacer()
                 if let delta = rating.delta {
                     Text(verbatim: signed(delta, digits: rating.fractionDigits))
-                        .font(.caption)
-                        .fontWeight(.heavy)
-                        .fontWidth(.expanded)
+                        .font(.scoreline(.caption))
                         .foregroundStyle(.secondary)
                 }
             }
             HStack(alignment: .lastTextBaseline, spacing: 8.0) {
                 Spacer(minLength: 0.0)
                 ratingValue(format(rating.value, digits: rating.fractionDigits), game: game)
-                    .font(.largeTitle)
+                    .font(.scoreline(.largeTitle))
             }
-            .fontWidth(.expanded)
-            .fontWeight(.black)
-            .monospacedDigit()
             .lineLimit(1)
             .minimumScaleFactor(0.5)
         }
@@ -177,11 +171,8 @@ struct ImportSummaryView: View {
                 .font(.caption2)
                 .foregroundStyle(color)
             Text(verbatim: String(count))
-                .font(.title2)
-                .fontWeight(.black)
-                .monospacedDigit()
+                .font(.scoreline(.title2))
         }
-        .fontWidth(.expanded)
         .fontWeight(.heavy)
         .lineLimit(1)
         .minimumScaleFactor(0.5)

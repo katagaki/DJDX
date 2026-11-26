@@ -168,7 +168,8 @@ struct CapturedPlayScoreView: View {
                     Spacer()
                     if let scoreRate {
                         Text(scoreRate, format: .percent.precision(.fractionLength(1)))
-                            .font(.scoreline(.largeTitle))
+                            .font(.scoreline(.largeTitle, width: .condensed))
+                            .fontWidth(.condensed)
                             .foregroundStyle(LinearGradient(
                                 colors: [.primary.opacity(0.35), .primary.opacity(0.2)],
                                 startPoint: .top,
@@ -192,8 +193,7 @@ struct CapturedPlayScoreView: View {
     private func detailRows() -> some View {
         VStack(alignment: .leading, spacing: 8.0) {
             IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
-            IIDXDetailRow("SCORE", value: score.score, style: Color.iidxScore,
-                          outlineColor: .iidxScoreOutline, outlineWidth: 0.3)
+            IIDXDetailRow("SCORE", score: score.score)
             if let matchedNoteCount {
                 IIDXDetailRow("NOTES", value: matchedNoteCount, style: Color.secondary)
             }
@@ -236,10 +236,7 @@ struct CapturedPlayScoreView: View {
                 }
             }
             Spacer(minLength: 0.0)
-            Text(verbatim: "\(play.exScore)")
-                .font(.scoreline(.body))
-                .foregroundStyle(Color.iidxScore)
-                .strokeText(color: .iidxScoreOutline, width: 0.4)
+            IIDXScoreText(play.exScore, style: .body)
         }
     }
 

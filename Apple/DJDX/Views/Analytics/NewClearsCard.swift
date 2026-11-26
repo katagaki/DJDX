@@ -15,10 +15,12 @@ struct NewClearsCard: View {
             if newClears.isEmpty {
                 Text(verbatim: "0")
                     .font(.scoreline(size: 20.0))
+                    .fontWidth(.standard)
                     .foregroundStyle(.secondary)
             } else {
                 Text("\(newClears.count)")
                     .font(.scoreline(size: 20.0))
+                    .fontWidth(.standard)
                     .foregroundStyle(.primary)
             }
             Spacer(minLength: 0)

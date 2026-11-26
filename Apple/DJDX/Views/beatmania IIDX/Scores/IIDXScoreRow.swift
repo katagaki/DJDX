@@ -18,7 +18,7 @@ struct IIDXScoreRow: View {
     var songRecord: IIDXSongRecord
     var level: IIDXLevel
     var score: IIDXLevelScore
-    @State var scoreRate: Float?
+    var scoreRate: Float?
     var scoreDelta: Int?
 
     var body: some View {
@@ -102,20 +102,19 @@ struct IIDXScoreRow: View {
                                                 endPoint: .bottom
                                             ))
                                             .font(.scoreline(.caption))
+                                            .fontWidth(.standard)
                                     }
                                     if isScoreVisible {
                                         if isDJLevelVisible || isScoreRateVisible {
                                             Divider()
                                                 .frame(maxHeight: 14.0)
                                         }
-                                        Text(String(score.score))
-                                            .foregroundStyle(Color.iidxScore)
-                                            .font(.scoreline(.caption))
-                                            .strokeText(color: .iidxScoreOutline, width: 0.3)
+                                        IIDXScoreText(score.score)
                                         if let scoreDelta, scoreDelta > 0 {
                                             Text("Analytics.NewHighScore.\(scoreDelta)")
                                                 .foregroundStyle(.orange)
                                                 .font(.scoreline(.caption))
+                                                .fontWidth(.standard)
                                         }
                                     }
                                 }

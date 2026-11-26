@@ -47,10 +47,12 @@ struct ImportSummaryEntryRow: View {
                 }
                 scoreText(scoreString(score))
                     .font(.scoreline(.caption))
+                    .fontWidth(.standard)
                 if let previousScore = entry.previousScore {
                     Text(verbatim: "(+\(scoreString(score - previousScore)))")
                         .foregroundStyle(.orange)
                         .font(.scoreline(.caption))
+                        .fontWidth(.standard)
                 }
             }
             if let lamp = entry.lamp {
@@ -97,9 +99,7 @@ struct ImportSummaryEntryRow: View {
     func scoreText(_ value: String) -> some View {
         switch game {
         case .iidx:
-            Text(verbatim: value)
-                .foregroundStyle(Color.iidxScore)
-                .strokeText(color: .iidxScoreOutline, width: 0.3)
+            IIDXScoreText(text: value)
         case .sdvx:
             Text(verbatim: value)
                 .sdvxScoreText()

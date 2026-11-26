@@ -11,24 +11,18 @@ struct ImportSummaryNotesRadarSection: View {
                     Text(verbatim: "NOTES RADAR (\(notesRadar.playType))")
                         .font(.caption)
                         .fontWeight(.heavy)
-                        .fontWidth(.expanded)
                     Spacer()
                     if let previousRadar = notesRadar.previousRadar {
                         Text(verbatim: signed(notesRadar.radar.sum() - previousRadar.sum()))
-                            .font(.caption)
-                            .fontWeight(.heavy)
-                            .fontWidth(.expanded)
+                            .font(.scoreline(.caption))
                             .foregroundStyle(.secondary)
                     }
                 }
                 HStack {
                     Spacer(minLength: 0.0)
                     Text(verbatim: format(notesRadar.radar.sum()))
-                        .font(.largeTitle)
-                        .fontWeight(.black)
-                        .fontWidth(.expanded)
+                        .font(.scoreline(.largeTitle))
                         .foregroundStyle(notesRadar.radar.color(isPlayerRadar: true).gradient)
-                        .monospacedDigit()
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                 }
@@ -63,20 +57,19 @@ struct ImportSummaryNotesRadarSection: View {
     func pointColumn(_ point: RadarPointConfig) -> some View {
         VStack(spacing: 2.0) {
             Text(verbatim: point.label)
-                .font(.caption2)
+                .font(.system(size: 10.0, weight: .black))
                 .foregroundStyle(point.color)
+                .brightness(0.88)
+                .shadow(color: point.color, radius: 1.0)
+                .shadow(color: point.color, radius: 3.0)
             Text(verbatim: format(point.value))
-                .font(.subheadline)
-                .fontWeight(.black)
+                .font(.scoreline(.subheadline))
             if let previousValue = previousValue(for: point.label) {
                 Text(verbatim: signed(point.value - previousValue))
-                    .font(.caption2)
+                    .font(.scoreline(.caption2, weight: .bold))
                     .foregroundStyle(.secondary)
             }
         }
-        .fontWidth(.expanded)
-        .fontWeight(.heavy)
-        .monospacedDigit()
         .lineLimit(1)
         .minimumScaleFactor(0.6)
         .frame(maxWidth: .infinity)

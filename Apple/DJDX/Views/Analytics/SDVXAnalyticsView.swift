@@ -232,6 +232,7 @@ struct SDVXAnalyticsView: View {
         VStack(alignment: .leading, spacing: 2.0) {
             Text("\(count)")
                 .font(.scoreline(size: 20.0))
+                .fontWidth(.standard)
                 .foregroundStyle(count > 0 ? .primary : .secondary)
                 .frame(height: 36.0, alignment: .topLeading)
                 .frame(maxWidth: .infinity, alignment: .leading)

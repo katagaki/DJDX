@@ -33,6 +33,7 @@ struct SDVXDetailRow: View {
             Spacer()
             Text(verbatim: value)
                 .font(isNumeric ? .scoreline(.caption) : nil)
+                .fontWidth(isNumeric ? .standard : .expanded)
                 .foregroundStyle(style)
                 .strokeText(color: outlineColor, width: outlineWidth)
         }
@@ -59,6 +60,7 @@ struct SDVXScoreDetailRow: View {
             Spacer()
             Text(value, format: .number)
                 .font(.scoreline(.caption))
+                .fontWidth(.standard)
                 .sdvxScoreText()
         }
         .font(.caption)
