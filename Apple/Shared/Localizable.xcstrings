@@ -4263,29 +4263,6 @@
         }
       }
     },
-    "ImportSummary.Ratings" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ratings"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "レーティング"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "評分"
-          }
-        }
-      }
-    },
     "ImportSummary.Title" : {
       "extractionState" : "manual",
       "localizations" : {
