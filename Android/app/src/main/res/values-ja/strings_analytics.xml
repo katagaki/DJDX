@@ -73,7 +73,7 @@
     <string name="goals_status_achieved">達成</string>
     <string name="goals_status_ahead">先行</string>
     <string name="goals_status_on_pace">順調</string>
-    <string name="goals_status_behind">遅れ</string>
+    <string name="goals_status_behind">遅れ気味</string>
     <string name="goals_status_missed">未達成</string>
     <string name="goals_status_not_started">未着手</string>
     <string name="goals_days_left">残り%1$d日</string>
