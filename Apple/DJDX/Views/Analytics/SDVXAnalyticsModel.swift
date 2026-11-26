@@ -15,6 +15,8 @@ final class SDVXAnalyticsModel {
     var totalCharts: Int = 0
     var totalPlays: Int = 0
     var volforce: Double = 0.0
+    var volforceSuggestions: [SDVXVolforceSuggestion] = []
+    var volforceHistory: [TrendPoint] = []
 
     // "前回のプレー" (Last Play): improvements between the latest two import groups.
     var newHighScores: [SDVXNewHighScoreEntry] = []
@@ -40,13 +42,11 @@ final class SDVXAnalyticsModel {
 
     var dataState: DataState = .initializing
 
-    let fetcher = SDVXReader()
-
-    private func chartForce(_ record: SDVXSongRecord) -> Double {
-        let levelValue = Double(record.level) ?? 0.0
-        guard levelValue > 0, record.highScore > 0 else { return 0.0 }
-        return levelValue * 2.0 * (Double(record.highScore) / 10_000_000.0)
+    nonisolated static func formatVolforce(_ value: Double) -> String {
+        value.formatted(.number.precision(.fractionLength(3)))
     }
+
+    let fetcher = SDVXReader()
 
     func reload(version: SDVXVersion, filters: SDVXFilterOptions? = nil) async {
         dataState = .loading
@@ -93,8 +93,8 @@ final class SDVXAnalyticsModel {
             }
         }
 
-        let topForces = allRecords.map { chartForce($0) }.sorted(by: >).prefix(50)
-        let computedVolforce = (topForces.reduce(0.0, +) * 100).rounded() / 100
+        let computedVolforce = SDVXVolforce.total(allRecords)
+        let computedVolforceHistory = await fetcher.volforceHistory(for: version)
 
         let lastPlay = await computeLastPlay(version: version, filters: filters)
 
@@ -105,6 +105,8 @@ final class SDVXAnalyticsModel {
             self.totalCharts = records.count
             self.totalPlays = plays
             self.volforce = computedVolforce
+            self.volforceSuggestions = SDVXVolforce.suggestions(allRecords: allRecords, candidates: records)
+            self.volforceHistory = computedVolforceHistory
             self.newClears = lastPlay.clears
             self.newHighScores = lastPlay.highScores
             self.newGrades = lastPlay.grades

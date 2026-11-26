@@ -26,6 +26,12 @@ enum AnalyticsPath: Hashable {
     case newAAADetail
     case newAADetail
     case newADetail
+    case djLevelSuggestionsDetail
+    case clearLampSuggestionsDetail
+}
+
+enum AnalyticsGoalPath: Hashable {
+    case detail(id: UUID)
 }
 
 enum SDVXScoresPath: Hashable {
@@ -33,12 +39,18 @@ enum SDVXScoresPath: Hashable {
     case chartViewer(chart: SDVXInChart)
 }
 
+enum DDRScoresPath: Hashable {
+    case scoreViewer(songRecord: DDRSongRecord)
+}
+
 enum SDVXAnalyticsPath: Hashable {
     case clearBreakdownDetail
     case gradeBreakdownDetail
+    case volforceTrendDetail
     case newHighScoresDetail
     case newClearsDetail(clearType: String)
     case newGradesDetail(grade: String)
+    case volforceSuggestionsDetail
 }
 
 enum PolarisChordAnalyticsPath: Hashable {

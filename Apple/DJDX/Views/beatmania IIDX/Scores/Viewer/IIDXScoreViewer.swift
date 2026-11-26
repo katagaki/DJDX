@@ -26,6 +26,10 @@ struct IIDXScoreViewer: View {
         return levels
     }
 
+    private var notesGame: Game {
+        Game.stored == .iidxInfinitas ? .iidxInfinitas : .iidxArcade
+    }
+
     var body: some View {
         List {
             Section {
@@ -69,8 +73,17 @@ struct IIDXScoreViewer: View {
                              playType: songRecord.playType,
                              chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 4)])
             }
+            if availableLevels.contains(selectedLevel) {
+                ChartNotesSection(
+                    game: notesGame,
+                    title: songRecord.title,
+                    chart: ChartNote.iidxChart(playType: songRecord.playType, level: selectedLevel),
+                    showsPlaySettings: true
+                )
+            }
         }
         .listSectionSpacing(.compact)
+        .scrollDismissesKeyboard(.immediately)
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
         .contentMargins(.top, 0.0, for: .scrollContent)

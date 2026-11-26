@@ -29,6 +29,8 @@ struct PolarisChordScoresView<Header: View>: View {
     @State var records: [PolarisChordSongRecord] = []
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
+    @State var isShowingShareCard: Bool = false
+    @State private var chartNoteTarget: ChartNoteTarget?
 
     @Namespace var polarisChordNamespace
 
@@ -163,9 +165,15 @@ struct PolarisChordScoresView<Header: View>: View {
                     }
                 }
                 if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
+                    let sortedRecords = sortedRecords
                     ForEach(sortedRecords, id: \.self) { record in
-                        PolarisChordScoreRow(record: record)
-                            .contentShape(.rect)
+                        Button {
+                            chartNoteTarget = record.chartNoteTarget
+                        } label: {
+                            PolarisChordScoreRow(record: record)
+                                .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                         Divider()
                             .padding(.leading, 16.0)
                     }
@@ -188,6 +196,21 @@ struct PolarisChordScoresView<Header: View>: View {
                 sortControl
                 filterControl
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
+            isShowingShareCard = true
+        }
+        .sheet(isPresented: $isShowingShareCard) {
+            ShareCardComposer(
+                game: .polarisChord,
+                profile: .polarisChord(),
+                entries: sortedRecords.map { ShareCardEntry(polarisChordSongRecord: $0) }
+            )
+        }
+        .sheet(item: $chartNoteTarget) { target in
+            ChartNotesSheet(game: target.game, title: target.title,
+                            chart: target.chart, chartLabel: target.chartLabel)
+                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             PolarisChordScoreFilterSheet(

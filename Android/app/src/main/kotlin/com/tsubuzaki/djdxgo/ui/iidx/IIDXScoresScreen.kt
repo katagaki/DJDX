@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui.iidx
 
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.Flow
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -44,14 +46,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.djdxgo.AppContainer
 import com.tsubuzaki.djdxgo.R
+import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.SettingsKeys
 import com.tsubuzaki.djdxgo.data.compact
 import com.tsubuzaki.djdxgo.data.external.IIDXSong
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXSongRecord
 import com.tsubuzaki.djdxgo.data.setSetting
+import com.tsubuzaki.djdxgo.ui.games.ScoreCountRow
 import com.tsubuzaki.djdxgo.ui.games.ScoresToolbar
 import com.tsubuzaki.djdxgo.ui.games.SortOption
+import com.tsubuzaki.djdxgo.ui.share.ShareCardSheet
+import com.tsubuzaki.djdxgo.ui.share.iidxShareCardEntry
+import com.tsubuzaki.djdxgo.ui.share.toShareCardProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -62,6 +69,7 @@ fun IIDXScoresScreen(
     container: AppContainer,
     contentPadding: PaddingValues,
     analyticsContent: (@Composable () -> Unit)? = null,
+    shareRequests: Flow<Unit> = emptyFlow(),
     onOpenSong: (title: String, playType: String, initialLevel: String, dateEpoch: Long) -> Unit
 ) {
     val context = LocalContext.current
@@ -95,6 +103,10 @@ fun IIDXScoresScreen(
     var isDatePickerShown by rememberSaveable { mutableStateOf(false) }
     var searchTerm by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by rememberSaveable { mutableStateOf(false) }
+    var showShareSheet by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(shareRequests) {
+        shareRequests.collect { showShareSheet = true }
+    }
 
     var records by remember { mutableStateOf<List<IIDXSongRecord>?>(null) }
     var songs by remember { mutableStateOf<Map<String, IIDXSong>>(emptyMap()) }
@@ -198,6 +210,12 @@ fun IIDXScoresScreen(
                             )
                         }
                     }
+                }
+            }
+            if (!records.isNullOrEmpty()) {
+                item(key = "count") {
+                    ScoreCountRow(count = entries.size)
+                    HorizontalDivider()
                 }
             }
             items(
@@ -340,5 +358,27 @@ fun IIDXScoresScreen(
 
     if (showFilterSheet) {
         IIDXScoreFilterSheet(onDismiss = { showFilterSheet = false })
+    }
+
+    if (showShareSheet) {
+        val profile by container.profileRepository.iidx.collectAsState()
+        val shareSource = if (searchTerm.isEmpty()) entries else searchEntries
+        ShareCardSheet(
+            game = Game.IIDX_ARCADE,
+            profile = profile.toShareCardProfile(playType),
+            playStyle = playType.displayName,
+            entries = shareSource.map { entry ->
+                iidxShareCardEntry(
+                    record = entry.record,
+                    level = entry.level,
+                    score = entry.score,
+                    scoreRate = scoreRate(
+                        entry.score.score,
+                        songs[entry.record.title.compact]?.noteCount(playType, entry.level)
+                    )
+                )
+            },
+            onDismiss = { showShareSheet = false }
+        )
     }
 }

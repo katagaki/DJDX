@@ -10,14 +10,17 @@ object Routes {
     const val EXTERNAL_DATA = "externalData"
     const val ATTRIBUTIONS = "attributions"
     const val RADAR_MAKER = "radarMaker"
+    const val TIER_LIST = "tierList?code={code}"
 
     const val IIDX_VIEWER = "viewer/iidx?title={title}&playType={playType}&level={level}&date={date}"
     const val SDVX_VIEWER = "viewer/sdvx?title={title}&date={date}&difficulty={difficulty}"
+    const val DDR_VIEWER = "viewer/ddr?songIndex={songIndex}&date={date}&style={style}&difficulty={difficulty}"
     const val TEXTAGE_VIEWER = "viewer/textage?legacy={legacy}&chart={chart}"
     const val SDVX_IN_VIEWER = "viewer/sdvxin?legacy={legacy}&viewer={viewer}&data={data}"
     const val TOWER = "tower?mode={mode}"
     const val IIDX_ANALYTICS = "analytics/iidx/{detail}?param={param}"
     const val CHART_ANALYTICS = "analytics/chart/{game}/{detail}?param={param}"
+    const val GOAL_DETAIL = "analytics/goals/{id}"
 
     const val IIDX_DETAIL_CLEAR_TYPE_OVERVIEW = "clearTypeOverview"
     const val IIDX_DETAIL_GRADE_BREAKDOWN = "gradeBreakdown"
@@ -25,12 +28,16 @@ object Routes {
     const val IIDX_DETAIL_DJ_LEVEL_LEVEL = "djLevelLevel"
     const val IIDX_DETAIL_NEW_ENTRIES = "newEntries"
     const val IIDX_DETAIL_PROGRESS = "progress"
+    const val IIDX_DETAIL_DJ_LEVEL_SUGGESTIONS = "djLevelSuggestions"
+    const val IIDX_DETAIL_CLEAR_LAMP_SUGGESTIONS = "clearLampSuggestions"
 
     const val CHART_DETAIL_CLEAR_BREAKDOWN = "clearBreakdown"
     const val CHART_DETAIL_GRADE_BREAKDOWN = "gradeBreakdown"
     const val CHART_DETAIL_NEW_HIGH_SCORES = "newHighScores"
     const val CHART_DETAIL_NEW_CLEARS = "newClears"
     const val CHART_DETAIL_NEW_GRADES = "newGrades"
+    const val CHART_DETAIL_SUGGESTIONS = "suggestions"
+    const val CHART_DETAIL_TREND = "trend"
 
     const val TOWER_RECENT = "recent"
     const val TOWER_TOTALS = "totals"
@@ -42,6 +49,10 @@ object Routes {
     fun sdvxViewer(title: String, date: Long, difficulty: String): String =
         "viewer/sdvx?title=${Uri.encode(title)}&date=$date&difficulty=${Uri.encode(difficulty)}"
 
+    fun ddrViewer(songIndex: String, date: Long, style: String, difficulty: String): String =
+        "viewer/ddr?songIndex=${Uri.encode(songIndex)}&date=$date" +
+            "&style=${Uri.encode(style)}&difficulty=${Uri.encode(difficulty)}"
+
     fun textageViewer(legacyURL: String?, chartViewerURL: String?): String =
         "viewer/textage?legacy=${Uri.encode(legacyURL.orEmpty())}&chart=${Uri.encode(chartViewerURL.orEmpty())}"
 
@@ -49,10 +60,14 @@ object Routes {
         "viewer/sdvxin?legacy=${Uri.encode(chart.legacyPageURL)}" +
             "&viewer=${Uri.encode(chart.viewerPageURL)}&data=${Uri.encode(chart.viewerDataURL)}"
 
+    fun tierList(code: String = ""): String = "tierList?code=${Uri.encode(code)}"
+
     fun tower(mode: String): String = "tower?mode=$mode"
 
     fun iidxAnalytics(detail: String, param: String = ""): String =
         "analytics/iidx/$detail?param=${Uri.encode(param)}"
+
+    fun goalDetail(id: String): String = "analytics/goals/${Uri.encode(id)}"
 
     fun chartAnalytics(game: Game, detail: String, param: String = ""): String =
         "analytics/chart/${game.id}/$detail?param=${Uri.encode(param)}"

@@ -3,14 +3,17 @@ import SwiftUI
 struct RadarChartView: View {
     let color: Color
     let points: [RadarPointConfig]
+    var comparisonPoints: [RadarPointConfig]?
     let maxValue: Double = 130.0
     let benchmarkValue: Double = 100.0
     var labelFontSize: CGFloat = 12.0
     var lineWidth: CGFloat = 2.0
 
-    init(_ data: RadarData, isPlayerRadar: Bool = false, labelFontSize: CGFloat = 12.0, lineWidth: CGFloat = 2.0) {
+    init(_ data: RadarData, isPlayerRadar: Bool = false, comparison: RadarData? = nil,
+         labelFontSize: CGFloat = 12.0, lineWidth: CGFloat = 2.0) {
         self.color = data.color(isPlayerRadar: isPlayerRadar)
         self.points = data.points()
+        self.comparisonPoints = comparison?.points()
         self.labelFontSize = labelFontSize
         self.lineWidth = lineWidth
     }
@@ -49,8 +52,7 @@ struct RadarChartView: View {
                         .frame(width: 0, height: 0)
                         .overlay(
                             Text(config.label)
-                                .font(.system(size: labelFontSize, weight: .black))
-                                .fontWidth(.expanded)
+                                .font(.radarline(size: labelFontSize))
                                 .foregroundStyle(config.color)
                                 .brightness(0.88)
                                 .shadow(color: config.color, radius: 1.0)
@@ -62,6 +64,10 @@ struct RadarChartView: View {
                 }
 
                 ZStack {
+                    if let comparisonPoints {
+                        RadarPolygonShape(configs: comparisonPoints, maxValue: maxValue)
+                            .stroke(Color.primary.opacity(0.6), style: StrokeStyle(lineWidth: lineWidth, dash: [3]))
+                    }
                     RadarPolygonShape(configs: points, maxValue: maxValue)
                         .fill(color.opacity(0.5))
                     RadarPolygonShape(configs: points, maxValue: maxValue)

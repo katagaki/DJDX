@@ -28,6 +28,8 @@ struct SDVXScoreRow: View {
                     if record.highScore > 0 {
                         Divider().frame(maxHeight: 14.0)
                         Text(String(record.highScore))
+                            .font(.scoreline(.caption))
+                            .fontWidth(.standard)
                             .sdvxScoreText()
                     }
                     Divider().frame(maxHeight: 14.0)
@@ -44,22 +46,9 @@ struct SDVXScoreRow: View {
             Spacer(minLength: 0.0)
 
             // Difficulty + level label
-            HStack(alignment: .center, spacing: 4.0) {
-                Text(verbatim: record.difficultyEnum.abbreviation)
-                    .lineLimit(1)
-                Spacer(minLength: 0.0)
-                Text(verbatim: record.level)
-                    .monospacedDigit()
-                    .lineLimit(1)
-            }
-            .font(.system(size: 14.0).weight(.bold))
-            .foregroundStyle(.white)
-            .padding([.leading, .trailing], 8.0)
-            .padding([.top, .bottom], 8.0)
-            .frame(width: 92.0)
-            .background(record.difficultyEnum.color)
-            .clipShape(.rect(cornerRadius: 6.0))
-            .padding([.top, .bottom], 8.0)
+            LevelBadge(name: record.difficultyEnum.rawValue, level: record.level,
+                       tint: record.difficultyEnum.color, layout: .horizontal)
+                .padding([.top, .bottom], 8.0)
         }
         .frame(maxWidth: .infinity)
         .padding(.trailing)

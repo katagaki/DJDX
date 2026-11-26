@@ -25,6 +25,7 @@ struct IIDXImportView: View {
     @State var autoImportFailedReason: ImportFailedReason?
 
     @State var isSelectingCSVFile: Bool = false
+    @State var summaryTarget: ImportSummaryTarget?
 
     let actor = IIDXImporter()
     let fetcher = IIDXReader()
@@ -33,19 +34,25 @@ struct IIDXImportView: View {
         NavigationStack(path: $importPath) {
             List {
                 ForEach(importGroups) { importGroup in
-                    HStack(alignment: .center, spacing: 6.0) {
-                        Text(importGroup.importDate, style: .date)
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        if let version = importGroup.iidxVersion {
-                            Text(version.marketingName)
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundStyle(colorScheme == .dark ?
-                                                 Color(uiColor: version.darkModeColor) :
-                                                    Color(uiColor: version.lightModeColor))
+                    Button {
+                        summaryTarget = ImportSummaryTarget(id: importGroup.id)
+                    } label: {
+                        HStack(alignment: .center, spacing: 6.0) {
+                            Text(importGroup.importDate, style: .date)
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if let version = importGroup.iidxVersion {
+                                Text(version.marketingName)
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(colorScheme == .dark ?
+                                                     Color(uiColor: version.darkModeColor) :
+                                                        Color(uiColor: version.lightModeColor))
+                            }
                         }
+                        .contentShape(.rect)
                     }
+                    .buttonStyle(.plain)
                     .listRowBackground(Color.clear)
                 }
                 .onDelete(perform: { indexSet in
@@ -84,19 +91,6 @@ struct IIDXImportView: View {
                     .padding()
             }
             .alert(
-                "Alert.Import.Success.Title",
-                isPresented: $didImportSucceed,
-                actions: {
-                    Button("Shared.OK", role: .cancel) {
-                        didImportSucceed = false
-                        importPath = NavigationPath()
-                    }
-                },
-                message: {
-                    Text("Alert.Import.Success.Subtitle")
-                }
-            )
-            .alert(
                 "Alert.Import.Error.Title",
                 isPresented: $isAutoImportFailed,
                 actions: {
@@ -115,8 +109,20 @@ struct IIDXImportView: View {
             }
             .onChange(of: didImportSucceed) { _, newValue in
                 if newValue {
+                    didImportSucceed = false
+                    importPath = NavigationPath()
                     NotificationCenter.default.post(name: .dataImported, object: nil)
-                    Task { await reloadImportGroups() }
+                    Task {
+                        await reloadImportGroups()
+                        if let importGroup = await fetcher.importGroup(for: importToDate) {
+                            summaryTarget = ImportSummaryTarget(id: importGroup.id)
+                        }
+                    }
+                }
+            }
+            .sheet(item: $summaryTarget) { target in
+                ImportSummaryView {
+                    await IIDXImportSummaryBuilder.summary(importGroupID: target.id)
                 }
             }
             .sheet(isPresented: $isSelectingCSVFile) {

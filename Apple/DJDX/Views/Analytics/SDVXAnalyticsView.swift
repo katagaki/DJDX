@@ -32,6 +32,8 @@ struct SDVXAnalyticsView: View {
     @AppStorage(wrappedValue: false, "Analytics.SDVX.LastPlayCollapsed") var isLastPlayCollapsedStored: Bool
     @State var isLastPlayCollapsed: Bool = false
 
+    @AppStorage(wrappedValue: false, "Analytics.SDVX.SuggestionsCollapsed") var isSuggestionsCollapsed: Bool
+
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
         GridItem(.flexible(), spacing: 12.0)
@@ -41,6 +43,7 @@ struct SDVXAnalyticsView: View {
         VStack(spacing: 20.0) {
             overviewSection
             lastPlaySection
+            suggestionsSection
         }
         .padding(.top, 20.0)
         .onAppear {
@@ -151,6 +154,45 @@ struct SDVXAnalyticsView: View {
         }
     }
 
+    @ViewBuilder
+    var suggestionsSection: some View {
+        if !isEditing {
+            VStack(spacing: 12.0) {
+                AnalyticsSectionHeader(
+                    title: AnalyticsSection.suggestions.titleKey,
+                    isCollapsible: true,
+                    isExpanded: !isSuggestionsCollapsed
+                ) {
+                    withAnimation(.smooth.speed(2.0)) { isSuggestionsCollapsed.toggle() }
+                }
+                if !isSuggestionsCollapsed {
+                    Button {
+                        navigationManager.push(SDVXAnalyticsPath.volforceSuggestionsDetail)
+                    } label: {
+                        AnalyticsSuggestionCard(
+                            title: Text(verbatim: "VOLFORCE"),
+                            systemImage: "arrow.up.right.circle",
+                            iconColor: .purple,
+                            count: model.volforceSuggestions.count,
+                            previews: model.volforceSuggestions.prefix(3).map { suggestion in
+                                AnalyticsSuggestionPreview(
+                                    id: suggestion.id,
+                                    title: suggestion.songTitle,
+                                    detail: "\(suggestion.difficulty.abbreviation) \(suggestion.level) · " +
+                                        suggestion.targetGrade,
+                                    value: SDVXVolforce.gainText(suggestion.volforceGain)
+                                )
+                            }
+                        )
+                    }
+                    .buttonStyle(AnalyticsCardButtonStyle())
+                    .matchedTransitionSource(id: "SDVX.volforceSuggestions", in: analyticsNamespace)
+                    .padding(.horizontal)
+                }
+            }
+        }
+    }
+
     // MARK: - Cards
 
     @ViewBuilder
@@ -163,6 +205,7 @@ struct SDVXAnalyticsView: View {
             switch cardType {
             case .clearBreakdown: clearBreakdownCard
             case .gradeBreakdown: gradeBreakdownCard
+            case .volforceTrend: volforceTrendCard
             default: EmptyView()
             }
         }
@@ -188,8 +231,8 @@ struct SDVXAnalyticsView: View {
         let count = lastPlayCount(for: cardType)
         VStack(alignment: .leading, spacing: 2.0) {
             Text("\(count)")
-                .font(.system(size: 20.0, weight: .black))
-                .fontWidth(.expanded)
+                .font(.scoreline(size: 20.0))
+                .fontWidth(.standard)
                 .foregroundStyle(count > 0 ? .primary : .secondary)
                 .frame(height: 36.0, alignment: .topLeading)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -323,6 +366,18 @@ struct SDVXAnalyticsView: View {
             .chartXAxis { AxisMarks { AxisGridLine() } }
         }
         .perLevelCaption("Analytics.SDVX.GradeBreakdown")
+    }
+
+    var volforceTrendCard: some View {
+        AnalyticsCardView(title: "Analytics.SDVX.VolforceTrend",
+                          systemImage: "",
+                          iconColor: .clear,
+                          contentHeight: 160.0,
+                          showsHeader: false) {
+            TrendCardContent(points: model.volforceHistory, color: .purple,
+                             format: SDVXAnalyticsModel.formatVolforce)
+        }
+        .perLevelCaption("Analytics.SDVX.VolforceTrend")
     }
 
     func clearLabel(_ rawValue: String) -> String {

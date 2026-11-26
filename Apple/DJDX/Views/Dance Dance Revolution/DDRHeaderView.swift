@@ -30,6 +30,9 @@ extension UnifiedView {
                                  isEditing: $isEditingAnalytics,
                                  analyticsNamespace: ddrAnalyticsNamespace)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
+                AnalyticsGoalsSection(game: .danceDanceRevolution, playStyle: ddrStyleToShow.rawValue)
+                    .padding(.top, 20.0)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
         }
         .padding(.bottom, 8.0)

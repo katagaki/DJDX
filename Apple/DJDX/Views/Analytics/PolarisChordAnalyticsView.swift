@@ -194,8 +194,8 @@ struct PolarisChordAnalyticsView: View {
         let count = lastPlayCount(for: cardType)
         VStack(alignment: .leading, spacing: 2.0) {
             Text("\(count)")
-                .font(.system(size: 20.0, weight: .black))
-                .fontWidth(.expanded)
+                .font(.scoreline(size: 20.0))
+                .fontWidth(.standard)
                 .foregroundStyle(count > 0 ? .primary : .secondary)
                 .frame(height: 36.0, alignment: .topLeading)
                 .frame(maxWidth: .infinity, alignment: .leading)

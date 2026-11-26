@@ -39,6 +39,7 @@ struct UnifiedView: View {
     @State var isBackupRestoreFailed: Bool = false
     @State var isPruneCompleted: Bool = false
     @State var storageReport = StorageReport()
+    @State var tierListShare: TierListShare?
 
     @State var migrationProgress = ProgressReporter()
 
@@ -135,6 +136,11 @@ struct UnifiedView: View {
                                 Label("Shared.Edit", systemImage: "pencil")
                             }
                         }
+                        if !isSessionsMode {
+                            Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
+                                NotificationCenter.default.post(name: .shareCardRequested, object: nil)
+                            }
+                        }
                     }
                 }
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
@@ -179,6 +185,14 @@ struct UnifiedView: View {
             .navigationDestination(for: DDRAnalyticsPath.self) { path in
                 DDRAnalyticsDestinationView(model: ddrAnalyticsModel, path: path, namespace: ddrAnalyticsNamespace)
             }
+            .navigationDestination(for: AnalyticsGoalPath.self) { path in
+                switch path {
+                case .detail(let id):
+                    AnalyticsGoalDetailView(goalID: id)
+                        .appBackgroundGradient()
+                        .navigationBarTitleDisplayMode(.inline)
+                }
+            }
         }
         .sheet(isPresented: $isPresentingImport) {
             Group {
@@ -219,6 +233,11 @@ struct UnifiedView: View {
                 }
             } message: {
                 Text("Alert.ICloudBackup.Restore.Subtitle.\(availableBackupDate ?? .now, format: .dateTime)")
+            }
+        }
+        .sheet(item: $tierListShare) { share in
+            NavigationStack {
+                TierListView(game: selectedGame, playType: playTypeToShow, initialShare: share)
             }
         }
         .progressCover(migrationProgress)

@@ -19,6 +19,11 @@ struct SDVXAnalyticsDestinationView: View {
                 SDVXGradeBreakdownDetailView(gradePerDifficulty: model.gradePerDifficulty)
                     .navigationTitle("Analytics.SDVX.GradeBreakdown")
                     .navigationTransition(.zoom(sourceID: "SDVX.gradeBreakdown", in: namespace))
+            case .volforceTrendDetail:
+                TrendDetailView(points: model.volforceHistory, color: .purple,
+                                format: SDVXAnalyticsModel.formatVolforce)
+                    .navigationTitle("Analytics.SDVX.VolforceTrend")
+                    .navigationTransition(.zoom(sourceID: "SDVX.volforceTrend", in: namespace))
             case .newHighScoresDetail:
                 SDVXNewHighScoresDetailView(newHighScores: model.newHighScores)
                     .navigationTitle("Analytics.NewHighScores")
@@ -33,6 +38,10 @@ struct SDVXAnalyticsDestinationView: View {
                 SDVXNewGradesDetailView(newGrades: model.newGrades[grade] ?? [])
                     .navigationTitle(Text(verbatim: grade))
                     .navigationTransition(.zoom(sourceID: transitionID(forGrade: grade), in: namespace))
+            case .volforceSuggestionsDetail:
+                SDVXVolforceSuggestionsDetailView(suggestions: model.volforceSuggestions)
+                    .navigationTitle(Text(verbatim: "VOLFORCE"))
+                    .navigationTransition(.zoom(sourceID: "SDVX.volforceSuggestions", in: namespace))
             }
         }
         .appBackgroundGradient()
@@ -71,19 +80,38 @@ struct SDVXLevelLabel: View {
     let level: String
 
     var body: some View {
-        VStack(spacing: 1.0) {
-            Text(verbatim: difficulty.abbreviation)
-                .font(.system(size: 10.0).weight(.black))
-                .foregroundStyle(difficulty.color)
-            Text(verbatim: level)
-                .font(.system(size: 18.0).weight(.heavy))
-                .fontWidth(.condensed)
-                .monospacedDigit()
+        LevelBadge(name: difficulty.rawValue, level: level, tint: difficulty.color)
+    }
+}
+
+// MARK: - Suggestions
+
+struct SDVXVolforceSuggestionsDetailView: View {
+    let suggestions: [SDVXVolforceSuggestion]
+
+    var body: some View {
+        List {
+            if suggestions.isEmpty {
+                Text("Analytics.Suggestions.Empty")
+                    .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
+            } else {
+                ForEach(suggestions) { suggestion in
+                    AnalyticsSuggestionRow(
+                        title: suggestion.songTitle,
+                        current: suggestion.currentGrade,
+                        target: suggestion.targetGrade,
+                        detail: String(localized: "Analytics.Suggestions.PointsNeeded.\(suggestion.pointsNeeded)"),
+                        gain: SDVXVolforce.gainText(suggestion.volforceGain),
+                        difficulty: suggestion.difficulty.abbreviation,
+                        difficultyColor: suggestion.difficulty.color,
+                        level: suggestion.level
+                    )
+                }
+            }
         }
-        .padding([.top, .bottom], 6.0)
-        .frame(width: 78.0, alignment: .center)
-        .background(.thinMaterial)
-        .clipShape(.rect(cornerRadius: 6.0))
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 }
 
@@ -197,17 +225,20 @@ struct SDVXNewHighScoresDetailView: View {
                                 .fontWidth(.condensed)
                             HStack(spacing: 4.0) {
                                 Text("\(entry.previousScore)")
-                                    .font(.caption)
+                                    .font(.scoreline(.caption, weight: .medium))
+                                    .fontWidth(.standard)
                                     .foregroundStyle(.secondary)
                                     .strikethrough()
                                 Image(systemName: "arrow.right")
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
                                 Text("\(entry.newScore)")
-                                    .font(.caption.weight(.semibold))
+                                    .font(.scoreline(.caption, weight: .bold))
+                                    .fontWidth(.standard)
                                     .foregroundStyle(.orange)
                                 Text("Analytics.NewHighScore.\(entry.newScore - entry.previousScore)")
-                                    .font(.caption2)
+                                    .font(.scoreline(.caption2, weight: .bold))
+                                    .fontWidth(.standard)
                                     .foregroundStyle(.orange.opacity(0.8))
                             }
                             if entry.newGrade != entry.previousGrade {
@@ -291,8 +322,7 @@ struct SDVXClearTypeLevelRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6.0) {
             HStack {
-                Text(verbatim: "LEVEL \(level)")
-                    .font(.subheadline.bold())
+                LevelNumberBadge(level: String(level))
                 Spacer()
                 Text("Shared.SongCount.\(total)")
                     .font(.caption)

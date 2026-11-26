@@ -19,6 +19,15 @@ struct DDRAnalyticsDestinationView: View {
                 DDRRankBreakdownDetailView(rankPerLevel: model.rankPerLevel)
                     .navigationTitle("Analytics.DDR.RankBreakdown")
                     .navigationTransition(.zoom(sourceID: "DDR.rankBreakdown", in: namespace))
+            case .flareSkillSuggestionsDetail:
+                DDRFlareSkillSuggestionsDetailView(suggestions: model.flareSkillSuggestions)
+                    .navigationTitle(Text(verbatim: "FLARE SKILL"))
+                    .navigationTransition(.zoom(sourceID: "DDR.flareSkillSuggestions", in: namespace))
+            case .flareSkillTrendDetail:
+                TrendDetailView(points: model.flareSkillHistory, color: .orange,
+                                format: DDRAnalyticsModel.formatFlareSkill)
+                    .navigationTitle("Analytics.DDR.FlareSkillTrend")
+                    .navigationTransition(.zoom(sourceID: "DDR.flareSkillTrend", in: namespace))
             }
         }
         .appBackgroundGradient()
@@ -73,8 +82,7 @@ struct DDRClearTypeLevelRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6.0) {
             HStack {
-                Text(verbatim: "LEVEL \(level)")
-                    .font(.subheadline.bold())
+                LevelNumberBadge(level: String(level))
                 Spacer()
                 Text("Shared.SongCount.\(total)")
                     .font(.caption)
@@ -124,7 +132,7 @@ struct DDRRankBreakdownDetailView: View {
                         .frame(height: 140.0)
                         .listRowBackground(Color.clear)
                     } header: {
-                        Text(verbatim: "LEVEL \(level)")
+                        LevelNumberBadge(level: String(level))
                     }
                 }
             }
@@ -139,5 +147,34 @@ struct DDRRankBreakdownDetailView: View {
             let count = counts[rank] ?? 0
             return count > 0 ? (rank, count) : nil
         }
+    }
+}
+
+struct DDRFlareSkillSuggestionsDetailView: View {
+    let suggestions: [DDRFlareSkillSuggestion]
+
+    var body: some View {
+        List {
+            if suggestions.isEmpty {
+                Text("Analytics.Suggestions.Empty")
+                    .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
+            } else {
+                ForEach(suggestions) { suggestion in
+                    AnalyticsSuggestionRow(
+                        title: suggestion.songTitle,
+                        current: suggestion.currentFlareRank.map { "FLARE \(DDRFlareSkill.rankLabel($0))" } ?? "---",
+                        target: "FLARE \(DDRFlareSkill.rankLabel(suggestion.targetFlareRank))",
+                        detail: "FLARE SKILL \(suggestion.currentFlareSkill) → \(suggestion.targetFlareSkill)",
+                        gain: "+\(suggestion.flareSkillGain)",
+                        difficulty: suggestion.difficulty.rawValue,
+                        difficultyColor: suggestion.difficulty.color,
+                        level: String(suggestion.level)
+                    )
+                }
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 }

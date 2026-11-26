@@ -14,13 +14,13 @@ struct NewHighScoresCard: View {
         VStack(alignment: .leading, spacing: 4.0) {
             if newHighScores.isEmpty {
                 Text(verbatim: "0")
-                    .font(.system(size: 20.0, weight: .black))
-                    .fontWidth(.expanded)
+                    .font(.scoreline(size: 20.0))
+                    .fontWidth(.standard)
                     .foregroundStyle(.secondary)
             } else {
                 Text("\(newHighScores.count)")
-                    .font(.system(size: 20.0, weight: .black))
-                    .fontWidth(.expanded)
+                    .font(.scoreline(size: 20.0))
+                    .fontWidth(.standard)
                     .foregroundStyle(.primary)
             }
             Spacer(minLength: 0)

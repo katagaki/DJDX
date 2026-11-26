@@ -18,7 +18,7 @@ struct IIDXScoreRow: View {
     var songRecord: IIDXSongRecord
     var level: IIDXLevel
     var score: IIDXLevelScore
-    @State var scoreRate: Float?
+    var scoreRate: Float?
     var scoreDelta: Int?
 
     var body: some View {
@@ -101,24 +101,20 @@ struct IIDXScoreRow: View {
                                                 startPoint: .top,
                                                 endPoint: .bottom
                                             ))
-                                            .fontWidth(.expanded)
-                                            .fontWeight(.black)
+                                            .font(.scoreline(.caption))
+                                            .fontWidth(.standard)
                                     }
                                     if isScoreVisible {
                                         if isDJLevelVisible || isScoreRateVisible {
                                             Divider()
                                                 .frame(maxHeight: 14.0)
                                         }
-                                        Text(String(score.score))
-                                            .foregroundStyle(Color.iidxScore)
-                                            .fontWidth(.expanded)
-                                            .fontWeight(.heavy)
-                                            .strokeText(color: .iidxScoreOutline, width: 0.3)
+                                        IIDXScoreText(score.score)
                                         if let scoreDelta, scoreDelta > 0 {
                                             Text("Analytics.NewHighScore.\(scoreDelta)")
                                                 .foregroundStyle(.orange)
-                                                .fontWidth(.expanded)
-                                                .fontWeight(.heavy)
+                                                .font(.scoreline(.caption))
+                                                .fontWidth(.standard)
                                         }
                                     }
                                 }
@@ -148,10 +144,7 @@ struct IIDXScoreRow: View {
 
             // Level
             if isLevelVisible {
-                IIDXLevelLabel(levelType: level, score: score)
-                    .padding([.top, .bottom], 6.0)
-                    .frame(width: 78.0, alignment: .center)
-                    .cardBackground(cornerRadius: 6.0)
+                IIDXLevelLabel(layout: .horizontal, levelType: level, score: score)
                     .padding([.top, .bottom], 8.0)
             }
         }
@@ -160,28 +153,10 @@ struct IIDXScoreRow: View {
     }
 
     var titleTextColor: LinearGradient {
-        if level == .leggendaria {
-            return IIDXVersion.leggendariaSongTitleTextColor
-        } else if colorScheme == .light && songRecord.version != iidxVersion.marketingName {
-            return LinearGradient(
-                colors: [.white, Color(red: 219 / 255, green: 219 / 255, blue: 224 / 255)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        } else {
-            return iidxVersion.songTitleTextColor(for: songRecord.version)
-        }
+        iidxVersion.rowTitleTextColor(for: songRecord.version, level: level, colorScheme: colorScheme)
     }
 
     var titleStrokeColor: Color {
-        if level == .leggendaria {
-            return IIDXVersion.leggendariaSongTitleStrokeColor
-        } else if songRecord.version != iidxVersion.marketingName {
-            return colorScheme == .dark ?
-                Color(red: 32 / 255, green: 32 / 255, blue: 32 / 255) :
-                Color(red: 56 / 255, green: 56 / 255, blue: 61 / 255)
-        } else {
-            return iidxVersion.songTitleStrokeColor(for: songRecord.version)
-        }
+        iidxVersion.rowTitleStrokeColor(for: songRecord.version, level: level, colorScheme: colorScheme)
     }
 }

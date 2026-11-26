@@ -44,6 +44,7 @@ object SettingsKeys {
     val sdvxLevelFilters = stringSetPreferencesKey("SDVXScoresView.LevelBucketFilters")
     val sdvxClearTypeFilters = stringSetPreferencesKey("SDVXScoresView.ClearTypeFilters")
     val sdvxGradeFilters = stringSetPreferencesKey("SDVXScoresView.GradeFilters")
+    val sdvxScoreBelowFilter = intPreferencesKey("SDVXScoresView.ScoreBelowFilter")
 
     val polarisChordSortMode = stringPreferencesKey("PolarisChordScoresView.SortMode")
     val polarisChordSortDescending = booleanPreferencesKey("PolarisChordScoresView.SortDescending")
@@ -79,6 +80,7 @@ object SettingsKeys {
     val iidxScoreProgressStyle = stringPreferencesKey("Analytics.ScoreProgress.Style")
     val iidxClearTypeCardLevels = stringSetPreferencesKey("Analytics.ClearType.Overall.CardLevels")
     val iidxDJLevelCardLevels = stringSetPreferencesKey("Analytics.DJLevel.Overall.CardLevels")
+    val iidxSuggestionTargetClearType = stringPreferencesKey("Analytics.Suggestions.TargetClearType")
     val sdvxCardOrder = stringPreferencesKey("Analytics.SDVX.CardOrder")
     val sdvxVisibleCards = stringSetPreferencesKey("Analytics.SDVX.VisibleCards")
     val sdvxCollapsedSections = stringSetPreferencesKey("Analytics.SDVX.CollapsedSections")
@@ -89,7 +91,12 @@ object SettingsKeys {
     val ddrVisibleCards = stringSetPreferencesKey("Analytics.DDR.VisibleCards")
     val ddrCollapsedSections = stringSetPreferencesKey("Analytics.DDR.CollapsedSections")
 
+    val analyticsGoals = stringPreferencesKey("Analytics.Goals")
+    val analyticsGoalsCollapsed = booleanPreferencesKey("Analytics.Goals.Collapsed")
+
     val onboardingLastSeenVersion = stringPreferencesKey("Onboarding.LastSeenVersion")
+
+    val shareCardCustomColor = intPreferencesKey("ShareCard.CustomColor")
 }
 
 val analyticsLayoutKeys: List<Preferences.Key<*>> = listOf(

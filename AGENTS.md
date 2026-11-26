@@ -33,6 +33,17 @@ Run build commands from inside the relevant folder.
 - The Lamp server URL comes from the Xcode Cloud environment variable `LAMP_SERVER_URL`,
   written into `LampServerURL` in `DJDX/Info.plist` by `ci_scripts/ci_pre_xcodebuild.sh`.
   Keep the committed value empty.
+- Game data must always be styled exactly as the Play Data rows style it
+  (`Views/*/Scores/*ScoreRow.swift`) on every screen, never with ad-hoc colors or fonts:
+  - Song titles: IIDX uses the version-tinted title (`IIDXVersion.rowTitleTextColor` /
+    `rowTitleStrokeColor`, heavy compressed); other games use `.bold()` titles.
+  - Scores: IIDX `Color.iidxScore` with `.iidxScoreOutline` stroke, SDVX `.sdvxScoreText()`,
+    DDR the cyan→blue gradient; new-score deltas use `Analytics.NewHighScore` in orange.
+  - Clear types and DJ levels (IIDX): `IIDXMetallicText.clearType` / `.djLevel`.
+    Other games: their clear type/grade colors (`clearTypeEnum.color`, `.sdvxGradeText()`,
+    `PolarisChordGrade.style`, `DDRSongRecord.clearColor` / `rankColor`).
+  - Clear lamps: the leading lamp bar in each game's lamp color (rainbow for IIDX full combo).
+  - Levels and difficulties: `LevelBadge` (or `IIDXLevelLabel` for IIDX), never a custom label.
 
 # Android
 

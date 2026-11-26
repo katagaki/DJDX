@@ -67,19 +67,7 @@ struct PolarisChordLevelLabel: View {
     let level: String
 
     var body: some View {
-        VStack(spacing: 1.0) {
-            Text(verbatim: difficulty.abbreviation)
-                .font(.system(size: 10.0).weight(.black))
-                .foregroundStyle(difficulty.color)
-            Text(verbatim: level)
-                .font(.system(size: 18.0).weight(.heavy))
-                .fontWidth(.condensed)
-                .monospacedDigit()
-        }
-        .padding([.top, .bottom], 6.0)
-        .frame(width: 78.0, alignment: .center)
-        .background(.thinMaterial)
-        .clipShape(.rect(cornerRadius: 6.0))
+        LevelBadge(name: difficulty.rawValue, level: level, tint: difficulty.color)
     }
 }
 
@@ -155,8 +143,7 @@ struct PolarisChordClearTypeLevelRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6.0) {
             HStack {
-                Text(verbatim: "LEVEL \(level)")
-                    .font(.subheadline.bold())
+                LevelNumberBadge(level: String(level))
                 Spacer()
                 Text("Shared.SongCount.\(total)")
                     .font(.caption)
@@ -333,14 +320,16 @@ struct PolarisChordNewHighScoresDetailView: View {
                                 .fontWidth(.condensed)
                             HStack(spacing: 4.0) {
                                 Text("\(entry.previousScore)")
-                                    .font(.caption)
+                                    .font(.scoreline(.caption, weight: .medium))
+                                    .fontWidth(.standard)
                                     .foregroundStyle(.secondary)
                                     .strikethrough()
                                 Image(systemName: "arrow.right")
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
                                 Text("\(entry.newScore)")
-                                    .font(.caption.weight(.semibold))
+                                    .font(.scoreline(.caption, weight: .bold))
+                                    .fontWidth(.standard)
                                     .foregroundStyle(.primary)
                             }
                             if entry.newGrade != entry.previousGrade {

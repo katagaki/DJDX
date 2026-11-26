@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowCircleUp
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material.icons.outlined.Whatshot
 import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -51,9 +53,12 @@ import com.tsubuzaki.djdxgo.ui.theme.DDRColors
 import com.tsubuzaki.djdxgo.ui.theme.Palette
 import com.tsubuzaki.djdxgo.ui.theme.PolarisChordColors
 import com.tsubuzaki.djdxgo.ui.theme.SDVXColors
+import java.text.NumberFormat
+import java.util.Locale
 
 internal const val CHART_CARD_CLEAR_BREAKDOWN = "clearBreakdown"
 internal const val CHART_CARD_GRADE_BREAKDOWN = "gradeBreakdown"
+internal const val CHART_CARD_TREND = "trend"
 internal const val CHART_CARD_NEW_HIGH_SCORES = "newHighScores"
 private const val CHART_CARD_NEW_CLEAR_PREFIX = "newClear:"
 private const val CHART_CARD_NEW_GRADE_PREFIX = "newGrade:"
@@ -79,7 +84,13 @@ internal class ChartGameSpec(
     val difficultyColor: (String) -> Color,
     val clearCaptionRes: Int,
     val gradeCaptionRes: Int,
-    val clearIcon: (String) -> ImageVector
+    val clearIcon: (String) -> ImageVector,
+    val suggestionTitle: String? = null,
+    val suggestionIcon: ImageVector = Icons.Outlined.Whatshot,
+    val suggestionColor: Color = Palette.orange,
+    val trendCaptionRes: Int? = null,
+    val trendColor: Color = Palette.blue,
+    val trendFormat: (Double) -> String = { it.toString() }
 ) {
     val lastPlayCards: List<String> =
         if (trackedClearTypes.isEmpty() && trackedGrades.isEmpty()) {
@@ -90,7 +101,11 @@ internal class ChartGameSpec(
                 trackedGrades.map { CHART_CARD_NEW_GRADE_PREFIX + it }
         }
 
-    val overviewCards: List<String> = listOf(CHART_CARD_CLEAR_BREAKDOWN, CHART_CARD_GRADE_BREAKDOWN)
+    val overviewCards: List<String> = listOfNotNull(
+        CHART_CARD_CLEAR_BREAKDOWN,
+        CHART_CARD_GRADE_BREAKDOWN,
+        CHART_CARD_TREND.takeIf { trendCaptionRes != null }
+    )
 
     val defaultOrder: List<String> = overviewCards + lastPlayCards
 }
@@ -116,7 +131,13 @@ internal val sdvxSpec = ChartGameSpec(
     difficultyColor = { SDVXColors.difficultyColor(it) },
     clearCaptionRes = R.string.analytics_clear_breakdown,
     gradeCaptionRes = R.string.analytics_grade_breakdown,
-    clearIcon = { Icons.Outlined.CheckCircle }
+    clearIcon = { Icons.Outlined.CheckCircle },
+    suggestionTitle = "VOLFORCE",
+    suggestionIcon = Icons.Outlined.ArrowCircleUp,
+    suggestionColor = Palette.purple,
+    trendCaptionRes = R.string.analytics_volforce_trend,
+    trendColor = Palette.purple,
+    trendFormat = { String.format(Locale.ROOT, "%.3f", it) }
 )
 
 internal val polarisChordSpec = ChartGameSpec(
@@ -162,7 +183,11 @@ internal val ddrSpec = ChartGameSpec(
     difficultyColor = { DDRColors.difficultyColor(it) },
     clearCaptionRes = R.string.analytics_clear_breakdown,
     gradeCaptionRes = R.string.analytics_rank_breakdown,
-    clearIcon = { Icons.Outlined.CheckCircle }
+    clearIcon = { Icons.Outlined.CheckCircle },
+    suggestionTitle = "FLARE SKILL",
+    trendCaptionRes = R.string.analytics_flare_skill_trend,
+    trendColor = Palette.orange,
+    trendFormat = { NumberFormat.getIntegerInstance().format(it.toLong()) }
 )
 
 internal fun chartGameSpec(game: Game): ChartGameSpec = when (game) {
@@ -247,6 +272,20 @@ private fun ChartAnalyticsSection(
                         onMoveBackward = { layout.move(id, -1) { it in spec.overviewCards } },
                         onMoveForward = { layout.move(id, 1) { it in spec.overviewCards } }
                     ) {
+                        if (id == CHART_CARD_TREND) {
+                            OverviewCard(
+                                caption = spec.trendCaptionRes?.let { stringResource(it) }.orEmpty(),
+                                contentHeight = 160.dp,
+                                onClick = if (isEditing) {
+                                    null
+                                } else {
+                                    { onNavigate(Routes.chartAnalytics(spec.game, Routes.CHART_DETAIL_TREND)) }
+                                }
+                            ) {
+                                TrendCardContent(data.trend, spec.trendColor, spec.trendFormat)
+                            }
+                            return@EditableCard
+                        }
                         val isClear = id == CHART_CARD_CLEAR_BREAKDOWN
                         val totals = if (isClear) {
                             data.totalClearCounts(spec.clearKeys)
@@ -356,6 +395,25 @@ private fun ChartAnalyticsSection(
                         }
                     }
                 }
+            }
+        }
+
+        spec.suggestionTitle?.let { suggestionTitle ->
+            SuggestionSection(layout, isEditing) {
+                SuggestionCard(
+                    title = suggestionTitle,
+                    icon = spec.suggestionIcon,
+                    iconColor = spec.suggestionColor,
+                    count = data.suggestions.size,
+                    previews = data.suggestions.take(3).map {
+                        SuggestionPreview(
+                            title = it.title,
+                            detail = "${spec.difficultyLabel(it.difficulty)} ${it.level} · ${it.target}",
+                            value = it.gainText
+                        )
+                    },
+                    onClick = { onNavigate(Routes.chartAnalytics(spec.game, Routes.CHART_DETAIL_SUGGESTIONS)) }
+                )
             }
         }
     }

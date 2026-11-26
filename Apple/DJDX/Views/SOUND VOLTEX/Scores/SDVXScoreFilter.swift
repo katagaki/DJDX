@@ -6,6 +6,7 @@ struct SDVXScoreFilterSheet: View {
     @Binding var levelBucketsToShow: Set<Double>
     @Binding var clearTypesToShow: Set<SDVXClearType>
     @Binding var gradesToShow: Set<SDVXGrade>
+    @Binding var scoreBelow: Int
     let availableLevelBuckets: [Double]
     var onReset: () -> Void
 
@@ -20,6 +21,7 @@ struct SDVXScoreFilterSheet: View {
                         levelBucketsToShow = []
                         clearTypesToShow = []
                         gradesToShow = []
+                        scoreBelow = 0
                         onReset()
                     }
                 }
@@ -67,6 +69,14 @@ struct SDVXScoreFilterSheet: View {
                         }
                     } label: {
                         SDVXFilterDisclosureLabel("Shared.SDVX.Grade", count: gradesToShow.count)
+                    }
+                    Picker("Scores.Filter.SDVX.ScoreBelow", selection: $scoreBelow) {
+                        Text("Shared.All")
+                            .tag(0)
+                        ForEach(SDVXFilterOptions.scoreThresholds, id: \.self) { threshold in
+                            Text("Scores.Filter.SDVX.ScoreBelow.\(threshold.formatted())")
+                                .tag(threshold)
+                        }
                     }
                 }
             }
