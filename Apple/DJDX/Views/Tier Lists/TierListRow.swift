@@ -24,19 +24,6 @@ struct TierListRow<Label: View>: View {
                             }
                             return true
                         }
-                        .contextMenu {
-                            ForEach(TierListTier.allCases) { target in
-                                Button("TierList.MoveTo.\(target.rawValue)") {
-                                    onPlace(chart.id, target, nil)
-                                }
-                                .disabled(target == tier)
-                            }
-                            if tier != nil {
-                                Button("TierList.Unplace", systemImage: "arrow.uturn.down") {
-                                    onPlace(chart.id, nil, nil)
-                                }
-                            }
-                        }
                 }
             }
             .padding(4.0)

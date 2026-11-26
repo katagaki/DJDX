@@ -79,9 +79,7 @@
     <string name="tier_list_no_data_title">スコアがありません</string>
     <string name="tier_list_no_data_message">スコアをインポートすると、譜面をランク付けできます。</string>
     <string name="tier_list_unplaced">未分類（%1$d）</string>
-    <string name="tier_list_hint">譜面を長押ししてティア間をドラッグするか、タップして移動先を選択できます。</string>
-    <string name="tier_list_move_to">%1$sに移動</string>
-    <string name="tier_list_unplace">ティアから外す</string>
+    <string name="tier_list_hint">譜面を長押ししてから、ティア間をドラッグして移動できます。</string>
     <string name="tier_list_code_copied">共有コードをコピーしました</string>
     <string name="tier_list_cancel">キャンセル</string>
     <string name="tier_list_import">読み込む</string>

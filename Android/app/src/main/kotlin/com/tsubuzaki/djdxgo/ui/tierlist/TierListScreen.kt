@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.draganddrop.dragAndDropSource
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -473,8 +472,6 @@ private fun TierRow(
                 }
                 TierTile(
                     chart = chart,
-                    currentTier = tier,
-                    onMove = { target -> onPlace(chart.id, target, null) },
                     modifier = Modifier
                         .dragAndDropSource { _ ->
                             DragAndDropTransferData(ClipData.newPlainText("chart", chart.id))
@@ -489,11 +486,8 @@ private fun TierRow(
 @Composable
 private fun TierTile(
     chart: TierListChart,
-    currentTier: TierListTier?,
-    onMove: (TierListTier?) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isMenuExpanded by remember { mutableStateOf(false) }
     val darkTheme = isSystemInDarkTheme()
     Box(modifier = modifier) {
         Row(
@@ -503,7 +497,6 @@ private fun TierTile(
                 .clip(RoundedCornerShape(6.dp))
                 .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                 .border(1.dp, chart.lampColor.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
-                .clickable { isMenuExpanded = true }
         ) {
             Box(
                 Modifier
@@ -548,20 +541,6 @@ private fun TierTile(
                         }
                     }
                 }
-            }
-        }
-        DropdownMenu(expanded = isMenuExpanded, onDismissRequest = { isMenuExpanded = false }) {
-            TierListTier.entries.filter { it != currentTier }.forEach { target ->
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.tier_list_move_to, target.code)) },
-                    onClick = { isMenuExpanded = false; onMove(target) }
-                )
-            }
-            if (currentTier != null) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.tier_list_unplace)) },
-                    onClick = { isMenuExpanded = false; onMove(null) }
-                )
             }
         }
     }

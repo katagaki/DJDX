@@ -9595,19 +9595,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drag charts between tiers, or touch and hold a chart to move it."
+            "value" : "Touch and hold a chart, then drag it between tiers."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "譜面をドラッグしてティア間を移動するか、長押しして移動先を選択できます。"
+            "value" : "譜面を長押ししてから、ティア間をドラッグして移動できます。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "拖曳譜面以在層級間移動，或長按譜面選擇移動目標。"
+            "value" : "長按譜面後拖曳即可在層級間移動。"
           }
         }
       }
@@ -9769,29 +9769,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分享代碼或連結"
-          }
-        }
-      }
-    },
-    "TierList.MoveTo.%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Move to %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@に移動"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "移至 %@"
           }
         }
       }
@@ -9999,29 +9976,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "個人難度表"
-          }
-        }
-      }
-    },
-    "TierList.Unplace" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove from Tier"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ティアから外す"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "從層級移除"
           }
         }
       }

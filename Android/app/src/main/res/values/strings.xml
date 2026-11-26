@@ -81,9 +81,7 @@
     <string name="tier_list_no_data_title">No Scores</string>
     <string name="tier_list_no_data_message">Import your scores to start ranking charts.</string>
     <string name="tier_list_unplaced">Unplaced (%1$d)</string>
-    <string name="tier_list_hint">Touch and hold a chart to drag it between tiers, or tap it to choose a tier.</string>
-    <string name="tier_list_move_to">Move to %1$s</string>
-    <string name="tier_list_unplace">Remove from Tier</string>
+    <string name="tier_list_hint">Touch and hold a chart, then drag it between tiers.</string>
     <string name="tier_list_code_copied">Share code copied</string>
     <string name="tier_list_cancel">Cancel</string>
     <string name="tier_list_import">Import</string>
