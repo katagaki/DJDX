@@ -3,6 +3,7 @@ import SwiftUI
 struct ImportSummaryEntryRow: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
+    @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     let entry: ImportSummaryEntry
     let game: ImportSummaryGame
@@ -16,10 +17,7 @@ struct ImportSummaryEntryRow: View {
                 .conditionalShadow(.black.opacity(0.2), radius: 1.0, x: 2.0)
 
             VStack(alignment: .leading, spacing: 2.0) {
-                Text(verbatim: entry.title)
-                    .fontWeight(.heavy)
-                    .fontWidth(.compressed)
-                    .squashedHorizontally()
+                title()
                 metadata()
                     .offset(y: 1.0)
             }
@@ -63,12 +61,32 @@ struct ImportSummaryEntryRow: View {
                 }
                 styledValue(lamp)
                     .fontWidth(.expanded)
-                    .fontWeight(.heavy)
+                    .fontWeight(.bold)
             }
         }
         .font(.caption)
         .lineLimit(1)
         .minimumScaleFactor(0.6)
+    }
+
+    @ViewBuilder
+    func title() -> some View {
+        switch entry.titleStyle {
+        case .iidx(let version, let level):
+            Text(verbatim: entry.title)
+                .fontWeight(.heavy)
+                .fontWidth(.compressed)
+                .foregroundStyle(iidxVersion.rowTitleTextColor(for: version, level: level, colorScheme: colorScheme))
+                .strokeText(
+                    color: iidxVersion.rowTitleStrokeColor(for: version, level: level, colorScheme: colorScheme),
+                    width: colorScheme == .light ? 0.5 : 0.35
+                )
+                .squashedHorizontally()
+        case .plain:
+            Text(verbatim: entry.title)
+                .bold()
+                .squashedHorizontally()
+        }
     }
 
     @ViewBuilder
@@ -87,7 +105,10 @@ struct ImportSummaryEntryRow: View {
         case .sdvx:
             Text(verbatim: value)
                 .sdvxScoreText()
-        case .polarisChord, .ddr:
+        case .polarisChord:
+            Text(verbatim: value)
+                .foregroundStyle(.secondary)
+        case .ddr:
             Text(verbatim: value)
                 .foregroundStyle(LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom))
         }
@@ -97,12 +118,9 @@ struct ImportSummaryEntryRow: View {
     func styledValue(_ change: ImportSummaryChange) -> some View {
         switch change.style {
         case .iidxClearType:
-            Text(verbatim: IIDXClearType.abbreviation(for: change.current))
-                .foregroundStyle(IIDXClearType.color(for: change.current))
+            IIDXMetallicText.clearType(change.current, label: IIDXClearType.abbreviation(for: change.current))
         case .iidxDJLevel:
-            Text(verbatim: change.current)
-                .foregroundStyle(IIDXDJLevel.style(for: change.current))
-                .strokeText(color: .black, width: 0.3)
+            IIDXMetallicText.djLevel(change.current)
         case .sdvxGrade:
             Text(verbatim: change.current)
                 .sdvxGradeText()

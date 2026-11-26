@@ -111,7 +111,8 @@ enum IIDXImportSummaryBuilder {
                     grade: isNewDJLevel ? ImportSummaryChange(
                         current: latest.djLevel,
                         style: .iidxDJLevel
-                    ) : nil
+                    ) : nil,
+                    titleStyle: .iidx(version: record.version, level: level)
                 ))
             }
         }
