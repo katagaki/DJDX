@@ -2,37 +2,38 @@ import Foundation
 
 enum SDVXVolforce {
 
+    static let chartLimit = 50
+
     static func total(_ records: [SDVXSongRecord]) -> Double {
-        let top = records.map(chartForce).sorted(by: >).prefix(50)
-        return Double(top.reduce(0, +)) / 1000.0
+        Double(RatingPool(values: records.map(chartForce), limit: chartLimit).total) / 1000.0
     }
 
     static func chartForce(_ record: SDVXSongRecord) -> Int {
-        let level = Double(record.level) ?? 0.0
-        guard level > 0, record.highScore > 0 else { return 0 }
-        let rate = Double(min(record.highScore, 10_000_000)) / 10_000_000.0
-        let grade = gradeCoefficient(SDVXGrade.grade(forScore: record.highScore))
-        let lamp = lampCoefficient(record.clearTypeEnum)
-        return Int((level * rate * grade * lamp * 20.0).rounded(.down))
+        force(level: Double(record.level) ?? 0.0, score: record.highScore, clearType: record.clearTypeEnum)
     }
 
-    static let gradeCoefficients: [SDVXGrade: Double] = [
-        .s: 1.05, .aaaPlus: 1.02, .aaa: 1.0, .aaPlus: 0.97, .aa: 0.94,
-        .aPlus: 0.91, .a: 0.88, .b: 0.85, .c: 0.82, .d: 0.8
+    static func force(level: Double, score: Int, clearType: SDVXClearType) -> Int {
+        guard level > 0, score > 0 else { return 0 }
+        let score = min(score, 10_000_000)
+        let grade = gradeCoefficients[SDVXGrade.grade(forScore: score)] ?? 0
+        let value = level * Double(score) * Double(grade) * Double(lampCoefficient(clearType)) *
+            20.0 / 10_000_000.0 / 10_000.0
+        return Int((value + 1e-9).rounded(.down))
+    }
+
+    static let gradeCoefficients: [SDVXGrade: Int] = [
+        .s: 105, .aaaPlus: 102, .aaa: 100, .aaPlus: 97, .aa: 94,
+        .aPlus: 91, .a: 88, .b: 85, .c: 82, .d: 80
     ]
 
-    static func gradeCoefficient(_ grade: SDVXGrade) -> Double {
-        gradeCoefficients[grade] ?? 0.0
-    }
-
-    static func lampCoefficient(_ clearType: SDVXClearType) -> Double {
+    static func lampCoefficient(_ clearType: SDVXClearType) -> Int {
         switch clearType {
-        case .perfectUltimateChain: return 1.1
-        case .ultimateChain: return 1.05
-        case .excessive: return 1.02
-        case .complete: return 1.0
-        case .played: return 0.5
-        default: return 0.0
+        case .perfectUltimateChain: return 110
+        case .ultimateChain: return 105
+        case .excessive: return 102
+        case .complete: return 100
+        case .played: return 50
+        default: return 0
         }
     }
 }

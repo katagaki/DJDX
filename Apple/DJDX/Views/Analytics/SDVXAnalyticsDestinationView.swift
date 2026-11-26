@@ -38,6 +38,10 @@ struct SDVXAnalyticsDestinationView: View {
                 SDVXNewGradesDetailView(newGrades: model.newGrades[grade] ?? [])
                     .navigationTitle(Text(verbatim: grade))
                     .navigationTransition(.zoom(sourceID: transitionID(forGrade: grade), in: namespace))
+            case .volforceSuggestionsDetail:
+                SDVXVolforceSuggestionsDetailView(suggestions: model.volforceSuggestions)
+                    .navigationTitle(Text(verbatim: "VOLFORCE"))
+                    .navigationTransition(.zoom(sourceID: "SDVX.volforceSuggestions", in: namespace))
             }
         }
         .appBackgroundGradient()
@@ -89,6 +93,37 @@ struct SDVXLevelLabel: View {
         .frame(width: 78.0, alignment: .center)
         .background(.thinMaterial)
         .clipShape(.rect(cornerRadius: 6.0))
+    }
+}
+
+// MARK: - Suggestions
+
+struct SDVXVolforceSuggestionsDetailView: View {
+    let suggestions: [SDVXVolforceSuggestion]
+
+    var body: some View {
+        List {
+            if suggestions.isEmpty {
+                Text("Analytics.Suggestions.Empty")
+                    .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
+            } else {
+                ForEach(suggestions) { suggestion in
+                    AnalyticsSuggestionRow(
+                        title: suggestion.songTitle,
+                        current: suggestion.currentGrade,
+                        target: suggestion.targetGrade,
+                        detail: String(localized: "Analytics.Suggestions.PointsNeeded.\(suggestion.pointsNeeded)"),
+                        gain: SDVXVolforce.gainText(suggestion.volforceGain),
+                        difficulty: suggestion.difficulty.abbreviation,
+                        difficultyColor: suggestion.difficulty.color,
+                        level: suggestion.level
+                    )
+                }
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 }
 

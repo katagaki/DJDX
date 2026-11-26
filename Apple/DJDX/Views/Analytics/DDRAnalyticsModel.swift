@@ -11,6 +11,7 @@ final class DDRAnalyticsModel {
     var rankPerLevel: [Int: OrderedDictionary<String, Int>] = [:]
 
     var totalCharts: Int = 0
+    var flareSkillSuggestions: [DDRFlareSkillSuggestion] = []
     var flareSkillHistory: [TrendPoint] = []
 
     var dataState: DataState = .initializing
@@ -23,8 +24,9 @@ final class DDRAnalyticsModel {
 
     func reload(version: DDRVersion, style: DDRPlayStyle, filters: DDRFilterOptions? = nil) async {
         dataState = .loading
-        let records = await fetcher.latestSongRecords(for: version)
-            .filter { $0.styleEnum == style && filters?.matches($0) ?? true }
+        let styleRecords = await fetcher.latestSongRecords(for: version)
+            .filter { $0.styleEnum == style }
+        let records = styleRecords.filter { filters?.matches($0) ?? true }
 
         var clearByDiff: [DDRDifficulty: OrderedDictionary<String, Int>] = [:]
         var rankByDiff: [DDRDifficulty: OrderedDictionary<String, Int>] = [:]
@@ -70,6 +72,7 @@ final class DDRAnalyticsModel {
         }
 
         let chartCount = records.count
+        let suggestions = DDRFlareSkill.suggestions(allRecords: styleRecords, candidates: records)
         let computedFlareSkillHistory = await fetcher.flareSkillHistory(for: version, style: style)
 
         withAnimation(.smooth.speed(2.0)) {
@@ -78,6 +81,7 @@ final class DDRAnalyticsModel {
             self.clearTypePerLevel = clearByLevel
             self.rankPerLevel = rankByLevel
             self.totalCharts = chartCount
+            self.flareSkillSuggestions = suggestions
             self.flareSkillHistory = computedFlareSkillHistory
             self.dataState = .presenting
         }

@@ -15,6 +15,7 @@ final class SDVXAnalyticsModel {
     var totalCharts: Int = 0
     var totalPlays: Int = 0
     var volforce: Double = 0.0
+    var volforceSuggestions: [SDVXVolforceSuggestion] = []
     var volforceHistory: [TrendPoint] = []
 
     // "前回のプレー" (Last Play): improvements between the latest two import groups.
@@ -104,6 +105,7 @@ final class SDVXAnalyticsModel {
             self.totalCharts = records.count
             self.totalPlays = plays
             self.volforce = computedVolforce
+            self.volforceSuggestions = SDVXVolforce.suggestions(allRecords: allRecords, candidates: records)
             self.volforceHistory = computedVolforceHistory
             self.newClears = lastPlay.clears
             self.newHighScores = lastPlay.highScores

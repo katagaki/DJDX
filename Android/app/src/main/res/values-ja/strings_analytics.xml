@@ -49,6 +49,13 @@
     <string name="analytics_progress_style_bars">棒グラフ</string>
     <string name="analytics_progress_style_stacked">積み上げ</string>
     <string name="analytics_card_items">カードに表示する項目（3つまで）</string>
+    <string name="analytics_section_suggestions">おすすめ</string>
+    <string name="analytics_suggestions_empty">おすすめの譜面はありません</string>
+    <string name="analytics_suggestions_next_dj_level">次のDJ LEVEL</string>
+    <string name="analytics_suggestions_next_clear_lamp">あと1ランプ</string>
+    <string name="analytics_suggestions_next_clear_lamp_target">%1$sまであと1ランプ</string>
+    <string name="analytics_suggestions_points_needed">あと%1$d点</string>
+    <string name="analytics_suggestions_target_clear_type">目標クリアランプ</string>
 
     <string name="goals_title">目標</string>
     <string name="goals_add">目標を追加</string>

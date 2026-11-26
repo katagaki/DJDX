@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowCircleUp
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material.icons.outlined.Whatshot
 import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -83,6 +85,9 @@ internal class ChartGameSpec(
     val clearCaptionRes: Int,
     val gradeCaptionRes: Int,
     val clearIcon: (String) -> ImageVector,
+    val suggestionTitle: String? = null,
+    val suggestionIcon: ImageVector = Icons.Outlined.Whatshot,
+    val suggestionColor: Color = Palette.orange,
     val trendCaptionRes: Int? = null,
     val trendColor: Color = Palette.blue,
     val trendFormat: (Double) -> String = { it.toString() }
@@ -127,6 +132,9 @@ internal val sdvxSpec = ChartGameSpec(
     clearCaptionRes = R.string.analytics_clear_breakdown,
     gradeCaptionRes = R.string.analytics_grade_breakdown,
     clearIcon = { Icons.Outlined.CheckCircle },
+    suggestionTitle = "VOLFORCE",
+    suggestionIcon = Icons.Outlined.ArrowCircleUp,
+    suggestionColor = Palette.purple,
     trendCaptionRes = R.string.analytics_volforce_trend,
     trendColor = Palette.purple,
     trendFormat = { String.format(Locale.ROOT, "%.3f", it) }
@@ -176,6 +184,7 @@ internal val ddrSpec = ChartGameSpec(
     clearCaptionRes = R.string.analytics_clear_breakdown,
     gradeCaptionRes = R.string.analytics_rank_breakdown,
     clearIcon = { Icons.Outlined.CheckCircle },
+    suggestionTitle = "FLARE SKILL",
     trendCaptionRes = R.string.analytics_flare_skill_trend,
     trendColor = Palette.orange,
     trendFormat = { NumberFormat.getIntegerInstance().format(it.toLong()) }
@@ -386,6 +395,25 @@ private fun ChartAnalyticsSection(
                         }
                     }
                 }
+            }
+        }
+
+        spec.suggestionTitle?.let { suggestionTitle ->
+            SuggestionSection(layout, isEditing) {
+                SuggestionCard(
+                    title = suggestionTitle,
+                    icon = spec.suggestionIcon,
+                    iconColor = spec.suggestionColor,
+                    count = data.suggestions.size,
+                    previews = data.suggestions.take(3).map {
+                        SuggestionPreview(
+                            title = it.title,
+                            detail = "${spec.difficultyLabel(it.difficulty)} ${it.level} · ${it.target}",
+                            value = it.gainText
+                        )
+                    },
+                    onClick = { onNavigate(Routes.chartAnalytics(spec.game, Routes.CHART_DETAIL_SUGGESTIONS)) }
+                )
             }
         }
     }

@@ -2,11 +2,13 @@ import Foundation
 
 enum DDRFlareSkill {
 
+    static let chartLimit = 30
+
     static func total(_ records: [DDRSongRecord]) -> Int {
-        Dictionary(grouping: records.filter { $0.flareSkill > 0 }, by: { category(for: $0.version) })
+        Dictionary(grouping: records, by: { category(for: $0.version) })
             .values
             .reduce(0) { total, records in
-                total + records.map(\.flareSkill).sorted(by: >).prefix(30).reduce(0, +)
+                total + RatingPool(values: records.map(\.flareSkill), limit: chartLimit).total
             }
     }
 

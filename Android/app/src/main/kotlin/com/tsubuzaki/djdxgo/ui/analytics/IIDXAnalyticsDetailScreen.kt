@@ -3,6 +3,14 @@ package com.tsubuzaki.djdxgo.ui.analytics
 import com.tsubuzaki.djdxgo.data.analytics.IIDXProgressKind
 import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
 import com.tsubuzaki.djdxgo.ui.common.IIDXClearTypeText
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.FilterChip
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.tsubuzaki.djdxgo.data.setSetting
+import com.tsubuzaki.djdxgo.data.analytics.IIDXSuggestions
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -78,6 +86,8 @@ fun IIDXAnalyticsDetailScreen(
         Routes.IIDX_DETAIL_DJ_LEVEL_LEVEL ->
             "LEVEL $difficulty$separator${stringResource(R.string.analytics_dj_level)}"
         Routes.IIDX_DETAIL_PROGRESS -> stringResource(progressKind.titleRes)
+        Routes.IIDX_DETAIL_DJ_LEVEL_SUGGESTIONS -> stringResource(R.string.analytics_suggestions_next_dj_level)
+        Routes.IIDX_DETAIL_CLEAR_LAMP_SUGGESTIONS -> stringResource(R.string.analytics_suggestions_next_clear_lamp)
         else -> IIDXNewEntryKind.fromKey(param)?.let { newEntryTitle(it) }.orEmpty()
     }
     DetailScaffold(
@@ -127,6 +137,8 @@ fun IIDXAnalyticsDetailScreen(
                 showsPieChart = showsPieChart,
                 modifier = modifier
             )
+            Routes.IIDX_DETAIL_DJ_LEVEL_SUGGESTIONS -> DJLevelSuggestionsDetail(analytics, modifier)
+            Routes.IIDX_DETAIL_CLEAR_LAMP_SUGGESTIONS -> ClearLampSuggestionsDetail(analytics, modifier)
             else -> IIDXAnalyticsDetailNewEntries(
                 container = container,
                 kind = IIDXNewEntryKind.fromKey(param) ?: IIDXNewEntryKind.HIGH_SCORES,
@@ -455,6 +467,80 @@ private fun BreakdownSection(
         AnalyticsSectionHeader(title = title, isCollapsible = true, isExpanded = isExpanded, onToggle = onToggle)
         if (isExpanded) {
             BreakdownBar(items = items, modifier = Modifier.padding(horizontal = 16.dp))
+        }
+    }
+}
+
+@Composable
+private fun DJLevelSuggestionsDetail(analytics: IIDXAnalyticsData, modifier: Modifier) {
+    SuggestionList(modifier, analytics.djLevelSuggestions.isEmpty()) {
+        items(analytics.djLevelSuggestions) { suggestion ->
+            SuggestionRow(
+                title = suggestion.title,
+                current = suggestion.currentDJLevel,
+                target = suggestion.targetDJLevel,
+                gain = "+${suggestion.pointsNeeded}",
+                detail = "EX SCORE ${suggestion.score} → ${suggestion.targetScore}",
+                difficulty = suggestion.level.csvPrefix,
+                difficultyColor = IIDXColors.levelColor(suggestion.level),
+                level = suggestion.difficulty.toString()
+            )
+        }
+    }
+}
+
+@Composable
+private fun ClearLampSuggestionsDetail(analytics: IIDXAnalyticsData, modifier: Modifier) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val targetValue by rememberSetting(SettingsKeys.iidxSuggestionTargetClearType, IIDXClearType.HARD_CLEAR.value)
+    val target = IIDXClearType.fromValue(targetValue) ?: IIDXClearType.HARD_CLEAR
+    val suggestions = IIDXSuggestions.clearLampSuggestions(analytics.clearLampSuggestionCandidates, target)
+    SuggestionList(
+        modifier = modifier,
+        isEmpty = suggestions.isEmpty(),
+        header = {
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.analytics_suggestions_target_clear_type),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        IIDXSuggestions.targetClearTypes.forEach { clearType ->
+                            FilterChip(
+                                selected = clearType == target,
+                                onClick = {
+                                    scope.launch {
+                                        context.setSetting(SettingsKeys.iidxSuggestionTargetClearType, clearType.value)
+                                    }
+                                },
+                                label = { Text(clearType.value) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    ) {
+        items(suggestions) { suggestion ->
+            SuggestionRow(
+                title = suggestion.title,
+                current = suggestion.clearType,
+                target = target.value,
+                gain = "",
+                detail = "EX SCORE ${suggestion.score}",
+                difficulty = suggestion.level.csvPrefix,
+                difficultyColor = IIDXColors.levelColor(suggestion.level),
+                level = suggestion.difficulty.toString()
+            )
         }
     }
 }

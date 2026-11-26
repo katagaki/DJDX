@@ -49,6 +49,9 @@ struct AnalyticsView: View {
     @AppStorage(wrappedValue: Data(), "Analytics.CollapsedSections") var collapsedSectionsData: Data
     @State var collapsedSections: Set<AnalyticsSection> = []
 
+    @AppStorage(wrappedValue: IIDXClearType.hardClear, "Analytics.Suggestions.TargetClearType")
+    var suggestionTargetClearType: IIDXClearType
+
     // Width of the layout container, measured rather than read from UIScreen.
     @State var containerWidth: CGFloat = 0.0
 
@@ -332,6 +335,8 @@ struct AnalyticsView: View {
                         }
                     }
                 }
+
+                suggestionsSection
             }
             .padding(.top, 20.0)
             .onGeometryChange(for: CGFloat.self) { proxy in
