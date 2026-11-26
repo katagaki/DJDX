@@ -16,6 +16,7 @@ struct MoreMenu: View {
     @State var isPresentingExternalDataSources: Bool = false
     @State var isPresentingICloudBackup: Bool = false
     @State var isPresentingRadarMaker: Bool = false
+    @State var isPresentingLampTransfer: Bool = false
     @State var isPresentingTierList: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingResetLayout: Bool = false
@@ -90,6 +91,9 @@ struct MoreMenu: View {
                 Button("More.ManageData.Backup", systemImage: "icloud") {
                     isPresentingICloudBackup = true
                 }
+                Button("More.ManageData.LampTransfer", systemImage: "person.badge.key") {
+                    isPresentingLampTransfer = true
+                }
                 Button("More.ManageData.FreeUpSpace", systemImage: "externaldrive.badge.minus") {
                     isPresentingFreeUpSpace = true
                 }
@@ -129,6 +133,11 @@ struct MoreMenu: View {
         .sheet(isPresented: $isPresentingICloudBackup) {
             NavigationStack {
                 MoreICloudBackup()
+            }
+        }
+        .sheet(isPresented: $isPresentingLampTransfer) {
+            NavigationStack {
+                MoreLampTransfer()
             }
         }
         .sheet(isPresented: $isPresentingRadarMaker) {
