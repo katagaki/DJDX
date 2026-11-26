@@ -23,6 +23,11 @@ struct DDRAnalyticsDestinationView: View {
                 DDRFlareSkillSuggestionsDetailView(suggestions: model.flareSkillSuggestions)
                     .navigationTitle(Text(verbatim: "FLARE SKILL"))
                     .navigationTransition(.zoom(sourceID: "DDR.flareSkillSuggestions", in: namespace))
+            case .flareSkillTrendDetail:
+                TrendDetailView(points: model.flareSkillHistory, color: .orange,
+                                format: DDRAnalyticsModel.formatFlareSkill)
+                    .navigationTitle("Analytics.DDR.FlareSkillTrend")
+                    .navigationTransition(.zoom(sourceID: "DDR.flareSkillTrend", in: namespace))
             }
         }
         .appBackgroundGradient()

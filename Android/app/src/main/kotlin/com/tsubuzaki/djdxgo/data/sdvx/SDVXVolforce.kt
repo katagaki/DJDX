@@ -3,6 +3,13 @@ package com.tsubuzaki.djdxgo.data.sdvx
 import com.tsubuzaki.djdxgo.data.analytics.RatingPool
 import kotlin.math.floor
 
+data class SDVXVolforceRow(
+    val date: Long,
+    val level: String,
+    val highScore: Int,
+    val clearType: String
+)
+
 object SDVXVolforce {
     const val CHART_LIMIT = 50
 
@@ -28,6 +35,10 @@ object SDVXVolforce {
 
     fun total(records: List<SDVXSongRecord>): Double =
         RatingPool(records.map(::chartForce), CHART_LIMIT).total / 1000.0
+
+    fun totalForRows(rows: List<SDVXVolforceRow>): Double =
+        RatingPool(rows.map { force(it.level.toDoubleOrNull() ?: 0.0, it.highScore, it.clearType) }, CHART_LIMIT)
+            .total / 1000.0
 
     fun grade(score: Int): SDVXGrade = when {
         score <= 0 -> SDVXGrade.NONE

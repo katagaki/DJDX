@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.data.analytics
 
+import com.tsubuzaki.djdxgo.data.TrendPoint
 import com.tsubuzaki.djdxgo.data.compact
 import com.tsubuzaki.djdxgo.data.ddr.DDRClearLamp
 import com.tsubuzaki.djdxgo.data.ddr.DDRDifficulty
@@ -38,7 +39,8 @@ data class ChartAnalyticsData(
     val newHighScores: List<ChartNewEntry> = emptyList(),
     val newClears: Map<String, List<ChartNewEntry>> = emptyMap(),
     val newGrades: Map<String, List<ChartNewEntry>> = emptyMap(),
-    val suggestions: List<ChartSuggestion> = emptyList()
+    val suggestions: List<ChartSuggestion> = emptyList(),
+    val trend: List<TrendPoint> = emptyList()
 ) {
     fun totalClearCounts(keys: List<String>): List<Pair<String, Int>> =
         keys.map { key -> key to clearTypePerDifficulty.values.sumOf { it[key] ?: 0 } }

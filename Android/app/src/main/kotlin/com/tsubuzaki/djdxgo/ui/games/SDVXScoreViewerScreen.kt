@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.Alignment
@@ -34,10 +35,15 @@ import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXDifficulty
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXGrade
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
+import com.tsubuzaki.djdxgo.ui.common.HistoryGuide
+import com.tsubuzaki.djdxgo.ui.common.ScoreHistoryCard
+import com.tsubuzaki.djdxgo.ui.common.zoomedHistoryMinimum
 import com.tsubuzaki.djdxgo.ui.theme.Palette
 import com.tsubuzaki.djdxgo.ui.theme.SDVXColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
+private const val SDVX_MAX_SCORE = 10_000_000
 
 @Composable
 fun SDVXScoreViewerScreen(
@@ -48,6 +54,7 @@ fun SDVXScoreViewerScreen(
     onBack: () -> Unit,
     onOpenChart: (SDVXInChart) -> Unit
 ) {
+    val darkTheme = isSystemInDarkTheme()
     var records by remember { mutableStateOf(listOf<SDVXSongRecord>()) }
     LaunchedEffect(title, dateEpoch) {
         records = withContext(Dispatchers.IO) {
@@ -74,6 +81,15 @@ fun SDVXScoreViewerScreen(
                 container.externalDataDao.sdvxInChart(current.title.compact, slot)
             }
         }
+    }
+
+    var history by remember { mutableStateOf(listOf<Int>()) }
+    LaunchedEffect(record?.id) {
+        history = record?.let { current ->
+            withContext(Dispatchers.IO) {
+                container.database.sdvxDao().scoreHistory(current.title, current.difficulty).map { it.score }
+            }
+        }.orEmpty()
     }
 
     ViewerWithSelector(
@@ -167,6 +183,20 @@ fun SDVXScoreViewerScreen(
                         )
                     }
                 }
+                ScoreHistoryCard(
+                    scores = history,
+                    minScore = zoomedHistoryMinimum(history, 100_000, SDVX_MAX_SCORE),
+                    maxScore = SDVX_MAX_SCORE,
+                    guides = listOf(
+                        SDVXGrade.S to 9_900_000f,
+                        SDVXGrade.AAA_PLUS to 9_800_000f,
+                        SDVXGrade.AAA to 9_700_000f,
+                        SDVXGrade.AA_PLUS to 9_500_000f,
+                        SDVXGrade.AA to 9_300_000f
+                    ).mapIndexed { index, (grade, value) ->
+                        HistoryGuide(value, SDVXColors.gradeColor(grade.value, darkTheme), 0.7f - index * 0.08f)
+                    }
+                )
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Row(
                         modifier = Modifier

@@ -2,6 +2,12 @@ package com.tsubuzaki.djdxgo.data.ddr
 
 import com.tsubuzaki.djdxgo.data.analytics.RatingPool
 
+data class DDRFlareSkillRow(
+    val date: Long,
+    val title: String,
+    val flareSkill: Int
+)
+
 object DDRFlareSkill {
     const val CHART_LIMIT = 30
 
@@ -15,16 +21,19 @@ object DDRFlareSkill {
     val rankRange: IntRange get() = rankMultipliers.indices
 
     fun total(records: List<DDRSongRecord>, version: (DDRSongRecord) -> Int): Int =
-        records.groupBy { category(version(it)) }
-            .values
-            .sumOf { group -> RatingPool(group.map { it.flareSkill }, CHART_LIMIT).total }
+        sumTop(records.map { it.flareSkill to category(version(it)) })
 
-    fun category(version: Int): Int = when {
-        version in 1..13 -> 1
-        version in 14..16 -> 2
-        version >= 17 -> 3
-        else -> 0
+    fun totalForRows(rows: List<DDRFlareSkillRow>, version: (DDRFlareSkillRow) -> Int): Int =
+        sumTop(rows.map { it.flareSkill to category(version(it)) })
+
+    fun category(version: Int): Int = when (version) {
+        in 1..11 -> 1
+        in 12..19 -> 2
+        else -> 3
     }
+
+    private fun sumTop(skills: List<Pair<Int, Int>>): Int =
+        skills.groupBy { it.second }.values.sumOf { group -> RatingPool(group.map { it.first }, CHART_LIMIT).total }
 
     fun rankLabel(rank: Int): String = "FLARE ${rankLabels.getOrElse(rank) { "" }}"
 

@@ -39,9 +39,14 @@ enum SDVXScoresPath: Hashable {
     case chartViewer(chart: SDVXInChart)
 }
 
+enum DDRScoresPath: Hashable {
+    case scoreViewer(songRecord: DDRSongRecord)
+}
+
 enum SDVXAnalyticsPath: Hashable {
     case clearBreakdownDetail
     case gradeBreakdownDetail
+    case volforceTrendDetail
     case newHighScoresDetail
     case newClearsDetail(clearType: String)
     case newGradesDetail(grade: String)

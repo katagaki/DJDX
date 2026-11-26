@@ -19,6 +19,11 @@ struct SDVXAnalyticsDestinationView: View {
                 SDVXGradeBreakdownDetailView(gradePerDifficulty: model.gradePerDifficulty)
                     .navigationTitle("Analytics.SDVX.GradeBreakdown")
                     .navigationTransition(.zoom(sourceID: "SDVX.gradeBreakdown", in: namespace))
+            case .volforceTrendDetail:
+                TrendDetailView(points: model.volforceHistory, color: .purple,
+                                format: SDVXAnalyticsModel.formatVolforce)
+                    .navigationTitle("Analytics.SDVX.VolforceTrend")
+                    .navigationTransition(.zoom(sourceID: "SDVX.volforceTrend", in: namespace))
             case .newHighScoresDetail:
                 SDVXNewHighScoresDetailView(newHighScores: model.newHighScores)
                     .navigationTitle("Analytics.NewHighScores")

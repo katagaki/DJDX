@@ -167,6 +167,7 @@ struct DDRAnalyticsView: View {
             switch cardType {
             case .clearBreakdown: clearBreakdownCard
             case .rankBreakdown: rankBreakdownCard
+            case .flareSkillTrend: flareSkillTrendCard
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
@@ -238,6 +239,18 @@ struct DDRAnalyticsView: View {
             }
         }
         return totals
+    }
+
+    var flareSkillTrendCard: some View {
+        AnalyticsCardView(title: "Analytics.DDR.FlareSkillTrend",
+                          systemImage: "",
+                          iconColor: .clear,
+                          contentHeight: 160.0,
+                          showsHeader: false) {
+            TrendCardContent(points: model.flareSkillHistory, color: .orange,
+                             format: DDRAnalyticsModel.formatFlareSkill)
+        }
+        .perLevelCaption("Analytics.DDR.FlareSkillTrend")
     }
 
     func clearLabel(_ key: String) -> String {

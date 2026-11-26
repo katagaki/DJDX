@@ -1582,6 +1582,29 @@
         }
       }
     },
+    "Analytics.DDR.FlareSkillTrend" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FLARE SKILL Over Time"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FLARE SKILLの推移"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FLARE SKILL 趨勢"
+          }
+        }
+      }
+    },
     "Analytics.DDR.RankBreakdown" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2220,6 +2243,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "VOLFORCE"
+          }
+        }
+      }
+    },
+    "Analytics.SDVX.VolforceTrend" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VOLFORCE Over Time"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VOLFORCEの推移"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VOLFORCE 趨勢"
           }
         }
       }

@@ -95,6 +95,7 @@ import com.tsubuzaki.djdxgo.ui.analytics.IIDXAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.PolarisChordAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.SDVXAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.TowerDetailScreen
+import com.tsubuzaki.djdxgo.ui.games.DDRScoreViewerScreen
 import com.tsubuzaki.djdxgo.ui.games.DDRScoresScreen
 import com.tsubuzaki.djdxgo.ui.games.PolarisChordScoresScreen
 import com.tsubuzaki.djdxgo.ui.games.SDVXScoreViewerScreen
@@ -216,6 +217,25 @@ fun DJDXApp() {
                 initialDifficulty = args.getString("difficulty").orEmpty(),
                 onBack = back,
                 onOpenChart = { chart -> navigate(Routes.sdvxInViewer(chart)) }
+            )
+        }
+        composable(
+            route = Routes.DDR_VIEWER,
+            arguments = listOf(
+                navArgument("songIndex") { type = NavType.StringType; defaultValue = "" },
+                navArgument("date") { type = NavType.LongType; defaultValue = 0L },
+                navArgument("style") { type = NavType.StringType; defaultValue = "" },
+                navArgument("difficulty") { type = NavType.StringType; defaultValue = "" }
+            )
+        ) { entry ->
+            val args = entry.arguments!!
+            DDRScoreViewerScreen(
+                container = container,
+                songIndex = args.getString("songIndex").orEmpty(),
+                dateEpoch = args.getLong("date"),
+                style = args.getString("style").orEmpty(),
+                initialDifficulty = args.getString("difficulty").orEmpty(),
+                onBack = back
             )
         }
         composable(
@@ -674,7 +694,10 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                             container = container,
                             contentPadding = PaddingValues(),
                             analyticsContent = header,
-                            shareRequests = shareRequests
+                            shareRequests = shareRequests,
+                            onOpenSong = { songIndex, date, style, difficulty ->
+                                onNavigate(Routes.ddrViewer(songIndex, date, style, difficulty))
+                            }
                         )
                     }
                 }

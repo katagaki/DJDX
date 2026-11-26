@@ -14,10 +14,9 @@ enum DDRFlareSkill {
 
     static func category(for version: Int) -> Int {
         switch version {
-        case 1...13: return 1
-        case 14...16: return 2
-        case 17...: return 3
-        default: return 0
+        case 1...11: return 1
+        case 12...19: return 2
+        default: return 3
         }
     }
 }
