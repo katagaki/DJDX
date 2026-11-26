@@ -2934,28 +2934,6 @@
         }
       }
     },
-    "Count.%lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld回"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld 次"
-          }
-        }
-      }
-    },
     "Date" : {
       "localizations" : {
         "en" : {
