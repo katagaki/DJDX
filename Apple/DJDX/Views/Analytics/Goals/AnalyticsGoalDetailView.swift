@@ -106,8 +106,8 @@ struct AnalyticsGoalDetailView: View {
                     Text(verbatim: progress.goal.formatted(progress.current))
                         .goalNumberFont(size: 34.0)
                     Text(verbatim: "/ \(progress.goal.formatted(progress.goal.target))")
-                        .font(.title3.weight(.bold).monospacedDigit())
-                        .fontWidth(.expanded)
+                        .font(.scoreline(.title3, weight: .bold))
+                        .fontWidth(.standard)
                         .foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 0.0)

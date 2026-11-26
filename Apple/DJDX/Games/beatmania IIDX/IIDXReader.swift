@@ -132,6 +132,21 @@ actor IIDXReader {
         return (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
     }
 
+    func songMetadata() -> [String: IIDXSongMetadata] {
+        let db = IIDXPlayDataDatabase.self
+        let query = db.songRecordTable.select(distinct: db.srTitle, db.srVersion, db.srGenre, db.srArtist)
+        guard let database = try? db.current.getReadConnection(),
+              let rows = try? database.prepare(query) else { return [:] }
+        var result: [String: IIDXSongMetadata] = [:]
+        for row in rows {
+            let title = row[db.srTitle]
+            result[title.compact] = IIDXSongMetadata(
+                title: title, version: row[db.srVersion], genre: row[db.srGenre], artist: row[db.srArtist]
+            )
+        }
+        return result
+    }
+
     func songRecordImportGroupIDs(for title: String) -> [String] {
         guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return [] }
         let query = IIDXPlayDataDatabase.songRecordTable

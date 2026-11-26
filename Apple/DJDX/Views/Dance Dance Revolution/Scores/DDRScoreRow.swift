@@ -21,6 +21,7 @@ struct DDRScoreRow: View {
                             .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
                                                             startPoint: .top, endPoint: .bottom))
                             .font(.scoreline(.caption))
+                            .fontWidth(.standard)
                     }
                     if !record.rankDisplay.isEmpty {
                         Divider().frame(maxHeight: 14.0)

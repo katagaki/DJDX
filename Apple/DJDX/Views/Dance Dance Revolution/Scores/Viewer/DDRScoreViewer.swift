@@ -126,6 +126,7 @@ struct DDRScoreViewer: View {
             Spacer()
             Text(songRecord.score, format: .number)
                 .font(.scoreline(.title))
+                .fontWidth(.standard)
                 .foregroundStyle(LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom))
         }
         .font(.title)

@@ -5,6 +5,8 @@ struct AnalyticsSuggestionPreview: Identifiable {
     let title: String
     let detail: String
     let value: String
+    var badge: LevelBadge?
+    var detailLabel: IIDXMetallicText?
 }
 
 struct AnalyticsSuggestionCard: View {
@@ -36,10 +38,10 @@ struct AnalyticsSuggestionCard: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                 Spacer(minLength: 0.0)
-                Text("\(count)")
-                    .font(.caption.weight(.bold))
+                Text(verbatim: "\(count)")
+                    .font(.scoreline(.caption, weight: .bold))
+                    .fontWidth(.standard)
                     .foregroundStyle(.secondary)
-                    .monospacedDigit()
                 Image(systemName: "chevron.right")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.tertiary)
@@ -79,17 +81,27 @@ struct AnalyticsSuggestionCard: View {
                             .font(.subheadline.bold())
                             .fontWidth(.condensed)
                             .lineLimit(1)
-                        Text(verbatim: preview.detail)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
+                        Group {
+                            if let detailLabel = preview.detailLabel {
+                                detailLabel
+                            } else {
+                                Text(verbatim: preview.detail)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .font(.caption2)
+                        .lineLimit(1)
                     }
                     Spacer(minLength: 0.0)
-                    Text(verbatim: preview.value)
-                        .font(.subheadline.weight(.heavy))
-                        .fontWidth(.expanded)
-                        .monospacedDigit()
-                        .foregroundStyle(.orange)
+                    if let badge = preview.badge {
+                        badge
+                            .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 4.0 }
+                    } else {
+                        Text(verbatim: preview.value)
+                            .font(.scoreline(.subheadline))
+                            .fontWidth(.standard)
+                            .foregroundStyle(.orange)
+                    }
                 }
             }
         }
@@ -115,6 +127,9 @@ struct AnalyticsSuggestionRow: View {
     let difficulty: String
     let difficultyColor: Color
     let level: String
+    var currentLabel: IIDXMetallicText?
+    var targetLabel: IIDXMetallicText?
+    var scores: (current: Int, target: Int?)?
 
     var body: some View {
         HStack(alignment: .center, spacing: 8.0) {
@@ -123,23 +138,45 @@ struct AnalyticsSuggestionRow: View {
                     .bold()
                     .fontWidth(.condensed)
                 HStack(spacing: 4.0) {
-                    Text(verbatim: current)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if let currentLabel {
+                        currentLabel
+                    } else {
+                        Text(verbatim: current)
+                            .foregroundStyle(.secondary)
+                    }
                     Image(systemName: "arrow.right")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
-                    Text(verbatim: target)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.orange)
+                    if let targetLabel {
+                        targetLabel
+                    } else {
+                        Text(verbatim: target)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.orange)
+                    }
                     if !gain.isEmpty {
                         Text(verbatim: gain)
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(.orange.opacity(0.8))
+                            .font(.scoreline(.caption))
+                            .fontWidth(.standard)
+                            .foregroundStyle(.orange)
                     }
                 }
+                .font(.caption)
                 .fontWidth(.expanded)
-                if !detail.isEmpty {
+                if let scores {
+                    HStack(spacing: 4.0) {
+                        Text(verbatim: "EX SCORE")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        scoreText(scores.current)
+                        if let target = scores.target {
+                            Image(systemName: "arrow.right")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                            scoreText(target)
+                        }
+                    }
+                } else if !detail.isEmpty {
                     Text(verbatim: detail)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
@@ -150,5 +187,9 @@ struct AnalyticsSuggestionRow: View {
         }
         .padding(.vertical, 2.0)
         .listRowBackground(Color.clear)
+    }
+
+    private func scoreText(_ score: Int) -> some View {
+        IIDXScoreText(score)
     }
 }

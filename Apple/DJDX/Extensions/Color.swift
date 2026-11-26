@@ -5,7 +5,7 @@ extension Color {
     static let iidxScoreOutline = Color(UIColor { traits in
         traits.userInterfaceStyle == .dark
             ? UIColor(red: 0.28, green: 0.6, blue: 0.93, alpha: 1.0)
-            : UIColor(red: 0.05, green: 0.27, blue: 0.6, alpha: 1.0)
+            : UIColor(red: 0.13, green: 0.42, blue: 0.82, alpha: 1.0)
     })
 }
 

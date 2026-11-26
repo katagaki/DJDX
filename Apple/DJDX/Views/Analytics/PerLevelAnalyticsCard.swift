@@ -81,14 +81,22 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
     }
 
     var statsRow: some View {
-        HStack(spacing: 10.0) {
+        ViewThatFits(in: .horizontal) {
+            statsRowContent(isFixed: true)
+            statsRowContent(isFixed: false)
+        }
+    }
+
+    func statsRowContent(isFixed: Bool) -> some View {
+        HStack(spacing: 6.0) {
             ForEach(visibleSegments) { segment in
-                HStack(spacing: 3.0) {
+                HStack(spacing: 2.0) {
                     segment.metallicLabel
+                        .fixedSize(horizontal: isFixed, vertical: false)
                     Text(verbatim: "\(segment.count)")
+                        .font(.scoreline(size: 10.0, weight: .bold, width: .condensed))
+                        .fixedSize()
                         .foregroundStyle(.primary)
-                        .fontWeight(.semibold)
-                        .monospacedDigit()
                 }
                 .font(.caption2)
             }

@@ -321,6 +321,7 @@ struct PolarisChordNewHighScoresDetailView: View {
                             HStack(spacing: 4.0) {
                                 Text("\(entry.previousScore)")
                                     .font(.scoreline(.caption, weight: .medium))
+                                    .fontWidth(.standard)
                                     .foregroundStyle(.secondary)
                                     .strikethrough()
                                 Image(systemName: "arrow.right")
@@ -328,6 +329,7 @@ struct PolarisChordNewHighScoresDetailView: View {
                                     .foregroundStyle(.secondary)
                                 Text("\(entry.newScore)")
                                     .font(.scoreline(.caption, weight: .bold))
+                                    .fontWidth(.standard)
                                     .foregroundStyle(.primary)
                             }
                             if entry.newGrade != entry.previousGrade {
