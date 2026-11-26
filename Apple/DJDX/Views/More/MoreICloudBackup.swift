@@ -70,19 +70,8 @@ struct MoreICloudBackup: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                if #available(iOS 26.0, *) {
-                    Button(role: .close) {
-                        dismiss()
-                    }
-                } else {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .tint(.primary)
-                            .font(.title2)
-                            .symbolRenderingMode(.hierarchical)
-                    }
+                Button(role: .close) {
+                    dismiss()
                 }
             }
         }
@@ -111,9 +100,7 @@ struct MoreICloudBackup: View {
                 isBackupFailed = false
             }
         } message: {
-            Text("Alert.ICloudBackup.Failed.Subtitle")
-            + Text(verbatim: "\n\n")
-            + Text(verbatim: backupFailureDetail)
+            Text("\(Text("Alert.ICloudBackup.Failed.Subtitle"))\n\n\(backupFailureDetail)")
         }
     }
 

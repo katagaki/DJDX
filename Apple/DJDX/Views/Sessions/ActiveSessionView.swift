@@ -2,7 +2,6 @@ import AVFoundation
 import PhotosUI
 import SwiftUI
 
-// swiftlint:disable:next type_body_length
 struct ActiveSessionView: View {
     var store: IIDXSessionStore
 
@@ -64,16 +63,10 @@ struct ActiveSessionView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    if #available(iOS 26.0, *) {
-                        Button(role: .close) {
-                            isConfirmingEnd = true
-                        }
-                        .accessibilityLabel("Sessions.End")
-                    } else {
-                        Button("Sessions.End", role: .destructive) {
-                            isConfirmingEnd = true
-                        }
+                    Button(role: .close) {
+                        isConfirmingEnd = true
                     }
+                    .accessibilityLabel("Sessions.End")
                 }
             }
         }
@@ -292,11 +285,7 @@ struct ActiveSessionView: View {
             Label("Sessions.Capture", systemImage: "camera.fill")
                 .frame(maxWidth: .infinity)
         }
-        if #available(iOS 26.0, *) {
-            button.buttonStyle(.glassProminent).controlSize(.large)
-        } else {
-            button.buttonStyle(.borderedProminent).controlSize(.large)
-        }
+        button.buttonStyle(.glassProminent).controlSize(.large)
     }
 
     @ViewBuilder
@@ -305,11 +294,7 @@ struct ActiveSessionView: View {
             Label("Sessions.Import", systemImage: "photo.on.rectangle")
                 .frame(maxWidth: .infinity)
         }
-        if #available(iOS 26.0, *) {
-            picker.buttonStyle(.glass).controlSize(.large)
-        } else {
-            picker.buttonStyle(.bordered).controlSize(.large)
-        }
+        picker.buttonStyle(.glass).controlSize(.large)
     }
 
     private func consumePendingCaptureRequest() {

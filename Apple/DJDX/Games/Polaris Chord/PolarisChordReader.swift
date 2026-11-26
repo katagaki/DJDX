@@ -3,7 +3,6 @@ import SQLite
 
 actor PolarisChordReader {
 
-    // swiftlint:disable:next type_name
     typealias DB = PolarisChordPlayDataDatabase
 
     // MARK: Import Groups

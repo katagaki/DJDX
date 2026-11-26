@@ -131,7 +131,7 @@ struct SDVXScoresView<Header: View>: View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
-        .automaticSheetMatchedTransitionSource(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
+        .matchedTransitionSource(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
     }
 
     var body: some View {
@@ -180,19 +180,11 @@ struct SDVXScoresView<Header: View>: View {
             await reload()
         }
         .toolbar {
-            if #available(iOS 26.0, *) {
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    sortControl
-                    filterControl
-                }
-            } else {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Spacer()
-                    sortControl
-                    filterControl
-                }
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                sortControl
+                filterControl
             }
         }
         .sheet(isPresented: $isShowingFilterSheet) {
@@ -206,7 +198,7 @@ struct SDVXScoresView<Header: View>: View {
                     // No additional handling needed when filters are reset
                 }
             )
-            .automaticSheetNavigationTransition(id: "SDVXScoreFilterSheet", in: sdvxNamespace)
+            .navigationTransition(.zoom(sourceID: "SDVXScoreFilterSheet", in: sdvxNamespace))
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
             .interactiveDismissDisabled()
@@ -221,8 +213,8 @@ struct SDVXScoresView<Header: View>: View {
             case .scoreViewer(let songRecord):
                 SDVXScoreViewer(songRecords: siblingCharts(of: songRecord),
                                 initialDifficulty: songRecord.difficultyEnum)
-                    .automaticNavigationTransition(id: "\(songRecord.title).\(songRecord.difficulty)",
-                                                   in: sdvxNamespace)
+                    .navigationTransition(.zoom(sourceID: "\(songRecord.title).\(songRecord.difficulty)",
+                                                   in: sdvxNamespace))
             case .chartViewer(let chart):
                 SDVXInChartViewer(chart: chart)
             }

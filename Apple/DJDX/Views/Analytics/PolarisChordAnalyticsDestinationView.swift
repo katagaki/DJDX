@@ -14,25 +14,25 @@ struct PolarisChordAnalyticsDestinationView: View {
             case .clearBreakdownDetail:
                 PolarisChordClearBreakdownDetailView(clearTypePerLevel: model.clearTypePerLevel)
                     .navigationTitle("Analytics.PolarisChord.ClearBreakdown")
-                    .automaticNavigationTransition(id: "PolarisChord.clearBreakdown", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "PolarisChord.clearBreakdown", in: namespace))
             case .gradeBreakdownDetail:
                 PolarisChordGradeBreakdownDetailView(gradePerDifficulty: model.gradePerDifficulty)
                     .navigationTitle("Analytics.PolarisChord.GradeBreakdown")
-                    .automaticNavigationTransition(id: "PolarisChord.gradeBreakdown", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "PolarisChord.gradeBreakdown", in: namespace))
             case .newHighScoresDetail:
                 PolarisChordNewHighScoresDetailView(newHighScores: model.newHighScores)
                     .navigationTitle("Analytics.NewHighScores")
-                    .automaticNavigationTransition(id: "PolarisChord.newHighScores", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "PolarisChord.newHighScores", in: namespace))
             case .newClearsDetail(let clearType):
                 PolarisChordNewClearsDetailView(newClears: model.newClears[clearType] ?? [])
                     .navigationTitle(Text(verbatim: clearType))
-                    .automaticNavigationTransition(
-                        id: transitionID(forClearType: clearType), in: namespace
-                    )
+                    .navigationTransition(.zoom(
+                        sourceID: transitionID(forClearType: clearType), in: namespace
+                    ))
             case .newGradesDetail(let grade):
                 PolarisChordNewGradesDetailView(newGrades: model.newGrades[grade] ?? [])
                     .navigationTitle(Text(verbatim: grade))
-                    .automaticNavigationTransition(id: transitionID(forGrade: grade), in: namespace)
+                    .navigationTransition(.zoom(sourceID: transitionID(forGrade: grade), in: namespace))
             }
         }
         .appBackgroundGradient()

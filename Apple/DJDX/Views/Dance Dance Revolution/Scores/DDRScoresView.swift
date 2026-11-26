@@ -133,7 +133,7 @@ struct DDRScoresView<Header: View>: View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
-        .automaticSheetMatchedTransitionSource(id: "DDRScoreFilterSheet", in: ddrNamespace)
+        .matchedTransitionSource(id: "DDRScoreFilterSheet", in: ddrNamespace)
     }
 
     var body: some View {
@@ -161,19 +161,11 @@ struct DDRScoresView<Header: View>: View {
             await reload()
         }
         .toolbar {
-            if #available(iOS 26.0, *) {
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    sortControl
-                    filterControl
-                }
-            } else {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Spacer()
-                    sortControl
-                    filterControl
-                }
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                sortControl
+                filterControl
             }
         }
         .sheet(isPresented: $isShowingFilterSheet) {
@@ -189,7 +181,7 @@ struct DDRScoresView<Header: View>: View {
                 onReset: {
                 }
             )
-            .automaticSheetNavigationTransition(id: "DDRScoreFilterSheet", in: ddrNamespace)
+            .navigationTransition(.zoom(sourceID: "DDRScoreFilterSheet", in: ddrNamespace))
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
             .interactiveDismissDisabled()

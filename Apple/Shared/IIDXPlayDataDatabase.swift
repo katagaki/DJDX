@@ -126,7 +126,6 @@ final class IIDXPlayDataDatabase: Sendable {
 
     // MARK: - Table Creation
 
-    // swiftlint:disable function_body_length
     private func createTablesIfNeeded() {
         do {
             let database = try Connection(databasePath)
@@ -231,5 +230,4 @@ final class IIDXPlayDataDatabase: Sendable {
             debugPrint("Failed to create tables: \(error)")
         }
     }
-    // swiftlint:enable function_body_length
 }

@@ -76,11 +76,7 @@ struct PolarisChordScoreFilterSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    if #available(iOS 26.0, *) {
-                        Button(role: .confirm) { dismiss() }
-                    } else {
-                        Button("Shared.Done") { dismiss() }
-                    }
+                    Button(role: .confirm) { dismiss() }
                 }
             }
         }

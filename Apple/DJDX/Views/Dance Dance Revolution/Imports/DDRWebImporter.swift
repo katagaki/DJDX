@@ -284,11 +284,9 @@ class DDRCoordinatorForImporter: NSObject, WKNavigationDelegate, WKScriptMessage
     }
 }
 
-// swiftlint:disable class_delegate_protocol
 protocol DDRUpdateScoreDataDelegate: Sendable {
     func importScoreData(using newScoreData: String) async
     func stopProcessing(with reason: ImportFailedReason)
     @MainActor func beginScrapeProgress()
     @MainActor func updateScrapeProgress(pagesFetched: Int)
 }
-// swiftlint:enable class_delegate_protocol

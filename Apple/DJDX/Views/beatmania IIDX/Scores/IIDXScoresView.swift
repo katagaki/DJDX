@@ -1,6 +1,5 @@
 import SwiftUI
 
-// swiftlint:disable:next type_body_length
 struct IIDXScoresView<Header: View>: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
@@ -106,11 +105,7 @@ struct IIDXScoresView<Header: View>: View {
     }
 
     var searchPlacement: SearchFieldPlacement {
-        if #available(iOS 26.0, *) {
-            .automatic
-        } else {
-            .navigationBarDrawer(displayMode: .always)
-        }
+        .automatic
     }
 
     @ViewBuilder var timeTravelButton: some View {
@@ -146,19 +141,10 @@ struct IIDXScoresView<Header: View>: View {
             .presentationCompactAdaptation(.popover)
         }
 
-        if #available(iOS 26.0, *) {
-            if isTimeTravelling {
-                button.buttonStyle(.glassProminent)
-            } else {
-                button
-            }
+        if isTimeTravelling {
+            button.buttonStyle(.glassProminent)
         } else {
             button
-                .background {
-                    if isTimeTravelling {
-                        Capsule().fill(Color.accentColor.opacity(0.25))
-                    }
-                }
         }
     }
 
@@ -229,24 +215,15 @@ struct IIDXScoresView<Header: View>: View {
                 AppBackgroundGradient()
             }
             .toolbar {
-                if #available(iOS 26.0, *) {
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        timeTravelButton
-                    }
-                    ToolbarSpacer(.fixed, placement: .bottomBar)
-                    DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                    ToolbarSpacer(.fixed, placement: .bottomBar)
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        sortControl
-                        filterControl
-                    }
-                } else {
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        timeTravelButton
-                        Spacer()
-                        sortControl
-                        filterControl
-                    }
+                ToolbarItemGroup(placement: .bottomBar) {
+                    timeTravelButton
+                }
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+                DefaultToolbarItem(kind: .search, placement: .bottomBar)
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    sortControl
+                    filterControl
                 }
             }
             .background {
@@ -278,7 +255,7 @@ struct IIDXScoresView<Header: View>: View {
                     isLastPlayDateVisible: $isLastPlayDateVisible,
                     onReset: { reloadDisplay() }
                 )
-                .automaticSheetNavigationTransition(id: "ScoreFilterSheet", in: scoresNamespace)
+                .navigationTransition(.zoom(sourceID: "ScoreFilterSheet", in: scoresNamespace))
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.hidden)
                 .interactiveDismissDisabled()
@@ -344,8 +321,8 @@ struct IIDXScoresView<Header: View>: View {
                         noteCount: noteCount,
                         initialLevel: initialLevel
                     )
-                    .automaticNavigationTransition(id: "\(songRecord.title).\(initialLevel.rawValue)",
-                                                   in: scoresNamespace)
+                    .navigationTransition(.zoom(sourceID: "\(songRecord.title).\(initialLevel.rawValue)",
+                                                   in: scoresNamespace))
                 case .textageViewer(let legacyURL, let chartViewerURL):
                     TextageViewer(legacyURL: legacyURL, chartViewerURL: chartViewerURL)
                 }
