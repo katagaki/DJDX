@@ -4,7 +4,6 @@ import OrderedCollections
 import SwiftUI
 import UniformTypeIdentifiers
 
-// swiftlint:disable type_body_length
 struct AnalyticsView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
@@ -115,7 +114,6 @@ struct AnalyticsView: View {
     }
 
     @ViewBuilder
-    // swiftlint:disable:next function_body_length
     func overviewCard(for cardType: AnalyticsCardType) -> some View {
         switch cardType {
         case .clearTypeOverall:
@@ -135,7 +133,7 @@ struct AnalyticsView: View {
                 .perLevelCaption("Analytics.ClearType.Overall")
             }
             .buttonStyle(AnalyticsCardButtonStyle())
-            .automaticMatchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
+            .matchedTransitionSource(id: "ClearType.Overall", in: analyticsNamespace)
         case .gradeBreakdown:
             Button {
                 if !isEditingCards && !model.djLevelPerDifficulty.isEmpty {
@@ -164,7 +162,7 @@ struct AnalyticsView: View {
                 .perLevelCaption("Analytics.DJLevel.Overall")
             }
             .buttonStyle(AnalyticsCardButtonStyle())
-            .automaticMatchedTransitionSource(id: "DJLevel.Overall", in: analyticsNamespace)
+            .matchedTransitionSource(id: "DJLevel.Overall", in: analyticsNamespace)
         case .progressTrend, .scoreProgressTrend:
             progressCard(cardType == .progressTrend ? .clears : .highScores)
         case .towerRecent, .towerTotals:
@@ -204,7 +202,7 @@ struct AnalyticsView: View {
                 .perLevelCaption(caption)
             }
             .buttonStyle(AnalyticsCardButtonStyle())
-            .automaticMatchedTransitionSource(id: transitionID, in: towerNamespace)
+            .matchedTransitionSource(id: transitionID, in: towerNamespace)
         default:
             EmptyView()
         }
@@ -419,4 +417,3 @@ struct AnalyticsView: View {
     }
 
 }
-// swiftlint:enable type_body_length

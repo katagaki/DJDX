@@ -32,11 +32,7 @@ struct AnalyticsCardView<Content: View>: View {
         self.systemImage = cardType.systemImage
         self.iconColor = cardType.iconColor
         self.contentHeight = cardType.cardContentHeight
-        if #available(iOS 26.0, *) {
-            self.cornerRadius = 20.0
-        } else {
-            self.cornerRadius = 12.0
-        }
+        self.cornerRadius = 20.0
         self.showsHeader = showsHeader
         self.headerPlacement = headerPlacement
         self.content = content
@@ -52,11 +48,7 @@ struct AnalyticsCardView<Content: View>: View {
         self.systemImage = systemImage
         self.iconColor = iconColor
         self.contentHeight = contentHeight
-        if #available(iOS 26.0, *) {
-            self.cornerRadius = 20.0
-        } else {
-            self.cornerRadius = 12.0
-        }
+        self.cornerRadius = 20.0
         self.showsHeader = showsHeader
         self.content = content
     }
@@ -70,11 +62,7 @@ struct AnalyticsCardView<Content: View>: View {
         self.systemImage = systemImage
         self.iconColor = iconColor
         self.contentHeight = contentHeight
-        if #available(iOS 26.0, *) {
-            self.cornerRadius = 20.0
-        } else {
-            self.cornerRadius = 12.0
-        }
+        self.cornerRadius = 20.0
         self.content = content
     }
 

@@ -82,6 +82,8 @@ import com.tsubuzaki.djdxgo.data.removeSettings
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVersion
 import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingFlow
+import com.tsubuzaki.djdxgo.ui.analytics.AnalyticsGoalDetailScreen
+import com.tsubuzaki.djdxgo.ui.analytics.AnalyticsGoalsSection
 import com.tsubuzaki.djdxgo.ui.analytics.ChartAnalyticsDetailScreen
 import com.tsubuzaki.djdxgo.ui.analytics.DDRAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.IIDXAnalyticsDetailScreen
@@ -279,6 +281,16 @@ fun DJDXApp() {
                 game = Game.fromId(entry.arguments?.getInt("game") ?: 0),
                 detail = entry.arguments?.getString("detail").orEmpty(),
                 param = entry.arguments?.getString("param").orEmpty(),
+                onBack = back
+            )
+        }
+        composable(
+            route = Routes.GOAL_DETAIL,
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { entry ->
+            AnalyticsGoalDetailScreen(
+                container = container,
+                goalID = entry.arguments?.getString("id").orEmpty(),
                 onBack = back
             )
         }
@@ -585,6 +597,15 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                                     container, ddrPlayStyle, isEditingAnalytics, onNavigate
                                 )
                             }
+                            AnalyticsGoalsSection(
+                                container = container,
+                                game = selectedGame,
+                                playStyle = when (selectedGame) {
+                                    Game.DANCE_DANCE_REVOLUTION -> ddrPlayStyle.value
+                                    else -> iidxPlayType.value
+                                },
+                                onNavigate = onNavigate
+                            )
                         }
                     }
                 } else {

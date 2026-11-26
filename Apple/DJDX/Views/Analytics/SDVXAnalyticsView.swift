@@ -3,7 +3,6 @@ import OrderedCollections
 import SwiftUI
 import UniformTypeIdentifiers
 
-// swiftlint:disable type_body_length
 struct SDVXAnalyticsView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
@@ -187,7 +186,7 @@ struct SDVXAnalyticsView: View {
                         )
                     }
                     .buttonStyle(AnalyticsCardButtonStyle())
-                    .automaticMatchedTransitionSource(id: "SDVX.volforceSuggestions", in: analyticsNamespace)
+                    .matchedTransitionSource(id: "SDVX.volforceSuggestions", in: analyticsNamespace)
                     .padding(.horizontal)
                 }
             }
@@ -210,7 +209,7 @@ struct SDVXAnalyticsView: View {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
+        .matchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
     }
 
     @ViewBuilder
@@ -223,7 +222,7 @@ struct SDVXAnalyticsView: View {
             lastPlayCountCard(for: cardType)
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
+        .matchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
     }
 
     @ViewBuilder
@@ -254,11 +253,7 @@ struct SDVXAnalyticsView: View {
     }
 
     var cardCornerRadius: CGFloat {
-        if #available(iOS 26.0, *) {
-            return 20.0
-        } else {
-            return 12.0
-        }
+        return 20.0
     }
 
     func lastPlayCount(for cardType: SDVXAnalyticsCard) -> Int {
@@ -376,4 +371,3 @@ struct SDVXAnalyticsView: View {
         SDVXClearType(rawValue: rawValue)?.abbreviation ?? rawValue
     }
 }
-// swiftlint:enable type_body_length

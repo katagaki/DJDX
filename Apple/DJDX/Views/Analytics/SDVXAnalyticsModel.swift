@@ -43,6 +43,10 @@ final class SDVXAnalyticsModel {
 
     let fetcher = SDVXReader()
 
+    nonisolated static func volforce(of records: [SDVXSongRecord]) -> Double {
+        SDVXVolforce.total(records)
+    }
+
     func reload(version: SDVXVersion, filters: SDVXFilterOptions? = nil) async {
         dataState = .loading
         let allRecords = await fetcher.latestSongRecords(for: version)
@@ -106,7 +110,6 @@ final class SDVXAnalyticsModel {
     }
 
     // Compares the latest two import groups for the version and computes what improved.
-    // swiftlint:disable:next large_tuple
     private func computeLastPlay(version: SDVXVersion, filters: SDVXFilterOptions?) async -> (
         clears: [String: [SDVXNewClearEntry]],
         highScores: [SDVXNewHighScoreEntry],
@@ -128,7 +131,6 @@ final class SDVXAnalyticsModel {
     nonisolated static func computeNewEntries(
         latestRecords: [SDVXSongRecord],
         previousRecords: [SDVXSongRecord]
-    // swiftlint:disable:next large_tuple
     ) -> (
         clears: [String: [SDVXNewClearEntry]],
         highScores: [SDVXNewHighScoreEntry],

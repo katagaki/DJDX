@@ -1,4 +1,3 @@
-// swiftlint:disable file_length
 
 let globalJSFunctions = """
 function waitForElementToExist(selector) {

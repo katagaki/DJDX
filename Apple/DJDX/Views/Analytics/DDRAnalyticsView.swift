@@ -148,7 +148,7 @@ struct DDRAnalyticsView: View {
                         )
                     }
                     .buttonStyle(AnalyticsCardButtonStyle())
-                    .automaticMatchedTransitionSource(id: "DDR.flareSkillSuggestions", in: analyticsNamespace)
+                    .matchedTransitionSource(id: "DDR.flareSkillSuggestions", in: analyticsNamespace)
                     .padding(.horizontal)
                 }
             }
@@ -170,7 +170,7 @@ struct DDRAnalyticsView: View {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
+        .matchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
     }
 
     // MARK: - Card storage

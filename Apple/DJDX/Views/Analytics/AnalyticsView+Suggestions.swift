@@ -44,7 +44,7 @@ extension AnalyticsView {
             )
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "Suggestions.DJLevel", in: analyticsNamespace)
+        .matchedTransitionSource(id: "Suggestions.DJLevel", in: analyticsNamespace)
     }
 
     var clearLampSuggestionsCard: some View {
@@ -68,7 +68,7 @@ extension AnalyticsView {
             )
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "Suggestions.ClearLamp", in: analyticsNamespace)
+        .matchedTransitionSource(id: "Suggestions.ClearLamp", in: analyticsNamespace)
     }
 }
 

@@ -14,15 +14,15 @@ struct DDRAnalyticsDestinationView: View {
             case .clearBreakdownDetail:
                 DDRClearBreakdownDetailView(clearTypePerLevel: model.clearTypePerLevel)
                     .navigationTitle("Analytics.DDR.ClearBreakdown")
-                    .automaticNavigationTransition(id: "DDR.clearBreakdown", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "DDR.clearBreakdown", in: namespace))
             case .rankBreakdownDetail:
                 DDRRankBreakdownDetailView(rankPerLevel: model.rankPerLevel)
                     .navigationTitle("Analytics.DDR.RankBreakdown")
-                    .automaticNavigationTransition(id: "DDR.rankBreakdown", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "DDR.rankBreakdown", in: namespace))
             case .flareSkillSuggestionsDetail:
                 DDRFlareSkillSuggestionsDetailView(suggestions: model.flareSkillSuggestions)
                     .navigationTitle(Text(verbatim: "FLARE SKILL"))
-                    .automaticNavigationTransition(id: "DDR.flareSkillSuggestions", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "DDR.flareSkillSuggestions", in: namespace))
             }
         }
         .appBackgroundGradient()

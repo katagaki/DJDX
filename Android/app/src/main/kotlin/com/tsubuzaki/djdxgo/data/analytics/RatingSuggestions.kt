@@ -85,6 +85,8 @@ object SDVXVolforce {
     fun force(record: SDVXSongRecord): Int =
         force(record.level.toDoubleOrNull() ?: 0.0, record.highScore, record.clearType)
 
+    fun total(records: List<SDVXSongRecord>): Double = RatingPool(records.map(::force), CHART_LIMIT).total / 1000.0
+
     fun gainText(gain: Int): String = String.format(Locale.ROOT, "+%.3f", gain / 1000.0)
 
     fun suggestions(allRecords: List<SDVXSongRecord>, candidates: List<SDVXSongRecord>): List<ChartSuggestion> {

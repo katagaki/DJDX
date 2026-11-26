@@ -51,13 +51,17 @@ struct SDVXScoreViewer: View {
                 .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                 chartActions()
             }
+            if selectedDifficulty != .unknown {
+                ChartNotesSection(game: .soundVoltex, title: title, chart: difficulty.rawValue)
+            }
         }
         .listSectionSpacing(.compact)
+        .scrollDismissesKeyboard(.immediately)
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
         .contentMargins(.top, 0.0, for: .scrollContent)
-        .softTopScrollEdgeEffect()
-        .softBottomScrollEdgeEffect()
+        .scrollEdgeEffectStyle(.soft, for: .top)
+        .scrollEdgeEffectStyle(.soft, for: .bottom)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -69,7 +73,6 @@ struct SDVXScoreViewer: View {
                 .padding(.horizontal, 20.0)
                 .padding(.bottom, 8.0)
         }
-        .conditionalBottomTabBarAccessory()
         .onAppear {
             if selectedDifficulty == .unknown {
                 selectedDifficulty = songRecords.contains(where: { $0.difficultyEnum == initialDifficulty })

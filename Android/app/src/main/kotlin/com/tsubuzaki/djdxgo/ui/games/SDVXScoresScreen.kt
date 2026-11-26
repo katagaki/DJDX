@@ -55,6 +55,7 @@ import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
 import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingFlow
 import com.tsubuzaki.djdxgo.ui.theme.SDVXColors
+import java.text.NumberFormat
 import java.time.Instant
 import com.tsubuzaki.djdxgo.data.analytics.sdvxLevelBucket
 import kotlinx.coroutines.Dispatchers
@@ -65,6 +66,10 @@ private const val SORT_TITLE = "Title"
 private const val SORT_CLEAR_TYPE = "ClearType"
 private const val SORT_SCORE = "Score"
 private const val SORT_LEVEL = "Level"
+
+private val SDVX_SCORE_THRESHOLDS = listOf(
+    9_000_000, 9_500_000, 9_700_000, 9_800_000, 9_900_000, 9_950_000, 9_980_000, 10_000_000
+)
 
 @Composable
 fun SDVXScoresScreen(
@@ -99,29 +104,31 @@ fun SDVXScoresScreen(
         .collectAsState(emptySet())
     val gradeFilters by context.settingFlow(SettingsKeys.sdvxGradeFilters, emptySet())
         .collectAsState(emptySet())
+    val scoreBelow by context.settingFlow(SettingsKeys.sdvxScoreBelowFilter, 0)
+        .collectAsState(0)
 
     var query by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by remember { mutableStateOf(false) }
 
     val displayed = remember(
         records, sortMode, sortDescending,
-        difficultyFilters, levelFilters, clearTypeFilters, gradeFilters
+        difficultyFilters, levelFilters, clearTypeFilters, gradeFilters, scoreBelow
     ) {
         sdvxDisplayRecords(
             records, "", sortMode, sortDescending,
-            difficultyFilters, levelFilters, clearTypeFilters, gradeFilters
+            difficultyFilters, levelFilters, clearTypeFilters, gradeFilters, scoreBelow
         )
     }
     val searchResults = remember(
         records, query, sortMode, sortDescending,
-        difficultyFilters, levelFilters, clearTypeFilters, gradeFilters
+        difficultyFilters, levelFilters, clearTypeFilters, gradeFilters, scoreBelow
     ) {
         if (query.isEmpty()) {
             emptyList()
         } else {
             sdvxDisplayRecords(
                 records, query, sortMode, sortDescending,
-                difficultyFilters, levelFilters, clearTypeFilters, gradeFilters
+                difficultyFilters, levelFilters, clearTypeFilters, gradeFilters, scoreBelow
             )
         }
     }
@@ -146,6 +153,12 @@ fun SDVXScoresScreen(
             }
             if (isLoaded && displayed.isEmpty()) {
                 item(key = "empty") { EmptyStateCard() }
+            }
+            if (records.isNotEmpty()) {
+                item(key = "count") {
+                    ScoreCountRow(count = displayed.size)
+                    HorizontalDivider()
+                }
             }
             items(displayed, key = { it.id }) { record ->
                 SDVXScoreRow(record = record) {
@@ -194,6 +207,7 @@ fun SDVXScoresScreen(
                     context.setSetting(SettingsKeys.sdvxLevelFilters, emptySet())
                     context.setSetting(SettingsKeys.sdvxClearTypeFilters, emptySet())
                     context.setSetting(SettingsKeys.sdvxGradeFilters, emptySet())
+                    context.setSetting(SettingsKeys.sdvxScoreBelowFilter, 0)
                 }
             }
         ) {
@@ -226,6 +240,18 @@ fun SDVXScoresScreen(
                 selected = gradeFilters,
                 onToggle = { toggleFilter(SettingsKeys.sdvxGradeFilters, gradeFilters, it) }
             )
+            val numberFormat = remember { NumberFormat.getIntegerInstance() }
+            FilterChipGroup(
+                title = stringResource(R.string.games_filter_score),
+                options = listOf("0" to stringResource(R.string.games_filter_all)) +
+                    SDVX_SCORE_THRESHOLDS.map {
+                        it.toString() to stringResource(R.string.games_filter_score_below, numberFormat.format(it))
+                    },
+                selected = setOf(scoreBelow.toString()),
+                onToggle = { value ->
+                    scope.launch { context.setSetting(SettingsKeys.sdvxScoreBelowFilter, value.toInt()) }
+                }
+            )
         }
     }
 }
@@ -238,7 +264,8 @@ private fun sdvxDisplayRecords(
     difficulties: Set<String>,
     levels: Set<String>,
     clearTypes: Set<String>,
-    grades: Set<String>
+    grades: Set<String>,
+    scoreBelow: Int
 ): List<SDVXSongRecord> {
     val queryCompact = query.compact
     val filtered = records.filter { record ->
@@ -246,7 +273,8 @@ private fun sdvxDisplayRecords(
             (difficulties.isEmpty() || record.difficulty in difficulties) &&
             (levels.isEmpty() || sdvxLevelBucket(record.level) in levels) &&
             (clearTypes.isEmpty() || record.clearType in clearTypes) &&
-            (grades.isEmpty() || record.grade in grades)
+            (grades.isEmpty() || record.grade in grades) &&
+            (scoreBelow <= 0 || record.highScore in 1 until scoreBelow)
     }
     val primary: Comparator<SDVXSongRecord> = when (sortMode) {
         SORT_CLEAR_TYPE -> compareByDescending { SDVXClearType.sortIndex(it.clearType) }
