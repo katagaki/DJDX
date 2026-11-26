@@ -15,7 +15,7 @@ struct TierListRow<Label: View>: View {
             FlowLayout(horizontalSpacing: 6.0, verticalSpacing: 6.0) {
                 ForEach(charts) { chart in
                     TierListTile(chart: chart)
-                        .contentShape(.dragPreview, .rect(cornerRadius: 10.0))
+                        .contentShape(.dragPreview, .rect)
                         .draggable(chart.id) {
                             TierListTile(chart: chart)
                         }

@@ -36,7 +36,7 @@ struct TierListTile: View {
         }
         .frame(width: Self.width, alignment: .leading)
         .background(Color(.tertiarySystemGroupedBackground))
-        .clipShape(.rect(cornerRadius: 10.0))
+        .clipShape(.rect)
         .accessibilityElement(children: .combine)
         .accessibilityValue(chart.lampLabel)
     }
