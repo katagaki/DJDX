@@ -1,10 +1,17 @@
 import SwiftUI
 
-struct SDVXScoreRow: View {
+struct SDVXScoreRow<Accessory: View>: View {
 
     var namespace: Namespace.ID
 
     var record: SDVXSongRecord
+    var accessory: Accessory
+
+    init(namespace: Namespace.ID, record: SDVXSongRecord, @ViewBuilder accessory: () -> Accessory) {
+        self.namespace = namespace
+        self.record = record
+        self.accessory = accessory()
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 8.0) {
@@ -39,6 +46,8 @@ struct SDVXScoreRow: View {
                         .fontWeight(.bold)
                 }
                 .font(.caption)
+                accessory
+                    .font(.caption)
             }
             .padding([.top, .bottom], 8.0)
             .matchedTransitionSource(id: "\(record.title).\(record.difficulty)", in: namespace)
@@ -52,5 +61,11 @@ struct SDVXScoreRow: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.trailing)
+    }
+}
+
+extension SDVXScoreRow where Accessory == EmptyView {
+    init(namespace: Namespace.ID, record: SDVXSongRecord) {
+        self.init(namespace: namespace, record: record) { EmptyView() }
     }
 }

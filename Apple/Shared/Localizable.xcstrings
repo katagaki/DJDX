@@ -2546,25 +2546,48 @@
         }
       }
     },
-    "Analytics.Suggestions.PointsNeeded.%lld" : {
+    "Analytics.Suggestions.NotPlayedRecently" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld points to go"
+            "value" : "Not Played Recently"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "あと%lld点"
+            "value" : "しばらくプレーしていない譜面"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "還差%lld分"
+            "value" : "一段時間未遊玩的譜面"
+          }
+        }
+      }
+    },
+    "Analytics.Suggestions.Settings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
           }
         }
       }

@@ -4,23 +4,25 @@ extension AnalyticsView {
 
     @ViewBuilder
     var suggestionsSection: some View {
-        if !isEditing && model.sessionStore == nil {
-            VStack(spacing: 12.0) {
-                AnalyticsSectionHeader(
-                    title: AnalyticsSection.suggestions.titleKey,
-                    isCollapsible: true,
-                    isExpanded: isSectionExpanded(.suggestions)
-                ) {
-                    toggleSection(.suggestions)
-                }
-                if isSectionExpanded(.suggestions) {
-                    LazyVGrid(columns: perLevelColumns, spacing: 12.0) {
-                        djLevelSuggestionsCard
-                        clearLampSuggestionsCard
-                    }
-                    .padding(.horizontal)
-                }
-            }
+        if model.sessionStore == nil {
+            AnalyticsSuggestionsSection(
+                cards: AnalyticsSuggestionCardID.iidxCards,
+                columns: perLevelColumns,
+                isEditing: isEditing,
+                isExpanded: isSectionExpanded(.suggestions),
+                onToggle: { toggleSection(.suggestions) },
+                card: suggestionCard
+            )
+        }
+    }
+
+    @ViewBuilder
+    func suggestionCard(_ cardID: AnalyticsSuggestionCardID) -> some View {
+        switch cardID {
+        case .iidxDJLevel: djLevelSuggestionsCard
+        case .iidxClearLamp: clearLampSuggestionsCard
+        case .iidxNotPlayedRecently: notPlayedRecentlySuggestionsCard
+        default: EmptyView()
         }
     }
 
@@ -32,46 +34,147 @@ extension AnalyticsView {
                 title: Text("Analytics.Suggestions.NextDJLevel"),
                 systemImage: "crown",
                 iconColor: .orange,
-                count: model.djLevelSuggestions.count,
-                previews: model.djLevelSuggestions.prefix(3).map { suggestion in
-                    AnalyticsSuggestionPreview(
-                        id: suggestion.id,
-                        title: suggestion.songTitle,
-                        detail: "\(suggestion.level.chartName) \(suggestion.difficulty) · \(suggestion.targetDJLevel)",
-                        value: "+\(suggestion.pointsNeeded)"
-                    )
-                }
-            )
+                items: model.djLevelSuggestions
+            ) { suggestion in
+                IIDXDJLevelSuggestionRow(namespace: analyticsNamespace, suggestion: suggestion)
+            }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .matchedTransitionSource(id: "Suggestions.DJLevel", in: analyticsNamespace)
+        .matchedTransitionSource(id: AnalyticsSuggestionCardID.iidxDJLevel.transitionID, in: analyticsNamespace)
     }
 
     var clearLampSuggestionsCard: some View {
-        let suggestions = model.clearLampSuggestions(for: suggestionTargetClearType)
-        return Button {
+        Button {
             navigationManager.push(AnalyticsPath.clearLampSuggestionsDetail)
         } label: {
             AnalyticsSuggestionCard(
                 title: Text("Analytics.Suggestions.NextClearLamp.\(suggestionTargetClearType.rawValue)"),
                 systemImage: "checkmark.seal",
                 iconColor: IIDXClearType.color(for: suggestionTargetClearType.rawValue),
-                count: suggestions.count,
-                previews: suggestions.prefix(3).map { suggestion in
-                    AnalyticsSuggestionPreview(
-                        id: suggestion.id,
-                        title: suggestion.songTitle,
-                        detail: suggestion.clearType,
-                        value: "",
-                        badge: LevelBadge(name: suggestion.level.chartName, level: String(suggestion.difficulty),
-                                          tint: suggestion.level.chartColor, layout: .compact),
-                        detailLabel: .clearType(suggestion.clearType)
-                    )
-                }
-            )
+                items: model.clearLampSuggestions(for: suggestionTargetClearType)
+            ) { suggestion in
+                IIDXClearLampSuggestionRow(namespace: analyticsNamespace, suggestion: suggestion,
+                                           targetClearType: suggestionTargetClearType)
+            }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .matchedTransitionSource(id: "Suggestions.ClearLamp", in: analyticsNamespace)
+        .matchedTransitionSource(id: AnalyticsSuggestionCardID.iidxClearLamp.transitionID, in: analyticsNamespace)
+    }
+
+    var notPlayedRecentlySuggestionsCard: some View {
+        Button {
+            navigationManager.push(AnalyticsPath.notPlayedRecentlySuggestionsDetail)
+        } label: {
+            AnalyticsSuggestionCard(
+                title: Text("Analytics.Suggestions.NotPlayedRecently"),
+                systemImage: "clock.arrow.circlepath",
+                iconColor: .teal,
+                items: model.longUnplayedSuggestions
+            ) { suggestion in
+                IIDXUnplayedSuggestionRow(namespace: analyticsNamespace, suggestion: suggestion)
+            }
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .matchedTransitionSource(id: AnalyticsSuggestionCardID.iidxNotPlayedRecently.transitionID,
+                                 in: analyticsNamespace)
+    }
+}
+
+// MARK: - Rows
+
+struct IIDXDJLevelSuggestionRow: View {
+    var namespace: Namespace.ID
+    let suggestion: IIDXDJLevelSuggestion
+
+    var body: some View {
+        IIDXScoreRow(namespace: namespace, songRecord: suggestion.songRecord, level: suggestion.level,
+                     score: suggestion.score, scoreRate: suggestion.scoreRate) {
+            AnalyticsSuggestionTarget {
+                IIDXMetallicText.djLevel(suggestion.targetDJLevel)
+                AnalyticsSuggestionGain(text: "+\(suggestion.pointsNeeded)")
+            }
+        }
+    }
+}
+
+struct IIDXClearLampSuggestionRow: View {
+    var namespace: Namespace.ID
+    let suggestion: IIDXChartSuggestion
+    let targetClearType: IIDXClearType
+
+    var body: some View {
+        IIDXScoreRow(namespace: namespace, songRecord: suggestion.songRecord, level: suggestion.level,
+                     score: suggestion.score, scoreRate: suggestion.scoreRate) {
+            AnalyticsSuggestionTarget {
+                IIDXMetallicText.clearType(targetClearType.rawValue)
+            }
+        }
+    }
+}
+
+struct IIDXUnplayedSuggestionRow: View {
+    var namespace: Namespace.ID
+    let suggestion: IIDXChartSuggestion
+
+    var body: some View {
+        IIDXScoreRow(namespace: namespace, songRecord: suggestion.songRecord, level: suggestion.level,
+                     score: suggestion.score, scoreRate: suggestion.scoreRate) {
+            HStack(spacing: 4.0) {
+                Image(systemName: "clock")
+                    .font(.caption2.weight(.bold))
+                Text(suggestion.songRecord.lastPlayDate, format: .relative(presentation: .named))
+                    .fontWidth(.condensed)
+            }
+            .foregroundStyle(.secondary)
+            .offset(y: 1.0)
+        }
+    }
+}
+
+// MARK: - Detail views
+
+struct IIDXSuggestionsDetailView<Item: Identifiable, Row: View>: View {
+    let items: [Item]
+    let songRecord: (Item) -> IIDXSongRecord
+    let level: (Item) -> IIDXLevel
+    @ViewBuilder let row: (Item, Namespace.ID) -> Row
+
+    @Namespace private var namespace
+
+    @State private var songCompactTitles: [String: IIDXSong] = [:]
+
+    private let fetcher = IIDXReader()
+
+    var body: some View {
+        AnalyticsSuggestionList(items: items) { item in
+            let songRecord = songRecord(item)
+            let level = level(item)
+            NavigationLink {
+                IIDXScoreViewer(songRecord: songRecord, noteCount: noteCount, initialLevel: level)
+                    .navigationTransition(.zoom(sourceID: "\(songRecord.title).\(level.rawValue)", in: namespace))
+            } label: {
+                row(item, namespace)
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+        }
+        .task {
+            songCompactTitles = await fetcher.songCompactTitles()
+        }
+    }
+
+    private func noteCount(_ songRecord: IIDXSongRecord, _ level: IIDXLevel) -> Int? {
+        let keyPath: KeyPath<IIDXNoteCount, Int?>?
+        switch level {
+        case .beginner: keyPath = \.beginnerNoteCount
+        case .normal: keyPath = \.normalNoteCount
+        case .hyper: keyPath = \.hyperNoteCount
+        case .another: keyPath = \.anotherNoteCount
+        case .leggendaria: keyPath = \.leggendariaNoteCount
+        default: keyPath = nil
+        }
+        guard let keyPath, let song = songCompactTitles[songRecord.titleCompact()] else { return nil }
+        return song.spNoteCount?[keyPath: keyPath]
     }
 }
 
@@ -79,31 +182,23 @@ struct IIDXDJLevelSuggestionsDetailView: View {
     let suggestions: [IIDXDJLevelSuggestion]
 
     var body: some View {
-        List {
-            if suggestions.isEmpty {
-                Text("Analytics.Suggestions.Empty")
-                    .foregroundStyle(.secondary)
-                    .listRowBackground(Color.clear)
-            } else {
-                ForEach(suggestions) { suggestion in
-                    AnalyticsSuggestionRow(
-                        title: suggestion.songTitle,
-                        current: suggestion.currentDJLevel,
-                        target: suggestion.targetDJLevel,
-                        detail: "EX SCORE \(suggestion.score) → \(suggestion.targetScore)",
-                        gain: "+\(suggestion.pointsNeeded)",
-                        difficulty: suggestion.level.chartName,
-                        difficultyColor: suggestion.level.chartColor,
-                        level: String(suggestion.difficulty),
-                        currentLabel: .djLevel(suggestion.currentDJLevel),
-                        targetLabel: .djLevel(suggestion.targetDJLevel),
-                        scores: (suggestion.score, suggestion.targetScore)
-                    )
-                }
-            }
+        IIDXSuggestionsDetailView(items: suggestions,
+                                  songRecord: \.songRecord,
+                                  level: \.level) { suggestion, namespace in
+            IIDXDJLevelSuggestionRow(namespace: namespace, suggestion: suggestion)
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
+    }
+}
+
+struct IIDXUnplayedSuggestionsDetailView: View {
+    let suggestions: [IIDXChartSuggestion]
+
+    var body: some View {
+        IIDXSuggestionsDetailView(items: suggestions,
+                                  songRecord: \.songRecord,
+                                  level: \.level) { suggestion, namespace in
+            IIDXUnplayedSuggestionRow(namespace: namespace, suggestion: suggestion)
+        }
     }
 }
 
@@ -114,43 +209,31 @@ struct IIDXClearLampSuggestionsDetailView: View {
     var targetClearType: IIDXClearType
 
     var body: some View {
-        let suggestions = model.clearLampSuggestions(for: targetClearType)
-        List {
-            Section {
-                Picker("Analytics.Suggestions.TargetClearType", selection: $targetClearType) {
-                    ForEach(AnalyticsModel.suggestionTargetClearTypes, id: \.self) { clearType in
-                        Text(verbatim: clearType.rawValue)
-                            .tag(clearType)
+        IIDXSuggestionsDetailView(
+            items: model.clearLampSuggestions(for: targetClearType),
+            songRecord: \.songRecord,
+            level: \.level
+        ) { suggestion, namespace in
+            IIDXClearLampSuggestionRow(namespace: namespace, suggestion: suggestion,
+                                       targetClearType: targetClearType)
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Section("Analytics.Suggestions.TargetClearType") {
+                        Picker("Analytics.Suggestions.TargetClearType",
+                               selection: $targetClearType.animation(.smooth.speed(2.0))) {
+                            ForEach(AnalyticsModel.suggestionTargetClearTypes, id: \.self) { clearType in
+                                Text(verbatim: clearType.rawValue)
+                                    .tag(clearType)
+                            }
+                        }
+                        .pickerStyle(.inline)
                     }
-                }
-                .pickerStyle(.menu)
-                .listRowBackground(Color.clear)
-            }
-            Section {
-                if suggestions.isEmpty {
-                    Text("Analytics.Suggestions.Empty")
-                        .foregroundStyle(.secondary)
-                        .listRowBackground(Color.clear)
-                } else {
-                    ForEach(suggestions) { suggestion in
-                        AnalyticsSuggestionRow(
-                            title: suggestion.songTitle,
-                            current: suggestion.clearType,
-                            target: targetClearType.rawValue,
-                            detail: "EX SCORE \(suggestion.score)",
-                            gain: "",
-                            difficulty: suggestion.level.chartName,
-                            difficultyColor: suggestion.level.chartColor,
-                            level: String(suggestion.difficulty),
-                            currentLabel: .clearType(suggestion.clearType),
-                            targetLabel: .clearType(targetClearType.rawValue),
-                            scores: (suggestion.score, nil)
-                        )
-                    }
+                } label: {
+                    Label("Analytics.Suggestions.Settings", systemImage: "gearshape")
                 }
             }
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
     }
 }

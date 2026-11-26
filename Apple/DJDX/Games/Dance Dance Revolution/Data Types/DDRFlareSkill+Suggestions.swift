@@ -2,9 +2,7 @@ import Foundation
 
 struct DDRFlareSkillSuggestion: Identifiable {
     let id = UUID()
-    let songTitle: String
-    let level: Int
-    let difficulty: DDRDifficulty
+    let record: DDRSongRecord
     let currentFlareRank: Int?
     let targetFlareRank: Int
     let currentFlareSkill: Int
@@ -52,9 +50,7 @@ extension DDRFlareSkill {
             let gain = pool.gain(replacing: record.flareSkill, with: targetSkill)
             guard gain > 0 else { return nil }
             return DDRFlareSkillSuggestion(
-                songTitle: record.title,
-                level: record.level,
-                difficulty: record.difficultyEnum,
+                record: record,
                 currentFlareRank: currentRank,
                 targetFlareRank: targetRank,
                 currentFlareSkill: record.flareSkill,
@@ -64,7 +60,7 @@ extension DDRFlareSkill {
         }
         .sorted {
             if $0.flareSkillGain != $1.flareSkillGain { return $0.flareSkillGain > $1.flareSkillGain }
-            return $0.level < $1.level
+            return $0.record.level < $1.record.level
         }
     }
 }

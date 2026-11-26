@@ -2,9 +2,7 @@ import Foundation
 
 struct SDVXVolforceSuggestion: Identifiable {
     let id = UUID()
-    let songTitle: String
-    let level: String
-    let difficulty: SDVXDifficulty
+    let record: SDVXSongRecord
     let score: Int
     let currentGrade: String
     let targetGrade: String
@@ -39,9 +37,7 @@ extension SDVXVolforce {
             let gain = pool.gain(replacing: currentForce, with: targetForce)
             guard gain > 0 else { return nil }
             return SDVXVolforceSuggestion(
-                songTitle: record.title,
-                level: record.level,
-                difficulty: record.difficultyEnum,
+                record: record,
                 score: record.highScore,
                 currentGrade: SDVXGrade.grade(forScore: record.highScore).rawValue,
                 targetGrade: target.grade.rawValue,

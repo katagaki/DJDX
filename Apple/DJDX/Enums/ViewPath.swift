@@ -28,6 +28,7 @@ enum AnalyticsPath: Hashable {
     case newADetail
     case djLevelSuggestionsDetail
     case clearLampSuggestionsDetail
+    case notPlayedRecentlySuggestionsDetail
 }
 
 enum AnalyticsGoalPath: Hashable {
