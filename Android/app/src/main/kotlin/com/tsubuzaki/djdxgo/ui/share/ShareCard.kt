@@ -43,7 +43,6 @@ import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.util.Locale
 
 val ShareCardWidth = 360.dp
 
@@ -213,9 +212,10 @@ private fun ShareCardProfileText(profile: ShareCardProfile, alignment: Alignment
                 Text(
                     text = rating.label,
                     style = ratingStyle.copy(color = Color.White.copy(alpha = 0.7f)),
-                    maxLines = 1
+                    maxLines = 1,
+                    modifier = Modifier.alignByBaseline()
                 )
-                Text(text = rating.value, style = ratingStyle, maxLines = 1)
+                Text(text = rating.value, style = ratingStyle, maxLines = 1, modifier = Modifier.alignByBaseline())
             }
         }
     }
@@ -240,19 +240,13 @@ private fun ShareCardProfileBand(profile: ShareCardProfile) {
             ShareCardProfileText(profile, Alignment.Start)
         }
         profile.radar?.let { radar ->
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                RadarChart(
-                    data = radar,
-                    color = RadarColors.playerColor(radar),
-                    labelSize = 8.dp,
-                    lineWidth = 1.5.dp,
-                    modifier = Modifier.size(width = 140.dp, height = 110.dp)
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(text = "TOTAL", style = ratingStyle.copy(color = Color.White.copy(alpha = 0.7f)))
-                    Text(text = String.format(Locale.ROOT, "%.2f", radar.sum()), style = ratingStyle)
-                }
-            }
+            RadarChart(
+                data = radar,
+                color = RadarColors.playerColor(radar),
+                labelSize = 8.dp,
+                lineWidth = 1.5.dp,
+                modifier = Modifier.size(width = 140.dp, height = 110.dp)
+            )
         }
     }
 }

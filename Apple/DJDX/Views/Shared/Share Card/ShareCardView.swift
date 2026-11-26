@@ -81,7 +81,7 @@ struct ShareCardView: View {
                     .minimumScaleFactor(0.6)
             }
             ForEach(profile.ratings) { rating in
-                HStack(spacing: 4.0) {
+                HStack(alignment: .firstTextBaseline, spacing: 4.0) {
                     Text(verbatim: rating.label)
                         .foregroundStyle(.white.opacity(0.7))
                     Text(verbatim: rating.value)
@@ -105,18 +105,8 @@ struct ShareCardView: View {
             profileText(profile, alignment: .leading)
             Spacer(minLength: 0.0)
             if let radar = profile.radar {
-                VStack(spacing: 0.0) {
-                    RadarChartView(radar, isPlayerRadar: true, labelFontSize: 8.0, lineWidth: 1.5)
-                        .frame(width: 170.0, height: 110.0)
-                    HStack(spacing: 4.0) {
-                        Text(verbatim: "TOTAL")
-                            .foregroundStyle(.white.opacity(0.7))
-                        Text(verbatim: String(format: "%.2f", radar.sum()))
-                            .monospacedDigit()
-                    }
-                    .font(.system(size: 11.0, weight: .heavy))
-                    .fontWidth(.condensed)
-                }
+                RadarChartView(radar, isPlayerRadar: true, labelFontSize: 8.0, lineWidth: 1.5)
+                    .frame(width: 170.0, height: 110.0)
             }
         }
     }
