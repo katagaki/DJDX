@@ -7,7 +7,6 @@ import SwiftUI
 extension AnalyticsView {
 
     @ViewBuilder
-    // swiftlint:disable:next cyclomatic_complexity
     func cardView(for cardType: AnalyticsCardType) -> some View {
         switch cardType {
         case .clearTypeOverall, .gradeBreakdown, .progressTrend, .scoreProgressTrend, .towerRecent, .towerTotals:
@@ -64,7 +63,7 @@ extension AnalyticsView {
             .perLevelCaption(LocalizedStringKey(kind.cardType.titleKey))
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: kind.transitionID, in: analyticsNamespace)
+        .matchedTransitionSource(id: kind.transitionID, in: analyticsNamespace)
     }
 
     var newClearsCard: some View {
@@ -78,7 +77,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewClears", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewClears", in: analyticsNamespace)
     }
 
     var newAssistClearsCard: some View {
@@ -92,7 +91,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewAssistClears", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewAssistClears", in: analyticsNamespace)
     }
 
     var newEasyClearsCard: some View {
@@ -106,7 +105,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewEasyClears", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewEasyClears", in: analyticsNamespace)
     }
 
     var newFullComboClearCard: some View {
@@ -120,7 +119,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewFullComboClear", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewFullComboClear", in: analyticsNamespace)
     }
 
     var newHardClearCard: some View {
@@ -134,7 +133,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewHardClear", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewHardClear", in: analyticsNamespace)
     }
 
     var newExHardClearCard: some View {
@@ -148,7 +147,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewExHardClear", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewExHardClear", in: analyticsNamespace)
     }
 
     var newFailedCard: some View {
@@ -162,7 +161,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewFailed", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewFailed", in: analyticsNamespace)
     }
 
     var newHighScoresCard: some View {
@@ -176,7 +175,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewHighScores", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewHighScores", in: analyticsNamespace)
     }
 
     var newClearLampsCard: some View {
@@ -190,7 +189,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewClearLamps", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewClearLamps", in: analyticsNamespace)
     }
 
     var newScoreUpdatesCard: some View {
@@ -204,7 +203,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewScoreUpdates", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewScoreUpdates", in: analyticsNamespace)
     }
 
     var newAAACard: some View {
@@ -218,7 +217,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewAAA", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewAAA", in: analyticsNamespace)
     }
 
     var newAACard: some View {
@@ -232,7 +231,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewAA", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewAA", in: analyticsNamespace)
     }
 
     var newACard: some View {
@@ -246,7 +245,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "NewA", in: analyticsNamespace)
+        .matchedTransitionSource(id: "NewA", in: analyticsNamespace)
     }
 
     // MARK: - Per-Level Card Views
@@ -314,7 +313,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
+        .matchedTransitionSource(id: "ClearType.Level.\(difficulty)", in: analyticsNamespace)
     }
 
     func clearTypeTrendsForLevelCard(difficulty: Int) -> some View {
@@ -337,7 +336,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(
+        .matchedTransitionSource(
             id: "ClearTypeTrends.Level.\(difficulty)", in: analyticsNamespace
         )
     }
@@ -362,7 +361,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace)
+        .matchedTransitionSource(id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace)
     }
 
     func djLevelTrendsForLevelCard(difficulty: Int) -> some View {
@@ -385,7 +384,7 @@ extension AnalyticsView {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(
+        .matchedTransitionSource(
             id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
         )
     }

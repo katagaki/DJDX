@@ -1,7 +1,6 @@
 import SwiftUI
 
 enum GITADORARank: String, Codable {
-    // swiftlint:disable identifier_name
     case all = "Shared.All"
     case ss = "SS"
     case s = "S"
@@ -12,7 +11,6 @@ enum GITADORARank: String, Codable {
     case e = "E"
     case none = "---"
     case unknown = ""
-    // swiftlint:enable identifier_name
 
     static let sorted: [GITADORARank] = [.ss, .s, .a, .b, .c, .d, .e]
 

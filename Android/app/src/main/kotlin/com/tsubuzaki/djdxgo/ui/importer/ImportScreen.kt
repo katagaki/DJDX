@@ -45,8 +45,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -101,7 +103,7 @@ private data class ImportGroupRow(
 private sealed interface ImportState {
     data object Idle : ImportState
     data object Importing : ImportState
-    data object Succeeded : ImportState
+    data class Succeeded(val importDate: Long) : ImportState
     data class Failed(val reason: ImportFailedReason) : ImportState
 }
 
@@ -128,6 +130,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
     var importState by remember { mutableStateOf<ImportState>(ImportState.Idle) }
     var groupPendingDeletion by remember { mutableStateOf<ImportGroupRow?>(null) }
     var isSampleDataPromptShown by remember { mutableStateOf(false) }
+    var summaryGroupID by remember { mutableStateOf<String?>(null) }
 
     val importGroups by remember(game) { importGroupRowsFlow(container, game) }
         .collectAsState(initial = emptyList())
@@ -141,16 +144,23 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
         val defaultImportDate = importDateEpochSeconds(selectedDate)
         importState = ImportState.Importing
         scope.launch(Dispatchers.IO) {
+            var lastImportDate = defaultImportDate
             uris.forEach { uri ->
                 val content = runCatching {
                     context.contentResolver.openInputStream(uri)
                         ?.bufferedReader(Charsets.UTF_8)
                         ?.use { it.readText() }
                 }.getOrNull() ?: return@forEach
+                val importDate = if (game == Game.IIDX_ARCADE) {
+                    fileNameImportDate(context, uri) ?: defaultImportDate
+                } else {
+                    defaultImportDate
+                }
+                lastImportDate = importDate
                 when (game) {
                     Game.IIDX_ARCADE -> container.iidxRepository.importCSV(
                         content,
-                        fileNameImportDate(context, uri) ?: defaultImportDate,
+                        importDate,
                         csvPlayType
                     )
                     Game.SOUND_VOLTEX -> container.sdvxRepository.importCSV(
@@ -163,7 +173,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
             }
             container.notifyImportCompleted()
             withContext(Dispatchers.Main) {
-                importState = ImportState.Succeeded
+                importState = ImportState.Succeeded(lastImportDate)
             }
         }
     }
@@ -185,7 +195,11 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                 container.notifyImportCompleted()
             }
             withContext(Dispatchers.Main) {
-                importState = if (content != null) ImportState.Succeeded else ImportState.Failed(ImportFailedReason.SERVER_ERROR)
+                importState = if (content != null) {
+                    ImportState.Succeeded(importDate)
+                } else {
+                    ImportState.Failed(ImportFailedReason.SERVER_ERROR)
+                }
             }
         }
     }
@@ -230,7 +244,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                         }
                         container.notifyImportCompleted()
                         withContext(Dispatchers.Main) {
-                            importState = ImportState.Succeeded
+                            importState = ImportState.Succeeded(importDate)
                         }
                     }
                 }
@@ -360,7 +374,10 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                     }
                 } else {
                     items(importGroups, key = { it.id }) { group ->
-                        Card(modifier = Modifier.fillMaxWidth()) {
+                        Card(
+                            onClick = { summaryGroupID = group.id },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
                             ListItem(
                                 headlineContent = {
                                     Text(formatEpochDate(group.importDate, dateFormatter))
@@ -461,16 +478,12 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
             title = { Text(stringResource(R.string.import_status_importing)) },
             text = { LinearProgressIndicator(modifier = Modifier.fillMaxWidth()) }
         )
-        ImportState.Succeeded -> AlertDialog(
-            onDismissRequest = { importState = ImportState.Idle },
-            confirmButton = {
-                TextButton(onClick = { importState = ImportState.Idle }) {
-                    Text(stringResource(R.string.import_ok))
-                }
-            },
-            title = { Text(stringResource(R.string.import_success_title)) },
-            text = { Text(stringResource(R.string.import_success_message)) }
-        )
+        is ImportState.Succeeded -> LaunchedEffect(state) {
+            summaryGroupID = withContext(Dispatchers.IO) {
+                container.importSummaryBuilder.importGroupID(game, state.importDate)
+            }
+            importState = ImportState.Idle
+        }
         is ImportState.Failed -> AlertDialog(
             onDismissRequest = { importState = ImportState.Idle },
             confirmButton = {
@@ -503,6 +516,17 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                 }
             }
         )
+    }
+
+    summaryGroupID?.let { groupID ->
+        key(groupID) {
+            ImportSummarySheet(
+                formatDate = { formatEpochDate(it, dateFormatter) },
+                onDismiss = { summaryGroupID = null }
+            ) {
+                withContext(Dispatchers.IO) { container.importSummaryBuilder.summary(game, groupID) }
+            }
+        }
     }
 
     groupPendingDeletion?.let { group ->

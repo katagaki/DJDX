@@ -14,6 +14,9 @@ extension UnifiedView {
                 SDVXAnalyticsView(model: sdvxAnalyticsModel, isEditing: $isEditingAnalytics,
                                   analyticsNamespace: sdvxAnalyticsNamespace)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
+                AnalyticsGoalsSection(game: .soundVoltex, playStyle: "")
+                    .padding(.top, 20.0)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
         }
         .padding(.bottom, 8.0)

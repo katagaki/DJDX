@@ -31,6 +31,8 @@ struct GITADORAScoresView<Header: View>: View {
     @State var records: [GITADORASongRecord] = []
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
+    @State var isShowingShareCard: Bool = false
+    @State private var chartNoteTarget: ChartNoteTarget?
 
     @Namespace var gitadoraNamespace
 
@@ -137,7 +139,7 @@ struct GITADORAScoresView<Header: View>: View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
-        .automaticSheetMatchedTransitionSource(id: "GITADORAScoreFilterSheet", in: gitadoraNamespace)
+        .matchedTransitionSource(id: "GITADORAScoreFilterSheet", in: gitadoraNamespace)
     }
 
     var body: some View {
@@ -162,9 +164,15 @@ struct GITADORAScoresView<Header: View>: View {
                     }
                 }
                 if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
+                    let sortedRecords = sortedRecords
                     ForEach(sortedRecords, id: \.self) { record in
-                        GITADORAScoreRow(record: record)
-                            .contentShape(.rect)
+                        Button {
+                            chartNoteTarget = record.chartNoteTarget
+                        } label: {
+                            GITADORAScoreRow(record: record)
+                                .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                         Divider()
                             .padding(.leading, 16.0)
                     }
@@ -181,20 +189,28 @@ struct GITADORAScoresView<Header: View>: View {
             await reload()
         }
         .toolbar {
-            if #available(iOS 26.0, *) {
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    sortControl
-                    filterControl
-                }
-            } else {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Spacer()
-                    sortControl
-                    filterControl
-                }
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                sortControl
+                filterControl
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
+            isShowingShareCard = true
+        }
+        .sheet(isPresented: $isShowingShareCard) {
+            ShareCardComposer(
+                game: .gitadora,
+                profile: .gitadora(instrument: instrument),
+                entries: sortedRecords.map { ShareCardEntry(gitadoraSongRecord: $0) },
+                playStyle: instrument.displayName
+            )
+        }
+        .sheet(item: $chartNoteTarget) { target in
+            ChartNotesSheet(game: target.game, title: target.title,
+                            chart: target.chart, chartLabel: target.chartLabel)
+                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             GITADORAScoreFilterSheet(
@@ -205,7 +221,7 @@ struct GITADORAScoresView<Header: View>: View {
                 availableLevels: availableLevels,
                 onReset: {}
             )
-            .automaticSheetNavigationTransition(id: "GITADORAScoreFilterSheet", in: gitadoraNamespace)
+            .navigationTransition(.zoom(sourceID: "GITADORAScoreFilterSheet", in: gitadoraNamespace))
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
             .interactiveDismissDisabled()

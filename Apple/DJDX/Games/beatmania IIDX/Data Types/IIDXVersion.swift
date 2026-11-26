@@ -170,7 +170,6 @@ enum IIDXVersion: Int, Codable, CaseIterable {
         })
     }
 
-    // swiftlint:disable line_length
     func loginPageRedirectURL() -> URL {
         return URL(string: """
 https://p.eagate.573.jp/gate/p/login.html?path=https%3A%2F%2Fp.eagate.573.jp%2Fgame%2F2dx%2F\(self.rawValue)%2Fdjdata%2Fscore_download.html
@@ -262,7 +261,6 @@ https://bemaniwiki.com/?beatmania+IIDX+34+ZINRAI/%B5%EC%B6%CA%C1%ED%A5%CE%A1%BC%
         default: return URL(string: "https://bemaniwiki.com")!
         }
     }
-    // swiftlint:enable line_length
 }
 
 extension IIDXVersion {
@@ -324,6 +322,35 @@ extension IIDXVersion {
             }
         } else {
             return Color(red: 77 / 255, green: 77 / 255, blue: 77 / 255)
+        }
+    }
+}
+
+extension IIDXVersion {
+
+    func rowTitleTextColor(for versionString: String, level: IIDXLevel, colorScheme: ColorScheme) -> LinearGradient {
+        if level == .leggendaria {
+            return IIDXVersion.leggendariaSongTitleTextColor
+        } else if colorScheme == .light && versionString != marketingName {
+            return LinearGradient(
+                colors: [.white, Color(red: 219 / 255, green: 219 / 255, blue: 224 / 255)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        } else {
+            return songTitleTextColor(for: versionString)
+        }
+    }
+
+    func rowTitleStrokeColor(for versionString: String, level: IIDXLevel, colorScheme: ColorScheme) -> Color {
+        if level == .leggendaria {
+            return IIDXVersion.leggendariaSongTitleStrokeColor
+        } else if versionString != marketingName {
+            return colorScheme == .dark ?
+                Color(red: 32 / 255, green: 32 / 255, blue: 32 / 255) :
+                Color(red: 56 / 255, green: 56 / 255, blue: 61 / 255)
+        } else {
+            return songTitleStrokeColor(for: versionString)
         }
     }
 }

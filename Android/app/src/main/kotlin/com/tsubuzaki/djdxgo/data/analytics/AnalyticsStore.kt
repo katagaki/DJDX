@@ -1,10 +1,12 @@
 package com.tsubuzaki.djdxgo.data.analytics
 
 import com.tsubuzaki.djdxgo.data.DJDXDatabase
+import com.tsubuzaki.djdxgo.data.TrendPoint
 import com.tsubuzaki.djdxgo.data.ddr.DDRPlayStyle
 import com.tsubuzaki.djdxgo.data.ddr.DDRRepository
 import com.tsubuzaki.djdxgo.data.gitadora.GITADORAInstrument
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
+import com.tsubuzaki.djdxgo.data.sdvx.SDVXVolforce
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +31,9 @@ class AnalyticsStore(
 
     suspend fun reloadIIDX(playType: IIDXPlayType, filters: IIDXFilterOptions) {
         iidxState.value = withContext(Dispatchers.IO) {
-            IIDXAnalytics.compute(database.iidxDao(), playType, filters)
+            IIDXAnalytics.compute(
+                database.iidxDao(), playType, filters, database.externalDataDao().allIIDXSongs()
+            )
         }
     }
 
@@ -39,7 +43,10 @@ class AnalyticsStore(
             val groups = dao.importGroups()
             val latest = groups.getOrNull(0)?.let { dao.songRecords(it.id) }.orEmpty()
             val previous = groups.getOrNull(1)?.let { dao.songRecords(it.id) }
-            ChartAnalytics.sdvx(latest, previous, filters)
+            val volforceTrend = dao.volforceRows().groupBy { it.date }.toSortedMap().map { (date, rows) ->
+                TrendPoint(date, SDVXVolforce.totalForRows(rows))
+            }
+            ChartAnalytics.sdvx(latest, previous, filters).copy(trend = volforceTrend)
         }
     }
 
@@ -69,8 +76,9 @@ class AnalyticsStore(
         ddrState.value = withContext(Dispatchers.IO) {
             ChartAnalytics.ddr(
                 ddrRepository.songRecords(System.currentTimeMillis() / 1000L, style),
-                filters
-            )
+                filters,
+                database.externalDataDao().allDDRSongMetas().associate { it.titleCompact to it.version }
+            ).copy(trend = ddrRepository.flareSkillHistory(style))
         }
     }
 }

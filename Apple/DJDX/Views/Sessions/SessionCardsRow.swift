@@ -33,11 +33,7 @@ struct SessionCardsRow: View {
     }
 
     private var cornerRadius: CGFloat {
-        if #available(iOS 26.0, *) {
-            20.0
-        } else {
-            12.0
-        }
+        20.0
     }
 
     private func activeSessionCard(_ session: IIDXPlaySession) -> some View {

@@ -2,7 +2,6 @@ import StoreKit
 import SwiftUI
 import TipKit
 
-// swiftlint:disable:next type_body_length
 struct UnifiedView: View {
 
     @Environment(\.requestReview) var requestReview
@@ -44,6 +43,7 @@ struct UnifiedView: View {
     @State var isBackupRestoreFailed: Bool = false
     @State var isPruneCompleted: Bool = false
     @State var storageReport = StorageReport()
+    @State var tierListShare: TierListShare?
 
     @State var migrationProgress = ProgressReporter()
 
@@ -123,9 +123,7 @@ struct UnifiedView: View {
                         }
                     }
                 }
-                if #available(iOS 26.0, *) {
-                    ToolbarSpacer(.fixed, placement: .topBarLeading)
-                }
+                ToolbarSpacer(.fixed, placement: .topBarLeading)
                 ToolbarItemGroup(placement: .topBarLeading) {
                     if isSessionsMode {
                         sessionButton
@@ -134,7 +132,7 @@ struct UnifiedView: View {
                             isPresentingImport = true
                         }
                         .popoverTip(ImportMovedTip(), arrowEdge: .top)
-                        .automaticSheetMatchedTransitionSource(id: "Import", in: importNamespace)
+                        .matchedTransitionSource(id: "Import", in: importNamespace)
                     }
                 }
                 if !isSessionsMode || showAnalytics {
@@ -148,11 +146,14 @@ struct UnifiedView: View {
                                 Label("Shared.Edit", systemImage: "pencil")
                             }
                         }
+                        if !isSessionsMode {
+                            Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
+                                NotificationCenter.default.post(name: .shareCardRequested, object: nil)
+                            }
+                        }
                     }
                 }
-                if #available(iOS 26.0, *) {
-                    ToolbarSpacer(.fixed, placement: .topBarTrailing)
-                }
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     MoreMenu()
                 }
@@ -172,10 +173,10 @@ struct UnifiedView: View {
             }
             .navigationDestination(for: TowerPath.self) { path in
                 TowerDetailContainer(path: path)
-                    .automaticNavigationTransition(
-                        id: path == .recent ? "Tower.Recent" : "Tower.Totals",
+                    .navigationTransition(.zoom(
+                        sourceID: path == .recent ? "Tower.Recent" : "Tower.Totals",
                         in: towerNamespace
-                    )
+                    ))
             }
             .navigationDestination(for: SDVXAnalyticsPath.self) { path in
                 SDVXAnalyticsDestinationView(
@@ -201,6 +202,14 @@ struct UnifiedView: View {
                     namespace: gitadoraAnalyticsNamespace
                 )
             }
+            .navigationDestination(for: AnalyticsGoalPath.self) { path in
+                switch path {
+                case .detail(let id):
+                    AnalyticsGoalDetailView(goalID: id)
+                        .appBackgroundGradient()
+                        .navigationBarTitleDisplayMode(.inline)
+                }
+            }
         }
         .sheet(isPresented: $isPresentingImport) {
             Group {
@@ -216,7 +225,7 @@ struct UnifiedView: View {
                     IIDXImportView()
                 }
             }
-            .automaticSheetNavigationTransition(id: "Import", in: importNamespace)
+            .navigationTransition(.zoom(sourceID: "Import", in: importNamespace))
             .presentationDetents([.large])
             .interactiveDismissDisabled()
         }
@@ -243,6 +252,11 @@ struct UnifiedView: View {
                 }
             } message: {
                 Text("Alert.ICloudBackup.Restore.Subtitle.\(availableBackupDate ?? .now, format: .dateTime)")
+            }
+        }
+        .sheet(item: $tierListShare) { share in
+            NavigationStack {
+                TierListView(game: selectedGame, playType: playTypeToShow, initialShare: share)
             }
         }
         .progressCover(migrationProgress)

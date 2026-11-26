@@ -14,7 +14,7 @@ struct GITADORAAnalyticsDestinationView: View {
             case .skillDetail:
                 GITADORASkillDetailView(records: model.topSkillRecords)
                     .navigationTitle("Shared.GITADORA.Skill")
-                    .automaticNavigationTransition(id: "GITADORA.skill", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "GITADORA.skill", in: namespace))
             case .clearBreakdownDetail:
                 GITADORALevelBreakdownDetailView(countsPerLevel: model.clearTypePerLevel,
                                                  keys: GITADORAClearType.sortedStringsWithoutNoPlay,
@@ -22,25 +22,25 @@ struct GITADORAAnalyticsDestinationView: View {
                                                      AnyShapeStyle(GITADORAClearType(rawValue: $0)?.color ?? .gray)
                                                  })
                     .navigationTitle("Analytics.GITADORA.ClearBreakdown")
-                    .automaticNavigationTransition(id: "GITADORA.clearBreakdown", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "GITADORA.clearBreakdown", in: namespace))
             case .rankBreakdownDetail:
                 GITADORALevelBreakdownDetailView(countsPerLevel: model.rankPerLevel,
                                                  keys: GITADORARank.sortedStrings,
                                                  style: { AnyShapeStyle(GITADORARank.color(for: $0)) })
                     .navigationTitle("Analytics.GITADORA.RankBreakdown")
-                    .automaticNavigationTransition(id: "GITADORA.rankBreakdown", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "GITADORA.rankBreakdown", in: namespace))
             case .newHighScoresDetail:
                 GITADORANewHighScoresDetailView(newHighScores: model.newHighScores)
                     .navigationTitle("Analytics.NewHighScores")
-                    .automaticNavigationTransition(id: "GITADORA.newHighScores", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "GITADORA.newHighScores", in: namespace))
             case .newClearsDetail(let clearType):
                 GITADORANewClearsDetailView(newClears: model.newClears[clearType] ?? [])
                     .navigationTitle(Text(verbatim: clearType))
-                    .automaticNavigationTransition(id: transitionID(forClearType: clearType), in: namespace)
+                    .navigationTransition(.zoom(sourceID: transitionID(forClearType: clearType), in: namespace))
             case .newRanksDetail(let rank):
                 GITADORANewRanksDetailView(newRanks: model.newRanks[rank] ?? [])
                     .navigationTitle(Text(verbatim: rank))
-                    .automaticNavigationTransition(id: transitionID(forRank: rank), in: namespace)
+                    .navigationTransition(.zoom(sourceID: transitionID(forRank: rank), in: namespace))
             }
         }
         .appBackgroundGradient()
@@ -206,8 +206,7 @@ struct GITADORALevelRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6.0) {
             HStack {
-                Text(verbatim: "LEVEL \(level)")
-                    .font(.subheadline.bold())
+                LevelNumberBadge(level: String(level))
                 Spacer()
                 Text("Shared.SongCount.\(total)")
                     .font(.caption)

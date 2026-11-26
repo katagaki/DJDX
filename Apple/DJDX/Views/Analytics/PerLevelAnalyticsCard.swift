@@ -18,7 +18,7 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
     @ViewBuilder let trendChart: () -> TrendChart
 
     var cornerRadius: CGFloat {
-        if #available(iOS 26.0, *) { 20.0 } else { 12.0 }
+        20.0
     }
 
     var total: Int {
@@ -38,8 +38,8 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
 
             VStack(alignment: .leading, spacing: 0.0) {
                 HStack(alignment: .center, spacing: 6.0) {
+                    LevelNumberBadge(level: String(difficulty))
                     Group {
-                        Text(verbatim: "LEVEL \(difficulty)")
                         Divider()
                             .frame(maxHeight: 14.0)
                         Text(subtitle)
@@ -81,14 +81,22 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
     }
 
     var statsRow: some View {
-        HStack(spacing: 10.0) {
+        ViewThatFits(in: .horizontal) {
+            statsRowContent(isFixed: true)
+            statsRowContent(isFixed: false)
+        }
+    }
+
+    func statsRowContent(isFixed: Bool) -> some View {
+        HStack(spacing: 6.0) {
             ForEach(visibleSegments) { segment in
-                HStack(spacing: 3.0) {
+                HStack(spacing: 2.0) {
                     segment.metallicLabel
+                        .fixedSize(horizontal: isFixed, vertical: false)
                     Text(verbatim: "\(segment.count)")
+                        .font(.scoreline(size: 10.0, weight: .bold, width: .condensed))
+                        .fixedSize()
                         .foregroundStyle(.primary)
-                        .fontWeight(.semibold)
-                        .monospacedDigit()
                 }
                 .font(.caption2)
             }

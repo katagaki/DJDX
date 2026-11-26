@@ -22,12 +22,8 @@ struct DifficultySegmentedPicker<Tag: Hashable>: View {
         segments.firstIndex { $0.tag == selection }
     }
 
-    private var selectionColor: Color {
-        segments.first { $0.tag == selection }?.color ?? .accentColor
-    }
-
     var body: some View {
-        let content = HStack(spacing: 4.0) {
+        let content = SegmentLayout(selectedIndex: selectedIndex, spacing: 4.0) {
             ForEach(Array(segments.enumerated()), id: \.element.id) { index, segment in
                 segmentButton(segment)
                     .background { frameReader(index: index) }
@@ -35,33 +31,13 @@ struct DifficultySegmentedPicker<Tag: Hashable>: View {
         }
         .frame(maxWidth: .infinity)
         .padding(4.0)
-        .background { selectionHighlight }
         .coordinateSpace(.named(coordinateSpaceName))
         .onPreferenceChange(SegmentFramePreferenceKey.self) { segmentFrames = $0 }
         .simultaneousGesture(dragGesture)
         .sensoryFeedback(.selection, trigger: selection)
 
-        if #available(iOS 26.0, *) {
-            content
-                .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 20.0))
-        } else {
-            content
-                .background(.ultraThinMaterial, in: .rect(cornerRadius: 20.0))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 20.0)
-                        .stroke(.secondary.opacity(0.2), lineWidth: 1.0)
-                }
-        }
-    }
-
-    @ViewBuilder
-    private var selectionHighlight: some View {
-        if let index = selectedIndex, let frame = segmentFrames[index] {
-            RoundedRectangle(cornerRadius: 16.0)
-                .fill(selectionColor)
-                .frame(width: frame.width, height: frame.height)
-                .position(x: frame.midX, y: frame.midY)
-        }
+        content
+            .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 20.0))
     }
 
     @ViewBuilder
@@ -72,21 +48,30 @@ struct DifficultySegmentedPicker<Tag: Hashable>: View {
                 selection = segment.tag
             }
         } label: {
-            VStack(spacing: 1.0) {
-                Text(verbatim: segment.number)
-                    .font(.title3)
-                    .fontWeight(.heavy)
-                    .fontWidth(.expanded)
-                segment.name
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .fontWidth(.condensed)
+            HStack(spacing: 7.0) {
+                if isSelected {
+                    segment.name
+                        .font(.system(size: 11.0, weight: .black))
+                        .fontWidth(.condensed)
+                        .kerning(0.4)
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                        .transition(.opacity)
+                }
+                LevelNumber(level: segment.number, size: 22.0, tint: segment.color, isColored: !isSelected)
+                    .shadow(color: .black.opacity(isSelected ? 0.35 : 0.0), radius: 0.0, y: 1.0)
             }
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
+            .padding(.horizontal, isSelected ? 12.0 : 0.0)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 8.0)
-            .foregroundStyle(isSelected ? AnyShapeStyle(.white) : AnyShapeStyle(segment.color))
+            .frame(height: 40.0)
+            .background {
+                RoundedRectangle(cornerRadius: 16.0)
+                    .fill(LinearGradient(colors: [segment.color.mix(with: .white, by: 0.35), segment.color],
+                                         startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .opacity(isSelected ? 1.0 : 0.0)
+            }
+            .clipShape(.rect(cornerRadius: 16.0))
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -135,6 +120,36 @@ struct DifficultySegmentedPicker<Tag: Hashable>: View {
         return segmentFrames.min(by: {
             abs($0.value.midX - positionX) < abs($1.value.midX - positionX)
         })?.key
+    }
+}
+
+private struct SegmentLayout: Layout {
+    var selectedIndex: Int?
+    var spacing: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
+        let idealWidth = sizes.reduce(0.0) { $0 + $1.width } + spacing * CGFloat(max(subviews.count - 1, 0))
+        return CGSize(width: proposal.width ?? idealWidth, height: sizes.map(\.height).max() ?? 0.0)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        guard !subviews.isEmpty else { return }
+        let available = max(bounds.width - spacing * CGFloat(subviews.count - 1), 0.0)
+        let share = available / CGFloat(subviews.count)
+        var widths = Array(repeating: share, count: subviews.count)
+        if let selectedIndex, subviews.indices.contains(selectedIndex), subviews.count > 1 {
+            let ideal = subviews[selectedIndex].sizeThatFits(.unspecified).width
+            let selectedWidth = min(max(share, ideal), available)
+            let otherWidth = (available - selectedWidth) / CGFloat(subviews.count - 1)
+            widths = widths.indices.map { $0 == selectedIndex ? selectedWidth : otherWidth }
+        }
+        var positionX = bounds.minX
+        for (index, subview) in subviews.enumerated() {
+            subview.place(at: CGPoint(x: positionX, y: bounds.midY), anchor: .leading,
+                          proposal: ProposedViewSize(width: widths[index], height: bounds.height))
+            positionX += widths[index] + spacing
+        }
     }
 }
 

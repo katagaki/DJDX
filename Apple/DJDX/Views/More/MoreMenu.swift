@@ -17,6 +17,7 @@ struct MoreMenu: View {
     @State var isPresentingExternalDataSources: Bool = false
     @State var isPresentingICloudBackup: Bool = false
     @State var isPresentingRadarMaker: Bool = false
+    @State var isPresentingTierList: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingResetLayout: Bool = false
     @State var isPresentingFreeUpSpace: Bool = false
@@ -82,6 +83,9 @@ struct MoreMenu: View {
                 Button("More.RadarMaker.Header", systemImage: "hexagon") {
                     isPresentingRadarMaker = true
                 }
+                Button("TierList.Title", systemImage: "square.stack.3d.up") {
+                    isPresentingTierList = true
+                }
             }
             Section("More.ManageData.Header") {
                 Button("More.ManageData.Backup", systemImage: "icloud") {
@@ -131,6 +135,11 @@ struct MoreMenu: View {
         .sheet(isPresented: $isPresentingRadarMaker) {
             NavigationStack {
                 MoreRadarMaker()
+            }
+        }
+        .sheet(isPresented: $isPresentingTierList) {
+            NavigationStack {
+                TierListView(game: Game.stored)
             }
         }
         .alert("Alert.DeleteData.Web.Title", isPresented: $isConfirmingWebDataDelete) {

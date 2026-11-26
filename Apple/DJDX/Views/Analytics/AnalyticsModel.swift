@@ -3,7 +3,6 @@ import SwiftUI
 
 @MainActor
 @Observable
-// swiftlint:disable:next type_body_length
 final class AnalyticsModel {
 
     // Overall
@@ -29,6 +28,11 @@ final class AnalyticsModel {
     var newAAA: [NewDJLevelEntry] = []
     var newAA: [NewDJLevelEntry] = []
     var newA: [NewDJLevelEntry] = []
+
+    // Suggestions
+    var djLevelSuggestions: [IIDXDJLevelSuggestion] = []
+    var clearLampSuggestionCandidates: [IIDXChartSuggestion] = []
+    var longUnplayedSuggestions: [IIDXChartSuggestion] = []
 
     // Tower
     var towerEntries: [IIDXTowerEntry] = []
@@ -75,6 +79,7 @@ final class AnalyticsModel {
         await reloadTrends(playType: playType, iidxVersion: iidxVersion, filters: filters)
         await reloadNewClearsAndHighScores(playType: playType, iidxVersion: iidxVersion, filters: filters)
         await reloadProgress(playType: playType, iidxVersion: iidxVersion, filters: filters)
+        await reloadSuggestions(playType: playType, iidxVersion: iidxVersion, filters: filters)
         towerEntries = await fetcher.allTowerEntries()
         await WidgetDataPublisher.shared.publishClearTypeAndDJLevel(
             playType: playType, iidxVersion: iidxVersion
@@ -213,12 +218,10 @@ final class AnalyticsModel {
         }
     }
 
-    // swiftlint:disable function_body_length
     nonisolated static func computeNewEntries(
         latestRecords: [IIDXSongRecord],
         previousRecords: [IIDXSongRecord],
         filters: FilterOptions? = nil
-    // swiftlint:disable:next large_tuple
     ) -> (
         clears: [String: [NewClearEntry]],
         highScores: [NewHighScoreEntry],
@@ -318,7 +321,6 @@ final class AnalyticsModel {
             computedNewHighScores.filter { $0.previousScore > 0 }, computedDJLevels
         )
     }
-    // swiftlint:enable function_body_length
 
     // MARK: - Helpers
 

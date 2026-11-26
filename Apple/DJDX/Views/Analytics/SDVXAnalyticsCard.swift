@@ -3,6 +3,7 @@ import SwiftUI
 enum SDVXAnalyticsCard: String, Codable, Hashable, CaseIterable {
     case clearBreakdown
     case gradeBreakdown
+    case volforceTrend
     case newHighScores
     case newClearComplete
     case newClearExcessive
@@ -20,7 +21,7 @@ enum SDVXAnalyticsCard: String, Codable, Hashable, CaseIterable {
 
     static var defaultVisible: Set<SDVXAnalyticsCard> {
         [
-            .clearBreakdown, .gradeBreakdown,
+            .clearBreakdown, .gradeBreakdown, .volforceTrend,
             .newHighScores,
             .newClearComplete, .newClearExcessive,
             .newClearUltimateChain, .newClearPerfectUC,
@@ -30,7 +31,7 @@ enum SDVXAnalyticsCard: String, Codable, Hashable, CaseIterable {
 
     var section: AnalyticsSection {
         switch self {
-        case .clearBreakdown, .gradeBreakdown: return .overview
+        case .clearBreakdown, .gradeBreakdown, .volforceTrend: return .overview
         default: return .lastPlay
         }
     }
@@ -64,6 +65,7 @@ enum SDVXAnalyticsCard: String, Codable, Hashable, CaseIterable {
         switch self {
         case .clearBreakdown: return .clearBreakdownDetail
         case .gradeBreakdown: return .gradeBreakdownDetail
+        case .volforceTrend: return .volforceTrendDetail
         case .newHighScores: return .newHighScoresDetail
         default:
             if let clearType { return .newClearsDetail(clearType: clearType) }
@@ -78,6 +80,7 @@ enum SDVXAnalyticsCard: String, Codable, Hashable, CaseIterable {
         switch self {
         case .clearBreakdown: return "chart.bar"
         case .gradeBreakdown: return "chart.bar"
+        case .volforceTrend: return "chart.line.uptrend.xyaxis"
         case .newHighScores: return "trophy"
         case .newClearComplete, .newClearExcessive,
              .newClearUltimateChain, .newClearPerfectUC: return "checkmark.circle"

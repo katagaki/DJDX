@@ -3,7 +3,6 @@ import SQLite
 
 actor GITADORAImporter {
 
-    // swiftlint:disable:next type_name
     typealias DB = GITADORAPlayDataDatabase
 
     static let playerNameKey = "GITADORAProfile.PlayerName"

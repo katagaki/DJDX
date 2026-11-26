@@ -15,11 +15,7 @@ struct MoreNotesRadarView: View {
     @State private var isShowingValues: Bool = false
 
     var cornerRadius: CGFloat {
-        if #available(iOS 26.0, *) {
-            return 20.0
-        } else {
-            return 12.0
-        }
+        return 20.0
     }
 
     var currentRadarData: RadarData? {
@@ -59,11 +55,11 @@ struct MoreNotesRadarView: View {
             ForEach(radarData.displayPoints(), id: \.label) { point in
                 HStack {
                     Text(verbatim: point.label)
-                        .font(.system(size: listFontSize, weight: .bold))
+                        .font(.radarline(size: listFontSize))
                         .foregroundStyle(point.color)
                     Spacer()
                     Text(verbatim: String(format: "%.2f", point.value))
-                        .font(.system(size: listFontSize, weight: .semibold).monospacedDigit())
+                        .font(.scoreline(size: listFontSize, weight: .bold))
                         .foregroundStyle(.primary)
                 }
             }
@@ -74,7 +70,7 @@ struct MoreNotesRadarView: View {
                     .font(.system(size: listFontSize, weight: .bold))
                 Spacer()
                 Text(verbatim: String(format: "%.2f", radarData.sum()))
-                    .font(.system(size: listFontSize, weight: .bold).monospacedDigit())
+                    .font(.scoreline(size: listFontSize))
             }
         }
         .padding(.horizontal, 16.0)

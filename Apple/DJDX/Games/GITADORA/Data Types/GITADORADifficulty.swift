@@ -5,7 +5,6 @@ enum GITADORADifficulty: String, Codable, CaseIterable {
     case basic = "BASIC"
     case advanced = "ADVANCED"
     case extreme = "EXTREME"
-    // swiftlint:disable:next inclusive_language
     case master = "MASTER"
     case unknown = ""
 

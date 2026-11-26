@@ -3,7 +3,6 @@ import SQLite
 
 actor SDVXReader {
 
-    // swiftlint:disable:next type_name
     typealias DB = SDVXPlayDataDatabase
 
     // MARK: Import Groups
@@ -113,6 +112,47 @@ actor SDVXReader {
         record.ultimateChainCount = row[DB.srUltimateChainCount]
         record.perfectCount = row[DB.srPerfectCount]
         return record
+    }
+
+    // MARK: History
+
+    func scoreHistory(title: String, difficulty: SDVXDifficulty) -> [Date: Int] {
+        guard let database = try? DB.shared.getReadConnection() else { return [:] }
+        let importDates = Dictionary(uniqueKeysWithValues: allImportGroups().map { ($0.id, $0.date) })
+        let query = DB.songRecordTable
+            .select(DB.srImportGroupID, DB.srHighScore)
+            .filter(DB.srTitle == title && DB.srDifficulty == difficulty.rawValue && DB.srHighScore > 0)
+        guard let rows = try? database.prepare(query) else { return [:] }
+        var history: [Date: Int] = [:]
+        for row in rows {
+            if let date = importDates[row[DB.srImportGroupID]] {
+                history[date] = row[DB.srHighScore]
+            }
+        }
+        return history
+    }
+
+    func volforceHistory(for version: SDVXVersion) -> [TrendPoint] {
+        guard let database = try? DB.shared.getReadConnection() else { return [] }
+        let groups = importGroups(for: version)
+        guard !groups.isEmpty else { return [] }
+        let query = DB.songRecordTable
+            .select(DB.srImportGroupID, DB.srLevel, DB.srHighScore, DB.srClearType, DB.srGrade)
+            .filter(groups.map(\.id).contains(DB.srImportGroupID) && DB.srHighScore > 0)
+        guard let rows = try? database.prepare(query) else { return [] }
+        var recordsByGroup: [String: [SDVXSongRecord]] = [:]
+        for row in rows {
+            let record = SDVXSongRecord()
+            record.level = row[DB.srLevel]
+            record.highScore = row[DB.srHighScore]
+            record.clearType = row[DB.srClearType]
+            record.grade = row[DB.srGrade]
+            recordsByGroup[row[DB.srImportGroupID], default: []].append(record)
+        }
+        return groups.reversed().compactMap { group in
+            guard let records = recordsByGroup[group.id] else { return nil }
+            return TrendPoint(date: group.date, value: SDVXVolforce.total(records))
+        }
     }
 
     // MARK: sdvx.in Chart Index (external data source)

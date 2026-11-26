@@ -287,11 +287,9 @@ class GITADORACoordinatorForImporter: NSObject, WKNavigationDelegate, WKScriptMe
     }
 }
 
-// swiftlint:disable class_delegate_protocol
 protocol GITADORAUpdateScoreDataDelegate: Sendable {
     func importScoreData(using newScoreData: String) async
     func stopProcessing(with reason: ImportFailedReason)
     @MainActor func beginScrapeProgress()
     @MainActor func updateScrapeProgress(step: Int, total: Int)
 }
-// swiftlint:enable class_delegate_protocol

@@ -1,8 +1,14 @@
 import SwiftUI
 
-struct DDRScoreRow: View {
+struct DDRScoreRow<Accessory: View>: View {
 
     var record: DDRSongRecord
+    var accessory: Accessory
+
+    init(record: DDRSongRecord, @ViewBuilder accessory: () -> Accessory) {
+        self.record = record
+        self.accessory = accessory()
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 8.0) {
@@ -20,8 +26,8 @@ struct DDRScoreRow: View {
                         Text(String(record.score))
                             .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
                                                             startPoint: .top, endPoint: .bottom))
-                            .fontWidth(.expanded)
-                            .fontWeight(.heavy)
+                            .font(.scoreline(.caption))
+                            .fontWidth(.standard)
                     }
                     if !record.rankDisplay.isEmpty {
                         Divider().frame(maxHeight: 14.0)
@@ -39,31 +45,25 @@ struct DDRScoreRow: View {
                     }
                 }
                 .font(.caption)
+                accessory
+                    .font(.caption)
             }
             .padding([.top, .bottom], 8.0)
 
             Spacer(minLength: 0.0)
 
-            VStack(spacing: 1.0) {
-                Text(verbatim: record.difficultyEnum.rawValue)
-                    .font(.system(size: 10.0).weight(.black))
-                    .fontWidth(.condensed)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .foregroundStyle(record.difficultyEnum.color)
-                if record.level > 0 {
-                    Text(verbatim: String(record.level))
-                        .font(.system(size: 18.0).weight(.heavy))
-                        .fontWidth(.condensed)
-                        .monospacedDigit()
-                }
-            }
-            .padding([.top, .bottom], 6.0)
-            .frame(width: 78.0, alignment: .center)
-            .cardBackground(cornerRadius: 6.0)
-            .padding([.top, .bottom], 8.0)
+            LevelBadge(name: record.difficultyEnum.rawValue,
+                       level: record.level > 0 ? String(record.level) : "",
+                       tint: record.difficultyEnum.color, layout: .horizontal)
+                .padding([.top, .bottom], 8.0)
         }
         .frame(maxWidth: .infinity)
         .padding(.trailing)
+    }
+}
+
+extension DDRScoreRow where Accessory == EmptyView {
+    init(record: DDRSongRecord) {
+        self.init(record: record) { EmptyView() }
     }
 }

@@ -4,10 +4,8 @@ import HealthKit
 import WatchConnectivity
 import WidgetKit
 
-// swiftlint:disable file_length
 
 @MainActor
-// swiftlint:disable:next type_body_length
 final class WatchWorkoutManager: NSObject, ObservableObject {
     static let shared = WatchWorkoutManager()
 

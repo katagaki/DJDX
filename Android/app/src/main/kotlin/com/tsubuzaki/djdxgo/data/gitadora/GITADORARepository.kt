@@ -93,6 +93,10 @@ class GITADORARepository(private val dao: GITADORADao) {
             ?: dao.closestImportGroupBefore(bucket.startOfNextDay)
     }
 
+    suspend fun importGroups(): List<GITADORAImportGroup> = dao.importGroups()
+
+    suspend fun songRecords(groupID: String): List<GITADORASongRecord> = dao.songRecords(groupID)
+
     suspend fun songRecords(date: Long): List<GITADORASongRecord> {
         val group = importGroupFor(date) ?: return emptyList()
         return dao.songRecords(group.id)

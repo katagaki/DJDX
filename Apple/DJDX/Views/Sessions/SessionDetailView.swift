@@ -1,7 +1,6 @@
 import SwiftUI
 import UIKit
 
-// swiftlint:disable:next type_body_length
 struct SessionDetailView: View {
     var store: IIDXSessionStore
     var session: IIDXPlaySession
@@ -254,7 +253,8 @@ struct SessionDetailView: View {
             return BreakdownBarItem(
                 label: level.rawValue,
                 count: count,
-                color: IIDXDJLevel.color(for: level.rawValue)
+                color: IIDXDJLevel.color(for: level.rawValue),
+                metallicLabel: .djLevel(level.rawValue)
             )
         }
     }
@@ -266,7 +266,10 @@ struct SessionDetailView: View {
             return BreakdownBarItem(
                 label: IIDXClearType.abbreviation(for: clearType.rawValue),
                 count: count,
-                color: IIDXClearType.color(for: clearType.rawValue)
+                color: IIDXClearType.color(for: clearType.rawValue),
+                metallicLabel: .clearType(clearType.rawValue,
+                                          label: IIDXClearType.abbreviation(for: clearType.rawValue)),
+                isFullCombo: clearType == .fullComboClear
             )
         }
     }

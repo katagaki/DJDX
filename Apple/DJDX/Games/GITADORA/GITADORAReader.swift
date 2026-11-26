@@ -3,7 +3,6 @@ import SQLite
 
 actor GITADORAReader {
 
-    // swiftlint:disable:next type_name
     typealias DB = GITADORAPlayDataDatabase
 
     // MARK: Import Groups
@@ -21,6 +20,31 @@ actor GITADORAReader {
             .order(DB.igImportDate.desc)
             .limit(1)
         return (try? database.pluck(query))?[DB.igID]
+    }
+
+    func importGroupID(for selectedDate: Date) -> String? {
+        guard let database = try? DB.shared.getReadConnection() else { return nil }
+        let startOfDay = Calendar.current.startOfDay(for: selectedDate)
+        let startOfNextDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
+        let query = DB.importGroupTable
+            .filter(DB.igImportDate >= startOfDay.timeIntervalSince1970
+                    && DB.igImportDate < startOfNextDay.timeIntervalSince1970)
+            .order(DB.igImportDate.asc)
+            .limit(1)
+        if let row = try? database.pluck(query) {
+            return row[DB.igID]
+        }
+        let allQuery = DB.importGroupTable.order(DB.igImportDate.asc)
+        guard let rows = try? database.prepare(allQuery) else { return nil }
+        var closestID: String?
+        for row in rows {
+            if row[DB.igImportDate] <= selectedDate.timeIntervalSince1970 {
+                closestID = row[DB.igID]
+            } else {
+                break
+            }
+        }
+        return closestID
     }
 
     func allImportGroups() -> [GITADORAImportGroupInfo] {

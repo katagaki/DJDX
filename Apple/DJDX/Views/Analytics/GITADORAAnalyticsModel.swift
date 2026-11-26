@@ -93,7 +93,6 @@ final class GITADORAAnalyticsModel {
 
     private func computeLastPlay(version: GITADORAVersion,
                                  instrument: GITADORAInstrument,
-                                 // swiftlint:disable:next large_tuple
                                  filters: GITADORAFilterOptions?) async -> (
         clears: [String: [GITADORANewClearEntry]],
         highScores: [GITADORANewHighScoreEntry],
@@ -114,7 +113,6 @@ final class GITADORAAnalyticsModel {
     nonisolated static func computeNewEntries(
         latestRecords: [GITADORASongRecord],
         previousRecords: [GITADORASongRecord]
-    // swiftlint:disable:next large_tuple
     ) -> (
         clears: [String: [GITADORANewClearEntry]],
         highScores: [GITADORANewHighScoreEntry],

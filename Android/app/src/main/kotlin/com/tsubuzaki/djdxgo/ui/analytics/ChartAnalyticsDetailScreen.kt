@@ -67,6 +67,8 @@ fun ChartAnalyticsDetailScreen(
         Routes.CHART_DETAIL_GRADE_BREAKDOWN -> stringResource(spec.gradeCaptionRes)
         Routes.CHART_DETAIL_NEW_HIGH_SCORES -> stringResource(R.string.analytics_new_record)
         Routes.CHART_DETAIL_NEW_CLEARS -> spec.clearLabel(param)
+        Routes.CHART_DETAIL_SUGGESTIONS -> spec.suggestionTitle.orEmpty()
+        Routes.CHART_DETAIL_TREND -> spec.trendCaptionRes?.let { stringResource(it) }.orEmpty()
         else -> param
     }
     DetailScaffold(title = title, onBack = onBack) { padding ->
@@ -82,6 +84,7 @@ fun ChartAnalyticsDetailScreen(
             } else {
                 DifficultyBreakdownDetail(spec, analytics, modifier)
             }
+            Routes.CHART_DETAIL_TREND -> TrendDetail(analytics.trend, spec.trendColor, spec.trendFormat, modifier)
             Routes.CHART_DETAIL_NEW_HIGH_SCORES -> NewEntriesList(spec, analytics.newHighScores, modifier) { entry ->
                 ChangeRow(
                     previous = entry.previousScore.toString(),
@@ -103,6 +106,22 @@ fun ChartAnalyticsDetailScreen(
                     current = spec.clearLabel(entry.newValue),
                     currentColor = spec.clearColor(entry.newValue, isSystemInDarkTheme())
                 )
+            }
+            Routes.CHART_DETAIL_SUGGESTIONS -> SuggestionList(modifier, analytics.suggestions.isEmpty()) {
+                items(analytics.suggestions) { suggestion ->
+                    SuggestionRow(
+                        title = suggestion.title,
+                        current = suggestion.current,
+                        target = suggestion.target,
+                        gain = suggestion.gainText,
+                        detail = suggestion.pointsNeeded?.let {
+                            stringResource(R.string.analytics_suggestions_points_needed, it)
+                        } ?: "${spec.suggestionTitle} ${suggestion.currentValue} → ${suggestion.targetValue}",
+                        difficulty = spec.difficultyLabel(suggestion.difficulty),
+                        difficultyColor = spec.difficultyColor(suggestion.difficulty),
+                        level = suggestion.level
+                    )
+                }
             }
             else -> NewEntriesList(spec, analytics.newGrades[param].orEmpty(), modifier) { entry ->
                 ChangeRow(

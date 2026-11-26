@@ -26,6 +26,10 @@ struct IIDXScoreViewer: View {
         return levels
     }
 
+    private var notesGame: Game {
+        Game.stored == .iidxInfinitas ? .iidxInfinitas : .iidxArcade
+    }
+
     var body: some View {
         List {
             Section {
@@ -69,13 +73,22 @@ struct IIDXScoreViewer: View {
                              playType: songRecord.playType,
                              chartRadarData: radarDataByLevel[radarKey(songRecord.playType, 4)])
             }
+            if availableLevels.contains(selectedLevel) {
+                ChartNotesSection(
+                    game: notesGame,
+                    title: songRecord.title,
+                    chart: ChartNote.iidxChart(playType: songRecord.playType, level: selectedLevel),
+                    showsPlaySettings: true
+                )
+            }
         }
         .listSectionSpacing(.compact)
+        .scrollDismissesKeyboard(.immediately)
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
         .contentMargins(.top, 0.0, for: .scrollContent)
-        .softTopScrollEdgeEffect()
-        .softBottomScrollEdgeEffect()
+        .scrollEdgeEffectStyle(.soft, for: .top)
+        .scrollEdgeEffectStyle(.soft, for: .bottom)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -88,7 +101,6 @@ struct IIDXScoreViewer: View {
                 .padding(.horizontal, 20.0)
                 .padding(.bottom, 8.0)
         }
-        .conditionalBottomTabBarAccessory()
         .task {
             await loadRadarData()
         }
@@ -196,16 +208,10 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
 
     @ToolbarContentBuilder
     func versionNumberToolbarItem() -> some ToolbarContent {
-        if #available(iOS 26.0, *) {
-            ToolbarItem(placement: .topBarTrailing) {
-                versionNumberToolbarItemContent()
-            }
-            .sharedBackgroundVisibility(.hidden)
-        } else {
-            ToolbarItem(placement: .topBarTrailing) {
-                versionNumberToolbarItemContent()
-            }
+        ToolbarItem(placement: .topBarTrailing) {
+            versionNumberToolbarItemContent()
         }
+        .sharedBackgroundVisibility(.hidden)
     }
 
     @ViewBuilder

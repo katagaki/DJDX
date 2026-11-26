@@ -1,27 +1,25 @@
 package com.tsubuzaki.djdxgo.ui.games
 
-import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
-import com.tsubuzaki.djdxgo.ui.theme.GameFonts
-import com.tsubuzaki.djdxgo.ui.theme.gameFont
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
 import com.tsubuzaki.djdxgo.AppContainer
 import com.tsubuzaki.djdxgo.R
+import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.SettingsKeys
 import com.tsubuzaki.djdxgo.data.compact
 import com.tsubuzaki.djdxgo.data.gitadora.GITADORAClearType
@@ -53,13 +52,23 @@ import com.tsubuzaki.djdxgo.data.gitadora.GITADORADifficulty
 import com.tsubuzaki.djdxgo.data.gitadora.GITADORAInstrument
 import com.tsubuzaki.djdxgo.data.gitadora.GITADORARank
 import com.tsubuzaki.djdxgo.data.gitadora.GITADORASongRecord
+import com.tsubuzaki.djdxgo.data.notes.ChartNoteTarget
 import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingFlow
+import com.tsubuzaki.djdxgo.ui.common.ChartNotesSheet
+import com.tsubuzaki.djdxgo.ui.share.ShareCardSheet
+import com.tsubuzaki.djdxgo.ui.share.toShareCardEntry
+import com.tsubuzaki.djdxgo.ui.share.toShareCardProfile
 import com.tsubuzaki.djdxgo.ui.theme.GITADORAColors
+import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
+import com.tsubuzaki.djdxgo.ui.theme.GameFonts
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import java.time.Instant
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private const val SORT_TITLE = "Title"
@@ -74,6 +83,7 @@ fun GITADORAScoresScreen(
     contentPadding: PaddingValues,
     instrument: GITADORAInstrument,
     analyticsContent: (@Composable () -> Unit)? = null,
+    shareRequests: Flow<Unit> = emptyFlow(),
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -107,6 +117,11 @@ fun GITADORAScoresScreen(
 
     var query by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by remember { mutableStateOf(false) }
+    var showShareSheet by remember { mutableStateOf(false) }
+    LaunchedEffect(shareRequests) {
+        shareRequests.collect { showShareSheet = true }
+    }
+    var noteTarget by remember { mutableStateOf<ChartNoteTarget?>(null) }
 
     val displayed = remember(
         records, sortMode, sortDescending,
@@ -152,8 +167,14 @@ fun GITADORAScoresScreen(
             if (isLoaded && displayed.isEmpty()) {
                 item(key = "empty") { EmptyStateCard() }
             }
+            if (records.isNotEmpty()) {
+                item(key = "count") {
+                    ScoreCountRow(count = displayed.size)
+                    HorizontalDivider()
+                }
+            }
             items(displayed, key = { it.id }) { record ->
-                GITADORAScoreRow(record = record)
+                GITADORAScoreRow(record = record, onClick = { noteTarget = record.chartNoteTarget() })
                 HorizontalDivider()
             }
         }
@@ -166,7 +187,7 @@ fun GITADORAScoresScreen(
             onQueryChange = { query = it },
             searchResults = searchResults,
             searchResultContent = { record ->
-                GITADORAScoreRow(record = record)
+                GITADORAScoreRow(record = record, onClick = { noteTarget = record.chartNoteTarget() })
             },
             sortOptions = listOf(
                 SortOption(SORT_TITLE, stringResource(R.string.games_sort_title)),
@@ -184,6 +205,24 @@ fun GITADORAScoresScreen(
                 }
             },
             onFilterClick = { showFilterSheet = true }
+        )
+    }
+
+    if (showShareSheet) {
+        val profile by container.profileRepository.gitadora.collectAsState()
+        ShareCardSheet(
+            game = Game.GITADORA,
+            profile = profile.toShareCardProfile(instrument),
+            entries = (if (query.isEmpty()) displayed else searchResults).map { it.toShareCardEntry() },
+            onDismiss = { showShareSheet = false }
+        )
+    }
+
+    noteTarget?.let { target ->
+        ChartNotesSheet(
+            repository = container.chartNotesRepository,
+            target = target,
+            onDismiss = { noteTarget = null }
         )
     }
 
@@ -270,11 +309,12 @@ private fun gitadoraDisplayRecords(
 }
 
 @Composable
-private fun GITADORAScoreRow(record: GITADORASongRecord) {
+private fun GITADORAScoreRow(record: GITADORASongRecord, onClick: () -> Unit) {
     val darkTheme = isSystemInDarkTheme()
     val clearType = GITADORAClearType.fromValue(record.clearType)
     Row(
         modifier = Modifier
+            .clickable(onClick = onClick)
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .padding(end = 16.dp),
@@ -385,3 +425,10 @@ private fun GITADORAScoreRow(record: GITADORASongRecord) {
         }
     }
 }
+
+private fun GITADORASongRecord.chartNoteTarget() = ChartNoteTarget(
+    game = Game.GITADORA,
+    title = title,
+    chart = "$instrument-$difficulty",
+    chartLabel = "$instrument $difficulty $level"
+)

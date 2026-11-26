@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct IIDXScoreRow: View {
+struct IIDXScoreRow<Accessory: View>: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
@@ -18,8 +18,20 @@ struct IIDXScoreRow: View {
     var songRecord: IIDXSongRecord
     var level: IIDXLevel
     var score: IIDXLevelScore
-    @State var scoreRate: Float?
+    var scoreRate: Float?
     var scoreDelta: Int?
+    var accessory: Accessory
+
+    init(namespace: Namespace.ID, songRecord: IIDXSongRecord, level: IIDXLevel, score: IIDXLevelScore,
+         scoreRate: Float? = nil, scoreDelta: Int? = nil, @ViewBuilder accessory: () -> Accessory) {
+        self.namespace = namespace
+        self.songRecord = songRecord
+        self.level = level
+        self.score = score
+        self.scoreRate = scoreRate
+        self.scoreDelta = scoreDelta
+        self.accessory = accessory()
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 8.0) {
@@ -101,24 +113,20 @@ struct IIDXScoreRow: View {
                                                 startPoint: .top,
                                                 endPoint: .bottom
                                             ))
-                                            .fontWidth(.expanded)
-                                            .fontWeight(.black)
+                                            .font(.scoreline(.caption))
+                                            .fontWidth(.standard)
                                     }
                                     if isScoreVisible {
                                         if isDJLevelVisible || isScoreRateVisible {
                                             Divider()
                                                 .frame(maxHeight: 14.0)
                                         }
-                                        Text(String(score.score))
-                                            .foregroundStyle(Color.iidxScore)
-                                            .fontWidth(.expanded)
-                                            .fontWeight(.heavy)
-                                            .strokeText(color: .iidxScoreOutline, width: 0.3)
+                                        IIDXScoreText(score.score)
                                         if let scoreDelta, scoreDelta > 0 {
                                             Text("Analytics.NewHighScore.\(scoreDelta)")
                                                 .foregroundStyle(.orange)
-                                                .fontWidth(.expanded)
-                                                .fontWeight(.heavy)
+                                                .font(.scoreline(.caption))
+                                                .fontWidth(.standard)
                                         }
                                     }
                                 }
@@ -140,18 +148,17 @@ struct IIDXScoreRow: View {
                         .offset(y: 1.0)
                         .font(.caption)
                     }
+                    accessory
+                        .font(.caption)
                 }
                 Spacer(minLength: 0.0)
             }
             .padding([.top, .bottom], 8.0)
-            .automaticMatchedTransitionSource(id: "\(songRecord.title).\(level.rawValue)", in: namespace)
+            .matchedTransitionSource(id: "\(songRecord.title).\(level.rawValue)", in: namespace)
 
             // Level
             if isLevelVisible {
-                IIDXLevelLabel(levelType: level, score: score)
-                    .padding([.top, .bottom], 6.0)
-                    .frame(width: 78.0, alignment: .center)
-                    .cardBackground(cornerRadius: 6.0)
+                IIDXLevelLabel(layout: .horizontal, levelType: level, score: score)
                     .padding([.top, .bottom], 8.0)
             }
         }
@@ -160,28 +167,18 @@ struct IIDXScoreRow: View {
     }
 
     var titleTextColor: LinearGradient {
-        if level == .leggendaria {
-            return IIDXVersion.leggendariaSongTitleTextColor
-        } else if colorScheme == .light && songRecord.version != iidxVersion.marketingName {
-            return LinearGradient(
-                colors: [.white, Color(red: 219 / 255, green: 219 / 255, blue: 224 / 255)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        } else {
-            return iidxVersion.songTitleTextColor(for: songRecord.version)
-        }
+        iidxVersion.rowTitleTextColor(for: songRecord.version, level: level, colorScheme: colorScheme)
     }
 
     var titleStrokeColor: Color {
-        if level == .leggendaria {
-            return IIDXVersion.leggendariaSongTitleStrokeColor
-        } else if songRecord.version != iidxVersion.marketingName {
-            return colorScheme == .dark ?
-                Color(red: 32 / 255, green: 32 / 255, blue: 32 / 255) :
-                Color(red: 56 / 255, green: 56 / 255, blue: 61 / 255)
-        } else {
-            return iidxVersion.songTitleStrokeColor(for: songRecord.version)
-        }
+        iidxVersion.rowTitleStrokeColor(for: songRecord.version, level: level, colorScheme: colorScheme)
+    }
+}
+
+extension IIDXScoreRow where Accessory == EmptyView {
+    init(namespace: Namespace.ID, songRecord: IIDXSongRecord, level: IIDXLevel, score: IIDXLevelScore,
+         scoreRate: Float? = nil, scoreDelta: Int? = nil) {
+        self.init(namespace: namespace, songRecord: songRecord, level: level, score: score,
+                  scoreRate: scoreRate, scoreDelta: scoreDelta) { EmptyView() }
     }
 }

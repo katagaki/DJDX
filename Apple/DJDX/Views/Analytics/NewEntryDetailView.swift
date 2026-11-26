@@ -64,10 +64,10 @@ struct NewEntryDetailView<Entry: IIDXNewEntry>: View {
                                     noteCount: noteCount,
                                     initialLevel: entry.level
                                 )
-                                .automaticNavigationTransition(
-                                    id: "\(entry.songRecord.title).\(entry.level.rawValue)",
+                                .navigationTransition(.zoom(
+                                    sourceID: "\(entry.songRecord.title).\(entry.level.rawValue)",
                                     in: namespace
-                                )
+                                ))
                             } label: {
                                 IIDXScoreRow(
                                     namespace: namespace,
@@ -137,7 +137,10 @@ struct NewEntryDetailView<Entry: IIDXNewEntry>: View {
             return BreakdownBarItem(
                 label: IIDXClearType.abbreviation(for: clearType.rawValue),
                 count: count,
-                color: IIDXClearType.color(for: clearType.rawValue)
+                color: IIDXClearType.color(for: clearType.rawValue),
+                metallicLabel: .clearType(clearType.rawValue,
+                                          label: IIDXClearType.abbreviation(for: clearType.rawValue)),
+                isFullCombo: clearType == .fullComboClear
             )
         }
     }

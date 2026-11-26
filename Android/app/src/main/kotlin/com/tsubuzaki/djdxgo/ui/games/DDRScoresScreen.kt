@@ -1,5 +1,12 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.Flow
+import com.tsubuzaki.djdxgo.data.Game
+import com.tsubuzaki.djdxgo.ui.share.ShareCardSheet
+import com.tsubuzaki.djdxgo.ui.share.toShareCardEntry
+import com.tsubuzaki.djdxgo.ui.share.toShareCardProfile
+import androidx.compose.foundation.clickable
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
 import com.tsubuzaki.djdxgo.ui.theme.GameFonts
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
@@ -73,6 +80,8 @@ fun DDRScoresScreen(
     container: AppContainer,
     contentPadding: PaddingValues,
     analyticsContent: (@Composable () -> Unit)? = null,
+    shareRequests: Flow<Unit> = emptyFlow(),
+    onOpenSong: (songIndex: String, dateEpoch: Long, style: String, difficulty: String) -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -110,6 +119,10 @@ fun DDRScoresScreen(
 
     var query by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by remember { mutableStateOf(false) }
+    var showShareSheet by remember { mutableStateOf(false) }
+    LaunchedEffect(shareRequests) {
+        shareRequests.collect { showShareSheet = true }
+    }
 
     val displayed = remember(
         records, sortMode, sortDescending,
@@ -155,8 +168,16 @@ fun DDRScoresScreen(
             if (isLoaded && displayed.isEmpty()) {
                 item(key = "empty") { EmptyStateCard() }
             }
+            if (records.isNotEmpty()) {
+                item(key = "count") {
+                    ScoreCountRow(count = displayed.size)
+                    HorizontalDivider()
+                }
+            }
             items(displayed, key = { it.id }) { record ->
-                DDRScoreRow(record = record)
+                DDRScoreRow(record = record) {
+                    onOpenSong(record.songIndex, selectedDateEpoch, record.style, record.difficulty)
+                }
                 HorizontalDivider()
             }
         }
@@ -169,7 +190,9 @@ fun DDRScoresScreen(
             onQueryChange = { query = it },
             searchResults = searchResults,
             searchResultContent = { record ->
-                DDRScoreRow(record = record)
+                DDRScoreRow(record = record) {
+                    onOpenSong(record.songIndex, selectedDateEpoch, record.style, record.difficulty)
+                }
             },
             sortOptions = listOf(
                 SortOption(SORT_TITLE, stringResource(R.string.games_sort_title)),
@@ -186,6 +209,17 @@ fun DDRScoresScreen(
                 }
             },
             onFilterClick = { showFilterSheet = true }
+        )
+    }
+
+    if (showShareSheet) {
+        val profile by container.profileRepository.ddr.collectAsState()
+        ShareCardSheet(
+            game = Game.DANCE_DANCE_REVOLUTION,
+            profile = profile.toShareCardProfile(playStyle),
+            playStyle = playStyle.displayName,
+            entries = (if (query.isEmpty()) displayed else searchResults).map { it.toShareCardEntry() },
+            onDismiss = { showShareSheet = false }
         )
     }
 
@@ -310,11 +344,12 @@ private fun ddrDisplayRecords(
 }
 
 @Composable
-private fun DDRScoreRow(record: DDRSongRecord) {
+private fun DDRScoreRow(record: DDRSongRecord, onClick: () -> Unit) {
     val darkTheme = isSystemInDarkTheme()
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .height(IntrinsicSize.Min)
             .padding(end = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -407,3 +442,4 @@ private fun DDRScoreRow(record: DDRSongRecord) {
         }
     }
 }
+
