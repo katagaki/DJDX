@@ -71,6 +71,7 @@
     <string name="share_card_color">Color</string>
     <string name="share_card_show_profile">Show Player Info</string>
     <string name="share_card_row_limit">Charts Shown</string>
+    <string name="share_card_row_limit_today">Today</string>
     <string name="share_card_more">and %1$d more</string>
     <string name="share_card_failed">The image could not be created. Please try again.</string>
     <string name="tier_list_title">Tier Lists</string>

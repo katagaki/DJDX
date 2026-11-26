@@ -58,7 +58,8 @@ extension ShareCardEntry {
             titleStyle: AnyShapeStyle(iidxVersion.rowTitleTextColor(for: songRecord.version, level: level,
                                                                     colorScheme: .dark)),
             titleStrokeColor: iidxVersion.rowTitleStrokeColor(for: songRecord.version, level: level,
-                                                              colorScheme: .dark)
+                                                              colorScheme: .dark),
+            playDate: score.score != 0 || score.clearType != "NO PLAY" ? songRecord.lastPlayDate : .distantPast
         )
     }
 

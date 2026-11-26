@@ -18,7 +18,8 @@ data class ShareCardEntry(
     val difficultyColor: Color,
     val metrics: List<ShareCardMetric>,
     val titleBrush: Brush = SolidColor(Color.White),
-    val titleStrokeColor: Color? = null
+    val titleStrokeColor: Color? = null,
+    val playDateEpochSeconds: Long? = null
 )
 
 data class ShareCardRating(val label: String, val value: String)
