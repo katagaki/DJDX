@@ -100,6 +100,7 @@ enum IIDXImportSummaryBuilder {
                     difficulty: "\(playType == .single ? "SP" : "DP") \(name(for: level))",
                     level: String(latest.difficulty),
                     difficultyColor: color(for: level),
+                    lampStyle: ShareCardEntry.iidxLampStyle(for: latest.clearType),
                     levelValue: Double(latest.difficulty),
                     previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                     score: isNewScore ? latest.score : nil,

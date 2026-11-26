@@ -65,6 +65,7 @@ enum PolarisChordImportSummaryBuilder {
                 difficulty: difficulty.rawValue,
                 level: record.level,
                 difficultyColor: difficulty.color,
+                lampStyle: AnyShapeStyle(clearType.color),
                 levelValue: Double(record.level.filter { $0.isNumber || $0 == "." }) ?? 0.0,
                 previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                 score: isNewScore ? record.score : nil,

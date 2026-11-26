@@ -89,6 +89,7 @@ enum DDRImportSummaryBuilder {
                 difficulty: "\(style.abbreviation) \(difficulty.rawValue)",
                 level: String(record.level),
                 difficultyColor: difficulty.color,
+                lampStyle: AnyShapeStyle(DDRSongRecord.clearColor(for: record.clearKind)),
                 levelValue: Double(record.level),
                 previousScore: isNewScore && previousScore > 0 ? previousScore : nil,
                 score: isNewScore ? record.score : nil,

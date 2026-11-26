@@ -5,7 +5,7 @@ struct ImportSummaryNotesRadarSection: View {
     let notesRadar: ImportSummaryNotesRadar
 
     var body: some View {
-        Section {
+        VStack(spacing: 12.0) {
             VStack(alignment: .leading, spacing: 4.0) {
                 HStack {
                     Text(verbatim: "NOTES RADAR (\(notesRadar.playType))")
