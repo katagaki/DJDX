@@ -87,11 +87,15 @@ import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.ui.gameIconRes
 import java.io.File
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private val rowLimits = listOf(3, 5, 10, 20, 30, 50)
+private const val TODAY_ONLY_ROW_LIMIT = 0
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,6 +118,18 @@ fun ShareCardSheet(
     var rowLimit by rememberSaveable { mutableIntStateOf(10) }
     val customColorValue by rememberSetting(SettingsKeys.shareCardCustomColor, 0x7A4DFF)
     val customColor = Color(0xFF000000.toInt() or customColorValue)
+    val hasPlayDates = entries.any { it.playDateEpochSeconds != null }
+    val isTodayOnly = hasPlayDates && rowLimit == TODAY_ONLY_ROW_LIMIT
+    val visibleEntries = if (isTodayOnly) {
+        val today = LocalDate.now()
+        entries.filter { entry ->
+            entry.playDateEpochSeconds?.takeIf { it > 0 }?.let {
+                Instant.ofEpochSecond(it).atZone(ZoneId.systemDefault()).toLocalDate() == today
+            } ?: false
+        }
+    } else {
+        entries.take(if (rowLimit == TODAY_ONLY_ROW_LIMIT) 10 else rowLimit)
+    }
 
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -185,8 +201,8 @@ fun ShareCardSheet(
                     title = game.displayName,
                     iconRes = gameIconRes(game),
                     profile = if (isProfileVisible) profile else null,
-                    entries = entries.take(rowLimit),
-                    totalCount = entries.size,
+                    entries = visibleEntries,
+                    totalCount = if (isTodayOnly) visibleEntries.size else entries.size,
                     playStyle = playStyle,
                     background = background,
                     photo = photo,
@@ -311,14 +327,22 @@ fun ShareCardSheet(
                     text = stringResource(R.string.share_card_row_limit),
                     style = MaterialTheme.typography.bodyLarge
                 )
+                val limitOptions = if (hasPlayDates) rowLimits + TODAY_ONLY_ROW_LIMIT else rowLimits
                 SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    rowLimits.forEachIndexed { index, limit ->
+                    limitOptions.forEachIndexed { index, limit ->
                         SegmentedButton(
                             selected = rowLimit == limit,
                             onClick = { rowLimit = limit },
-                            shape = SegmentedButtonDefaults.itemShape(index, rowLimits.size)
+                            shape = SegmentedButtonDefaults.itemShape(index, limitOptions.size)
                         ) {
-                            Text(limit.toString())
+                            Text(
+                                if (limit == TODAY_ONLY_ROW_LIMIT) {
+                                    stringResource(R.string.share_card_row_limit_today)
+                                } else {
+                                    limit.toString()
+                                },
+                                maxLines = 1
+                            )
                         }
                     }
                 }

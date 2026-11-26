@@ -12,7 +12,9 @@ struct AnalyticsGoalsSection: View {
     @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
     @AppStorage(wrappedValue: SDVXVersion.nabla, "Global.SDVX.Version") var sdvxVersion: SDVXVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
-    @AppStorage(wrappedValue: false, "Analytics.Goals.Collapsed") var isCollapsed: Bool
+    @AppStorage(wrappedValue: false, "Analytics.Goals.Collapsed") var isCollapsedStored: Bool
+
+    @State var isCollapsed: Bool = UserDefaults.standard.bool(forKey: "Analytics.Goals.Collapsed")
 
     @State var progresses: [AnalyticsGoalProgress] = []
     @State var isAddingGoal: Bool = false
@@ -27,6 +29,7 @@ struct AnalyticsGoalsSection: View {
                 HStack(spacing: 0.0) {
                     AnalyticsSectionHeader(title: "Goals.Title", isCollapsible: true, isExpanded: !isCollapsed) {
                         withAnimation(.smooth.speed(2.0)) { isCollapsed.toggle() }
+                        isCollapsedStored = isCollapsed
                     }
                     Button("Goals.Add", systemImage: "plus") {
                         isAddingGoal = true
@@ -50,6 +53,7 @@ struct AnalyticsGoalsSection: View {
                         }
                     }
                     .padding(.horizontal)
+                    .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
                 }
             }
             .task(id: reloadKey) {

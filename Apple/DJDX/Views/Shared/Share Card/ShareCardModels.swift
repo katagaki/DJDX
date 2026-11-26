@@ -20,6 +20,9 @@ struct ShareCardEntry: Identifiable {
     let difficultyText: String
     let difficultyColor: Color
     var metrics: [ShareCardMetric]
+    var titleStyle: AnyShapeStyle = AnyShapeStyle(Color.white)
+    var titleStrokeColor: Color?
+    var playDate: Date?
 }
 
 struct ShareCardRating: Identifiable {

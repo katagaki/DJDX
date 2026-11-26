@@ -27,10 +27,8 @@ struct ImportSummaryEntryRow: View {
 
             Spacer(minLength: 0.0)
 
-            levelLabel()
-                .padding([.top, .bottom], 6.0)
-                .frame(width: 78.0, alignment: .center)
-                .cardBackground(cornerRadius: 6.0)
+            LevelBadge(name: entry.difficulty, level: entry.level,
+                       tint: entry.difficultyColor, layout: .horizontal)
                 .padding([.top, .bottom], 8.0)
         }
         .frame(maxWidth: .infinity)
@@ -77,25 +75,6 @@ struct ImportSummaryEntryRow: View {
     func separator() -> some View {
         Divider()
             .frame(maxHeight: 14.0)
-    }
-
-    @ViewBuilder
-    func levelLabel() -> some View {
-        VStack(alignment: .center) {
-            Text(verbatim: entry.level)
-                .italic()
-                .font(.system(size: 16.0))
-                .fontWeight(.black)
-            Text(verbatim: entry.difficulty)
-                .font(.system(size: 10.0))
-                .fontWeight(.semibold)
-        }
-        .kerning(-0.2)
-        .lineLimit(1)
-        .minimumScaleFactor(0.5)
-        .drawingGroup()
-        .offset(y: -1.5)
-        .modifier(LevelLabelGlow(color: entry.difficultyColor))
     }
 
     @ViewBuilder

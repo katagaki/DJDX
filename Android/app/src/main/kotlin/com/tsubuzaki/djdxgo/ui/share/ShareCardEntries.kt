@@ -63,7 +63,14 @@ fun iidxShareCardEntry(
         levelText = score.difficulty.toString(),
         difficultyText = level.csvPrefix,
         difficultyColor = IIDXColors.levelColor(level),
-        metrics = metrics
+        metrics = metrics,
+        titleBrush = IIDXColors.rowTitleBrush(record.version, level, darkTheme = true),
+        titleStrokeColor = IIDXColors.rowTitleStrokeColor(record.version, level, darkTheme = true),
+        playDateEpochSeconds = if (score.score != 0 || IIDXClearType.fromValue(score.clearType) != IIDXClearType.NO_PLAY) {
+            record.lastPlayDate
+        } else {
+            0L
+        }
     )
 }
 

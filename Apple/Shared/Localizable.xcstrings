@@ -9450,6 +9450,29 @@
         }
       }
     },
+    "ShareCard.RowLimit.Today" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日のみ"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "僅今天"
+          }
+        }
+      }
+    },
     "ShareCard.ShowProfile" : {
       "extractionState" : "manual",
       "localizations" : {

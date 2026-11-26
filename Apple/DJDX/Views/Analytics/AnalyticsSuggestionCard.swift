@@ -102,22 +102,7 @@ struct AnalyticsSuggestionLevelLabel: View {
     let level: String
 
     var body: some View {
-        VStack(spacing: 1.0) {
-            Text(verbatim: difficulty)
-                .font(.system(size: 10.0).weight(.black))
-                .fontWidth(.condensed)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-                .foregroundStyle(color)
-            Text(verbatim: level)
-                .font(.system(size: 18.0).weight(.heavy))
-                .fontWidth(.condensed)
-                .monospacedDigit()
-        }
-        .padding([.top, .bottom], 6.0)
-        .frame(width: 78.0, alignment: .center)
-        .background(.thinMaterial)
-        .clipShape(.rect(cornerRadius: 6.0))
+        LevelBadge(name: difficulty, level: level, tint: color)
     }
 }
 

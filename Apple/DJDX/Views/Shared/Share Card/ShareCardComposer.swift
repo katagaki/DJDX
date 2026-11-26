@@ -20,6 +20,22 @@ struct ShareCardComposer: View {
     var playStyle: String?
 
     static let rowLimits: [Int] = [3, 5, 10, 20, 30, 50]
+    static let todayOnlyRowLimit: Int = 0
+
+    var hasPlayDates: Bool {
+        entries.contains { $0.playDate != nil }
+    }
+
+    var isTodayOnly: Bool {
+        rowLimit == Self.todayOnlyRowLimit && hasPlayDates
+    }
+
+    var visibleEntries: [ShareCardEntry] {
+        if isTodayOnly {
+            return entries.filter { $0.playDate.map(Calendar.current.isDateInToday) ?? false }
+        }
+        return Array(entries.prefix(rowLimit == Self.todayOnlyRowLimit ? 10 : rowLimit))
+    }
 
     @State var background: ShareCardBackground = .gradient(.accent)
     @State var photoItem: PhotosPickerItem?
@@ -87,6 +103,10 @@ struct ShareCardComposer: View {
                         ForEach(Self.rowLimits, id: \.self) { limit in
                             Text(verbatim: String(limit))
                                 .tag(limit)
+                        }
+                        if hasPlayDates {
+                            Text("ShareCard.RowLimit.Today")
+                                .tag(Self.todayOnlyRowLimit)
                         }
                     }
                 }
@@ -229,8 +249,8 @@ struct ShareCardComposer: View {
         let card = ShareCardView(
             game: game,
             profile: isProfileVisible ? profile : nil,
-            entries: Array(entries.prefix(rowLimit)),
-            totalCount: entries.count,
+            entries: visibleEntries,
+            totalCount: isTodayOnly ? visibleEntries.count : entries.count,
             playStyle: playStyle,
             background: background,
             photo: photo,
