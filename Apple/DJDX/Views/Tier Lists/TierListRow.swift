@@ -30,9 +30,8 @@ struct TierListRow<Label: View>: View {
             .padding(6.0)
             .frame(maxWidth: .infinity, minHeight: 60.0, alignment: .topLeading)
         }
-        .background(isTargeted ? Color.accentColor.opacity(0.15) : Color.clear)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(.rect(cornerRadius: 16.0))
+        .background(isTargeted ? Color.accentColor.opacity(0.2) : Color.clear)
+        .background(Color.tierListBackground)
         .dropDestination(for: String.self) { ids, _ in
             for id in ids {
                 onPlace(id, tier, nil)

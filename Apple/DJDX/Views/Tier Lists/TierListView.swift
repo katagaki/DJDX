@@ -94,9 +94,10 @@ struct TierListView: View {
                     tiers
                 }
             }
-            .padding()
+            .padding(.vertical)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color.tierListBackground)
+        .preferredColorScheme(.dark)
         .searchable(text: $searchTerm, placement: .navigationBarDrawer(displayMode: .always),
                     prompt: "Scores.Search.Prompt")
         .navigationTitle("TierList.Title")
@@ -242,32 +243,37 @@ struct TierListView: View {
 
     @ViewBuilder
     var tiers: some View {
-        ForEach(TierListTier.allCases) { tier in
-            TierListRow(tier: tier, charts: charts(in: tier), onPlace: place) {
-                Text(tier.rawValue)
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .fontDesign(.rounded)
-                    .foregroundStyle(.black.opacity(0.8))
-                    .frame(width: 40.0)
-                    .frame(maxHeight: .infinity)
-                    .background(tier.color)
+        VStack(spacing: 2.0) {
+            ForEach(TierListTier.allCases) { tier in
+                TierListRow(tier: tier, charts: charts(in: tier), onPlace: place) {
+                    Text(tier.rawValue)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.black.opacity(0.85))
+                        .frame(width: 64.0)
+                        .frame(maxHeight: .infinity)
+                        .background(tier.color)
+                }
+                .fixedSize(horizontal: false, vertical: true)
             }
-            .fixedSize(horizontal: false, vertical: true)
         }
+        .padding(.vertical, 2.0)
+        .background(.black)
         Text("TierList.Unplaced.\(unplacedCharts.count)")
             .font(.subheadline)
             .fontWeight(.semibold)
             .foregroundStyle(.secondary)
             .padding(.top, 12.0)
-            .padding(.horizontal, 4.0)
+            .padding(.horizontal)
         TierListRow(tier: nil, charts: unplacedCharts, onPlace: place) {
             EmptyView()
         }
+        .padding(.vertical, 2.0)
+        .background(.black)
         Text("TierList.Hint")
             .font(.footnote)
             .foregroundStyle(.secondary)
-            .padding(.horizontal, 4.0)
+            .padding(.horizontal)
     }
 
     var actionsMenu: some View {
@@ -378,4 +384,8 @@ struct TierListView: View {
             .filter { !$0.isEmpty }
             .joined(separator: " ")
     }
+}
+
+extension Color {
+    static let tierListBackground = Color(red: 0.1, green: 0.1, blue: 0.09)
 }
