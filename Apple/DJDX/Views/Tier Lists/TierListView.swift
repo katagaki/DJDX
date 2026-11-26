@@ -80,7 +80,6 @@ struct TierListView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 8.0) {
-                controls
                 if isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
@@ -122,6 +121,7 @@ struct TierListView: View {
                     }
                 }
             }
+            controls
         }
         .task(id: loadTaskID) {
             await loadCharts()
@@ -169,9 +169,9 @@ struct TierListView: View {
         }
     }
 
-    @ViewBuilder
-    var controls: some View {
-        HStack(spacing: 8.0) {
+    @ToolbarContentBuilder
+    var controls: some ToolbarContent {
+        ToolbarItem(placement: .bottomBar) {
             Menu {
                 Picker("TierList.Game", selection: $game) {
                     ForEach(Game.allCases.filter(\.isAvailable)) { game in
@@ -181,6 +181,11 @@ struct TierListView: View {
             } label: {
                 pickerLabel(Text(game.shortName))
             }
+        }
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+        }
+        ToolbarItem(placement: .bottomBar) {
             if !levels.isEmpty {
                 Menu {
                     Picker(selection: $level) {
@@ -194,7 +199,15 @@ struct TierListView: View {
                     pickerLabel(Text(verbatim: "LEVEL \(level)"))
                 }
             }
-            Spacer(minLength: 0.0)
+        }
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+        } else {
+            ToolbarItem(placement: .bottomBar) {
+                Spacer()
+            }
+        }
+        ToolbarItem(placement: .bottomBar) {
             if game.supportsTierListPlayType {
                 Picker("TierList.PlayType", selection: $playType) {
                     ForEach(TierListPlayType.allCases) { playType in
@@ -205,7 +218,6 @@ struct TierListView: View {
                 .fixedSize()
             }
         }
-        .buttonStyle(.plain)
     }
 
     func pickerLabel(_ text: Text) -> some View {
@@ -218,11 +230,7 @@ struct TierListView: View {
                 .foregroundStyle(.secondary)
         }
         .font(.subheadline)
-        .padding(.horizontal, 12.0)
-        .frame(height: 32.0)
-        .background(Color(.tertiarySystemFill))
-        .clipShape(.capsule)
-        .contentShape(.capsule)
+        .foregroundStyle(.primary)
     }
 
     @ViewBuilder
