@@ -12,9 +12,10 @@ struct TierListRow<Label: View>: View {
     var body: some View {
         HStack(alignment: .top, spacing: 0.0) {
             label()
-            FlowLayout(horizontalSpacing: 4.0, verticalSpacing: 4.0) {
+            FlowLayout(horizontalSpacing: 6.0, verticalSpacing: 6.0) {
                 ForEach(charts) { chart in
                     TierListTile(chart: chart)
+                        .contentShape(.dragPreview, .rect(cornerRadius: 10.0))
                         .draggable(chart.id) {
                             TierListTile(chart: chart)
                         }
@@ -26,12 +27,12 @@ struct TierListRow<Label: View>: View {
                         }
                 }
             }
-            .padding(4.0)
+            .padding(6.0)
             .frame(maxWidth: .infinity, minHeight: 60.0, alignment: .topLeading)
         }
         .background(isTargeted ? Color.accentColor.opacity(0.15) : Color.clear)
-        .background(.background.tertiary)
-        .clipShape(.rect(cornerRadius: 8.0))
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(.rect(cornerRadius: 16.0))
         .dropDestination(for: String.self) { ids, _ in
             for id in ids {
                 onPlace(id, tier, nil)

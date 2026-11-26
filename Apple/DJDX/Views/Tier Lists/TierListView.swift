@@ -97,6 +97,7 @@ struct TierListView: View {
             }
             .padding()
         }
+        .background(Color(.systemGroupedBackground))
         .searchable(text: $searchTerm, placement: .navigationBarDrawer(displayMode: .always),
                     prompt: "Scores.Search.Prompt")
         .navigationTitle("TierList.Title")
@@ -170,13 +171,24 @@ struct TierListView: View {
 
     @ViewBuilder
     var controls: some View {
-        HStack(spacing: 8.0) {
+        HStack(spacing: 4.0) {
             Picker("TierList.Game", selection: $game) {
                 ForEach(Game.allCases.filter(\.isAvailable)) { game in
                     Text(game.shortName).tag(game)
                 }
             }
             .pickerStyle(.menu)
+            if !levels.isEmpty {
+                Picker(selection: $level) {
+                    ForEach(levels, id: \.self) { value in
+                        Text(verbatim: "LEVEL \(value)").tag(value)
+                    }
+                } label: {
+                    Text(verbatim: "LEVEL")
+                }
+                .pickerStyle(.menu)
+            }
+            Spacer(minLength: 0.0)
             if game.supportsTierListPlayType {
                 Picker("TierList.PlayType", selection: $playType) {
                     ForEach(TierListPlayType.allCases) { playType in
@@ -186,30 +198,8 @@ struct TierListView: View {
                 .pickerStyle(.segmented)
                 .fixedSize()
             }
-            Spacer(minLength: 0.0)
         }
-        if !levels.isEmpty {
-            ScrollView(.horizontal) {
-                HStack(spacing: 6.0) {
-                    ForEach(levels, id: \.self) { value in
-                        Button {
-                            level = value
-                        } label: {
-                            Text(verbatim: "LEVEL \(value)")
-                                .font(.subheadline)
-                                .fontWeight(.bold)
-                                .padding(.horizontal, 10.0)
-                                .padding(.vertical, 6.0)
-                                .foregroundStyle(level == value ? Color.white : Color.primary)
-                                .background(level == value ? Color.accentColor : Color(.secondarySystemFill))
-                                .clipShape(.capsule)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-            .scrollIndicators(.hidden)
-        }
+        .padding(.leading, -8.0)
     }
 
     @ViewBuilder
@@ -217,24 +207,29 @@ struct TierListView: View {
         ForEach(TierListTier.allCases) { tier in
             TierListRow(tier: tier, charts: charts(in: tier), onPlace: place) {
                 Text(tier.rawValue)
-                    .font(.title2)
-                    .fontWeight(.black)
-                    .foregroundStyle(.black)
-                    .frame(width: 44.0)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .fontDesign(.rounded)
+                    .foregroundStyle(.black.opacity(0.8))
+                    .frame(width: 40.0)
                     .frame(maxHeight: .infinity)
                     .background(tier.color)
             }
             .fixedSize(horizontal: false, vertical: true)
         }
         Text("TierList.Unplaced.\(unplacedCharts.count)")
-            .font(.headline)
-            .padding(.top, 8.0)
+            .font(.subheadline)
+            .fontWeight(.semibold)
+            .foregroundStyle(.secondary)
+            .padding(.top, 12.0)
+            .padding(.horizontal, 4.0)
         TierListRow(tier: nil, charts: unplacedCharts, onPlace: place) {
             EmptyView()
         }
         Text("TierList.Hint")
-            .font(.caption)
+            .font(.footnote)
             .foregroundStyle(.secondary)
+            .padding(.horizontal, 4.0)
     }
 
     var actionsMenu: some View {

@@ -7,7 +7,7 @@ struct TierListTile: View {
 
     let chart: TierListChart
 
-    static let width: CGFloat = 143.0
+    static let width: CGFloat = 138.0
 
     var body: some View {
         HStack(spacing: 0.0) {
@@ -35,12 +35,8 @@ struct TierListTile: View {
             .padding(.vertical, 4.0)
         }
         .frame(width: Self.width, alignment: .leading)
-        .background(.background.secondary)
-        .clipShape(.rect(cornerRadius: 6.0))
-        .overlay {
-            RoundedRectangle(cornerRadius: 6.0)
-                .stroke(chart.lampColor.opacity(0.5), lineWidth: 1.0)
-        }
+        .background(Color(.tertiarySystemGroupedBackground))
+        .clipShape(.rect(cornerRadius: 10.0))
         .accessibilityElement(children: .combine)
         .accessibilityValue(chart.lampLabel)
     }
