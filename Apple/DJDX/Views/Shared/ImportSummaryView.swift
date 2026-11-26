@@ -122,7 +122,7 @@ struct ImportSummaryView: View {
                         .font(.caption)
                         .fontWeight(.heavy)
                         .fontWidth(.expanded)
-                        .foregroundStyle(delta > 0 ? .green : delta < 0 ? .red : .secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
             HStack(alignment: .lastTextBaseline, spacing: 8.0) {
