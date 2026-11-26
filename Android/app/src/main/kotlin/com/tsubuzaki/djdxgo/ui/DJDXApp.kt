@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui
 
+import androidx.compose.material.icons.outlined.Share
+import kotlinx.coroutines.flow.MutableSharedFlow
 import android.content.Intent
 import android.net.Uri
 import android.webkit.CookieManager
@@ -121,7 +123,7 @@ import kotlinx.coroutines.withContext
 
 private enum class PendingDialog { FREE_UP_SPACE, DELETE_WEB, DELETE_SCORE_CODE, DELETE_SCORE, RESET_LAYOUT, DISCLAIMER }
 
-private fun gameIconRes(game: Game): Int = when (game) {
+internal fun gameIconRes(game: Game): Int = when (game) {
     Game.IIDX_ARCADE -> R.drawable.ic_game_iidx
     Game.SOUND_VOLTEX -> R.drawable.ic_game_sdvx
     Game.POLARIS_CHORD -> R.drawable.ic_game_polaris
@@ -418,6 +420,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
     var selectedTab by rememberSaveable(selectedGame) { mutableIntStateOf(0) }
     var isEditingAnalytics by rememberSaveable(selectedGame) { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
+    val shareRequests = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1) }
     val showAnalyticsTab = showAnalytics && selectedTab == 1
 
     suspend fun refreshProfile() {
@@ -507,6 +510,11 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                     }
                 },
                 actions = {
+                    if (!showAnalyticsTab) {
+                        IconButton(onClick = { shareRequests.tryEmit(Unit) }) {
+                            Icon(Icons.Outlined.Share, contentDescription = stringResource(R.string.share_card_title))
+                        }
+                    }
                     if (showAnalyticsTab) {
                         IconButton(onClick = { isEditingAnalytics = !isEditingAnalytics }) {
                             Icon(
@@ -642,6 +650,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                             container = container,
                             contentPadding = PaddingValues(),
                             analyticsContent = header,
+                            shareRequests = shareRequests,
                             onOpenSong = { title, playType, level, date ->
                                 onNavigate(Routes.iidxViewer(title, playType, level, date))
                             }
@@ -650,6 +659,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                             container = container,
                             contentPadding = PaddingValues(),
                             analyticsContent = header,
+                            shareRequests = shareRequests,
                             onOpenSong = { title, date, difficulty ->
                                 onNavigate(Routes.sdvxViewer(title, date, difficulty))
                             }
@@ -657,12 +667,14 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                         Game.POLARIS_CHORD -> PolarisChordScoresScreen(
                             container = container,
                             contentPadding = PaddingValues(),
-                            analyticsContent = header
+                            analyticsContent = header,
+                            shareRequests = shareRequests
                         )
                         Game.DANCE_DANCE_REVOLUTION -> DDRScoresScreen(
                             container = container,
                             contentPadding = PaddingValues(),
-                            analyticsContent = header
+                            analyticsContent = header,
+                            shareRequests = shareRequests
                         )
                     }
                 }

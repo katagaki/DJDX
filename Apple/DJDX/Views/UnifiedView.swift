@@ -136,6 +136,11 @@ struct UnifiedView: View {
                                 Label("Shared.Edit", systemImage: "pencil")
                             }
                         }
+                        if !isSessionsMode {
+                            Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
+                                NotificationCenter.default.post(name: .shareCardRequested, object: nil)
+                            }
+                        }
                     }
                 }
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)

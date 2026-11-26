@@ -95,6 +95,8 @@ object SettingsKeys {
     val analyticsGoalsCollapsed = booleanPreferencesKey("Analytics.Goals.Collapsed")
 
     val onboardingLastSeenVersion = stringPreferencesKey("Onboarding.LastSeenVersion")
+
+    val shareCardCustomColor = intPreferencesKey("ShareCard.CustomColor")
 }
 
 val analyticsLayoutKeys: List<Preferences.Key<*>> = listOf(

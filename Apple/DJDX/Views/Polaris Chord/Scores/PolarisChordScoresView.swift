@@ -29,6 +29,7 @@ struct PolarisChordScoresView<Header: View>: View {
     @State var records: [PolarisChordSongRecord] = []
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
+    @State var isShowingShareCard: Bool = false
     @State private var chartNoteTarget: ChartNoteTarget?
 
     @Namespace var polarisChordNamespace
@@ -199,6 +200,16 @@ struct PolarisChordScoresView<Header: View>: View {
                 sortControl
                 filterControl
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
+            isShowingShareCard = true
+        }
+        .sheet(isPresented: $isShowingShareCard) {
+            ShareCardComposer(
+                game: .polarisChord,
+                profile: .polarisChord(),
+                entries: sortedRecords.map { ShareCardEntry(polarisChordSongRecord: $0) }
+            )
         }
         .sheet(item: $chartNoteTarget) { target in
             ChartNotesSheet(game: target.game, title: target.title,

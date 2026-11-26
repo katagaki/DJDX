@@ -1,5 +1,11 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.Flow
+import com.tsubuzaki.djdxgo.data.Game
+import com.tsubuzaki.djdxgo.ui.share.ShareCardSheet
+import com.tsubuzaki.djdxgo.ui.share.toShareCardEntry
+import com.tsubuzaki.djdxgo.ui.share.toShareCardProfile
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import com.tsubuzaki.djdxgo.ui.common.OutlinedText
@@ -76,6 +82,7 @@ fun SDVXScoresScreen(
     container: AppContainer,
     contentPadding: PaddingValues,
     analyticsContent: (@Composable () -> Unit)? = null,
+    shareRequests: Flow<Unit> = emptyFlow(),
     onOpenSong: (title: String, dateEpoch: Long, difficulty: String) -> Unit
 ) {
     val context = LocalContext.current
@@ -109,6 +116,10 @@ fun SDVXScoresScreen(
 
     var query by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by remember { mutableStateOf(false) }
+    var showShareSheet by remember { mutableStateOf(false) }
+    LaunchedEffect(shareRequests) {
+        shareRequests.collect { showShareSheet = true }
+    }
 
     val displayed = remember(
         records, sortMode, sortDescending,
@@ -195,6 +206,16 @@ fun SDVXScoresScreen(
                 }
             },
             onFilterClick = { showFilterSheet = true }
+        )
+    }
+
+    if (showShareSheet) {
+        val profile by container.profileRepository.sdvx.collectAsState()
+        ShareCardSheet(
+            game = Game.SOUND_VOLTEX,
+            profile = profile.toShareCardProfile(),
+            entries = (if (query.isEmpty()) displayed else searchResults).map { it.toShareCardEntry() },
+            onDismiss = { showShareSheet = false }
         )
     }
 

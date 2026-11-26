@@ -32,6 +32,7 @@ struct IIDXScoresView<Header: View>: View {
 
     @State var isSystemChangingFilterAndSort: Bool = false
     @State var isShowingFilterSheet: Bool = false
+    @State var isShowingShareCard: Bool = false
     @State var isSystemChangingCalendarDate: Bool = false
     @State var isSystemChangingAllRecords: Bool = false
 
@@ -263,6 +264,20 @@ struct IIDXScoresView<Header: View>: View {
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.hidden)
                 .interactiveDismissDisabled()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
+                isShowingShareCard = true
+            }
+            .sheet(isPresented: $isShowingShareCard) {
+                ShareCardComposer(
+                    game: Game.stored,
+                    profile: Game.stored == .iidxArcade ? .iidx(playType: playTypeToShow) : ShareCardProfile(),
+                    entries: levelEntries(from: searchResults ?? songRecords ?? []).map {
+                        ShareCardEntry(iidxSongRecord: $0.songRecord, level: $0.level,
+                                       score: $0.score, scoreRate: $0.scoreRate)
+                    },
+                    playStyle: playTypeToShow.displayName()
+                )
             }
             .onAppear {
                 if dataState == .initializing {

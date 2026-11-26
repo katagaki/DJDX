@@ -1,7 +1,12 @@
 package com.tsubuzaki.djdxgo.ui.games
 
-import androidx.compose.foundation.clickable
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.Flow
 import com.tsubuzaki.djdxgo.data.Game
+import com.tsubuzaki.djdxgo.ui.share.ShareCardSheet
+import com.tsubuzaki.djdxgo.ui.share.toShareCardEntry
+import com.tsubuzaki.djdxgo.ui.share.toShareCardProfile
+import androidx.compose.foundation.clickable
 import com.tsubuzaki.djdxgo.data.notes.ChartNoteTarget
 import com.tsubuzaki.djdxgo.ui.common.ChartNotesSheet
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
@@ -74,6 +79,7 @@ fun PolarisChordScoresScreen(
     container: AppContainer,
     contentPadding: PaddingValues,
     analyticsContent: (@Composable () -> Unit)? = null,
+    shareRequests: Flow<Unit> = emptyFlow(),
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -106,6 +112,10 @@ fun PolarisChordScoresScreen(
 
     var query by rememberSaveable { mutableStateOf("") }
     var showFilterSheet by remember { mutableStateOf(false) }
+    var showShareSheet by remember { mutableStateOf(false) }
+    LaunchedEffect(shareRequests) {
+        shareRequests.collect { showShareSheet = true }
+    }
     var noteTarget by remember { mutableStateOf<ChartNoteTarget?>(null) }
 
     val displayed = remember(
@@ -192,6 +202,16 @@ fun PolarisChordScoresScreen(
         )
     }
 
+    if (showShareSheet) {
+        val profile by container.profileRepository.polarisChord.collectAsState()
+        ShareCardSheet(
+            game = Game.POLARIS_CHORD,
+            profile = profile.toShareCardProfile(),
+            entries = (if (query.isEmpty()) displayed else searchResults).map { it.toShareCardEntry() },
+            onDismiss = { showShareSheet = false }
+        )
+    }
+
     noteTarget?.let { target ->
         ChartNotesSheet(
             repository = container.chartNotesRepository,
@@ -199,6 +219,7 @@ fun PolarisChordScoresScreen(
             onDismiss = { noteTarget = null }
         )
     }
+
     if (showFilterSheet) {
         FilterSheet(
             onDismiss = { showFilterSheet = false },
