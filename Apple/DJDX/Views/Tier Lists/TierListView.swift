@@ -207,28 +207,23 @@ struct TierListView: View {
                 Spacer()
             }
         }
-        if #available(iOS 26.0, *) {
-            ToolbarItem(placement: .bottomBar) {
-                playTypePicker
-            }
-            .sharedBackgroundVisibility(.hidden)
-        } else {
-            ToolbarItem(placement: .bottomBar) {
-                playTypePicker
-            }
+        ToolbarItem(placement: .bottomBar) {
+            playTypePicker
         }
     }
 
     @ViewBuilder
     var playTypePicker: some View {
         if game.supportsTierListPlayType {
-            Picker("TierList.PlayType", selection: $playType) {
-                ForEach(TierListPlayType.allCases) { playType in
-                    Text(playType.rawValue).tag(playType)
+            Menu {
+                Picker("TierList.PlayType", selection: $playType) {
+                    ForEach(TierListPlayType.allCases) { playType in
+                        Text(playType.rawValue).tag(playType)
+                    }
                 }
+            } label: {
+                pickerLabel(Text(playType.rawValue))
             }
-            .pickerStyle(.segmented)
-            .fixedSize()
         }
     }
 
