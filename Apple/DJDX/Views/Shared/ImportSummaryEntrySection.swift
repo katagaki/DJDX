@@ -49,10 +49,10 @@ struct ImportSummaryEntrySection: View {
                 detailRow("SCORE") {
                     VStack(alignment: .trailing, spacing: 2.0) {
                         scoreText(scoreString(score))
-                            .font(.subheadline)
+                            .font(.scoreline(.subheadline))
                         if let previousScore = entry.previousScore {
                             Text(verbatim: "+" + scoreString(score - previousScore))
-                                .font(.caption2)
+                                .font(.scoreline(.caption2, weight: .bold))
                                 .foregroundStyle(.secondary)
                         }
                     }

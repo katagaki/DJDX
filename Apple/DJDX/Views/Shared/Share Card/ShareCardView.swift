@@ -189,6 +189,7 @@ struct ShareCardRow: View {
                     HStack(spacing: 8.0) {
                         ForEach(entry.metrics) { metric in
                             Text(verbatim: metric.text)
+                                .font(metric.text.first?.isNumber == true ? .scoreline(size: 11.0) : nil)
                                 .foregroundStyle(metric.style)
                         }
                     }

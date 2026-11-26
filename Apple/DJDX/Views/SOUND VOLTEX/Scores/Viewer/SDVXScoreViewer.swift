@@ -142,6 +142,7 @@ struct SDVXScoreViewer: View {
             }
             Spacer()
             Text(songRecord.highScore, format: .number)
+                .font(.scoreline(.title))
                 .sdvxScoreText(outlineWidth: 0.6)
         }
         .font(.title)

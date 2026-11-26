@@ -101,8 +101,7 @@ struct IIDXScoreRow: View {
                                                 startPoint: .top,
                                                 endPoint: .bottom
                                             ))
-                                            .fontWidth(.expanded)
-                                            .fontWeight(.black)
+                                            .font(.scoreline(.caption))
                                     }
                                     if isScoreVisible {
                                         if isDJLevelVisible || isScoreRateVisible {
@@ -111,14 +110,12 @@ struct IIDXScoreRow: View {
                                         }
                                         Text(String(score.score))
                                             .foregroundStyle(Color.iidxScore)
-                                            .fontWidth(.expanded)
-                                            .fontWeight(.heavy)
+                                            .font(.scoreline(.caption))
                                             .strokeText(color: .iidxScoreOutline, width: 0.3)
                                         if let scoreDelta, scoreDelta > 0 {
                                             Text("Analytics.NewHighScore.\(scoreDelta)")
                                                 .foregroundStyle(.orange)
-                                                .fontWidth(.expanded)
-                                                .fontWeight(.heavy)
+                                                .font(.scoreline(.caption))
                                         }
                                     }
                                 }

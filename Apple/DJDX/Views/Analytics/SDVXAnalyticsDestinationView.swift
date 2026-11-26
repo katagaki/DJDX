@@ -237,17 +237,17 @@ struct SDVXNewHighScoresDetailView: View {
                                 .fontWidth(.condensed)
                             HStack(spacing: 4.0) {
                                 Text("\(entry.previousScore)")
-                                    .font(.caption)
+                                    .font(.scoreline(.caption, weight: .medium))
                                     .foregroundStyle(.secondary)
                                     .strikethrough()
                                 Image(systemName: "arrow.right")
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
                                 Text("\(entry.newScore)")
-                                    .font(.caption.weight(.semibold))
+                                    .font(.scoreline(.caption, weight: .bold))
                                     .foregroundStyle(.orange)
                                 Text("Analytics.NewHighScore.\(entry.newScore - entry.previousScore)")
-                                    .font(.caption2)
+                                    .font(.scoreline(.caption2, weight: .bold))
                                     .foregroundStyle(.orange.opacity(0.8))
                             }
                             if entry.newGrade != entry.previousGrade {

@@ -28,6 +28,7 @@ struct SDVXScoreRow: View {
                     if record.highScore > 0 {
                         Divider().frame(maxHeight: 14.0)
                         Text(String(record.highScore))
+                            .font(.scoreline(.caption))
                             .sdvxScoreText()
                     }
                     Divider().frame(maxHeight: 14.0)
