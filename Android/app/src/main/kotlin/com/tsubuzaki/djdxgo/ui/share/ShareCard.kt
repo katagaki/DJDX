@@ -20,11 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,6 +57,7 @@ fun ShareCard(
     background: ShareCardBackground,
     photo: ImageBitmap?,
     accentColor: Color,
+    customColor: Color,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.width(ShareCardWidth)) {
@@ -64,6 +65,7 @@ fun ShareCard(
             background = background,
             photo = photo,
             accentColor = accentColor,
+            customColor = customColor,
             modifier = Modifier.matchParentSize()
         )
         Column(
@@ -122,6 +124,7 @@ private fun ShareCardBackdrop(
     background: ShareCardBackground,
     photo: ImageBitmap?,
     accentColor: Color,
+    customColor: Color,
     modifier: Modifier
 ) {
     when (background) {
@@ -130,17 +133,11 @@ private fun ShareCardBackdrop(
                 Brush.linearGradient(background.gradient.colors(accentColor))
             )
         )
-        is ShareCardBackground.Icon -> Box(modifier = modifier.background(Color.Black)) {
-            Image(
-                painter = painterResource(background.resId),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .matchParentSize()
-                    .blur(24.dp)
+        ShareCardBackground.Custom -> Box(
+            modifier = modifier.background(
+                Brush.linearGradient(listOf(customColor, lerp(customColor, Color.Black, 0.75f)))
             )
-            Box(modifier = Modifier.matchParentSize().background(Color.Black.copy(alpha = 0.25f)))
-        }
+        )
         ShareCardBackground.Photo -> Box(modifier = modifier.background(Color.Black)) {
             if (photo != null) {
                 Image(

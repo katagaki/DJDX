@@ -67,6 +67,6 @@ enum ShareCardGradient: String, CaseIterable, Identifiable {
 
 enum ShareCardBackground: Hashable {
     case gradient(ShareCardGradient)
-    case appIcon(String)
+    case custom
     case photo
 }

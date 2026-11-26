@@ -68,6 +68,7 @@
     <string name="share_card_share">Share</string>
     <string name="share_card_background">Background</string>
     <string name="share_card_photo">Photo</string>
+    <string name="share_card_color">Color</string>
     <string name="share_card_show_profile">Show Player Info</string>
     <string name="share_card_row_limit">Charts Shown</string>
     <string name="share_card_more">and %1$d more</string>

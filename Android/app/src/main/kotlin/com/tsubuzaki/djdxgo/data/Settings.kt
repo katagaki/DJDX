@@ -90,6 +90,8 @@ object SettingsKeys {
     val ddrCollapsedSections = stringSetPreferencesKey("Analytics.DDR.CollapsedSections")
 
     val onboardingLastSeenVersion = stringPreferencesKey("Onboarding.LastSeenVersion")
+
+    val shareCardCustomColor = intPreferencesKey("ShareCard.CustomColor")
 }
 
 val analyticsLayoutKeys: List<Preferences.Key<*>> = listOf(

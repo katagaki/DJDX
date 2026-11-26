@@ -1,6 +1,5 @@
 package com.tsubuzaki.djdxgo.ui.share
 
-import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -49,6 +48,6 @@ enum class ShareCardGradient {
 
 sealed interface ShareCardBackground {
     data class Gradient(val gradient: ShareCardGradient) : ShareCardBackground
-    data class Icon(@param:DrawableRes val resId: Int) : ShareCardBackground
+    data object Custom : ShareCardBackground
     data object Photo : ShareCardBackground
 }

@@ -1,5 +1,19 @@
 package com.tsubuzaki.djdxgo.ui.share
 
+import com.tsubuzaki.djdxgo.ui.iidx.rememberSetting
+import com.tsubuzaki.djdxgo.data.setSetting
+import com.tsubuzaki.djdxgo.data.SettingsKeys
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.drag
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.shape.CircleShape
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -78,7 +92,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private val rowLimits = listOf(10, 20, 30, 50)
-private val iconBackgrounds = Game.entries.map { gameIconRes(it) }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,11 +106,14 @@ fun ShareCardSheet(
     val scope = rememberCoroutineScope()
     val accentColor = MaterialTheme.colorScheme.primary
     val graphicsLayer = rememberGraphicsLayer()
+    val colorLabel = stringResource(R.string.share_card_color)
 
     var background by remember { mutableStateOf<ShareCardBackground>(ShareCardBackground.Gradient(ShareCardGradient.ACCENT)) }
     var photo by remember { mutableStateOf<ImageBitmap?>(null) }
     var isProfileVisible by rememberSaveable { mutableStateOf(true) }
     var rowLimit by rememberSaveable { mutableIntStateOf(10) }
+    val customColorValue by rememberSetting(SettingsKeys.shareCardCustomColor, 0x7A4DFF)
+    val customColor = Color(0xFF000000.toInt() or customColorValue)
 
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -175,6 +191,7 @@ fun ShareCardSheet(
                     background = background,
                     photo = photo,
                     accentColor = accentColor,
+                    customColor = customColor,
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
                         .drawWithContent {
@@ -202,15 +219,28 @@ fun ShareCardSheet(
                         )
                     }
                 }
-                items(iconBackgrounds) { resId ->
-                    val option = ShareCardBackground.Icon(resId)
-                    Swatch(isSelected = background == option, onClick = { background = option }) {
-                        Image(
-                            painter = painterResource(resId),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(52.dp)
-                        )
+                item {
+                    Swatch(
+                        isSelected = background == ShareCardBackground.Custom,
+                        onClick = { background = ShareCardBackground.Custom }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(52.dp)
+                                .background(Brush.sweepGradient(hueColors)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(22.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.White)
+                                    .padding(2.dp)
+                                    .clip(CircleShape)
+                                    .background(customColor)
+                                    .semantics { contentDescription = colorLabel }
+                            )
+                        }
                     }
                 }
                 item {
@@ -248,6 +278,15 @@ fun ShareCardSheet(
                         }
                     }
                 }
+            }
+            if (background == ShareCardBackground.Custom) {
+                ShareCardColorPicker(
+                    color = customColor,
+                    onColorChange = { color ->
+                        scope.launch { context.setSetting(SettingsKeys.shareCardCustomColor, color.toArgb() and 0xFFFFFF) }
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
             }
             if (!profile.isEmpty) {
                 Row(
@@ -316,3 +355,51 @@ private fun decodeSampledBitmap(context: Context, uri: Uri, maxDimension: Int = 
     val options = BitmapFactory.Options().apply { inSampleSize = sampleSize }
     context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
 }.getOrNull()
+
+private val hueColors = listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)
+
+@Composable
+private fun ShareCardColorPicker(color: Color, onColorChange: (Color) -> Unit, modifier: Modifier = Modifier) {
+    val hsv = remember(color) { FloatArray(3).also { android.graphics.Color.colorToHSV(color.toArgb(), it) } }
+    fun update(hue: Float = hsv[0], saturation: Float = hsv[1], value: Float = hsv[2]) {
+        onColorChange(Color(android.graphics.Color.HSVToColor(floatArrayOf(hue, saturation, value))))
+    }
+    val hueColor = Color(android.graphics.Color.HSVToColor(floatArrayOf(hsv[0], 1f, 1f)))
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(text = stringResource(R.string.share_card_color), style = MaterialTheme.typography.bodyLarge)
+        GradientSlider(hsv[0] / 360f, Brush.horizontalGradient(hueColors)) { update(hue = it * 360f) }
+        GradientSlider(hsv[1], Brush.horizontalGradient(listOf(Color.White, hueColor))) { update(saturation = it) }
+        GradientSlider(hsv[2], Brush.horizontalGradient(listOf(Color.Black, hueColor))) { update(value = it) }
+    }
+}
+
+@Composable
+private fun GradientSlider(value: Float, brush: Brush, onValueChange: (Float) -> Unit) {
+    val currentOnValueChange by rememberUpdatedState(onValueChange)
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(28.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(brush)
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    val down = awaitFirstDown()
+                    currentOnValueChange((down.position.x / size.width).coerceIn(0f, 1f))
+                    drag(down.id) { change ->
+                        change.consume()
+                        currentOnValueChange((change.position.x / size.width).coerceIn(0f, 1f))
+                    }
+                }
+            }
+    ) {
+        val thumbSize = 24.dp
+        Box(
+            modifier = Modifier
+                .offset(x = (maxWidth - thumbSize - 4.dp) * value + 2.dp)
+                .align(Alignment.CenterStart)
+                .size(thumbSize)
+                .border(3.dp, Color.White, CircleShape)
+        )
+    }
+}

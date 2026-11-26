@@ -12,6 +12,7 @@ struct ShareCardComposer: View {
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
     @AppStorage(wrappedValue: true, "ShareCard.ProfileVisible") var isProfileVisible: Bool
     @AppStorage(wrappedValue: 10, "ShareCard.RowLimit") var rowLimit: Int
+    @AppStorage(wrappedValue: 0x7A4DFF, "ShareCard.CustomColor") var customColorValue: Int
 
     let game: Game
     let profile: ShareCardProfile
@@ -35,8 +36,21 @@ struct ShareCardComposer: View {
         )
     }
 
+    var customColor: Binding<Color> {
+        Binding {
+            Color(hex: UInt32(customColorValue))
+        } set: { newValue in
+            var red: CGFloat = 0.0
+            var green: CGFloat = 0.0
+            var blue: CGFloat = 0.0
+            UIColor(newValue).getRed(&red, green: &green, blue: &blue, alpha: nil)
+            let component: (CGFloat) -> Int = { Int((min(max($0, 0.0), 1.0) * 255.0).rounded()) }
+            customColorValue = (component(red) << 16) | (component(green) << 8) | component(blue)
+        }
+    }
+
     var renderKey: String {
-        "\(background.hashValue).\(photo?.hash ?? 0).\(isProfileVisible).\(rowLimit)"
+        "\(background.hashValue).\(customColorValue).\(photo?.hash ?? 0).\(isProfileVisible).\(rowLimit)"
     }
 
     var body: some View {
@@ -59,6 +73,9 @@ struct ShareCardComposer: View {
                 }
                 Section {
                     backgroundCarousel()
+                    if background == .custom {
+                        ColorPicker("ShareCard.Color", selection: customColor, supportsOpacity: false)
+                    }
                 } header: {
                     Text("ShareCard.Background")
                 }
@@ -129,16 +146,19 @@ struct ShareCardComposer: View {
                     }
                     .accessibilityLabel(Text(verbatim: gradient.rawValue.capitalized))
                 }
-                ForEach(AppIconChoice.all, id: \.name) { icon in
-                    swatch(for: .appIcon(icon.previewImageName)) {
-                        Image(icon.previewImageName)
-                            .resizable()
-                            .scaledToFill()
+                swatch(for: .custom) {
+                    ZStack {
+                        AngularGradient(
+                            colors: [.red, .yellow, .green, .cyan, .blue, .purple, .red],
+                            center: .center
+                        )
+                        Circle()
+                            .fill(Color(hex: UInt32(customColorValue)))
+                            .stroke(.white, lineWidth: 2.0)
+                            .frame(width: 22.0, height: 22.0)
                     }
-                    .accessibilityLabel(
-                        icon.isNameLocalized ? Text(LocalizedStringKey(icon.name)) : Text(verbatim: icon.name)
-                    )
                 }
+                .accessibilityLabel(Text("ShareCard.Color"))
                 photoSwatch()
             }
             .padding(8.0)
@@ -214,7 +234,8 @@ struct ShareCardComposer: View {
             playStyle: playStyle,
             background: background,
             photo: photo,
-            accentColor: accentColor
+            accentColor: accentColor,
+            customColor: Color(hex: UInt32(customColorValue))
         )
         let renderer = ImageRenderer(content: card)
         renderer.scale = 3.0

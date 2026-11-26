@@ -66,6 +66,7 @@
     <string name="share_card_share">共有</string>
     <string name="share_card_background">背景</string>
     <string name="share_card_photo">写真</string>
+    <string name="share_card_color">カラー</string>
     <string name="share_card_show_profile">プレイヤー情報を表示</string>
     <string name="share_card_row_limit">表示する譜面数</string>
     <string name="share_card_more">他%1$d譜面</string>

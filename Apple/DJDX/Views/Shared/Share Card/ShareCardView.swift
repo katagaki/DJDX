@@ -10,6 +10,7 @@ struct ShareCardView: View {
     let background: ShareCardBackground
     let photo: UIImage?
     let accentColor: Color
+    var customColor: Color = .accentColor
     var date: Date = .now
 
     static let width: CGFloat = 390.0
@@ -144,16 +145,12 @@ struct ShareCardView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
-        case .appIcon(let imageName):
-            ZStack {
-                Color.black
-                Image(imageName)
-                    .resizable()
-                    .scaledToFill()
-                    .blur(radius: 24.0)
-                    .saturation(1.3)
-                Color.black.opacity(0.2)
-            }
+        case .custom:
+            LinearGradient(
+                colors: [customColor, customColor.mix(with: .black, by: 0.75)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
         case .photo:
             ZStack {
                 Color.black

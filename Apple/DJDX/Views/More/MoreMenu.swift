@@ -28,7 +28,15 @@ struct MoreMenu: View {
     @State var scoreDeleteCode: String = ""
     @State var scoreDeleteCodeEntry: String = ""
 
-    let appIcons: [AppIconChoice] = AppIconChoice.all
+    let appIcons: [AppIconChoice] = [
+        AppIconChoice("Default", imageName: nil, isNameLocalized: true),
+        AppIconChoice("ZINRAI", imageName: "AppIcon.34"),
+        AppIconChoice("Sparkle Shower", imageName: "AppIcon.33"),
+        AppIconChoice("Pinky Crush", imageName: "AppIcon.32"),
+        AppIconChoice("EPOLIS", imageName: "AppIcon.31"),
+        AppIconChoice("NABLA", imageName: "AppIcon.VII"),
+        AppIconChoice("EXCEED GEAR", imageName: "AppIcon.VI")
+    ]
 
     var body: some View {
         Menu {
@@ -257,16 +265,6 @@ struct AppIconChoice {
     let name: String
     let imageName: String?
     let isNameLocalized: Bool
-
-    static let all: [AppIconChoice] = [
-        AppIconChoice("Default", imageName: nil, isNameLocalized: true),
-        AppIconChoice("ZINRAI", imageName: "AppIcon.34"),
-        AppIconChoice("Sparkle Shower", imageName: "AppIcon.33"),
-        AppIconChoice("Pinky Crush", imageName: "AppIcon.32"),
-        AppIconChoice("EPOLIS", imageName: "AppIcon.31"),
-        AppIconChoice("NABLA", imageName: "AppIcon.VII"),
-        AppIconChoice("EXCEED GEAR", imageName: "AppIcon.VI")
-    ]
 
     init(_ name: String, imageName: String?, isNameLocalized: Bool = false) {
         self.name = name
