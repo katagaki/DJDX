@@ -23,6 +23,7 @@ struct SDVXScoresView<Header: View>: View {
     @State var records: [SDVXSongRecord] = []
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
+    @State var isShowingShareCard: Bool = false
 
     @Namespace var sdvxNamespace
 
@@ -215,6 +216,16 @@ struct SDVXScoresView<Header: View>: View {
             if dataState == .presenting && records.isEmpty {
                 ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
+            isShowingShareCard = true
+        }
+        .sheet(isPresented: $isShowingShareCard) {
+            ShareCardComposer(
+                game: .soundVoltex,
+                profile: .sdvx(),
+                entries: sortedRecords.map { ShareCardEntry(sdvxSongRecord: $0) }
+            )
         }
         .navigationDestination(for: SDVXScoresPath.self) { viewPath in
             switch viewPath {

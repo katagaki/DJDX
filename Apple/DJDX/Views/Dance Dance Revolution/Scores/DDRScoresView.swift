@@ -21,6 +21,7 @@ struct DDRScoresView<Header: View>: View {
     @State var records: [DDRSongRecord] = []
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
+    @State var isShowingShareCard: Bool = false
     @State private var chartNoteTarget: ChartNoteTarget?
 
     @Namespace var ddrNamespace
@@ -179,6 +180,17 @@ struct DDRScoresView<Header: View>: View {
                 sortControl
                 filterControl
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
+            isShowingShareCard = true
+        }
+        .sheet(isPresented: $isShowingShareCard) {
+            ShareCardComposer(
+                game: .danceDanceRevolution,
+                profile: .ddr(style: ddrStyleToShow),
+                entries: sortedRecords.map { ShareCardEntry(ddrSongRecord: $0) },
+                playStyle: ddrStyleToShow == .single ? "SP" : "DP"
+            )
         }
         .sheet(item: $chartNoteTarget) { target in
             ChartNotesSheet(game: target.game, title: target.title,
