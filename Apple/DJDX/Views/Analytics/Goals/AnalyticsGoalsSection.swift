@@ -151,16 +151,21 @@ struct AnalyticsGoalCard: View {
 
 struct AnalyticsGoalStatusBadge: View {
     let status: AnalyticsGoalStatus
+    var isLarge: Bool = false
 
     var body: some View {
-        Label(status.titleKey, systemImage: status.systemImage)
-            .font(.caption2.weight(.heavy))
-            .fontWidth(.expanded)
-            .foregroundStyle(status.color)
-            .padding(.horizontal, 8.0)
-            .padding(.vertical, 3.0)
-            .background(status.color.opacity(0.15), in: .capsule)
-            .lineLimit(1)
+        HStack(spacing: isLarge ? 5.0 : 3.0) {
+            Image(systemName: status.systemImage)
+            Text(status.titleKey)
+                .fontWidth(.expanded)
+        }
+        .font(isLarge ? .subheadline.weight(.heavy) : .caption2.weight(.heavy))
+        .foregroundStyle(status == .achieved ? Color.black : Color.white)
+        .padding(.horizontal, isLarge ? 12.0 : 8.0)
+        .padding(.vertical, isLarge ? 6.0 : 4.0)
+        .background(status.color.gradient, in: .capsule)
+        .lineLimit(1)
+        .fixedSize()
     }
 }
 

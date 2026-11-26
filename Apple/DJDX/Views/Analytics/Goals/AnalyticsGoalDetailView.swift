@@ -20,6 +20,7 @@ struct AnalyticsGoalDetailView: View {
             if let progress {
                 Section {
                     header(progress)
+                        .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets(top: 8.0, leading: 16.0, bottom: 0.0, trailing: 16.0))
                     chart(progress)
@@ -28,13 +29,6 @@ struct AnalyticsGoalDetailView: View {
                         .listRowInsets(EdgeInsets(top: 8.0, leading: 16.0, bottom: 8.0, trailing: 16.0))
                 }
                 Section {
-                    HStack {
-                        Text("Goals.Status")
-                        Spacer()
-                        AnalyticsGoalStatusBadge(status: progress.status)
-                    }
-                    row("Goals.Current", progress.goal.formatted(progress.current))
-                    row("Goals.Target", progress.goal.formatted(progress.goal.target))
                     row("Goals.Start", progress.goal.formatted(progress.baseline))
                     row("Goals.Expected", progress.goal.formatted(progress.expected))
                     row("Goals.Remaining", progress.goal.formatted(progress.remaining))
@@ -107,16 +101,19 @@ struct AnalyticsGoalDetailView: View {
         VStack(alignment: .leading, spacing: 4.0) {
             AnalyticsGoalTitle(goal: progress.goal)
                 .font(.subheadline)
-            HStack(alignment: .firstTextBaseline, spacing: 4.0) {
-                Text(verbatim: progress.goal.formatted(progress.current))
-                    .goalNumberFont(size: 34.0)
-                Text(verbatim: "/ \(progress.goal.formatted(progress.goal.target))")
-                    .font(.title3.weight(.bold).monospacedDigit())
-                    .fontWidth(.expanded)
-                    .foregroundStyle(.secondary)
+            HStack(alignment: .center, spacing: 8.0) {
+                HStack(alignment: .firstTextBaseline, spacing: 4.0) {
+                    Text(verbatim: progress.goal.formatted(progress.current))
+                        .goalNumberFont(size: 34.0)
+                    Text(verbatim: "/ \(progress.goal.formatted(progress.goal.target))")
+                        .font(.title3.weight(.bold).monospacedDigit())
+                        .fontWidth(.expanded)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0.0)
+                AnalyticsGoalStatusBadge(status: progress.status, isLarge: true)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     func chart(_ progress: AnalyticsGoalProgress) -> some View {

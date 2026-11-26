@@ -41,7 +41,7 @@ struct AnalyticsGoal: Codable, Identifiable, Hashable {
         case .rating:
             return game == .danceDanceRevolution ? "FLARE SKILL" : "VOLFORCE"
         case .clearCount, .gradeCount:
-            let levelText = level > 0 ? "☆\(level) " : ""
+            let levelText = level > 0 ? "LEVEL \(level) " : ""
             return levelText + AnalyticsGoal.thresholdDisplay(threshold, kind: kind, game: game)
         }
     }

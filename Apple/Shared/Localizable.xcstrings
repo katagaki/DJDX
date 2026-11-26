@@ -3022,29 +3022,6 @@
         }
       }
     },
-    "Goals.Current" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Current"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "目前"
-          }
-        }
-      }
-    },
     "Goals.DaysLeft.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3616,29 +3593,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開始日期"
-          }
-        }
-      }
-    },
-    "Goals.Status" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Status"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "状況"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "狀態"
           }
         }
       }

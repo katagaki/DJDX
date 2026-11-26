@@ -90,7 +90,7 @@ struct AnalyticsGoalEditorView: View {
                                 Spacer()
                                 Group {
                                     if level > 0 {
-                                        Text(verbatim: "☆\(level)")
+                                        Text(verbatim: "LEVEL \(level)")
                                     } else {
                                         Text("Goals.Level.All")
                                     }
