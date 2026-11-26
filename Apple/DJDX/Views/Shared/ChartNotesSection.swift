@@ -98,9 +98,11 @@ struct ChartNotesSheet: View {
             .scrollDismissesKeyboard(.immediately)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Shared.Done") {
-                        dismiss()
+                ToolbarItem(placement: .topBarTrailing) {
+                    if #available(iOS 26.0, *) {
+                        Button(role: .confirm) { dismiss() }
+                    } else {
+                        Button("Shared.Done") { dismiss() }
                     }
                 }
             }
