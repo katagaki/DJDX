@@ -833,6 +833,13 @@ private fun MoreMenu(
         )
         HorizontalDivider()
         DropdownMenuItem(
+            text = { Text(stringResource(R.string.more_feedback)) },
+            onClick = {
+                onDismiss()
+                context.startActivity(Intent(Intent.ACTION_VIEW, "https://forms.gle/G59rciD8dSbNhdqr5".toUri()))
+            }
+        )
+        DropdownMenuItem(
             text = { Text(stringResource(R.string.more_github)) },
             onClick = {
                 onDismiss()
