@@ -11,30 +11,31 @@ struct TierListTile: View {
             Rectangle()
                 .fill(chart.lampColor)
                 .frame(width: 5.0)
-            levelLabel
-                .frame(width: 54.0)
-            Text(chart.title)
-                .font(.caption)
-                .fontWeight(.semibold)
-                .fontWidth(.compressed)
-                .lineLimit(3)
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, minHeight: 36.0, alignment: .leading)
-                .padding(.vertical, 4.0)
-                .padding(.leading, 2.0)
-            if !chart.grade.isEmpty {
-                Text(chart.grade)
+            VStack(alignment: .leading, spacing: 2.0) {
+                HStack(alignment: .center, spacing: 4.0) {
+                    levelLabel
+                    Spacer(minLength: 0.0)
+                    if !chart.grade.isEmpty {
+                        Text(chart.grade)
+                            .font(.caption)
+                            .fontWidth(.expanded)
+                            .fontWeight(.black)
+                            .foregroundStyle(gradeStyle)
+                            .strokeText(color: .black, width: 0.3)
+                            .lineLimit(1)
+                            .fixedSize()
+                    }
+                }
+                Text(chart.title)
                     .font(.caption)
-                    .fontWidth(.expanded)
-                    .fontWeight(.black)
-                    .foregroundStyle(gradeStyle)
-                    .strokeText(color: .black, width: 0.3)
-                    .lineLimit(1)
-                    .fixedSize()
-                    .padding(.leading, 4.0)
+                    .fontWeight(.semibold)
+                    .fontWidth(.compressed)
+                    .lineLimit(2, reservesSpace: true)
+                    .multilineTextAlignment(.leading)
             }
+            .padding(.horizontal, 6.0)
+            .padding(.vertical, 4.0)
         }
-        .padding(.trailing, 6.0)
         .frame(width: Self.width, alignment: .leading)
         .background(.background.secondary)
         .clipShape(.rect(cornerRadius: 6.0))
@@ -50,15 +51,16 @@ struct TierListTile: View {
     var levelLabel: some View {
         if let iidxLevel = chart.iidxLevel {
             IIDXLevelLabel(
+                orientation: .horizontal,
                 levelType: iidxLevel,
                 score: IIDXLevelScore(level: iidxLevel, difficulty: Int(chart.level) ?? 0)
             )
-            .minimumScaleFactor(0.7)
+            .minimumScaleFactor(0.6)
         } else {
-            VStack(alignment: .center) {
+            HStack(alignment: .center, spacing: 6.0) {
                 Text(chart.level)
                     .italic()
-                    .font(.system(size: 16.0))
+                    .font(.system(size: 14.0))
                     .fontWeight(.black)
                 Text(chart.difficultyLabel)
                     .font(.system(size: 10.0))
@@ -66,7 +68,6 @@ struct TierListTile: View {
             }
             .kerning(-0.2)
             .lineLimit(1)
-            .minimumScaleFactor(0.7)
             .modifier(LevelLabelGlow(color: chart.difficultyColor))
         }
     }

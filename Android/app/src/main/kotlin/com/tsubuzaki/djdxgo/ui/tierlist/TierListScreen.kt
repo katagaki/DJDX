@@ -68,6 +68,9 @@ import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -83,7 +86,7 @@ import com.tsubuzaki.djdxgo.data.tierlist.TierListShare
 import com.tsubuzaki.djdxgo.data.tierlist.TierListTier
 import com.tsubuzaki.djdxgo.ui.common.DetailScaffold
 import com.tsubuzaki.djdxgo.ui.common.IIDXDJLevelText
-import com.tsubuzaki.djdxgo.ui.iidx.IIDXLevelBadge
+import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -257,7 +260,7 @@ fun TierListScreen(
                         FilterChip(
                             selected = level == value,
                             onClick = { level = value },
-                            label = { Text("☆$value", fontWeight = FontWeight.Bold) }
+                            label = { Text("LEVEL $value", fontWeight = FontWeight.Bold) }
                         )
                     }
                 }
@@ -306,7 +309,7 @@ fun TierListScreen(
 
     pendingShare?.let { share ->
         val gameName = gameForTierListCode(share.game)?.shortName ?: share.game
-        val description = listOf(gameName, share.playType, "☆${share.level}").filter { it.isNotEmpty() }.joinToString(" ")
+        val description = listOf(gameName, share.playType, "LEVEL ${share.level}").filter { it.isNotEmpty() }.joinToString(" ")
         AlertDialog(
             onDismissRequest = { pendingShare = null },
             title = { Text(stringResource(R.string.tier_list_import_title)) },
@@ -491,7 +494,6 @@ private fun TierTile(
     val darkTheme = isSystemInDarkTheme()
     Box(modifier = modifier) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .width(156.dp)
                 .height(IntrinsicSize.Min)
@@ -507,55 +509,31 @@ private fun TierTile(
                     .background(chart.lampColor)
             )
             val iidxLevel = chart.iidxLevel
-            if (iidxLevel != null) {
-                IIDXLevelBadge(
-                    level = iidxLevel,
-                    difficulty = chart.level.toIntOrNull() ?: 0,
-                    darkTheme = darkTheme,
-                    modifier = Modifier.padding(4.dp).width(56.dp)
+            Column(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    TierLevelLabel(chart = chart, darkTheme = darkTheme, modifier = Modifier.weight(1f))
+                    if (chart.grade.isNotEmpty()) {
+                        if (iidxLevel != null) {
+                            IIDXDJLevelText(djLevel = chart.grade, style = MaterialTheme.typography.labelMedium)
+                        } else {
+                            Text(
+                                chart.grade,
+                                color = chart.gradeColor,
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Black,
+                                maxLines = 1
+                            )
+                        }
+                    }
+                }
+                Text(
+                    chart.title,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    minLines = 2,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
-            } else {
-                Column(
-                    modifier = Modifier.padding(4.dp).width(56.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        chart.difficultyLabel,
-                        color = chart.difficultyColor,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Black,
-                        maxLines = 1
-                    )
-                    Text(chart.level, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
-                }
-            }
-            Text(
-                chart.title,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 4.dp),
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
-            if (chart.grade.isNotEmpty()) {
-                if (iidxLevel != null) {
-                    IIDXDJLevelText(
-                        djLevel = chart.grade,
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.padding(horizontal = 6.dp)
-                    )
-                } else {
-                    Text(
-                        chart.grade,
-                        modifier = Modifier.padding(horizontal = 6.dp),
-                        color = chart.gradeColor,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Black,
-                        maxLines = 1
-                    )
-                }
             }
         }
         DropdownMenu(expanded = isMenuExpanded, onDismissRequest = { isMenuExpanded = false }) {
@@ -572,5 +550,36 @@ private fun TierTile(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun TierLevelLabel(chart: TierListChart, darkTheme: Boolean, modifier: Modifier = Modifier) {
+    val baseColor = chart.iidxLevel?.let { IIDXColors.levelColor(it) } ?: chart.difficultyColor
+    val color = if (darkTheme) lerp(Color.White, baseColor, 0.2f) else baseColor
+    val glow = if (darkTheme) Shadow(color = baseColor, blurRadius = 12f) else null
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = chart.level,
+            color = color,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            fontStyle = FontStyle.Italic,
+            style = MaterialTheme.typography.titleMedium.copy(shadow = glow),
+            maxLines = 1
+        )
+        Text(
+            text = chart.iidxLevel?.name ?: chart.difficultyLabel,
+            color = color,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.labelSmall.copy(shadow = glow),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }

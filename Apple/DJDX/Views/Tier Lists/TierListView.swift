@@ -195,7 +195,7 @@ struct TierListView: View {
                         Button {
                             level = value
                         } label: {
-                            Text(verbatim: "☆\(value)")
+                            Text(verbatim: "LEVEL \(value)")
                                 .font(.subheadline)
                                 .fontWeight(.bold)
                                 .padding(.horizontal, 10.0)
@@ -341,7 +341,7 @@ struct TierListView: View {
 
     func description(of share: TierListShare) -> String {
         let gameName = Game(tierListCode: share.game)?.shortName ?? share.game
-        return [gameName, share.playType, "☆\(share.level)"]
+        return [gameName, share.playType, "LEVEL \(share.level)"]
             .filter { !$0.isEmpty }
             .joined(separator: " ")
     }
