@@ -211,20 +211,9 @@ struct ShareCardRow: View {
             }
             .padding(.vertical, 8.0)
             Spacer(minLength: 0.0)
-            VStack(spacing: 0.0) {
-                Text(verbatim: entry.levelText)
-                    .font(.system(size: 17.0, weight: .black))
-                    .italic()
-                    .monospacedDigit()
-                Text(verbatim: entry.difficultyText)
-                    .font(.system(size: 9.0, weight: .heavy))
-                    .fontWidth(.condensed)
-                    .foregroundStyle(entry.difficultyColor)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-            }
-            .frame(width: 60.0)
-            .padding(.vertical, 8.0)
+            LevelBadge(name: entry.difficultyText, level: entry.levelText,
+                       tint: entry.difficultyColor, layout: .horizontal)
+                .padding(.vertical, 8.0)
         }
         .padding(.trailing, 6.0)
         .fixedSize(horizontal: false, vertical: true)

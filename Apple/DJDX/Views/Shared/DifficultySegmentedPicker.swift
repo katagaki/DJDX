@@ -30,6 +30,7 @@ struct DifficultySegmentedPicker<Tag: Hashable>: View {
         let content = HStack(spacing: 4.0) {
             ForEach(Array(segments.enumerated()), id: \.element.id) { index, segment in
                 segmentButton(segment)
+                    .layoutPriority(selection == segment.tag ? 1.0 : 0.0)
                     .background { frameReader(index: index) }
             }
         }
@@ -49,7 +50,8 @@ struct DifficultySegmentedPicker<Tag: Hashable>: View {
     private var selectionHighlight: some View {
         if let index = selectedIndex, let frame = segmentFrames[index] {
             RoundedRectangle(cornerRadius: 16.0)
-                .fill(selectionColor)
+                .fill(LinearGradient(colors: [selectionColor.mix(with: .white, by: 0.35), selectionColor],
+                                     startPoint: .topLeading, endPoint: .bottomTrailing))
                 .frame(width: frame.width, height: frame.height)
                 .position(x: frame.midX, y: frame.midY)
         }
@@ -63,21 +65,23 @@ struct DifficultySegmentedPicker<Tag: Hashable>: View {
                 selection = segment.tag
             }
         } label: {
-            VStack(spacing: 1.0) {
-                Text(verbatim: segment.number)
-                    .font(.title3)
-                    .fontWeight(.heavy)
-                    .fontWidth(.expanded)
-                segment.name
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .fontWidth(.condensed)
+            HStack(spacing: 7.0) {
+                if isSelected {
+                    segment.name
+                        .font(.system(size: 11.0, weight: .black))
+                        .fontWidth(.condensed)
+                        .kerning(0.4)
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                        .transition(.opacity)
+                }
+                LevelNumber(level: segment.number, size: 22.0, tint: segment.color, isColored: !isSelected)
+                    .shadow(color: .black.opacity(isSelected ? 0.35 : 0.0), radius: 0.0, y: 1.0)
             }
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 8.0)
-            .foregroundStyle(isSelected ? AnyShapeStyle(.white) : AnyShapeStyle(segment.color))
+            .padding(.horizontal, isSelected ? 12.0 : 0.0)
+            .frame(maxWidth: isSelected ? nil : .infinity)
+            .frame(height: 40.0)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
