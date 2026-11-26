@@ -184,8 +184,12 @@ struct IIDXScoresView<Header: View>: View {
                     }
                 }
                 if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
-                    ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
-                            id: \.id) { entry in
+                    let entries = levelEntries(from: searchResults ?? songRecords ?? [])
+                    if !(songRecords ?? []).isEmpty {
+                        ScoreCountRow(count: entries.count)
+                        Divider()
+                    }
+                    ForEach(entries, id: \.id) { entry in
                         Button {
                             navigationManager.push(
                                 ScoresPath.scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level)

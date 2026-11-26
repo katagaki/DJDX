@@ -64,6 +64,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -120,6 +121,18 @@ internal fun BrushedText(text: String, brush: Brush, style: TextStyle, maxLines:
         style = style.merge(TextStyle(brush = brush)),
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+internal fun ScoreCountRow(count: Int) {
+    Text(
+        text = pluralStringResource(R.plurals.games_chart_count, count, count),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     )
 }
 
@@ -307,6 +320,10 @@ internal fun <T> SearchSheet(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(16.dp)
                 )
+            } else if (query.isNotEmpty()) {
+                Box(modifier = Modifier.padding(top = 8.dp)) {
+                    ScoreCountRow(count = results.size)
+                }
             }
             androidx.compose.foundation.lazy.LazyColumn(
                 modifier = Modifier
