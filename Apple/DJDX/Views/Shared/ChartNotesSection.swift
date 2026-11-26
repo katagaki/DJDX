@@ -95,6 +95,7 @@ struct ChartNotesSheet: View {
                 ChartNotesSection(game: game, title: title, chart: chart)
             }
             .navigationTitle("Scores.Notes")
+            .scrollDismissesKeyboard(.immediately)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

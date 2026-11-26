@@ -83,6 +83,7 @@ struct IIDXScoreViewer: View {
             }
         }
         .listSectionSpacing(.compact)
+        .scrollDismissesKeyboard(.immediately)
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
         .contentMargins(.top, 0.0, for: .scrollContent)
