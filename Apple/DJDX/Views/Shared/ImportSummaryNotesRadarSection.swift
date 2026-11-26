@@ -13,14 +13,14 @@ struct ImportSummaryNotesRadarSection: View {
                     Spacer()
                     if let previousRadar = notesRadar.previousRadar {
                         Text(verbatim: signed(notesRadar.radar.sum() - previousRadar.sum()))
-                            .font(.radarline(.caption))
+                            .font(.scoreline(.caption))
                             .foregroundStyle(.secondary)
                     }
                 }
                 HStack {
                     Spacer(minLength: 0.0)
                     Text(verbatim: format(notesRadar.radar.sum()))
-                        .font(.radarline(.largeTitle))
+                        .font(.scoreline(.largeTitle))
                         .foregroundStyle(notesRadar.radar.color(isPlayerRadar: true).gradient)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
@@ -62,10 +62,10 @@ struct ImportSummaryNotesRadarSection: View {
                 .shadow(color: point.color, radius: 1.0)
                 .shadow(color: point.color, radius: 3.0)
             Text(verbatim: format(point.value))
-                .font(.radarline(.subheadline))
+                .font(.scoreline(.subheadline))
             if let previousValue = previousValue(for: point.label) {
                 Text(verbatim: signed(point.value - previousValue))
-                    .font(.radarline(.caption2, weight: .bold))
+                    .font(.scoreline(.caption2, weight: .bold))
                     .foregroundStyle(.secondary)
             }
         }
