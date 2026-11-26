@@ -14,6 +14,7 @@ object Routes {
 
     const val IIDX_VIEWER = "viewer/iidx?title={title}&playType={playType}&level={level}&date={date}"
     const val SDVX_VIEWER = "viewer/sdvx?title={title}&date={date}&difficulty={difficulty}"
+    const val DDR_VIEWER = "viewer/ddr?songIndex={songIndex}&date={date}&style={style}&difficulty={difficulty}"
     const val TEXTAGE_VIEWER = "viewer/textage?legacy={legacy}&chart={chart}"
     const val SDVX_IN_VIEWER = "viewer/sdvxin?legacy={legacy}&viewer={viewer}&data={data}"
     const val TOWER = "tower?mode={mode}"
@@ -33,6 +34,7 @@ object Routes {
     const val CHART_DETAIL_NEW_HIGH_SCORES = "newHighScores"
     const val CHART_DETAIL_NEW_CLEARS = "newClears"
     const val CHART_DETAIL_NEW_GRADES = "newGrades"
+    const val CHART_DETAIL_TREND = "trend"
 
     const val TOWER_RECENT = "recent"
     const val TOWER_TOTALS = "totals"
@@ -43,6 +45,10 @@ object Routes {
 
     fun sdvxViewer(title: String, date: Long, difficulty: String): String =
         "viewer/sdvx?title=${Uri.encode(title)}&date=$date&difficulty=${Uri.encode(difficulty)}"
+
+    fun ddrViewer(songIndex: String, date: Long, style: String, difficulty: String): String =
+        "viewer/ddr?songIndex=${Uri.encode(songIndex)}&date=$date" +
+            "&style=${Uri.encode(style)}&difficulty=${Uri.encode(difficulty)}"
 
     fun textageViewer(legacyURL: String?, chartViewerURL: String?): String =
         "viewer/textage?legacy=${Uri.encode(legacyURL.orEmpty())}&chart=${Uri.encode(chartViewerURL.orEmpty())}"

@@ -1,4 +1,3 @@
-import Charts
 import SwiftUI
 
 struct IIDXScoreSection: View {
@@ -11,10 +10,7 @@ struct IIDXScoreSection: View {
     var playType: IIDXPlayType
     var chartRadarData: ChartRadarData?
 
-    @State private var isShowingHistory: Bool = false
     @State private var scoreHistory: [Date: Int] = [:]
-    @State private var earliestDate: Date = Calendar.current.date(byAdding: .day, value: -1, to: .now)!
-    @State private var latestDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: .now)!
 
     private let fetcher = IIDXReader()
 
@@ -81,98 +77,27 @@ struct IIDXScoreSection: View {
                     IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
                 }
             }
-            if score.djLevelEnum() != .none, scoreHistory.count >= 2 {
-                historyRow()
+            if score.djLevelEnum() != .none {
+                ScoreHistoryRows(history: scoreHistory, yDomain: historyYDomain, thresholds: historyThresholds)
             }
         }
     }
 
-    @ViewBuilder
-    func historyRow() -> some View {
-        Button {
-            withAnimation(.smooth.speed(2.0)) {
-                isShowingHistory.toggle()
-            }
-        } label: {
-            HStack {
-                Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
-                Text("Scores.Viewer.ShowHistory")
-                    .foregroundStyle(.primary)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .rotationEffect(.degrees(isShowingHistory ? 90.0 : 0.0))
-                    .foregroundStyle(.secondary)
-            }
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        if isShowingHistory {
-            historyChart()
-                .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
-        }
-    }
-
-    @ViewBuilder
-    func historyChart() -> some View {
-        Chart {
-            ForEach(scoreHistory.sorted(by: { $0.key < $1.key }), id: \.key) { date, score in
-                AreaMark(x: .value("Shared.Date", date), y: .value("Shared.Score", score))
-            }
-            if let noteCount, noteCount > 0 {
-                RuleMark(y: .value("AAA", Float(noteCount * 2) * 8.0 / 9.0))
-                    .foregroundStyle(.orange)
-                    .annotation(position: .topLeading,
-                                overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
-                        Text(verbatim: "AAA")
-                            .foregroundStyle(.orange.gradient)
-                            .font(.caption2)
-                            .opacity(0.7)
-                    }
-                    .opacity(0.7)
-                RuleMark(y: .value("AA", Float(noteCount * 2) * 7.0 / 9.0))
-                    .foregroundStyle(.gray)
-                    .annotation(position: .topLeading,
-                                overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
-                        Text(verbatim: "AA")
-                            .foregroundStyle(.gray.gradient)
-                            .font(.caption2)
-                            .opacity(0.55)
-                    }
-                    .opacity(0.55)
-                RuleMark(y: .value("A", Float(noteCount * 2) * 6.0 / 9.0))
-                    .foregroundStyle(.teal)
-                    .annotation(position: .topLeading,
-                                overflowResolution: .init(x: .fit(to: .chart), y: .automatic)) {
-                        Text(verbatim: "A")
-                            .foregroundStyle(.teal.gradient)
-                            .font(.caption2)
-                            .opacity(0.4)
-                    }
-                    .opacity(0.4)
-            }
-        }
-        .chartXScale(domain: earliestDate...latestDate)
-        .chartYScale(domain: 0...chartYUpperBound)
-        .chartXAxis {
-            AxisMarks(values: .automatic(desiredCount: 3)) { value in
-                AxisGridLine()
-                AxisTick()
-                if let date = value.as(Date.self) {
-                    AxisValueLabel {
-                        Text(date, format: .dateTime.year(.twoDigits).month(.abbreviated))
-                    }
-                }
-            }
-        }
-        .chartYAxis(.hidden)
-        .frame(height: 200.0)
-    }
-
-    private var chartYUpperBound: Int {
+    private var historyYDomain: ClosedRange<Double> {
         if let noteCount, noteCount > 0 {
-            return noteCount * 2
+            return 0...Double(noteCount * 2)
         }
-        return max(scoreHistory.values.max() ?? 1, 1)
+        return 0...Double(max(scoreHistory.values.max() ?? 1, 1))
+    }
+
+    private var historyThresholds: [ScoreHistoryThreshold] {
+        guard let noteCount, noteCount > 0 else { return [] }
+        let maxScore = Double(noteCount * 2)
+        return [
+            ScoreHistoryThreshold(label: "AAA", value: maxScore * 8.0 / 9.0, color: .orange, opacity: 0.7),
+            ScoreHistoryThreshold(label: "AA", value: maxScore * 7.0 / 9.0, color: .gray, opacity: 0.55),
+            ScoreHistoryThreshold(label: "A", value: maxScore * 6.0 / 9.0, color: .teal, opacity: 0.4)
+        ]
     }
 
     func reloadScoreHistory() async {
@@ -202,22 +127,5 @@ struct IIDXScoreSection: View {
                 partialResult[importDate] = levelScore.score
             }
         })
-
-        // Set date range for chart
-        var newEarliestDate: Date = .now
-        var newLatestDate: Date = .now
-        for pair in recordImportGroups {
-            let (songRecord, groupID) = pair
-            if let levelScore = songRecord.score(for: score.level), levelScore.score > 0,
-               let importDate = importGroupDates[groupID] {
-                if importDate < newEarliestDate {
-                    newEarliestDate = importDate
-                } else if importDate > newLatestDate {
-                    newLatestDate = importDate
-                }
-            }
-        }
-        earliestDate = Calendar.current.date(byAdding: .day, value: -1, to: newEarliestDate)!
-        latestDate = Calendar.current.date(byAdding: .day, value: 1, to: newLatestDate)!
     }
 }

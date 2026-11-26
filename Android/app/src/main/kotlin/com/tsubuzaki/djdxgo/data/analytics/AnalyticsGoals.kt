@@ -17,6 +17,7 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXGrade
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
+import com.tsubuzaki.djdxgo.data.sdvx.SDVXVolforce
 import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingFlow
 import java.time.Instant
@@ -374,12 +375,6 @@ class AnalyticsGoalEvaluator(
     companion object {
         private const val DDR_FLARE_SKILL_CHARTS = 90
 
-        fun volforce(records: List<SDVXSongRecord>): Double {
-            val top = records.map { record ->
-                val level = record.level.toDoubleOrNull() ?: 0.0
-                if (level <= 0.0 || record.highScore <= 0) 0.0 else level * 2.0 * (record.highScore / 10_000_000.0)
-            }.sortedDescending().take(50)
-            return (top.sum() * 100).roundToInt() / 100.0
-        }
+        fun volforce(records: List<SDVXSongRecord>): Double = SDVXVolforce.total(records)
     }
 }

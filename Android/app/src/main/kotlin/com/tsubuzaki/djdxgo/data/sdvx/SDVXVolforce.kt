@@ -2,6 +2,13 @@ package com.tsubuzaki.djdxgo.data.sdvx
 
 import kotlin.math.floor
 
+data class SDVXVolforceRow(
+    val date: Long,
+    val level: String,
+    val highScore: Int,
+    val clearType: String
+)
+
 object SDVXVolforce {
 
     private val gradeCoefficients = mapOf(
@@ -17,14 +24,23 @@ object SDVXVolforce {
     )
 
     fun total(records: List<SDVXSongRecord>): Double =
-        records.map(::chartForce).sortedDescending().take(50).sum() / 1000.0
+        sumTop(records.map(::chartForce))
 
-    fun chartForce(record: SDVXSongRecord): Int {
-        val level = record.level.toDoubleOrNull() ?: 0.0
-        if (level <= 0.0 || record.highScore <= 0) return 0
-        val rate = minOf(record.highScore, 10_000_000) / 10_000_000.0
-        val grade = gradeCoefficients[SDVXGrade.forScore(record.highScore)] ?: 0.0
-        val lamp = SDVXClearType.fromValue(record.clearType)?.let { lampCoefficients[it] } ?: 0.0
+    fun totalForRows(rows: List<SDVXVolforceRow>): Double =
+        sumTop(rows.map { chartForce(it.level, it.highScore, it.clearType) })
+
+    fun chartForce(record: SDVXSongRecord): Int =
+        chartForce(record.level, record.highScore, record.clearType)
+
+    private fun chartForce(levelValue: String, highScore: Int, clearType: String): Int {
+        val level = levelValue.toDoubleOrNull() ?: 0.0
+        if (level <= 0.0 || highScore <= 0) return 0
+        val rate = minOf(highScore, 10_000_000) / 10_000_000.0
+        val grade = gradeCoefficients[SDVXGrade.forScore(highScore)] ?: 0.0
+        val lamp = SDVXClearType.fromValue(clearType)?.let { lampCoefficients[it] } ?: 0.0
         return floor(level * rate * grade * lamp * 20.0).toInt()
     }
+
+    private fun sumTop(forces: List<Int>): Double =
+        forces.sortedDescending().take(50).sum() / 1000.0
 }

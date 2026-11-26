@@ -19,6 +19,11 @@ struct DDRAnalyticsDestinationView: View {
                 DDRRankBreakdownDetailView(rankPerLevel: model.rankPerLevel)
                     .navigationTitle("Analytics.DDR.RankBreakdown")
                     .navigationTransition(.zoom(sourceID: "DDR.rankBreakdown", in: namespace))
+            case .flareSkillTrendDetail:
+                TrendDetailView(points: model.flareSkillHistory, color: .orange,
+                                format: DDRAnalyticsModel.formatFlareSkill)
+                    .navigationTitle("Analytics.DDR.FlareSkillTrend")
+                    .navigationTransition(.zoom(sourceID: "DDR.flareSkillTrend", in: namespace))
             }
         }
         .appBackgroundGradient()

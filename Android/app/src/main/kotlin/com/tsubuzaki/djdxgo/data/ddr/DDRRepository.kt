@@ -1,5 +1,6 @@
 package com.tsubuzaki.djdxgo.data.ddr
 
+import com.tsubuzaki.djdxgo.data.TrendPoint
 import com.tsubuzaki.djdxgo.data.dayBucket
 import com.tsubuzaki.djdxgo.data.ddrCompact
 import com.tsubuzaki.djdxgo.data.external.DDRSongMeta
@@ -98,6 +99,14 @@ class DDRRepository(
     suspend fun songRecordsForGroup(groupID: String, style: DDRPlayStyle): List<DDRSongRecord> =
         applyMetadata(dao.songRecords(groupID, style.value))
 
+    suspend fun songRecordsForSong(date: Long, songIndex: String, style: DDRPlayStyle): List<DDRSongRecord> {
+        val group = importGroupFor(date) ?: return emptyList()
+        val order = DDRDifficulty.entries
+        return applyMetadata(
+            dao.songRecordsForIndex(group.id, songIndex).filter { it.style == style.value }
+        ).sortedBy { DDRDifficulty.fromValue(it.difficulty)?.let(order::indexOf) ?: Int.MAX_VALUE }
+    }
+
     private suspend fun applyMetadata(records: List<DDRSongRecord>): List<DDRSongRecord> {
         if (records.isEmpty()) return records
         val metaByTitle = externalDao.allDDRSongMetas().associateBy { it.titleCompact }
@@ -109,6 +118,20 @@ class DDRRepository(
                 DDRDifficulty.fromValue(record.difficulty)
             )
             if (level > 0) record.copy(level = level) else record
+        }
+    }
+
+    suspend fun flareSkillHistory(style: DDRPlayStyle): List<TrendPoint> {
+        val rows = dao.flareSkillRows(style.value)
+        if (rows.isEmpty()) return emptyList()
+        val versionByTitle = externalDao.allDDRSongMetas().associate { it.titleCompact to it.version }
+        return rows.groupBy { it.date }.toSortedMap().map { (date, groupRows) ->
+            TrendPoint(
+                date = date,
+                value = DDRFlareSkill.totalForRows(groupRows) {
+                    versionByTitle[it.title.ddrCompact] ?: 0
+                }.toDouble()
+            )
         }
     }
 

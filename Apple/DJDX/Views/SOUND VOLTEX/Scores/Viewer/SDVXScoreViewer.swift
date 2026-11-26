@@ -10,6 +10,7 @@ struct SDVXScoreViewer: View {
 
     @State private var selectedDifficulty: SDVXDifficulty = .unknown
     @State private var sdvxInChart: SDVXInChart?
+    @State private var scoreHistory: [Date: Int] = [:]
 
     private let fetcher = SDVXReader()
 
@@ -49,6 +50,11 @@ struct SDVXScoreViewer: View {
                     SDVXNoteTypeDetailRow("PERFECT", value: songRecord.perfectCount, style: Color.yellow)
                 }
                 .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+                ScoreHistoryRows(
+                    history: scoreHistory,
+                    yDomain: ScoreHistoryChart.zoomedDomain(for: scoreHistory, step: 100_000, upperBound: 10_000_000),
+                    thresholds: Self.historyThresholds
+                )
                 chartActions()
             }
             if selectedDifficulty != .unknown {
@@ -82,7 +88,19 @@ struct SDVXScoreViewer: View {
         }
         .task(id: selectedDifficulty) {
             sdvxInChart = await fetcher.sdvxInChart(title: songRecord.title, difficulty: difficulty)
+            scoreHistory = await fetcher.scoreHistory(title: songRecord.title, difficulty: difficulty)
         }
+    }
+
+    static let historyThresholds: [ScoreHistoryThreshold] = [
+        (SDVXGrade.s, 9_900_000.0, 0.7),
+        (SDVXGrade.aaaPlus, 9_800_000.0, 0.6),
+        (SDVXGrade.aaa, 9_700_000.0, 0.55),
+        (SDVXGrade.aaPlus, 9_500_000.0, 0.45),
+        (SDVXGrade.aa, 9_300_000.0, 0.4)
+    ].map { grade, value, opacity in
+        ScoreHistoryThreshold(label: grade.rawValue, value: value,
+                              color: SDVXGrade.color(for: grade.rawValue), opacity: opacity)
     }
 
     @ViewBuilder
