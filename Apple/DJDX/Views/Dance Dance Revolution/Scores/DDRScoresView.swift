@@ -21,6 +21,7 @@ struct DDRScoresView<Header: View>: View {
     @State var records: [DDRSongRecord] = []
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
+    @State private var chartNoteTarget: ChartNoteTarget?
 
     @Namespace var ddrNamespace
 
@@ -149,7 +150,13 @@ struct DDRScoresView<Header: View>: View {
                         Divider()
                     }
                     ForEach(sortedRecords, id: \.self) { record in
-                        DDRScoreRow(record: record)
+                        Button {
+                            chartNoteTarget = record.chartNoteTarget
+                        } label: {
+                            DDRScoreRow(record: record)
+                                .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                         Divider()
                             .padding(.leading, 16.0)
                     }
@@ -172,6 +179,11 @@ struct DDRScoresView<Header: View>: View {
                 sortControl
                 filterControl
             }
+        }
+        .sheet(item: $chartNoteTarget) { target in
+            ChartNotesSheet(game: target.game, title: target.title,
+                            chart: target.chart, chartLabel: target.chartLabel)
+                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             DDRScoreFilterSheet(

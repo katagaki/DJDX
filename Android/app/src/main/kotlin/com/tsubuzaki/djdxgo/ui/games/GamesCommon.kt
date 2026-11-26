@@ -1,5 +1,10 @@
 package com.tsubuzaki.djdxgo.ui.games
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
@@ -451,11 +456,23 @@ internal fun ViewerWithSelector(
         }
     ) { padding ->
         val density = LocalDensity.current
+        val focusManager = LocalFocusManager.current
+        val dismissKeyboardOnScroll = remember(focusManager) {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    if (source == NestedScrollSource.UserInput && available.y != 0f) {
+                        focusManager.clearFocus()
+                    }
+                    return Offset.Zero
+                }
+            }
+        }
         var selectorHeight by remember { mutableStateOf(0.dp) }
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .nestedScroll(dismissKeyboardOnScroll)
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp)
                     .padding(bottom = if (selector != null) selectorHeight + 24.dp else 24.dp),

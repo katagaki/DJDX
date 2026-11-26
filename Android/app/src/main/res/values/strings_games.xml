@@ -58,4 +58,9 @@
     <string name="ddr_data_source_warning_action">Open Data Sources</string>
     <string name="sdvx_in_viewer_title">Chart</string>
     <string name="sdvx_in_fallback_message">Chart not opening?\nTry opening it manually on sdvx.in.</string>
+    <string name="chart_notes">Notes</string>
+    <string name="chart_notes_green_number">Green Number</string>
+    <string name="chart_notes_lane_cover">Lane Cover</string>
+    <string name="chart_notes_judgment_offset">Offset</string>
+    <string name="chart_notes_placeholder">Add a note for this chart</string>
 </resources>
