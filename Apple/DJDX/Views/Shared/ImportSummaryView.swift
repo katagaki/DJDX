@@ -188,7 +188,7 @@ struct ImportSummaryView: View {
     }
 }
 
-private extension View {
+extension View {
     func groupedInsetBackground() -> some View {
         background(Color(uiColor: .secondarySystemGroupedBackground), in: .rect(cornerRadius: 26.0))
     }
