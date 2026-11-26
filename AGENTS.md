@@ -30,6 +30,9 @@ Run build commands from inside the relevant folder.
   SwiftUI wrapper over a `UIViewRepresentable` `WKWebView` + a `WKNavigationDelegate`
   coordinator. Changes to import behavior usually need applying to all four.
 - `Apple/DJDX.xcodeproj/xcshareddata/xcodecloud/` is gitignored and must never be staged.
+- The Lamp server URL comes from the Xcode Cloud environment variable `LAMP_SERVER_URL`,
+  written into `LampServerURL` in `DJDX/Info.plist` by `ci_scripts/ci_pre_xcodebuild.sh`.
+  Keep the committed value empty.
 
 # Android
 
