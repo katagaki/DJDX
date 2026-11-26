@@ -513,22 +513,6 @@ private fun TierTile(
             )
             val iidxLevel = chart.iidxLevel
             Column(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    TierLevelLabel(chart = chart, darkTheme = darkTheme, modifier = Modifier.weight(1f))
-                    if (chart.grade.isNotEmpty()) {
-                        if (iidxLevel != null) {
-                            IIDXDJLevelText(djLevel = chart.grade, style = MaterialTheme.typography.labelMedium)
-                        } else {
-                            Text(
-                                chart.grade,
-                                color = chart.gradeColor,
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Black,
-                                maxLines = 1
-                            )
-                        }
-                    }
-                }
                 if (iidxLevel != null) {
                     OutlinedText(
                         text = chart.title,
@@ -547,6 +531,22 @@ private fun TierTile(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    TierLevelLabel(chart = chart, darkTheme = darkTheme, modifier = Modifier.weight(1f))
+                    if (chart.grade.isNotEmpty()) {
+                        if (iidxLevel != null) {
+                            IIDXDJLevelText(djLevel = chart.grade, style = MaterialTheme.typography.labelMedium)
+                        } else {
+                            Text(
+                                chart.grade,
+                                color = chart.gradeColor,
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Black,
+                                maxLines = 1
+                            )
+                        }
+                    }
                 }
             }
         }

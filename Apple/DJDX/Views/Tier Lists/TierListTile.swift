@@ -15,6 +15,7 @@ struct TierListTile: View {
                 .fill(chart.lampColor)
                 .frame(width: 5.0)
             VStack(alignment: .leading, spacing: 2.0) {
+                title
                 HStack(alignment: .center, spacing: 4.0) {
                     levelLabel
                     Spacer(minLength: 0.0)
@@ -29,7 +30,6 @@ struct TierListTile: View {
                             .fixedSize()
                     }
                 }
-                title
             }
             .padding(.horizontal, 6.0)
             .padding(.vertical, 4.0)
