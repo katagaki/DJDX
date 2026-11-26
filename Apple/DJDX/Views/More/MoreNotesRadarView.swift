@@ -55,11 +55,11 @@ struct MoreNotesRadarView: View {
             ForEach(radarData.displayPoints(), id: \.label) { point in
                 HStack {
                     Text(verbatim: point.label)
-                        .font(.system(size: listFontSize, weight: .bold))
+                        .font(.radarline(size: listFontSize, weight: .bold, width: .expanded))
                         .foregroundStyle(point.color)
                     Spacer()
                     Text(verbatim: String(format: "%.2f", point.value))
-                        .font(.system(size: listFontSize, weight: .semibold).monospacedDigit())
+                        .font(.radarline(size: listFontSize, weight: .medium))
                         .foregroundStyle(.primary)
                 }
             }
@@ -70,7 +70,7 @@ struct MoreNotesRadarView: View {
                     .font(.system(size: listFontSize, weight: .bold))
                 Spacer()
                 Text(verbatim: String(format: "%.2f", radarData.sum()))
-                    .font(.system(size: listFontSize, weight: .bold).monospacedDigit())
+                    .font(.radarline(size: listFontSize, weight: .bold))
             }
         }
         .padding(.horizontal, 16.0)

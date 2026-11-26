@@ -9,19 +9,18 @@ struct ImportSummaryNotesRadarSection: View {
             VStack(alignment: .leading, spacing: 4.0) {
                 HStack {
                     Text(verbatim: "NOTES RADAR (\(notesRadar.playType))")
-                        .font(.caption)
-                        .fontWeight(.heavy)
+                        .font(.radarline(.caption))
                     Spacer()
                     if let previousRadar = notesRadar.previousRadar {
                         Text(verbatim: signed(notesRadar.radar.sum() - previousRadar.sum()))
-                            .font(.scoreline(.caption))
+                            .font(.radarline(.caption))
                             .foregroundStyle(.secondary)
                     }
                 }
                 HStack {
                     Spacer(minLength: 0.0)
                     Text(verbatim: format(notesRadar.radar.sum()))
-                        .font(.scoreline(.largeTitle))
+                        .font(.radarline(.largeTitle))
                         .foregroundStyle(notesRadar.radar.color(isPlayerRadar: true).gradient)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
@@ -57,16 +56,16 @@ struct ImportSummaryNotesRadarSection: View {
     func pointColumn(_ point: RadarPointConfig) -> some View {
         VStack(spacing: 2.0) {
             Text(verbatim: point.label)
-                .font(.system(size: 10.0, weight: .black))
+                .font(.radarline(size: 10.0))
                 .foregroundStyle(point.color)
                 .brightness(0.88)
                 .shadow(color: point.color, radius: 1.0)
                 .shadow(color: point.color, radius: 3.0)
             Text(verbatim: format(point.value))
-                .font(.scoreline(.subheadline))
+                .font(.radarline(.subheadline))
             if let previousValue = previousValue(for: point.label) {
                 Text(verbatim: signed(point.value - previousValue))
-                    .font(.scoreline(.caption2, weight: .bold))
+                    .font(.radarline(.caption2, weight: .bold))
                     .foregroundStyle(.secondary)
             }
         }
