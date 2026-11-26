@@ -14,10 +14,7 @@ struct ImportSummaryView: View {
             ScrollView {
                 LazyVStack(spacing: 0.0) {
                     if let summary {
-                        header(summary)
                         if !summary.notesRadars.isEmpty || !summary.ratings.isEmpty {
-                            AnalyticsSectionHeader(title: "ImportSummary.Ratings")
-                                .padding(.bottom, 12.0)
                             VStack(spacing: 12.0) {
                                 ForEach(summary.notesRadars) { notesRadar in
                                     ImportSummaryNotesRadarSection(notesRadar: notesRadar)
@@ -31,6 +28,7 @@ struct ImportSummaryView: View {
                                 }
                             }
                             .padding(.horizontal)
+                            .padding(.top, 16.0)
                             .padding(.bottom, 24.0)
                         }
                         if summary.previousImportDate != nil {
@@ -40,7 +38,9 @@ struct ImportSummaryView: View {
                                 .padding(.vertical, 12.0)
                                 .groupedInsetBackground()
                                 .padding(.horizontal)
-                                .padding(.bottom, 16.0)
+                                .padding(.bottom, 24.0)
+                            AnalyticsSectionHeader(title: "ViewTitle.Scores")
+                                .padding(.bottom, 12.0)
                             Divider()
                             if summary.personalBests.isEmpty {
                                 Text("ImportSummary.NoPersonalBests")
@@ -69,7 +69,7 @@ struct ImportSummaryView: View {
                     ContentUnavailableView("ImportSummary.Unavailable", systemImage: "tray")
                 }
             }
-            .navigationTitle("ImportSummary.Title")
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -99,19 +99,12 @@ struct ImportSummaryView: View {
         }
     }
 
-    // MARK: Header
-
-    @ViewBuilder
-    func header(_ summary: ImportSummary) -> some View {
-        Text(summary.importDate, format: .dateTime.year().month().day())
-            .font(.title)
-            .fontWeight(.heavy)
-            .fontWidth(.compressed)
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16.0)
-        .padding(.horizontal, 20.0)
+    var navigationTitle: Text {
+        if let summary {
+            Text(summary.importDate, format: .dateTime.year().month().day())
+        } else {
+            Text("ImportSummary.Title")
+        }
     }
 
     // MARK: Ratings
