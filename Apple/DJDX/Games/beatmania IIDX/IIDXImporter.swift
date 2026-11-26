@@ -333,24 +333,6 @@ actor IIDXImporter {
 
     // MARK: Delete Helpers
 
-    func deleteImportGroup(id: String) {
-        guard let database = try? IIDXPlayDataDatabase.current.getWriteConnection() else { return }
-        let col = IIDXPlayDataDatabase.self
-        try? database.transaction {
-            try database.run(col.songRecordTable.filter(col.srImportGroupID == id).delete())
-            try database.run(col.importGroupTable.filter(col.igID == id).delete())
-        }
-    }
-
-    func deleteAllScoreData() {
-        guard let database = try? IIDXPlayDataDatabase.current.getWriteConnection() else { return }
-        let col = IIDXPlayDataDatabase.self
-        try? database.transaction {
-            try database.run(col.songRecordTable.delete())
-            try database.run(col.importGroupTable.delete())
-        }
-    }
-
     func deleteAllSongs() {
         guard let database = try? BEMANIWikiDatabase.shared.getWriteConnection() else { return }
         _ = try? database.run(BEMANIWikiDatabase.songTable.delete())

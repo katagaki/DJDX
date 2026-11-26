@@ -9,6 +9,7 @@ import com.tsubuzaki.djdxgo.data.ddr.DDRRepository
 import com.tsubuzaki.djdxgo.data.external.ExternalDataReloader
 import com.tsubuzaki.djdxgo.data.iidx.IIDXChartAnalyzer
 import com.tsubuzaki.djdxgo.data.iidx.IIDXRepository
+import com.tsubuzaki.djdxgo.data.importsummary.ImportSummaryBuilder
 import com.tsubuzaki.djdxgo.data.notes.ChartNotesDatabase
 import com.tsubuzaki.djdxgo.data.notes.ChartNotesRepository
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordRepository
@@ -34,6 +35,7 @@ class AppContainer(context: Context) {
     val ddrRepository = DDRRepository(database.ddrDao(), externalDataDao)
     val externalDataReloader = ExternalDataReloader(externalDataDao)
     val analyticsStore = AnalyticsStore(database, ddrRepository)
+    val importSummaryBuilder = ImportSummaryBuilder(iidxRepository, sdvxRepository, polarisChordRepository, ddrRepository)
     val goalEvaluator = AnalyticsGoalEvaluator(context.applicationContext, database, ddrRepository)
     val profileRepository = ProfileRepository(context.applicationContext)
     val chartAnalyzer = IIDXChartAnalyzer(context.applicationContext.cacheDir)

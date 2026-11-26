@@ -89,7 +89,7 @@ enum AnalyticsGoalEvaluator {
     static func sdvxValue(_ records: [SDVXSongRecord], goal: AnalyticsGoal) -> Double {
         switch goal.kind {
         case .rating:
-            return SDVXAnalyticsModel.volforce(of: records)
+            return SDVXVolforce.total(records)
         case .clearCount:
             let ranking = SDVXClearType.sortedStringsWithoutNoPlay
             return Double(countAtOrAbove(records, ranking: ranking, goal: goal,
