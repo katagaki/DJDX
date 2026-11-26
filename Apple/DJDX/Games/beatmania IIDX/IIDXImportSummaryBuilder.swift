@@ -41,12 +41,28 @@ enum IIDXImportSummaryBuilder {
             }
         }
 
+        var notesRadars: [ImportSummaryNotesRadar] = []
+        for playType in [IIDXPlayType.single, .double] {
+            guard let radar = await reader.notesRadar(for: group.id, playType: playType) else { continue }
+            var previousRadar: RadarData?
+            for candidate in earlierGroups {
+                if let candidateRadar = await reader.notesRadar(for: candidate.id, playType: playType) {
+                    previousRadar = candidateRadar
+                    break
+                }
+            }
+            notesRadars.append(ImportSummaryNotesRadar(
+                playType: playType == .single ? "SP" : "DP", radar: radar, previousRadar: previousRadar
+            ))
+        }
+
         return ImportSummary(
             game: .iidx,
             importDate: group.importDate,
             previousImportDate: previousImportDate,
             ratings: [],
-            personalBests: entries.sorted { ($0.levelValue, $1.title) > ($1.levelValue, $0.title) }
+            personalBests: entries.sorted { ($0.levelValue, $1.title) > ($1.levelValue, $0.title) },
+            notesRadars: notesRadars
         )
     }
 

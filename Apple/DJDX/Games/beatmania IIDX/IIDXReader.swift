@@ -85,6 +85,25 @@ actor IIDXReader {
         return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
     }
 
+    // MARK: Notes Radar
+
+    func notesRadar(for importGroupID: String, playType: IIDXPlayType) -> RadarData? {
+        guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return nil }
+        let col = IIDXPlayDataDatabase.self
+        guard let row = try? database.pluck(col.notesRadarTable
+            .filter(col.nrImportGroupID == importGroupID && col.nrPlayType == playType.rawValue)) else {
+            return nil
+        }
+        return RadarData(
+            notes: row[col.nrNotes],
+            chord: row[col.nrChord],
+            peak: row[col.nrPeak],
+            charge: row[col.nrCharge],
+            scratch: row[col.nrScratch],
+            soflan: row[col.nrSoflan]
+        )
+    }
+
     // MARK: Song Records
 
     func invalidateCachedRecords() {

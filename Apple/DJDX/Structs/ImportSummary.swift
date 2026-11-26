@@ -21,6 +21,15 @@ struct ImportSummary {
     let previousImportDate: Date?
     let ratings: [ImportSummaryRating]
     let personalBests: [ImportSummaryEntry]
+    var notesRadars: [ImportSummaryNotesRadar] = []
+}
+
+struct ImportSummaryNotesRadar: Identifiable {
+    let playType: String
+    let radar: RadarData
+    let previousRadar: RadarData?
+
+    var id: String { playType }
 }
 
 struct ImportSummaryRating: Identifiable, Hashable {

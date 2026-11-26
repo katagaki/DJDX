@@ -5,4 +5,5 @@ extension Notification.Name {
     static let analyticsLayoutReset = Notification.Name("DJDX.AnalyticsLayoutReset")
     static let profileRefreshRequested = Notification.Name("DJDX.ProfileRefreshRequested")
     static let externalDataChanged = Notification.Name("DJDX.ExternalDataChanged")
+    static let importSummaryUpdated = Notification.Name("DJDX.ImportSummaryUpdated")
 }

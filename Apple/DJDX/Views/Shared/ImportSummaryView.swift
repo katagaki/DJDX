@@ -19,6 +19,9 @@ struct ImportSummaryView: View {
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+                    ForEach(summary.notesRadars) { notesRadar in
+                        ImportSummaryNotesRadarSection(notesRadar: notesRadar)
+                    }
                     ForEach(summary.ratings) { rating in
                         Section {
                             ratingRow(rating, game: summary.game)
@@ -74,6 +77,9 @@ struct ImportSummaryView: View {
             .task {
                 summary = await load()
                 isLoading = false
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .importSummaryUpdated)) { _ in
+                Task { summary = await load() }
             }
         }
     }
