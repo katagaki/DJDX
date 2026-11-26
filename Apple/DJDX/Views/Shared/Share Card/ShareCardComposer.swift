@@ -19,7 +19,7 @@ struct ShareCardComposer: View {
     let entries: [ShareCardEntry]
     var playStyle: String?
 
-    static let rowLimits: [Int] = [10, 20, 30, 50]
+    static let rowLimits: [Int] = [3, 5, 10, 20, 30, 50]
 
     @State var background: ShareCardBackground = .gradient(.accent)
     @State var photoItem: PhotosPickerItem?

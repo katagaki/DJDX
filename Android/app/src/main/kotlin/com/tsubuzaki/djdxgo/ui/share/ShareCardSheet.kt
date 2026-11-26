@@ -91,7 +91,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private val rowLimits = listOf(10, 20, 30, 50)
+private val rowLimits = listOf(3, 5, 10, 20, 30, 50)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
