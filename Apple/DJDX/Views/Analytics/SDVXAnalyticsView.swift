@@ -154,43 +154,32 @@ struct SDVXAnalyticsView: View {
         }
     }
 
-    @ViewBuilder
     var suggestionsSection: some View {
-        if !isEditing {
-            VStack(spacing: 12.0) {
-                AnalyticsSectionHeader(
-                    title: AnalyticsSection.suggestions.titleKey,
-                    isCollapsible: true,
-                    isExpanded: !isSuggestionsCollapsed
-                ) {
-                    withAnimation(.smooth.speed(2.0)) { isSuggestionsCollapsed.toggle() }
-                }
-                if !isSuggestionsCollapsed {
-                    Button {
-                        navigationManager.push(SDVXAnalyticsPath.volforceSuggestionsDetail)
-                    } label: {
-                        AnalyticsSuggestionCard(
-                            title: Text(verbatim: "VOLFORCE"),
-                            systemImage: "arrow.up.right.circle",
-                            iconColor: .purple,
-                            count: model.volforceSuggestions.count,
-                            previews: model.volforceSuggestions.prefix(3).map { suggestion in
-                                AnalyticsSuggestionPreview(
-                                    id: suggestion.id,
-                                    title: suggestion.songTitle,
-                                    detail: "\(suggestion.difficulty.abbreviation) \(suggestion.level) · " +
-                                        suggestion.targetGrade,
-                                    value: SDVXVolforce.gainText(suggestion.volforceGain)
-                                )
-                            }
-                        )
-                    }
-                    .buttonStyle(AnalyticsCardButtonStyle())
-                    .matchedTransitionSource(id: "SDVX.volforceSuggestions", in: analyticsNamespace)
-                    .padding(.horizontal)
-                }
+        AnalyticsSuggestionsSection(
+            cards: AnalyticsSuggestionCardID.sdvxCards,
+            columns: [GridItem(.flexible())],
+            isEditing: isEditing,
+            isExpanded: !isSuggestionsCollapsed,
+            onToggle: { withAnimation(.smooth.speed(2.0)) { isSuggestionsCollapsed.toggle() } },
+            card: { _ in volforceSuggestionsCard }
+        )
+    }
+
+    var volforceSuggestionsCard: some View {
+        Button {
+            navigationManager.push(SDVXAnalyticsPath.volforceSuggestionsDetail)
+        } label: {
+            AnalyticsSuggestionCard(
+                title: Text(verbatim: "VOLFORCE"),
+                systemImage: "arrow.up.right.circle",
+                iconColor: .purple,
+                items: model.volforceSuggestions
+            ) { suggestion in
+                SDVXVolforceSuggestionRow(namespace: analyticsNamespace, suggestion: suggestion)
             }
         }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .matchedTransitionSource(id: AnalyticsSuggestionCardID.sdvxVolforce.transitionID, in: analyticsNamespace)
     }
 
     // MARK: - Cards

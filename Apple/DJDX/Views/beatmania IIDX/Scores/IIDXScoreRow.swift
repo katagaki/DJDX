@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct IIDXScoreRow: View {
+struct IIDXScoreRow<Accessory: View>: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
@@ -20,6 +20,18 @@ struct IIDXScoreRow: View {
     var score: IIDXLevelScore
     var scoreRate: Float?
     var scoreDelta: Int?
+    var accessory: Accessory
+
+    init(namespace: Namespace.ID, songRecord: IIDXSongRecord, level: IIDXLevel, score: IIDXLevelScore,
+         scoreRate: Float? = nil, scoreDelta: Int? = nil, @ViewBuilder accessory: () -> Accessory) {
+        self.namespace = namespace
+        self.songRecord = songRecord
+        self.level = level
+        self.score = score
+        self.scoreRate = scoreRate
+        self.scoreDelta = scoreDelta
+        self.accessory = accessory()
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 8.0) {
@@ -136,6 +148,8 @@ struct IIDXScoreRow: View {
                         .offset(y: 1.0)
                         .font(.caption)
                     }
+                    accessory
+                        .font(.caption)
                 }
                 Spacer(minLength: 0.0)
             }
@@ -158,5 +172,13 @@ struct IIDXScoreRow: View {
 
     var titleStrokeColor: Color {
         iidxVersion.rowTitleStrokeColor(for: songRecord.version, level: level, colorScheme: colorScheme)
+    }
+}
+
+extension IIDXScoreRow where Accessory == EmptyView {
+    init(namespace: Namespace.ID, songRecord: IIDXSongRecord, level: IIDXLevel, score: IIDXLevelScore,
+         scoreRate: Float? = nil, scoreDelta: Int? = nil) {
+        self.init(namespace: namespace, songRecord: songRecord, level: level, score: score,
+                  scoreRate: scoreRate, scoreDelta: scoreDelta) { EmptyView() }
     }
 }

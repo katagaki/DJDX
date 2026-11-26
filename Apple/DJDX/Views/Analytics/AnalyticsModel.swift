@@ -31,7 +31,8 @@ final class AnalyticsModel {
 
     // Suggestions
     var djLevelSuggestions: [IIDXDJLevelSuggestion] = []
-    var clearLampSuggestionCandidates: [IIDXClearLampSuggestion] = []
+    var clearLampSuggestionCandidates: [IIDXChartSuggestion] = []
+    var longUnplayedSuggestions: [IIDXChartSuggestion] = []
 
     // Tower
     var towerEntries: [IIDXTowerEntry] = []

@@ -116,43 +116,32 @@ struct DDRAnalyticsView: View {
         }
     }
 
-    @ViewBuilder
     var suggestionsSection: some View {
-        if !isEditing {
-            VStack(spacing: 12.0) {
-                AnalyticsSectionHeader(
-                    title: AnalyticsSection.suggestions.titleKey,
-                    isCollapsible: true,
-                    isExpanded: !isSuggestionsCollapsed
-                ) {
-                    withAnimation(.smooth.speed(2.0)) { isSuggestionsCollapsed.toggle() }
-                }
-                if !isSuggestionsCollapsed {
-                    Button {
-                        navigationManager.push(DDRAnalyticsPath.flareSkillSuggestionsDetail)
-                    } label: {
-                        AnalyticsSuggestionCard(
-                            title: Text(verbatim: "FLARE SKILL"),
-                            systemImage: "flame",
-                            iconColor: .orange,
-                            count: model.flareSkillSuggestions.count,
-                            previews: model.flareSkillSuggestions.prefix(3).map { suggestion in
-                                AnalyticsSuggestionPreview(
-                                    id: suggestion.id,
-                                    title: suggestion.songTitle,
-                                    detail: "\(suggestion.difficulty.rawValue) \(suggestion.level) · " +
-                                        "FLARE \(DDRFlareSkill.rankLabel(suggestion.targetFlareRank))",
-                                    value: "+\(suggestion.flareSkillGain)"
-                                )
-                            }
-                        )
-                    }
-                    .buttonStyle(AnalyticsCardButtonStyle())
-                    .matchedTransitionSource(id: "DDR.flareSkillSuggestions", in: analyticsNamespace)
-                    .padding(.horizontal)
-                }
+        AnalyticsSuggestionsSection(
+            cards: AnalyticsSuggestionCardID.ddrCards,
+            columns: [GridItem(.flexible())],
+            isEditing: isEditing,
+            isExpanded: !isSuggestionsCollapsed,
+            onToggle: { withAnimation(.smooth.speed(2.0)) { isSuggestionsCollapsed.toggle() } },
+            card: { _ in flareSkillSuggestionsCard }
+        )
+    }
+
+    var flareSkillSuggestionsCard: some View {
+        Button {
+            navigationManager.push(DDRAnalyticsPath.flareSkillSuggestionsDetail)
+        } label: {
+            AnalyticsSuggestionCard(
+                title: Text(verbatim: "FLARE SKILL"),
+                systemImage: "flame",
+                iconColor: .orange,
+                items: model.flareSkillSuggestions
+            ) { suggestion in
+                DDRFlareSkillSuggestionRow(suggestion: suggestion)
             }
         }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .matchedTransitionSource(id: AnalyticsSuggestionCardID.ddrFlareSkill.transitionID, in: analyticsNamespace)
     }
 
     // MARK: - Cards

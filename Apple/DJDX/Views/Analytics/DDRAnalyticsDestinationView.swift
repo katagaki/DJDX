@@ -22,7 +22,8 @@ struct DDRAnalyticsDestinationView: View {
             case .flareSkillSuggestionsDetail:
                 DDRFlareSkillSuggestionsDetailView(suggestions: model.flareSkillSuggestions)
                     .navigationTitle(Text(verbatim: "FLARE SKILL"))
-                    .navigationTransition(.zoom(sourceID: "DDR.flareSkillSuggestions", in: namespace))
+                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.ddrFlareSkill.transitionID,
+                                                in: namespace))
             case .flareSkillTrendDetail:
                 TrendDetailView(points: model.flareSkillHistory, color: .orange,
                                 format: DDRAnalyticsModel.formatFlareSkill)
@@ -150,31 +151,36 @@ struct DDRRankBreakdownDetailView: View {
     }
 }
 
+struct DDRFlareSkillSuggestionRow: View {
+    let suggestion: DDRFlareSkillSuggestion
+
+    var body: some View {
+        DDRScoreRow(record: suggestion.record) {
+            AnalyticsSuggestionTarget {
+                Text(verbatim: "FLARE \(DDRFlareSkill.rankLabel(suggestion.targetFlareRank))")
+                    .foregroundStyle(.secondary)
+                    .fontWidth(.expanded)
+                    .fontWeight(.bold)
+                AnalyticsSuggestionGain(text: "+\(suggestion.flareSkillGain)")
+            }
+        }
+    }
+}
+
 struct DDRFlareSkillSuggestionsDetailView: View {
+    @EnvironmentObject var navigationManager: NavigationManager
+
     let suggestions: [DDRFlareSkillSuggestion]
 
     var body: some View {
-        List {
-            if suggestions.isEmpty {
-                Text("Analytics.Suggestions.Empty")
-                    .foregroundStyle(.secondary)
-                    .listRowBackground(Color.clear)
-            } else {
-                ForEach(suggestions) { suggestion in
-                    AnalyticsSuggestionRow(
-                        title: suggestion.songTitle,
-                        current: suggestion.currentFlareRank.map { "FLARE \(DDRFlareSkill.rankLabel($0))" } ?? "---",
-                        target: "FLARE \(DDRFlareSkill.rankLabel(suggestion.targetFlareRank))",
-                        detail: "FLARE SKILL \(suggestion.currentFlareSkill) → \(suggestion.targetFlareSkill)",
-                        gain: "+\(suggestion.flareSkillGain)",
-                        difficulty: suggestion.difficulty.rawValue,
-                        difficultyColor: suggestion.difficulty.color,
-                        level: String(suggestion.level)
-                    )
-                }
+        AnalyticsSuggestionList(items: suggestions) { suggestion in
+            Button {
+                navigationManager.push(DDRScoresPath.scoreViewer(songRecord: suggestion.record))
+            } label: {
+                DDRFlareSkillSuggestionRow(suggestion: suggestion)
+                    .contentShape(.rect)
             }
+            .buttonStyle(.plain)
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
     }
 }

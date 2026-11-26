@@ -1,8 +1,14 @@
 import SwiftUI
 
-struct DDRScoreRow: View {
+struct DDRScoreRow<Accessory: View>: View {
 
     var record: DDRSongRecord
+    var accessory: Accessory
+
+    init(record: DDRSongRecord, @ViewBuilder accessory: () -> Accessory) {
+        self.record = record
+        self.accessory = accessory()
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 8.0) {
@@ -39,6 +45,8 @@ struct DDRScoreRow: View {
                     }
                 }
                 .font(.caption)
+                accessory
+                    .font(.caption)
             }
             .padding([.top, .bottom], 8.0)
 
@@ -51,5 +59,11 @@ struct DDRScoreRow: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.trailing)
+    }
+}
+
+extension DDRScoreRow where Accessory == EmptyView {
+    init(record: DDRSongRecord) {
+        self.init(record: record) { EmptyView() }
     }
 }
