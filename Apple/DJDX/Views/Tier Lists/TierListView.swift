@@ -171,22 +171,28 @@ struct TierListView: View {
 
     @ViewBuilder
     var controls: some View {
-        HStack(spacing: 4.0) {
-            Picker("TierList.Game", selection: $game) {
-                ForEach(Game.allCases.filter(\.isAvailable)) { game in
-                    Text(game.shortName).tag(game)
+        HStack(spacing: 8.0) {
+            Menu {
+                Picker("TierList.Game", selection: $game) {
+                    ForEach(Game.allCases.filter(\.isAvailable)) { game in
+                        Text(game.shortName).tag(game)
+                    }
                 }
+            } label: {
+                pickerLabel(Text(game.shortName))
             }
-            .pickerStyle(.menu)
             if !levels.isEmpty {
-                Picker(selection: $level) {
-                    ForEach(levels, id: \.self) { value in
-                        Text(verbatim: "LEVEL \(value)").tag(value)
+                Menu {
+                    Picker(selection: $level) {
+                        ForEach(levels, id: \.self) { value in
+                            Text(verbatim: "LEVEL \(value)").tag(value)
+                        }
+                    } label: {
+                        Text(verbatim: "LEVEL")
                     }
                 } label: {
-                    Text(verbatim: "LEVEL")
+                    pickerLabel(Text(verbatim: "LEVEL \(level)"))
                 }
-                .pickerStyle(.menu)
             }
             Spacer(minLength: 0.0)
             if game.supportsTierListPlayType {
@@ -199,7 +205,24 @@ struct TierListView: View {
                 .fixedSize()
             }
         }
-        .padding(.leading, -8.0)
+        .buttonStyle(.plain)
+    }
+
+    func pickerLabel(_ text: Text) -> some View {
+        HStack(spacing: 4.0) {
+            text
+                .fontWeight(.semibold)
+            Image(systemName: "chevron.up.chevron.down")
+                .font(.caption2)
+                .fontWeight(.bold)
+                .foregroundStyle(.secondary)
+        }
+        .font(.subheadline)
+        .padding(.horizontal, 12.0)
+        .frame(height: 32.0)
+        .background(Color(.tertiarySystemFill))
+        .clipShape(.capsule)
+        .contentShape(.capsule)
     }
 
     @ViewBuilder
