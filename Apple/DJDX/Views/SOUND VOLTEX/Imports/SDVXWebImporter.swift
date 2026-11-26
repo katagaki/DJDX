@@ -264,9 +264,7 @@ class SDVXCoordinatorForImporter: NSObject, WKNavigationDelegate {
     }
 }
 
-// swiftlint:disable class_delegate_protocol
 protocol SDVXUpdateScoreDataDelegate: Sendable {
     func importScoreData(using newScoreData: String) async
     func stopProcessing(with reason: ImportFailedReason)
 }
-// swiftlint:enable class_delegate_protocol

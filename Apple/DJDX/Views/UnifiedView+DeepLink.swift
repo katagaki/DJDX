@@ -1,7 +1,6 @@
 import SwiftUI
 
 extension UnifiedView {
-    // swiftlint:disable:next function_body_length cyclomatic_complexity
     func handleDeepLink(_ url: URL) {
         guard url.scheme == "djdx",
               let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {

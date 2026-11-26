@@ -24,7 +24,6 @@ Run build commands from inside the relevant folder.
   a JSON serializer — that reorders/re-escapes the whole file into a massive diff.
 - Build/verify from `Apple/` with:
   `xcodebuild build -project DJDX.xcodeproj -scheme DJDX -destination 'generic/platform=iOS Simulator' -configuration Debug`
-- SwiftLint runs as a build phase using `Apple/.swiftlint.yml`.
 - The four web importers (DDR, SDVX, Polaris Chord, IIDX) share one structure: a
   SwiftUI wrapper over a `UIViewRepresentable` `WKWebView` + a `WKNavigationDelegate`
   coordinator. Changes to import behavior usually need applying to all four.

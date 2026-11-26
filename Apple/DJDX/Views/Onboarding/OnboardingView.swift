@@ -11,7 +11,7 @@ struct OnboardingView: View {
         let accent = Text(appName).foregroundStyle(.accent)
         let parts = format.components(separatedBy: "%@")
         guard parts.count == 2 else { return accent }
-        return Text(parts[0]) + accent + Text(parts[1])
+        return Text("\(parts[0])\(accent)\(parts[1])")
     }
 
     var body: some View {
@@ -78,17 +78,10 @@ struct OnboardingView: View {
             .fontWeight(.bold)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 6.0)
-        if #available(iOS 26.0, *) {
-            Button(action: onContinue) { label }
-                .clipShape(.capsule)
-                .tint(.accent)
-                .buttonStyle(.glassProminent)
-        } else {
-            Button(action: onContinue) { label }
-                .clipShape(.capsule)
-                .tint(.accent)
-                .buttonStyle(.borderedProminent)
-        }
+        Button(action: onContinue) { label }
+            .clipShape(.capsule)
+            .tint(.accent)
+            .buttonStyle(.glassProminent)
     }
 }
 

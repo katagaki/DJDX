@@ -128,7 +128,7 @@ struct DDRAnalyticsView: View {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
+        .matchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
     }
 
     // MARK: - Card storage

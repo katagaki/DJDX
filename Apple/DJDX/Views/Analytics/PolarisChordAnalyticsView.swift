@@ -2,7 +2,6 @@ import Charts
 import OrderedCollections
 import SwiftUI
 
-// swiftlint:disable type_body_length
 struct PolarisChordAnalyticsView: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -174,7 +173,7 @@ struct PolarisChordAnalyticsView: View {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
+        .matchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
     }
 
     @ViewBuilder
@@ -187,7 +186,7 @@ struct PolarisChordAnalyticsView: View {
             lastPlayCountCard(for: cardType)
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
+        .matchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
     }
 
     @ViewBuilder
@@ -218,11 +217,7 @@ struct PolarisChordAnalyticsView: View {
     }
 
     var cardCornerRadius: CGFloat {
-        if #available(iOS 26.0, *) {
-            return 20.0
-        } else {
-            return 12.0
-        }
+        return 20.0
     }
 
     func lastPlayCount(for cardType: PolarisChordAnalyticsCard) -> Int {
@@ -345,4 +340,3 @@ struct PolarisChordAnalyticsView: View {
         return AnyShapeStyle(grade.style(colorScheme: colorScheme))
     }
 }
-// swiftlint:enable type_body_length

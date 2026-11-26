@@ -144,7 +144,7 @@ struct IIDXScoreRow: View {
                 Spacer(minLength: 0.0)
             }
             .padding([.top, .bottom], 8.0)
-            .automaticMatchedTransitionSource(id: "\(songRecord.title).\(level.rawValue)", in: namespace)
+            .matchedTransitionSource(id: "\(songRecord.title).\(level.rawValue)", in: namespace)
 
             // Level
             if isLevelVisible {

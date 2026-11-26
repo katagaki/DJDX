@@ -19,6 +19,7 @@ object Routes {
     const val TOWER = "tower?mode={mode}"
     const val IIDX_ANALYTICS = "analytics/iidx/{detail}?param={param}"
     const val CHART_ANALYTICS = "analytics/chart/{game}/{detail}?param={param}"
+    const val GOAL_DETAIL = "analytics/goals/{id}"
 
     const val IIDX_DETAIL_CLEAR_TYPE_OVERVIEW = "clearTypeOverview"
     const val IIDX_DETAIL_GRADE_BREAKDOWN = "gradeBreakdown"
@@ -56,6 +57,8 @@ object Routes {
 
     fun iidxAnalytics(detail: String, param: String = ""): String =
         "analytics/iidx/$detail?param=${Uri.encode(param)}"
+
+    fun goalDetail(id: String): String = "analytics/goals/${Uri.encode(id)}"
 
     fun chartAnalytics(game: Game, detail: String, param: String = ""): String =
         "analytics/chart/${game.id}/$detail?param=${Uri.encode(param)}"

@@ -29,6 +29,7 @@ struct PolarisChordScoresView<Header: View>: View {
     @State var records: [PolarisChordSongRecord] = []
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
+    @State private var chartNoteTarget: ChartNoteTarget?
 
     @Namespace var polarisChordNamespace
 
@@ -138,7 +139,7 @@ struct PolarisChordScoresView<Header: View>: View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
-        .automaticSheetMatchedTransitionSource(id: "PolarisChordScoreFilterSheet", in: polarisChordNamespace)
+        .matchedTransitionSource(id: "PolarisChordScoreFilterSheet", in: polarisChordNamespace)
     }
 
     var body: some View {
@@ -163,9 +164,19 @@ struct PolarisChordScoresView<Header: View>: View {
                     }
                 }
                 if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
+                    let sortedRecords = sortedRecords
+                    if !records.isEmpty {
+                        ScoreCountRow(count: sortedRecords.count)
+                        Divider()
+                    }
                     ForEach(sortedRecords, id: \.self) { record in
-                        PolarisChordScoreRow(record: record)
-                            .contentShape(.rect)
+                        Button {
+                            chartNoteTarget = record.chartNoteTarget
+                        } label: {
+                            PolarisChordScoreRow(record: record)
+                                .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                         Divider()
                             .padding(.leading, 16.0)
                     }
@@ -182,20 +193,17 @@ struct PolarisChordScoresView<Header: View>: View {
             await reload()
         }
         .toolbar {
-            if #available(iOS 26.0, *) {
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    sortControl
-                    filterControl
-                }
-            } else {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Spacer()
-                    sortControl
-                    filterControl
-                }
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                sortControl
+                filterControl
             }
+        }
+        .sheet(item: $chartNoteTarget) { target in
+            ChartNotesSheet(game: target.game, title: target.title,
+                            chart: target.chart, chartLabel: target.chartLabel)
+                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             PolarisChordScoreFilterSheet(
@@ -206,7 +214,7 @@ struct PolarisChordScoresView<Header: View>: View {
                 availableLevels: availableLevels,
                 onReset: {}
             )
-            .automaticSheetNavigationTransition(id: "PolarisChordScoreFilterSheet", in: polarisChordNamespace)
+            .navigationTransition(.zoom(sourceID: "PolarisChordScoreFilterSheet", in: polarisChordNamespace))
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
             .interactiveDismissDisabled()
