@@ -3,7 +3,9 @@ package com.tsubuzaki.djdxgo.ui.share
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.lerp
+import com.tsubuzaki.djdxgo.data.RadarData
 
 data class ShareCardMetric(val text: String, val brush: Brush)
 
@@ -21,10 +23,15 @@ data class ShareCardRating(val label: String, val value: String)
 
 data class ShareCardProfile(
     val playerName: String? = null,
-    val ratings: List<ShareCardRating> = emptyList()
+    val ratings: List<ShareCardRating> = emptyList(),
+    val avatar: ImageBitmap? = null,
+    val radar: RadarData? = null
 ) {
+    val hasVisuals: Boolean
+        get() = avatar != null || radar != null
+
     val isEmpty: Boolean
-        get() = playerName.isNullOrEmpty() && ratings.isEmpty()
+        get() = playerName.isNullOrEmpty() && ratings.isEmpty() && !hasVisuals
 }
 
 enum class ShareCardGradient {

@@ -31,9 +31,15 @@ struct ShareCardRating: Identifiable {
 struct ShareCardProfile {
     var playerName: String?
     var ratings: [ShareCardRating] = []
+    var avatar: UIImage?
+    var radar: RadarData?
 
     var isEmpty: Bool {
-        (playerName?.isEmpty ?? true) && ratings.isEmpty
+        (playerName?.isEmpty ?? true) && ratings.isEmpty && !hasVisuals
+    }
+
+    var hasVisuals: Bool {
+        avatar != nil || radar != nil
     }
 }
 

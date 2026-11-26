@@ -3,6 +3,7 @@ package com.tsubuzaki.djdxgo.ui.share
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.asImageBitmap
 import com.tsubuzaki.djdxgo.data.ddr.DDRClearLamp
 import com.tsubuzaki.djdxgo.data.ddr.DDRPlayStyle
 import com.tsubuzaki.djdxgo.data.ddr.DDRRank
@@ -151,13 +152,11 @@ private fun lampBrush(isEmpty: Boolean, color: Color): Brush =
 
 fun IIDXProfile.toShareCardProfile(playType: IIDXPlayType): ShareCardProfile {
     val rank = (if (playType == IIDXPlayType.SINGLE) spRank else dpRank)?.takeIf { it.isNotEmpty() && it != "--" }
-    val radar = if (playType == IIDXPlayType.SINGLE) spRadar else dpRadar
     return ShareCardProfile(
         playerName = djName,
-        ratings = listOfNotNull(
-            rank?.let { ShareCardRating(playType.displayName, it) },
-            radar?.let { ShareCardRating("NOTES RADAR", String.format(Locale.ROOT, "%.2f", it.sum())) }
-        )
+        ratings = listOfNotNull(rank?.let { ShareCardRating(playType.displayName, it) }),
+        avatar = qpro?.asImageBitmap(),
+        radar = if (playType == IIDXPlayType.SINGLE) spRadar else dpRadar
     )
 }
 

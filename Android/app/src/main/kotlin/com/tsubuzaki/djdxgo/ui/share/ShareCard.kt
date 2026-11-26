@@ -35,12 +35,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tsubuzaki.djdxgo.R
+import com.tsubuzaki.djdxgo.ui.common.RadarChart
+import com.tsubuzaki.djdxgo.ui.theme.RadarColors
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
 import com.tsubuzaki.djdxgo.ui.theme.GameFonts
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.util.Locale
 
 val ShareCardWidth = 360.dp
 
@@ -154,54 +157,100 @@ private fun ShareCardBackdrop(
 
 @Composable
 private fun ShareCardHeader(title: String, @DrawableRes iconRes: Int, profile: ShareCardProfile?) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Image(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                        .gameFont(GameFontWidth.EXPANDED),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = LocalDate.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
+                    style = TextStyle(
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White.copy(alpha = 0.7f)
+                    )
+                )
+            }
+            if (profile != null && !profile.isEmpty && !profile.hasVisuals) {
+                ShareCardProfileText(profile, Alignment.End)
+            }
+        }
+        if (profile != null && profile.hasVisuals) {
+            ShareCardProfileBand(profile)
+        }
+    }
+}
+
+@Composable
+private fun ShareCardProfileText(profile: ShareCardProfile, alignment: Alignment.Horizontal) {
+    Column(horizontalAlignment = alignment, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        profile.playerName?.takeIf { it.isNotEmpty() }?.let { name ->
+            Text(
+                text = name,
+                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        profile.ratings.forEach { rating ->
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = rating.label,
+                    style = ratingStyle.copy(color = Color.White.copy(alpha = 0.7f)),
+                    maxLines = 1
+                )
+                Text(text = rating.value, style = ratingStyle, maxLines = 1)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShareCardProfileBand(profile: ShareCardProfile) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Image(
-            painter = painterResource(iconRes),
-            contentDescription = null,
-            modifier = Modifier
-                .size(36.dp)
-                .clip(RoundedCornerShape(8.dp))
-        )
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
-                    .gameFont(GameFontWidth.EXPANDED),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = LocalDate.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
-                style = TextStyle(
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White.copy(alpha = 0.7f)
-                )
+        profile.avatar?.let {
+            Image(
+                bitmap = it,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.height(100.dp)
             )
         }
-        if (profile != null && !profile.isEmpty) {
-            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                profile.playerName?.takeIf { it.isNotEmpty() }?.let { name ->
-                    Text(
-                        text = name,
-                        style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                profile.ratings.forEach { rating ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(
-                            text = rating.label,
-                            style = ratingStyle.copy(color = Color.White.copy(alpha = 0.7f)),
-                            maxLines = 1
-                        )
-                        Text(text = rating.value, style = ratingStyle, maxLines = 1)
-                    }
+        Box(modifier = Modifier.weight(1f)) {
+            ShareCardProfileText(profile, Alignment.Start)
+        }
+        profile.radar?.let { radar ->
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                RadarChart(
+                    data = radar,
+                    color = RadarColors.playerColor(radar),
+                    labelSize = 8.dp,
+                    lineWidth = 1.5.dp,
+                    modifier = Modifier.size(width = 140.dp, height = 110.dp)
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(text = "TOTAL", style = ratingStyle.copy(color = Color.White.copy(alpha = 0.7f)))
+                    Text(text = String.format(Locale.ROOT, "%.2f", radar.sum()), style = ratingStyle)
                 }
             }
         }

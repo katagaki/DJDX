@@ -42,44 +42,80 @@ struct ShareCardView: View {
     }
 
     @ViewBuilder var header: some View {
-        HStack(alignment: .center, spacing: 10.0) {
-            if let iconResource = game.iconResource {
-                Image(iconResource)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 36.0, height: 36.0)
-                    .clipShape(.rect(cornerRadius: 8.0))
+        VStack(alignment: .leading, spacing: 12.0) {
+            HStack(alignment: .center, spacing: 10.0) {
+                if let iconResource = game.iconResource {
+                    Image(iconResource)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 36.0, height: 36.0)
+                        .clipShape(.rect(cornerRadius: 8.0))
+                }
+                VStack(alignment: .leading, spacing: 1.0) {
+                    Text(verbatim: game.displayName)
+                        .font(.system(size: 15.0, weight: .heavy))
+                        .fontWidth(.expanded)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                    Text(date, format: .dateTime.year().month().day())
+                        .font(.system(size: 11.0, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+                Spacer(minLength: 8.0)
+                if let profile, !profile.isEmpty, !profile.hasVisuals {
+                    profileText(profile, alignment: .trailing)
+                }
             }
-            VStack(alignment: .leading, spacing: 1.0) {
-                Text(verbatim: game.displayName)
-                    .font(.system(size: 15.0, weight: .heavy))
-                    .fontWidth(.expanded)
+            if let profile, profile.hasVisuals {
+                profileBand(profile)
+            }
+        }
+    }
+
+    func profileText(_ profile: ShareCardProfile, alignment: HorizontalAlignment) -> some View {
+        VStack(alignment: alignment, spacing: 2.0) {
+            if let playerName = profile.playerName, !playerName.isEmpty {
+                Text(verbatim: playerName)
+                    .font(.system(size: 15.0, weight: .bold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
-                Text(date, format: .dateTime.year().month().day())
-                    .font(.system(size: 11.0, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.7))
             }
-            Spacer(minLength: 8.0)
-            if let profile, !profile.isEmpty {
-                VStack(alignment: .trailing, spacing: 2.0) {
-                    if let playerName = profile.playerName, !playerName.isEmpty {
-                        Text(verbatim: playerName)
-                            .font(.system(size: 15.0, weight: .bold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
+            ForEach(profile.ratings) { rating in
+                HStack(spacing: 4.0) {
+                    Text(verbatim: rating.label)
+                        .foregroundStyle(.white.opacity(0.7))
+                    Text(verbatim: rating.value)
+                        .monospacedDigit()
+                }
+                .font(.system(size: 11.0, weight: .heavy))
+                .fontWidth(.condensed)
+                .lineLimit(1)
+            }
+        }
+    }
+
+    func profileBand(_ profile: ShareCardProfile) -> some View {
+        HStack(alignment: .center, spacing: 12.0) {
+            if let avatar = profile.avatar {
+                Image(uiImage: avatar)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 110.0)
+            }
+            profileText(profile, alignment: .leading)
+            Spacer(minLength: 0.0)
+            if let radar = profile.radar {
+                VStack(spacing: 0.0) {
+                    RadarChartView(radar, isPlayerRadar: true, labelFontSize: 8.0, lineWidth: 1.5)
+                        .frame(width: 170.0, height: 110.0)
+                    HStack(spacing: 4.0) {
+                        Text(verbatim: "TOTAL")
+                            .foregroundStyle(.white.opacity(0.7))
+                        Text(verbatim: String(format: "%.2f", radar.sum()))
+                            .monospacedDigit()
                     }
-                    ForEach(profile.ratings) { rating in
-                        HStack(spacing: 4.0) {
-                            Text(verbatim: rating.label)
-                                .foregroundStyle(.white.opacity(0.7))
-                            Text(verbatim: rating.value)
-                                .monospacedDigit()
-                        }
-                        .font(.system(size: 11.0, weight: .heavy))
-                        .fontWidth(.condensed)
-                        .lineLimit(1)
-                    }
+                    .font(.system(size: 11.0, weight: .heavy))
+                    .fontWidth(.condensed)
                 }
             }
         }

@@ -137,13 +137,25 @@ extension ShareCardProfile {
         }
         let radarPrefix = playType == .single ? "NotesRadar.SP" : "NotesRadar.DP"
         let shared = SharedContainer.defaults
+        var radar: RadarData?
         if shared.object(forKey: "\(radarPrefix).Notes") != nil {
-            let total = ["Notes", "Chord", "Peak", "Charge", "Scratch", "Soflan"]
-                .map { shared.double(forKey: "\(radarPrefix).\($0)") }
-                .reduce(0.0, +)
-            ratings.append(ShareCardRating(label: "NOTES RADAR", value: String(format: "%.2f", total)))
+            let radarData = RadarData(
+                notes: shared.double(forKey: "\(radarPrefix).Notes"),
+                chord: shared.double(forKey: "\(radarPrefix).Chord"),
+                peak: shared.double(forKey: "\(radarPrefix).Peak"),
+                charge: shared.double(forKey: "\(radarPrefix).Charge"),
+                scratch: shared.double(forKey: "\(radarPrefix).Scratch"),
+                soflan: shared.double(forKey: "\(radarPrefix).Soflan")
+            )
+            radar = radarData
         }
-        return ShareCardProfile(playerName: defaults.string(forKey: "Profile.IIDX.DJName"), ratings: ratings)
+        let qproPath = SharedContainer.imagesURL.appendingPathComponent("Qpro.png").path
+        return ShareCardProfile(
+            playerName: defaults.string(forKey: "Profile.IIDX.DJName"),
+            ratings: ratings,
+            avatar: UIImage(contentsOfFile: qproPath),
+            radar: radar
+        )
     }
 
     static func sdvx() -> ShareCardProfile {
