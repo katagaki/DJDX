@@ -201,6 +201,7 @@ struct ShareCardRow: View {
                         ForEach(entry.metrics) { metric in
                             Text(verbatim: metric.text)
                                 .font(metric.text.first?.isNumber == true ? .scoreline(size: 11.0) : nil)
+                                .fontWidth(metric.text.first?.isNumber == true ? .standard : .expanded)
                                 .foregroundStyle(metric.style)
                         }
                     }

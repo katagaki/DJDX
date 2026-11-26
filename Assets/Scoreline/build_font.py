@@ -8,8 +8,8 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 
 CAP = 700
 SIDE = 85
-WEIGHTS = {"Regular": (96, 96), "Medium": (118, 104), "Bold": (142, 112), "Heavy": (168, 120)}
-WIDTHS = {"Condensed": 820, "": 1040, "Expanded": 1280}
+WEIGHTS = {"Regular": (106, 96), "Medium": (130, 104), "Bold": (156, 112), "Heavy": (184, 120)}
+WIDTHS = {"Condensed": 760, "": 960, "Expanded": 1180}
 
 
 VERTICAL, HORIZONTAL = 1.32, 0.86

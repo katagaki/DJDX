@@ -71,8 +71,7 @@ struct AnalyticsGoalTitle: View {
 
 extension View {
     func goalNumberFont(size: CGFloat) -> some View {
-        font(.system(size: size, weight: .black))
-            .fontWidth(.expanded)
-            .monospacedDigit()
+        font(.scoreline(size: size))
+            .fontWidth(.standard)
     }
 }

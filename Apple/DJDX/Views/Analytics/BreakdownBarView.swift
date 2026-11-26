@@ -5,6 +5,8 @@ struct BreakdownBarItem: Identifiable {
     let label: String
     let count: Int
     let color: Color
+    var metallicLabel: IIDXMetallicText?
+    var isFullCombo: Bool = false
 }
 
 struct BreakdownBarView: View {
@@ -22,9 +24,14 @@ struct BreakdownBarView: View {
         return GeometryReader { proxy in
             HStack(spacing: 0.0) {
                 ForEach(items) { item in
-                    Rectangle()
-                        .fill(item.color)
-                        .frame(width: proxy.size.width * CGFloat(item.count) / CGFloat(total))
+                    Group {
+                        if item.isFullCombo {
+                            FullComboRainbowFill()
+                        } else {
+                            item.color
+                        }
+                    }
+                    .frame(width: proxy.size.width * CGFloat(item.count) / CGFloat(total))
                 }
             }
         }
@@ -33,25 +40,27 @@ struct BreakdownBarView: View {
     }
 
     private var legend: some View {
-        LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: 96.0), spacing: 8.0)],
-            alignment: .leading,
-            spacing: 6.0
-        ) {
+        FlowLayout(horizontalSpacing: 12.0, verticalSpacing: 6.0) {
             ForEach(items) { item in
-                HStack(spacing: 5.0) {
-                    RoundedRectangle(cornerRadius: 2.0)
-                        .fill(item.color)
-                        .frame(width: 10.0, height: 10.0)
-                    Text(verbatim: item.label)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                    Spacer(minLength: 2.0)
+                HStack(spacing: 4.0) {
+                    if let metallicLabel = item.metallicLabel {
+                        metallicLabel
+                    } else {
+                        RoundedRectangle(cornerRadius: 2.0)
+                            .fill(item.color)
+                            .frame(width: 10.0, height: 10.0)
+                        Text(verbatim: item.label)
+                            .foregroundStyle(.secondary)
+                    }
                     Text(verbatim: "\(item.count)")
-                        .font(.caption.monospacedDigit().weight(.semibold))
+                        .font(.scoreline(.caption, weight: .bold))
+                        .fontWidth(.standard)
+                        .foregroundStyle(.primary)
                 }
+                .font(.caption)
+                .lineLimit(1)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

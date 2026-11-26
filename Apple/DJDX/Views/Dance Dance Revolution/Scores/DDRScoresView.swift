@@ -155,10 +155,6 @@ struct DDRScoresView<Header: View>: View {
                 }
                 if !isEditingAnalytics {
                     let sortedRecords = sortedRecords
-                    if !records.isEmpty {
-                        ScoreCountRow(count: sortedRecords.count)
-                        Divider()
-                    }
                     ForEach(sortedRecords, id: \.self) { record in
                         Button {
                             navigationManager.push(DDRScoresPath.scoreViewer(songRecord: record))

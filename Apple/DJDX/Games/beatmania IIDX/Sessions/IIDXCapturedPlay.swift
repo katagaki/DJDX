@@ -63,9 +63,15 @@ final class IIDXCapturedPlay: Identifiable, @unchecked Sendable {
         "\((songTitle ?? "").compact)|\(playType.displayName())|\(level.rawValue)"
     }
 
-    func asSongRecord() -> IIDXSongRecord {
+    func asSongRecord(metadata: [String: IIDXSongMetadata] = [:]) -> IIDXSongRecord {
         let record = IIDXSongRecord()
         record.title = songTitle ?? String(localized: "Sessions.UnknownSong")
+        if let songTitle, let match = metadata[songTitle.compact] {
+            record.title = match.title
+            record.version = match.version
+            record.genre = match.genre
+            record.artist = match.artist
+        }
         record.playType = playType
         record.lastPlayDate = captureDate
         let score = levelScore()

@@ -61,8 +61,11 @@ extension AnalyticsView {
                     AnalyticsSuggestionPreview(
                         id: suggestion.id,
                         title: suggestion.songTitle,
-                        detail: "\(suggestion.level.chartName) · \(suggestion.clearType)",
-                        value: "LEVEL \(suggestion.difficulty)"
+                        detail: suggestion.clearType,
+                        value: "",
+                        badge: LevelBadge(name: suggestion.level.chartName, level: String(suggestion.difficulty),
+                                          tint: suggestion.level.chartColor, layout: .compact),
+                        detailLabel: .clearType(suggestion.clearType)
                     )
                 }
             )
@@ -91,7 +94,10 @@ struct IIDXDJLevelSuggestionsDetailView: View {
                         gain: "+\(suggestion.pointsNeeded)",
                         difficulty: suggestion.level.chartName,
                         difficultyColor: suggestion.level.chartColor,
-                        level: String(suggestion.difficulty)
+                        level: String(suggestion.difficulty),
+                        currentLabel: .djLevel(suggestion.currentDJLevel),
+                        targetLabel: .djLevel(suggestion.targetDJLevel),
+                        scores: (suggestion.score, suggestion.targetScore)
                     )
                 }
             }
@@ -135,7 +141,10 @@ struct IIDXClearLampSuggestionsDetailView: View {
                             gain: "",
                             difficulty: suggestion.level.chartName,
                             difficultyColor: suggestion.level.chartColor,
-                            level: String(suggestion.difficulty)
+                            level: String(suggestion.difficulty),
+                            currentLabel: .clearType(suggestion.clearType),
+                            targetLabel: .clearType(targetClearType.rawValue),
+                            scores: (suggestion.score, nil)
                         )
                     }
                 }

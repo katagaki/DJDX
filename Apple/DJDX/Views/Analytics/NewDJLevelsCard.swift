@@ -15,10 +15,12 @@ struct NewDJLevelsCard: View {
             if newDJLevels.isEmpty {
                 Text(verbatim: "0")
                     .font(.scoreline(size: 20.0))
+                    .fontWidth(.standard)
                     .foregroundStyle(.secondary)
             } else {
                 Text("\(newDJLevels.count)")
                     .font(.scoreline(size: 20.0))
+                    .fontWidth(.standard)
                     .foregroundStyle(.primary)
             }
             Spacer(minLength: 0)

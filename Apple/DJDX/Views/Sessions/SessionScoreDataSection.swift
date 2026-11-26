@@ -42,7 +42,7 @@ struct SessionScoreDataSection: View {
                     } label: {
                         IIDXScoreRow(
                             namespace: scoresNamespace,
-                            songRecord: play.asSongRecord(),
+                            songRecord: play.asSongRecord(metadata: IIDXSessionSongInfo.shared.metadata),
                             level: play.level == .unknown ? .another : play.level,
                             score: play.levelScore(),
                             scoreRate: play.scoreRate(songCompactTitles: songCompactTitles)

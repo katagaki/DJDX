@@ -12,8 +12,6 @@ struct LevelBadge: View {
     let tint: Color
     var layout: LevelBadgeLayout = .vertical
 
-    @State private var nameWidth: CGFloat = 0.0
-
     var body: some View {
         let radius: CGFloat = layout == .compact ? 4.0 : 6.0
         Group {
@@ -30,31 +28,39 @@ struct LevelBadge: View {
                         .frame(height: 30.0)
                 }
                 .frame(width: 78.0)
-                .background(alignment: .topLeading) { slash(isVertical: true, split: 14.5, lean: 4.5) }
+                .background {
+                    ZStack(alignment: .topLeading) {
+                        darkFill
+                        LevelBadgeSlash(isVertical: true, split: 14.5, lean: 4.5)
+                            .fill(slashFill)
+                    }
+                }
             case .horizontal:
                 HStack(spacing: 0.0) {
                     nameText(size: 10.0)
                         .padding(.leading, 9.0)
                         .padding(.trailing, 9.0)
-                        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { nameWidth = $0 }
+                        .frame(maxHeight: .infinity)
+                        .background { slash(lean: 5.0) }
                     number(size: 20.0)
                         .padding(.leading, 9.0)
                         .padding(.trailing, 10.0)
                 }
                 .frame(height: 32.0)
-                .background(alignment: .topLeading) { slash(isVertical: false, split: nameWidth, lean: 5.0) }
+                .background { darkFill }
             case .compact:
                 HStack(spacing: 0.0) {
                     nameText(size: 7.5)
                         .padding(.leading, 5.0)
                         .padding(.trailing, 5.5)
-                        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { nameWidth = $0 }
+                        .frame(maxHeight: .infinity)
+                        .background { slash(lean: 3.0) }
                     number(size: 13.0)
                         .padding(.leading, 5.5)
                         .padding(.trailing, 6.0)
                 }
                 .frame(height: 20.0)
-                .background(alignment: .topLeading) { slash(isVertical: false, split: nameWidth, lean: 3.0) }
+                .background { darkFill }
             }
         }
         .clipShape(.rect(cornerRadius: radius))
@@ -67,11 +73,18 @@ struct LevelBadge: View {
 
     private var soft: Color { tint.mix(with: .white, by: 0.35) }
 
-    private func slash(isVertical: Bool, split: CGFloat, lean: CGFloat) -> some View {
-        ZStack(alignment: .topLeading) {
-            LinearGradient(colors: [Color(hex: 0x2A2D33), Color(hex: 0x111215)], startPoint: .top, endPoint: .bottom)
-            LevelBadgeSlash(isVertical: isVertical, split: split, lean: lean)
-                .fill(LinearGradient(colors: [soft, tint], startPoint: .topLeading, endPoint: .bottomTrailing))
+    private var darkFill: LinearGradient {
+        LinearGradient(colors: [Color(hex: 0x2A2D33), Color(hex: 0x111215)], startPoint: .top, endPoint: .bottom)
+    }
+
+    private var slashFill: LinearGradient {
+        LinearGradient(colors: [soft, tint], startPoint: .topLeading, endPoint: .bottomTrailing)
+    }
+
+    private func slash(lean: CGFloat) -> some View {
+        GeometryReader { proxy in
+            LevelBadgeSlash(isVertical: false, split: proxy.size.width, lean: lean)
+                .fill(slashFill)
         }
     }
 

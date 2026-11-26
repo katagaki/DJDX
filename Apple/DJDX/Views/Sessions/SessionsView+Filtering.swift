@@ -3,7 +3,8 @@ import Foundation
 extension IIDXCapturedPlay {
     func scoreRate(songCompactTitles: [String: IIDXSong]) -> Float? {
         guard let title = songTitle,
-              let noteCount = songCompactTitles[title.compact]?.spNoteCount?.noteCount(for: level),
+              let song = songCompactTitles[title.compact],
+              let noteCount = (playType == .single ? song.spNoteCount : song.dpNoteCount)?.noteCount(for: level),
               noteCount > 0 else { return nil }
         return Float(exScore) / Float(noteCount * 2)
     }
