@@ -96,7 +96,7 @@ fun ShareCardSheet(
     var background by remember { mutableStateOf<ShareCardBackground>(ShareCardBackground.Gradient(ShareCardGradient.ACCENT)) }
     var photo by remember { mutableStateOf<ImageBitmap?>(null) }
     var isProfileVisible by rememberSaveable { mutableStateOf(true) }
-    var rowLimit by rememberSaveable { mutableIntStateOf(20) }
+    var rowLimit by rememberSaveable { mutableIntStateOf(10) }
 
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult

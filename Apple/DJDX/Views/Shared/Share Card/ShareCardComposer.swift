@@ -11,7 +11,7 @@ struct ShareCardComposer: View {
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
     @AppStorage(wrappedValue: true, "ShareCard.ProfileVisible") var isProfileVisible: Bool
-    @AppStorage(wrappedValue: 20, "ShareCard.RowLimit") var rowLimit: Int
+    @AppStorage(wrappedValue: 10, "ShareCard.RowLimit") var rowLimit: Int
 
     let game: Game
     let profile: ShareCardProfile
