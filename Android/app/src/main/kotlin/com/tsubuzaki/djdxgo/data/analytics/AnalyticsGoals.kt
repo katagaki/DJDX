@@ -68,7 +68,7 @@ data class AnalyticsGoal(
         get() = when (kind) {
             AnalyticsGoalKind.RATING ->
                 if (gameEnum == Game.DANCE_DANCE_REVOLUTION) "FLARE SKILL" else "VOLFORCE"
-            else -> (if (level > 0) "☆$level " else "") + thresholdDisplay(threshold, kind, gameEnum)
+            else -> (if (level > 0) "LEVEL $level " else "") + thresholdDisplay(threshold, kind, gameEnum)
         }
 
     val subtitle: String?

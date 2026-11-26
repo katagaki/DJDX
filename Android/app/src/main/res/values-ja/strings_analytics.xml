@@ -70,7 +70,6 @@
     <string name="goals_save">保存</string>
     <string name="goals_delete">目標を削除</string>
     <string name="goals_delete_confirm">この目標を削除しますか？</string>
-    <string name="goals_status">状況</string>
     <string name="goals_status_achieved">達成</string>
     <string name="goals_status_ahead">先行</string>
     <string name="goals_status_on_pace">順調</string>
@@ -81,7 +80,6 @@
     <string name="goals_due">期限：%1$s</string>
     <string name="goals_chart_progress">進捗</string>
     <string name="goals_chart_pace">ペース</string>
-    <string name="goals_current">現在</string>
     <string name="goals_start">開始時の値</string>
     <string name="goals_expected">今日時点の目安</string>
     <string name="goals_remaining">残り</string>

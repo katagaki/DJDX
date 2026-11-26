@@ -22,6 +22,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.FastForward
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Flag
@@ -61,6 +66,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -202,20 +208,40 @@ private fun AnalyticsGoalStatus.label(): String = stringResource(
     }
 )
 
+private fun AnalyticsGoalStatus.icon(): ImageVector = when (this) {
+    AnalyticsGoalStatus.ACHIEVED -> Icons.Filled.EmojiEvents
+    AnalyticsGoalStatus.AHEAD -> Icons.Filled.FastForward
+    AnalyticsGoalStatus.ON_PACE -> Icons.Filled.CheckCircle
+    AnalyticsGoalStatus.BEHIND -> Icons.Filled.Schedule
+    AnalyticsGoalStatus.MISSED -> Icons.Filled.Cancel
+}
+
 @Composable
-private fun StatusBadge(status: AnalyticsGoalStatus) {
-    val color = status.color()
-    Text(
-        text = status.label(),
-        style = MaterialTheme.typography.labelSmall.gameFont(),
-        fontWeight = FontWeight.ExtraBold,
-        color = color,
-        maxLines = 1,
+private fun StatusBadge(status: AnalyticsGoalStatus, isLarge: Boolean = false) {
+    val contentColor = if (status == AnalyticsGoalStatus.ACHIEVED) Color.Black else Color.White
+    val style = if (isLarge) MaterialTheme.typography.labelLarge else MaterialTheme.typography.labelSmall
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(if (isLarge) 5.dp else 3.dp),
         modifier = Modifier
             .clip(RoundedCornerShape(50))
-            .background(color.copy(alpha = 0.15f))
-            .padding(horizontal = 8.dp, vertical = 3.dp)
-    )
+            .background(status.color())
+            .padding(horizontal = if (isLarge) 12.dp else 8.dp, vertical = if (isLarge) 6.dp else 4.dp)
+    ) {
+        Icon(
+            imageVector = status.icon(),
+            contentDescription = null,
+            tint = contentColor,
+            modifier = Modifier.size(if (isLarge) 16.dp else 12.dp)
+        )
+        Text(
+            text = status.label(),
+            style = style.gameFont(),
+            fontWeight = FontWeight.ExtraBold,
+            color = contentColor,
+            maxLines = 1
+        )
+    }
 }
 
 @Composable
@@ -560,6 +586,8 @@ fun AnalyticsGoalDetailScreen(container: AppContainer, goalID: String, onBack: (
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
+                        Spacer(modifier = Modifier.weight(1f))
+                        StatusBadge(current.status, isLarge = true)
                     }
                 }
                 GoalChart(
@@ -582,9 +610,6 @@ fun AnalyticsGoalDetailScreen(container: AppContainer, goalID: String, onBack: (
                     )
                 }
                 val g = current.goal
-                DetailRow(stringResource(R.string.goals_status)) { StatusBadge(current.status) }
-                DetailValueRow(stringResource(R.string.goals_current), g.formatted(current.current))
-                DetailValueRow(stringResource(R.string.goals_target), g.formatted(g.target))
                 DetailValueRow(stringResource(R.string.goals_start), g.formatted(current.baseline))
                 DetailValueRow(stringResource(R.string.goals_expected), g.formatted(current.expected))
                 DetailValueRow(stringResource(R.string.goals_remaining), g.formatted(current.remaining))
@@ -681,7 +706,7 @@ private fun GoalLevelChips(game: Game, level: Int, onToggle: (Int) -> Unit) {
             modifier = Modifier.weight(1f)
         )
         Text(
-            text = if (level > 0) "☆$level" else stringResource(R.string.goals_level_all),
+            text = if (level > 0) "LEVEL $level" else stringResource(R.string.goals_level_all),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

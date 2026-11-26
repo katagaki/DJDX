@@ -71,7 +71,6 @@
     <string name="goals_save">Save</string>
     <string name="goals_delete">Delete Goal</string>
     <string name="goals_delete_confirm">Delete this goal?</string>
-    <string name="goals_status">Status</string>
     <string name="goals_status_achieved">Achieved</string>
     <string name="goals_status_ahead">Ahead</string>
     <string name="goals_status_on_pace">On Pace</string>
@@ -82,7 +81,6 @@
     <string name="goals_due">Due %1$s</string>
     <string name="goals_chart_progress">Progress</string>
     <string name="goals_chart_pace">Pace</string>
-    <string name="goals_current">Current</string>
     <string name="goals_start">Starting Value</string>
     <string name="goals_expected">Expected by Today</string>
     <string name="goals_remaining">Remaining</string>
