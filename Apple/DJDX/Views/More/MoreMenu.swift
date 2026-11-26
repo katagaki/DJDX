@@ -106,6 +106,9 @@ struct MoreMenu: View {
                 }
             }
             Section {
+                Link(destination: URL(string: "https://forms.gle/G59rciD8dSbNhdqr5")!) {
+                    Label("More.Feedback", systemImage: "text.bubble")
+                }
                 Link(destination: URL(string: "https://github.com/katagaki/DJDX")!) {
                     Label("More.GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                 }

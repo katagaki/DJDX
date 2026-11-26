@@ -5357,6 +5357,28 @@
         }
       }
     },
+    "More.Feedback" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Feedback…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィードバックを送信…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "傳送意見回饋…"
+          }
+        }
+      }
+    },
     "More.General.AppIcon" : {
       "extractionState" : "manual",
       "localizations" : {
