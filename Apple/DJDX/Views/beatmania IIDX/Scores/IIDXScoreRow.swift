@@ -149,9 +149,6 @@ struct IIDXScoreRow: View {
             // Level
             if isLevelVisible {
                 IIDXLevelLabel(levelType: level, score: score)
-                    .padding([.top, .bottom], 6.0)
-                    .frame(width: 78.0, alignment: .center)
-                    .cardBackground(cornerRadius: 6.0)
                     .padding([.top, .bottom], 8.0)
             }
         }

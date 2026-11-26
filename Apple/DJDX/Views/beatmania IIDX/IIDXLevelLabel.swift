@@ -42,35 +42,14 @@ struct IIDXLevelLabel: View {
     }
 
     var body: some View {
-        Group {
-            switch orientation {
-            case .vertical:
-                VStack(alignment: .center) {
-                    Text(String(score.difficulty))
-                        .italic()
-                        .font(.system(size: 16.0))
-                        .fontWeight(.black)
-                    Text(LocalizedStringKey(levelType.rawValue))
-                        .font(.system(size: 10.0))
-                        .fontWeight(.semibold)
-                }
-            case .horizontal:
-                HStack(alignment: .center, spacing: 12.0) {
-                    Text(String(score.difficulty))
-                        .italic()
-                        .font(.system(size: 18.0))
-                        .fontWeight(.black)
-                    Text(LocalizedStringKey(levelType.rawValue))
-                        .font(.system(size: 12.0))
-                        .fontWeight(.semibold)
-                }
-            }
+        let name = String(localized: String.LocalizationValue(levelType.rawValue))
+        switch orientation {
+        case .vertical:
+            LevelBadge(name: name, level: String(score.difficulty), tint: foregroundColor())
+        case .horizontal:
+            LevelBadge(name: String(name.prefix(1)), level: String(score.difficulty),
+                       tint: foregroundColor(), layout: .compact)
         }
-        .kerning(-0.2)
-        .lineLimit(1)
-        .drawingGroup()
-        .offset(y: -1.5) // HACK: Fixes weird offset when using black font weight
-        .modifier(LevelLabelGlow(color: foregroundColor()))
     }
 
     func foregroundColor() -> Color {

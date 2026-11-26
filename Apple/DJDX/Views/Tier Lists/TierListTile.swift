@@ -49,20 +49,9 @@ struct TierListTile: View {
                 levelType: iidxLevel,
                 score: IIDXLevelScore(level: iidxLevel, difficulty: Int(chart.level) ?? 0)
             )
-            .minimumScaleFactor(0.6)
         } else {
-            HStack(alignment: .center, spacing: 6.0) {
-                Text(chart.level)
-                    .italic()
-                    .font(.system(size: 14.0))
-                    .fontWeight(.black)
-                Text(chart.difficultyLabel)
-                    .font(.system(size: 10.0))
-                    .fontWeight(.semibold)
-            }
-            .kerning(-0.2)
-            .lineLimit(1)
-            .modifier(LevelLabelGlow(color: chart.difficultyColor))
+            LevelBadge(name: chart.difficultyLabel, level: chart.level,
+                       tint: chart.difficultyColor, layout: .compact)
         }
     }
 

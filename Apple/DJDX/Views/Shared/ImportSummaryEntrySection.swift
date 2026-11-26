@@ -24,21 +24,7 @@ struct ImportSummaryEntrySection: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
             Spacer(minLength: 0.0)
-            VStack(spacing: 1.0) {
-                Text(verbatim: entry.level)
-                    .font(.system(size: 18.0).weight(.heavy))
-                    .fontWidth(.condensed)
-                    .monospacedDigit()
-                Text(verbatim: entry.difficulty)
-                    .font(.system(size: 10.0).weight(.black))
-                    .fontWidth(.condensed)
-                    .foregroundStyle(entry.difficultyColor)
-            }
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
-            .padding(.vertical, 6.0)
-            .frame(width: 78.0, alignment: .center)
-            .cardBackground(cornerRadius: 6.0)
+            LevelBadge(name: entry.difficulty, level: entry.level, tint: entry.difficultyColor)
         }
     }
 

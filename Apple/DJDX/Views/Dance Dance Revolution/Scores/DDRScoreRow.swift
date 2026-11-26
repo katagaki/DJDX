@@ -44,24 +44,10 @@ struct DDRScoreRow: View {
 
             Spacer(minLength: 0.0)
 
-            VStack(spacing: 1.0) {
-                Text(verbatim: record.difficultyEnum.rawValue)
-                    .font(.system(size: 10.0).weight(.black))
-                    .fontWidth(.condensed)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .foregroundStyle(record.difficultyEnum.color)
-                if record.level > 0 {
-                    Text(verbatim: String(record.level))
-                        .font(.system(size: 18.0).weight(.heavy))
-                        .fontWidth(.condensed)
-                        .monospacedDigit()
-                }
-            }
-            .padding([.top, .bottom], 6.0)
-            .frame(width: 78.0, alignment: .center)
-            .cardBackground(cornerRadius: 6.0)
-            .padding([.top, .bottom], 8.0)
+            LevelBadge(name: record.difficultyEnum.rawValue,
+                       level: record.level > 0 ? String(record.level) : "",
+                       tint: record.difficultyEnum.color)
+                .padding([.top, .bottom], 8.0)
         }
         .frame(maxWidth: .infinity)
         .padding(.trailing)
