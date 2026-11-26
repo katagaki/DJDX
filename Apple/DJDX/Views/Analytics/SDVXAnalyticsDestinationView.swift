@@ -319,8 +319,7 @@ struct SDVXClearTypeLevelRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6.0) {
             HStack {
-                Text(verbatim: "LEVEL \(level)")
-                    .font(.subheadline.bold())
+                LevelNumberBadge(level: String(level))
                 Spacer()
                 Text("Shared.SongCount.\(total)")
                     .font(.caption)

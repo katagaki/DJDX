@@ -11,15 +11,14 @@ struct AnalyticsGoalTitle: View {
                     .fontWeight(.black)
                     .fontWidth(.expanded)
             case .clearCount, .gradeCount:
-                Group {
-                    if goal.level > 0 {
-                        Text(verbatim: "LEVEL \(goal.level)")
-                    } else {
-                        Text("Goals.Level.All")
-                    }
+                if goal.level > 0 {
+                    LevelNumberBadge(level: String(goal.level))
+                        .alignmentGuide(.firstTextBaseline) { $0[.bottom] - 5.0 }
+                } else {
+                    Text("Goals.Level.All")
+                        .fontWeight(.black)
+                        .fontWidth(.expanded)
                 }
-                .fontWeight(.black)
-                    .fontWidth(.expanded)
                 Divider()
                     .frame(maxHeight: 12.0)
                 threshold

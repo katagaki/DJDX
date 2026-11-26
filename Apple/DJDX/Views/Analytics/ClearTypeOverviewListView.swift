@@ -73,8 +73,7 @@ struct ClearTypeLevelRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6.0) {
             HStack {
-                Text(verbatim: "LEVEL \(difficulty)")
-                    .font(.subheadline.bold())
+                LevelNumberBadge(level: String(difficulty))
                 Spacer()
                 Text("Shared.SongCount.\(total)")
                     .font(.caption)
