@@ -71,7 +71,7 @@ struct TierListRow<Label: View>: View {
     }
 
     func tierPicker(for chart: TierListChart) -> some View {
-        HStack(spacing: 6.0) {
+        LazyVGrid(columns: Array(repeating: GridItem(.fixed(40.0), spacing: 8.0), count: 4), spacing: 8.0) {
             ForEach(TierListTier.allCases) { target in
                 Button {
                     assigningChartID = nil
@@ -88,7 +88,7 @@ struct TierListRow<Label: View>: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(10.0)
+        .padding(16.0)
     }
 
     func draggableTile(for chart: TierListChart) -> some View {
