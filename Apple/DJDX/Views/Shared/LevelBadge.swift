@@ -78,12 +78,11 @@ struct LevelBadge: View {
     private func nameText(size: CGFloat) -> some View {
         Text(verbatim: name)
             .font(.system(size: size, weight: .black))
-            .fontWidth(.condensed)
+            .fontWidth(Font.Width(-0.1))
             .lineLimit(1)
             .minimumScaleFactor(0.6)
-            .kerning(0.4)
             .foregroundStyle(.white)
-            .shadow(color: tint.mix(with: .black, by: 0.78).opacity(0.6), radius: 0.0, y: 1.0)
+            .strokeText(color: tint.mix(with: .black, by: 0.55), width: size * 0.05)
     }
 
     private func number(size: CGFloat) -> some View {
@@ -141,8 +140,7 @@ struct LevelNumberBadge: View {
         HStack(spacing: isCompact ? 5.0 : 7.0) {
             Text(verbatim: "LEVEL")
                 .font(.system(size: isCompact ? 7.5 : 10.0, weight: .black))
-                .fontWidth(.condensed)
-                .kerning(0.4)
+                .fontWidth(Font.Width(-0.1))
                 .foregroundStyle(.white.opacity(0.7))
             LevelNumber(level: level, size: isCompact ? 13.0 : 20.0)
         }
