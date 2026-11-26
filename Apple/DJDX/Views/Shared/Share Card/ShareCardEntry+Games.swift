@@ -32,7 +32,7 @@ extension ShareCardEntry {
     }
 
     init(iidxSongRecord songRecord: IIDXSongRecord, level: IIDXLevel,
-         score: IIDXLevelScore, scoreRate: Float?) {
+         score: IIDXLevelScore, scoreRate: Float?, iidxVersion: IIDXVersion) {
         var metrics: [ShareCardMetric] = []
         if score.score != 0 {
             if !score.djLevel.isEmpty, score.djLevel != "---" {
@@ -54,7 +54,11 @@ extension ShareCardEntry {
             levelText: String(score.difficulty),
             difficultyText: String(localized: String.LocalizationValue(level.rawValue)),
             difficultyColor: Self.iidxDifficultyColor(for: level),
-            metrics: metrics
+            metrics: metrics,
+            titleStyle: AnyShapeStyle(iidxVersion.rowTitleTextColor(for: songRecord.version, level: level,
+                                                                    colorScheme: .dark)),
+            titleStrokeColor: iidxVersion.rowTitleStrokeColor(for: songRecord.version, level: level,
+                                                              colorScheme: .dark)
         )
     }
 

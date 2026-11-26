@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.sp
 import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.ui.common.RadarChart
 import com.tsubuzaki.djdxgo.ui.theme.RadarColors
+import com.tsubuzaki.djdxgo.ui.common.OutlinedText
+import com.tsubuzaki.djdxgo.ui.common.SquashedHorizontally
 import com.tsubuzaki.djdxgo.ui.theme.GameFontWidth
 import com.tsubuzaki.djdxgo.ui.theme.GameFonts
 import com.tsubuzaki.djdxgo.ui.theme.gameFont
@@ -296,22 +298,37 @@ private fun ShareCardRow(entry: ShareCardEntry) {
                 .padding(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            Text(
-                text = entry.title,
-                style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            val titleStrokeColor = entry.titleStrokeColor
+            if (titleStrokeColor != null) {
+                OutlinedText(
+                    text = entry.title,
+                    style = TextStyle(fontSize = 15.sp).gameFont(GameFontWidth.COMPRESSED),
+                    fontWeight = FontWeight.Black,
+                    fill = entry.titleBrush,
+                    outline = titleStrokeColor,
+                    outlineWidth = 0.35.dp,
+                    squashed = true
+                )
+            } else {
+                SquashedHorizontally(Modifier) {
+                    Text(
+                        text = entry.title,
+                        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold, brush = entry.titleBrush),
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Visible
+                    )
+                }
+            }
             entry.subtitle?.takeIf { it.isNotEmpty() }?.let { subtitle ->
-                Text(
+                OutlinedText(
                     text = subtitle,
-                    style = TextStyle(
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.White.copy(alpha = 0.65f)
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    style = TextStyle(fontSize = 11.sp),
+                    fontWeight = FontWeight.Black,
+                    fill = Color.White,
+                    outline = Color.Black.copy(alpha = 0.7f),
+                    outlineWidth = 0.35.dp,
+                    squashed = true
                 )
             }
             if (entry.metrics.isNotEmpty()) {

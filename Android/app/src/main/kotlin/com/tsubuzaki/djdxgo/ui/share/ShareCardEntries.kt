@@ -63,7 +63,9 @@ fun iidxShareCardEntry(
         levelText = score.difficulty.toString(),
         difficultyText = level.csvPrefix,
         difficultyColor = IIDXColors.levelColor(level),
-        metrics = metrics
+        metrics = metrics,
+        titleBrush = IIDXColors.rowTitleBrush(record.version, level, darkTheme = true),
+        titleStrokeColor = IIDXColors.rowTitleStrokeColor(record.version, level, darkTheme = true)
     )
 }
 

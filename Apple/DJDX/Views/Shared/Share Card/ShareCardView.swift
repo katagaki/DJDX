@@ -176,14 +176,25 @@ struct ShareCardRow: View {
                 .frame(width: 8.0)
                 .frame(maxHeight: .infinity)
             VStack(alignment: .leading, spacing: 2.0) {
-                Text(verbatim: entry.title)
-                    .font(.system(size: 14.0, weight: .bold))
-                    .lineLimit(1)
+                if let titleStrokeColor = entry.titleStrokeColor {
+                    Text(verbatim: entry.title)
+                        .font(.system(size: 15.0, weight: .heavy))
+                        .fontWidth(.compressed)
+                        .foregroundStyle(entry.titleStyle)
+                        .strokeText(color: titleStrokeColor, width: 0.35)
+                        .shareCardSquashed()
+                } else {
+                    Text(verbatim: entry.title)
+                        .font(.system(size: 14.0, weight: .bold))
+                        .foregroundStyle(entry.titleStyle)
+                        .shareCardSquashed()
+                }
                 if let subtitle = entry.subtitle, !subtitle.isEmpty {
                     Text(verbatim: subtitle)
-                        .font(.system(size: 11.0, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.65))
-                        .lineLimit(1)
+                        .font(.system(size: 11.0, weight: .heavy))
+                        .foregroundStyle(.white)
+                        .strokeText(color: .black.opacity(0.7), width: 0.35)
+                        .shareCardSquashed()
                 }
                 if !entry.metrics.isEmpty {
                     HStack(spacing: 8.0) {
@@ -217,5 +228,20 @@ struct ShareCardRow: View {
         }
         .padding(.trailing, 6.0)
         .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+private extension View {
+    func shareCardSquashed() -> some View {
+        self
+            .lineLimit(1)
+            .fixedSize()
+            .visualEffect { content, proxy in
+                let availableWidth = proxy.bounds(of: .named("ShareCardSquash"))?.width ?? proxy.size.width
+                let scale = proxy.size.width > availableWidth ? availableWidth / proxy.size.width : 1.0
+                return content.scaleEffect(x: scale, y: 1.0, anchor: .leading)
+            }
+            .frame(minWidth: 0.0, maxWidth: .infinity, alignment: .leading)
+            .coordinateSpace(.named("ShareCardSquash"))
     }
 }
