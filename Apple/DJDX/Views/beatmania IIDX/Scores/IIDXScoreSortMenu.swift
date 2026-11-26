@@ -38,7 +38,7 @@ struct ScoreFilterButton: View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
-        .automaticSheetMatchedTransitionSource(id: "ScoreFilterSheet", in: filterNamespace)
+        .matchedTransitionSource(id: "ScoreFilterSheet", in: filterNamespace)
     }
 }
 
@@ -203,14 +203,8 @@ struct ScoreFilterSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    if #available(iOS 26.0, *) {
-                        Button(role: .confirm) {
-                            dismiss()
-                        }
-                    } else {
-                        Button(.sharedDone) {
-                            dismiss()
-                        }
+                    Button(role: .confirm) {
+                        dismiss()
                     }
                 }
             }

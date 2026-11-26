@@ -2,7 +2,6 @@ import SwiftUI
 
 // Maps to the スコアグレード column in the SDVX CSV.
 enum SDVXGrade: String, Codable {
-    // swiftlint:disable identifier_name
     case all = "Shared.All"
     case s = "S"
     case aaaPlus = "AAA+"
@@ -16,7 +15,6 @@ enum SDVXGrade: String, Codable {
     case d = "D"
     case none = "---"
     case unknown = ""
-    // swiftlint:enable identifier_name
 
     static let sorted: [SDVXGrade] = [
         .s, .aaaPlus, .aaa, .aaPlus, .aa, .aPlus, .a, .b, .c, .d
@@ -26,7 +24,6 @@ enum SDVXGrade: String, Codable {
         sorted.map { $0.rawValue }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     static func color(for grade: String) -> Color {
         switch grade {
         case "S": return .primary
@@ -44,7 +41,6 @@ enum SDVXGrade: String, Codable {
     }
 
     // Minimum score (out of 10,000,000) required for each grade
-    // swiftlint:disable:next cyclomatic_complexity
     static func grade(forScore score: Int) -> SDVXGrade {
         switch score {
         case 9_900_000...: return .s

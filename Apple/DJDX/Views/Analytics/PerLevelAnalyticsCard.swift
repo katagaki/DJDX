@@ -18,7 +18,7 @@ struct PerLevelAnalyticsCard<TrendChart: View>: View {
     @ViewBuilder let trendChart: () -> TrendChart
 
     var cornerRadius: CGFloat {
-        if #available(iOS 26.0, *) { 20.0 } else { 12.0 }
+        20.0
     }
 
     var total: Int {

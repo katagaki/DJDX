@@ -16,7 +16,6 @@ struct DDRScrapedRow: Decodable {
 
 actor DDRImporter {
 
-    // swiftlint:disable:next type_name
     typealias DB = DDRPlayDataDatabase
 
     func importJSON(

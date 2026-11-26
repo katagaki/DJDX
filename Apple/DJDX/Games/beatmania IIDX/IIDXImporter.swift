@@ -1,7 +1,6 @@
 import Foundation
 import SQLite
 
-// swiftlint:disable:next type_body_length
 actor IIDXImporter {
 
     let dateFormat = "yyyy-MM-dd-HH-mm-ss"
@@ -64,7 +63,7 @@ actor IIDXImporter {
         continuation: AsyncStream<ImportProgress>.Continuation
     ) {
         if let urlOfData: URL = url,
-            let stringFromData: String = try? String(contentsOf: urlOfData) {
+            let stringFromData: String = try? String(contentsOf: urlOfData, encoding: .utf8) {
             let parsedCSV = CSwiftV(with: stringFromData)
             if let keyedRows = parsedCSV.keyedRows {
 
@@ -207,7 +206,6 @@ actor IIDXImporter {
 
     // MARK: Insert Helpers
 
-    // swiftlint:disable:next function_body_length
     static func insertSongRecord(database: Connection, record: IIDXSongRecord, importGroupID: String) {
         let col = IIDXPlayDataDatabase.self
         _ = try? database.run(col.songRecordTable.insert(

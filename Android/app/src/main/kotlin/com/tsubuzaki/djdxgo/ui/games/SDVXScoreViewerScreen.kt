@@ -26,7 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.djdxgo.AppContainer
 import com.tsubuzaki.djdxgo.R
+import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.compact
+import com.tsubuzaki.djdxgo.ui.common.ChartNotesCard
 import com.tsubuzaki.djdxgo.data.external.SDVXInChart
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXDifficulty
@@ -197,6 +199,12 @@ fun SDVXScoreViewerScreen(
                         }
                     }
                 }
+                ChartNotesCard(
+                    repository = container.chartNotesRepository,
+                    game = Game.SOUND_VOLTEX,
+                    title = title,
+                    chart = current.difficulty
+                )
             }
     }
 }

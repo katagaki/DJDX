@@ -44,7 +44,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tsubuzaki.djdxgo.AppContainer
 import com.tsubuzaki.djdxgo.R
+import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.SettingsKeys
+import com.tsubuzaki.djdxgo.data.notes.ChartNote
+import com.tsubuzaki.djdxgo.ui.common.ChartNotesCard
 import com.tsubuzaki.djdxgo.data.compact
 import com.tsubuzaki.djdxgo.data.external.IIDXSong
 import com.tsubuzaki.djdxgo.data.external.NotesRadarEntry
@@ -231,6 +234,13 @@ fun IIDXScoreViewerScreen(
                     chartAnalyzer = container.chartAnalyzer,
                     isChartViewerEnabled = isChartViewerEnabled,
                     onOpenTextage = onOpenTextage
+                )
+                ChartNotesCard(
+                    repository = container.chartNotesRepository,
+                    game = Game.IIDX_ARCADE,
+                    title = title,
+                    chart = ChartNote.iidxChart(playTypeEnum, level),
+                    showsPlaySettings = true
                 )
             }
         }

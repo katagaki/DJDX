@@ -1,8 +1,6 @@
 import Foundation
 import SQLite
 
-// swiftlint:disable file_length
-// swiftlint:disable:next type_body_length
 actor IIDXReader {
 
     var previousFilters: FilterOptions?
@@ -142,7 +140,6 @@ actor IIDXReader {
         return (try? database.prepare(query).map { $0[IIDXPlayDataDatabase.srImportGroupID] }) ?? []
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func songRecords(
         on playDataDate: Date,
         version: IIDXVersion? = nil,
@@ -826,4 +823,3 @@ actor IIDXReader {
         )
     }
 }
-// swiftlint:enable file_length

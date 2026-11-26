@@ -15,11 +15,7 @@ struct MoreNotesRadarView: View {
     @State private var isShowingValues: Bool = false
 
     var cornerRadius: CGFloat {
-        if #available(iOS 26.0, *) {
-            return 20.0
-        } else {
-            return 12.0
-        }
+        return 20.0
     }
 
     var currentRadarData: RadarData? {
