@@ -5,14 +5,22 @@ struct CapturedPlayRow: View {
 
     @Namespace private var namespace
 
+    private var songInfo: IIDXSessionSongInfo { .shared }
+
     var body: some View {
+        content
+            .task { await songInfo.loadIfNeeded() }
+    }
+
+    @ViewBuilder
+    private var content: some View {
         if play.state == .done || play.state == .needsReview {
             IIDXScoreRow(
                 namespace: namespace,
                 songRecord: songRecord,
                 level: play.level == .unknown ? .another : play.level,
                 score: play.levelScore(),
-                scoreRate: nil
+                scoreRate: play.scoreRate(songCompactTitles: songInfo.songs)
             )
             .overlay(alignment: .topTrailing) {
                 if play.state == .needsReview {
@@ -25,6 +33,10 @@ struct CapturedPlayRow: View {
         }
     }
 
+    private var songRecord: IIDXSongRecord {
+        play.asSongRecord(metadata: songInfo.metadata)
+    }
+
     private var reviewBadge: some View {
         Image(systemName: "exclamationmark")
             .font(.system(size: 10.0, weight: .black))
@@ -32,14 +44,6 @@ struct CapturedPlayRow: View {
             .frame(width: 16.0, height: 16.0)
             .background(.orange, in: Circle())
             .shadow(color: .black.opacity(0.25), radius: 1.5, y: 1.0)
-    }
-
-    private var songRecord: IIDXSongRecord {
-        let record = IIDXSongRecord()
-        record.title = play.songTitle ?? String(localized: "Sessions.UnknownSong")
-        record.playType = play.playType
-        record.lastPlayDate = play.captureDate
-        return record
     }
 
     private var statusRow: some View {

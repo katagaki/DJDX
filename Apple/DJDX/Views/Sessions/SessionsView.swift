@@ -28,7 +28,6 @@ struct SessionsView: View {
 
     @Namespace var sessionsNamespace
 
-    private let reader = IIDXReader()
 
     var pastSessions: [IIDXPlaySession] {
         store.sessions.filter { !$0.isActive }.sorted { $0.startDate > $1.startDate }
@@ -105,7 +104,8 @@ struct SessionsView: View {
             store.bootstrap()
         }
         .task {
-            songCompactTitles = await reader.songCompactTitles()
+            await IIDXSessionSongInfo.shared.reload()
+            songCompactTitles = IIDXSessionSongInfo.shared.songs
             reloadScores()
         }
         .onReceive(NotificationCenter.default.publisher(for: .playSessionDidChange)
