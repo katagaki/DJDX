@@ -1,7 +1,6 @@
 import SwiftUI
 
 enum PopnRank: String, Codable, CaseIterable {
-    // swiftlint:disable identifier_name
     case s = "S"
     case aaa = "AAA"
     case aaPlus = "AA+"
@@ -14,7 +13,6 @@ enum PopnRank: String, Codable, CaseIterable {
     case d = "D"
     case e = "E"
     case none = "---"
-    // swiftlint:enable identifier_name
 
     static let sorted: [PopnRank] = [.s, .aaa, .aaPlus, .aa, .aPlus, .a, .bPlus, .b, .c, .d, .e]
 
@@ -22,7 +20,6 @@ enum PopnRank: String, Codable, CaseIterable {
         sorted.map { $0.rawValue }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     init(code: String) {
         switch code.lowercased() {
         case "s": self = .s

@@ -12,6 +12,7 @@ struct PopnImportView: View {
     @State var didImportSucceed: Bool = false
     @State var autoImportFailedReason: ImportFailedReason?
     @State var importGroups: [PopnImportGroupInfo] = []
+    @State var summaryTarget: ImportSummaryTarget?
 
     let importer = PopnImporter()
     let fetcher = PopnReader()
@@ -24,17 +25,23 @@ struct PopnImportView: View {
         NavigationStack(path: $importPath) {
             List {
                 ForEach(importGroups) { group in
-                    HStack(alignment: .center, spacing: 6.0) {
-                        Text(group.date, style: .date)
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        if let version = group.version {
-                            Text(version.marketingName)
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundStyle(.secondary)
+                    Button {
+                        summaryTarget = ImportSummaryTarget(id: group.id)
+                    } label: {
+                        HStack(alignment: .center, spacing: 6.0) {
+                            Text(group.date, style: .date)
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if let version = group.version {
+                                Text(version.marketingName)
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
+                        .contentShape(.rect)
                     }
+                    .buttonStyle(.plain)
                     .listRowBackground(Color.clear)
                 }
                 .onDelete(perform: { indexSet in
@@ -46,46 +53,17 @@ struct PopnImportView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    if #available(iOS 26.0, *) {
-                        Button(role: .close) { dismiss() }
-                    } else {
-                        Button {
-                            dismiss()
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
-                                .tint(.primary)
-                                .font(.title2)
-                                .symbolRenderingMode(.hierarchical)
-                        }
-                    }
+                    Button(role: .close) { dismiss() }
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                if #available(iOS 26.0, *) {
-                    bottomBar()
-                        .padding(.top, 2.0)
-                        .contentShape(.rect)
-                        .clipShape(.rect(cornerRadius: 24.0))
-                        .glassEffect(.regular, in: .rect(cornerRadius: 24.0))
-                        .padding()
-                } else {
-                    TabBarAccessory(placement: .bottom) {
-                        bottomBar()
-                            .contentShape(.rect)
-                    }
-                }
+                bottomBar()
+                    .padding(.top, 2.0)
+                    .contentShape(.rect)
+                    .clipShape(.rect(cornerRadius: 24.0))
+                    .glassEffect(.regular, in: .rect(cornerRadius: 24.0))
+                    .padding()
             }
-            .alert(
-                "Alert.Import.Success.Title",
-                isPresented: $didImportSucceed,
-                actions: {
-                    Button("Shared.OK", role: .cancel) {
-                        didImportSucceed = false
-                        importPath = NavigationPath()
-                    }
-                },
-                message: { Text("Alert.Import.Success.Subtitle") }
-            )
             .alert(
                 "Alert.Import.Error.Title",
                 isPresented: $isAutoImportFailed,
@@ -99,8 +77,20 @@ struct PopnImportView: View {
             )
             .onChange(of: didImportSucceed) { _, newValue in
                 if newValue {
+                    didImportSucceed = false
+                    importPath = NavigationPath()
                     NotificationCenter.default.post(name: .dataImported, object: nil)
-                    Task { await reloadImportGroups() }
+                    Task {
+                        await reloadImportGroups()
+                        if let importGroupID = await fetcher.importGroupID(for: importToDate) {
+                            summaryTarget = ImportSummaryTarget(id: importGroupID)
+                        }
+                    }
+                }
+            }
+            .sheet(item: $summaryTarget) { target in
+                ImportSummaryView {
+                    await PopnImportSummaryBuilder.summary(importGroupID: target.id)
                 }
             }
             .task {

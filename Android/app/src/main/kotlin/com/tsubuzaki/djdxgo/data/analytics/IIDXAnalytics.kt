@@ -2,6 +2,7 @@ package com.tsubuzaki.djdxgo.data.analytics
 
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.tsubuzaki.djdxgo.data.compact
+import com.tsubuzaki.djdxgo.data.external.IIDXSong
 import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXDJLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXDao
@@ -117,7 +118,9 @@ data class IIDXAnalyticsData(
     val djLevelTrends: List<IIDXTrendPoint> = emptyList(),
     val newEntries: Map<IIDXNewEntryKind, List<IIDXNewEntry>> = emptyMap(),
     val progress: List<IIDXProgressPoint> = emptyList(),
-    val towerEntries: List<IIDXTowerEntry> = emptyList()
+    val towerEntries: List<IIDXTowerEntry> = emptyList(),
+    val djLevelSuggestions: List<IIDXDJLevelSuggestion> = emptyList(),
+    val clearLampSuggestionCandidates: List<IIDXClearLampSuggestion> = emptyList()
 ) {
     fun newEntries(kind: IIDXNewEntryKind): List<IIDXNewEntry> = newEntries[kind].orEmpty()
 
@@ -149,12 +152,18 @@ object IIDXAnalytics {
     suspend fun compute(
         dao: IIDXDao,
         playType: IIDXPlayType,
-        filters: IIDXFilterOptions
+        filters: IIDXFilterOptions,
+        songs: List<IIDXSong> = emptyList()
     ): IIDXAnalyticsData {
         val groups = dao.importGroups(IIDXVersionInfo.NUMBER).sortedBy { it.importDate }
+        val suggestions = groups.lastOrNull()?.let { group ->
+            IIDXSuggestions.compute(dao.songRecords(group.id, playType.value), songs, playType, filters)
+        }
         return levelCounts(dao, groups, playType, filters).copy(
             newEntries = newEntries(dao, groups, playType, filters),
-            progress = progress(dao, groups, playType, filters)
+            progress = progress(dao, groups, playType, filters),
+            djLevelSuggestions = suggestions?.first.orEmpty(),
+            clearLampSuggestionCandidates = suggestions?.second.orEmpty()
         )
     }
 

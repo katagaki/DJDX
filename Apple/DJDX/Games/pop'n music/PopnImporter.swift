@@ -3,7 +3,6 @@ import SQLite
 
 actor PopnImporter {
 
-    // swiftlint:disable:next type_name
     typealias DB = PopnPlayDataDatabase
 
     func importJSON(

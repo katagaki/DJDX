@@ -27,6 +27,9 @@ extension UnifiedView {
                               analyticsNamespace: analyticsNamespace,
                               towerNamespace: towerNamespace)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
+                AnalyticsGoalsSection(game: selectedGame, playStyle: playTypeToShow.rawValue)
+                    .padding(.top, 20.0)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
         }
         .padding(.bottom, 8.0)

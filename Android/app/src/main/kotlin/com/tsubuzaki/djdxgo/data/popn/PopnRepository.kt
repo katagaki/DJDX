@@ -82,6 +82,10 @@ class PopnRepository(private val dao: PopnDao) {
             ?: dao.closestImportGroupBefore(bucket.startOfNextDay)
     }
 
+    suspend fun importGroups(): List<PopnImportGroup> = dao.importGroups()
+
+    suspend fun songRecords(groupID: String): List<PopnSongRecord> = dao.songRecords(groupID)
+
     suspend fun songRecords(date: Long): List<PopnSongRecord> {
         val group = importGroupFor(date) ?: return emptyList()
         return dao.songRecords(group.id)

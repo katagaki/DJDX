@@ -275,11 +275,9 @@ class PopnCoordinatorForImporter: NSObject, WKNavigationDelegate, WKScriptMessag
     }
 }
 
-// swiftlint:disable class_delegate_protocol
 protocol PopnUpdateScoreDataDelegate: Sendable {
     func beginScrapeProgress()
     func updateScrapeProgress(levelsDone: Int, totalLevels: Int)
     func importScoreData(using newScoreData: String) async
     func stopProcessing(with reason: ImportFailedReason)
 }
-// swiftlint:enable class_delegate_protocol

@@ -2,7 +2,6 @@ import Charts
 import OrderedCollections
 import SwiftUI
 
-// swiftlint:disable type_body_length
 struct PopnAnalyticsView: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -174,7 +173,7 @@ struct PopnAnalyticsView: View {
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
+        .matchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
     }
 
     @ViewBuilder
@@ -187,7 +186,7 @@ struct PopnAnalyticsView: View {
             lastPlayCountCard(for: cardType)
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
+        .matchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
     }
 
     @ViewBuilder
@@ -338,4 +337,3 @@ struct PopnAnalyticsView: View {
         return AnyShapeStyle(rank.style(colorScheme: colorScheme))
     }
 }
-// swiftlint:enable type_body_length

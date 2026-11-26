@@ -13,7 +13,7 @@ struct PopnAnalyticsDestinationView: View {
             case .popnClassDetail:
                 PopnClassDetailView(model: model)
                     .navigationTitle("Shared.Popn.PopnClass")
-                    .automaticNavigationTransition(id: "Popn.popnClass", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "Popn.popnClass", in: namespace))
             case .medalBreakdownDetail:
                 PopnLevelBreakdownDetailView(
                     countsPerLevel: model.clearTypePerLevel,
@@ -22,7 +22,7 @@ struct PopnAnalyticsDestinationView: View {
                     label: { PopnClearType(rawValue: $0)?.abbreviation ?? $0 }
                 )
                 .navigationTitle("Analytics.Popn.MedalBreakdown")
-                .automaticNavigationTransition(id: "Popn.medalBreakdown", in: namespace)
+                .navigationTransition(.zoom(sourceID: "Popn.medalBreakdown", in: namespace))
             case .rankBreakdownDetail:
                 PopnLevelBreakdownDetailView(
                     countsPerLevel: model.rankPerLevel,
@@ -31,19 +31,19 @@ struct PopnAnalyticsDestinationView: View {
                     label: { $0 }
                 )
                 .navigationTitle("Analytics.Popn.RankBreakdown")
-                .automaticNavigationTransition(id: "Popn.rankBreakdown", in: namespace)
+                .navigationTransition(.zoom(sourceID: "Popn.rankBreakdown", in: namespace))
             case .newHighScoresDetail:
                 PopnNewHighScoresDetailView(newHighScores: model.newHighScores)
                     .navigationTitle("Analytics.NewHighScores")
-                    .automaticNavigationTransition(id: "Popn.newHighScores", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "Popn.newHighScores", in: namespace))
             case .newClearsDetail(let clearType):
                 PopnNewClearsDetailView(newClears: model.newClears[clearType] ?? [])
                     .navigationTitle(Text(verbatim: clearType))
-                    .automaticNavigationTransition(id: transitionID(forClearType: clearType), in: namespace)
+                    .navigationTransition(.zoom(sourceID: transitionID(forClearType: clearType), in: namespace))
             case .newRanksDetail(let rank):
                 PopnNewRanksDetailView(newRanks: model.newRanks[rank] ?? [])
                     .navigationTitle(Text(verbatim: rank))
-                    .automaticNavigationTransition(id: transitionID(forRank: rank), in: namespace)
+                    .navigationTransition(.zoom(sourceID: transitionID(forRank: rank), in: namespace))
             }
         }
         .appBackgroundGradient()

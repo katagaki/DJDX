@@ -47,7 +47,6 @@ enum ZipArchive {
         throw ZipArchiveError.invalidArchive
     }
 
-    // swiftlint:disable:next function_body_length cyclomatic_complexity
     private static func extractEntry(at offset: Int, in data: Data, to destinationURL: URL) throws -> Int {
         guard offset + 46 <= data.count,
               read(UInt32.self, in: data, at: offset) == 0x02014B50 else {

@@ -1,6 +1,5 @@
 import SwiftUI
 
-// swiftlint:disable:next type_body_length
 struct IIDXScoresView<Header: View>: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
@@ -33,6 +32,7 @@ struct IIDXScoresView<Header: View>: View {
 
     @State var isSystemChangingFilterAndSort: Bool = false
     @State var isShowingFilterSheet: Bool = false
+    @State var isShowingShareCard: Bool = false
     @State var isSystemChangingCalendarDate: Bool = false
     @State var isSystemChangingAllRecords: Bool = false
 
@@ -106,11 +106,7 @@ struct IIDXScoresView<Header: View>: View {
     }
 
     var searchPlacement: SearchFieldPlacement {
-        if #available(iOS 26.0, *) {
-            .automatic
-        } else {
-            .navigationBarDrawer(displayMode: .always)
-        }
+        .automatic
     }
 
     @ViewBuilder var timeTravelButton: some View {
@@ -146,19 +142,10 @@ struct IIDXScoresView<Header: View>: View {
             .presentationCompactAdaptation(.popover)
         }
 
-        if #available(iOS 26.0, *) {
-            if isTimeTravelling {
-                button.buttonStyle(.glassProminent)
-            } else {
-                button
-            }
+        if isTimeTravelling {
+            button.buttonStyle(.glassProminent)
         } else {
             button
-                .background {
-                    if isTimeTravelling {
-                        Capsule().fill(Color.accentColor.opacity(0.25))
-                    }
-                }
         }
     }
 
@@ -198,8 +185,8 @@ struct IIDXScoresView<Header: View>: View {
                     }
                 }
                 if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
-                    ForEach(levelEntries(from: searchResults ?? songRecords ?? []),
-                            id: \.id) { entry in
+                    let entries = levelEntries(from: searchResults ?? songRecords ?? [])
+                    ForEach(entries, id: \.id) { entry in
                         Button {
                             navigationManager.push(
                                 ScoresPath.scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level)
@@ -229,24 +216,15 @@ struct IIDXScoresView<Header: View>: View {
                 AppBackgroundGradient()
             }
             .toolbar {
-                if #available(iOS 26.0, *) {
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        timeTravelButton
-                    }
-                    ToolbarSpacer(.fixed, placement: .bottomBar)
-                    DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                    ToolbarSpacer(.fixed, placement: .bottomBar)
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        sortControl
-                        filterControl
-                    }
-                } else {
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        timeTravelButton
-                        Spacer()
-                        sortControl
-                        filterControl
-                    }
+                ToolbarItemGroup(placement: .bottomBar) {
+                    timeTravelButton
+                }
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+                DefaultToolbarItem(kind: .search, placement: .bottomBar)
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    sortControl
+                    filterControl
                 }
             }
             .background {
@@ -278,10 +256,24 @@ struct IIDXScoresView<Header: View>: View {
                     isLastPlayDateVisible: $isLastPlayDateVisible,
                     onReset: { reloadDisplay() }
                 )
-                .automaticSheetNavigationTransition(id: "ScoreFilterSheet", in: scoresNamespace)
+                .navigationTransition(.zoom(sourceID: "ScoreFilterSheet", in: scoresNamespace))
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.hidden)
                 .interactiveDismissDisabled()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
+                isShowingShareCard = true
+            }
+            .sheet(isPresented: $isShowingShareCard) {
+                ShareCardComposer(
+                    game: Game.stored,
+                    profile: Game.stored == .iidxArcade ? .iidx(playType: playTypeToShow) : ShareCardProfile(),
+                    entries: levelEntries(from: searchResults ?? songRecords ?? []).map {
+                        ShareCardEntry(iidxSongRecord: $0.songRecord, level: $0.level,
+                                       score: $0.score, scoreRate: $0.scoreRate, iidxVersion: iidxVersion)
+                    },
+                    playStyle: playTypeToShow.displayName()
+                )
             }
             .onAppear {
                 if dataState == .initializing {
@@ -344,8 +336,8 @@ struct IIDXScoresView<Header: View>: View {
                         noteCount: noteCount,
                         initialLevel: initialLevel
                     )
-                    .automaticNavigationTransition(id: "\(songRecord.title).\(initialLevel.rawValue)",
-                                                   in: scoresNamespace)
+                    .navigationTransition(.zoom(sourceID: "\(songRecord.title).\(initialLevel.rawValue)",
+                                                   in: scoresNamespace))
                 case .textageViewer(let legacyURL, let chartViewerURL):
                     TextageViewer(legacyURL: legacyURL, chartViewerURL: chartViewerURL)
                 }

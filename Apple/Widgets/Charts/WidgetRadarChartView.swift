@@ -91,8 +91,7 @@ struct WidgetRadarChartView: View {
                             .frame(width: 0, height: 0)
                             .overlay(
                                 Text(config.label)
-                                    .font(.system(size: labelFontSize, weight: .black))
-                                    .fontWidth(.expanded)
+                                    .font(.radarline(size: labelFontSize))
                                     .foregroundStyle(config.color)
                                     .fixedSize(),
                                 alignment: config.alignment

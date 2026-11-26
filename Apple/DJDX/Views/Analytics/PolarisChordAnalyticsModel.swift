@@ -95,7 +95,6 @@ final class PolarisChordAnalyticsModel {
     }
 
     // Compares the latest two import groups for the version and computes what improved.
-    // swiftlint:disable:next large_tuple
     private func computeLastPlay(version: PolarisChordVersion, filters: PolarisChordFilterOptions?) async -> (
         clears: [String: [PolarisChordNewClearEntry]],
         highScores: [PolarisChordNewHighScoreEntry],
@@ -117,7 +116,6 @@ final class PolarisChordAnalyticsModel {
     nonisolated static func computeNewEntries(
         latestRecords: [PolarisChordSongRecord],
         previousRecords: [PolarisChordSongRecord]
-    // swiftlint:disable:next large_tuple
     ) -> (
         clears: [String: [PolarisChordNewClearEntry]],
         highScores: [PolarisChordNewHighScoreEntry],

@@ -12,12 +12,14 @@ enum AnalyticsSection: String, Codable, Hashable, CaseIterable {
     case overview
     case lastPlay
     case perLevel
+    case suggestions
 
     var titleKey: LocalizedStringKey {
         switch self {
         case .overview: "Analytics.Section.Overview"
         case .lastPlay: "Analytics.Section.LastPlay"
         case .perLevel: "Analytics.Section.PerLevel"
+        case .suggestions: "Analytics.Section.Suggestions"
         }
     }
 }

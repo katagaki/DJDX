@@ -76,14 +76,18 @@ struct TowerDetailView<Chart: View>: View {
                         Text(entry.playDate, format: .dateTime.year().month().day())
                             .monospacedDigit()
                         Spacer()
-                        Text("Count.\(entry.keyCount)")
-                            .monospacedDigit()
+                        Text(entry.keyCount, format: .number)
+                            .font(.scoreline(.body))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
                             .foregroundStyle(.blue)
-                            .frame(width: 80, alignment: .trailing)
-                        Text("Count.\(entry.scratchCount)")
-                            .monospacedDigit()
+                            .frame(width: 100, alignment: .trailing)
+                        Text(entry.scratchCount, format: .number)
+                            .font(.scoreline(.body))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
                             .foregroundStyle(.red)
-                            .frame(width: 80, alignment: .trailing)
+                            .frame(width: 100, alignment: .trailing)
                     }
                     .listRowBackground(Color.clear)
                 }
@@ -92,9 +96,9 @@ struct TowerDetailView<Chart: View>: View {
                     Text("Tower.Header.PlayDate")
                     Spacer()
                     Text("Shared.IIDX.Keys")
-                        .frame(width: 80, alignment: .trailing)
+                        .frame(width: 100, alignment: .trailing)
                     Text("Shared.IIDX.Scratch")
-                        .frame(width: 80, alignment: .trailing)
+                        .frame(width: 100, alignment: .trailing)
                 }
             }
         }

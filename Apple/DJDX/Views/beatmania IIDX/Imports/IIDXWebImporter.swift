@@ -345,10 +345,8 @@ class CoordinatorForImporter: NSObject, WKNavigationDelegate {
     }
 }
 
-// swiftlint:disable class_delegate_protocol
 protocol UpdateScoreDataDelegate: Sendable {
     func importScoreData(using newScoreData: String) async
     func importTowerData(using towerData: String) async
     func stopProcessing(with reason: ImportFailedReason)
 }
-// swiftlint:enable class_delegate_protocol

@@ -30,6 +30,8 @@ struct DDRAnalyticsView: View {
     @AppStorage(wrappedValue: false, "Analytics.DDR.OverviewCollapsed") var isOverviewCollapsedStored: Bool
     @State var isOverviewCollapsed: Bool = false
 
+    @AppStorage(wrappedValue: false, "Analytics.DDR.SuggestionsCollapsed") var isSuggestionsCollapsed: Bool
+
     let cardColumns = [
         GridItem(.flexible(), spacing: 12.0),
         GridItem(.flexible(), spacing: 12.0)
@@ -38,6 +40,7 @@ struct DDRAnalyticsView: View {
     var body: some View {
         VStack(spacing: 20.0) {
             overviewSection
+            suggestionsSection
         }
         .padding(.top, 20.0)
         .onAppear {
@@ -113,6 +116,34 @@ struct DDRAnalyticsView: View {
         }
     }
 
+    var suggestionsSection: some View {
+        AnalyticsSuggestionsSection(
+            cards: AnalyticsSuggestionCardID.ddrCards,
+            columns: [GridItem(.flexible())],
+            isEditing: isEditing,
+            isExpanded: !isSuggestionsCollapsed,
+            onToggle: { withAnimation(.smooth.speed(2.0)) { isSuggestionsCollapsed.toggle() } },
+            card: { _ in flareSkillSuggestionsCard }
+        )
+    }
+
+    var flareSkillSuggestionsCard: some View {
+        Button {
+            navigationManager.push(DDRAnalyticsPath.flareSkillSuggestionsDetail)
+        } label: {
+            AnalyticsSuggestionCard(
+                title: Text(verbatim: "FLARE SKILL"),
+                systemImage: "flame",
+                iconColor: .orange,
+                items: model.flareSkillSuggestions
+            ) { suggestion in
+                DDRFlareSkillSuggestionRow(suggestion: suggestion)
+            }
+        }
+        .buttonStyle(AnalyticsCardButtonStyle())
+        .matchedTransitionSource(id: AnalyticsSuggestionCardID.ddrFlareSkill.transitionID, in: analyticsNamespace)
+    }
+
     // MARK: - Cards
 
     @ViewBuilder
@@ -125,10 +156,11 @@ struct DDRAnalyticsView: View {
             switch cardType {
             case .clearBreakdown: clearBreakdownCard
             case .rankBreakdown: rankBreakdownCard
+            case .flareSkillTrend: flareSkillTrendCard
             }
         }
         .buttonStyle(AnalyticsCardButtonStyle())
-        .automaticMatchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
+        .matchedTransitionSource(id: cardType.transitionID, in: analyticsNamespace)
     }
 
     // MARK: - Card storage
@@ -196,6 +228,18 @@ struct DDRAnalyticsView: View {
             }
         }
         return totals
+    }
+
+    var flareSkillTrendCard: some View {
+        AnalyticsCardView(title: "Analytics.DDR.FlareSkillTrend",
+                          systemImage: "",
+                          iconColor: .clear,
+                          contentHeight: 160.0,
+                          showsHeader: false) {
+            TrendCardContent(points: model.flareSkillHistory, color: .orange,
+                             format: DDRAnalyticsModel.formatFlareSkill)
+        }
+        .perLevelCaption("Analytics.DDR.FlareSkillTrend")
     }
 
     func clearLabel(_ key: String) -> String {

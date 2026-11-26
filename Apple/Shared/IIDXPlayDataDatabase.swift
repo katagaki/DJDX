@@ -105,6 +105,18 @@ final class IIDXPlayDataDatabase: Sendable {
     static let teKeyCount = SQLite.Expression<Int>("keyCount")
     static let teScratchCount = SQLite.Expression<Int>("scratchCount")
 
+    // MARK: - IIDXNotesRadar Table
+
+    static let notesRadarTable = Table("IIDXNotesRadar")
+    static let nrImportGroupID = SQLite.Expression<String>("importGroupID")
+    static let nrPlayType = SQLite.Expression<String>("playType")
+    static let nrNotes = SQLite.Expression<Double>("notes")
+    static let nrChord = SQLite.Expression<Double>("chord")
+    static let nrPeak = SQLite.Expression<Double>("peak")
+    static let nrCharge = SQLite.Expression<Double>("charge")
+    static let nrScratch = SQLite.Expression<Double>("scratch")
+    static let nrSoflan = SQLite.Expression<Double>("soflan")
+
     // MARK: - Initialization
 
     init(fileName: String = "PlayData.db") {
@@ -126,7 +138,6 @@ final class IIDXPlayDataDatabase: Sendable {
 
     // MARK: - Table Creation
 
-    // swiftlint:disable function_body_length
     private func createTablesIfNeeded() {
         do {
             let database = try Connection(databasePath)
@@ -218,6 +229,17 @@ final class IIDXPlayDataDatabase: Sendable {
                 table.column(Self.teKeyCount, defaultValue: 0)
                 table.column(Self.teScratchCount, defaultValue: 0)
             })
+            try database.run(Self.notesRadarTable.create(ifNotExists: true) { table in
+                table.column(Self.nrImportGroupID)
+                table.column(Self.nrPlayType)
+                table.column(Self.nrNotes, defaultValue: 0.0)
+                table.column(Self.nrChord, defaultValue: 0.0)
+                table.column(Self.nrPeak, defaultValue: 0.0)
+                table.column(Self.nrCharge, defaultValue: 0.0)
+                table.column(Self.nrScratch, defaultValue: 0.0)
+                table.column(Self.nrSoflan, defaultValue: 0.0)
+                table.primaryKey(Self.nrImportGroupID, Self.nrPlayType)
+            })
             // MARK: Indexes
             try database.run(Self.songRecordTable.createIndex(
                 Self.srImportGroupID, Self.srPlayType,
@@ -231,5 +253,4 @@ final class IIDXPlayDataDatabase: Sendable {
             debugPrint("Failed to create tables: \(error)")
         }
     }
-    // swiftlint:enable function_body_length
 }

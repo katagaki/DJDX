@@ -1,5 +1,7 @@
 package com.tsubuzaki.djdxgo.ui
 
+import androidx.compose.material.icons.outlined.Share
+import kotlinx.coroutines.flow.MutableSharedFlow
 import android.content.Intent
 import android.net.Uri
 import android.webkit.CookieManager
@@ -22,6 +24,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.outlined.Hexagon
+import androidx.compose.material.icons.outlined.Leaderboard
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -83,6 +86,9 @@ import com.tsubuzaki.djdxgo.data.removeSettings
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVersion
 import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingFlow
+import com.tsubuzaki.djdxgo.data.tierlist.TierListShare
+import com.tsubuzaki.djdxgo.ui.analytics.AnalyticsGoalDetailScreen
+import com.tsubuzaki.djdxgo.ui.analytics.AnalyticsGoalsSection
 import com.tsubuzaki.djdxgo.ui.analytics.ChartAnalyticsDetailScreen
 import com.tsubuzaki.djdxgo.ui.analytics.DDRAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.IIDXAnalyticsDetailScreen
@@ -91,6 +97,7 @@ import com.tsubuzaki.djdxgo.ui.analytics.PolarisChordAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.PopnAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.SDVXAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.TowerDetailScreen
+import com.tsubuzaki.djdxgo.ui.games.DDRScoreViewerScreen
 import com.tsubuzaki.djdxgo.ui.games.DDRScoresScreen
 import com.tsubuzaki.djdxgo.ui.games.PolarisChordScoresScreen
 import com.tsubuzaki.djdxgo.ui.games.PopnScoresScreen
@@ -104,6 +111,7 @@ import com.tsubuzaki.djdxgo.ui.more.DeleteScoreDataDialog
 import com.tsubuzaki.djdxgo.ui.more.FreeUpSpaceDialog
 import com.tsubuzaki.djdxgo.ui.more.ExternalDataSourcesScreen
 import com.tsubuzaki.djdxgo.ui.more.RadarMakerScreen
+import com.tsubuzaki.djdxgo.ui.tierlist.TierListScreen
 import com.tsubuzaki.djdxgo.ui.onboarding.OnboardingScreen
 import com.tsubuzaki.djdxgo.ui.profile.DDRDataSourceWarning
 import com.tsubuzaki.djdxgo.ui.profile.DDRProfileHeader
@@ -120,7 +128,7 @@ import kotlinx.coroutines.withContext
 
 private enum class PendingDialog { FREE_UP_SPACE, DELETE_WEB, DELETE_SCORE_CODE, DELETE_SCORE, RESET_LAYOUT, DISCLAIMER }
 
-private fun gameIconRes(game: Game): Int = when (game) {
+internal fun gameIconRes(game: Game): Int = when (game) {
     Game.IIDX_ARCADE -> R.drawable.ic_game_iidx
     Game.SOUND_VOLTEX -> R.drawable.ic_game_sdvx
     Game.POLARIS_CHORD -> R.drawable.ic_game_polaris
@@ -218,6 +226,25 @@ fun DJDXApp() {
             )
         }
         composable(
+            route = Routes.DDR_VIEWER,
+            arguments = listOf(
+                navArgument("songIndex") { type = NavType.StringType; defaultValue = "" },
+                navArgument("date") { type = NavType.LongType; defaultValue = 0L },
+                navArgument("style") { type = NavType.StringType; defaultValue = "" },
+                navArgument("difficulty") { type = NavType.StringType; defaultValue = "" }
+            )
+        ) { entry ->
+            val args = entry.arguments!!
+            DDRScoreViewerScreen(
+                container = container,
+                songIndex = args.getString("songIndex").orEmpty(),
+                dateEpoch = args.getLong("date"),
+                style = args.getString("style").orEmpty(),
+                initialDifficulty = args.getString("difficulty").orEmpty(),
+                onBack = back
+            )
+        }
+        composable(
             route = Routes.TEXTAGE_VIEWER,
             arguments = listOf(
                 navArgument("legacy") { type = NavType.StringType; defaultValue = "" },
@@ -288,6 +315,16 @@ fun DJDXApp() {
                 onBack = back
             )
         }
+        composable(
+            route = Routes.GOAL_DETAIL,
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { entry ->
+            AnalyticsGoalDetailScreen(
+                container = container,
+                goalID = entry.arguments?.getString("id").orEmpty(),
+                onBack = back
+            )
+        }
         composable(Routes.EXTERNAL_DATA) {
             ExternalDataSourcesScreen(container = container, onBack = back)
         }
@@ -296,6 +333,27 @@ fun DJDXApp() {
         }
         composable(Routes.RADAR_MAKER) {
             RadarMakerScreen(onBack = back)
+        }
+        composable(
+            route = Routes.TIER_LIST,
+            arguments = listOf(navArgument("code") { type = NavType.StringType; defaultValue = "" })
+        ) { entry ->
+            val selectedGameId by context.settingFlow(SettingsKeys.selectedGame, 0)
+                .collectAsState<Int, Int?>(initial = null)
+            val playTypeValue by context.settingFlow(SettingsKeys.iidxPlayType, IIDXPlayType.SINGLE.value)
+                .collectAsState<String, String?>(initial = null)
+            val gameId = selectedGameId
+            val playType = playTypeValue
+            if (gameId != null && playType != null) {
+                TierListScreen(
+                    container = container,
+                    initialGame = Game.fromId(gameId),
+                    initialPlayType = IIDXPlayType.fromValue(playType).code,
+                    initialShare = entry.arguments?.getString("code")?.takeIf { it.isNotEmpty() }
+                        ?.let(TierListShare::decode),
+                    onBack = back
+                )
+            }
         }
     }
 }
@@ -326,6 +384,10 @@ private suspend fun handleDeepLink(
                 navController.popBackStack(Routes.SCORES, inclusive = false)
                 context.setSetting(SettingsKeys.selectedGame, game.id)
             }
+        }
+        "tierlist" -> {
+            val code = value("code") ?: return
+            navController.navigate(Routes.tierList(code))
         }
         "reonboard" -> context.setSetting(SettingsKeys.onboardingLastSeenVersion, "")
     }
@@ -384,6 +446,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
     var selectedTab by rememberSaveable(selectedGame) { mutableIntStateOf(0) }
     var isEditingAnalytics by rememberSaveable(selectedGame) { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
+    val shareRequests = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1) }
     val showAnalyticsTab = showAnalytics && selectedTab == 1
 
     suspend fun refreshProfile() {
@@ -475,6 +538,11 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                     }
                 },
                 actions = {
+                    if (!showAnalyticsTab) {
+                        IconButton(onClick = { shareRequests.tryEmit(Unit) }) {
+                            Icon(Icons.Outlined.Share, contentDescription = stringResource(R.string.share_card_title))
+                        }
+                    }
                     if (showAnalyticsTab) {
                         IconButton(onClick = { isEditingAnalytics = !isEditingAnalytics }) {
                             Icon(
@@ -595,6 +663,15 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                                 )
                                 Game.POPN -> PopnAnalyticsSection(container, isEditingAnalytics, onNavigate)
                             }
+                            AnalyticsGoalsSection(
+                                container = container,
+                                game = selectedGame,
+                                playStyle = when (selectedGame) {
+                                    Game.DANCE_DANCE_REVOLUTION -> ddrPlayStyle.value
+                                    else -> iidxPlayType.value
+                                },
+                                onNavigate = onNavigate
+                            )
                         }
                     }
                 } else {
@@ -603,6 +680,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                             container = container,
                             contentPadding = PaddingValues(),
                             analyticsContent = header,
+                            shareRequests = shareRequests,
                             onOpenSong = { title, playType, level, date ->
                                 onNavigate(Routes.iidxViewer(title, playType, level, date))
                             }
@@ -611,6 +689,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                             container = container,
                             contentPadding = PaddingValues(),
                             analyticsContent = header,
+                            shareRequests = shareRequests,
                             onOpenSong = { title, date, difficulty ->
                                 onNavigate(Routes.sdvxViewer(title, date, difficulty))
                             }
@@ -618,12 +697,17 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                         Game.POLARIS_CHORD -> PolarisChordScoresScreen(
                             container = container,
                             contentPadding = PaddingValues(),
-                            analyticsContent = header
+                            analyticsContent = header,
+                            shareRequests = shareRequests
                         )
                         Game.DANCE_DANCE_REVOLUTION -> DDRScoresScreen(
                             container = container,
                             contentPadding = PaddingValues(),
-                            analyticsContent = header
+                            analyticsContent = header,
+                            shareRequests = shareRequests,
+                            onOpenSong = { songIndex, date, style, difficulty ->
+                                onNavigate(Routes.ddrViewer(songIndex, date, style, difficulty))
+                            }
                         )
                         Game.POPN -> PopnScoresScreen(
                             container = container,
@@ -740,6 +824,11 @@ private fun MoreMenu(
             text = { Text(stringResource(R.string.radar_maker_title)) },
             leadingIcon = { Icon(Icons.Outlined.Hexagon, contentDescription = null) },
             onClick = { onNavigate(Routes.RADAR_MAKER) }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.tier_list_title)) },
+            leadingIcon = { Icon(Icons.Outlined.Leaderboard, contentDescription = null) },
+            onClick = { onNavigate(Routes.tierList()) }
         )
         HorizontalDivider()
         DropdownMenuItem(

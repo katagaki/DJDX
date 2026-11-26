@@ -1,8 +1,6 @@
 import Foundation
 import SQLite
 
-// swiftlint:disable file_length
-// swiftlint:disable:next type_body_length
 actor IIDXReader {
 
     var previousFilters: FilterOptions?
@@ -85,6 +83,25 @@ actor IIDXReader {
         return (try? database.prepare(query).map { Self.importGroup(from: $0) }) ?? []
     }
 
+    // MARK: Notes Radar
+
+    func notesRadar(for importGroupID: String, playType: IIDXPlayType) -> RadarData? {
+        guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return nil }
+        let col = IIDXPlayDataDatabase.self
+        guard let row = try? database.pluck(col.notesRadarTable
+            .filter(col.nrImportGroupID == importGroupID && col.nrPlayType == playType.rawValue)) else {
+            return nil
+        }
+        return RadarData(
+            notes: row[col.nrNotes],
+            chord: row[col.nrChord],
+            peak: row[col.nrPeak],
+            charge: row[col.nrCharge],
+            scratch: row[col.nrScratch],
+            soflan: row[col.nrSoflan]
+        )
+    }
+
     // MARK: Song Records
 
     func invalidateCachedRecords() {
@@ -115,6 +132,21 @@ actor IIDXReader {
         return (try? database.prepare(query).map { Self.songRecord(from: $0) }) ?? []
     }
 
+    func songMetadata() -> [String: IIDXSongMetadata] {
+        let db = IIDXPlayDataDatabase.self
+        let query = db.songRecordTable.select(distinct: db.srTitle, db.srVersion, db.srGenre, db.srArtist)
+        guard let database = try? db.current.getReadConnection(),
+              let rows = try? database.prepare(query) else { return [:] }
+        var result: [String: IIDXSongMetadata] = [:]
+        for row in rows {
+            let title = row[db.srTitle]
+            result[title.compact] = IIDXSongMetadata(
+                title: title, version: row[db.srVersion], genre: row[db.srGenre], artist: row[db.srArtist]
+            )
+        }
+        return result
+    }
+
     func songRecordImportGroupIDs(for title: String) -> [String] {
         guard let database = try? IIDXPlayDataDatabase.current.getReadConnection() else { return [] }
         let query = IIDXPlayDataDatabase.songRecordTable
@@ -123,7 +155,6 @@ actor IIDXReader {
         return (try? database.prepare(query).map { $0[IIDXPlayDataDatabase.srImportGroupID] }) ?? []
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func songRecords(
         on playDataDate: Date,
         version: IIDXVersion? = nil,
@@ -807,4 +838,3 @@ actor IIDXReader {
         )
     }
 }
-// swiftlint:enable file_length

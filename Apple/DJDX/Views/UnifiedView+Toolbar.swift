@@ -20,11 +20,7 @@ extension UnifiedView {
         }
         .tint(isActive ? .red : .accent)
 
-        if #available(iOS 26.0, *) {
-            button.buttonStyle(.glassProminent)
-        } else {
-            button.buttonStyle(.borderedProminent)
-        }
+        button.buttonStyle(.glassProminent)
     }
 
     @ViewBuilder

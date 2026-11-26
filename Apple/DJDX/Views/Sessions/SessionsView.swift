@@ -28,7 +28,6 @@ struct SessionsView: View {
 
     @Namespace var sessionsNamespace
 
-    private let reader = IIDXReader()
 
     var pastSessions: [IIDXPlaySession] {
         store.sessions.filter { !$0.isActive }.sorted { $0.startDate > $1.startDate }
@@ -43,11 +42,7 @@ struct SessionsView: View {
     }
 
     var searchPlacement: SearchFieldPlacement {
-        if #available(iOS 26.0, *) {
-            .automatic
-        } else {
-            .navigationBarDrawer(displayMode: .always)
-        }
+        .automatic
     }
 
     var body: some View {
@@ -83,24 +78,15 @@ struct SessionsView: View {
                     placement: searchPlacement,
                     prompt: "Scores.Search.Prompt")
         .toolbar {
-            if #available(iOS 26.0, *) {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    SessionsHelpMenu()
-                }
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    sortControl
-                    filterControl
-                }
-            } else {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    SessionsHelpMenu()
-                    Spacer()
-                    sortControl
-                    filterControl
-                }
+            ToolbarItemGroup(placement: .bottomBar) {
+                SessionsHelpMenu()
+            }
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                sortControl
+                filterControl
             }
         }
         .sheet(isPresented: $isShowingFilterSheet) {
@@ -110,7 +96,7 @@ struct SessionsView: View {
                 clearTypesToShow: $clearTypesToShow.animation(.smooth.speed(2.0)),
                 djLevelsToShow: $djLevelsToShow.animation(.smooth.speed(2.0))
             )
-            .automaticSheetNavigationTransition(id: "ScoreFilterSheet", in: sessionsNamespace)
+            .navigationTransition(.zoom(sourceID: "ScoreFilterSheet", in: sessionsNamespace))
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
         }
@@ -118,7 +104,8 @@ struct SessionsView: View {
             store.bootstrap()
         }
         .task {
-            songCompactTitles = await reader.songCompactTitles()
+            await IIDXSessionSongInfo.shared.reload()
+            songCompactTitles = IIDXSessionSongInfo.shared.songs
             reloadScores()
         }
         .onReceive(NotificationCenter.default.publisher(for: .playSessionDidChange)

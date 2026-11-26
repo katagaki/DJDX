@@ -276,42 +276,41 @@ struct IIDXProgressDetailView: View {
         kind.series.filter { !hiddenSeries.contains($0) }
     }
 
+    var columnCount: Int {
+        let count = max(visibleSeries.count, 1)
+        let rows = (count + 3) / 4
+        return (count + rows - 1) / rows
+    }
+
     var body: some View {
-        List {
+        ScrollView {
             if points.isEmpty {
                 Text("Analytics.NoData")
                     .foregroundStyle(.secondary)
-                    .listRowBackground(Color.clear)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
             } else {
-                Section {
+                LazyVStack(alignment: .leading, spacing: 0.0) {
                     IIDXProgressGraph(points: points, kind: kind, scrollsBars: true)
                         .chartLegend(position: .bottom, alignment: .leading) {
                             legend
                         }
                         .frame(height: 240.0)
-                        .listRowBackground(Color.clear)
-                }
-                Section {
+                        .padding(.horizontal)
+                        .padding(.vertical, 12.0)
                     ForEach(points.reversed()) { point in
-                        VStack(alignment: .leading, spacing: 6.0) {
+                        VStack(alignment: .leading, spacing: 8.0) {
                             Text(point.date, format: .dateTime.year().month().day())
                                 .font(.subheadline.weight(.semibold))
-                            LazyVGrid(
-                                columns: [GridItem(.adaptive(minimum: 96.0), spacing: 10.0, alignment: .leading)],
-                                alignment: .leading,
-                                spacing: 4.0
-                            ) {
-                                ForEach(visibleSeries, id: \.self) { series in
-                                    seriesCount(series, count: point.count(for: series, kind: kind))
-                                }
-                            }
+                                .padding(.horizontal, 20.0)
+                            countsCard(point)
+                                .padding(.horizontal)
                         }
-                        .listRowBackground(Color.clear)
+                        .padding(.vertical, 12.0)
                     }
                 }
             }
         }
-        .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .animation(.smooth.speed(2.0), value: hiddenSeries)
         .animation(.smooth.speed(2.0), value: style)
@@ -377,14 +376,31 @@ struct IIDXProgressDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    func seriesCount(_ series: String, count: Int) -> some View {
-        HStack(spacing: 3.0) {
-            kind.metallicLabel(for: series)
-            Text(verbatim: "\(count)")
-                .foregroundStyle(count > 0 ? .primary : .secondary)
-                .fontWeight(.semibold)
-                .monospacedDigit()
+    func countsCard(_ point: IIDXProgressPoint) -> some View {
+        LazyVGrid(
+            columns: Array(repeating: GridItem(.flexible(), spacing: 0.0), count: columnCount),
+            spacing: 12.0
+        ) {
+            ForEach(visibleSeries, id: \.self) { series in
+                seriesCount(series, count: point.count(for: series, kind: kind))
+            }
         }
-        .font(.caption)
+        .padding(.vertical, 12.0)
+        .groupedInsetBackground()
+    }
+
+    func seriesCount(_ series: String, count: Int) -> some View {
+        VStack(spacing: 4.0) {
+            kind.metallicLabel(for: series)
+                .font(.caption2)
+            Text(verbatim: String(count))
+                .font(.scoreline(.title2))
+                .foregroundStyle(count > 0 ? .primary : .secondary)
+        }
+        .fontWeight(.heavy)
+        .lineLimit(1)
+        .minimumScaleFactor(0.5)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 4.0)
     }
 }

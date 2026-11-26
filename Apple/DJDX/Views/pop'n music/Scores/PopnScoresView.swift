@@ -125,7 +125,7 @@ struct PopnScoresView<Header: View>: View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
         }
-        .automaticSheetMatchedTransitionSource(id: "PopnScoreFilterSheet", in: popnNamespace)
+        .matchedTransitionSource(id: "PopnScoreFilterSheet", in: popnNamespace)
     }
 
     var body: some View {
@@ -193,7 +193,7 @@ struct PopnScoresView<Header: View>: View {
                 availableLevels: availableLevels,
                 onReset: {}
             )
-            .automaticSheetNavigationTransition(id: "PopnScoreFilterSheet", in: popnNamespace)
+            .navigationTransition(.zoom(sourceID: "PopnScoreFilterSheet", in: popnNamespace))
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
             .interactiveDismissDisabled()

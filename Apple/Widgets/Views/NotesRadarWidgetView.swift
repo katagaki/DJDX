@@ -93,20 +93,20 @@ struct NotesRadarWidgetView: View {
             ForEach(Self.displayOrder, id: \.self) { label in
                 HStack {
                     Text(verbatim: label)
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.radarline(size: 10))
                         .foregroundStyle(Self.displayColors[label] ?? .primary)
                     Spacer()
                     Text(verbatim: String(format: "%.2f", value(for: label)))
-                        .font(.system(size: 10, weight: .semibold).monospacedDigit())
+                        .font(.scoreline(size: 10, weight: .bold))
                 }
             }
             Divider()
             HStack {
                 Text(verbatim: "TOTAL")
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.radarline(size: 10))
                 Spacer()
                 Text(verbatim: String(format: "%.2f", data.sum))
-                    .font(.system(size: 10, weight: .bold).monospacedDigit())
+                    .font(.scoreline(size: 10))
             }
         }
     }

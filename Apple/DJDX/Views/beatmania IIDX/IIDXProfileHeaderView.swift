@@ -110,7 +110,6 @@ struct IIDXProfileHeaderView: View {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func downloadStatusPageData() async {
         let baseURLString = "https://p.eagate.573.jp"
         let request = URLRequest(url: iidxVersion.statusPageURL())
@@ -176,12 +175,22 @@ struct IIDXProfileHeaderView: View {
 
             saveRadarData()
             saveProfileData()
+            await saveNotesRadarForImport()
             await WidgetDataPublisher.shared.publishRadar()
             await WidgetDataPublisher.shared.publishQpro()
             IIDXSessionWorkoutBridge.shared.syncProfileToWatch()
         } catch {
             return
         }
+    }
+
+    func saveNotesRadarForImport() async {
+        var radars: [IIDXPlayType: RadarData] = [:]
+        radars[.single] = spRadarData
+        radars[.double] = dpRadarData
+        guard !radars.isEmpty,
+              await IIDXImporter().saveNotesRadar(radars, version: iidxVersion, on: .now) else { return }
+        NotificationCenter.default.post(name: .importSummaryUpdated, object: nil)
     }
 
     func saveRadarData() {

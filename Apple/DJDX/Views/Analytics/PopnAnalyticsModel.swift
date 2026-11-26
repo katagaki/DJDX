@@ -101,7 +101,6 @@ final class PopnAnalyticsModel {
         OrderedDictionary(uniqueKeys: keys, values: keys.map { _ in 0 })
     }
 
-    // swiftlint:disable:next large_tuple
     private func computeLastPlay(version: PopnVersion, filters: PopnFilterOptions?) async -> (
         clears: [String: [PopnNewClearEntry]],
         highScores: [PopnNewHighScoreEntry],
@@ -120,7 +119,6 @@ final class PopnAnalyticsModel {
     nonisolated static func computeNewEntries(
         latestRecords: [PopnSongRecord],
         previousRecords: [PopnSongRecord]
-    // swiftlint:disable:next large_tuple
     ) -> (
         clears: [String: [PopnNewClearEntry]],
         highScores: [PopnNewHighScoreEntry],

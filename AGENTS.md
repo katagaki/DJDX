@@ -24,11 +24,21 @@ Run build commands from inside the relevant folder.
   a JSON serializer — that reorders/re-escapes the whole file into a massive diff.
 - Build/verify from `Apple/` with:
   `xcodebuild build -project DJDX.xcodeproj -scheme DJDX -destination 'generic/platform=iOS Simulator' -configuration Debug`
-- SwiftLint runs as a build phase using `Apple/.swiftlint.yml`.
 - The four web importers (DDR, SDVX, Polaris Chord, IIDX) share one structure: a
   SwiftUI wrapper over a `UIViewRepresentable` `WKWebView` + a `WKNavigationDelegate`
   coordinator. Changes to import behavior usually need applying to all four.
 - `Apple/DJDX.xcodeproj/xcshareddata/xcodecloud/` is gitignored and must never be staged.
+- Game data must always be styled exactly as the Play Data rows style it
+  (`Views/*/Scores/*ScoreRow.swift`) on every screen, never with ad-hoc colors or fonts:
+  - Song titles: IIDX uses the version-tinted title (`IIDXVersion.rowTitleTextColor` /
+    `rowTitleStrokeColor`, heavy compressed); other games use `.bold()` titles.
+  - Scores: IIDX `Color.iidxScore` with `.iidxScoreOutline` stroke, SDVX `.sdvxScoreText()`,
+    DDR the cyan→blue gradient; new-score deltas use `Analytics.NewHighScore` in orange.
+  - Clear types and DJ levels (IIDX): `IIDXMetallicText.clearType` / `.djLevel`.
+    Other games: their clear type/grade colors (`clearTypeEnum.color`, `.sdvxGradeText()`,
+    `PolarisChordGrade.style`, `DDRSongRecord.clearColor` / `rankColor`).
+  - Clear lamps: the leading lamp bar in each game's lamp color (rainbow for IIDX full combo).
+  - Levels and difficulties: `LevelBadge` (or `IIDXLevelLabel` for IIDX), never a custom label.
 
 # Android
 

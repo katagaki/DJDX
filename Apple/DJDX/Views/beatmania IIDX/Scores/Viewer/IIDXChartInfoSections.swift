@@ -49,12 +49,11 @@ struct IIDXChartInfoSections: View {
                                     ForEach(chartRadarData.radarData.displayPoints(), id: \.label) { point in
                                         HStack {
                                             Text(verbatim: point.label)
-                                                .font(.system(size: 12, weight: .bold))
-                                                .fontWidth(.expanded)
+                                                .font(.radarline(size: 12))
                                                 .foregroundStyle(point.color)
                                             Spacer()
                                             Text(verbatim: String(format: "%.2f", point.value))
-                                                .font(.system(size: 12, weight: .semibold).monospacedDigit())
+                                                .font(.scoreline(size: 12, weight: .bold))
                                                 .foregroundStyle(.primary)
                                         }
                                     }

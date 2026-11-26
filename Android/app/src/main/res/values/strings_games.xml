@@ -13,6 +13,13 @@
     <string name="games_filter_level">Level</string>
     <string name="games_filter_clear_type">Clear Type</string>
     <string name="games_filter_grade">Grade</string>
+    <string name="games_filter_score">Score</string>
+    <string name="games_filter_all">All</string>
+    <string name="games_filter_score_below">Under %1$s</string>
+    <plurals name="games_chart_count">
+        <item quantity="one">%1$d chart</item>
+        <item quantity="other">%1$d charts</item>
+    </plurals>
     <string name="games_filter_reset">Reset Filters</string>
     <string name="games_empty_title">No Score Data</string>
     <string name="games_empty_message">Import your play data to see your scores here.</string>
@@ -54,4 +61,9 @@
     <string name="ddr_data_source_warning_action">Open Data Sources</string>
     <string name="sdvx_in_viewer_title">Chart</string>
     <string name="sdvx_in_fallback_message">Chart not opening?\nTry opening it manually on sdvx.in.</string>
+    <string name="chart_notes">Notes</string>
+    <string name="chart_notes_green_number">Green Number</string>
+    <string name="chart_notes_lane_cover">Lane Cover</string>
+    <string name="chart_notes_judgment_offset">Offset</string>
+    <string name="chart_notes_placeholder">Add a note for this chart</string>
 </resources>

@@ -3,7 +3,6 @@ import SQLite
 
 actor DDRReader {
 
-    // swiftlint:disable:next type_name
     typealias DB = DDRPlayDataDatabase
 
     // MARK: Import Groups
@@ -119,6 +118,51 @@ actor DDRReader {
     func songRecords(on date: Date) -> [DDRSongRecord] {
         guard let importGroupID = importGroupID(for: date) else { return [] }
         return songRecords(for: importGroupID)
+    }
+
+    // MARK: History
+
+    func scoreHistory(songIndex: String, title: String,
+                      style: DDRPlayStyle, difficulty: DDRDifficulty) -> [Date: Int] {
+        guard let database = try? DB.shared.getReadConnection() else { return [:] }
+        let importDates = Dictionary(uniqueKeysWithValues: allImportGroups().map { ($0.id, $0.date) })
+        let songFilter = songIndex.isEmpty ? DB.srTitle == title : DB.srSongIndex == songIndex
+        let query = DB.songRecordTable
+            .select(DB.srImportGroupID, DB.srScore)
+            .filter(songFilter && DB.srStyle == style.rawValue
+                    && DB.srDifficulty == difficulty.rawValue && DB.srScore > 0)
+        guard let rows = try? database.prepare(query) else { return [:] }
+        var history: [Date: Int] = [:]
+        for row in rows {
+            if let date = importDates[row[DB.srImportGroupID]] {
+                history[date] = row[DB.srScore]
+            }
+        }
+        return history
+    }
+
+    func flareSkillHistory(for version: DDRVersion, style: DDRPlayStyle) -> [TrendPoint] {
+        guard let database = try? DB.shared.getReadConnection() else { return [] }
+        let groups = importGroups(for: version)
+        guard !groups.isEmpty else { return [] }
+        let metaByTitle = loadMetaByTitle()
+        let query = DB.songRecordTable
+            .select(DB.srImportGroupID, DB.srTitle, DB.srFlareSkill)
+            .filter(groups.map(\.id).contains(DB.srImportGroupID)
+                    && DB.srStyle == style.rawValue && DB.srFlareSkill > 0)
+        guard let rows = try? database.prepare(query) else { return [] }
+        var recordsByGroup: [String: [DDRSongRecord]] = [:]
+        for row in rows {
+            let record = DDRSongRecord()
+            record.title = row[DB.srTitle]
+            record.flareSkill = row[DB.srFlareSkill]
+            record.version = metaByTitle[record.titleCompact()]?.version ?? 0
+            recordsByGroup[row[DB.srImportGroupID], default: []].append(record)
+        }
+        return groups.reversed().compactMap { group in
+            guard let records = recordsByGroup[group.id] else { return nil }
+            return TrendPoint(date: group.date, value: Double(DDRFlareSkill.total(records)))
+        }
     }
 
     static func songRecord(from row: Row) -> DDRSongRecord {

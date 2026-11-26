@@ -3,11 +3,14 @@ import SwiftUI
 enum DDRAnalyticsPath: Hashable {
     case clearBreakdownDetail
     case rankBreakdownDetail
+    case flareSkillSuggestionsDetail
+    case flareSkillTrendDetail
 }
 
 enum DDRAnalyticsCard: String, Codable, Hashable, CaseIterable {
     case clearBreakdown
     case rankBreakdown
+    case flareSkillTrend
 
     static var defaultOrder: [DDRAnalyticsCard] { allCases }
 
@@ -19,6 +22,7 @@ enum DDRAnalyticsCard: String, Codable, Hashable, CaseIterable {
         switch self {
         case .clearBreakdown: return .clearBreakdownDetail
         case .rankBreakdown: return .rankBreakdownDetail
+        case .flareSkillTrend: return .flareSkillTrendDetail
         }
     }
 

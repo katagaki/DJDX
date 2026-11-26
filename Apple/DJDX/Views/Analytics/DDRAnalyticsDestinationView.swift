@@ -14,11 +14,21 @@ struct DDRAnalyticsDestinationView: View {
             case .clearBreakdownDetail:
                 DDRClearBreakdownDetailView(clearTypePerLevel: model.clearTypePerLevel)
                     .navigationTitle("Analytics.DDR.ClearBreakdown")
-                    .automaticNavigationTransition(id: "DDR.clearBreakdown", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "DDR.clearBreakdown", in: namespace))
             case .rankBreakdownDetail:
                 DDRRankBreakdownDetailView(rankPerLevel: model.rankPerLevel)
                     .navigationTitle("Analytics.DDR.RankBreakdown")
-                    .automaticNavigationTransition(id: "DDR.rankBreakdown", in: namespace)
+                    .navigationTransition(.zoom(sourceID: "DDR.rankBreakdown", in: namespace))
+            case .flareSkillSuggestionsDetail:
+                DDRFlareSkillSuggestionsDetailView(suggestions: model.flareSkillSuggestions)
+                    .navigationTitle(Text(verbatim: "FLARE SKILL"))
+                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.ddrFlareSkill.transitionID,
+                                                in: namespace))
+            case .flareSkillTrendDetail:
+                TrendDetailView(points: model.flareSkillHistory, color: .orange,
+                                format: DDRAnalyticsModel.formatFlareSkill)
+                    .navigationTitle("Analytics.DDR.FlareSkillTrend")
+                    .navigationTransition(.zoom(sourceID: "DDR.flareSkillTrend", in: namespace))
             }
         }
         .appBackgroundGradient()
@@ -73,8 +83,7 @@ struct DDRClearTypeLevelRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6.0) {
             HStack {
-                Text(verbatim: "LEVEL \(level)")
-                    .font(.subheadline.bold())
+                LevelNumberBadge(level: String(level))
                 Spacer()
                 Text("Shared.SongCount.\(total)")
                     .font(.caption)
@@ -124,7 +133,7 @@ struct DDRRankBreakdownDetailView: View {
                         .frame(height: 140.0)
                         .listRowBackground(Color.clear)
                     } header: {
-                        Text(verbatim: "LEVEL \(level)")
+                        LevelNumberBadge(level: String(level))
                     }
                 }
             }
@@ -138,6 +147,40 @@ struct DDRRankBreakdownDetailView: View {
         return DDRSongRecord.rankOrder.compactMap { rank in
             let count = counts[rank] ?? 0
             return count > 0 ? (rank, count) : nil
+        }
+    }
+}
+
+struct DDRFlareSkillSuggestionRow: View {
+    let suggestion: DDRFlareSkillSuggestion
+
+    var body: some View {
+        DDRScoreRow(record: suggestion.record) {
+            AnalyticsSuggestionTarget {
+                Text(verbatim: "FLARE \(DDRFlareSkill.rankLabel(suggestion.targetFlareRank))")
+                    .foregroundStyle(.secondary)
+                    .fontWidth(.expanded)
+                    .fontWeight(.bold)
+                AnalyticsSuggestionGain(text: "+\(suggestion.flareSkillGain)")
+            }
+        }
+    }
+}
+
+struct DDRFlareSkillSuggestionsDetailView: View {
+    @EnvironmentObject var navigationManager: NavigationManager
+
+    let suggestions: [DDRFlareSkillSuggestion]
+
+    var body: some View {
+        AnalyticsSuggestionList(items: suggestions) { suggestion in
+            Button {
+                navigationManager.push(DDRScoresPath.scoreViewer(songRecord: suggestion.record))
+            } label: {
+                DDRFlareSkillSuggestionRow(suggestion: suggestion)
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
         }
     }
 }

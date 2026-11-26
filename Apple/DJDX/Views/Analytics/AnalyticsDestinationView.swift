@@ -20,39 +20,54 @@ struct AnalyticsDestinationView: View {
             case .clearTypeOverviewGraph:
                 ClearTypeOverviewListView(graphData: $model.clearTypePerDifficulty)
                     .navigationTitle("Analytics.ClearType.Overall")
-                    .automaticNavigationTransition(id: "ClearType.Overall", in: analyticsNamespace)
+                    .navigationTransition(.zoom(sourceID: "ClearType.Overall", in: analyticsNamespace))
             case .gradeBreakdownDetail:
                 IIDXGradeBreakdownDetailView(djLevelPerDifficulty: model.djLevelPerDifficulty)
                     .navigationTitle("Analytics.DJLevel.Overall")
-                    .automaticNavigationTransition(id: "DJLevel.Overall", in: analyticsNamespace)
+                    .navigationTransition(.zoom(sourceID: "DJLevel.Overall", in: analyticsNamespace))
             case .progressDetail(let kind):
                 IIDXProgressDetailView(points: model.progressPerImportGroup, kind: kind)
                     .navigationTitle(LocalizedStringKey(kind.cardType.titleKey))
-                    .automaticNavigationTransition(id: kind.transitionID, in: analyticsNamespace)
+                    .navigationTransition(.zoom(sourceID: kind.transitionID, in: analyticsNamespace))
             case .clearTypeForLevel(let difficulty):
                 ClearTypePerLevelDetailView(model: model, difficulty: difficulty)
                     .navigationTitle(perLevelTitle(difficulty, .clearRate))
-                    .automaticNavigationTransition(
-                        id: "ClearType.Level.\(difficulty)", in: analyticsNamespace
-                    )
+                    .navigationTransition(.zoom(
+                        sourceID: "ClearType.Level.\(difficulty)", in: analyticsNamespace
+                    ))
             case .clearTypeTrendsForLevel(let difficulty):
                 ClearTypePerLevelDetailView(model: model, difficulty: difficulty)
                     .navigationTitle(perLevelTitle(difficulty, .clearRate))
-                    .automaticNavigationTransition(
-                        id: "ClearTypeTrends.Level.\(difficulty)", in: analyticsNamespace
-                    )
+                    .navigationTransition(.zoom(
+                        sourceID: "ClearTypeTrends.Level.\(difficulty)", in: analyticsNamespace
+                    ))
             case .djLevelForLevel(let difficulty):
                 DJLevelPerLevelDetailView(model: model, difficulty: difficulty)
                     .navigationTitle(perLevelTitle(difficulty, .djLevel))
-                    .automaticNavigationTransition(
-                        id: "DJLevel.Level.\(difficulty)", in: analyticsNamespace
-                    )
+                    .navigationTransition(.zoom(
+                        sourceID: "DJLevel.Level.\(difficulty)", in: analyticsNamespace
+                    ))
             case .djLevelTrendsForLevel(let difficulty):
                 DJLevelPerLevelDetailView(model: model, difficulty: difficulty)
                     .navigationTitle(perLevelTitle(difficulty, .djLevel))
-                    .automaticNavigationTransition(
-                        id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
-                    )
+                    .navigationTransition(.zoom(
+                        sourceID: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
+                    ))
+            case .djLevelSuggestionsDetail:
+                IIDXDJLevelSuggestionsDetailView(suggestions: model.djLevelSuggestions)
+                    .navigationTitle("Analytics.Suggestions.NextDJLevel")
+                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.iidxDJLevel.transitionID,
+                                                in: analyticsNamespace))
+            case .clearLampSuggestionsDetail:
+                IIDXClearLampSuggestionsDetailView(model: model)
+                    .navigationTitle("Analytics.Suggestions.NextClearLamp")
+                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.iidxClearLamp.transitionID,
+                                                in: analyticsNamespace))
+            case .notPlayedRecentlySuggestionsDetail:
+                IIDXUnplayedSuggestionsDetailView(suggestions: model.longUnplayedSuggestions)
+                    .navigationTitle("Analytics.Suggestions.NotPlayedRecently")
+                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.iidxNotPlayedRecently.transitionID,
+                                                in: analyticsNamespace))
             default:
                 newEntryDestination
             }
@@ -69,43 +84,43 @@ struct AnalyticsDestinationView: View {
                 entries: model.newClears,
                 title: AnalyticsCardType.newClears.titleKey
             )
-            .automaticNavigationTransition(id: "NewClears", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewClears", in: analyticsNamespace))
         case .newAssistClearsDetail:
             NewEntryDetailView(
                 entries: model.newAssistClears,
                 title: AnalyticsCardType.newAssistClears.titleKey
             )
-            .automaticNavigationTransition(id: "NewAssistClears", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewAssistClears", in: analyticsNamespace))
         case .newEasyClearsDetail:
             NewEntryDetailView(
                 entries: model.newEasyClears,
                 title: AnalyticsCardType.newEasyClears.titleKey
             )
-            .automaticNavigationTransition(id: "NewEasyClears", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewEasyClears", in: analyticsNamespace))
         case .newFullComboClearDetail:
             NewEntryDetailView(
                 entries: model.newFullComboClears,
                 title: AnalyticsCardType.newFullComboClear.titleKey
             )
-            .automaticNavigationTransition(id: "NewFullComboClear", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewFullComboClear", in: analyticsNamespace))
         case .newHardClearDetail:
             NewEntryDetailView(
                 entries: model.newHardClears,
                 title: AnalyticsCardType.newHardClear.titleKey
             )
-            .automaticNavigationTransition(id: "NewHardClear", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewHardClear", in: analyticsNamespace))
         case .newExHardClearDetail:
             NewEntryDetailView(
                 entries: model.newExHardClears,
                 title: AnalyticsCardType.newExHardClear.titleKey
             )
-            .automaticNavigationTransition(id: "NewExHardClear", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewExHardClear", in: analyticsNamespace))
         case .newFailedDetail:
             NewEntryDetailView(
                 entries: model.newFailed,
                 title: AnalyticsCardType.newFailed.titleKey
             )
-            .automaticNavigationTransition(id: "NewFailed", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewFailed", in: analyticsNamespace))
         case .newHighScoresDetail:
             NewEntryDetailView(
                 entries: model.newHighScores,
@@ -113,13 +128,13 @@ struct AnalyticsDestinationView: View {
                 showsClearTypeBreakdown: true,
                 scoreDelta: { $0.score.score - $0.previousScore }
             )
-            .automaticNavigationTransition(id: "NewHighScores", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewHighScores", in: analyticsNamespace))
         case .newClearLampsDetail:
             NewEntryDetailView(
                 entries: model.newClearLamps,
                 title: AnalyticsCardType.newClearLamps.titleKey
             )
-            .automaticNavigationTransition(id: "NewClearLamps", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewClearLamps", in: analyticsNamespace))
         case .newScoreUpdatesDetail:
             NewEntryDetailView(
                 entries: model.newScoreUpdates,
@@ -127,25 +142,25 @@ struct AnalyticsDestinationView: View {
                 showsClearTypeBreakdown: true,
                 scoreDelta: { $0.score.score - $0.previousScore }
             )
-            .automaticNavigationTransition(id: "NewScoreUpdates", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewScoreUpdates", in: analyticsNamespace))
         case .newAAADetail:
             NewEntryDetailView(
                 entries: model.newAAA,
                 title: AnalyticsCardType.newAAA.titleKey
             )
-            .automaticNavigationTransition(id: "NewAAA", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewAAA", in: analyticsNamespace))
         case .newAADetail:
             NewEntryDetailView(
                 entries: model.newAA,
                 title: AnalyticsCardType.newAA.titleKey
             )
-            .automaticNavigationTransition(id: "NewAA", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewAA", in: analyticsNamespace))
         case .newADetail:
             NewEntryDetailView(
                 entries: model.newA,
                 title: AnalyticsCardType.newA.titleKey
             )
-            .automaticNavigationTransition(id: "NewA", in: analyticsNamespace)
+            .navigationTransition(.zoom(sourceID: "NewA", in: analyticsNamespace))
         default:
             Color.clear
         }
@@ -194,7 +209,7 @@ struct IIDXGradeBreakdownDetailView: View {
                         .frame(height: 140.0)
                         .listRowBackground(Color.clear)
                     } header: {
-                        Text(verbatim: "LEVEL \(difficulty)")
+                        LevelNumberBadge(level: String(difficulty))
                     }
                 }
             }

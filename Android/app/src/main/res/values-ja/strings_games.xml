@@ -13,6 +13,13 @@
     <string name="games_filter_level">レベル</string>
     <string name="games_filter_clear_type">クリアランク</string>
     <string name="games_filter_grade">グレード</string>
+    <string name="games_filter_score">スコア</string>
+    <string name="games_filter_all">すべて</string>
+    <string name="games_filter_score_below">%1$s未満</string>
+    <plurals name="games_chart_count">
+        <item quantity="one">%1$d譜面</item>
+        <item quantity="other">%1$d譜面</item>
+    </plurals>
     <string name="games_filter_reset">フィルターをリセット</string>
     <string name="games_empty_title">スコアデータなし</string>
     <string name="games_empty_message">プレーデータをインポートすると、ここにスコアが表示されます。</string>
@@ -54,4 +61,9 @@
     <string name="ddr_data_source_warning_action">外部データソースを開く</string>
     <string name="sdvx_in_viewer_title">譜面</string>
     <string name="sdvx_in_fallback_message">譜面が開きませんか？\nお手数ですが、sdvx.inで手動で開いてみてください。</string>
+    <string name="chart_notes">メモ</string>
+    <string name="chart_notes_green_number">緑数字</string>
+    <string name="chart_notes_lane_cover">レーンカバー</string>
+    <string name="chart_notes_judgment_offset">判定</string>
+    <string name="chart_notes_placeholder">この譜面のメモを入力</string>
 </resources>
