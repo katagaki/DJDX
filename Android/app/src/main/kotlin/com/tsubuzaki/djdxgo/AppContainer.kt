@@ -31,7 +31,7 @@ class AppContainer(context: Context) {
     val ddrRepository = DDRRepository(database.ddrDao(), externalDataDao)
     val externalDataReloader = ExternalDataReloader(externalDataDao)
     val analyticsStore = AnalyticsStore(database, ddrRepository)
-    val goalEvaluator = AnalyticsGoalEvaluator(database, ddrRepository)
+    val goalEvaluator = AnalyticsGoalEvaluator(context.applicationContext, database, ddrRepository)
     val profileRepository = ProfileRepository(context.applicationContext)
     val chartAnalyzer = IIDXChartAnalyzer(context.applicationContext.cacheDir)
 

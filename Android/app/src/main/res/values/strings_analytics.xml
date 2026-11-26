@@ -76,6 +76,7 @@
     <string name="goals_status_on_pace">On Pace</string>
     <string name="goals_status_behind">Behind</string>
     <string name="goals_status_missed">Missed</string>
+    <string name="goals_status_not_started">Not Started</string>
     <string name="goals_days_left">%1$d days left</string>
     <string name="goals_pace">Pace: %1$s</string>
     <string name="goals_due">Due %1$s</string>

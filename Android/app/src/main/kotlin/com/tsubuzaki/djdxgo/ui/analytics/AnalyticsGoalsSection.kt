@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FastForward
+import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
@@ -195,6 +196,7 @@ private fun AnalyticsGoalStatus.color(): Color = when (this) {
     AnalyticsGoalStatus.ON_PACE -> Palette.blue
     AnalyticsGoalStatus.BEHIND -> Palette.orange
     AnalyticsGoalStatus.MISSED -> Palette.red
+    AnalyticsGoalStatus.NOT_STARTED -> Color.Gray
 }
 
 @Composable
@@ -205,6 +207,7 @@ private fun AnalyticsGoalStatus.label(): String = stringResource(
         AnalyticsGoalStatus.ON_PACE -> R.string.goals_status_on_pace
         AnalyticsGoalStatus.BEHIND -> R.string.goals_status_behind
         AnalyticsGoalStatus.MISSED -> R.string.goals_status_missed
+        AnalyticsGoalStatus.NOT_STARTED -> R.string.goals_status_not_started
     }
 )
 
@@ -214,6 +217,7 @@ private fun AnalyticsGoalStatus.icon(): ImageVector = when (this) {
     AnalyticsGoalStatus.ON_PACE -> Icons.Filled.CheckCircle
     AnalyticsGoalStatus.BEHIND -> Icons.Filled.Schedule
     AnalyticsGoalStatus.MISSED -> Icons.Filled.Cancel
+    AnalyticsGoalStatus.NOT_STARTED -> Icons.Filled.HourglassEmpty
 }
 
 @Composable
@@ -478,13 +482,18 @@ fun AnalyticsGoalEditorDialog(
                     val deadline = LocalDate.ofEpochDay(deadlineEpochDay).atTime(23, 59, 59)
                         .atZone(ZoneId.systemDefault()).toEpochSecond()
                     val base = goal ?: AnalyticsGoal(game = game.id, kind = kind, target = target, deadline = deadline)
+                    val newLevel = if (kind == AnalyticsGoalKind.RATING) 0 else level
+                    val newThreshold = if (kind == AnalyticsGoalKind.RATING) "" else threshold
+                    val isSameMetric = base.kind == kind && base.playStyle == playStyle &&
+                        base.level == newLevel && base.threshold == newThreshold
                     onSave(
                         base.copy(
                             kind = kind,
                             playStyle = playStyle,
-                            level = if (kind == AnalyticsGoalKind.RATING) 0 else level,
-                            threshold = if (kind == AnalyticsGoalKind.RATING) "" else threshold,
+                            level = newLevel,
+                            threshold = newThreshold,
                             target = target,
+                            startValue = if (isSameMetric) base.startValue else null,
                             deadline = deadline
                         )
                     )

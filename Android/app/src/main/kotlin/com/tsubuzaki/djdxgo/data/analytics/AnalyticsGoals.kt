@@ -23,7 +23,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -58,6 +57,7 @@ data class AnalyticsGoal(
     val threshold: String = "",
     val target: Double,
     val startDate: Long = System.currentTimeMillis() / 1000L,
+    val startValue: Double? = null,
     val deadline: Long
 ) {
     val gameEnum: Game get() = Game.fromId(game)
@@ -135,7 +135,8 @@ enum class AnalyticsGoalStatus {
     AHEAD,
     ON_PACE,
     BEHIND,
-    MISSED
+    MISSED,
+    NOT_STARTED
 }
 
 data class AnalyticsGoalPoint(val date: Long, val value: Double)
@@ -145,8 +146,10 @@ data class AnalyticsGoalProgress(
     val history: List<AnalyticsGoalPoint>,
     val now: Long = System.currentTimeMillis() / 1000L
 ) {
-    val baseline: Double =
+    val historicalBaseline: Double =
         history.lastOrNull { it.date <= goal.startDate }?.value ?: history.firstOrNull()?.value ?: 0.0
+
+    val baseline: Double = goal.startValue ?: historicalBaseline
 
     val current: Double = history.lastOrNull()?.value ?: baseline
 
@@ -157,7 +160,21 @@ data class AnalyticsGoalProgress(
             return ((now - goal.startDate).toDouble() / total).coerceIn(0.0, 1.0)
         }
 
-    val expected: Double get() = baseline + (goal.target - baseline) * timeFraction
+    val expected: Double get() = expectedAt(now)
+
+    val latestUpdate: AnalyticsGoalPoint?
+        get() {
+            val latest = history.lastOrNull() ?: return null
+            if (latest.date <= goal.startDate && latest.value == baseline) return null
+            return AnalyticsGoalPoint(maxOf(latest.date, goal.startDate), latest.value)
+        }
+
+    fun expectedAt(date: Long): Double {
+        val total = goal.deadline - goal.startDate
+        if (total <= 0) return goal.target
+        val fraction = ((date - goal.startDate).toDouble() / total).coerceIn(0.0, 1.0)
+        return baseline + (goal.target - baseline) * fraction
+    }
 
     val progressFraction: Double
         get() {
@@ -180,11 +197,16 @@ data class AnalyticsGoalProgress(
         get() {
             if (current >= goal.target) return AnalyticsGoalStatus.ACHIEVED
             if (now >= goal.deadline) return AnalyticsGoalStatus.MISSED
-            val tolerance = maxOf(abs(goal.target - baseline) * 0.05, if (goal.isRating) 0.0 else 0.5)
+            val update = latestUpdate ?: return AnalyticsGoalStatus.NOT_STARTED
+            val gained = update.value - baseline
+            if (gained <= 0) return AnalyticsGoalStatus.BEHIND
+            val required = expectedAt(update.date) - baseline
+            if (required <= 0) return AnalyticsGoalStatus.AHEAD
+            val ratio = gained / required
             return when {
-                current > expected + tolerance -> AnalyticsGoalStatus.AHEAD
-                current < expected - tolerance -> AnalyticsGoalStatus.BEHIND
-                else -> AnalyticsGoalStatus.ON_PACE
+                ratio >= 1.15 -> AnalyticsGoalStatus.AHEAD
+                ratio >= 0.9 -> AnalyticsGoalStatus.ON_PACE
+                else -> AnalyticsGoalStatus.BEHIND
             }
         }
 }
@@ -202,6 +224,21 @@ object AnalyticsGoalStore {
         save(context, goals)
     }
 
+    suspend fun recordStartValues(context: Context, values: Map<String, Double>) {
+        val goals = goalsFlow(context).first()
+        var didChange = false
+        val updated = goals.map { goal ->
+            val value = values[goal.id]
+            if (goal.startValue == null && value != null) {
+                didChange = true
+                goal.copy(startValue = value)
+            } else {
+                goal
+            }
+        }
+        if (didChange) save(context, updated)
+    }
+
     suspend fun delete(context: Context, id: String) {
         save(context, goalsFlow(context).first().filter { it.id != id })
     }
@@ -216,6 +253,7 @@ object AnalyticsGoalStore {
 }
 
 class AnalyticsGoalEvaluator(
+    private val context: Context,
     private val database: DJDXDatabase,
     private val ddrRepository: DDRRepository
 ) {
@@ -229,7 +267,12 @@ class AnalyticsGoalEvaluator(
                 Game.POLARIS_CHORD -> emptyList()
             }
         }.toMap()
-        goals.map { AnalyticsGoalProgress(it, histories[it.id].orEmpty()) }
+        val progresses = goals.map { AnalyticsGoalProgress(it, histories[it.id].orEmpty()) }
+        val startValues = progresses
+            .filter { it.goal.startValue == null && it.history.isNotEmpty() }
+            .associate { it.goal.id to it.historicalBaseline }
+        if (startValues.isNotEmpty()) AnalyticsGoalStore.recordStartValues(context, startValues)
+        progresses
     }
 
     private suspend fun iidxHistories(goals: List<AnalyticsGoal>): List<Pair<String, List<AnalyticsGoalPoint>>> {
