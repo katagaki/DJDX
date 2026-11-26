@@ -46,7 +46,7 @@ struct DDRScoreRow: View {
 
             LevelBadge(name: record.difficultyEnum.rawValue,
                        level: record.level > 0 ? String(record.level) : "",
-                       tint: record.difficultyEnum.color)
+                       tint: record.difficultyEnum.color, layout: .horizontal)
                 .padding([.top, .bottom], 8.0)
         }
         .frame(maxWidth: .infinity)

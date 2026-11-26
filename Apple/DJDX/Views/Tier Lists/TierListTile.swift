@@ -45,7 +45,7 @@ struct TierListTile: View {
     var levelLabel: some View {
         if let iidxLevel = chart.iidxLevel {
             IIDXLevelLabel(
-                orientation: .horizontal,
+                layout: .compact,
                 levelType: iidxLevel,
                 score: IIDXLevelScore(level: iidxLevel, difficulty: Int(chart.level) ?? 0)
             )

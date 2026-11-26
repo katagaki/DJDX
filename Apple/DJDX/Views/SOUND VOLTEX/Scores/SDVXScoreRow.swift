@@ -45,7 +45,7 @@ struct SDVXScoreRow: View {
 
             // Difficulty + level label
             LevelBadge(name: record.difficultyEnum.rawValue, level: record.level,
-                       tint: record.difficultyEnum.color)
+                       tint: record.difficultyEnum.color, layout: .horizontal)
                 .padding([.top, .bottom], 8.0)
         }
         .frame(maxWidth: .infinity)

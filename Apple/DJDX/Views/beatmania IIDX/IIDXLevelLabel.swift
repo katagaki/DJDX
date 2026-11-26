@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct IIDXLevelLabel: View {
-    var orientation: LevelLabelOrientation
+    var layout: LevelBadgeLayout
     var levelType: IIDXLevel
     var score: IIDXLevelScore
 
     init(levelType: IIDXLevel, songRecord: IIDXSongRecord) {
-        self.orientation = .vertical
+        self.layout = .vertical
         switch levelType {
         case .beginner:
             self.levelType = .beginner
@@ -30,26 +30,21 @@ struct IIDXLevelLabel: View {
     }
 
     init(levelType: IIDXLevel, score: IIDXLevelScore) {
-        self.orientation = .vertical
+        self.layout = .vertical
         self.levelType = levelType
         self.score = score
     }
 
-    init(orientation: LevelLabelOrientation, levelType: IIDXLevel, score: IIDXLevelScore) {
-        self.orientation = orientation
+    init(layout: LevelBadgeLayout, levelType: IIDXLevel, score: IIDXLevelScore) {
+        self.layout = layout
         self.levelType = levelType
         self.score = score
     }
 
     var body: some View {
         let name = String(localized: String.LocalizationValue(levelType.rawValue))
-        switch orientation {
-        case .vertical:
-            LevelBadge(name: name, level: String(score.difficulty), tint: foregroundColor())
-        case .horizontal:
-            LevelBadge(name: String(name.prefix(1)), level: String(score.difficulty),
-                       tint: foregroundColor(), layout: .compact)
-        }
+        LevelBadge(name: layout == .compact ? String(name.prefix(1)) : name,
+                   level: String(score.difficulty), tint: foregroundColor(), layout: layout)
     }
 
     func foregroundColor() -> Color {

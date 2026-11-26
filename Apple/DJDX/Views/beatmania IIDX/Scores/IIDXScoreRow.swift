@@ -148,7 +148,7 @@ struct IIDXScoreRow: View {
 
             // Level
             if isLevelVisible {
-                IIDXLevelLabel(levelType: level, score: score)
+                IIDXLevelLabel(layout: .horizontal, levelType: level, score: score)
                     .padding([.top, .bottom], 8.0)
             }
         }
