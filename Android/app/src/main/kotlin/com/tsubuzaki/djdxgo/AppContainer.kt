@@ -14,6 +14,7 @@ import com.tsubuzaki.djdxgo.data.notes.ChartNotesRepository
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordRepository
 import com.tsubuzaki.djdxgo.data.profile.ProfileRepository
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXRepository
+import com.tsubuzaki.djdxgo.data.tierlist.TierListStore
 import com.tsubuzaki.djdxgo.widget.WidgetDataPublisher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,6 +37,7 @@ class AppContainer(context: Context) {
     val goalEvaluator = AnalyticsGoalEvaluator(context.applicationContext, database, ddrRepository)
     val profileRepository = ProfileRepository(context.applicationContext)
     val chartAnalyzer = IIDXChartAnalyzer(context.applicationContext.cacheDir)
+    val tierListStore = TierListStore(context.applicationContext)
     val chartNotesRepository = ChartNotesRepository(ChartNotesDatabase.get(context).chartNoteDao())
 
     private val dataVersionState = MutableStateFlow(0)

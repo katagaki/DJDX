@@ -39,6 +39,7 @@ struct UnifiedView: View {
     @State var isBackupRestoreFailed: Bool = false
     @State var isPruneCompleted: Bool = false
     @State var storageReport = StorageReport()
+    @State var tierListShare: TierListShare?
 
     @State var migrationProgress = ProgressReporter()
 
@@ -232,6 +233,11 @@ struct UnifiedView: View {
                 }
             } message: {
                 Text("Alert.ICloudBackup.Restore.Subtitle.\(availableBackupDate ?? .now, format: .dateTime)")
+            }
+        }
+        .sheet(item: $tierListShare) { share in
+            NavigationStack {
+                TierListView(game: selectedGame, playType: playTypeToShow, initialShare: share)
             }
         }
         .progressCover(migrationProgress)

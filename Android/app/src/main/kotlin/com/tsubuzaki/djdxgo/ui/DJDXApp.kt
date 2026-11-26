@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.outlined.Hexagon
+import androidx.compose.material.icons.outlined.Leaderboard
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -84,6 +85,7 @@ import com.tsubuzaki.djdxgo.data.removeSettings
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVersion
 import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingFlow
+import com.tsubuzaki.djdxgo.data.tierlist.TierListShare
 import com.tsubuzaki.djdxgo.ui.analytics.AnalyticsGoalDetailScreen
 import com.tsubuzaki.djdxgo.ui.analytics.AnalyticsGoalsSection
 import com.tsubuzaki.djdxgo.ui.analytics.ChartAnalyticsDetailScreen
@@ -105,6 +107,7 @@ import com.tsubuzaki.djdxgo.ui.more.DeleteScoreDataDialog
 import com.tsubuzaki.djdxgo.ui.more.FreeUpSpaceDialog
 import com.tsubuzaki.djdxgo.ui.more.ExternalDataSourcesScreen
 import com.tsubuzaki.djdxgo.ui.more.RadarMakerScreen
+import com.tsubuzaki.djdxgo.ui.tierlist.TierListScreen
 import com.tsubuzaki.djdxgo.ui.onboarding.OnboardingScreen
 import com.tsubuzaki.djdxgo.ui.profile.DDRDataSourceWarning
 import com.tsubuzaki.djdxgo.ui.profile.DDRProfileHeader
@@ -305,6 +308,27 @@ fun DJDXApp() {
         composable(Routes.RADAR_MAKER) {
             RadarMakerScreen(onBack = back)
         }
+        composable(
+            route = Routes.TIER_LIST,
+            arguments = listOf(navArgument("code") { type = NavType.StringType; defaultValue = "" })
+        ) { entry ->
+            val selectedGameId by context.settingFlow(SettingsKeys.selectedGame, 0)
+                .collectAsState<Int, Int?>(initial = null)
+            val playTypeValue by context.settingFlow(SettingsKeys.iidxPlayType, IIDXPlayType.SINGLE.value)
+                .collectAsState<String, String?>(initial = null)
+            val gameId = selectedGameId
+            val playType = playTypeValue
+            if (gameId != null && playType != null) {
+                TierListScreen(
+                    container = container,
+                    initialGame = Game.fromId(gameId),
+                    initialPlayType = IIDXPlayType.fromValue(playType).code,
+                    initialShare = entry.arguments?.getString("code")?.takeIf { it.isNotEmpty() }
+                        ?.let(TierListShare::decode),
+                    onBack = back
+                )
+            }
+        }
     }
 }
 
@@ -334,6 +358,10 @@ private suspend fun handleDeepLink(
                 navController.popBackStack(Routes.SCORES, inclusive = false)
                 context.setSetting(SettingsKeys.selectedGame, game.id)
             }
+        }
+        "tierlist" -> {
+            val code = value("code") ?: return
+            navController.navigate(Routes.tierList(code))
         }
         "reonboard" -> context.setSetting(SettingsKeys.onboardingLastSeenVersion, "")
     }
@@ -757,6 +785,11 @@ private fun MoreMenu(
             text = { Text(stringResource(R.string.radar_maker_title)) },
             leadingIcon = { Icon(Icons.Outlined.Hexagon, contentDescription = null) },
             onClick = { onNavigate(Routes.RADAR_MAKER) }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.tier_list_title)) },
+            leadingIcon = { Icon(Icons.Outlined.Leaderboard, contentDescription = null) },
+            onClick = { onNavigate(Routes.tierList()) }
         )
         HorizontalDivider()
         DropdownMenuItem(
