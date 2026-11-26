@@ -43,10 +43,6 @@ final class SDVXAnalyticsModel {
 
     let fetcher = SDVXReader()
 
-    nonisolated static func volforce(of records: [SDVXSongRecord]) -> Double {
-        SDVXVolforce.total(records)
-    }
-
     func reload(version: SDVXVersion, filters: SDVXFilterOptions? = nil) async {
         dataState = .loading
         let allRecords = await fetcher.latestSongRecords(for: version)
@@ -92,6 +88,8 @@ final class SDVXAnalyticsModel {
             }
         }
 
+        let computedVolforce = SDVXVolforce.total(allRecords)
+
         let lastPlay = await computeLastPlay(version: version, filters: filters)
 
         withAnimation(.smooth.speed(2.0)) {
@@ -100,7 +98,7 @@ final class SDVXAnalyticsModel {
             self.clearTypePerLevel = clearByLevel
             self.totalCharts = records.count
             self.totalPlays = plays
-            self.volforce = SDVXVolforce.total(allRecords)
+            self.volforce = computedVolforce
             self.volforceSuggestions = SDVXVolforce.suggestions(allRecords: allRecords, candidates: records)
             self.newClears = lastPlay.clears
             self.newHighScores = lastPlay.highScores

@@ -14,9 +14,7 @@ struct SDVXVolforceSuggestion: Identifiable {
     var pointsNeeded: Int { targetScore - score }
 }
 
-enum SDVXVolforce {
-
-    static let chartLimit = 50
+extension SDVXVolforce {
 
     static let gradeThresholds: [(grade: SDVXGrade, score: Int)] = [
         (.c, 6_500_000), (.b, 7_500_000), (.a, 8_700_000), (.aPlus, 9_000_000),
@@ -24,45 +22,13 @@ enum SDVXVolforce {
         (.s, 9_900_000)
     ]
 
-    static let gradeCoefficients: [SDVXGrade: Int] = [
-        .s: 105, .aaaPlus: 102, .aaa: 100, .aaPlus: 97, .aa: 94,
-        .aPlus: 91, .a: 88, .b: 85, .c: 82, .d: 80
-    ]
-
-    static func clearCoefficient(_ clearType: SDVXClearType) -> Int {
-        switch clearType {
-        case .perfectUltimateChain: return 110
-        case .ultimateChain: return 106
-        case .excessive: return 102
-        case .complete: return 100
-        case .played: return 50
-        default: return 0
-        }
-    }
-
-    static func force(level: Double, score: Int, clearType: SDVXClearType) -> Int {
-        guard level > 0, score > 0 else { return 0 }
-        let grade = SDVXGrade.grade(forScore: score)
-        let value = level * Double(score) * Double(gradeCoefficients[grade] ?? 0) *
-            Double(clearCoefficient(clearType)) * 20.0 / 10_000_000.0 / 10_000.0
-        return Int((value + 1e-9).rounded(.down))
-    }
-
-    static func force(_ record: SDVXSongRecord) -> Int {
-        force(level: Double(record.level) ?? 0.0, score: record.highScore, clearType: record.clearTypeEnum)
-    }
-
     static func gainText(_ gain: Int) -> String {
         String(format: "+%.3f", Double(gain) / 1000.0)
     }
 
-    static func total(_ records: [SDVXSongRecord]) -> Double {
-        Double(RatingPool(values: records.map { force($0) }, limit: chartLimit).total) / 1000.0
-    }
-
     static func suggestions(allRecords: [SDVXSongRecord],
                             candidates: [SDVXSongRecord]) -> [SDVXVolforceSuggestion] {
-        let pool = RatingPool(values: allRecords.map { force($0) }, limit: chartLimit)
+        let pool = RatingPool(values: allRecords.map(chartForce), limit: chartLimit)
         return candidates.compactMap { record -> SDVXVolforceSuggestion? in
             let level = Double(record.level) ?? 0.0
             guard level > 0, record.highScore > 0,

@@ -17,6 +17,7 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXGrade
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
+import com.tsubuzaki.djdxgo.data.sdvx.SDVXVolforce
 import com.tsubuzaki.djdxgo.data.setSetting
 import com.tsubuzaki.djdxgo.data.settingFlow
 import java.time.Instant

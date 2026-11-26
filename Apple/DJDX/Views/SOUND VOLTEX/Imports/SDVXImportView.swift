@@ -18,6 +18,7 @@ struct SDVXImportView: View {
     @State var autoImportFailedReason: ImportFailedReason?
     @State var isSelectingCSVFile: Bool = false
     @State var importGroups: [SDVXImportGroupInfo] = []
+    @State var summaryTarget: ImportSummaryTarget?
 
     let importer = SDVXImporter()
     let fetcher = SDVXReader()
@@ -30,17 +31,23 @@ struct SDVXImportView: View {
         NavigationStack(path: $importPath) {
             List {
                 ForEach(importGroups) { group in
-                    HStack(alignment: .center, spacing: 6.0) {
-                        Text(group.date, style: .date)
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        if let version = group.version {
-                            Text(version.marketingName)
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundStyle(version.color)
+                    Button {
+                        summaryTarget = ImportSummaryTarget(id: group.id)
+                    } label: {
+                        HStack(alignment: .center, spacing: 6.0) {
+                            Text(group.date, style: .date)
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if let version = group.version {
+                                Text(version.marketingName)
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(version.color)
+                            }
                         }
+                        .contentShape(.rect)
                     }
+                    .buttonStyle(.plain)
                     .listRowBackground(Color.clear)
                 }
                 .onDelete(perform: { indexSet in
@@ -77,17 +84,6 @@ struct SDVXImportView: View {
                     .padding()
             }
             .alert(
-                "Alert.Import.Success.Title",
-                isPresented: $didImportSucceed,
-                actions: {
-                    Button("Shared.OK", role: .cancel) {
-                        didImportSucceed = false
-                        importPath = NavigationPath()
-                    }
-                },
-                message: { Text("Alert.Import.Success.Subtitle") }
-            )
-            .alert(
                 "Alert.Import.Error.Title",
                 isPresented: $isAutoImportFailed,
                 actions: {
@@ -100,8 +96,20 @@ struct SDVXImportView: View {
             )
             .onChange(of: didImportSucceed) { _, newValue in
                 if newValue {
+                    didImportSucceed = false
+                    importPath = NavigationPath()
                     NotificationCenter.default.post(name: .dataImported, object: nil)
-                    Task { await reloadImportGroups() }
+                    Task {
+                        await reloadImportGroups()
+                        if let importGroupID = await fetcher.importGroupID(for: importToDate) {
+                            summaryTarget = ImportSummaryTarget(id: importGroupID)
+                        }
+                    }
+                }
+            }
+            .sheet(item: $summaryTarget) { target in
+                ImportSummaryView {
+                    await SDVXImportSummaryBuilder.summary(importGroupID: target.id)
                 }
             }
             .task {

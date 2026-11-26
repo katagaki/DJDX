@@ -20,8 +20,14 @@
     <string name="import_status_connecting">Connecting…</string>
     <string name="import_status_loading">Loading…</string>
     <string name="import_status_importing">Importing…</string>
-    <string name="import_success_title">Import Completed</string>
-    <string name="import_success_message">Your score data was imported successfully.</string>
+    <string name="import_summary_title">Import Summary</string>
+    <string name="import_summary_import_date">Imported</string>
+    <string name="import_summary_compared_with">Compared With</string>
+    <string name="import_summary_no_previous_import">First Import</string>
+    <string name="import_summary_ratings">Ratings</string>
+    <string name="import_summary_personal_bests">New Personal Bests</string>
+    <string name="import_summary_no_personal_bests">No new personal bests since the previous import.</string>
+    <string name="import_summary_unavailable">Summary Unavailable</string>
     <string name="import_error_title">Import Failed</string>
     <string name="import_error_no_premium_course">The import could not be completed as the e-amusement account is not subscribed to the "e-amusementプレミアムコース" service.</string>
     <string name="import_error_no_eamusement_pass">The import could not be completed as there is no e-amusement pass linked.</string>

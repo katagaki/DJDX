@@ -3,6 +3,7 @@ package com.tsubuzaki.djdxgo.data.analytics
 import com.tsubuzaki.djdxgo.data.compact
 import com.tsubuzaki.djdxgo.data.ddr.DDRClearLamp
 import com.tsubuzaki.djdxgo.data.ddr.DDRDifficulty
+import com.tsubuzaki.djdxgo.data.ddr.DDRFlareSkill
 import com.tsubuzaki.djdxgo.data.ddr.DDRRank
 import com.tsubuzaki.djdxgo.data.ddr.DDRSongRecord
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
@@ -13,6 +14,7 @@ import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXDifficulty
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXGrade
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
+import com.tsubuzaki.djdxgo.data.sdvx.SDVXVolforce
 import java.util.Locale
 import kotlin.math.floor
 

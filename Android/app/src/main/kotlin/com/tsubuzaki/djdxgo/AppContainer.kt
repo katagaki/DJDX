@@ -9,11 +9,13 @@ import com.tsubuzaki.djdxgo.data.ddr.DDRRepository
 import com.tsubuzaki.djdxgo.data.external.ExternalDataReloader
 import com.tsubuzaki.djdxgo.data.iidx.IIDXChartAnalyzer
 import com.tsubuzaki.djdxgo.data.iidx.IIDXRepository
+import com.tsubuzaki.djdxgo.data.importsummary.ImportSummaryBuilder
 import com.tsubuzaki.djdxgo.data.notes.ChartNotesDatabase
 import com.tsubuzaki.djdxgo.data.notes.ChartNotesRepository
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordRepository
 import com.tsubuzaki.djdxgo.data.profile.ProfileRepository
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXRepository
+import com.tsubuzaki.djdxgo.data.tierlist.TierListStore
 import com.tsubuzaki.djdxgo.widget.WidgetDataPublisher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -33,9 +35,11 @@ class AppContainer(context: Context) {
     val ddrRepository = DDRRepository(database.ddrDao(), externalDataDao)
     val externalDataReloader = ExternalDataReloader(externalDataDao)
     val analyticsStore = AnalyticsStore(database, ddrRepository)
+    val importSummaryBuilder = ImportSummaryBuilder(iidxRepository, sdvxRepository, polarisChordRepository, ddrRepository)
     val goalEvaluator = AnalyticsGoalEvaluator(context.applicationContext, database, ddrRepository)
     val profileRepository = ProfileRepository(context.applicationContext)
     val chartAnalyzer = IIDXChartAnalyzer(context.applicationContext.cacheDir)
+    val tierListStore = TierListStore(context.applicationContext)
     val chartNotesRepository = ChartNotesRepository(ChartNotesDatabase.get(context).chartNoteDao())
 
     private val dataVersionState = MutableStateFlow(0)

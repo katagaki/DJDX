@@ -12,9 +12,7 @@ struct DDRFlareSkillSuggestion: Identifiable {
     let flareSkillGain: Int
 }
 
-enum DDRFlareSkill {
-
-    static let chartLimit = 30
+extension DDRFlareSkill {
 
     static let baseValues: [Int] = [
         0, 145, 155, 170, 185, 205, 230, 255, 290, 335, 400,
@@ -40,22 +38,13 @@ enum DDRFlareSkill {
         }
     }
 
-    static func category(forVersion version: Int) -> Int {
-        switch version {
-        case 1...13: return 1
-        case 14...19: return 2
-        case DDRVersion.worldVersionNumber...: return 3
-        default: return 0
-        }
-    }
-
     static func suggestions(allRecords: [DDRSongRecord],
                             candidates: [DDRSongRecord]) -> [DDRFlareSkillSuggestion] {
-        let pools = Dictionary(grouping: allRecords) { category(forVersion: $0.version) }
+        let pools = Dictionary(grouping: allRecords) { category(for: $0.version) }
             .mapValues { RatingPool(values: $0.map(\.flareSkill), limit: chartLimit) }
         return candidates.compactMap { record -> DDRFlareSkillSuggestion? in
             guard record.level > 0, baseValues.indices.contains(record.level),
-                  let pool = pools[category(forVersion: record.version)] else { return nil }
+                  let pool = pools[category(for: record.version)] else { return nil }
             let currentRank = rank(level: record.level, skill: record.flareSkill)
             let targetRank = (currentRank ?? -1) + 1
             guard rankMultipliers.indices.contains(targetRank) else { return nil }
