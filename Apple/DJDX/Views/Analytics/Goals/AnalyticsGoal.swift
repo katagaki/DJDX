@@ -32,6 +32,7 @@ struct AnalyticsGoal: Codable, Identifiable, Hashable {
     var threshold: String = ""
     var target: Double
     var startDate: Date = .now
+    var startValue: Double?
     var deadline: Date
 
     var isRating: Bool { kind == .rating }
@@ -118,6 +119,7 @@ enum AnalyticsGoalStatus: Hashable {
     case onPace
     case behind
     case missed
+    case notStarted
 
     var titleKey: LocalizedStringKey {
         switch self {
@@ -126,6 +128,7 @@ enum AnalyticsGoalStatus: Hashable {
         case .onPace: "Goals.Status.OnPace"
         case .behind: "Goals.Status.Behind"
         case .missed: "Goals.Status.Missed"
+        case .notStarted: "Goals.Status.NotStarted"
         }
     }
 
@@ -136,6 +139,7 @@ enum AnalyticsGoalStatus: Hashable {
         case .onPace: .blue
         case .behind: .orange
         case .missed: .red
+        case .notStarted: .gray
         }
     }
 
@@ -146,6 +150,7 @@ enum AnalyticsGoalStatus: Hashable {
         case .onPace: "checkmark.circle.fill"
         case .behind: "tortoise.fill"
         case .missed: "xmark.circle.fill"
+        case .notStarted: "hourglass"
         }
     }
 }
@@ -165,6 +170,10 @@ struct AnalyticsGoalProgress: Hashable, Identifiable {
     var id: UUID { goal.id }
 
     var baseline: Double {
+        goal.startValue ?? historicalBaseline
+    }
+
+    var historicalBaseline: Double {
         history.last(where: { $0.date <= goal.startDate })?.value ?? history.first?.value ?? 0.0
     }
 
@@ -179,7 +188,20 @@ struct AnalyticsGoalProgress: Hashable, Identifiable {
     }
 
     var expected: Double {
-        baseline + (goal.target - baseline) * timeFraction
+        expected(at: now)
+    }
+
+    var latestUpdate: AnalyticsGoalPoint? {
+        guard let latest = history.last,
+              latest.date > goal.startDate || latest.value != baseline else { return nil }
+        return AnalyticsGoalPoint(date: max(latest.date, goal.startDate), value: latest.value)
+    }
+
+    func expected(at date: Date) -> Double {
+        let total = goal.deadline.timeIntervalSince(goal.startDate)
+        guard total > 0 else { return goal.target }
+        let fraction = min(max(date.timeIntervalSince(goal.startDate) / total, 0.0), 1.0)
+        return baseline + (goal.target - baseline) * fraction
     }
 
     var progressFraction: Double {
@@ -199,10 +221,15 @@ struct AnalyticsGoalProgress: Hashable, Identifiable {
     var status: AnalyticsGoalStatus {
         if current >= goal.target { return .achieved }
         if now >= goal.deadline { return .missed }
-        let tolerance = max(abs(goal.target - baseline) * 0.05, goal.isRating ? 0.0 : 0.5)
-        if current > expected + tolerance { return .ahead }
-        if current < expected - tolerance { return .behind }
-        return .onPace
+        guard let latestUpdate else { return .notStarted }
+        let gained = latestUpdate.value - baseline
+        guard gained > 0 else { return .behind }
+        let required = expected(at: latestUpdate.date) - baseline
+        guard required > 0 else { return .ahead }
+        let ratio = gained / required
+        if ratio >= 1.15 { return .ahead }
+        if ratio >= 0.9 { return .onPace }
+        return .behind
     }
 }
 
@@ -228,6 +255,18 @@ enum AnalyticsGoalStore {
             goals.append(goal)
         }
         save(goals)
+    }
+
+    static func recordStartValues(_ values: [UUID: Double]) {
+        var goals = load()
+        var didChange = false
+        for index in goals.indices where goals[index].startValue == nil {
+            if let value = values[goals[index].id] {
+                goals[index].startValue = value
+                didChange = true
+            }
+        }
+        if didChange { save(goals) }
     }
 
     static func delete(_ id: UUID) {

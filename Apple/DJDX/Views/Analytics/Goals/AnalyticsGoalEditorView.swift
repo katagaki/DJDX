@@ -155,10 +155,16 @@ struct AnalyticsGoalEditorView: View {
 
     func save() {
         var goal = existingGoal ?? AnalyticsGoal(game: game, kind: kind, target: target, deadline: deadline)
+        let newLevel = kind == .rating ? 0 : level
+        let newThreshold = kind == .rating ? "" : threshold
+        if goal.kind != kind || goal.playStyle != playStyle
+            || goal.level != newLevel || goal.threshold != newThreshold {
+            goal.startValue = nil
+        }
         goal.kind = kind
         goal.playStyle = playStyle
-        goal.level = kind == .rating ? 0 : level
-        goal.threshold = kind == .rating ? "" : threshold
+        goal.level = newLevel
+        goal.threshold = newThreshold
         goal.target = target
         goal.deadline = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: deadline) ?? deadline
         AnalyticsGoalStore.upsert(goal)

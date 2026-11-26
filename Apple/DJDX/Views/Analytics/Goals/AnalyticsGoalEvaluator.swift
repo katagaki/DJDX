@@ -20,7 +20,14 @@ enum AnalyticsGoalEvaluator {
         case .polarisChord:
             histories = [:]
         }
-        return goals.map { AnalyticsGoalProgress(goal: $0, history: histories[$0.id] ?? []) }
+        let progresses = goals.map { AnalyticsGoalProgress(goal: $0, history: histories[$0.id] ?? []) }
+        let startValues = Dictionary(uniqueKeysWithValues: progresses
+            .filter { $0.goal.startValue == nil && !$0.history.isEmpty }
+            .map { ($0.goal.id, $0.historicalBaseline) })
+        if !startValues.isEmpty {
+            await MainActor.run { AnalyticsGoalStore.recordStartValues(startValues) }
+        }
+        return progresses
     }
 
     // MARK: - IIDX

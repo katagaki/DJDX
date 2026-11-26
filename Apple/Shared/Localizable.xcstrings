@@ -3689,6 +3689,29 @@
         }
       }
     },
+    "Goals.Status.NotStarted" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Started"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未着手"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未開始"
+          }
+        }
+      }
+    },
     "Goals.Status.OnPace" : {
       "extractionState" : "manual",
       "localizations" : {
