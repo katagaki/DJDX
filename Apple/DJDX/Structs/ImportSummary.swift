@@ -45,6 +45,11 @@ struct ImportSummaryRating: Identifiable, Hashable {
     }
 }
 
+enum ImportSummaryTitleStyle {
+    case iidx(version: String, level: IIDXLevel)
+    case plain
+}
+
 enum ImportSummaryValueStyle: Hashable {
     case iidxClearType
     case iidxDJLevel
@@ -70,6 +75,7 @@ struct ImportSummaryEntry: Identifiable, Hashable {
     let score: Int?
     let lamp: ImportSummaryChange?
     let grade: ImportSummaryChange?
+    var titleStyle: ImportSummaryTitleStyle = .plain
 
     static func == (lhs: ImportSummaryEntry, rhs: ImportSummaryEntry) -> Bool {
         lhs.id == rhs.id
