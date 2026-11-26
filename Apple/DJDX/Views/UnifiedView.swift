@@ -179,6 +179,14 @@ struct UnifiedView: View {
             .navigationDestination(for: DDRAnalyticsPath.self) { path in
                 DDRAnalyticsDestinationView(model: ddrAnalyticsModel, path: path, namespace: ddrAnalyticsNamespace)
             }
+            .navigationDestination(for: AnalyticsGoalPath.self) { path in
+                switch path {
+                case .detail(let id):
+                    AnalyticsGoalDetailView(goalID: id)
+                        .appBackgroundGradient()
+                        .navigationBarTitleDisplayMode(.inline)
+                }
+            }
         }
         .sheet(isPresented: $isPresentingImport) {
             Group {

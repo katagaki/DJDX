@@ -90,6 +90,9 @@ object SettingsKeys {
     val ddrVisibleCards = stringSetPreferencesKey("Analytics.DDR.VisibleCards")
     val ddrCollapsedSections = stringSetPreferencesKey("Analytics.DDR.CollapsedSections")
 
+    val analyticsGoals = stringPreferencesKey("Analytics.Goals")
+    val analyticsGoalsCollapsed = booleanPreferencesKey("Analytics.Goals.Collapsed")
+
     val onboardingLastSeenVersion = stringPreferencesKey("Onboarding.LastSeenVersion")
 }
 
