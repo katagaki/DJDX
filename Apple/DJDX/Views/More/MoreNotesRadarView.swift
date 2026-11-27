@@ -57,6 +57,7 @@ struct MoreNotesRadarView: View {
                     Text(verbatim: point.label)
                         .font(.radarline(size: listFontSize))
                         .foregroundStyle(point.color)
+                        .brightness(colorScheme == .light ? -0.18 : 0.0)
                     Spacer()
                     Text(verbatim: String(format: "%.2f", point.value))
                         .font(.scoreline(size: listFontSize, weight: .bold))

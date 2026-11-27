@@ -53,10 +53,7 @@ struct RadarChartView: View {
                         .overlay(
                             Text(config.label)
                                 .font(.radarline(size: labelFontSize))
-                                .foregroundStyle(config.color)
-                                .brightness(0.88)
-                                .shadow(color: config.color, radius: 1.0)
-                                .shadow(color: config.color, radius: 3.0)
+                                .radarLabelStyle(config.color)
                                 .fixedSize(),
                             alignment: config.alignment
                         )
