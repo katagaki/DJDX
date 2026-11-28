@@ -17,19 +17,21 @@ struct ShareCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14.0) {
             header
-            VStack(spacing: 0.0) {
-                ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
-                    if index > 0 {
-                        Rectangle()
-                            .fill(.white.opacity(0.12))
-                            .frame(height: 0.5)
-                            .padding(.leading, 18.0)
+            if !entries.isEmpty {
+                VStack(spacing: 0.0) {
+                    ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+                        if index > 0 {
+                            Rectangle()
+                                .fill(.white.opacity(0.12))
+                                .frame(height: 0.5)
+                                .padding(.leading, 18.0)
+                        }
+                        ShareCardRow(entry: entry)
                     }
-                    ShareCardRow(entry: entry)
                 }
+                .background(.black.opacity(0.4))
+                .clipShape(.rect(cornerRadius: 14.0))
             }
-            .background(.black.opacity(0.4))
-            .clipShape(.rect(cornerRadius: 14.0))
             footer
         }
         .padding(20.0)

@@ -11,6 +11,7 @@ struct ShareCardComposer: View {
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
     @AppStorage(wrappedValue: true, "ShareCard.ProfileVisible") var isProfileVisible: Bool
+    @AppStorage(wrappedValue: true, "ShareCard.ChartsVisible") var isChartsVisible: Bool
     @AppStorage(wrappedValue: 10, "ShareCard.RowLimit") var rowLimit: Int
     @AppStorage(wrappedValue: 0x7A4DFF, "ShareCard.CustomColor") var customColorValue: Int
 
@@ -31,6 +32,9 @@ struct ShareCardComposer: View {
     }
 
     var visibleEntries: [ShareCardEntry] {
+        if !isChartsVisible {
+            return []
+        }
         if isTodayOnly {
             return entries.filter { $0.playDate.map(Calendar.current.isDateInToday) ?? false }
         }
@@ -66,7 +70,7 @@ struct ShareCardComposer: View {
     }
 
     var renderKey: String {
-        "\(background.hashValue).\(customColorValue).\(photo?.hash ?? 0).\(isProfileVisible).\(rowLimit)"
+        "\(background.hashValue).\(customColorValue).\(photo?.hash ?? 0).\(isProfileVisible).\(isChartsVisible).\(rowLimit)"
     }
 
     var body: some View {
@@ -99,14 +103,17 @@ struct ShareCardComposer: View {
                     if !profile.isEmpty {
                         Toggle("ShareCard.ShowProfile", isOn: $isProfileVisible)
                     }
-                    Picker("ShareCard.RowLimit", selection: $rowLimit) {
-                        ForEach(Self.rowLimits, id: \.self) { limit in
-                            Text(verbatim: String(limit))
-                                .tag(limit)
-                        }
-                        if hasPlayDates {
-                            Text("ShareCard.RowLimit.Today")
-                                .tag(Self.todayOnlyRowLimit)
+                    Toggle("ShareCard.ShowCharts", isOn: $isChartsVisible)
+                    if isChartsVisible {
+                        Picker("ShareCard.RowLimit", selection: $rowLimit) {
+                            ForEach(Self.rowLimits, id: \.self) { limit in
+                                Text(verbatim: String(limit))
+                                    .tag(limit)
+                            }
+                            if hasPlayDates {
+                                Text("ShareCard.RowLimit.Today")
+                                    .tag(Self.todayOnlyRowLimit)
+                            }
                         }
                     }
                 }
@@ -115,7 +122,7 @@ struct ShareCardComposer: View {
             .navigationTitle("ShareCard.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     if #available(iOS 26.0, *) {
                         Button(role: .close) {
                             dismiss()
@@ -126,13 +133,15 @@ struct ShareCardComposer: View {
                         }
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .bottomBar) {
                     if let renderedImage {
                         let image = Image(uiImage: renderedImage)
                         ShareLink(
                             item: image,
                             preview: SharePreview(Text(verbatim: game.displayName), image: image)
-                        )
+                        ) {
+                            Text("ShareCard.Share")
+                        }
                     }
                 }
             }
