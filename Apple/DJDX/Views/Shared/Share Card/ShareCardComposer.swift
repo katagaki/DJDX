@@ -251,7 +251,6 @@ struct ShareCardComposer: View {
             game: game,
             profile: isProfileVisible ? profile : nil,
             entries: visibleEntries,
-            totalCount: isTodayOnly ? visibleEntries.count : entries.count,
             playStyle: playStyle,
             background: background,
             photo: photo,

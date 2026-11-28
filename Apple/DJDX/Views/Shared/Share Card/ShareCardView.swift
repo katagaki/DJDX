@@ -5,7 +5,6 @@ struct ShareCardView: View {
     let game: Game
     let profile: ShareCardProfile?
     let entries: [ShareCardEntry]
-    let totalCount: Int
     var playStyle: String?
     let background: ShareCardBackground
     let photo: UIImage?
@@ -124,9 +123,6 @@ struct ShareCardView: View {
 
     @ViewBuilder var footer: some View {
         HStack {
-            if totalCount > entries.count {
-                Text("ShareCard.More.\(totalCount - entries.count)")
-            }
             Spacer()
             Text(verbatim: "DJDX")
         }
