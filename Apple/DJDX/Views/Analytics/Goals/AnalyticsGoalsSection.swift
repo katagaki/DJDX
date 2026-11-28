@@ -120,32 +120,34 @@ struct AnalyticsGoalCard: View {
     let progress: AnalyticsGoalProgress
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8.0) {
+        VStack(alignment: .leading, spacing: 6.0) {
             HStack(alignment: .center, spacing: 6.0) {
                 AnalyticsGoalTitle(goal: progress.goal)
                     .font(.caption)
                 Spacer(minLength: 4.0)
                 AnalyticsGoalStatusBadge(status: progress.status)
             }
-            HStack(alignment: .firstTextBaseline, spacing: 4.0) {
-                Text(verbatim: progress.goal.formatted(progress.current))
-                    .goalNumberFont(size: 20.0)
-                Text(verbatim: "/ \(progress.goal.formatted(progress.goal.target))")
-                    .font(.scoreline(.subheadline, weight: .bold))
-                    .fontWidth(.standard)
+            HStack(alignment: .center, spacing: 8.0) {
+                HStack(alignment: .firstTextBaseline, spacing: 3.0) {
+                    Text(verbatim: progress.goal.formatted(progress.current))
+                        .goalNumberFont(size: 13.0)
+                    Text(verbatim: "/ \(progress.goal.formatted(progress.goal.target))")
+                        .goalNumberFont(size: 13.0)
+                        .foregroundStyle(.secondary)
+                }
+                .lineLimit(1)
+                .fixedSize()
+                AnalyticsGoalProgressBar(progress: progress.progressFraction,
+                                         pace: progress.timeFraction,
+                                         color: progress.status.color,
+                                         height: 11.0)
+                Text("Goals.Days.\(progress.daysLeft)")
+                    .goalNumberFont(size: 13.0)
                     .foregroundStyle(.secondary)
-                Spacer()
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .fixedSize()
             }
-            AnalyticsGoalProgressBar(progress: progress.progressFraction,
-                                     pace: progress.timeFraction,
-                                     color: progress.status.color)
-            HStack {
-                Text("Goals.Pace.\(progress.goal.formatted(progress.expected))")
-                Spacer()
-                Text("Goals.DaysLeft.\(progress.daysLeft)")
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
         }
         .padding(.horizontal, 10.0)
         .padding(.vertical, 8.0)
@@ -209,22 +211,25 @@ struct AnalyticsGoalProgressBar: View {
     let progress: Double
     let pace: Double
     let color: Color
+    var height: CGFloat = 8.0
 
     var body: some View {
         GeometryReader { proxy in
-            ZStack(alignment: .leading) {
-                Rectangle()
-                    .fill(.secondary.opacity(0.2))
-                Rectangle()
-                    .fill(color.gradient)
-                    .frame(width: max(proxy.size.width * progress, progress > 0 ? 8.0 : 0.0))
-                Rectangle()
-                    .fill(.primary)
-                    .frame(width: 2.0, height: proxy.size.height + 6.0)
-                    .offset(x: min(max(proxy.size.width * pace - 1.0, 0.0), proxy.size.width - 2.0))
-            }
+            Rectangle()
+                .fill(.secondary.opacity(0.2))
+                .overlay(alignment: .leading) {
+                    Rectangle()
+                        .fill(color.gradient)
+                        .frame(width: max(proxy.size.width * progress, progress > 0 ? 8.0 : 0.0))
+                }
+                .overlay(alignment: .leading) {
+                    Rectangle()
+                        .fill(.primary)
+                        .frame(width: 2.0, height: proxy.size.height + 6.0)
+                        .offset(x: min(max(proxy.size.width * pace - 1.0, 0.0), proxy.size.width - 2.0))
+                }
         }
-        .frame(height: 8.0)
+        .frame(height: height)
         .padding(.vertical, 3.0)
     }
 }
