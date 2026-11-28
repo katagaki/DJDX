@@ -92,14 +92,6 @@ struct MoreRadarMaker: View {
                 .font(.system(size: 12.0, weight: .bold))
             }
             .clearSection()
-            Section {
-                Button {
-                    exportImage()
-                } label: {
-                    Label("More.RadarMaker.Export", systemImage: "square.and.arrow.up")
-                }
-            }
-            .clearSection()
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
@@ -109,6 +101,11 @@ struct MoreRadarMaker: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(role: .close) {
                     dismiss()
+                }
+            }
+            ToolbarItem(placement: .bottomBar) {
+                Button("More.RadarMaker.Export") {
+                    exportImage()
                 }
             }
         }
