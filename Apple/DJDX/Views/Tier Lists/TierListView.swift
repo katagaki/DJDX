@@ -1,6 +1,5 @@
 import SwiftUI
 
-// swiftlint:disable:next type_body_length
 struct TierListView: View {
 
     @Environment(\.dismiss) var dismiss

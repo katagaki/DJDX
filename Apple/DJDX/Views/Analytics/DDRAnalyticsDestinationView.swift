@@ -19,11 +19,6 @@ struct DDRAnalyticsDestinationView: View {
                 DDRRankBreakdownDetailView(rankPerLevel: model.rankPerLevel)
                     .navigationTitle("Analytics.DDR.RankBreakdown")
                     .navigationTransition(.zoom(sourceID: "DDR.rankBreakdown", in: namespace))
-            case .flareSkillSuggestionsDetail:
-                DDRFlareSkillSuggestionsDetailView(suggestions: model.flareSkillSuggestions)
-                    .navigationTitle(Text(verbatim: "FLARE SKILL"))
-                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.ddrFlareSkill.transitionID,
-                                                in: namespace))
             case .flareSkillTrendDetail:
                 TrendDetailView(points: model.flareSkillHistory, color: .orange,
                                 format: DDRAnalyticsModel.formatFlareSkill)
@@ -59,6 +54,7 @@ struct DDRClearBreakdownDetailView: View {
                     }
                 } header: {
                     Text("Shared.Level")
+                        .sectionListHeader()
                 }
             }
         }
@@ -97,7 +93,6 @@ struct DDRClearTypeLevelRow: View {
                             .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
                     }
                 }
-                .clipShape(.rect(cornerRadius: 4.0))
             }
             .frame(height: 16.0)
         }
@@ -155,32 +150,15 @@ struct DDRFlareSkillSuggestionRow: View {
     let suggestion: DDRFlareSkillSuggestion
 
     var body: some View {
-        DDRScoreRow(record: suggestion.record) {
+        var row = DDRScoreRow(record: suggestion.record) {
             AnalyticsSuggestionTarget {
                 Text(verbatim: "FLARE \(DDRFlareSkill.rankLabel(suggestion.targetFlareRank))")
                     .foregroundStyle(.secondary)
-                    .fontWidth(.expanded)
-                    .fontWeight(.bold)
+                    .font(.playline(.caption, weight: .regular))
                 AnalyticsSuggestionGain(text: "+\(suggestion.flareSkillGain)")
             }
         }
-    }
-}
-
-struct DDRFlareSkillSuggestionsDetailView: View {
-    @EnvironmentObject var navigationManager: NavigationManager
-
-    let suggestions: [DDRFlareSkillSuggestion]
-
-    var body: some View {
-        AnalyticsSuggestionList(items: suggestions) { suggestion in
-            Button {
-                navigationManager.push(DDRScoresPath.scoreViewer(songRecord: suggestion.record))
-            } label: {
-                DDRFlareSkillSuggestionRow(suggestion: suggestion)
-                    .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
-        }
+        row.verticalPadding = 5.0
+        return row
     }
 }

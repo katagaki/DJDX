@@ -1542,13 +1542,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Summary - Clear Type"
+            "value" : "Clear Type"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クリアランプ概要"
+            "value" : "クリアランプ"
           }
         },
         "zh-Hant" : {
@@ -2391,19 +2391,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Score Data"
+            "value" : "All Play Data"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "プレー記録"
+            "value" : "すべてのプレー記録"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "成績資料"
+            "value" : "所有成績資料"
           }
         }
       }
@@ -2552,19 +2552,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "One Lamp from %@"
+            "value" : "ALMOST %@"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@まであと1ランプ"
+            "value" : "ALMOST %@"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "距離%@差一個燈"
+            "value" : "ALMOST %@"
           }
         }
       }
@@ -3031,19 +3031,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When BEMANIWiki data is turned off, chart levels are not downloaded and won't appear."
+            "value" : "When BEMANIWiki data is not downloaded, chart levels won't appear."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BEMANIWikiデータをオフにしていると、譜面のレベルが取得されず、表示されません。"
+            "value" : "BEMANIWikiデータがダウンロードされていないと、譜面のレベルが表示されません。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "若關閉 BEMANIWiki 資料，將不會下載譜面的等級，因此無法顯示。"
+            "value" : "若未下載 BEMANIWiki 資料，將無法顯示譜面的等級。"
           }
         }
       }
@@ -5035,6 +5035,52 @@
         }
       }
     },
+    "More.ExternalData.DeleteData" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データを削除"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除資料"
+          }
+        }
+      }
+    },
+    "More.ExternalData.DeleteData.Message.%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete downloaded data from %@? You can download it again anytime."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@のダウンロード済みデータを削除しますか？いつでも再ダウンロードできます。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要刪除從 %@ 下載的資料嗎？隨時都可以重新下載。"
+          }
+        }
+      }
+    },
     "More.ExternalData.Description" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5081,6 +5127,29 @@
         }
       }
     },
+    "More.ExternalData.DownloadData" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データをダウンロード"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下載資料"
+          }
+        }
+      }
+    },
     "More.ExternalData.Header" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5100,6 +5169,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "外部資料來源"
+          }
+        }
+      }
+    },
+    "More.ExternalData.Info" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source Info"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ソース情報"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "來源資訊"
           }
         }
       }
@@ -5403,6 +5495,28 @@
         }
       }
     },
+    "More.Feedback" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Feedback…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィードバックを送信…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "傳送意見回饋…"
+          }
+        }
+      }
+    },
     "More.General.AppIcon" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5445,29 +5559,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一般"
-          }
-        }
-      }
-    },
-    "More.General.ShowAnalytics" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Analytics"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アナリティクスを表示"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "顯示分析"
           }
         }
       }
@@ -5770,6 +5861,29 @@
         }
       }
     },
+    "More.PlayDataDisplay.Fields" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play Data Fields"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレー記録の表示項目"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "成績資料顯示項目"
+          }
+        }
+      }
+    },
     "More.PlayDataDisplay.Header" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5812,6 +5926,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "隱藏 BEGINNER 難易度"
+          }
+        }
+      }
+    },
+    "More.PlayDataDisplay.Sections" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sections"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セクション"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "區塊"
           }
         }
       }
@@ -7592,19 +7729,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When BEMANIWiki 2nd is turned off, song names may be inaccurate or may not appear."
+            "value" : "When BEMANIWiki 2nd data is not downloaded, song names may be inaccurate or may not appear."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BEMANIWiki 2ndをオフにしていると、曲名が正しく取得できなかったり、表示されないことがあります。"
+            "value" : "BEMANIWiki 2ndデータがダウンロードされていないと、曲名が正しく取得できなかったり、表示されないことがあります。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "若關閉 BEMANIWiki 2nd，可能無法正確取得曲名，或無法顯示曲名。"
+            "value" : "若未下載 BEMANIWiki 2nd 資料，可能無法正確取得曲名，或無法顯示曲名。"
           }
         }
       }
@@ -8595,52 +8732,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開啟後，DJDX 會將每段遊玩記錄記為體能訓練。心率僅在連接 Apple Watch 時顯示。"
-          }
-        }
-      }
-    },
-    "Sessions.HealthKit.Toggle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Track Workouts with Health"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ヘルスケアでワークアウトを記録"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在「健康」記錄體能訓練"
-          }
-        }
-      }
-    },
-    "Sessions.HeartRate" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Heart Rate"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "心拍数"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "心率"
           }
         }
       }
@@ -10705,50 +10796,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分數評價"
-          }
-        }
-      }
-    },
-    "Shared.SelectDate" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select Date"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日付を選択"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選擇日期"
-          }
-        }
-      }
-    },
-    "Shared.ShowPastData" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Go Back in Time"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "遡る"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "回顧過往資料"
           }
         }
       }

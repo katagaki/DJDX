@@ -57,10 +57,7 @@ struct ImportSummaryNotesRadarSection: View {
         VStack(spacing: 2.0) {
             Text(verbatim: point.label)
                 .font(.radarline(size: 10.0))
-                .foregroundStyle(point.color)
-                .brightness(0.88)
-                .shadow(color: point.color, radius: 1.0)
-                .shadow(color: point.color, radius: 3.0)
+                .radarLabelStyle(point.color)
             Text(verbatim: format(point.value))
                 .font(.scoreline(.subheadline))
             if let previousValue = previousValue(for: point.label) {

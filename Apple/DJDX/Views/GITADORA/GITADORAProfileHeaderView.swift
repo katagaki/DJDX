@@ -9,7 +9,7 @@ struct GITADORAProfileHeaderView: View {
     @State var playerName: String?
     @State var skills: [String: String] = [:]
 
-    let profileHeight: CGFloat = 60.0
+    let profileHeight: CGFloat = DesignMetrics.profileHeight
     let gameTypes: [(gameType: String, label: String)] = [("gf", "GuitarFreaks"), ("dm", "DrumMania")]
 
     var hasData: Bool {
@@ -23,9 +23,7 @@ struct GITADORAProfileHeaderView: View {
                     VStack(alignment: .leading, spacing: 2.0) {
                         if let playerName {
                             Text(verbatim: playerName)
-                                .font(.title2)
-                                .fontDesign(.rounded)
-                                .fontWeight(.bold)
+                                .font(.playline(size: 16.0))
                                 .lineLimit(1)
                         }
                     }
@@ -54,28 +52,24 @@ struct GITADORAProfileHeaderView: View {
 
     @ViewBuilder
     func skillBlock(label: String, value: String) -> some View {
-        VStack(spacing: 6.0) {
+        VStack(spacing: 4.0) {
             HStack(spacing: 3.0) {
                 Text(verbatim: label)
                 Text("Shared.GITADORA.Skill")
             }
             .font(.caption2.weight(.bold))
-            .italic()
             .foregroundStyle(.secondary)
             .textCase(.uppercase)
             .lineLimit(1)
             .minimumScaleFactor(0.7)
             Text(verbatim: value)
-                .font(.title3.bold())
-                .fontWidth(.condensed)
-                .italic()
-                .monospacedDigit()
-                .frame(height: 24.0, alignment: .center)
+                .font(.scoreline(.callout))
+                .frame(height: 22.0, alignment: .center)
         }
         .frame(minWidth: 64.0)
-        .padding(.vertical, 8.0)
-        .padding(.horizontal, 10.0)
-        .cardBackground(cornerRadius: 8.0)
+        .fixedSize()
+        .padding(.vertical, 6.0)
+        .padding(.horizontal, 4.0)
     }
 
     func refreshProfile() async {

@@ -9,7 +9,7 @@ extension IIDXScoresView {
         } completion: {
             Task.detached {
                 let songRecords = await actor.songRecords(
-                    on: playDataDate,
+                    on: .now,
                     version: iidxVersion,
                     filters: FilterOptions(playType: playTypeToShow,
                                            onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,

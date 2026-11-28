@@ -1,25 +1,28 @@
 import SwiftUI
 
 struct MoreLicensesView: View {
+
+    @Environment(\.dismiss) var dismiss
+
     var body: some View {
         List {
             ForEach(Dependency.all) { dependency in
-                Section {
+                Section(dependency.name) {
                     Text(dependency.licenseText)
                         .font(.caption)
                         .monospaced()
-                        .listRowBackground(Color.clear)
-                } header: {
-                    Text(dependency.name)
                 }
             }
         }
-        .listStyle(.grouped)
+        .listStyle(.insetGrouped)
         .navigationTitle("More.Attributions")
         .navigationBarTitleDisplayMode(.inline)
-        .scrollContentBackground(.hidden)
-        .background {
-            AppBackgroundGradient()
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(role: .close) {
+                    dismiss()
+                }
+            }
         }
     }
 }

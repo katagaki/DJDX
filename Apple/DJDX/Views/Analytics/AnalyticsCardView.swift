@@ -15,10 +15,8 @@ enum AnalyticsCardHeaderPlacement {
 struct AnalyticsCardView<Content: View>: View {
 
     let title: Text
-    let systemImage: String
     let iconColor: Color
     let contentHeight: CGFloat
-    let cornerRadius: CGFloat
     var showsHeader: Bool = true
     var headerPlacement: AnalyticsCardHeaderPlacement = .top
     var caption: LocalizedStringKey?
@@ -29,78 +27,74 @@ struct AnalyticsCardView<Content: View>: View {
          headerPlacement: AnalyticsCardHeaderPlacement = .top,
          @ViewBuilder content: @escaping () -> Content) {
         self.title = cardType.titleText
-        self.systemImage = cardType.systemImage
         self.iconColor = cardType.iconColor
         self.contentHeight = cardType.cardContentHeight
-        self.cornerRadius = 20.0
         self.showsHeader = showsHeader
         self.headerPlacement = headerPlacement
         self.content = content
     }
 
     init(title: LocalizedStringKey,
-         systemImage: String,
-         iconColor: Color,
+         iconColor: Color = .clear,
          contentHeight: CGFloat = 80.0,
          showsHeader: Bool = true,
          @ViewBuilder content: @escaping () -> Content) {
         self.title = Text(title)
-        self.systemImage = systemImage
         self.iconColor = iconColor
         self.contentHeight = contentHeight
-        self.cornerRadius = 20.0
         self.showsHeader = showsHeader
         self.content = content
     }
 
-    init(verbatimTitle: String,
-         systemImage: String,
-         iconColor: Color,
-         contentHeight: CGFloat = 80.0,
-         @ViewBuilder content: @escaping () -> Content) {
-        self.title = Text(verbatim: verbatimTitle)
-        self.systemImage = systemImage
-        self.iconColor = iconColor
-        self.contentHeight = contentHeight
-        self.cornerRadius = 20.0
-        self.content = content
+    var summaryTitle: some View {
+        title
+            .cardLabel()
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
     }
 
-    var header: some View {
-        HStack(spacing: 5.0) {
-            Image(systemName: systemImage)
-                .resizable()
-                .scaledToFit()
-                .foregroundStyle(iconColor)
-                .frame(width: 12.0, height: 12.0)
-            title
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+    @ViewBuilder
+    var body: some View {
+        if showsHeader && headerPlacement == .bottom {
+            VStack(alignment: .leading, spacing: 2.0) {
+                content()
+                    .fixedSize()
+                title
+                    .cardLabel()
+                    .foregroundStyle(.secondary)
+                    .fixedSize()
+            }
+            .padding(.horizontal, DesignMetrics.cardPadding)
+            .padding(.vertical, 4.0)
+            .cardBackground()
+            .environment(\.cardRailColor, iconColor)
+        } else {
+            stackedBody
         }
     }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: headerPlacement == .bottom ? 2.0 : 8.0) {
-            if showsHeader && headerPlacement == .top {
-                header
-            }
-            content()
-                .frame(height: contentHeight)
-            if showsHeader && headerPlacement == .bottom {
-                header
+    var stackedBody: some View {
+        VStack(alignment: .leading, spacing: 8.0) {
+            if showsHeader {
+                summaryTitle
             }
             if let caption {
                 Text(caption)
+                    .cardLabel()
                     .font(.caption2.bold())
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(height: 12.0)
             }
+            content()
+                .frame(height: DesignMetrics.chartHeight(contentHeight))
         }
-        .padding(12.0)
+        .padding(DesignMetrics.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .cardBackground(cornerRadius: cornerRadius)
+        .cardBackground()
+        .environment(\.cardRailColor, showsHeader ? iconColor : nil)
     }
+
 }
 
 struct AnalyticsCardButtonStyle: ButtonStyle {

@@ -37,6 +37,7 @@ struct ClearTypeOverviewListView: View {
                 }
             } header: {
                 Text("Shared.Level")
+                    .sectionListHeader()
             }
         }
         .listStyle(.plain)
@@ -53,8 +54,8 @@ struct ClearTypeOverviewListView: View {
     }
 }
 
-struct ClearTypeLevelRow: View {
 
+struct ClearTypeLevelRow: View {
     let counts: OrderedDictionary<String, Int>
     let difficulty: Int
 
@@ -93,7 +94,6 @@ struct ClearTypeLevelRow: View {
                         .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
                     }
                 }
-                .clipShape(.rect(cornerRadius: 4.0))
             }
             .frame(height: 16.0)
         }

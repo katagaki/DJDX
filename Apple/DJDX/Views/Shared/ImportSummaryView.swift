@@ -183,6 +183,7 @@ struct ImportSummaryView: View {
 
 extension View {
     func groupedInsetBackground() -> some View {
-        background(Color(uiColor: .secondarySystemGroupedBackground), in: .rect(cornerRadius: 26.0))
+        background { CardFill() }
+            .clipShape(.rect)
     }
 }

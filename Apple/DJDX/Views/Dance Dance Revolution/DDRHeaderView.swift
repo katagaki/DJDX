@@ -13,7 +13,7 @@ extension UnifiedView {
             .pickerStyle(.segmented)
             .padding(.horizontal)
             .padding(.top, 8.0)
-            if !isDDRExternalDataEnabled {
+            if !hasDDRMetadata {
                 ddrBemaniWikiWarning
                     .padding(.horizontal)
                     .padding(.top, 16.0)
@@ -22,23 +22,22 @@ extension UnifiedView {
             if showProfileHeader {
                 DDRProfileHeaderView()
                     .padding(.horizontal)
-                    .padding(.top, 16.0)
+                    .padding(.top, 10.0)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
-            if showAnalytics {
-                DDRAnalyticsView(model: ddrAnalyticsModel,
-                                 isEditing: $isEditingAnalytics,
-                                 analyticsNamespace: ddrAnalyticsNamespace)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-                AnalyticsGoalsSection(game: .danceDanceRevolution, playStyle: ddrStyleToShow.rawValue)
-                    .padding(.top, 20.0)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-            }
+            DDRAnalyticsView(model: ddrAnalyticsModel,
+                             isEditing: $isEditingAnalytics,
+                             analyticsNamespace: ddrAnalyticsNamespace)
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
+            AnalyticsGoalsSection(game: .danceDanceRevolution, playStyle: ddrStyleToShow.rawValue)
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
+            DDRSuggestionsSection(model: ddrAnalyticsModel,
+                                  isEditing: $isEditingAnalytics,
+                                  analyticsNamespace: ddrAnalyticsNamespace)
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
         }
-        .padding(.bottom, 8.0)
-        .animation(.smooth.speed(2.0), value: isDDRExternalDataEnabled)
+        .animation(.smooth.speed(2.0), value: hasDDRMetadata)
         .animation(.smooth.speed(2.0), value: showProfileHeader)
-        .animation(.smooth.speed(2.0), value: showAnalytics)
     }
 
     @ViewBuilder
@@ -66,6 +65,6 @@ extension UnifiedView {
             Spacer(minLength: 0.0)
         }
         .padding(12.0)
-        .cardBackground(cornerRadius: 8.0)
+        .cardBackground()
     }
 }

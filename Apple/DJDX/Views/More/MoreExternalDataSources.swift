@@ -6,12 +6,6 @@ struct MoreExternalDataSources: View {
     @Environment(\.openURL) var openURL
     @Environment(\.dismiss) var dismiss
 
-    @AppStorage(wrappedValue: false, "ExternalData.Textage.Enabled") var isTextageEnabled: Bool
-    @AppStorage(wrappedValue: false, "ExternalData.TextageChartViewer.Enabled") var isTextageChartViewerEnabled: Bool
-    @AppStorage(wrappedValue: false, "ExternalData.SDVXIn.Enabled") var isSDVXInEnabled: Bool
-    @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
-    @AppStorage(wrappedValue: false, "ExternalData.BM2DX.Enabled") var isBM2DXEnabled: Bool
-    @AppStorage(wrappedValue: false, "ExternalData.DDR.Enabled") var isDDREnabled: Bool
     @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @State var bemaniWikiEntryCount: Int = 0
@@ -21,37 +15,51 @@ struct MoreExternalDataSources: View {
     @State var textageChartViewerEntryCount: Int = 0
     @State var ddrSongMetaCount: Int = 0
 
-    @State var reloadingSources: Set<ExternalDataReloadSource> = []
-    @State var reloadProgress: [ExternalDataReloadSource: Double] = [:]
-
-    enum ExternalDataReloadSource {
-        case bemaniWiki, bm2dx, sdvxIn, textage, textageChartViewer, ddr
-    }
+    @State var reloadingSources: Set<ExternalDataSourceID> = []
+    @State var reloadProgress: [ExternalDataSourceID: Double] = [:]
+    @State var reloadTasks: [ExternalDataSourceID: Task<Void, Never>] = [:]
+    @State var infoSource: ExternalDataSourceID?
+    @State var sourcePendingDelete: ExternalDataSourceID?
 
     let fetcher = IIDXReader()
     let sdvxFetcher = SDVXReader()
     let ddrMetaImporter = DDRMetadataImporter()
 
     var body: some View {
-        List {
-            textageChartViewerSection()
-            textageSection()
-            sdvxInSection()
-            bemaniWikiSection()
-            bm2dxSection()
+        Group {
+            ScrollView {
+                sources()
+                    .padding(.horizontal, 16.0)
+                    .padding(.vertical, 12.0)
+            }
+            .background(Color(uiColor: .systemGroupedBackground))
         }
         .navigationTitle("More.ExternalData.Header")
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: [isTextageEnabled, isTextageChartViewerEnabled, isSDVXInEnabled,
-                       isBemaniWikiEnabled, isBM2DXEnabled, isDDREnabled]) { _, _ in
-            NotificationCenter.default.post(name: .externalDataChanged, object: nil)
-        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(role: .close) {
                     dismiss()
                 }
             }
+        }
+        .alert(
+            "More.ExternalData.DeleteData",
+            isPresented: Binding(
+                get: { sourcePendingDelete != nil },
+                set: { if !$0 { sourcePendingDelete = nil } }
+            ),
+            presenting: sourcePendingDelete
+        ) { source in
+            Button("Shared.Delete", role: .destructive) {
+                sourcePendingDelete = nil
+                Task { await deleteData(for: source) }
+            }
+            Button("Shared.Cancel", role: .cancel) {
+                sourcePendingDelete = nil
+            }
+        } message: { source in
+            Text("More.ExternalData.DeleteData.Message.\(siteDisplayName(for: source))")
         }
         .task {
             bemaniWikiEntryCount = await fetcher.bemaniWikiSongCount()
@@ -63,224 +71,251 @@ struct MoreExternalDataSources: View {
         }
     }
 
-    // MARK: - Data Source Card
+    // MARK: - Sources
 
     @ViewBuilder
-    private func dataSourceCard<Title: View>(
-        @ViewBuilder title: () -> Title,
+    private func sources() -> some View {
+        VStack(alignment: .leading, spacing: 10.0) {
+            sourceRow(site: "More.ExternalData.TextageChartViewer",
+                             detail: Text("More.ExternalData.TextageChartViewer.Description"),
+                             footer: "More.ExternalData.TextageChartViewer.Footer",
+                             count: textageChartViewerEntryCount,
+                             source: .textageChartViewer,
+                             url: "https://textage-chart-viewer.vercel.app")
+            sourceRow(site: "More.ExternalData.Textage",
+                             detail: Text("More.ExternalData.Textage.Description"),
+                             footer: "More.ExternalData.Textage.Footer",
+                             count: textageEntryCount,
+                             source: .textage,
+                             url: "https://textage.cc")
+            sourceRow(site: "More.ExternalData.SDVXIn",
+                             detail: Text("More.ExternalData.SDVXIn.Description"),
+                             footer: "More.ExternalData.SDVXIn.Footer",
+                             count: sdvxInEntryCount,
+                             source: .sdvxIn,
+                             url: "https://sdvx.in")
+            sourceRow(site: "More.ExternalData.BemaniWiki2nd",
+                             detail: Text(verbatim: "beatmania IIDX"),
+                             footer: "More.ExternalData.BemaniWiki2nd.Footer",
+                             count: bemaniWikiEntryCount,
+                             source: .wikiIidx,
+                             url: "https://bemaniwiki.com")
+            sourceRow(site: "More.ExternalData.BemaniWiki2nd",
+                             detail: Text(verbatim: "DanceDanceRevolution"),
+                             footer: "More.ExternalData.BemaniWiki2nd.Footer",
+                             count: ddrSongMetaCount,
+                             source: .wikiDdr,
+                             url: "https://bemaniwiki.com")
+            sourceRow(site: "More.ExternalData.BM2DX",
+                             detail: Text("More.ExternalData.BM2DX.Description"),
+                             footer: "More.ExternalData.BM2DX.Footer",
+                             count: bm2dxEntryCount,
+                             source: .bm2dx,
+                             url: "https://bm2dx.com/IIDX/notes_radar/")
+            Text("More.ExternalData.Disclaimer")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.top, 4.0)
+        }
+    }
+
+    private func sourceRow(
+        site: LocalizedStringKey,
+        detail: Text,
+        footer: LocalizedStringKey,
         count: Int,
-        isOn: Binding<Bool>,
-        source: ExternalDataReloadSource,
-        reload: @escaping () async -> Void
+        source: ExternalDataSourceID,
+        url: String
     ) -> some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 12.0) {
-                title()
-                    .font(.body)
-                Spacer(minLength: 8.0)
-                Text(count.formatted())
-                    .font(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-                Toggle(isOn: isOn) {
-                    EmptyView()
-                }
-                .labelsHidden()
-            }
-            if isOn.wrappedValue {
-                Divider()
-                    .padding(.vertical, 12.0)
-                HStack {
-                    Button("More.ExternalData.UpdateData") {
-                        reloadingSources.insert(source)
-                        reloadProgress[source] = 0.0
-                        Task {
-                            await reload()
-                            reloadingSources.remove(source)
-                            reloadProgress[source] = nil
-                            NotificationCenter.default.post(name: .externalDataChanged, object: nil)
-                        }
+        let isDownloaded = count > 0
+        let isReloading = reloadingSources.contains(source)
+        return HStack(spacing: 12.0) {
+            VStack(alignment: .leading, spacing: 4.0) {
+                Text(site)
+                    .font(.playline(size: 12.0))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                HStack(spacing: 6.0) {
+                    detail
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    if isDownloaded {
+                        Text(verbatim: count.formatted())
+                            .font(.scoreline(size: 10.0))
+                            .foregroundStyle(.secondary)
                     }
-                    .disabled(reloadingSources.contains(source))
-                    Spacer()
-                    reloadIndicator(for: source)
+                }
+            }
+            Spacer(minLength: 4.0)
+            HStack(spacing: 8.0) {
+                if isReloading {
+                    Button {
+                        cancelReload(source)
+                    } label: {
+                        Image(systemName: "stop.fill")
+                            .font(.system(size: 10.0, weight: .semibold))
+                            .frame(width: 22.0, height: 22.0)
+                    }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.circle)
+                    .controlSize(.small)
+                    .tint(.primary)
+                    .overlay {
+                        ProgressDonut(progress: reloadProgress[source] ?? 0.0,
+                                      lineWidth: 2.5,
+                                      tint: .primary,
+                                      size: nil)
+                            .allowsHitTesting(false)
+                    }
+                    .accessibilityLabel(Text("Shared.Cancel"))
+                } else {
+                    Button {
+                        startReload(source)
+                    } label: {
+                        Image(systemName: isDownloaded ? "arrow.clockwise" : "arrow.down")
+                            .font(.system(size: 13.0, weight: .semibold))
+                            .frame(width: 22.0, height: 22.0)
+                    }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.circle)
+                    .controlSize(.small)
+                    .tint(.primary)
+                    .accessibilityLabel(Text(isDownloaded ? "More.ExternalData.UpdateData" : "More.ExternalData.DownloadData"))
+                }
+                if isDownloaded {
+                    Button(role: .destructive) {
+                        sourcePendingDelete = source
+                    } label: {
+                        Image(systemName: "trash")
+                            .font(.system(size: 13.0, weight: .semibold))
+                            .frame(width: 22.0, height: 22.0)
+                    }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.circle)
+                    .controlSize(.small)
+                    .disabled(isReloading)
+                    .accessibilityLabel(Text("More.ExternalData.DeleteData"))
+                }
+                Button {
+                    infoSource = source
+                } label: {
+                    Image(systemName: "info")
+                        .font(.system(size: 13.0, weight: .semibold))
+                        .frame(width: 22.0, height: 22.0)
+                }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.circle)
+                .controlSize(.small)
+                .tint(.primary)
+                .accessibilityLabel(Text("More.ExternalData.Info"))
+                .popover(isPresented: Binding(
+                    get: { infoSource == source },
+                    set: { if !$0, infoSource == source { infoSource = nil } }
+                )) {
+                    sourceInfoPopover(site: site, footer: footer, url: url)
+                        .presentationCompactAdaptation(.popover)
                 }
             }
         }
-        .padding()
-        .background(Color(uiColor: .secondarySystemGroupedBackground),
-                    in: RoundedRectangle(cornerRadius: 24.0))
-        .listRowInsets(.init())
-        .listRowBackground(Color.clear)
-        .listRowSeparator(.hidden)
+        .padding(.horizontal, 14.0)
+        .padding(.vertical, 12.0)
+        .cardBackground()
+        .environment(\.cardRailColor, isDownloaded ? Color.accentColor : Color.primary.opacity(0.15))
     }
 
-    @ViewBuilder
-    private func reloadIndicator(for source: ExternalDataReloadSource) -> some View {
-        if reloadingSources.contains(source) {
-            switch source {
-            case .bm2dx, .ddr, .textageChartViewer:
-                ProgressView()
-            default:
-                ProgressDonut(progress: reloadProgress[source] ?? 0.0)
+    private func sourceInfoPopover(
+        site: LocalizedStringKey,
+        footer: LocalizedStringKey,
+        url: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 10.0) {
+            Text(site)
+                .font(.playline(size: 13.0))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Text(footer)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            if let link = URL(string: url) {
+                Link(destination: link) {
+                    Label("More.ExternalData.ViewSource", systemImage: "arrow.up.right")
+                        .font(.footnote.weight(.semibold))
+                }
             }
         }
+        .padding(16.0)
+        .frame(maxWidth: 280.0, alignment: .leading)
     }
 
-    private func progressHandler(for source: ExternalDataReloadSource) -> ExternalDataReloader.Progress {
+    private func progressHandler(for source: ExternalDataSourceID) -> ExternalDataReloader.Progress {
         { done, total in
             reloadProgress[source] = total > 0 ? Double(done) / Double(total) : 0.0
         }
     }
 
-    // MARK: - BEMANIWiki 2nd
-
-    @ViewBuilder
-    private func bemaniWikiSection() -> some View {
-        Section {
-            dataSourceCard(
-                title: { Text(verbatim: "beatmania IIDX") },
-                count: bemaniWikiEntryCount,
-                isOn: $isBemaniWikiEnabled,
-                source: .bemaniWiki,
-                reload: reloadBemaniWikiData
-            )
-            .padding(.bottom, 8.0)
-            dataSourceCard(
-                title: { Text(verbatim: "DanceDanceRevolution") },
-                count: ddrSongMetaCount,
-                isOn: $isDDREnabled,
-                source: .ddr,
-                reload: reloadDDRData
-            )
-        } header: {
-            ListSectionHeader(text: "More.ExternalData.BemaniWiki2nd")
-                .font(.body)
-        } footer: {
-            sourceFooter("More.ExternalData.BemaniWiki2nd.Footer", url: "https://bemaniwiki.com")
-        }
-    }
-
-    // MARK: - bm2dx.com
-
-    @ViewBuilder
-    private func bm2dxSection() -> some View {
-        Section {
-            dataSourceCard(
-                title: { Text("More.ExternalData.BM2DX.Description") },
-                count: bm2dxEntryCount,
-                isOn: $isBM2DXEnabled,
-                source: .bm2dx,
-                reload: reloadBM2DXData
-            )
-        } header: {
-            ListSectionHeader(text: "More.ExternalData.BM2DX")
-                .font(.body)
-        } footer: {
-            sourceFooter("More.ExternalData.BM2DX.Footer", url: "https://bm2dx.com/IIDX/notes_radar/")
-        }
-    }
-
-    // MARK: - sdvx.in
-
-    @ViewBuilder
-    private func sdvxInSection() -> some View {
-        Section {
-            dataSourceCard(
-                title: { Text("More.ExternalData.SDVXIn.Description") },
-                count: sdvxInEntryCount,
-                isOn: $isSDVXInEnabled,
-                source: .sdvxIn,
-                reload: reloadSDVXInData
-            )
-        } header: {
-            ListSectionHeader(text: "More.ExternalData.SDVXIn")
-                .font(.body)
-        } footer: {
-            sourceFooter("More.ExternalData.SDVXIn.Footer", url: "https://sdvx.in")
-        }
-    }
-
-    // MARK: - Textage
-
-    @ViewBuilder
-    private func textageSection() -> some View {
-        Section {
-            dataSourceCard(
-                title: { Text("More.ExternalData.Textage.Description") },
-                count: textageEntryCount,
-                isOn: $isTextageEnabled,
-                source: .textage,
-                reload: reloadTextageData
-            )
-        } header: {
-            ListSectionHeader(text: "More.ExternalData.Textage")
-                .font(.body)
-        } footer: {
-            sourceFooter("More.ExternalData.Textage.Footer", url: "https://textage.cc")
-        }
-    }
-
-    // MARK: - Textage Chart Viewer
-
-    @ViewBuilder
-    private func textageChartViewerSection() -> some View {
-        Section {
-            dataSourceCard(
-                title: { Text("More.ExternalData.TextageChartViewer.Description") },
-                count: textageChartViewerEntryCount,
-                isOn: $isTextageChartViewerEnabled,
-                source: .textageChartViewer,
-                reload: reloadTextageChartViewerData
-            )
-        } header: {
-            ListSectionHeader(text: "More.ExternalData.TextageChartViewer")
-                .font(.body)
-        } footer: {
-            sourceFooter("More.ExternalData.TextageChartViewer.Footer", url: "https://textage-chart-viewer.vercel.app")
+    private func siteDisplayName(for source: ExternalDataSourceID) -> String {
+        switch source {
+        case .textageChartViewer:
+            String(localized: "More.ExternalData.TextageChartViewer")
+        case .textage:
+            String(localized: "More.ExternalData.Textage")
+        case .sdvxIn:
+            String(localized: "More.ExternalData.SDVXIn")
+        case .wikiIidx:
+            "\(String(localized: "More.ExternalData.BemaniWiki2nd")) (beatmania IIDX)"
+        case .wikiDdr:
+            "\(String(localized: "More.ExternalData.BemaniWiki2nd")) (DanceDanceRevolution)"
+        case .bm2dx:
+            String(localized: "More.ExternalData.BM2DX")
         }
     }
 
     // MARK: - Data Loading
 
-    func reloadTextageData() async {
-        textageEntryCount = await ExternalDataReloader.reload(
-            .textage, iidxVersion: iidxVersion, progress: progressHandler(for: .textage)
-        )
+    private func startReload(_ source: ExternalDataSourceID) {
+        reloadTasks[source]?.cancel()
+        reloadingSources.insert(source)
+        reloadProgress[source] = 0.0
+        reloadTasks[source] = Task {
+            let count = await ExternalDataReloader.reload(
+                source, iidxVersion: iidxVersion, progress: progressHandler(for: source)
+            )
+            guard !Task.isCancelled else { return }
+            withAnimation(.smooth.speed(2.0)) {
+                setCount(count, for: source)
+                reloadingSources.remove(source)
+                reloadProgress[source] = nil
+                reloadTasks[source] = nil
+            }
+        }
     }
 
-    func reloadTextageChartViewerData() async {
-        textageChartViewerEntryCount = await ExternalDataReloader.reload(
-            .textageChartViewer, iidxVersion: iidxVersion, progress: progressHandler(for: .textageChartViewer)
-        )
+    private func cancelReload(_ source: ExternalDataSourceID) {
+        reloadTasks[source]?.cancel()
+        reloadTasks[source] = nil
+        withAnimation(.smooth.speed(2.0)) {
+            reloadingSources.remove(source)
+            reloadProgress[source] = nil
+        }
     }
 
-    func reloadSDVXInData() async {
-        sdvxInEntryCount = await ExternalDataReloader.reload(
-            .sdvxIn, iidxVersion: iidxVersion, progress: progressHandler(for: .sdvxIn)
-        )
+    private func deleteData(for source: ExternalDataSourceID) async {
+        await ExternalDataReloader.delete(source)
+        withAnimation(.smooth.speed(2.0)) {
+            setCount(0, for: source)
+        }
     }
 
-    func reloadBemaniWikiData() async {
-        bemaniWikiEntryCount = await ExternalDataReloader.reload(
-            .wikiIidx, iidxVersion: iidxVersion, progress: progressHandler(for: .bemaniWiki)
-        )
-    }
-
-    func reloadBM2DXData() async {
-        bm2dxEntryCount = await ExternalDataReloader.reload(
-            .bm2dx, iidxVersion: iidxVersion, progress: progressHandler(for: .bm2dx)
-        )
-    }
-
-    func reloadDDRData() async {
-        ddrSongMetaCount = await ExternalDataReloader.reload(
-            .wikiDdr, iidxVersion: iidxVersion, progress: progressHandler(for: .ddr)
-        )
-    }
-
-    func sourceFooter(_ key: LocalizedStringKey, url: String) -> Text {
-        let link = LocalizedStringKey("[\(String(localized: "More.ExternalData.ViewSource"))](\(url))")
-        return Text("\(Text(key)) \(Text(link))")
+    private func setCount(_ count: Int, for source: ExternalDataSourceID) {
+        switch source {
+        case .textage: textageEntryCount = count
+        case .textageChartViewer: textageChartViewerEntryCount = count
+        case .sdvxIn: sdvxInEntryCount = count
+        case .wikiIidx: bemaniWikiEntryCount = count
+        case .bm2dx: bm2dxEntryCount = count
+        case .wikiDdr: ddrSongMetaCount = count
+        }
     }
 }

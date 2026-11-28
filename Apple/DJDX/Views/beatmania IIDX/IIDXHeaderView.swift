@@ -18,22 +18,21 @@ extension UnifiedView {
             if selectedGame.supportsProfile && showProfileHeader {
                 IIDXProfileHeaderView()
                     .padding(.horizontal)
-                    .padding(.top, 16.0)
+                    .padding(.top, 10.0)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
-            if showAnalytics {
-                AnalyticsView(model: analyticsModel,
-                              isEditing: $isEditingAnalytics,
-                              analyticsNamespace: analyticsNamespace,
-                              towerNamespace: towerNamespace)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-                AnalyticsGoalsSection(game: selectedGame, playStyle: playTypeToShow.rawValue)
-                    .padding(.top, 20.0)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-            }
+            AnalyticsView(model: analyticsModel,
+                          isEditing: $isEditingAnalytics,
+                          analyticsNamespace: analyticsNamespace,
+                          towerNamespace: towerNamespace)
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
+            AnalyticsGoalsSection(game: selectedGame, playStyle: playTypeToShow.rawValue)
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
+            IIDXSuggestionsSection(model: analyticsModel,
+                                   isEditing: $isEditingAnalytics,
+                                   analyticsNamespace: analyticsNamespace)
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
         }
-        .padding(.bottom, 8.0)
         .animation(.smooth.speed(2.0), value: showProfileHeader)
-        .animation(.smooth.speed(2.0), value: showAnalytics)
     }
 }

@@ -91,7 +91,6 @@ struct LevelBadge: View {
     private func nameText(size: CGFloat) -> some View {
         Text(verbatim: name)
             .font(.system(size: size, weight: .black))
-            .fontWidth(Font.Width(-0.1))
             .lineLimit(1)
             .minimumScaleFactor(0.6)
             .foregroundStyle(.white)
@@ -153,7 +152,6 @@ struct LevelNumberBadge: View {
         HStack(spacing: isCompact ? 5.0 : 7.0) {
             Text(verbatim: "LEVEL")
                 .font(.system(size: isCompact ? 7.5 : 10.0, weight: .black))
-                .fontWidth(Font.Width(-0.1))
                 .foregroundStyle(.white.opacity(0.7))
             LevelNumber(level: level, size: isCompact ? 13.0 : 20.0)
         }
@@ -167,6 +165,7 @@ struct LevelNumberBadge: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: "LEVEL \(level)"))
+        .fixedSize()
     }
 }
 

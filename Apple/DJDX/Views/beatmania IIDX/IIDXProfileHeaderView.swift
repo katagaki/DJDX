@@ -14,7 +14,7 @@ struct IIDXProfileHeaderView: View {
     @State var spRadarData: RadarData?
     @State var dpRadarData: RadarData?
 
-    let profileHeight: CGFloat = 120.0
+    let profileHeight: CGFloat = DesignMetrics.profileHeight
 
     var hasData: Bool {
         qproImage != nil || djName != nil || spRadarData != nil || dpRadarData != nil
@@ -44,26 +44,29 @@ struct IIDXProfileHeaderView: View {
                         VStack(alignment: .leading, spacing: 2.0) {
                             if let djName {
                                 Text(verbatim: djName)
-                                    .font(.system(size: 16.0, weight: .semibold))
+                                    .font(.playline(size: 16.0))
                                     .lineLimit(1)
                             }
                             if let rankText {
                                 Text(verbatim: rankText)
-                                    .font(.system(size: 14.0))
+                                    .font(.caption)
                                     .lineLimit(1)
                                     .foregroundStyle(.secondary)
                             }
                         }
-                        .fontWidth(.condensed)
                     }
                     Spacer(minLength: 0)
                     if spRadarData != nil || dpRadarData != nil {
                         MoreNotesRadarView(
                             spRadarData: spRadarData,
                             dpRadarData: dpRadarData,
+                            width: 132.0,
                             maxHeight: profileHeight,
-                            radarFontSize: 8.0,
-                            listFontSize: 10.0
+                            radarFontSize: 6.5,
+                            listFontSize: 12.0,
+                            radarPadding: 0.0,
+                            radarLabelPadding: 16.0,
+                            radarLineWidth: 0.75
                         )
                     }
                 }

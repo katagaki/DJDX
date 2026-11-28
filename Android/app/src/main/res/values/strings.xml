@@ -27,6 +27,7 @@
     <string name="more_delete_score_data_message">To confirm deletion of all score data, enter the code %1$s.</string>
     <string name="more_delete_score_data_done">Score data deleted.</string>
     <string name="more_delete_score_data_confirm">Delete ALL imported score data? This cannot be undone.</string>
+    <string name="more_feedback">Send Feedback…</string>
     <string name="more_github">View Source Code</string>
     <string name="more_attributions">Attributions</string>
     <string name="more_disclaimer">Disclaimer</string>

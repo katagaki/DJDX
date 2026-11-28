@@ -52,9 +52,8 @@ struct DifficultySegmentedPicker<Tag: Hashable>: View {
                 if isSelected {
                     segment.name
                         .font(.system(size: 11.0, weight: .black))
-                        .fontWidth(.condensed)
-                        .kerning(0.4)
                         .foregroundStyle(.white)
+                        .strokeText(color: segment.color.mix(with: .black, by: 0.55), width: 0.55)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                         .transition(.opacity)

@@ -32,8 +32,9 @@ struct TowerTotalsChart: View {
             .annotation(position: .top) {
                 if showsAnnotations {
                     Text("Tower.Totals.HeightValue.\(Int(keyTowerHeight))")
-                        .font(.caption)
-                        .monospacedDigit()
+                        .font(.scoreline(.caption))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
             }
 
@@ -46,8 +47,9 @@ struct TowerTotalsChart: View {
             .annotation(position: .top) {
                 if showsAnnotations {
                     Text("Tower.Totals.HeightValue.\(Int(scratchTowerHeight))")
-                        .font(.caption)
-                        .monospacedDigit()
+                        .font(.scoreline(.caption))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
             }
         }

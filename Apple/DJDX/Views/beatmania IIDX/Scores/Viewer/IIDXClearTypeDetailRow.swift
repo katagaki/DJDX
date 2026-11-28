@@ -12,11 +12,11 @@ struct IIDXClearTypeDetailRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .fontWidth(.expanded)
+                .cardLabel()
+                .foregroundStyle(.secondary)
             Spacer()
             IIDXMetallicText.clearType(value)
+                .font(.caption)
         }
-        .font(.caption)
-        .fontWeight(.heavy)
     }
 }

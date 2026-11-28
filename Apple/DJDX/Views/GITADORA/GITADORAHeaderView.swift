@@ -16,18 +16,14 @@ extension UnifiedView {
             if showProfileHeader {
                 GITADORAProfileHeaderView()
                     .padding(.horizontal)
-                    .padding(.top, 16.0)
+                    .padding(.top, 10.0)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
-            if showAnalytics {
-                GITADORAAnalyticsView(model: gitadoraAnalyticsModel,
-                                      isEditing: $isEditingAnalytics,
-                                      analyticsNamespace: gitadoraAnalyticsNamespace)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-            }
+            GITADORAAnalyticsView(model: gitadoraAnalyticsModel,
+                                  isEditing: $isEditingAnalytics,
+                                  analyticsNamespace: gitadoraAnalyticsNamespace)
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
         }
-        .padding(.bottom, 8.0)
         .animation(.snappy, value: showProfileHeader)
-        .animation(.smooth.speed(2.0), value: showAnalytics)
     }
 }

@@ -5,15 +5,16 @@ import UIKit
 struct DDRProfileHeaderView: View {
 
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
+    @AppStorage(wrappedValue: DDRPlayStyle.single, "Global.DDR.Style") var ddrStyleToShow: DDRPlayStyle
 
     @State var dancerName: String?
     @State var flareSkill: [DDRPlayStyle: String] = [:]
     @State var flareIcon: [DDRPlayStyle: UIImage] = [:]
     @State var danRank: [DDRPlayStyle: UIImage] = [:]
 
-    let profileHeight: CGFloat = 96.0
-    let flareIconHeight: CGFloat = 28.0
-    let danRankHeight: CGFloat = 22.0
+    let profileHeight: CGFloat = DesignMetrics.profileHeight
+    let flareIconHeight: CGFloat = 22.0
+    let danRankHeight: CGFloat = 18.0
 
     var hasData: Bool {
         dancerName != nil || !flareSkill.isEmpty || !flareIcon.isEmpty || !danRank.isEmpty
@@ -26,16 +27,12 @@ struct DDRProfileHeaderView: View {
                     VStack(alignment: .leading, spacing: 2.0) {
                         if let dancerName {
                             Text(verbatim: dancerName)
-                                .font(.title2)
-                                .fontDesign(.rounded)
-                                .fontWeight(.bold)
+                                .font(.playline(size: 16.0))
                                 .lineLimit(1)
                         }
                     }
                     Spacer(minLength: 0.0)
-                    ForEach([DDRPlayStyle.single, DDRPlayStyle.double], id: \.self) { style in
-                        styleBlock(for: style)
-                    }
+                    styleBlock(for: ddrStyleToShow)
                 }
                 .frame(maxWidth: .infinity)
                 .frame(height: profileHeight)
@@ -57,11 +54,7 @@ struct DDRProfileHeaderView: View {
 
     @ViewBuilder
     func styleBlock(for style: DDRPlayStyle) -> some View {
-        VStack(spacing: 6.0) {
-            Text(verbatim: style.rawValue)
-                .font(.caption.weight(.bold))
-                .italic()
-                .foregroundStyle(.secondary)
+        VStack(spacing: 4.0) {
             HStack(spacing: 4.0) {
                 if let icon = flareIcon[style] {
                     Image(uiImage: icon)
@@ -70,10 +63,8 @@ struct DDRProfileHeaderView: View {
                         .frame(height: flareIconHeight)
                 }
                 Text(verbatim: flareSkill[style] ?? "0")
-                    .font(.title3.bold())
-                    .fontWidth(.condensed)
-                    .italic()
-                    .monospacedDigit()
+                    .font(.scoreline(.callout))
+                    .fixedSize()
             }
             .frame(height: flareIconHeight, alignment: .center)
             if let dan = danRank[style] {
@@ -81,25 +72,12 @@ struct DDRProfileHeaderView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(height: danRankHeight)
+                    .inkOutline()
             }
         }
         .frame(minWidth: 64.0)
-        .padding(.vertical, 8.0)
+        .padding(.vertical, 6.0)
         .padding(.horizontal, 10.0)
-        .background {
-            LinearGradient(
-                stops: [
-                    .init(color: .white.opacity(0.0), location: 0.0),
-                    .init(color: .white.opacity(0.04), location: 0.45),
-                    .init(color: .white.opacity(0.18), location: 0.65),
-                    .init(color: .white.opacity(0.5), location: 0.82),
-                    .init(color: .white.opacity(1.0), location: 1.0)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        }
-        .cardBackground(cornerRadius: 8.0)
     }
 
     func refreshProfile() async {

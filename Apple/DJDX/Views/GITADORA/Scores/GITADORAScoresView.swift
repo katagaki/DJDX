@@ -26,6 +26,7 @@ struct GITADORAScoresView<Header: View>: View {
 
     var isScoreDataExpandedKey: String = "GITADORAScoresView.ScoreDataExpanded"
     @State var isScoreDataExpanded: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.scoreDataKey) var isScoreDataVisible: Bool
 
     @State var dataState: DataState = .initializing
     @State var records: [GITADORASongRecord] = []
@@ -112,29 +113,6 @@ struct GITADORAScoresView<Header: View>: View {
             ?? GITADORAClearType.sorted.count
     }
 
-    @ViewBuilder var sortControl: some View {
-        Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
-            Picker("Shared.Sort", selection: $sortMode.animation(.smooth.speed(2.0))) {
-                ForEach(GITADORASortMode.allCases, id: \.self) { mode in
-                    Text(LocalizedStringKey(mode.rawValue))
-                        .tag(mode)
-                }
-            }
-            .pickerStyle(.inline)
-            Section {
-                Picker("Shared.Sort.Order", selection: $sortOrder.animation(.smooth.speed(2.0))) {
-                    Label("Shared.Sort.Ascending", systemImage: "arrow.up")
-                        .tag(SortOrder.ascending)
-                    Label("Shared.Sort.Descending", systemImage: "arrow.down")
-                        .tag(SortOrder.descending)
-                }
-                .pickerStyle(.inline)
-            }
-        }
-        .menuOrder(.fixed)
-        .menuActionDismissBehavior(.disabled)
-    }
-
     @ViewBuilder var filterControl: some View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
@@ -147,7 +125,7 @@ struct GITADORAScoresView<Header: View>: View {
             LazyVStack(spacing: 0.0) {
                 if searchTerm.isEmpty {
                     header
-                    if !isEditingAnalytics {
+                    if !isEditingAnalytics, isScoreDataVisible {
                         AnalyticsSectionHeader(
                             title: "Analytics.Section.ScoreData",
                             isCollapsible: true,
@@ -155,15 +133,23 @@ struct GITADORAScoresView<Header: View>: View {
                         ) {
                             withAnimation(.smooth.speed(2.0)) { isScoreDataExpanded.toggle() }
                             UserDefaults.standard.set(isScoreDataExpanded, forKey: isScoreDataExpandedKey)
+                        } accessory: {
+                            if !sortedRecords.isEmpty {
+                                Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
+                                    isShowingShareCard = true
+                                }
+                                .labelStyle(.iconOnly)
+                                .font(.subheadline.weight(.bold))
+                            }
                         }
-                        .padding(.top, 16.0)
-                        .padding(.bottom, 12.0)
+                        .padding(.top, DesignMetrics.sectionGap)
+                        .padding(.bottom, isScoreDataExpanded ? 8.0 : 0.0)
                         if isScoreDataExpanded {
                             Divider()
                         }
                     }
                 }
-                if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
+                if !isEditingAnalytics, (isScoreDataVisible && isScoreDataExpanded) || !searchTerm.isEmpty {
                     let sortedRecords = sortedRecords
                     ForEach(sortedRecords, id: \.self) { record in
                         Button {
@@ -192,12 +178,8 @@ struct GITADORAScoresView<Header: View>: View {
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
             ToolbarSpacer(.fixed, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
-                sortControl
                 filterControl
             }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
-            isShowingShareCard = true
         }
         .sheet(isPresented: $isShowingShareCard) {
             ShareCardComposer(
@@ -214,6 +196,8 @@ struct GITADORAScoresView<Header: View>: View {
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             GITADORAScoreFilterSheet(
+                sortMode: $sortMode.animation(.smooth.speed(2.0)),
+                sortOrder: $sortOrder.animation(.smooth.speed(2.0)),
                 difficultiesToShow: $difficultiesToShow.animation(.smooth.speed(2.0)),
                 levelsToShow: $levelsToShow.animation(.smooth.speed(2.0)),
                 clearTypesToShow: $clearTypesToShow.animation(.smooth.speed(2.0)),

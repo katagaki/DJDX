@@ -21,6 +21,12 @@ struct IIDXScoreRow<Accessory: View>: View {
     var scoreRate: Float?
     var scoreDelta: Int?
     var accessory: Accessory
+    var showsMetadata: Bool = true
+    var showsGenre: Bool = true
+    var showsScore: Bool = true
+    var showsLastPlayDate: Bool = true
+    var isAccessoryInline: Bool = false
+    var verticalPadding: CGFloat = 8.0
 
     init(namespace: Namespace.ID, songRecord: IIDXSongRecord, level: IIDXLevel, score: IIDXLevelScore,
          scoreRate: Float? = nil, scoreDelta: Int? = nil, @ViewBuilder accessory: () -> Accessory) {
@@ -68,7 +74,7 @@ struct IIDXScoreRow<Accessory: View>: View {
             HStack(alignment: .center, spacing: 0.0) {
                 // Song Info
                 VStack(alignment: .leading, spacing: 2.0) {
-                    if isGenreVisible {
+                    if showsGenre && isGenreVisible && !songRecord.genre.isEmpty {
                         Text(songRecord.genre)
                             .font(.caption2)
                             .fontWeight(.heavy)
@@ -82,7 +88,7 @@ struct IIDXScoreRow<Accessory: View>: View {
                         .foregroundStyle(titleTextColor)
                         .strokeText(color: titleStrokeColor, width: colorScheme == .light ? 0.5 : 0.35)
                         .squashedHorizontally()
-                    if isArtistVisible {
+                    if isArtistVisible && !songRecord.artist.isEmpty {
                         Text(songRecord.artist)
                             .font(.caption)
                             .fontWeight(.heavy)
@@ -91,7 +97,9 @@ struct IIDXScoreRow<Accessory: View>: View {
                             .squashedHorizontally()
                     }
                     // Metadata Row
-                    if isDJLevelVisible || isScoreRateVisible || isScoreVisible || isLastPlayDateVisible {
+                    let showsAnyScoreField = isDJLevelVisible || isScoreRateVisible
+                        || (showsScore && isScoreVisible) || (showsLastPlayDate && isLastPlayDateVisible)
+                    if showsMetadata, (score.score != 0 && showsAnyScoreField) || isAccessoryInline {
                         HStack(alignment: .center, spacing: 6.0) {
                             if score.score != 0 {
                                 Group {
@@ -116,7 +124,7 @@ struct IIDXScoreRow<Accessory: View>: View {
                                             .font(.scoreline(.caption))
                                             .fontWidth(.standard)
                                     }
-                                    if isScoreVisible {
+                                    if showsScore && isScoreVisible {
                                         if isDJLevelVisible || isScoreRateVisible {
                                             Divider()
                                                 .frame(maxHeight: 14.0)
@@ -131,8 +139,8 @@ struct IIDXScoreRow<Accessory: View>: View {
                                     }
                                 }
                                 .font(.caption)
-                                if isLastPlayDateVisible {
-                                    if isDJLevelVisible || isScoreRateVisible || isScoreVisible {
+                                if showsLastPlayDate && isLastPlayDateVisible {
+                                    if isDJLevelVisible || isScoreRateVisible || (showsScore && isScoreVisible) {
                                         Divider()
                                             .frame(maxHeight: 14.0)
                                     }
@@ -144,22 +152,27 @@ struct IIDXScoreRow<Accessory: View>: View {
                                     .fontWidth(.condensed)
                                 }
                             }
+                            if isAccessoryInline {
+                                accessory
+                                    .font(.caption)
+                            }
                         }
                         .offset(y: 1.0)
                         .font(.caption)
                     }
-                    accessory
-                        .font(.caption)
+                    if !isAccessoryInline {
+                        accessory
+                            .font(.caption)
+                    }
                 }
                 Spacer(minLength: 0.0)
             }
-            .padding([.top, .bottom], 8.0)
-            .matchedTransitionSource(id: "\(songRecord.title).\(level.rawValue)", in: namespace)
+            .padding([.top, .bottom], verticalPadding)
 
             // Level
             if isLevelVisible {
                 IIDXLevelLabel(layout: .horizontal, levelType: level, score: score)
-                    .padding([.top, .bottom], 8.0)
+                    .padding([.top, .bottom], verticalPadding)
             }
         }
         .frame(maxWidth: .infinity)

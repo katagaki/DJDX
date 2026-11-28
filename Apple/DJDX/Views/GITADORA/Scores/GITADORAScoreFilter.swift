@@ -2,6 +2,8 @@ import SwiftUI
 
 struct GITADORAScoreFilterSheet: View {
 
+    @Binding var sortMode: GITADORASortMode
+    @Binding var sortOrder: SortOrder
     @Binding var difficultiesToShow: Set<GITADORADifficulty>
     @Binding var levelsToShow: Set<String>
     @Binding var clearTypesToShow: Set<GITADORAClearType>
@@ -9,75 +11,143 @@ struct GITADORAScoreFilterSheet: View {
     let availableLevels: [String]
     var onReset: () -> Void
 
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.overviewKey) var isOverviewVisible: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.lastPlayKey) var isLastPlayVisible: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.scoreDataKey) var isScoreDataVisible: Bool
+
     @Environment(\.dismiss) var dismiss
+
+    func resetFilters() {
+        difficultiesToShow = []
+        levelsToShow = []
+        clearTypesToShow = []
+        ranksToShow = []
+        onReset()
+    }
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    Button("Shared.Filter.ResetAll", systemImage: "arrow.clockwise") {
-                        difficultiesToShow = []
-                        levelsToShow = []
-                        clearTypesToShow = []
-                        ranksToShow = []
-                        onReset()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14.0) {
+                    Text("Shared.Sort")
+                        .sectionListHeader()
+                    sortGroups
+                    Text("Shared.Filter")
+                        .sectionListHeader()
+                        .padding(.top, 6.0)
+                    filterGroups
+                    Text("More.PlayDataDisplay.Header")
+                        .sectionListHeader()
+                        .padding(.top, 6.0)
+                    displayGroups
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 24.0)
+            }
+            .navigationTitle("Scores.CustomizeDisplay")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(.sharedFilterResetAll, systemImage: "arrow.clockwise") {
+                        resetFilters()
                     }
                 }
-                Section("Shared.Filter") {
-                    DisclosureGroup {
-                        ForEach(GITADORADifficulty.sorted, id: \.self) { difficulty in
-                            GITADORASelectableRow(isSelected: difficultiesToShow.contains(difficulty)) {
-                                Text(verbatim: difficulty.rawValue)
-                            } action: {
-                                toggle(difficulty, in: $difficultiesToShow)
-                            }
-                        }
-                    } label: {
-                        GITADORAFilterDisclosureLabel("Shared.Level", count: difficultiesToShow.count)
-                    }
-                    FilterLevelDisclosure {
-                        FilterLevelGrid(
-                            items: availableLevels,
-                            selection: levelsToShow,
-                            title: { $0 },
-                            onToggle: { toggle($0, in: $levelsToShow) }
-                        )
-                    } label: {
-                        GITADORAFilterDisclosureLabel("Shared.Sort.Difficulty", count: levelsToShow.count)
-                    }
-                    DisclosureGroup {
-                        ForEach(GITADORAClearType.sorted, id: \.self) { clearType in
-                            GITADORASelectableRow(isSelected: clearTypesToShow.contains(clearType)) {
-                                Text(verbatim: clearType.rawValue)
-                            } action: {
-                                toggle(clearType, in: $clearTypesToShow)
-                            }
-                        }
-                    } label: {
-                        GITADORAFilterDisclosureLabel("Shared.GITADORA.ClearType",
-                                                          count: clearTypesToShow.count)
-                    }
-                    DisclosureGroup {
-                        ForEach(GITADORARank.sorted, id: \.self) { grade in
-                            GITADORASelectableRow(isSelected: ranksToShow.contains(grade)) {
-                                Text(verbatim: grade.rawValue)
-                            } action: {
-                                toggle(grade, in: $ranksToShow)
-                            }
-                        }
-                    } label: {
-                        GITADORAFilterDisclosureLabel("Shared.GITADORA.Rank",
-                                                          count: ranksToShow.count)
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(role: .confirm) {
+                        dismiss()
                     }
                 }
             }
-            .listSectionSpacing(.compact)
-            .navigationTitle("Shared.Filter")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(role: .confirm) { dismiss() }
+        }
+    }
+
+    @ViewBuilder
+    var sortGroups: some View {
+        FlowLayout(horizontalSpacing: 6.0, verticalSpacing: 6.0) {
+            ForEach(GITADORASortMode.allCases, id: \.self) { mode in
+                FilterTextChip(title: Text(LocalizedStringKey(mode.rawValue)), isOn: sortMode == mode) {
+                    sortMode = mode
                 }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        FilterChipGroup(title: Text("Shared.Sort.Order")) {
+            FilterTextChip(title: Text("Shared.Sort.Ascending"), isOn: sortOrder == .ascending) {
+                sortOrder = .ascending
+            }
+            FilterTextChip(title: Text("Shared.Sort.Descending"), isOn: sortOrder == .descending) {
+                sortOrder = .descending
+            }
+        }
+    }
+
+    @ViewBuilder
+    var filterGroups: some View {
+        FilterChipGroup(title: Text("Shared.Level")) {
+            ForEach(GITADORADifficulty.sorted, id: \.self) { difficulty in
+                let tint = difficulty.color
+                FilterChip(isOn: difficultiesToShow.contains(difficulty),
+                              isDimmed: !difficultiesToShow.isEmpty && !difficultiesToShow.contains(difficulty),
+                              fill: tint) {
+                    toggle(difficulty, in: $difficultiesToShow)
+                } label: {
+                    Text(verbatim: difficulty.rawValue)
+                        .font(.system(size: 11.0, weight: .black))
+                        .foregroundStyle(.white)
+                        .strokeText(color: tint.mix(with: .black, by: 0.55), width: 0.55)
+                }
+            }
+        }
+        if !availableLevels.isEmpty {
+            FilterChipGroup(title: Text("Shared.Sort.Difficulty")) {
+                ForEach(availableLevels, id: \.self) { level in
+                    FilterChip(isOn: levelsToShow.contains(level),
+                                  isDimmed: !levelsToShow.isEmpty && !levelsToShow.contains(level)) {
+                        toggle(level, in: $levelsToShow)
+                    } label: {
+                        LevelNumber(level: level, size: 15.0)
+                    }
+                }
+            }
+        }
+        FilterChipGroup(title: Text("Shared.GITADORA.ClearType")) {
+            ForEach(GITADORAClearType.sorted, id: \.self) { clearType in
+                FilterChip(isOn: clearTypesToShow.contains(clearType),
+                              isDimmed: !clearTypesToShow.isEmpty && !clearTypesToShow.contains(clearType)) {
+                    toggle(clearType, in: $clearTypesToShow)
+                } label: {
+                    Text(verbatim: clearType.abbreviation)
+                        .font(.playline(size: 12.0, weight: .regular))
+                        .foregroundStyle(clearType.color)
+                }
+            }
+        }
+        FilterChipGroup(title: Text("Shared.GITADORA.Rank")) {
+            ForEach(GITADORARank.sorted, id: \.self) { grade in
+                FilterChip(isOn: ranksToShow.contains(grade),
+                              isDimmed: !ranksToShow.isEmpty && !ranksToShow.contains(grade)) {
+                    toggle(grade, in: $ranksToShow)
+                } label: {
+                    Text(verbatim: grade.rawValue)
+                        .font(.system(size: 13.0, weight: .black))
+                        .fontWidth(.expanded)
+                        .foregroundStyle(grade.style(colorScheme: .dark))
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    var displayGroups: some View {
+        FilterChipGroup(title: Text("More.PlayDataDisplay.Sections")) {
+            FilterTextChip(title: Text("Analytics.Section.Overview"), isOn: isOverviewVisible) {
+                isOverviewVisible.toggle()
+            }
+            FilterTextChip(title: Text("Analytics.Section.LastPlay"), isOn: isLastPlayVisible) {
+                isLastPlayVisible.toggle()
+            }
+            FilterTextChip(title: Text("Analytics.Section.ScoreData"), isOn: isScoreDataVisible) {
+                isScoreDataVisible.toggle()
             }
         }
     }
@@ -88,53 +158,5 @@ struct GITADORAScoreFilterSheet: View {
         } else {
             binding.wrappedValue.insert(element)
         }
-    }
-}
-
-private struct GITADORAFilterDisclosureLabel: View {
-    let title: LocalizedStringKey
-    let count: Int
-
-    init(_ title: LocalizedStringKey, count: Int) {
-        self.title = title
-        self.count = count
-    }
-
-    var body: some View {
-        HStack {
-            Text(title)
-            Spacer()
-            if count > 0 {
-                Text(verbatim: "\(count)")
-                    .foregroundStyle(.secondary)
-            } else {
-                Text("Shared.All")
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-}
-
-private struct GITADORASelectableRow<Label: View>: View {
-    var isSelected: Bool
-    @ViewBuilder var label: Label
-    var action: () -> Void
-
-    var body: some View {
-        Button {
-            action()
-        } label: {
-            HStack {
-                label
-                Spacer()
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .foregroundStyle(.tint)
-                        .fontWeight(.semibold)
-                }
-            }
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
     }
 }

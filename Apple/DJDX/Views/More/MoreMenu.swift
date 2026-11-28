@@ -7,7 +7,6 @@ struct MoreMenu: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: true, "More.General.ShowProfileHeader") var showProfileHeader: Bool
-    @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
 
     let importer = IIDXImporter()
     let sdvxImporter = SDVXImporter()
@@ -18,6 +17,7 @@ struct MoreMenu: View {
     @State var isPresentingICloudBackup: Bool = false
     @State var isPresentingRadarMaker: Bool = false
     @State var isPresentingTierList: Bool = false
+    @State var isPresentingAttributions: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingResetLayout: Bool = false
     @State var isPresentingFreeUpSpace: Bool = false
@@ -47,7 +47,6 @@ struct MoreMenu: View {
                     isPresentingExternalDataSources = true
                 }
                 Toggle("More.General.ShowProfileHeader", systemImage: "person.crop.circle", isOn: $showProfileHeader)
-                Toggle("More.General.ShowAnalytics", systemImage: "chart.xyaxis.line", isOn: $showAnalytics)
             }
             Section {
                 Button("More.KonamiIDEmail", systemImage: "envelope") {
@@ -107,11 +106,14 @@ struct MoreMenu: View {
                 }
             }
             Section {
+                Link(destination: URL(string: "https://forms.gle/G59rciD8dSbNhdqr5")!) {
+                    Label("More.Feedback", systemImage: "text.bubble")
+                }
                 Link(destination: URL(string: "https://github.com/katagaki/DJDX")!) {
                     Label("More.GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                 }
                 Button("More.Attributions") {
-                    navigationManager.push(MorePath.moreAttributions)
+                    isPresentingAttributions = true
                 }
                 Button("More.Disclaimer") {
                     isPresentingDisclaimer = true
@@ -140,6 +142,11 @@ struct MoreMenu: View {
         .sheet(isPresented: $isPresentingTierList) {
             NavigationStack {
                 TierListView(game: Game.stored)
+            }
+        }
+        .sheet(isPresented: $isPresentingAttributions) {
+            NavigationStack {
+                MoreLicensesView()
             }
         }
         .alert("Alert.DeleteData.Web.Title", isPresented: $isConfirmingWebDataDelete) {
@@ -268,6 +275,11 @@ struct MoreMenu: View {
                      forKey: "Analytics.PerLevelCardOrder")
         defaults.set((try? encoder.encode(PerLevelCardID.defaultVisible)) ?? Data(),
                      forKey: "Analytics.VisiblePerLevelCards")
+        defaults.set(true, forKey: AnalyticsSectionVisibility.overviewKey)
+        defaults.set(true, forKey: AnalyticsSectionVisibility.lastPlayKey)
+        defaults.set(true, forKey: AnalyticsSectionVisibility.perLevelKey)
+        defaults.set(true, forKey: AnalyticsSectionVisibility.goalsKey)
+        defaults.set(true, forKey: AnalyticsSectionVisibility.scoreDataKey)
         NotificationCenter.default.post(name: .analyticsLayoutReset, object: nil)
     }
 }

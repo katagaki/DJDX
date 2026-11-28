@@ -57,7 +57,6 @@ enum TierListChartProvider {
         Set(charts.map(\.level)).sorted { levelSortKey($0) < levelSortKey($1) }
     }
 
-    // swiftlint:disable:next function_parameter_count
     static func charts(
         for game: Game,
         playType: TierListPlayType,
