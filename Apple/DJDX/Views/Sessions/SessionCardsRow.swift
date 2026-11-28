@@ -7,7 +7,7 @@ struct SessionCardsRow: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12.0) {
+            HStack(spacing: DesignMetrics.gap) {
                 if let active = store.activeSession {
                     Button(action: onResume) {
                         activeSessionCard(active)
@@ -39,7 +39,7 @@ struct SessionCardsRow: View {
     private func activeSessionCard(_ session: IIDXPlaySession) -> some View {
         VStack(alignment: .leading, spacing: 4.0) {
             Text("Sessions.InProgress")
-                .font(.system(size: 20.0, weight: .black))
+                .font(.system(size: DesignMetrics.sessionTitleSize, weight: .black))
                 .fontWidth(.expanded)
                 .foregroundStyle(.primary)
                 .lineLimit(2, reservesSpace: true)
@@ -49,15 +49,16 @@ struct SessionCardsRow: View {
                 .font(.caption2.bold())
                 .foregroundStyle(.secondary)
         }
-        .padding(12.0)
-        .frame(width: 148.0, height: 108.0, alignment: .leading)
-        .cardBackground(cornerRadius: cornerRadius)
+        .padding(DesignMetrics.cardPadding)
+        .frame(width: DesignMetrics.sessionCardSize.width, height: DesignMetrics.sessionCardSize.height,
+               alignment: .leading)
+        .cardBackground()
     }
 
     private func sessionCard(_ session: IIDXPlaySession) -> some View {
         VStack(alignment: .leading, spacing: 4.0) {
             Text(verbatim: durationText(for: session))
-                .font(.system(size: 20.0, weight: .black))
+                .font(.system(size: DesignMetrics.sessionTitleSize, weight: .black))
                 .fontWidth(.expanded)
                 .foregroundStyle(.secondary)
                 .lineLimit(2, reservesSpace: true)
@@ -66,9 +67,10 @@ struct SessionCardsRow: View {
                 .font(.caption2.bold())
                 .foregroundStyle(.secondary)
         }
-        .padding(12.0)
-        .frame(width: 148.0, height: 108.0, alignment: .leading)
-        .cardBackground(cornerRadius: cornerRadius)
+        .padding(DesignMetrics.cardPadding)
+        .frame(width: DesignMetrics.sessionCardSize.width, height: DesignMetrics.sessionCardSize.height,
+               alignment: .leading)
+        .cardBackground()
     }
 
     private func durationText(for session: IIDXPlaySession) -> String {

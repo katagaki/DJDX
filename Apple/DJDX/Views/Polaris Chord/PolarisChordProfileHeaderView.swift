@@ -13,8 +13,8 @@ struct PolarisChordProfileHeaderView: View {
     @State var paClassImage: UIImage?
     @State var paSkillImage: UIImage?
 
-    let profileHeight: CGFloat = 60.0
-    let paSkillIconHeight: CGFloat = 24.0
+    let profileHeight: CGFloat = DesignMetrics.profileHeight
+    let paSkillIconHeight: CGFloat = 22.0
 
     var hasData: Bool {
         playerName != nil || title != nil || paClass != nil || paSkill != nil
@@ -27,16 +27,13 @@ struct PolarisChordProfileHeaderView: View {
                     VStack(alignment: .leading, spacing: 2.0) {
                         if let playerName {
                             Text(verbatim: playerName)
-                                .font(.title2)
-                                .fontDesign(.rounded)
-                                .fontWeight(.bold)
+                                .font(.playline(size: 16.0))
                                 .lineLimit(1)
                         }
                         if let title {
                             Text(verbatim: title)
-                                .fontDesign(.rounded)
+                                .font(.caption)
                                 .foregroundStyle(.secondary)
-                                .fontWeight(.bold)
                                 .lineLimit(1)
                         }
                     }
@@ -68,10 +65,9 @@ struct PolarisChordProfileHeaderView: View {
 
     @ViewBuilder
     func statBlock(label: LocalizedStringKey, value: String, icon: UIImage? = nil) -> some View {
-        VStack(spacing: 6.0) {
+        VStack(spacing: 4.0) {
             Text(label)
                 .font(.caption.weight(.bold))
-                .italic()
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
             HStack(spacing: 4.0) {
@@ -82,17 +78,14 @@ struct PolarisChordProfileHeaderView: View {
                         .frame(height: paSkillIconHeight)
                 }
                 Text(verbatim: value)
-                    .font(.title3.bold())
-                    .fontWidth(.condensed)
-                    .italic()
-                    .monospacedDigit()
+                    .font(.scoreline(.callout))
             }
-            .frame(height: 24.0, alignment: .center)
+            .frame(height: paSkillIconHeight, alignment: .center)
         }
         .frame(minWidth: 64.0)
-        .padding(.vertical, 8.0)
-        .padding(.horizontal, 10.0)
-        .cardBackground(cornerRadius: 8.0)
+        .fixedSize()
+        .padding(.vertical, 6.0)
+        .padding(.horizontal, 4.0)
     }
 
     func refreshProfile() async {

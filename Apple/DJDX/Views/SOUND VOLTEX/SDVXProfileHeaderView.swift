@@ -11,9 +11,9 @@ struct SDVXProfileHeaderView: View {
     @State var volforceImage: UIImage?
     @State var volforce: String?
 
-    let profileHeight: CGFloat = 100.0
-    let apCardHeight: CGFloat = 100.0
-    let volforceImageHeight: CGFloat = 72.0
+    let profileHeight: CGFloat = DesignMetrics.profileHeight
+    let apCardHeight: CGFloat = DesignMetrics.profileHeight
+    let volforceImageHeight: CGFloat = 42.0
 
     var hasData: Bool {
         apCardImage != nil || playerName != nil || volforceImage != nil || volforce != nil
@@ -28,18 +28,27 @@ struct SDVXProfileHeaderView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(height: apCardHeight)
-                            .clipShape(.rect(cornerRadius: 8.0))
+                            .clipShape(.rect(cornerRadius: 6.0))
                     }
                     if let playerName {
-                        Text(verbatim: playerName)
-                            .font(.headline)
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth: .infinity)
+                        let lines = playerName.split(separator: "\n").map(String.init)
+                        VStack(spacing: 2.0) {
+                            Text(verbatim: lines.last ?? playerName)
+                                .font(.playline(size: 16.0))
+                                .lineLimit(1)
+                            if lines.count > 1 {
+                                Text(verbatim: lines.dropLast().joined(separator: " "))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
                     } else {
                         Spacer(minLength: 0.0)
                     }
                     if volforceImage != nil || volforce != nil {
-                        VStack(spacing: 4.0) {
+                        VStack(spacing: 2.0) {
                             if let volforceImage {
                                 Image(uiImage: volforceImage)
                                     .resizable()
@@ -48,8 +57,7 @@ struct SDVXProfileHeaderView: View {
                             }
                             if let volforce {
                                 Text(verbatim: volforce)
-                                    .font(.title3.bold())
-                                    .monospacedDigit()
+                                    .font(.scoreline(.subheadline))
                             }
                         }
                     }

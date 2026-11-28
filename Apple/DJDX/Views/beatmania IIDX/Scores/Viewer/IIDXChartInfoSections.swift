@@ -16,8 +16,6 @@ struct IIDXChartInfoSections: View {
     @State private var textageChartViewerChart: TextageChartViewerChart?
     @State private var chartTraits: [IIDXChartTrait]?
 
-    @AppStorage(wrappedValue: false, "ExternalData.TextageChartViewer.Enabled") var isTextageChartViewerEnabled: Bool
-
     private let fetcher = IIDXReader()
 
     var body: some View {
@@ -70,9 +68,9 @@ struct IIDXChartInfoSections: View {
                     .buttonStyle(.plain)
                 }
             } header: {
-                ListSectionHeader(text: "Scores.Viewer.Section.Chart")
-                    .font(.body)
+                SectionListHeader(text: "Scores.Viewer.Section.Chart")
             }
+            .clearSection()
         }
     }
 
@@ -81,16 +79,16 @@ struct IIDXChartInfoSections: View {
         Section {
             chartActions()
         } header: {
-            ListSectionHeader(text: "Scores.Viewer.Section.Reference")
-                .font(.body)
+            SectionListHeader(text: "Scores.Viewer.Section.Reference")
         }
+        .clearSection()
         .task(id: songTitle) {
             await loadChartInfo()
         }
     }
 
     private var isChartTraitsAvailable: Bool {
-        isTextageChartViewerEnabled && level != .beginner && textageChartViewerChart?.textageScoreURL(
+        level != .beginner && textageChartViewerChart?.textageScoreURL(
             for: level, playType: playType
         ) != nil
     }

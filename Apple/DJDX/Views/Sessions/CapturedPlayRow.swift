@@ -53,15 +53,16 @@ struct CapturedPlayRow: View {
                 .frame(width: 10.0)
                 .frame(maxHeight: .infinity)
             Text(verbatim: play.songTitle ?? String(localized: "Sessions.UnknownSong"))
-                .bold()
-                .fontWidth(.condensed)
+                .fontWeight(.heavy)
+                .fontWidth(.compressed)
+                .squashedHorizontally()
                 .lineLimit(1)
                 .padding(.vertical, 16.0)
             Spacer(minLength: 8.0)
             HStack(spacing: 6.0) {
                 stateIcon
                 Text(statusText)
-                    .font(.caption)
+                    .font(.playline(.caption))
                     .foregroundStyle(.secondary)
             }
         }

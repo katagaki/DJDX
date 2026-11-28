@@ -25,6 +25,7 @@
     <string name="more_delete_score_data_message">すべてのスコアデータを削除するには、コード %1$s を入力してください。</string>
     <string name="more_delete_score_data_done">スコアデータを削除しました。</string>
     <string name="more_delete_score_data_confirm">インポートしたスコアデータをすべて削除しますか？この操作は取り消せません。</string>
+    <string name="more_feedback">フィードバックを送信…</string>
     <string name="more_github">ソースコード</string>
     <string name="more_attributions">著者権表記</string>
     <string name="more_disclaimer">免責事項</string>

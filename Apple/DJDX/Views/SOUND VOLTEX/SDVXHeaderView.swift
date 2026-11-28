@@ -7,20 +7,19 @@ extension UnifiedView {
             if showProfileHeader {
                 SDVXProfileHeaderView()
                     .padding(.horizontal)
-                    .padding(.top, 16.0)
+                    .padding(.top, 10.0)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
-            if showAnalytics {
-                SDVXAnalyticsView(model: sdvxAnalyticsModel, isEditing: $isEditingAnalytics,
-                                  analyticsNamespace: sdvxAnalyticsNamespace)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-                AnalyticsGoalsSection(game: .soundVoltex, playStyle: "")
-                    .padding(.top, 20.0)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-            }
+            SDVXAnalyticsView(model: sdvxAnalyticsModel, isEditing: $isEditingAnalytics,
+                              analyticsNamespace: sdvxAnalyticsNamespace)
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
+            AnalyticsGoalsSection(game: .soundVoltex, playStyle: "")
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
+            SDVXSuggestionsSection(model: sdvxAnalyticsModel,
+                                   isEditing: $isEditingAnalytics,
+                                   analyticsNamespace: sdvxAnalyticsNamespace)
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
         }
-        .padding(.bottom, 8.0)
         .animation(.smooth.speed(2.0), value: showProfileHeader)
-        .animation(.smooth.speed(2.0), value: showAnalytics)
     }
 }

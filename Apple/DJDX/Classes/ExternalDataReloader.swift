@@ -12,16 +12,15 @@ enum ExternalDataSourceID: String, CaseIterable {
 
 @MainActor
 struct ExternalDataReloader {
-
-    typealias Progress = (Int, Int) -> Void
+    typealias Progress = @MainActor @Sendable (Int, Int) -> Void
 
     @discardableResult
     static func reload(
         _ id: ExternalDataSourceID,
         iidxVersion: IIDXVersion,
-        progress: Progress = { _, _ in }
+        progress: @escaping Progress = { _, _ in }
     ) async -> Int {
-        switch id {
+        let count: Int = switch id {
         case .textage: await refreshingInfinitasCharts(await reloadTextage(progress: progress))
         case .textageChartViewer: await reloadTextageChartViewer(progress: progress)
         case .sdvxIn: await reloadSDVXIn(progress: progress)
@@ -29,6 +28,30 @@ struct ExternalDataReloader {
         case .bm2dx: await reloadBM2DX(progress: progress)
         case .wikiDdr: await reloadWikiDDR(progress: progress)
         }
+        if !Task.isCancelled {
+            NotificationCenter.default.post(name: .externalDataChanged, object: nil)
+        }
+        return count
+    }
+
+    static func delete(_ id: ExternalDataSourceID) async {
+        switch id {
+        case .textage:
+            await TextageImporter().deleteAllCharts()
+            _ = await refreshingInfinitasCharts(0)
+        case .textageChartViewer:
+            await TextageChartViewerImporter().deleteAllCharts()
+        case .sdvxIn:
+            await SDVXInImporter().deleteAllCharts()
+        case .wikiIidx:
+            await IIDXImporter().deleteAllSongs()
+            _ = await refreshingInfinitasCharts(0)
+        case .bm2dx:
+            await IIDXImporter().deleteAllNotesRadarEntries()
+        case .wikiDdr:
+            await DDRMetadataImporter().deleteAllSongMeta()
+        }
+        NotificationCenter.default.post(name: .externalDataChanged, object: nil)
     }
 
     private static func refreshingInfinitasCharts(_ count: Int) async -> Int {
@@ -59,7 +82,9 @@ struct ExternalDataReloader {
         }
         progress(2, 2)
 
-        guard let titleTableText, let accessTableText else { return 0 }
+        guard !Task.isCancelled, let titleTableText, let accessTableText else {
+            return await IIDXReader().textageChartCount()
+        }
         let charts = TextageTableParser.charts(titleTableText: titleTableText,
                                                accessTableText: accessTableText)
         await TextageImporter().replaceAllCharts(charts)
@@ -102,6 +127,7 @@ struct ExternalDataReloader {
             }
         }
 
+        guard !Task.isCancelled else { return await IIDXReader().textageChartViewerChartCount() }
         await TextageChartViewerImporter().replaceAllCharts(charts)
         progress(1, 1)
         return await IIDXReader().textageChartViewerChartCount()
@@ -115,6 +141,7 @@ struct ExternalDataReloader {
 
         progress(0, fileCount)
         for fileNumber in 1...fileCount {
+            guard !Task.isCancelled else { return await SDVXReader().sdvxInChartCount() }
             defer { progress(fileNumber, fileCount) }
             let fileSlug = String(format: "%02d", fileNumber)
             guard let url = URL(string: "https://sdvx.in/sdvx/_/json/songs\(fileSlug).json"),
@@ -123,6 +150,7 @@ struct ExternalDataReloader {
             charts.append(contentsOf: songs.flatMap(\.charts))
         }
 
+        guard !Task.isCancelled else { return await SDVXReader().sdvxInChartCount() }
         await SDVXInImporter().replaceAllCharts(charts)
         return await SDVXReader().sdvxInChartCount()
     }
@@ -142,12 +170,14 @@ struct ExternalDataReloader {
     private static func reloadWikiIIDX(version: IIDXVersion, progress: Progress) async -> Int {
         let importer = IIDXImporter()
         progress(0, 2)
-        await importer.deleteAllSongs()
         var iidxSongs: [IIDXSong] = []
         iidxSongs.append(contentsOf: await songsForLatestVersion(version: version))
+        guard !Task.isCancelled else { return await IIDXReader().bemaniWikiSongCount() }
         progress(1, 2)
         iidxSongs.append(contentsOf: await songsForExistingVersions(version: version))
+        guard !Task.isCancelled else { return await IIDXReader().bemaniWikiSongCount() }
         let levels = await levelsForLatestVersion(version: version)
+        guard !Task.isCancelled else { return await IIDXReader().bemaniWikiSongCount() }
         for song in iidxSongs {
             if let entry = levels[song.title.compact] {
                 song.spLevels = entry.single
@@ -155,6 +185,7 @@ struct ExternalDataReloader {
             }
         }
         progress(2, 2)
+        await importer.deleteAllSongs()
         await importer.insertSongs(iidxSongs)
         await Task.detached(priority: .utility) {
             IIDXSessionCaptureProcessor.backfillDifficultiesFromBEMANIWiki()
@@ -266,6 +297,7 @@ struct ExternalDataReloader {
                           let charge = row[7] as? Double,
                           let scratch = row[8] as? Double,
                           let soflan = row[9] as? Double else { return 0 }
+
                     guard notes + chord + peak + charge + scratch + soflan > 0.0 else { continue }
                     allEntries.append(ChartRadarData(
                         title: title,
@@ -281,23 +313,22 @@ struct ExternalDataReloader {
             debugPrint("Failed to fetch BM2DX data: \(error)")
         }
 
-        guard await importer.replaceAllNotesRadarEntries(allEntries) else { return 0 }
+        guard !Task.isCancelled, await importer.replaceAllNotesRadarEntries(allEntries) else {
+            return await IIDXReader().chartRadarDataCount()
+        }
         progress(1, 1)
         return await IIDXReader().chartRadarDataCount()
     }
 
     // MARK: - BEMANIWiki (DanceDanceRevolution levels)
 
-    private static func reloadWikiDDR(progress: Progress) async -> Int {
-        progress(0, 1)
-        let count = await DDRMetadataImporter().reloadBemaniWikiData()
-        progress(1, 1)
-        return count
+    private static func reloadWikiDDR(progress: @escaping Progress) async -> Int {
+        await DDRMetadataImporter().reloadBemaniWikiData(progress: progress)
+
     }
 }
 
 private struct TextageChartViewerSongsResponse: Decodable {
-
     struct Song: Decodable {
         var songId: String
         var version: Int
@@ -324,7 +355,6 @@ private struct TextageChartViewerSongsResponse: Decodable {
 
 @MainActor
 extension ExternalDataReloader {
-
     static func levelsForLatestVersion(version: IIDXVersion) async -> [String: IIDXSongLevels] {
         do {
             var levels: [String: IIDXSongLevels] = [:]

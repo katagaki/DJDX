@@ -38,11 +38,6 @@ struct SDVXAnalyticsDestinationView: View {
                 SDVXNewGradesDetailView(newGrades: model.newGrades[grade] ?? [])
                     .navigationTitle(Text(verbatim: grade))
                     .navigationTransition(.zoom(sourceID: transitionID(forGrade: grade), in: namespace))
-            case .volforceSuggestionsDetail:
-                SDVXVolforceSuggestionsDetailView(suggestions: model.volforceSuggestions)
-                    .navigationTitle(Text(verbatim: "VOLFORCE"))
-                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.sdvxVolforce.transitionID,
-                                                in: namespace))
             }
         }
         .appBackgroundGradient()
@@ -268,6 +263,7 @@ struct SDVXClearBreakdownDetailView: View {
                     }
                 } header: {
                     Text("Shared.Level")
+                        .sectionListHeader()
                 }
             }
         }
@@ -306,7 +302,6 @@ struct SDVXClearTypeLevelRow: View {
                             .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
                     }
                 }
-                .clipShape(.rect(cornerRadius: 4.0))
             }
             .frame(height: 16.0)
         }
@@ -344,6 +339,7 @@ struct SDVXGradeBreakdownDetailView: View {
                     } header: {
                         Text(verbatim: difficulty.abbreviation)
                             .foregroundStyle(difficulty.color)
+                            .sectionListHeader()
                     }
                 }
             }

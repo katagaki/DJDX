@@ -4,7 +4,7 @@ struct AnalyticsGoalTitle: View {
     let goal: AnalyticsGoal
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 6.0) {
+        HStack(alignment: .center, spacing: 6.0) {
             switch goal.kind {
             case .rating:
                 Text(verbatim: goal.title)
@@ -13,7 +13,6 @@ struct AnalyticsGoalTitle: View {
             case .clearCount, .gradeCount:
                 if goal.level > 0 {
                     LevelNumberBadge(level: String(goal.level))
-                        .alignmentGuide(.firstTextBaseline) { $0[.bottom] - 5.0 }
                 } else {
                     Text("Goals.Level.All")
                         .fontWeight(.black)
@@ -22,12 +21,6 @@ struct AnalyticsGoalTitle: View {
                 Divider()
                     .frame(maxHeight: 12.0)
                 threshold
-            }
-            if let subtitle = goal.subtitle {
-                Text(verbatim: subtitle)
-                    .font(.caption2.weight(.semibold))
-                    .fontWidth(.expanded)
-                    .foregroundStyle(.secondary)
             }
         }
         .lineLimit(1)

@@ -6,7 +6,6 @@ struct IIDXDetailRow: View {
     var style: any ShapeStyle
     var outlineColor: Color
     var outlineWidth: CGFloat
-    var isNumeric: Bool = false
     var isIIDXScore: Bool = false
 
     init(_ title: String, score: Int) {
@@ -30,25 +29,23 @@ struct IIDXDetailRow: View {
         self.style = style
         self.outlineColor = outlineColor
         self.outlineWidth = outlineWidth
-        self.isNumeric = true
     }
 
     var body: some View {
         HStack {
             Text(title)
+                .cardLabel()
+                .foregroundStyle(.secondary)
             Spacer()
             if isIIDXScore {
                 IIDXScoreText(text: value, width: .condensed)
             } else {
                 Text(value)
-                    .font(isNumeric ? .scoreline(.caption, width: .condensed) : nil)
-                    .fontWidth(isNumeric ? .condensed : .expanded)
+                    .font(.scoreline(.caption))
+                    .fontWidth(.standard)
                     .foregroundStyle(style)
                     .strokeText(color: outlineColor, width: outlineWidth)
             }
         }
-        .fontWidth(.expanded)
-        .font(.caption)
-        .fontWeight(.heavy)
     }
 }

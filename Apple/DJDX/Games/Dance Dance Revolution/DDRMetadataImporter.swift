@@ -6,14 +6,22 @@ actor DDRMetadataImporter {
 
     typealias DB = DDRMetadataDatabase
 
-    func reloadBemaniWikiData(version: DDRVersion = .world) async -> Int {
+    func reloadBemaniWikiData(
+        version: DDRVersion = .world,
+        progress: (@MainActor @Sendable (Int, Int) -> Void)? = nil
+    ) async -> Int {
+        await progress?(0, 2)
         var metas: [DDRSongMeta] = []
         if let html = await fetchPage(version.bemaniWikiOldSongsPageURL()) {
             metas.append(contentsOf: parseSongs(from: html, baseVersion: nil))
         }
+        guard !Task.isCancelled else { return songMetaCount() }
+        await progress?(1, 2)
         if let html = await fetchPage(version.bemaniWikiNewSongsPageURL()) {
             metas.append(contentsOf: parseSongs(from: html, baseVersion: DDRVersion.worldVersionNumber))
         }
+        guard !Task.isCancelled else { return songMetaCount() }
+        await progress?(2, 2)
         replaceAll(with: metas)
         return metas.count
     }
@@ -87,6 +95,11 @@ actor DDRMetadataImporter {
     func songMetaCount() -> Int {
         guard let database = try? DB.shared.getReadConnection() else { return 0 }
         return (try? database.scalar(DB.songMetaTable.count)) ?? 0
+    }
+
+    func deleteAllSongMeta() {
+        guard let database = try? DB.shared.getWriteConnection() else { return }
+        _ = try? database.run(DB.songMetaTable.delete())
     }
 
     static func meta(from row: Row) -> DDRSongMeta {

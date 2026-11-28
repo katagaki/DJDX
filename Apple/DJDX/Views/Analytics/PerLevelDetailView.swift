@@ -17,8 +17,7 @@ struct PerLevelDetailSection<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
             Text(titleKey)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .sectionListHeader()
             content()
         }
     }

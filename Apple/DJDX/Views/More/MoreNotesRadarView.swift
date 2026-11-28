@@ -6,17 +6,17 @@ struct MoreNotesRadarView: View {
 
     let spRadarData: RadarData?
     let dpRadarData: RadarData?
+    var width: CGFloat?
     var maxHeight: CGFloat?
     var radarFontSize: CGFloat = 10.0
-    var listFontSize: CGFloat = 10.0
+    var listFontSize: CGFloat = 12.0
+    var radarPadding: CGFloat = 8.0
+    var radarLabelPadding: CGFloat = 30.0
+    var radarLineWidth: CGFloat = 1.5
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var selectedPlayType: IIDXPlayType
 
     @State private var isShowingValues: Bool = false
-
-    var cornerRadius: CGFloat {
-        return 20.0
-    }
 
     var currentRadarData: RadarData? {
         switch selectedPlayType {
@@ -26,62 +26,55 @@ struct MoreNotesRadarView: View {
     }
 
     var body: some View {
-        VStack(spacing: 12.0) {
-            if let radarData = currentRadarData {
-                Group {
-                    if isShowingValues {
-                        valueList(for: radarData)
-                    } else {
-                        RadarChartView(radarData, isPlayerRadar: true, labelFontSize: radarFontSize, lineWidth: 1.5)
-                            .padding(8.0)
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: maxHeight)
+        if let radarData = currentRadarData {
+            RadarChartView(radarData, isPlayerRadar: true, labelFontSize: radarFontSize,
+                           lineWidth: radarLineWidth, labelPadding: radarLabelPadding)
+                .padding(radarPadding)
+                .frame(width: width, height: maxHeight)
+                .frame(maxWidth: width == nil ? .infinity : nil, maxHeight: maxHeight)
                 .contentShape(.rect)
                 .onTapGesture {
-                    withAnimation(.smooth) {
-                        isShowingValues.toggle()
-                    }
+                    isShowingValues = true
+                }
+                .popover(isPresented: $isShowingValues) {
+                    valueList(for: radarData)
+                        .presentationCompactAdaptation(.popover)
                 }
                 .animation(.smooth, value: selectedPlayType)
-            }
         }
-        .frame(maxHeight: maxHeight)
     }
 
     @ViewBuilder
     func valueList(for radarData: RadarData) -> some View {
-        VStack(spacing: 1.0) {
+        VStack(spacing: 6.0) {
             ForEach(radarData.displayPoints(), id: \.label) { point in
-                HStack {
+                HStack(spacing: 16.0) {
                     Text(verbatim: point.label)
                         .font(.radarline(size: listFontSize))
                         .foregroundStyle(point.color)
-                    Spacer()
+                        .brightness(colorScheme == .light ? -0.18 : 0.0)
+                        .fixedSize()
+                    Spacer(minLength: 8.0)
                     Text(verbatim: String(format: "%.2f", point.value))
                         .font(.scoreline(size: listFontSize, weight: .bold))
                         .foregroundStyle(.primary)
+                        .fixedSize()
                 }
             }
             Divider()
-                .padding(.vertical, 1.0)
-            HStack {
+                .padding(.vertical, 2.0)
+            HStack(spacing: 16.0) {
                 Text("More.NotesRadar.Total")
                     .font(.system(size: listFontSize, weight: .bold))
-                Spacer()
+                    .fixedSize()
+                Spacer(minLength: 8.0)
                 Text(verbatim: String(format: "%.2f", radarData.sum()))
-                    .font(.scoreline(size: listFontSize))
+                    .font(.scoreline(size: listFontSize, weight: .bold))
+                    .fixedSize()
             }
         }
-        .padding(.horizontal, 16.0)
-        .padding(.vertical, 12.0)
-        .background {
-            switch colorScheme {
-            case .light: Color.white
-            case .dark: Color.clear.background(.regularMaterial)
-            @unknown default: Color.clear
-            }
-        }
-        .clipShape(.rect(cornerRadius: cornerRadius))
+        .padding(.horizontal, 18.0)
+        .padding(.vertical, 14.0)
+        .frame(minWidth: 210.0)
     }
 }

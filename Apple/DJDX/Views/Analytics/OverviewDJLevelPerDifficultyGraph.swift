@@ -24,6 +24,17 @@ struct OverviewDJLevelPerDifficultyGraph: View {
             )
             .foregroundStyle(by: .value("Shared.IIDX.DJLevel", djLevel.rawValue))
         }
+              .chartXAxis {
+                  AxisMarks(values: Self.visibleLevelStrings) { value in
+                      AxisValueLabel {
+                          if let djLevel = value.as(String.self) {
+                              IIDXMetallicText.djLevel(djLevel)
+                                  .font(.caption2)
+                                  .fixedSize()
+                          }
+                      }
+                  }
+              }
               .chartXScale(domain: Self.visibleLevelStrings)
               .chartForegroundStyleScale(
                   domain: IIDXDJLevel.chartColorDomain,

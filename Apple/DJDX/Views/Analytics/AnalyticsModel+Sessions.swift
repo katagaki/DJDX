@@ -2,8 +2,7 @@ import OrderedCollections
 import SwiftUI
 
 extension AnalyticsModel {
-
-    func reloadFromLastSession(store: IIDXSessionStore, playType: IIDXPlayType) {
+    func reloadFromLastSession(store: IIDXSessionStore, playType: IIDXPlayType) async {
         store.loadSessions()
         let sessions = store.sessions.sorted { $0.startDate < $1.startDate }
 
@@ -13,6 +12,9 @@ extension AnalyticsModel {
             }
             return
         }
+
+        await IIDXSessionSongInfo.shared.reload()
+        let metadata = IIDXSessionSongInfo.shared.metadata
 
         let lastPlays = Self.latestPlaysPerChart(
             validPlays(store.plays(for: lastSession), playType: playType)
@@ -26,8 +28,8 @@ extension AnalyticsModel {
         let progress = sessionProgress(store: store, playType: playType, sessions: sessions)
 
         let computed = Self.computeNewEntries(
-            latestRecords: Self.mergedSongRecords(lastPlays),
-            previousRecords: Self.mergedSongRecords(baseline)
+            latestRecords: Self.mergedSongRecords(lastPlays, metadata: metadata),
+            previousRecords: Self.mergedSongRecords(baseline, metadata: metadata)
         )
 
         withAnimation(.smooth.speed(2.0)) {
@@ -119,7 +121,10 @@ extension AnalyticsModel {
         return latest.values.sorted { $0.captureDate > $1.captureDate }
     }
 
-    nonisolated static func mergedSongRecords(_ plays: [IIDXCapturedPlay]) -> [IIDXSongRecord] {
+    nonisolated static func mergedSongRecords(
+        _ plays: [IIDXCapturedPlay],
+        metadata: [String: IIDXSongMetadata] = [:]
+    ) -> [IIDXSongRecord] {
         var records: [String: IIDXSongRecord] = [:]
         for play in plays {
             let key = (play.songTitle ?? "").compact
@@ -135,7 +140,7 @@ extension AnalyticsModel {
                 }
                 record.lastPlayDate = max(record.lastPlayDate, play.captureDate)
             } else {
-                records[key] = play.asSongRecord()
+                records[key] = play.asSongRecord(metadata: metadata)
             }
         }
         return records.values.sorted { $0.lastPlayDate < $1.lastPlayDate }

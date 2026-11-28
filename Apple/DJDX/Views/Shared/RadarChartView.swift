@@ -8,39 +8,47 @@ struct RadarChartView: View {
     let benchmarkValue: Double = 100.0
     var labelFontSize: CGFloat = 12.0
     var lineWidth: CGFloat = 2.0
+    var labelPadding: CGFloat = 30.0
 
     init(_ data: RadarData, isPlayerRadar: Bool = false, comparison: RadarData? = nil,
-         labelFontSize: CGFloat = 12.0, lineWidth: CGFloat = 2.0) {
+         labelFontSize: CGFloat = 12.0, lineWidth: CGFloat = 2.0, labelPadding: CGFloat = 30.0) {
         self.color = data.color(isPlayerRadar: isPlayerRadar)
         self.points = data.points()
         self.comparisonPoints = comparison?.points()
         self.labelFontSize = labelFontSize
         self.lineWidth = lineWidth
+        self.labelPadding = labelPadding
     }
 
-    init(_ data: RadarData, color: Color, labelFontSize: CGFloat = 12.0, lineWidth: CGFloat = 2.0) {
+    init(_ data: RadarData, color: Color, labelFontSize: CGFloat = 12.0, lineWidth: CGFloat = 2.0,
+         labelPadding: CGFloat = 30.0) {
         self.color = color
         self.points = data.points()
         self.labelFontSize = labelFontSize
         self.lineWidth = lineWidth
+        self.labelPadding = labelPadding
     }
 
     var body: some View {
         GeometryReader { geometry in
-            let size = min(geometry.size.width - 30.0, geometry.size.height - 30.0)
+            let size = max(0.0, min(geometry.size.width - labelPadding, geometry.size.height - labelPadding))
             let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
             let radius = size / 2
             let circleScale = benchmarkValue / maxValue
             let circleSize = size * CGFloat(circleScale)
 
+            let circleLineWidth = min(2.0, lineWidth)
+            let axisLineWidth: CGFloat = lineWidth < 1.5 ? 0.5 : 1.0
+            let axisDash: CGFloat = lineWidth < 1.5 ? 2.0 : 4.0
+
             ZStack {
                 Circle()
                     .fill(Color.gray.opacity(0.5))
-                    .stroke(Color.gray.opacity(0.8), lineWidth: 2)
+                    .stroke(Color.gray.opacity(0.8), lineWidth: circleLineWidth)
                     .frame(width: circleSize, height: circleSize)
 
                 RadarAxesShape(configs: points)
-                    .stroke(Color.gray.opacity(0.4), style: StrokeStyle(lineWidth: 1, dash: [4]))
+                    .stroke(Color.gray.opacity(0.4), style: StrokeStyle(lineWidth: axisLineWidth, dash: [axisDash]))
                     .frame(width: size, height: size)
 
                 ForEach(0..<points.count, id: \.self) { index in
@@ -53,10 +61,7 @@ struct RadarChartView: View {
                         .overlay(
                             Text(config.label)
                                 .font(.radarline(size: labelFontSize))
-                                .foregroundStyle(config.color)
-                                .brightness(0.88)
-                                .shadow(color: config.color, radius: 1.0)
-                                .shadow(color: config.color, radius: 3.0)
+                                .radarLabelStyle(config.color)
                                 .fixedSize(),
                             alignment: config.alignment
                         )

@@ -119,6 +119,7 @@ struct PolarisChordClearBreakdownDetailView: View {
                     }
                 } header: {
                     Text("Shared.Level")
+                        .sectionListHeader()
                 }
             }
         }
@@ -157,7 +158,6 @@ struct PolarisChordClearTypeLevelRow: View {
                             .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
                     }
                 }
-                .clipShape(.rect(cornerRadius: 4.0))
             }
             .frame(height: 16.0)
         }
@@ -197,6 +197,7 @@ struct PolarisChordGradeBreakdownDetailView: View {
                     } header: {
                         Text(verbatim: difficulty.rawValue)
                             .foregroundStyle(difficulty.color)
+                            .sectionListHeader()
                     }
                 }
             }
