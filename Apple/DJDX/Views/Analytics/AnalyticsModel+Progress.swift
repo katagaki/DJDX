@@ -23,16 +23,48 @@ struct IIDXProgressPoint: Identifiable, Hashable {
 
 extension AnalyticsModel {
 
-    func reloadProgress(playType: IIDXPlayType, iidxVersion: IIDXVersion, filters: FilterOptions? = nil) async {
-        debugPrint("Calculating progress")
-        let importGroups = await fetcher.importGroups(for: iidxVersion)
-        var points: [IIDXProgressPoint] = []
+    nonisolated static func loadProgress(
+        importGroups: [ImportGroup], playType: IIDXPlayType, filters: FilterOptions?
+    ) async -> [IIDXProgressPoint] {
+        guard importGroups.count >= 2 else { return [] }
+        let chunkCount = max(1, min(ProcessInfo.processInfo.activeProcessorCount, importGroups.count / 8))
+        let chunkSize = (importGroups.count + chunkCount - 1) / chunkCount
+        let ranges = stride(from: 0, to: importGroups.count, by: chunkSize).map {
+            $0..<min($0 + chunkSize, importGroups.count)
+        }
+        return await withTaskGroup(of: (Int, [IIDXProgressPoint]).self) { group in
+            for (index, range) in ranges.enumerated() {
+                group.addTask {
+                    (index, await progressPoints(
+                        in: range, importGroups: importGroups, playType: playType, filters: filters
+                    ))
+                }
+            }
+            var chunks: [[IIDXProgressPoint]] = Array(repeating: [], count: ranges.count)
+            for await (index, points) in group {
+                chunks[index] = points
+            }
+            return chunks.flatMap { $0 }
+        }
+    }
+
+    nonisolated static func progressPoints(
+        in range: Range<Int>, importGroups: [ImportGroup], playType: IIDXPlayType, filters: FilterOptions?
+    ) async -> [IIDXProgressPoint] {
+        let reader = IIDXReader()
         var previousRecords: [IIDXSongRecord]?
-        for importGroup in importGroups {
-            let records = await fetcher.songRecords(for: importGroup.id, playType: playType)
+        var baselineIndex = range.lowerBound - 1
+        while previousRecords == nil, baselineIndex >= 0 {
+            let records = await reader.songRecords(for: importGroups[baselineIndex].id, playType: playType)
+            if !records.isEmpty { previousRecords = records }
+            baselineIndex -= 1
+        }
+        var points: [IIDXProgressPoint] = []
+        for importGroup in importGroups[range] {
+            let records = await reader.songRecords(for: importGroup.id, playType: playType)
             guard !records.isEmpty else { continue }
             if let previousRecords {
-                let computed = Self.computeNewEntries(
+                let computed = computeNewEntries(
                     latestRecords: records, previousRecords: previousRecords, filters: filters
                 )
                 points.append(IIDXProgressPoint(
@@ -43,9 +75,7 @@ extension AnalyticsModel {
             }
             previousRecords = records
         }
-        withAnimation(.smooth.speed(2.0)) {
-            self.progressPerImportGroup = points
-        }
+        return points
     }
 
     func sessionProgress(

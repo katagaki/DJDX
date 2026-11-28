@@ -4,62 +4,72 @@ import SwiftUI
 extension IIDXScoresView {
 
     func reloadDisplay() {
-        withAnimation(.smooth.speed(2.0)) {
+        if dataState == .initializing {
             dataState = .loading
-        } completion: {
-            Task.detached {
-                let songRecords = await actor.songRecords(
-                    on: .now,
-                    version: iidxVersion,
-                    filters: FilterOptions(playType: playTypeToShow,
-                                           onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
-                                           levels: levelsToShow,
-                                           difficulties: difficultiesToShow,
-                                           clearTypes: clearTypesToShow,
-                                           djLevels: djLevelsToShow,
-                                           versions: versionsToShow),
-                    sortOptions: SortOptions(mode: sortMode, order: sortOrder)
-                )
-                let songCompactTitles = await actor.songCompactTitles()
-
-                await MainActor.run {
-                    withAnimation(.smooth.speed(2.0)) {
-                        if let songRecords {
-                            // Calculate clear rates
-                            let noteCounts: [String: IIDXNoteCount] = songCompactTitles
-                                .compactMapValues { $0.spNoteCount }
-
-                            let songRecordClearRates: [IIDXSongRecord: [IIDXLevel: Float]] = songRecords
-                                .reduce(into: [:], { partialResult, songRecord in
-                                    let song = noteCounts[songRecord.titleCompact()]
-                                    if let song {
-                                        let scores: [IIDXLevelScore] = songRecord.scores()
-                                        let scoreRates = scores.reduce(
-                                            into: [:] as [IIDXLevel: Float]
-                                        ) { partialResult, score in
-                                            if let noteCount = song.noteCount(for: score.level) {
-                                                partialResult[score.level] = Float(score.score) / Float(noteCount * 2)
-                                            }
-                                        }
-                                        partialResult[songRecord] = scoreRates
-                                    }
-                                })
-
-                            self.songRecordClearRates = songRecordClearRates
-                            self.songRecords = songRecords
-                        } else {
-                            self.songRecordClearRates = [:]
-                            self.songRecords = nil
-                        }
-
-                        self.songCompactTitles = songCompactTitles
-                        self.songNoteCounts = noteCounts
-
-                        dataState = .presenting
-                    }
-                }
+            loadDisplayData()
+        } else {
+            withAnimation(.smooth.speed(2.0)) {
+                dataState = .loading
+            } completion: {
+                loadDisplayData()
             }
         }
+    }
+
+    private func loadDisplayData() {
+        let actor = actor
+        let filters = FilterOptions(playType: playTypeToShow,
+                                    onlyPlayDataWithScores: isShowingOnlyPlayDataWithScores,
+                                    levels: levelsToShow,
+                                    difficulties: difficultiesToShow,
+                                    clearTypes: clearTypesToShow,
+                                    djLevels: djLevelsToShow,
+                                    versions: versionsToShow)
+        let sortOptions = SortOptions(mode: sortMode, order: sortOrder)
+        let version = iidxVersion
+        Task {
+            let (songRecords, songCompactTitles, noteCounts, clearRates) = await Self.fetchDisplayData(
+                actor: actor, version: version, filters: filters, sortOptions: sortOptions
+            )
+            withAnimation(.smooth.speed(2.0)) {
+                self.songRecordClearRates = clearRates
+                self.songRecords = songRecords
+                self.songCompactTitles = songCompactTitles
+                self.songNoteCounts = noteCounts
+                refreshDisplayedEntries()
+                dataState = .presenting
+            }
+        }
+    }
+
+    nonisolated private static func fetchDisplayData(
+        actor: IIDXReader, version: IIDXVersion, filters: FilterOptions, sortOptions: SortOptions
+    ) async -> (
+        [IIDXSongRecord]?, [String: IIDXSong], [String: IIDXNoteCount], [IIDXSongRecord: [IIDXLevel: Float]]
+    ) {
+        async let songRecordsTask = actor.songRecords(
+            on: .now, version: version, filters: filters, sortOptions: sortOptions
+        )
+        async let songCompactTitlesTask = actor.songCompactTitles()
+        let songRecords = await songRecordsTask
+        let songCompactTitles = await songCompactTitlesTask
+        let noteCounts = songCompactTitles.compactMapValues { $0.spNoteCount }
+        var clearRates: [IIDXSongRecord: [IIDXLevel: Float]] = [:]
+        for songRecord in songRecords ?? [] {
+            guard let song = noteCounts[songRecord.titleCompact()] else { continue }
+            var scoreRates: [IIDXLevel: Float] = [:]
+            for score in songRecord.scores() {
+                if let noteCount = song.noteCount(for: score.level) {
+                    scoreRates[score.level] = Float(score.score) / Float(noteCount * 2)
+                }
+            }
+            clearRates[songRecord] = scoreRates
+        }
+        return (songRecords, songCompactTitles, noteCounts, clearRates)
+    }
+
+    func refreshDisplayedEntries() {
+        displayedEntries = levelEntries(from: searchResults ?? songRecords ?? [])
     }
 
     private var noteCounts: [String: IIDXNoteCount] {
@@ -69,6 +79,7 @@ extension IIDXScoresView {
     func filterSongRecords() {
         guard let songRecords else {
             searchResults = nil
+            refreshDisplayedEntries()
             return
         }
         let searchTermTrimmed = searchTerm.lowercased().trimmingCharacters(in: .whitespaces)
@@ -80,6 +91,7 @@ extension IIDXScoresView {
         } else {
             searchResults = nil
         }
+        refreshDisplayedEntries()
     }
 
     struct SongLevelEntry {

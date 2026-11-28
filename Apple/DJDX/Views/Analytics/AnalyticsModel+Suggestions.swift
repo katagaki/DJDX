@@ -73,27 +73,6 @@ extension AnalyticsModel {
         return clearLampSuggestionCandidates.filter { $0.clearType == previous.rawValue }
     }
 
-    func reloadSuggestions(playType: IIDXPlayType, iidxVersion: IIDXVersion, filters: FilterOptions? = nil) async {
-        guard let latestGroup = await fetcher.importGroups(for: iidxVersion).last else {
-            withAnimation(.smooth.speed(2.0)) {
-                djLevelSuggestions = []
-                clearLampSuggestionCandidates = []
-                longUnplayedSuggestions = []
-            }
-            return
-        }
-        async let recordsTask = fetcher.songRecords(for: latestGroup.id, playType: playType)
-        async let songsTask = fetcher.songCompactTitles()
-        let records = await recordsTask
-        let songs = await songsTask
-        let computed = Self.computeSuggestions(records: records, songs: songs, playType: playType, filters: filters)
-        withAnimation(.smooth.speed(2.0)) {
-            djLevelSuggestions = computed.djLevels
-            clearLampSuggestionCandidates = computed.clearLamps
-            longUnplayedSuggestions = computed.longUnplayed
-        }
-    }
-
     nonisolated static func computeSuggestions(
         records: [IIDXSongRecord],
         songs: [String: IIDXSong],

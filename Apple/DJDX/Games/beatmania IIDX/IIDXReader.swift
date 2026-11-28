@@ -106,6 +106,8 @@ actor IIDXReader {
 
     func invalidateCachedRecords() {
         importGroupID = nil
+        songs = []
+        songNoteCounts = [:]
     }
 
     func songRecords(for importGroupID: String) -> [IIDXSongRecord] {
@@ -407,9 +409,11 @@ actor IIDXReader {
     // MARK: Song Metadata
 
     func songCompactTitles() -> [String: IIDXSong] {
+        if songs.isEmpty {
+            songs = fetchAllSongs()
+        }
         var result: [String: IIDXSong] = [:]
-        let fetchedSongs = fetchAllSongs()
-        fetchedSongs.forEach { song in
+        songs.forEach { song in
             result[song.titleCompact()] = song
         }
         return result

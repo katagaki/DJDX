@@ -64,9 +64,23 @@ final class AnalyticsModel {
         towerEntries.reduce(0) { $0 + $1.scratchCount } / 100
     }
 
+    typealias NewEntrySet = (
+        clears: [String: [NewClearEntry]],
+        highScores: [NewHighScoreEntry],
+        clearLamps: [NewClearEntry],
+        scoreUpdates: [NewHighScoreEntry],
+        djLevels: [String: [NewDJLevelEntry]]
+    )
+
+    enum ReloadResult: Sendable {
+        case counts(clearType: [String: [Int: [String: Int]]], djLevel: [String: [Int: [String: Int]]])
+        case latest(newEntries: NewEntrySet?, suggestions: IIDXSuggestionSet)
+        case progress([IIDXProgressPoint])
+        case tower([IIDXTowerEntry])
+    }
+
     func reload(playType: IIDXPlayType, iidxVersion: IIDXVersion, filters: FilterOptions? = nil) async {
         dataState = .loading
-        try? await Task.sleep(for: .seconds(0.5))
         if let sessionStore {
             await reloadFromLastSession(store: sessionStore, playType: playType)
             towerEntries = await fetcher.allTowerEntries()
@@ -75,43 +89,67 @@ final class AnalyticsModel {
             }
             return
         }
-        await reloadOverview(playType: playType, iidxVersion: iidxVersion, filters: filters)
-        await reloadTrends(playType: playType, iidxVersion: iidxVersion, filters: filters)
-        await reloadNewClearsAndHighScores(playType: playType, iidxVersion: iidxVersion, filters: filters)
-        await reloadProgress(playType: playType, iidxVersion: iidxVersion, filters: filters)
-        await reloadSuggestions(playType: playType, iidxVersion: iidxVersion, filters: filters)
-        towerEntries = await fetcher.allTowerEntries()
-        await WidgetDataPublisher.shared.publishClearTypeAndDJLevel(
-            playType: playType, iidxVersion: iidxVersion
-        )
+        let importGroups = await fetcher.importGroups(for: iidxVersion)
+        await withTaskGroup(of: ReloadResult.self) { group in
+            group.addTask {
+                let result = await IIDXReader().aggregatedCounts(
+                    for: importGroups.map(\.id), playType: playType, filters: filters
+                )
+                return .counts(clearType: result.clearType, djLevel: result.djLevel)
+            }
+            group.addTask {
+                await Self.loadLatest(importGroups: importGroups, playType: playType, filters: filters)
+            }
+            group.addTask {
+                .progress(await Self.loadProgress(importGroups: importGroups, playType: playType, filters: filters))
+            }
+            group.addTask {
+                .tower(await IIDXReader().allTowerEntries())
+            }
+            for await result in group {
+                apply(result, importGroups: importGroups)
+            }
+        }
         withAnimation(.smooth.speed(2.0)) {
             dataState = .presenting
         }
+        await WidgetDataPublisher.shared.publishClearTypeAndDJLevel(
+            playType: playType, iidxVersion: iidxVersion
+        )
     }
 
-    func reloadOverview(playType: IIDXPlayType, iidxVersion: IIDXVersion, filters: FilterOptions? = nil) async {
-        debugPrint("Calculating overview")
-        let importGroupID = await fetcher.importGroups(for: iidxVersion).last?.id
-        if let importGroupID {
-            let result = await fetcher.aggregatedCounts(
-                for: [importGroupID], playType: playType, filters: filters
-            )
-            let rawClearType = result.clearType[importGroupID]
-            let rawDJLevel = result.djLevel[importGroupID]
+    func apply(_ result: ReloadResult, importGroups: [ImportGroup]) {
+        switch result {
+        case .counts(let clearType, let djLevel):
+            applyOverview(clearType: clearType, djLevel: djLevel, latestGroupID: importGroups.last?.id)
+            applyTrends(clearType: clearType, djLevel: djLevel, importGroups: importGroups)
+        case .latest(let newEntries, let suggestions):
+            applyNewEntries(newEntries)
+            withAnimation(.smooth.speed(2.0)) {
+                djLevelSuggestions = suggestions.djLevels
+                clearLampSuggestionCandidates = suggestions.clearLamps
+                longUnplayedSuggestions = suggestions.longUnplayed
+            }
+        case .progress(let points):
+            withAnimation(.smooth.speed(2.0)) {
+                progressPerImportGroup = points
+            }
+        case .tower(let entries):
+            towerEntries = entries
+        }
+    }
 
-            if let rawClearType, !rawClearType.isEmpty {
-                let newClearType = buildOrderedClearType(from: rawClearType)
-                let newDJLevel = buildOrderedDJLevel(from: rawDJLevel ?? [:])
-                let newDJLevelPerDifficulty = convertToEnumKeyed(newDJLevel)
-                withAnimation(.smooth.speed(2.0)) {
-                    self.clearTypePerDifficulty = newClearType
-                    self.djLevelPerDifficulty = newDJLevelPerDifficulty
-                }
-            } else {
-                withAnimation(.smooth.speed(2.0)) {
-                    self.clearTypePerDifficulty.removeAll()
-                    self.djLevelPerDifficulty.removeAll()
-                }
+    func applyOverview(
+        clearType: [String: [Int: [String: Int]]],
+        djLevel: [String: [Int: [String: Int]]],
+        latestGroupID: String?
+    ) {
+        if let latestGroupID, let rawClearType = clearType[latestGroupID], !rawClearType.isEmpty {
+            let newClearType = buildOrderedClearType(from: rawClearType)
+            let newDJLevelPerDifficulty = convertToEnumKeyed(buildOrderedDJLevel(from: djLevel[latestGroupID] ?? [:]))
+            withAnimation(.smooth.speed(2.0)) {
+                self.clearTypePerDifficulty = newClearType
+                self.djLevelPerDifficulty = newDJLevelPerDifficulty
             }
         } else {
             withAnimation(.smooth.speed(2.0)) {
@@ -121,101 +159,78 @@ final class AnalyticsModel {
         }
     }
 
-    func reloadTrends(playType: IIDXPlayType, iidxVersion: IIDXVersion, filters: FilterOptions? = nil) async {
-        debugPrint("Calculating trends")
-        let importGroups = await fetcher.importGroups(for: iidxVersion)
+    func applyTrends(
+        clearType: [String: [Int: [String: Int]]],
+        djLevel: [String: [Int: [String: Int]]],
+        importGroups: [ImportGroup]
+    ) {
         guard !importGroups.isEmpty else { return }
-
-        let importGroupIDs = importGroups.map(\.id)
-        let idToDate = Dictionary(uniqueKeysWithValues: importGroups.map { ($0.id, $0.importDate) })
-
-        let result = await fetcher.aggregatedCounts(for: importGroupIDs, playType: playType, filters: filters)
-
         var newClearTypeData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
         var newDJLevelData: [Date: [Int: OrderedDictionary<String, Int>]] = [:]
-
-        for igID in importGroupIDs {
-            guard let date = idToDate[igID] else { continue }
-
-            if let rawClearType = result.clearType[igID] {
+        for importGroup in importGroups {
+            if let rawClearType = clearType[importGroup.id] {
                 let ordered = buildOrderedClearType(from: rawClearType)
                 if sumOfCounts(ordered) > 0 {
-                    newClearTypeData[date] = ordered
+                    newClearTypeData[importGroup.importDate] = ordered
                 }
             }
-            if let rawDJLevel = result.djLevel[igID] {
+            if let rawDJLevel = djLevel[importGroup.id] {
                 let ordered = buildOrderedDJLevel(from: rawDJLevel)
                 if sumOfCounts(ordered) > 0 {
-                    newDJLevelData[date] = ordered
+                    newDJLevelData[importGroup.importDate] = ordered
                 }
             }
         }
-
         withAnimation(.smooth.speed(2.0)) {
             self.clearTypePerImportGroup = newClearTypeData
             self.djLevelPerImportGroup = newDJLevelData
         }
     }
 
-    func reloadNewClearsAndHighScores(
-        playType: IIDXPlayType, iidxVersion: IIDXVersion, filters: FilterOptions? = nil
-    ) async {
-        debugPrint("Calculating new clears and high scores")
-        let importGroups = await fetcher.importGroups(for: iidxVersion)
-
-        guard importGroups.count >= 2 else {
-            withAnimation(.smooth.speed(2.0)) {
-                self.newClears = []
-                self.newAssistClears = []
-                self.newEasyClears = []
-                self.newFullComboClears = []
-                self.newHardClears = []
-                self.newExHardClears = []
-                self.newFailed = []
-                self.newHighScores = []
-                self.newClearLamps = []
-                self.newScoreUpdates = []
-                self.newAAA = []
-                self.newAA = []
-                self.newA = []
-            }
-            return
-        }
-
-        let latestGroup = importGroups[importGroups.count - 1]
-        let previousGroup = importGroups[importGroups.count - 2]
-
-        async let latestRecordsTask = fetcher.songRecords(
-            for: latestGroup.id, playType: playType
-        )
-        async let previousRecordsTask = fetcher.songRecords(
-            for: previousGroup.id, playType: playType
-        )
-
-        let latestRecords = await latestRecordsTask.sorted(by: {
-            $0.lastPlayDate < $1.lastPlayDate
-        })
-        let previousRecords = await previousRecordsTask
-
-        let computed = Self.computeNewEntries(
-            latestRecords: latestRecords, previousRecords: previousRecords, filters: filters
-        )
-
+    func applyNewEntries(_ computed: NewEntrySet?) {
         withAnimation(.smooth.speed(2.0)) {
-            self.newClears = computed.clears["CLEAR"]!
-            self.newEasyClears = computed.clears["EASY CLEAR"]!
-            self.newAssistClears = computed.clears["ASSIST CLEAR"]!
-            self.newFullComboClears = computed.clears["FULLCOMBO CLEAR"]!
-            self.newHardClears = computed.clears["HARD CLEAR"]!
-            self.newExHardClears = computed.clears["EX HARD CLEAR"]!
-            self.newFailed = computed.clears["FAILED"]!
-            self.newHighScores = computed.highScores
-            self.newClearLamps = computed.clearLamps
-            self.newScoreUpdates = computed.scoreUpdates
-            self.newAAA = computed.djLevels["AAA"]!
-            self.newAA = computed.djLevels["AA"]!
-            self.newA = computed.djLevels["A"]!
+            self.newClears = computed?.clears["CLEAR"] ?? []
+            self.newEasyClears = computed?.clears["EASY CLEAR"] ?? []
+            self.newAssistClears = computed?.clears["ASSIST CLEAR"] ?? []
+            self.newFullComboClears = computed?.clears["FULLCOMBO CLEAR"] ?? []
+            self.newHardClears = computed?.clears["HARD CLEAR"] ?? []
+            self.newExHardClears = computed?.clears["EX HARD CLEAR"] ?? []
+            self.newFailed = computed?.clears["FAILED"] ?? []
+            self.newHighScores = computed?.highScores ?? []
+            self.newClearLamps = computed?.clearLamps ?? []
+            self.newScoreUpdates = computed?.scoreUpdates ?? []
+            self.newAAA = computed?.djLevels["AAA"] ?? []
+            self.newAA = computed?.djLevels["AA"] ?? []
+            self.newA = computed?.djLevels["A"] ?? []
         }
+    }
+
+    nonisolated static func loadLatest(
+        importGroups: [ImportGroup], playType: IIDXPlayType, filters: FilterOptions?
+    ) async -> ReloadResult {
+        async let songsTask = IIDXReader().songCompactTitles()
+        async let latestTask = loadRecords(for: importGroups.last, playType: playType)
+        async let previousTask = loadRecords(
+            for: importGroups.count >= 2 ? importGroups[importGroups.count - 2] : nil, playType: playType
+        )
+        let latestRecords = await latestTask
+        var newEntries: NewEntrySet?
+        if importGroups.count >= 2 {
+            newEntries = computeNewEntries(
+                latestRecords: latestRecords.sorted { $0.lastPlayDate < $1.lastPlayDate },
+                previousRecords: await previousTask,
+                filters: filters
+            )
+        }
+        let suggestions = computeSuggestions(
+            records: latestRecords, songs: await songsTask, playType: playType, filters: filters
+        )
+        return .latest(newEntries: newEntries, suggestions: suggestions)
+    }
+
+    nonisolated static func loadRecords(for importGroup: ImportGroup?, playType: IIDXPlayType) async -> [IIDXSongRecord] {
+        guard let importGroup else { return [] }
+        return await IIDXReader().songRecords(for: importGroup.id, playType: playType)
     }
 
     nonisolated static func computeNewEntries(
