@@ -27,6 +27,7 @@ struct IIDXScoresView<Header: View>: View {
 
     @State var searchTerm: String = ""
     @State var searchResults: [IIDXSongRecord]?
+    @State var displayedEntries: [SongLevelEntry] = []
 
     @State var isSystemChangingFilterAndSort: Bool = false
     @State var isShowingFilterSheet: Bool = false
@@ -44,7 +45,7 @@ struct IIDXScoresView<Header: View>: View {
     @State var isScoreDataExpanded: Bool
     @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.scoreDataKey) var isScoreDataVisible: Bool
 
-    let actor = IIDXReader()
+    @State var actor = IIDXReader()
 
     @AppStorage(wrappedValue: true, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
     @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
@@ -130,8 +131,7 @@ struct IIDXScoresView<Header: View>: View {
                     }
                 }
                 if !isEditingAnalytics, (isScoreDataVisible && isScoreDataExpanded) || !searchTerm.isEmpty {
-                    let entries = levelEntries(from: searchResults ?? songRecords ?? [])
-                    ForEach(entries, id: \.id) { entry in
+                    ForEach(displayedEntries, id: \.id) { entry in
                         Button {
                             navigationManager.push(
                                 ScoresPath.scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level)
@@ -226,9 +226,13 @@ struct IIDXScoresView<Header: View>: View {
                 reloadDisplay()
             }
             .onChange(of: conditionsForReload) {_, _ in
+                refreshDisplayedEntries()
                 if !isSystemChangingFilterAndSort {
                     reloadDisplay()
                 }
+            }
+            .onChange(of: isBeginnerLevelHidden) {_, _ in
+                refreshDisplayedEntries()
             }
             .onChange(of: searchTerm) {_, _ in
                 filterSongRecords()
@@ -242,7 +246,10 @@ struct IIDXScoresView<Header: View>: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: .externalDataChanged)) { _ in
                 dataState = .initializing
-                reloadDisplay()
+                Task {
+                    await actor.invalidateCachedRecords()
+                    reloadDisplay()
+                }
             }
             .navigationDestination(for: ScoresPath.self) { viewPath in
                 switch viewPath {
