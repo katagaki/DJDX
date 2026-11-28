@@ -169,10 +169,11 @@ struct AnalyticsView: View {
                             TowerTotalsChart(
                                 totalKeyCount: model.towerTotalKeyCount,
                                 totalScratchCount: model.towerTotalScratchCount,
-                                showsAnnotations: true
+                                showsAnnotations: !model.towerEntries.isEmpty
                             )
                             .chartXAxis(.hidden)
                             .chartYAxis(.hidden)
+                            .padding(.top, 6.0)
                         }
                     }
                     .opacity(model.towerEntries.isEmpty ? 0.25 : 1.0)
