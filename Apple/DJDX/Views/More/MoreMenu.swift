@@ -98,6 +98,7 @@ struct MoreMenu: View {
             NavigationStack {
                 MoreICloudBackup()
             }
+            .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $isPresentingRadarMaker) {
             NavigationStack {
