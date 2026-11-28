@@ -154,8 +154,7 @@ struct DDRFlareSkillSuggestionRow: View {
             AnalyticsSuggestionTarget {
                 Text(verbatim: "FLARE \(DDRFlareSkill.rankLabel(suggestion.targetFlareRank))")
                     .foregroundStyle(.secondary)
-                    .fontWidth(.expanded)
-                    .fontWeight(.bold)
+                    .font(.playline(.caption, weight: .regular))
                 AnalyticsSuggestionGain(text: "+\(suggestion.flareSkillGain)")
             }
         }

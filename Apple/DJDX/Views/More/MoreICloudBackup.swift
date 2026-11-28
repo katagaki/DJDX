@@ -23,11 +23,9 @@ struct MoreICloudBackup: View {
                 Toggle("ICloudBackup.Enable", systemImage: "icloud", isOn: $isBackupEnabled)
             } header: {
                 Text("More.ManageData.ICloudBackup")
-                    .sectionListHeader()
             } footer: {
                 Text("ICloudBackup.Description")
             }
-            .sectionStyle()
             if isBackupEnabled {
                 Section {
                     LabeledContent("ICloudBackup.LastBackup") {
@@ -50,7 +48,6 @@ struct MoreICloudBackup: View {
                     }
                     .disabled(isBackingUp)
                 }
-                .sectionStyle()
             }
             Section {
                 Button {
@@ -68,9 +65,8 @@ struct MoreICloudBackup: View {
             } footer: {
                 Text("Backup.Export.Footer")
             }
-            .sectionStyle()
         }
-        .insetList()
+        .listStyle(.insetGrouped)
         .navigationTitle("Backup.Title")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

@@ -16,6 +16,7 @@ struct MoreMenu: View {
     @State var isPresentingICloudBackup: Bool = false
     @State var isPresentingRadarMaker: Bool = false
     @State var isPresentingTierList: Bool = false
+    @State var isPresentingAttributions: Bool = false
     @State var isConfirmingWebDataDelete: Bool = false
     @State var isConfirmingResetLayout: Bool = false
     @State var isPresentingFreeUpSpace: Bool = false
@@ -111,7 +112,7 @@ struct MoreMenu: View {
                     Label("More.GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                 }
                 Button("More.Attributions") {
-                    navigationManager.push(MorePath.moreAttributions)
+                    isPresentingAttributions = true
                 }
                 Button("More.Disclaimer") {
                     isPresentingDisclaimer = true
@@ -140,6 +141,11 @@ struct MoreMenu: View {
         .sheet(isPresented: $isPresentingTierList) {
             NavigationStack {
                 TierListView(game: Game.stored)
+            }
+        }
+        .sheet(isPresented: $isPresentingAttributions) {
+            NavigationStack {
+                MoreLicensesView()
             }
         }
         .alert("Alert.DeleteData.Web.Title", isPresented: $isConfirmingWebDataDelete) {

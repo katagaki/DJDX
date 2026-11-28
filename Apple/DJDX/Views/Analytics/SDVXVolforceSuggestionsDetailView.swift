@@ -14,8 +14,7 @@ struct SDVXVolforceSuggestionRow: View {
                 Divider().frame(maxHeight: 14.0)
                 Text(verbatim: "VF")
                     .foregroundStyle(.secondary)
-                    .fontWidth(.expanded)
-                    .fontWeight(.bold)
+                    .font(.playline(.caption, weight: .regular))
                 AnalyticsSuggestionGain(text: SDVXVolforce.gainText(suggestion.volforceGain))
             }
         }

@@ -135,8 +135,7 @@ struct SDVXScoreFilterSheet: View {
                     toggle(clearType, in: $clearTypesToShow)
                 } label: {
                     Text(verbatim: clearType.abbreviation)
-                        .font(.system(size: 12.0, weight: .bold))
-                        .fontWidth(.expanded)
+                        .font(.playline(size: 12.0, weight: .regular))
                         .foregroundStyle(clearType.color)
                 }
             }

@@ -43,8 +43,7 @@ struct DDRScoreRow<Accessory: View>: View {
                         Divider().frame(maxHeight: 14.0)
                         Text(record.clearDisplay)
                             .foregroundStyle(DDRSongRecord.clearColor(for: record.clearKind))
-                            .fontWidth(.expanded)
-                            .fontWeight(.bold)
+                            .font(.playline(.caption, weight: .regular))
                             .fixedSize()
                     }
                 }

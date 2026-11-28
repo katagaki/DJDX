@@ -65,7 +65,6 @@ enum ImportPath: Hashable {
 
 enum MorePath: Hashable {
     case moreExternalDataSources
-    case moreAttributions
 }
 
 enum TowerPath: Hashable {

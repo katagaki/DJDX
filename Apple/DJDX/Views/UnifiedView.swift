@@ -143,7 +143,6 @@ struct UnifiedView: View {
             .navigationDestination(for: MorePath.self) { viewPath in
                 switch viewPath {
                 case .moreExternalDataSources: MoreExternalDataSources()
-                case .moreAttributions: MoreLicensesView()
                 }
             }
             .navigationDestination(for: AnalyticsPath.self) { viewPath in

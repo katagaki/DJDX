@@ -136,8 +136,7 @@ struct DDRScoreFilterSheet: View {
                         toggle(lamp, in: $clearLampsToShow)
                     } label: {
                         Text(verbatim: lamp.uppercased())
-                            .font(.system(size: 12.0, weight: .bold))
-                            .fontWidth(.expanded)
+                            .font(.playline(size: 12.0, weight: .regular))
                             .foregroundStyle(DDRSongRecord.clearColor(for: lamp))
                     }
                 }

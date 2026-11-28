@@ -101,7 +101,8 @@ struct MoreRadarMaker: View {
             }
             .clearSection()
         }
-        .insetList()
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .navigationTitle("More.RadarMaker.Header")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
