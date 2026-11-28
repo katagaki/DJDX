@@ -12,6 +12,8 @@ enum DesignMetrics {
     static let emptyCardHeight: CGFloat = 56.0
     static let sessionCardSize = CGSize(width: 124.0, height: 80.0)
     static let sessionTitleSize: CGFloat = 17.0
+    static let sectionHeaderIconSize: CGFloat = 32.0
+    static let sectionHeaderIconFont: Font = .system(size: 16.0, weight: .bold)
 
     static func chartHeight(_ height: CGFloat) -> CGFloat {
         height >= 100.0 ? 52.0 : height
@@ -37,17 +39,26 @@ struct CardFill: View {
 
 struct SectionChevron: View {
     let context: SectionHeaderContext
-    var font: Font = .footnote.weight(.bold)
 
     var body: some View {
         if context.isCollapsible {
             Image(systemName: "chevron.down")
-                .font(font)
+                .font(DesignMetrics.sectionHeaderIconFont)
                 .foregroundStyle(.secondary)
                 .rotationEffect(.degrees(context.isExpanded ? 0.0 : -90.0))
-                .frame(minWidth: 28.0, minHeight: 28.0)
+                .frame(width: DesignMetrics.sectionHeaderIconSize, height: DesignMetrics.sectionHeaderIconSize)
                 .animation(.smooth.speed(2.0), value: context.isExpanded)
         }
+    }
+}
+
+extension View {
+    func sectionHeaderButton() -> some View {
+        self
+            .labelStyle(.iconOnly)
+            .font(DesignMetrics.sectionHeaderIconFont)
+            .frame(width: DesignMetrics.sectionHeaderIconSize, height: DesignMetrics.sectionHeaderIconSize)
+            .contentShape(.rect)
     }
 }
 

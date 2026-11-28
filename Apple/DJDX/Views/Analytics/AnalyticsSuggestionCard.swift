@@ -117,8 +117,7 @@ struct AnalyticsSuggestionsSection<Content: View>: View {
                                     Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
                                         onShare(cardID)
                                     }
-                                    .labelStyle(.iconOnly)
-                                    .font(.subheadline.weight(.bold))
+                                    .sectionHeaderButton()
                                 }
                             }
                             .padding(.bottom, isExpanded ? 8.0 : 0.0)

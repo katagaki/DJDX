@@ -34,8 +34,7 @@ struct AnalyticsGoalsSection: View {
                     Button("Goals.Add", systemImage: "plus") {
                         isAddingGoal = true
                     }
-                    .labelStyle(.iconOnly)
-                    .font(.subheadline.weight(.bold))
+                    .sectionHeaderButton()
                 }
                 if !isCollapsed {
                     Group {

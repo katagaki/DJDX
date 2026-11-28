@@ -133,8 +133,7 @@ struct SDVXScoresView<Header: View>: View {
                                 Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
                                     isShowingShareCard = true
                                 }
-                                .labelStyle(.iconOnly)
-                                .font(.subheadline.weight(.bold))
+                                .sectionHeaderButton()
                             }
                         }
                         .padding(.top, DesignMetrics.sectionGap)

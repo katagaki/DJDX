@@ -123,11 +123,13 @@ struct AnalyticsSectionHeader<Accessory: View>: View {
                 }
                 .contentShape(.rect)
             }
-            accessory()
-            if isCollapsible {
-                toggleWrapper {
-                    SectionChevron(context: context)
-                        .contentShape(.rect)
+            HStack(spacing: 0.0) {
+                accessory()
+                if isCollapsible {
+                    toggleWrapper {
+                        SectionChevron(context: context)
+                            .contentShape(.rect)
+                    }
                 }
             }
         }
