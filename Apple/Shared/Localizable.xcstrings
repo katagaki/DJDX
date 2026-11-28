@@ -11523,6 +11523,52 @@
         }
       }
     },
+    "TierList.Share.Image" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Image"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像を共有"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分享圖片"
+          }
+        }
+      }
+    },
+    "TierList.Share.Image.Failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The tier list image could not be created."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "難易度表の画像を作成できませんでした。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法製作難度表圖片。"
+          }
+        }
+      }
+    },
     "TierList.Share.Link" : {
       "extractionState" : "manual",
       "localizations" : {
