@@ -127,8 +127,13 @@ data class IIDXClearLampSuggestion(
     val level: IIDXLevel,
     val difficulty: Int,
     val score: Int,
-    val clearType: String
-)
+    val clearType: String,
+    val scoreRate: Float? = null,
+    val missCount: Int = 0
+) {
+    val missSortKey: Int
+        get() = if (missCount > 0) missCount else Int.MAX_VALUE
+}
 
 object IIDXSuggestions {
     private val djLevelThresholds = listOf(
@@ -149,7 +154,11 @@ object IIDXSuggestions {
         target: IIDXClearType
     ): List<IIDXClearLampSuggestion> {
         val previous = clearTypeBefore(target) ?: return emptyList()
-        return candidates.filter { it.clearType == previous.value }
+        val filtered = candidates.filter { it.clearType == previous.value }
+        if (target != IIDXClearType.FULL_COMBO_CLEAR) return filtered
+        return filtered.sortedWith(
+            compareBy<IIDXClearLampSuggestion> { it.missSortKey }.thenByDescending { it.scoreRate ?: -1f }
+        )
     }
 
     private fun threshold(index: Int, maxScore: Int): Int = (maxScore * (index + 2) + 8) / 9
@@ -169,12 +178,20 @@ object IIDXSuggestions {
             for (level in IIDXLevel.entries) {
                 val score = record.slot(level)
                 if (score.difficulty <= 0 || !filters.matches(level, score)) continue
+                val noteCount = song?.noteCount(playType, level) ?: 0
                 if (score.clearType != IIDXClearType.NO_PLAY.value) {
                     clearLamps.add(
-                        IIDXClearLampSuggestion(record.title, level, score.difficulty, score.score, score.clearType)
+                        IIDXClearLampSuggestion(
+                            title = record.title,
+                            level = level,
+                            difficulty = score.difficulty,
+                            score = score.score,
+                            clearType = score.clearType,
+                            scoreRate = if (noteCount > 0) score.score.toFloat() / (noteCount * 2) else null,
+                            missCount = score.missCount
+                        )
                     )
                 }
-                val noteCount = song?.noteCount(playType, level) ?: continue
                 if (score.score <= 0 || noteCount <= 0) continue
                 val maxScore = noteCount * 2
                 val targetIndex = djLevelThresholds.indices
@@ -195,7 +212,9 @@ object IIDXSuggestions {
         return Pair(
             djLevels.sortedWith(compareBy<IIDXDJLevelSuggestion> { it.pointsNeeded }.thenByDescending { it.difficulty }),
             clearLamps.sortedWith(
-                compareByDescending<IIDXClearLampSuggestion> { it.difficulty }.thenByDescending { it.score }
+                compareByDescending<IIDXClearLampSuggestion> { it.scoreRate ?: -1f }
+                    .thenBy { it.missSortKey }
+                    .thenByDescending { it.difficulty }
             )
         )
     }
