@@ -48,6 +48,11 @@ struct DDRAnalyticsView: View {
             loadVisibleCards()
             isOverviewCollapsed = isOverviewCollapsedStored
         }
+        .onChange(of: isEditing) { _, isEditing in
+            if !isEditing {
+                saveCardOrder()
+            }
+        }
         .task {
             if model.dataState == .initializing {
                 await reload()

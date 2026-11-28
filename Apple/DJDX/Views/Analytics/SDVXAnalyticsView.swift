@@ -55,6 +55,11 @@ struct SDVXAnalyticsView: View {
             isOverviewCollapsed = isOverviewCollapsedStored
             isLastPlayCollapsed = isLastPlayCollapsedStored
         }
+        .onChange(of: isEditing) { _, isEditing in
+            if !isEditing {
+                saveCardOrder()
+            }
+        }
         .task {
             if model.dataState == .initializing {
                 await reload()

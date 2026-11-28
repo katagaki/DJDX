@@ -20,6 +20,7 @@ struct CardReorderDropDelegate: DropDelegate {
 
     func performDrop(info _: DropInfo) -> Bool {
         draggedCard = nil
+        onReorder()
         return true
     }
 
@@ -37,7 +38,6 @@ struct CardReorderDropDelegate: DropDelegate {
                 toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
             )
         }
-        onReorder()
     }
 
     func dropExited(info _: DropInfo) {
@@ -86,6 +86,7 @@ struct PerLevelCardReorderDropDelegate: DropDelegate {
 
     func performDrop(info _: DropInfo) -> Bool {
         draggedCard = nil
+        onReorder()
         return true
     }
 
@@ -100,7 +101,6 @@ struct PerLevelCardReorderDropDelegate: DropDelegate {
                 toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
             )
         }
-        onReorder()
     }
 
     func dropExited(info _: DropInfo) {
