@@ -4,22 +4,16 @@ struct IIDXSuggestionsSection: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @Bindable var model: AnalyticsModel
-    @Binding var isEditing: Bool
     var analyticsNamespace: Namespace.ID
 
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
     @State var shareCardID: AnalyticsSuggestionCardID?
 
-    var rowLimit: Int {
-        isEditing ? AnalyticsSuggestionCardID.editingPreviewLimit : AnalyticsSuggestionCardID.sectionLimit
-    }
-
     var body: some View {
         if model.sessionStore == nil {
             AnalyticsSuggestionsSection(
                 cards: AnalyticsSuggestionCardID.iidxCards,
-                isEditing: isEditing,
                 title: sectionTitle,
                 canShare: canShare,
                 onShare: { shareCardID = $0 },
@@ -85,7 +79,7 @@ struct IIDXSuggestionsSection: View {
     @ViewBuilder
     func suggestionRows(_ cardID: AnalyticsSuggestionCardID) -> some View {
         if let target = cardID.targetClearType {
-            AnalyticsSuggestionPreviewRows(items: model.clearLampSuggestions(for: target), limit: rowLimit) { suggestion in
+            AnalyticsSuggestionPreviewRows(items: model.clearLampSuggestions(for: target)) { suggestion in
                 navigationManager.push(
                     ScoresPath.scoreViewer(songRecord: suggestion.songRecord, initialLevel: suggestion.level)
                 )
@@ -96,7 +90,7 @@ struct IIDXSuggestionsSection: View {
         } else {
             switch cardID {
             case .iidxDJLevel:
-                AnalyticsSuggestionPreviewRows(items: model.djLevelSuggestions, limit: rowLimit) { suggestion in
+                AnalyticsSuggestionPreviewRows(items: model.djLevelSuggestions) { suggestion in
                     navigationManager.push(
                         ScoresPath.scoreViewer(songRecord: suggestion.songRecord, initialLevel: suggestion.level)
                     )
@@ -104,7 +98,7 @@ struct IIDXSuggestionsSection: View {
                     IIDXDJLevelSuggestionRow(namespace: analyticsNamespace, suggestion: suggestion)
                 }
             case .iidxNotPlayedRecently:
-                AnalyticsSuggestionPreviewRows(items: model.longUnplayedSuggestions, limit: rowLimit) { suggestion in
+                AnalyticsSuggestionPreviewRows(items: model.longUnplayedSuggestions) { suggestion in
                     navigationManager.push(
                         ScoresPath.scoreViewer(songRecord: suggestion.songRecord, initialLevel: suggestion.level)
                     )

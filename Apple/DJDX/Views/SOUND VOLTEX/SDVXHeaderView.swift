@@ -15,10 +15,10 @@ extension UnifiedView {
                 .transition(.scale(scale: 0.9).combined(with: .opacity))
             AnalyticsGoalsSection(game: .soundVoltex, playStyle: "")
                 .transition(.scale(scale: 0.9).combined(with: .opacity))
-            SDVXSuggestionsSection(model: sdvxAnalyticsModel,
-                                   isEditing: $isEditingAnalytics,
-                                   analyticsNamespace: sdvxAnalyticsNamespace)
-                .transition(.scale(scale: 0.9).combined(with: .opacity))
+            if !isEditingAnalytics {
+                SDVXSuggestionsSection(model: sdvxAnalyticsModel, analyticsNamespace: sdvxAnalyticsNamespace)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
+            }
         }
         .animation(.smooth.speed(2.0), value: showProfileHeader)
     }

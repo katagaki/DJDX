@@ -28,10 +28,10 @@ extension UnifiedView {
                 .transition(.scale(scale: 0.9).combined(with: .opacity))
             AnalyticsGoalsSection(game: selectedGame, playStyle: playTypeToShow.rawValue)
                 .transition(.scale(scale: 0.9).combined(with: .opacity))
-            IIDXSuggestionsSection(model: analyticsModel,
-                                   isEditing: $isEditingAnalytics,
-                                   analyticsNamespace: analyticsNamespace)
-                .transition(.scale(scale: 0.9).combined(with: .opacity))
+            if !isEditingAnalytics {
+                IIDXSuggestionsSection(model: analyticsModel, analyticsNamespace: analyticsNamespace)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
+            }
         }
         .animation(.smooth.speed(2.0), value: showProfileHeader)
     }
