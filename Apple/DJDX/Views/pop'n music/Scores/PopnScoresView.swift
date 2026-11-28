@@ -23,6 +23,7 @@ struct PopnScoresView<Header: View>: View {
 
     var isScoreDataExpandedKey: String = "PopnScoresView.ScoreDataExpanded"
     @State var isScoreDataExpanded: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.scoreDataKey) var isScoreDataVisible: Bool
 
     @State var dataState: DataState = .initializing
     @State var records: [PopnSongRecord] = []
@@ -98,29 +99,6 @@ struct PopnScoresView<Header: View>: View {
         PopnMedal.sorted.firstIndex(of: record.medalEnum) ?? PopnMedal.sorted.count
     }
 
-    @ViewBuilder var sortControl: some View {
-        Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
-            Picker("Shared.Sort", selection: $sortMode.animation(.smooth.speed(2.0))) {
-                ForEach(PopnSortMode.allCases, id: \.self) { mode in
-                    Text(LocalizedStringKey(mode.rawValue))
-                        .tag(mode)
-                }
-            }
-            .pickerStyle(.inline)
-            Section {
-                Picker("Shared.Sort.Order", selection: $sortOrder.animation(.smooth.speed(2.0))) {
-                    Label("Shared.Sort.Ascending", systemImage: "arrow.up")
-                        .tag(SortOrder.ascending)
-                    Label("Shared.Sort.Descending", systemImage: "arrow.down")
-                        .tag(SortOrder.descending)
-                }
-                .pickerStyle(.inline)
-            }
-        }
-        .menuOrder(.fixed)
-        .menuActionDismissBehavior(.disabled)
-    }
-
     @ViewBuilder var filterControl: some View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
@@ -133,7 +111,7 @@ struct PopnScoresView<Header: View>: View {
             LazyVStack(spacing: 0.0) {
                 if searchTerm.isEmpty {
                     header
-                    if !isEditingAnalytics {
+                    if !isEditingAnalytics, isScoreDataVisible {
                         AnalyticsSectionHeader(
                             title: "Analytics.Section.ScoreData",
                             isCollapsible: true,
@@ -142,14 +120,14 @@ struct PopnScoresView<Header: View>: View {
                             withAnimation(.smooth.speed(2.0)) { isScoreDataExpanded.toggle() }
                             UserDefaults.standard.set(isScoreDataExpanded, forKey: isScoreDataExpandedKey)
                         }
-                        .padding(.top, 16.0)
-                        .padding(.bottom, 12.0)
+                        .padding(.top, DesignMetrics.sectionGap)
+                        .padding(.bottom, isScoreDataExpanded ? 8.0 : 0.0)
                         if isScoreDataExpanded {
                             Divider()
                         }
                     }
                 }
-                if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
+                if !isEditingAnalytics, (isScoreDataVisible && isScoreDataExpanded) || !searchTerm.isEmpty {
                     ForEach(sortedRecords, id: \.self) { record in
                         PopnScoreRow(record: record)
                             .contentShape(.rect)
@@ -169,23 +147,16 @@ struct PopnScoresView<Header: View>: View {
             await reload()
         }
         .toolbar {
-            if #available(iOS 26.0, *) {
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    sortControl
-                    filterControl
-                }
-            } else {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Spacer()
-                    sortControl
-                    filterControl
-                }
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                filterControl
             }
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             PopnScoreFilterSheet(
+                sortMode: $sortMode.animation(.smooth.speed(2.0)),
+                sortOrder: $sortOrder.animation(.smooth.speed(2.0)),
                 difficultiesToShow: $difficultiesToShow.animation(.smooth.speed(2.0)),
                 levelsToShow: $levelsToShow.animation(.smooth.speed(2.0)),
                 clearTypesToShow: $clearTypesToShow.animation(.smooth.speed(2.0)),

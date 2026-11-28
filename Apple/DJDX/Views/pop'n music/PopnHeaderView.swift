@@ -7,18 +7,14 @@ extension UnifiedView {
             if showProfileHeader {
                 PopnProfileHeaderView()
                     .padding(.horizontal)
-                    .padding(.top, 16.0)
+                    .padding(.top, 10.0)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
-            if showAnalytics {
-                PopnAnalyticsView(model: popnAnalyticsModel,
-                                  isEditing: $isEditingAnalytics,
-                                  analyticsNamespace: popnAnalyticsNamespace)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-            }
+            PopnAnalyticsView(model: popnAnalyticsModel,
+                              isEditing: $isEditingAnalytics,
+                              analyticsNamespace: popnAnalyticsNamespace)
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
         }
-        .padding(.bottom, 8.0)
         .animation(.snappy, value: showProfileHeader)
-        .animation(.smooth.speed(2.0), value: showAnalytics)
     }
 }

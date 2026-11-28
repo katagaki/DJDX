@@ -27,9 +27,8 @@ struct PopnScoreRow: View {
                     Text(record.score.formatted(.number))
                         .foregroundStyle(LinearGradient(colors: [.cyan, .blue],
                                                         startPoint: .top, endPoint: .bottom))
-                        .fontWidth(.expanded)
-                        .fontWeight(.heavy)
-                        .monospacedDigit()
+                        .font(.scoreline(.caption))
+                        .fontWidth(.standard)
                     if record.rankEnum != .none {
                         Divider().frame(maxHeight: 14.0)
                         Text(verbatim: record.rank)
@@ -40,30 +39,19 @@ struct PopnScoreRow: View {
                     Divider().frame(maxHeight: 14.0)
                     Text(verbatim: record.medalEnum.abbreviation)
                         .foregroundStyle(record.clearType.color)
-                        .fontWidth(.expanded)
-                        .fontWeight(.bold)
+                        .font(.playline(.caption, weight: .regular))
                 }
                 .font(.caption)
+                .squashedHorizontally()
             }
             .padding([.top, .bottom], 8.0)
 
             Spacer(minLength: 0.0)
 
-            VStack(spacing: 1.0) {
-                Text(verbatim: record.level > 0 ? "\(record.level)" : "-")
-                    .font(.system(size: 18.0).weight(.heavy))
-                    .monospacedDigit()
-                Text(verbatim: record.difficultyEnum.rawValue)
-                    .font(.system(size: 10.0).weight(.black))
-                    .fontWidth(.condensed)
-                    .foregroundStyle(record.difficultyEnum.color)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-            }
-            .padding([.top, .bottom], 6.0)
-            .frame(width: 78.0, alignment: .center)
-            .cardBackground(cornerRadius: 6.0)
-            .padding([.top, .bottom], 8.0)
+            LevelBadge(name: record.difficultyEnum.rawValue,
+                       level: record.level > 0 ? String(record.level) : "-",
+                       tint: record.difficultyEnum.color, layout: .horizontal)
+                .padding([.top, .bottom], 8.0)
         }
         .frame(maxWidth: .infinity)
         .padding(.trailing)

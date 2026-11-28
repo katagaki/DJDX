@@ -10,7 +10,7 @@ struct PopnProfileHeaderView: View {
     @State var popnClassImage: UIImage?
     @State var popnClassTier: PopnClass.Tier?
 
-    let profileHeight: CGFloat = 60.0
+    let profileHeight: CGFloat = DesignMetrics.profileHeight
     let reader = PopnReader()
 
     var body: some View {
@@ -19,9 +19,7 @@ struct PopnProfileHeaderView: View {
                 HStack(alignment: .center, spacing: 12.0) {
                     if let playerName {
                         Text(verbatim: playerName)
-                            .font(.title2)
-                            .fontDesign(.rounded)
-                            .fontWeight(.bold)
+                            .font(.playline(size: 16.0))
                             .lineLimit(1)
                     }
                     Spacer(minLength: 0.0)
@@ -46,34 +44,30 @@ struct PopnProfileHeaderView: View {
 
     @ViewBuilder
     func classBlock(value: String) -> some View {
-        VStack(spacing: 6.0) {
+        VStack(spacing: 4.0) {
             Text("Shared.Popn.PopnClass")
                 .font(.caption.weight(.bold))
-                .italic()
                 .foregroundStyle(.secondary)
             HStack(spacing: 4.0) {
                 if let popnClassImage {
                     Image(uiImage: popnClassImage)
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 24.0)
+                        .frame(height: 22.0)
                 } else if let popnClassTier {
                     Text(verbatim: popnClassTier.name)
                         .font(.caption.bold())
                         .foregroundStyle(popnClassTier.color)
                 }
                 Text(verbatim: value)
-                    .font(.title3.bold())
-                    .fontWidth(.condensed)
-                    .italic()
-                    .monospacedDigit()
+                    .font(.scoreline(.callout))
             }
-            .frame(height: 24.0, alignment: .center)
+            .frame(height: 22.0, alignment: .center)
         }
         .frame(minWidth: 64.0)
-        .padding(.vertical, 8.0)
-        .padding(.horizontal, 10.0)
-        .cardBackground(cornerRadius: 8.0)
+        .fixedSize()
+        .padding(.vertical, 6.0)
+        .padding(.horizontal, 4.0)
     }
 
     func loadProfile() async {
