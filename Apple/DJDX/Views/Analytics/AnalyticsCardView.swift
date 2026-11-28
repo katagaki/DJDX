@@ -15,7 +15,6 @@ enum AnalyticsCardHeaderPlacement {
 struct AnalyticsCardView<Content: View>: View {
 
     let title: Text
-    let systemImage: String
     let iconColor: Color
     let contentHeight: CGFloat
     var showsHeader: Bool = true
@@ -28,7 +27,6 @@ struct AnalyticsCardView<Content: View>: View {
          headerPlacement: AnalyticsCardHeaderPlacement = .top,
          @ViewBuilder content: @escaping () -> Content) {
         self.title = cardType.titleText
-        self.systemImage = cardType.systemImage
         self.iconColor = cardType.iconColor
         self.contentHeight = cardType.cardContentHeight
         self.showsHeader = showsHeader
@@ -37,28 +35,14 @@ struct AnalyticsCardView<Content: View>: View {
     }
 
     init(title: LocalizedStringKey,
-         systemImage: String,
-         iconColor: Color,
+         iconColor: Color = .clear,
          contentHeight: CGFloat = 80.0,
          showsHeader: Bool = true,
          @ViewBuilder content: @escaping () -> Content) {
         self.title = Text(title)
-        self.systemImage = systemImage
         self.iconColor = iconColor
         self.contentHeight = contentHeight
         self.showsHeader = showsHeader
-        self.content = content
-    }
-
-    init(verbatimTitle: String,
-         systemImage: String,
-         iconColor: Color,
-         contentHeight: CGFloat = 80.0,
-         @ViewBuilder content: @escaping () -> Content) {
-        self.title = Text(verbatim: verbatimTitle)
-        self.systemImage = systemImage
-        self.iconColor = iconColor
-        self.contentHeight = contentHeight
         self.content = content
     }
 
@@ -103,8 +87,7 @@ struct AnalyticsCardView<Content: View>: View {
                     .frame(height: 12.0)
             }
             content()
-                .frame(height: headerPlacement == .bottom
-                       ? DesignMetrics.summaryContentHeight : DesignMetrics.chartHeight(contentHeight))
+                .frame(height: DesignMetrics.chartHeight(contentHeight))
         }
         .padding(DesignMetrics.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)

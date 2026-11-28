@@ -53,21 +53,6 @@ struct AnalyticsDestinationView: View {
                     .navigationTransition(.zoom(
                         sourceID: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
                     ))
-            case .djLevelSuggestionsDetail:
-                IIDXDJLevelSuggestionsDetailView(suggestions: model.djLevelSuggestions)
-                    .navigationTitle("Analytics.Suggestions.NextDJLevel")
-                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.iidxDJLevel.transitionID,
-                                                in: analyticsNamespace))
-            case .clearLampSuggestionsDetail(let target):
-                IIDXClearLampSuggestionsDetailView(model: model, targetClearType: target)
-                    .navigationTitle("Analytics.Suggestions.NextClearLamp.\(target.rawValue)")
-                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.clearLampID(for: target).transitionID,
-                                                in: analyticsNamespace))
-            case .notPlayedRecentlySuggestionsDetail:
-                IIDXUnplayedSuggestionsDetailView(suggestions: model.longUnplayedSuggestions)
-                    .navigationTitle("Analytics.Suggestions.NotPlayedRecently")
-                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.iidxNotPlayedRecently.transitionID,
-                                                in: analyticsNamespace))
             default:
                 newEntryDestination
             }

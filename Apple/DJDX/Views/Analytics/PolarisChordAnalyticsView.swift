@@ -281,8 +281,6 @@ struct PolarisChordAnalyticsView: View {
 
     var clearBreakdownCard: some View {
         AnalyticsCardView(title: "Analytics.PolarisChord.ClearBreakdown",
-                          systemImage: "",
-                          iconColor: .clear,
                           contentHeight: 160.0,
                           showsHeader: false) {
             StackedBreakdownBar(items: totalClearCounts.elements.filter { $0.value > 0 }.map { element in
@@ -295,8 +293,6 @@ struct PolarisChordAnalyticsView: View {
 
     var gradeBreakdownCard: some View {
         AnalyticsCardView(title: "Analytics.PolarisChord.GradeBreakdown",
-                          systemImage: "",
-                          iconColor: .clear,
                           contentHeight: 160.0,
                           showsHeader: false) {
             StackedBreakdownBar(items: totalGradeCounts.elements.filter { $0.value > 0 }.map { element in

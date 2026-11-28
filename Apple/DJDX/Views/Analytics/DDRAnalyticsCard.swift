@@ -3,7 +3,6 @@ import SwiftUI
 enum DDRAnalyticsPath: Hashable {
     case clearBreakdownDetail
     case rankBreakdownDetail
-    case flareSkillSuggestionsDetail
     case flareSkillTrendDetail
 }
 

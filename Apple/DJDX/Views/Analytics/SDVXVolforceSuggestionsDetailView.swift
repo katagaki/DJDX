@@ -23,23 +23,3 @@ struct SDVXVolforceSuggestionRow: View {
         return row
     }
 }
-
-struct SDVXVolforceSuggestionsDetailView: View {
-    @EnvironmentObject var navigationManager: NavigationManager
-
-    let suggestions: [SDVXVolforceSuggestion]
-
-    @Namespace private var namespace
-
-    var body: some View {
-        AnalyticsSuggestionList(items: suggestions) { suggestion in
-            Button {
-                navigationManager.push(SDVXScoresPath.scoreViewer(songRecord: suggestion.record))
-            } label: {
-                SDVXVolforceSuggestionRow(namespace: namespace, suggestion: suggestion)
-                    .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
-        }
-    }
-}

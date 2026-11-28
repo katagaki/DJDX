@@ -5517,29 +5517,6 @@
         }
       }
     },
-    "More.General.ShowAnalytics" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Analytics"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アナリティクスを表示"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "顯示分析"
-          }
-        }
-      }
-    },
     "More.General.ShowProfileHeader" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -10727,50 +10704,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分數評價"
-          }
-        }
-      }
-    },
-    "Shared.SelectDate" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select Date"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日付を選択"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選擇日期"
-          }
-        }
-      }
-    },
-    "Shared.ShowPastData" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Go Back in Time"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "遡る"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "回顧過往資料"
           }
         }
       }

@@ -1,35 +1,5 @@
 import SwiftUI
 
-struct IIDXScoreSortMenu: View {
-
-    @Binding var sortMode: SortMode
-    @Binding var sortOrder: SortOrder
-
-    var body: some View {
-        Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
-            Picker("Shared.Sort", selection: $sortMode) {
-                ForEach(SortMode.whenLevelFiltered, id: \.self) { sortMode in
-                    Text(LocalizedStringKey(sortMode.rawValue))
-                        .tag(sortMode)
-                }
-            }
-            .pickerStyle(.inline)
-            Section {
-                Picker("Shared.Sort.Order", selection: $sortOrder) {
-                    Label("Shared.Sort.Ascending", systemImage: "arrow.up")
-                        .tag(SortOrder.ascending)
-                    Label("Shared.Sort.Descending", systemImage: "arrow.down")
-                        .tag(SortOrder.descending)
-                }
-                .pickerStyle(.inline)
-            }
-            .sectionStyle()
-        }
-        .menuOrder(.fixed)
-        .menuActionDismissBehavior(.disabled)
-    }
-}
-
 struct ScoreFilterButton: View {
 
     @Binding var isShowingFilterSheet: Bool

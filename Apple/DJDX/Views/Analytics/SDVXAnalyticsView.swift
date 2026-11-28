@@ -276,8 +276,6 @@ struct SDVXAnalyticsView: View {
 
     var clearBreakdownCard: some View {
         AnalyticsCardView(title: "Analytics.SDVX.ClearBreakdown",
-                          systemImage: "",
-                          iconColor: .clear,
                           contentHeight: 160.0,
                           showsHeader: false) {
             StackedBreakdownBar(items: totalClearCounts.elements.filter { $0.value > 0 }.map { element in
@@ -290,8 +288,6 @@ struct SDVXAnalyticsView: View {
 
     var gradeBreakdownCard: some View {
         AnalyticsCardView(title: "Analytics.SDVX.GradeBreakdown",
-                          systemImage: "",
-                          iconColor: .clear,
                           contentHeight: 160.0,
                           showsHeader: false) {
             StackedBreakdownBar(items: totalGradeCounts.elements.filter { $0.value > 0 }.map { element in
@@ -304,8 +300,6 @@ struct SDVXAnalyticsView: View {
 
     var volforceTrendCard: some View {
         AnalyticsCardView(title: "Analytics.SDVX.VolforceTrend",
-                          systemImage: "",
-                          iconColor: .clear,
                           contentHeight: 160.0,
                           showsHeader: false) {
             TrendCardContent(points: model.volforceHistory, color: .purple,

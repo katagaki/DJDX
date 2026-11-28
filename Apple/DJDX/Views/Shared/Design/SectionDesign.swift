@@ -8,7 +8,6 @@ enum DesignMetrics {
     static let perLevelHeight: CGFloat = 48.0
     static let barHeight: CGFloat = 12.0
     static let barSegmentGap: CGFloat = 1.0
-    static let summaryContentHeight: CGFloat = 24.0
     static let profileHeight: CGFloat = 64.0
     static let emptyCardHeight: CGFloat = 56.0
     static let sessionCardSize = CGSize(width: 124.0, height: 80.0)
@@ -73,7 +72,6 @@ struct RailCard: ViewModifier {
 
 extension Color {
     static let hairline = Color.primary.opacity(0.14)
-    static let hairlineStrong = Color.primary.opacity(0.32)
 }
 
 extension View {

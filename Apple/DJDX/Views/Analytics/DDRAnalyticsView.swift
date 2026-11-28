@@ -202,8 +202,6 @@ struct DDRAnalyticsView: View {
 
     var flareSkillTrendCard: some View {
         AnalyticsCardView(title: "Analytics.DDR.FlareSkillTrend",
-                          systemImage: "",
-                          iconColor: .clear,
                           contentHeight: 160.0,
                           showsHeader: false) {
             TrendCardContent(points: model.flareSkillHistory, color: .orange,
@@ -218,8 +216,6 @@ struct DDRAnalyticsView: View {
 
     var clearBreakdownCard: some View {
         AnalyticsCardView(title: "Analytics.DDR.ClearBreakdown",
-                          systemImage: "",
-                          iconColor: .clear,
                           contentHeight: 160.0,
                           showsHeader: false) {
             StackedBreakdownBar(items: totalClearCounts.elements.filter { $0.value > 0 }.map { element in
@@ -232,8 +228,6 @@ struct DDRAnalyticsView: View {
 
     var rankBreakdownCard: some View {
         AnalyticsCardView(title: "Analytics.DDR.RankBreakdown",
-                          systemImage: "",
-                          iconColor: .clear,
                           contentHeight: 160.0,
                           showsHeader: false) {
             StackedBreakdownBar(items: totalRankCounts.elements.filter { $0.value > 0 }.map { element in

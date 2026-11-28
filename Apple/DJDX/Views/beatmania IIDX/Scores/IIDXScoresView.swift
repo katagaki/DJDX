@@ -31,7 +31,6 @@ struct IIDXScoresView<Header: View>: View {
     @State var isSystemChangingFilterAndSort: Bool = false
     @State var isShowingFilterSheet: Bool = false
     @State var isShowingShareCard: Bool = false
-    @State var isSystemChangingAllRecords: Bool = false
 
     @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
@@ -51,14 +50,6 @@ struct IIDXScoresView<Header: View>: View {
     @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
 
     @Namespace var scoresNamespace
-
-    var effectiveLevel: IIDXLevel {
-        levelsToShow.count == 1 ? levelsToShow.first! : .all
-    }
-
-    var effectiveDifficulty: IIDXDifficulty {
-        difficultiesToShow.count == 1 ? difficultiesToShow.first! : .all
-    }
 
     static var allLevels: [(IIDXLevel, KeyPath<IIDXSongRecord, IIDXLevelScore>)] {
         [

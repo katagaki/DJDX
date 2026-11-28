@@ -28,8 +28,6 @@ enum AnalyticsSuggestionCardID: String, Codable, Hashable, CaseIterable, Identif
         .iidxAlmostFullCombo, .iidxAlmostExHard, .iidxAlmostClear, .iidxAlmostEasy, .iidxAlmostAssist
     ]
 
-    var transitionID: String { "Suggestions.\(rawValue)" }
-
     var targetClearType: IIDXClearType? {
         switch self {
         case .iidxAlmostFullCombo: .fullComboClear
@@ -300,30 +298,6 @@ struct AnalyticsSuggestionPreviewRows<Item: Identifiable, Row: View>: View {
                 }
             }
         }
-    }
-}
-
-struct AnalyticsSuggestionList<Item: Identifiable, Row: View>: View {
-    let items: [Item]
-    @ViewBuilder let row: (Item) -> Row
-
-    var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 0.0) {
-                if items.isEmpty {
-                    Text("Analytics.Suggestions.Empty")
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 24.0)
-                } else {
-                    ForEach(items) { item in
-                        row(item)
-                        Divider()
-                    }
-                }
-            }
-        }
-        .scrollContentBackground(.hidden)
     }
 }
 

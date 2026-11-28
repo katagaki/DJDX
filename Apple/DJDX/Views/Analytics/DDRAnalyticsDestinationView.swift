@@ -19,11 +19,6 @@ struct DDRAnalyticsDestinationView: View {
                 DDRRankBreakdownDetailView(rankPerLevel: model.rankPerLevel)
                     .navigationTitle("Analytics.DDR.RankBreakdown")
                     .navigationTransition(.zoom(sourceID: "DDR.rankBreakdown", in: namespace))
-            case .flareSkillSuggestionsDetail:
-                DDRFlareSkillSuggestionsDetailView(suggestions: model.flareSkillSuggestions)
-                    .navigationTitle(Text(verbatim: "FLARE SKILL"))
-                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.ddrFlareSkill.transitionID,
-                                                in: namespace))
             case .flareSkillTrendDetail:
                 TrendDetailView(points: model.flareSkillHistory, color: .orange,
                                 format: DDRAnalyticsModel.formatFlareSkill)
@@ -166,23 +161,5 @@ struct DDRFlareSkillSuggestionRow: View {
         }
         row.verticalPadding = 5.0
         return row
-    }
-}
-
-struct DDRFlareSkillSuggestionsDetailView: View {
-    @EnvironmentObject var navigationManager: NavigationManager
-
-    let suggestions: [DDRFlareSkillSuggestion]
-
-    var body: some View {
-        AnalyticsSuggestionList(items: suggestions) { suggestion in
-            Button {
-                navigationManager.push(DDRScoresPath.scoreViewer(songRecord: suggestion.record))
-            } label: {
-                DDRFlareSkillSuggestionRow(suggestion: suggestion)
-                    .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
-        }
     }
 }

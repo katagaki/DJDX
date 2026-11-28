@@ -38,11 +38,6 @@ struct SDVXAnalyticsDestinationView: View {
                 SDVXNewGradesDetailView(newGrades: model.newGrades[grade] ?? [])
                     .navigationTitle(Text(verbatim: grade))
                     .navigationTransition(.zoom(sourceID: transitionID(forGrade: grade), in: namespace))
-            case .volforceSuggestionsDetail:
-                SDVXVolforceSuggestionsDetailView(suggestions: model.volforceSuggestions)
-                    .navigationTitle(Text(verbatim: "VOLFORCE"))
-                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.sdvxVolforce.transitionID,
-                                                in: namespace))
             }
         }
         .appBackgroundGradient()

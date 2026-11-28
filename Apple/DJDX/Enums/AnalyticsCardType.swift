@@ -193,17 +193,10 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    /// Whether this card is pinned (cannot be reordered past)
     var isPinned: Bool {
         self == .clearTypeOverall
     }
 
-    /// Tower cards, shown in their own section
-    static var towerCards: [AnalyticsCardType] {
-        [.towerTotals, .towerRecent]
-    }
-
-    /// Default card order
     static var defaultOrder: [AnalyticsCardType] {
         [
             .clearTypeOverall,
