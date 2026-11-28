@@ -3184,6 +3184,29 @@
         }
       }
     },
+    "Goals.Days.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld days"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld日"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 天"
+          }
+        }
+      }
+    },
     "Goals.DaysLeft.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3640,29 +3663,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新目標"
-          }
-        }
-      }
-    },
-    "Goals.Pace.%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pace: %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ペース：%@"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "進度：%@"
           }
         }
       }
