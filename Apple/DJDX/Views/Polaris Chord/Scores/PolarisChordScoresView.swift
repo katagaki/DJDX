@@ -123,7 +123,7 @@ struct PolarisChordScoresView<Header: View>: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 0.0) {
+            VStack(spacing: 0.0) {
                 if searchTerm.isEmpty {
                     header
                     if !isEditingAnalytics, isScoreDataVisible {
@@ -152,16 +152,18 @@ struct PolarisChordScoresView<Header: View>: View {
                 }
                 if !isEditingAnalytics, (isScoreDataVisible && isScoreDataExpanded) || !searchTerm.isEmpty {
                     let sortedRecords = sortedRecords
-                    ForEach(sortedRecords, id: \.self) { record in
-                        Button {
-                            chartNoteTarget = record.chartNoteTarget
-                        } label: {
-                            PolarisChordScoreRow(record: record)
-                                .contentShape(.rect)
+                    LazyVStack(spacing: 0.0) {
+                        ForEach(sortedRecords, id: \.self) { record in
+                            Button {
+                                chartNoteTarget = record.chartNoteTarget
+                            } label: {
+                                PolarisChordScoreRow(record: record)
+                                    .contentShape(.rect)
+                            }
+                            .buttonStyle(.plain)
+                            Divider()
+                                .padding(.leading, 16.0)
                         }
-                        .buttonStyle(.plain)
-                        Divider()
-                            .padding(.leading, 16.0)
                     }
                 }
             }
