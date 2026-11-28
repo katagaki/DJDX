@@ -37,15 +37,17 @@ extension ShareCardEntry {
         if score.score != 0 {
             if !score.djLevel.isEmpty, score.djLevel != "---" {
                 metrics.append(ShareCardMetric(score.djLevel,
-                                               style: AnyShapeStyle(IIDXDJLevel.style(for: score.djLevel))))
+                                               style: AnyShapeStyle(IIDXDJLevel.style(for: score.djLevel)),
+                                               typeface: .grade))
             }
             if let scoreRate {
                 metrics.append(ShareCardMetric(
                     scoreRate.formatted(.percent.precision(.fractionLength(1))),
-                    style: Color.white.opacity(0.7)
+                    style: Color.white.opacity(0.7),
+                    typeface: .score
                 ))
             }
-            metrics.append(ShareCardMetric(String(score.score), style: Color.iidxScore))
+            metrics.append(ShareCardMetric(String(score.score), style: Color.iidxScore, typeface: .score))
         }
         self.init(
             title: songRecord.title,
@@ -66,12 +68,13 @@ extension ShareCardEntry {
     init(sdvxSongRecord record: SDVXSongRecord) {
         var metrics: [ShareCardMetric] = []
         if record.gradeEnum != .none && record.gradeEnum != .unknown {
-            metrics.append(ShareCardMetric(record.grade, style: LinearGradient.sdvxGrade))
+            metrics.append(ShareCardMetric(record.grade, style: LinearGradient.sdvxGrade, typeface: .grade))
         }
         if record.highScore > 0 {
-            metrics.append(ShareCardMetric(String(record.highScore), style: LinearGradient.sdvxScore))
+            metrics.append(ShareCardMetric(String(record.highScore), style: LinearGradient.sdvxScore, typeface: .score))
         }
-        metrics.append(ShareCardMetric(record.clearTypeEnum.abbreviation, style: record.clearTypeEnum.color))
+        metrics.append(ShareCardMetric(record.clearTypeEnum.abbreviation, style: record.clearTypeEnum.color,
+                                       typeface: .clearType))
         self.init(
             title: record.title,
             lampStyle: AnyShapeStyle(record.clearTypeEnum.color),
@@ -87,15 +90,18 @@ extension ShareCardEntry {
         if record.score > 0 {
             metrics.append(ShareCardMetric(
                 String(record.score),
-                style: LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom)
+                style: LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom),
+                typeface: .score
             ))
         }
         if !record.rankDisplay.isEmpty {
-            metrics.append(ShareCardMetric(record.rankDisplay, style: DDRSongRecord.rankColor(forStem: record.rank)))
+            metrics.append(ShareCardMetric(record.rankDisplay, style: DDRSongRecord.rankColor(forStem: record.rank),
+                                           typeface: .grade))
         }
         if !record.clearDisplay.isEmpty {
             metrics.append(ShareCardMetric(record.clearDisplay,
-                                           style: DDRSongRecord.clearColor(for: record.clearKind)))
+                                           style: DDRSongRecord.clearColor(for: record.clearKind),
+                                           typeface: .clearType))
         }
         self.init(
             title: record.title,
@@ -112,14 +118,17 @@ extension ShareCardEntry {
         if !record.achievementRate.isEmpty {
             metrics.append(ShareCardMetric(
                 "\(record.achievementRate)%",
-                style: LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom)
+                style: LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom),
+                typeface: .score
             ))
         }
         if record.gradeEnum != .none && record.gradeEnum != .unknown {
             metrics.append(ShareCardMetric(record.grade,
-                                           style: AnyShapeStyle(record.gradeEnum.style(colorScheme: .dark))))
+                                           style: AnyShapeStyle(record.gradeEnum.style(colorScheme: .dark)),
+                                           typeface: .grade))
         }
-        metrics.append(ShareCardMetric(record.clearTypeEnum.abbreviation, style: record.clearTypeEnum.color))
+        metrics.append(ShareCardMetric(record.clearTypeEnum.abbreviation, style: record.clearTypeEnum.color,
+                                       typeface: .clearType))
         self.init(
             title: record.title,
             lampStyle: AnyShapeStyle(record.clearTypeEnum.color),

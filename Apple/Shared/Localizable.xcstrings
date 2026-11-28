@@ -9415,29 +9415,6 @@
         }
       }
     },
-    "ShareCard.More.%lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "and %lld more"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "他%lld譜面"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "其他 %lld 個譜面"
-          }
-        }
-      }
-    },
     "ShareCard.RowLimit" : {
       "extractionState" : "manual",
       "localizations" : {

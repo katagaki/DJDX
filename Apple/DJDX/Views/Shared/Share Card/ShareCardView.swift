@@ -5,7 +5,6 @@ struct ShareCardView: View {
     let game: Game
     let profile: ShareCardProfile?
     let entries: [ShareCardEntry]
-    let totalCount: Int
     var playStyle: String?
     let background: ShareCardBackground
     let photo: UIImage?
@@ -55,12 +54,13 @@ struct ShareCardView: View {
                 }
                 VStack(alignment: .leading, spacing: 1.0) {
                     Text(verbatim: game.displayName)
-                        .font(.system(size: 15.0, weight: .heavy))
-                        .fontWidth(.expanded)
+                        .font(.playline(size: 15.0))
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
-                    Text(date, format: .dateTime.year().month().day())
-                        .font(.system(size: 11.0, weight: .semibold))
+                    Text(verbatim: date.formatted(.verbatim(
+                        "\(year: .defaultDigits)/\(month: .twoDigits)/\(day: .twoDigits)",
+                        timeZone: .current, calendar: Calendar(identifier: .gregorian))))
+                        .font(.playline(size: 11.0, weight: .regular))
                         .foregroundStyle(.white.opacity(0.7))
                 }
                 Spacer(minLength: 8.0)
@@ -69,8 +69,7 @@ struct ShareCardView: View {
                 }
                 if let playStyle {
                     Text(verbatim: playStyle)
-                        .font(.system(size: 13.0, weight: .black))
-                        .fontWidth(.expanded)
+                        .font(.playline(size: 13.0))
                         .padding(.horizontal, 10.0)
                         .padding(.vertical, 5.0)
                         .background(.white.opacity(0.2), in: .capsule)
@@ -86,7 +85,7 @@ struct ShareCardView: View {
         VStack(alignment: alignment, spacing: 2.0) {
             if let playerName = profile.playerName, !playerName.isEmpty {
                 Text(verbatim: playerName)
-                    .font(.system(size: 15.0, weight: .bold))
+                    .font(.playline(size: 16.0))
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
             }
@@ -94,13 +93,12 @@ struct ShareCardView: View {
                 HStack(alignment: .firstTextBaseline, spacing: 4.0) {
                     if !rating.label.isEmpty {
                         Text(verbatim: rating.label)
+                            .font(.playline(size: 11.0, weight: .regular))
                             .foregroundStyle(.white.opacity(0.7))
                     }
                     Text(verbatim: rating.value)
-                        .monospacedDigit()
+                        .font(rating.value.first?.isNumber == true ? .scoreline(size: 13.0) : .playline(size: 13.0))
                 }
-                .font(.system(size: 11.0, weight: .heavy))
-                .fontWidth(.condensed)
                 .lineLimit(1)
             }
         }
@@ -125,14 +123,10 @@ struct ShareCardView: View {
 
     @ViewBuilder var footer: some View {
         HStack {
-            if totalCount > entries.count {
-                Text("ShareCard.More.\(totalCount - entries.count)")
-            }
             Spacer()
             Text(verbatim: "DJDX")
-                .fontWidth(.expanded)
         }
-        .font(.system(size: 11.0, weight: .heavy))
+        .font(.playline(size: 11.0))
         .foregroundStyle(.white.opacity(0.7))
         .padding(.horizontal, 4.0)
     }
@@ -199,15 +193,9 @@ struct ShareCardRow: View {
                 if !entry.metrics.isEmpty {
                     HStack(spacing: 8.0) {
                         ForEach(entry.metrics) { metric in
-                            Text(verbatim: metric.text)
-                                .font(metric.text.first?.isNumber == true ? .scoreline(size: 11.0) : nil)
-                                .fontWidth(metric.text.first?.isNumber == true ? .standard : .expanded)
-                                .foregroundStyle(metric.style)
+                            ShareCardMetricText(metric: metric)
                         }
                     }
-                    .font(.system(size: 11.0, weight: .heavy))
-                    .fontWidth(.expanded)
-                    .monospacedDigit()
                     .lineLimit(1)
                 }
             }
@@ -219,6 +207,29 @@ struct ShareCardRow: View {
         }
         .padding(.trailing, 6.0)
         .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+struct ShareCardMetricText: View {
+
+    let metric: ShareCardMetric
+
+    var body: some View {
+        switch metric.typeface {
+        case .score:
+            Text(verbatim: metric.text)
+                .font(.scoreline(size: 11.0))
+                .foregroundStyle(metric.style)
+        case .grade:
+            Text(verbatim: metric.text)
+                .font(.system(size: 11.0, weight: .black))
+                .fontWidth(.expanded)
+                .foregroundStyle(metric.style)
+        case .clearType:
+            Text(verbatim: metric.text)
+                .font(.playline(size: 11.0, weight: .regular))
+                .foregroundStyle(metric.style)
+        }
     }
 }
 

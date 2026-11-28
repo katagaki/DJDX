@@ -87,7 +87,6 @@ struct ShareCardComposer: View {
                     .frame(maxWidth: .infinity, maxHeight: 460.0)
                     .listRowBackground(Color.clear)
                 }
-                .sectionStyle()
                 Section {
                     backgroundCarousel()
                     if background == .custom {
@@ -95,9 +94,7 @@ struct ShareCardComposer: View {
                     }
                 } header: {
                     Text("ShareCard.Background")
-                        .sectionListHeader()
                 }
-                .sectionStyle()
                 Section {
                     if !profile.isEmpty {
                         Toggle("ShareCard.ShowProfile", isOn: $isProfileVisible)
@@ -113,9 +110,8 @@ struct ShareCardComposer: View {
                         }
                     }
                 }
-                .sectionStyle()
             }
-            .insetList()
+            .listStyle(.insetGrouped)
             .navigationTitle("ShareCard.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -255,7 +251,6 @@ struct ShareCardComposer: View {
             game: game,
             profile: isProfileVisible ? profile : nil,
             entries: visibleEntries,
-            totalCount: isTodayOnly ? visibleEntries.count : entries.count,
             playStyle: playStyle,
             background: background,
             photo: photo,

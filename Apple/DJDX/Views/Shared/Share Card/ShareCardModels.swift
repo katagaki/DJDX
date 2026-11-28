@@ -1,13 +1,21 @@
 import SwiftUI
 
 struct ShareCardMetric: Identifiable {
+    enum Typeface {
+        case score
+        case grade
+        case clearType
+    }
+
     let id = UUID()
     let text: String
     let style: AnyShapeStyle
+    let typeface: Typeface
 
-    init(_ text: String, style: some ShapeStyle) {
+    init(_ text: String, style: some ShapeStyle, typeface: Typeface) {
         self.text = text
         self.style = AnyShapeStyle(style)
+        self.typeface = typeface
     }
 }
 
