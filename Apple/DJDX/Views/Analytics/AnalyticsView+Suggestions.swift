@@ -1,82 +1,120 @@
 import SwiftUI
 
-extension AnalyticsView {
+struct IIDXSuggestionsSection: View {
+    @EnvironmentObject var navigationManager: NavigationManager
 
-    @ViewBuilder
-    var suggestionsSection: some View {
+    @Bindable var model: AnalyticsModel
+    @Binding var isEditing: Bool
+    var analyticsNamespace: Namespace.ID
+
+    @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
+    @AppStorage(wrappedValue: IIDXVersion.zinrai, "Global.IIDX.Version") var iidxVersion: IIDXVersion
+    @State var shareCardID: AnalyticsSuggestionCardID?
+
+    var rowLimit: Int {
+        isEditing ? AnalyticsSuggestionCardID.editingPreviewLimit : AnalyticsSuggestionCardID.sectionLimit
+    }
+
+    var body: some View {
         if model.sessionStore == nil {
             AnalyticsSuggestionsSection(
                 cards: AnalyticsSuggestionCardID.iidxCards,
-                columns: perLevelColumns,
                 isEditing: isEditing,
-                isExpanded: isSectionExpanded(.suggestions),
-                onToggle: { toggleSection(.suggestions) },
-                card: suggestionCard
+                title: sectionTitle,
+                canShare: canShare,
+                onShare: { shareCardID = $0 },
+                content: suggestionRows
             )
+            .sheet(item: $shareCardID) { cardID in
+                ShareCardComposer(
+                    game: Game.stored,
+                    profile: Game.stored == .iidxArcade ? .iidx(playType: playTypeToShow) : ShareCardProfile(),
+                    entries: shareEntries(for: cardID),
+                    playStyle: playTypeToShow.displayName()
+                )
+            }
+        }
+    }
+
+    func canShare(_ cardID: AnalyticsSuggestionCardID) -> Bool {
+        if let target = cardID.targetClearType {
+            return !model.clearLampSuggestions(for: target).isEmpty
+        }
+        switch cardID {
+        case .iidxDJLevel: return !model.djLevelSuggestions.isEmpty
+        case .iidxNotPlayedRecently: return !model.longUnplayedSuggestions.isEmpty
+        default: return false
+        }
+    }
+
+    func shareEntries(for cardID: AnalyticsSuggestionCardID) -> [ShareCardEntry] {
+        let limit = AnalyticsSuggestionCardID.sectionLimit
+        if let target = cardID.targetClearType {
+            return model.clearLampSuggestions(for: target).prefix(limit).map {
+                ShareCardEntry(iidxSongRecord: $0.songRecord, level: $0.level,
+                               score: $0.score, scoreRate: $0.scoreRate, iidxVersion: iidxVersion)
+            }
+        }
+        switch cardID {
+        case .iidxDJLevel:
+            return model.djLevelSuggestions.prefix(limit).map {
+                ShareCardEntry(iidxSongRecord: $0.songRecord, level: $0.level,
+                               score: $0.score, scoreRate: $0.scoreRate, iidxVersion: iidxVersion)
+            }
+        case .iidxNotPlayedRecently:
+            return model.longUnplayedSuggestions.prefix(limit).map {
+                ShareCardEntry(iidxSongRecord: $0.songRecord, level: $0.level,
+                               score: $0.score, scoreRate: $0.scoreRate, iidxVersion: iidxVersion)
+            }
+        default:
+            return []
+        }
+    }
+
+    func sectionTitle(for cardID: AnalyticsSuggestionCardID) -> LocalizedStringKey {
+        if let target = cardID.targetClearType {
+            return "Analytics.Suggestions.NextClearLamp.\(target.rawValue)"
+        }
+        switch cardID {
+        case .iidxDJLevel: return "Analytics.Suggestions.NextDJLevel"
+        case .iidxNotPlayedRecently: return "Analytics.Suggestions.NotPlayedRecently"
+        default: return ""
         }
     }
 
     @ViewBuilder
-    func suggestionCard(_ cardID: AnalyticsSuggestionCardID) -> some View {
-        switch cardID {
-        case .iidxDJLevel: djLevelSuggestionsCard
-        case .iidxClearLamp: clearLampSuggestionsCard
-        case .iidxNotPlayedRecently: notPlayedRecentlySuggestionsCard
-        default: EmptyView()
-        }
-    }
-
-    var djLevelSuggestionsCard: some View {
-        Button {
-            navigationManager.push(AnalyticsPath.djLevelSuggestionsDetail)
-        } label: {
-            AnalyticsSuggestionCard(
-                title: Text("Analytics.Suggestions.NextDJLevel"),
-                systemImage: "crown",
-                iconColor: .orange,
-                items: model.djLevelSuggestions
-            ) { suggestion in
-                IIDXDJLevelSuggestionRow(namespace: analyticsNamespace, suggestion: suggestion)
-            }
-        }
-        .buttonStyle(AnalyticsCardButtonStyle())
-        .matchedTransitionSource(id: AnalyticsSuggestionCardID.iidxDJLevel.transitionID, in: analyticsNamespace)
-    }
-
-    var clearLampSuggestionsCard: some View {
-        Button {
-            navigationManager.push(AnalyticsPath.clearLampSuggestionsDetail)
-        } label: {
-            AnalyticsSuggestionCard(
-                title: Text("Analytics.Suggestions.NextClearLamp.\(suggestionTargetClearType.rawValue)"),
-                systemImage: "checkmark.seal",
-                iconColor: IIDXClearType.color(for: suggestionTargetClearType.rawValue),
-                items: model.clearLampSuggestions(for: suggestionTargetClearType)
-            ) { suggestion in
+    func suggestionRows(_ cardID: AnalyticsSuggestionCardID) -> some View {
+        if let target = cardID.targetClearType {
+            AnalyticsSuggestionPreviewRows(items: model.clearLampSuggestions(for: target), limit: rowLimit) { suggestion in
+                navigationManager.push(
+                    ScoresPath.scoreViewer(songRecord: suggestion.songRecord, initialLevel: suggestion.level)
+                )
+            } row: { suggestion in
                 IIDXClearLampSuggestionRow(namespace: analyticsNamespace, suggestion: suggestion,
-                                           targetClearType: suggestionTargetClearType)
+                                           targetClearType: target)
+            }
+        } else {
+            switch cardID {
+            case .iidxDJLevel:
+                AnalyticsSuggestionPreviewRows(items: model.djLevelSuggestions, limit: rowLimit) { suggestion in
+                    navigationManager.push(
+                        ScoresPath.scoreViewer(songRecord: suggestion.songRecord, initialLevel: suggestion.level)
+                    )
+                } row: { suggestion in
+                    IIDXDJLevelSuggestionRow(namespace: analyticsNamespace, suggestion: suggestion)
+                }
+            case .iidxNotPlayedRecently:
+                AnalyticsSuggestionPreviewRows(items: model.longUnplayedSuggestions, limit: rowLimit) { suggestion in
+                    navigationManager.push(
+                        ScoresPath.scoreViewer(songRecord: suggestion.songRecord, initialLevel: suggestion.level)
+                    )
+                } row: { suggestion in
+                    IIDXUnplayedSuggestionRow(namespace: analyticsNamespace, suggestion: suggestion)
+                }
+            default:
+                EmptyView()
             }
         }
-        .buttonStyle(AnalyticsCardButtonStyle())
-        .matchedTransitionSource(id: AnalyticsSuggestionCardID.iidxClearLamp.transitionID, in: analyticsNamespace)
-    }
-
-    var notPlayedRecentlySuggestionsCard: some View {
-        Button {
-            navigationManager.push(AnalyticsPath.notPlayedRecentlySuggestionsDetail)
-        } label: {
-            AnalyticsSuggestionCard(
-                title: Text("Analytics.Suggestions.NotPlayedRecently"),
-                systemImage: "clock.arrow.circlepath",
-                iconColor: .teal,
-                items: model.longUnplayedSuggestions
-            ) { suggestion in
-                IIDXUnplayedSuggestionRow(namespace: analyticsNamespace, suggestion: suggestion)
-            }
-        }
-        .buttonStyle(AnalyticsCardButtonStyle())
-        .matchedTransitionSource(id: AnalyticsSuggestionCardID.iidxNotPlayedRecently.transitionID,
-                                 in: analyticsNamespace)
     }
 }
 
@@ -87,13 +125,19 @@ struct IIDXDJLevelSuggestionRow: View {
     let suggestion: IIDXDJLevelSuggestion
 
     var body: some View {
-        IIDXScoreRow(namespace: namespace, songRecord: suggestion.songRecord, level: suggestion.level,
-                     score: suggestion.score, scoreRate: suggestion.scoreRate) {
-            AnalyticsSuggestionTarget {
+        var row = IIDXScoreRow(namespace: namespace, songRecord: suggestion.songRecord, level: suggestion.level,
+                               score: suggestion.score, scoreRate: suggestion.scoreRate) {
+            AnalyticsSuggestionTarget(isInline: true) {
                 IIDXMetallicText.djLevel(suggestion.targetDJLevel)
                 AnalyticsSuggestionGain(text: "+\(suggestion.pointsNeeded)")
             }
         }
+        row.showsGenre = false
+        row.showsScore = false
+        row.showsLastPlayDate = false
+        row.isAccessoryInline = true
+        row.verticalPadding = 5.0
+        return row
     }
 }
 
@@ -103,12 +147,13 @@ struct IIDXClearLampSuggestionRow: View {
     let targetClearType: IIDXClearType
 
     var body: some View {
-        IIDXScoreRow(namespace: namespace, songRecord: suggestion.songRecord, level: suggestion.level,
-                     score: suggestion.score, scoreRate: suggestion.scoreRate) {
-            AnalyticsSuggestionTarget {
-                IIDXMetallicText.clearType(targetClearType.rawValue)
-            }
+        var row = IIDXScoreRow(namespace: namespace, songRecord: suggestion.songRecord, level: suggestion.level,
+                               score: suggestion.score, scoreRate: suggestion.scoreRate) {
         }
+        row.showsGenre = false
+        row.showsMetadata = false
+        row.verticalPadding = 5.0
+        return row
     }
 }
 
@@ -117,17 +162,13 @@ struct IIDXUnplayedSuggestionRow: View {
     let suggestion: IIDXChartSuggestion
 
     var body: some View {
-        IIDXScoreRow(namespace: namespace, songRecord: suggestion.songRecord, level: suggestion.level,
-                     score: suggestion.score, scoreRate: suggestion.scoreRate) {
-            HStack(spacing: 4.0) {
-                Image(systemName: "clock")
-                    .font(.caption2.weight(.bold))
-                Text(suggestion.songRecord.lastPlayDate, format: .relative(presentation: .named))
-                    .fontWidth(.condensed)
-            }
-            .foregroundStyle(.secondary)
-            .offset(y: 1.0)
-        }
+        var row = IIDXScoreRow(namespace: namespace, songRecord: suggestion.songRecord, level: suggestion.level,
+                               score: suggestion.score, scoreRate: suggestion.scoreRate)
+        row.showsGenre = false
+        row.showsScore = false
+        row.showsLastPlayDate = false
+        row.verticalPadding = 5.0
+        return row
     }
 }
 
@@ -151,7 +192,6 @@ struct IIDXSuggestionsDetailView<Item: Identifiable, Row: View>: View {
             let level = level(item)
             NavigationLink {
                 IIDXScoreViewer(songRecord: songRecord, noteCount: noteCount, initialLevel: level)
-                    .navigationTransition(.zoom(sourceID: "\(songRecord.title).\(level.rawValue)", in: namespace))
             } label: {
                 row(item, namespace)
                     .contentShape(.rect)
@@ -204,9 +244,7 @@ struct IIDXUnplayedSuggestionsDetailView: View {
 
 struct IIDXClearLampSuggestionsDetailView: View {
     @Bindable var model: AnalyticsModel
-
-    @AppStorage(wrappedValue: IIDXClearType.hardClear, "Analytics.Suggestions.TargetClearType")
-    var targetClearType: IIDXClearType
+    let targetClearType: IIDXClearType
 
     var body: some View {
         IIDXSuggestionsDetailView(
@@ -216,24 +254,6 @@ struct IIDXClearLampSuggestionsDetailView: View {
         ) { suggestion, namespace in
             IIDXClearLampSuggestionRow(namespace: namespace, suggestion: suggestion,
                                        targetClearType: targetClearType)
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Section("Analytics.Suggestions.TargetClearType") {
-                        Picker("Analytics.Suggestions.TargetClearType",
-                               selection: $targetClearType.animation(.smooth.speed(2.0))) {
-                            ForEach(AnalyticsModel.suggestionTargetClearTypes, id: \.self) { clearType in
-                                Text(verbatim: clearType.rawValue)
-                                    .tag(clearType)
-                            }
-                        }
-                        .pickerStyle(.inline)
-                    }
-                } label: {
-                    Label("Analytics.Suggestions.Settings", systemImage: "gearshape")
-                }
-            }
         }
     }
 }

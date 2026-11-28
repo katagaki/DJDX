@@ -24,6 +24,14 @@ enum AnalyticsSection: String, Codable, Hashable, CaseIterable {
     }
 }
 
+enum AnalyticsSectionVisibility {
+    static let overviewKey = "Analytics.Section.Overview.Visible"
+    static let lastPlayKey = "Analytics.Section.LastPlay.Visible"
+    static let perLevelKey = "Analytics.Section.PerLevel.Visible"
+    static let goalsKey = "Analytics.Section.Goals.Visible"
+    static let scoreDataKey = "Analytics.Section.ScoreData.Visible"
+}
+
 enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     case clearTypeOverall
     case gradeBreakdown
@@ -66,9 +74,6 @@ enum AnalyticsCardType: String, Codable, CaseIterable, Identifiable {
     }
 
     /// Grade cards (AAA, AA, A) render at half the standard summary card width
-    var isGradeCard: Bool {
-        self == .newAAA || self == .newAA || self == .newA
-    }
 
     var titleText: Text {
         switch self {

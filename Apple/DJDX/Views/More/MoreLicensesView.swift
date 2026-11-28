@@ -11,6 +11,7 @@ struct MoreLicensesView: View {
                         .listRowBackground(Color.clear)
                 } header: {
                     Text(dependency.name)
+                        .sectionListHeader()
                 }
             }
         }

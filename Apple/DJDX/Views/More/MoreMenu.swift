@@ -7,7 +7,6 @@ struct MoreMenu: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @AppStorage(wrappedValue: true, "More.General.ShowProfileHeader") var showProfileHeader: Bool
-    @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
 
     let importer = IIDXImporter()
     let sdvxImporter = SDVXImporter()
@@ -46,7 +45,6 @@ struct MoreMenu: View {
                     isPresentingExternalDataSources = true
                 }
                 Toggle("More.General.ShowProfileHeader", systemImage: "person.crop.circle", isOn: $showProfileHeader)
-                Toggle("More.General.ShowAnalytics", systemImage: "chart.xyaxis.line", isOn: $showAnalytics)
             }
             Section {
                 Button("More.KonamiIDEmail", systemImage: "envelope") {
@@ -269,6 +267,11 @@ struct MoreMenu: View {
                      forKey: "Analytics.PerLevelCardOrder")
         defaults.set((try? encoder.encode(PerLevelCardID.defaultVisible)) ?? Data(),
                      forKey: "Analytics.VisiblePerLevelCards")
+        defaults.set(true, forKey: AnalyticsSectionVisibility.overviewKey)
+        defaults.set(true, forKey: AnalyticsSectionVisibility.lastPlayKey)
+        defaults.set(true, forKey: AnalyticsSectionVisibility.perLevelKey)
+        defaults.set(true, forKey: AnalyticsSectionVisibility.goalsKey)
+        defaults.set(true, forKey: AnalyticsSectionVisibility.scoreDataKey)
         NotificationCenter.default.post(name: .analyticsLayoutReset, object: nil)
     }
 }

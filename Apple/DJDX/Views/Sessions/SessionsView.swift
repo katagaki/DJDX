@@ -15,8 +15,8 @@ struct SessionsView: View {
     @State var songCompactTitles: [String: IIDXSong] = [:]
     @State var searchTerm: String = ""
     @State var isShowingFilterSheet: Bool = false
-    @AppStorage(wrappedValue: false, "ExternalData.BemaniWiki2nd.Enabled") var isBemaniWikiEnabled: Bool
-    @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
+    @State var hasBemaniWikiData: Bool = true
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.scoreDataKey) var isScoreDataVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
 
     @AppStorage(wrappedValue: [], "SessionsView.LevelFilters") var levelsToShow: Set<IIDXLevel>
@@ -49,7 +49,7 @@ struct SessionsView: View {
         ScrollView {
             LazyVStack(spacing: 0.0) {
                 if !isSearching {
-                    if !isEditingAnalytics, !isBemaniWikiEnabled {
+                    if !isEditingAnalytics, !hasBemaniWikiData {
                         sessionsCard { bemaniWikiWarning }
                             .padding(.horizontal)
                             .padding(.top, 8.0)
@@ -58,14 +58,12 @@ struct SessionsView: View {
                         historySection
                             .padding(.top, 20.0)
                     }
-                    if showAnalytics {
-                        AnalyticsView(model: analyticsModel,
-                                      isEditing: $isEditingAnalytics,
-                                      analyticsNamespace: analyticsNamespace,
-                                      towerNamespace: towerNamespace)
-                    }
+                    AnalyticsView(model: analyticsModel,
+                                  isEditing: $isEditingAnalytics,
+                                  analyticsNamespace: analyticsNamespace,
+                                  towerNamespace: towerNamespace)
                 }
-                if !isEditingAnalytics {
+                if !isEditingAnalytics, isScoreDataVisible || isSearching {
                     scoreDataSection
                 }
             }
@@ -85,12 +83,13 @@ struct SessionsView: View {
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
             ToolbarSpacer(.fixed, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
-                sortControl
                 filterControl
             }
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             SessionScoreFilterSheet(
+                sortMode: $sortMode.animation(.smooth.speed(2.0)),
+                sortOrder: $sortOrder.animation(.smooth.speed(2.0)),
                 levelsToShow: $levelsToShow.animation(.smooth.speed(2.0)),
                 difficultiesToShow: $difficultiesToShow.animation(.smooth.speed(2.0)),
                 clearTypesToShow: $clearTypesToShow.animation(.smooth.speed(2.0)),
@@ -99,14 +98,23 @@ struct SessionsView: View {
             .navigationTransition(.zoom(sourceID: "ScoreFilterSheet", in: sessionsNamespace))
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
+            .interactiveDismissDisabled()
         }
         .onAppear {
             store.bootstrap()
         }
         .task {
+            hasBemaniWikiData = await IIDXReader().bemaniWikiSongCount() > 0
             await IIDXSessionSongInfo.shared.reload()
             songCompactTitles = IIDXSessionSongInfo.shared.songs
             reloadScores()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .externalDataChanged)) { _ in
+            Task {
+                hasBemaniWikiData = await IIDXReader().bemaniWikiSongCount() > 0
+                await IIDXSessionSongInfo.shared.reload()
+                songCompactTitles = IIDXSessionSongInfo.shared.songs
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .playSessionDidChange)
             .debounce(for: .seconds(0.4), scheduler: RunLoop.main)) { _ in

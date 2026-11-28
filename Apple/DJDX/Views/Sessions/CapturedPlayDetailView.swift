@@ -73,7 +73,7 @@ struct CapturedPlayDetailView: View {
 
     private var editorForm: some View {
         Form {
-            Section("Sessions.Detail.Chart") {
+            TitledSection("Sessions.Detail.Chart") {
                 marked(songNeedsAttention) {
                     TextField("Sessions.Detail.Song", text: $songTitle)
                         .focused($songFieldFocused)
@@ -112,7 +112,7 @@ struct CapturedPlayDetailView: View {
                 }
             }
 
-            Section("Sessions.Detail.Result") {
+            TitledSection("Sessions.Detail.Result") {
                 marked(clearTypeNeedsAttention) {
                     Picker("Sessions.Detail.ClearType", selection: $clearType) {
                         ForEach(IIDXClearType.sorted, id: \.self) { value in

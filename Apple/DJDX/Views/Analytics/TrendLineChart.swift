@@ -43,8 +43,8 @@ struct TrendCardContent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4.0) {
             Text(verbatim: points.last.map { format($0.value) } ?? "-")
-                .font(.system(size: 20.0, weight: .black))
-                .fontWidth(.expanded)
+                .font(.scoreline(size: 20.0))
+                .fontWidth(.standard)
                 .foregroundStyle(points.isEmpty ? .secondary : .primary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
@@ -55,6 +55,7 @@ struct TrendCardContent: View {
                 .overlay {
                     if points.isEmpty {
                         Text("Shared.NoData")
+                            .emptyLabel()
                             .font(.caption.bold())
                             .foregroundStyle(.secondary)
                     }

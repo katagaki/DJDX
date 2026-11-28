@@ -26,7 +26,9 @@ struct ChartNotesSection: View {
                 .lineLimit(3...)
         } header: {
             Text("Scores.Notes")
+                .sectionListHeader()
         }
+        .clearSection()
         .task(id: "\(game.rawValue)|\(title)|\(chart)") {
             saveIfNeeded()
             let loaded = database.note(game: game, title: title, chart: chart)
@@ -71,8 +73,8 @@ struct ChartNotesSection: View {
     }
 }
 
-struct ChartNotesSheet: View {
 
+struct ChartNotesSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     var game: Game
@@ -92,8 +94,10 @@ struct ChartNotesSheet: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                .sectionStyle()
                 ChartNotesSection(game: game, title: title, chart: chart)
             }
+            .insetList()
             .navigationTitle("Scores.Notes")
             .scrollDismissesKeyboard(.immediately)
             .navigationBarTitleDisplayMode(.inline)

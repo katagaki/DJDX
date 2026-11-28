@@ -68,7 +68,7 @@ final class AnalyticsModel {
         dataState = .loading
         try? await Task.sleep(for: .seconds(0.5))
         if let sessionStore {
-            reloadFromLastSession(store: sessionStore, playType: playType)
+            await reloadFromLastSession(store: sessionStore, playType: playType)
             towerEntries = await fetcher.allTowerEntries()
             withAnimation(.smooth.speed(2.0)) {
                 dataState = .presenting

@@ -53,10 +53,47 @@ struct OverviewClearTypeOverallGraph: View {
 
     var body: some View {
         if isHorizontal {
-            horizontalChart
+            compactRows
         } else {
             verticalChart
         }
+    }
+
+    var compactRows: some View {
+        let levels = shownDifficulties
+        let maxTotal = levels.map { graphData[$0]?.values.reduce(0, +) ?? 0 }.max() ?? 0
+        return VStack(alignment: .leading, spacing: 3.0) {
+            ForEach(levels, id: \.self) { difficulty in
+                HStack(spacing: 6.0) {
+                    LevelNumber(level: String(difficulty), size: 10.0)
+                        .frame(width: 18.0)
+                        .frame(maxHeight: .infinity)
+                        .background(
+                            LinearGradient(colors: [Color(hex: 0x2A2D33), Color(hex: 0x111215)],
+                                           startPoint: .top, endPoint: .bottom),
+                            in: .rect(cornerRadius: 3.0)
+                        )
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 3.0).strokeBorder(.white.opacity(0.25), lineWidth: 1.0)
+                        }
+                    GeometryReader { geometry in
+                        HStack(spacing: 0.0) {
+                            ForEach(Array((graphData[difficulty] ?? [:]).elements.reversed()), id: \.key) { element in
+                                Group {
+                                    if element.key == "FULLCOMBO CLEAR" {
+                                        FullComboRainbowFill()
+                                    } else {
+                                        IIDXClearType.color(for: element.key)
+                                    }
+                                }
+                                .frame(width: geometry.size.width * CGFloat(element.value) / CGFloat(max(maxTotal, 1)))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 
     @ViewBuilder
@@ -87,33 +124,6 @@ struct OverviewClearTypeOverallGraph: View {
                 plotArea.padding(.horizontal, 0.0)
             }
             .chartXScale(domain: levelDomain)
-            .chartForegroundStyleScale(
-                domain: IIDXClearType.chartColorDomain,
-                range: IIDXClearType.chartColorRange(phase: phase)
-            )
-        }
-    }
-
-    @ViewBuilder
-    var horizontalChart: some View {
-        FullComboRainbowTimeline(isActive: hasFullCombo) { phase in
-            Chart(shownDifficulties, id: \.self) { difficulty in
-                ForEach(graphData[difficulty]!.keys.reversed(), id: \.self) { clearType in
-                    let count = graphData[difficulty]![clearType]!
-                    BarMark(
-                        x: .value("Shared.ClearCount", count),
-                        y: .value("LEVEL", "\(difficulty)"),
-                        stacking: .standard
-                    )
-                    .foregroundStyle(by: .value("Shared.IIDX.ClearType", clearType))
-                }
-            }
-            .chartYAxis {
-                AxisMarks(preset: .extended, position: .leading) {
-                    AxisValueLabel()
-                }
-            }
-            .chartYScale(domain: shownDifficulties.map { "\($0)" })
             .chartForegroundStyleScale(
                 domain: IIDXClearType.chartColorDomain,
                 range: IIDXClearType.chartColorRange(phase: phase)

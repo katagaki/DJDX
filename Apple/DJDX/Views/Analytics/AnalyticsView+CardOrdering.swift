@@ -102,40 +102,101 @@ extension AnalyticsView {
 
 // MARK: - Section Header
 
-struct AnalyticsSectionHeader: View {
+struct AnalyticsSectionHeader<Accessory: View>: View {
     let title: LocalizedStringKey
     var isCollapsible: Bool = false
     var isExpanded: Bool = true
     var onToggle: (() -> Void)?
+    @ViewBuilder var accessory: () -> Accessory
 
     var body: some View {
-        if isCollapsible, let onToggle {
-            Button(action: onToggle) {
-                headerContent
-                    .contentShape(.rect)
+        let context = SectionHeaderContext(title: title, isCollapsible: isCollapsible, isExpanded: isExpanded)
+        HStack(spacing: 10.0) {
+            toggleWrapper {
+                HStack(spacing: 10.0) {
+                    Text(context.title)
+                        .sectionHeaderTitle()
+                        .layoutPriority(1)
+                    Rectangle()
+                        .fill(Color.hairline)
+                        .frame(height: 1.0)
+                }
+                .contentShape(.rect)
             }
-            .buttonStyle(.plain)
-        } else {
-            headerContent
+            accessory()
+            if isCollapsible {
+                toggleWrapper {
+                    SectionChevron(context: context)
+                        .contentShape(.rect)
+                }
+            }
         }
+        .padding(.horizontal)
+        .padding(.top, 6.0)
+        .padding(.bottom, 4.0)
     }
 
     @ViewBuilder
-    var headerContent: some View {
-        HStack(spacing: 6.0) {
-            Text(title)
-                .font(.title3.bold())
-                .foregroundStyle(.primary)
-            if isCollapsible {
-                Image(systemName: "chevron.down")
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.secondary)
-                    .rotationEffect(.degrees(isExpanded ? 0.0 : -90.0))
-                    .animation(.smooth.speed(2.0), value: isExpanded)
+    private func toggleWrapper<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        if isCollapsible, let onToggle {
+            Button(action: onToggle) {
+                content()
             }
-            Spacer()
+            .buttonStyle(.plain)
+        } else {
+            content()
         }
-        .padding(.horizontal)
+    }
+}
+
+struct AnalyticsCardGrid<Item: Hashable, Content: View>: View {
+    let items: [Item]
+    let columns: Int
+    let spacing: CGFloat
+    @ViewBuilder let content: (Item) -> Content
+
+    var body: some View {
+        if columns <= 1 {
+            VStack(spacing: spacing) {
+                ForEach(items, id: \.self) { item in
+                    content(item)
+                }
+            }
+        } else {
+            let rowCount = (items.count + columns - 1) / columns
+            VStack(spacing: spacing) {
+                ForEach(0..<rowCount, id: \.self) { row in
+                    HStack(spacing: spacing) {
+                        ForEach(0..<columns, id: \.self) { col in
+                            let index = row * columns + col
+                            if index < items.count {
+                                content(items[index])
+                                    .id(items[index])
+                                    .frame(maxWidth: .infinity)
+                            } else {
+                                Color.clear
+                                    .frame(maxWidth: .infinity)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+extension AnalyticsSectionHeader where Accessory == EmptyView {
+    init(
+        title: LocalizedStringKey,
+        isCollapsible: Bool = false,
+        isExpanded: Bool = true,
+        onToggle: (() -> Void)? = nil
+    ) {
+        self.title = title
+        self.isCollapsible = isCollapsible
+        self.isExpanded = isExpanded
+        self.onToggle = onToggle
+        self.accessory = { EmptyView() }
     }
 }
 

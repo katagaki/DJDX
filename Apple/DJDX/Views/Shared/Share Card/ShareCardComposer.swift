@@ -87,6 +87,7 @@ struct ShareCardComposer: View {
                     .frame(maxWidth: .infinity, maxHeight: 460.0)
                     .listRowBackground(Color.clear)
                 }
+                .sectionStyle()
                 Section {
                     backgroundCarousel()
                     if background == .custom {
@@ -94,7 +95,9 @@ struct ShareCardComposer: View {
                     }
                 } header: {
                     Text("ShareCard.Background")
+                        .sectionListHeader()
                 }
+                .sectionStyle()
                 Section {
                     if !profile.isEmpty {
                         Toggle("ShareCard.ShowProfile", isOn: $isProfileVisible)
@@ -110,7 +113,9 @@ struct ShareCardComposer: View {
                         }
                     }
                 }
+                .sectionStyle()
             }
+            .insetList()
             .navigationTitle("ShareCard.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -58,10 +58,10 @@ struct AnalyticsDestinationView: View {
                     .navigationTitle("Analytics.Suggestions.NextDJLevel")
                     .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.iidxDJLevel.transitionID,
                                                 in: analyticsNamespace))
-            case .clearLampSuggestionsDetail:
-                IIDXClearLampSuggestionsDetailView(model: model)
-                    .navigationTitle("Analytics.Suggestions.NextClearLamp")
-                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.iidxClearLamp.transitionID,
+            case .clearLampSuggestionsDetail(let target):
+                IIDXClearLampSuggestionsDetailView(model: model, targetClearType: target)
+                    .navigationTitle("Analytics.Suggestions.NextClearLamp.\(target.rawValue)")
+                    .navigationTransition(.zoom(sourceID: AnalyticsSuggestionCardID.clearLampID(for: target).transitionID,
                                                 in: analyticsNamespace))
             case .notPlayedRecentlySuggestionsDetail:
                 IIDXUnplayedSuggestionsDetailView(suggestions: model.longUnplayedSuggestions)
@@ -78,47 +78,55 @@ struct AnalyticsDestinationView: View {
 
     @ViewBuilder
     var newEntryDestination: some View {
+        let isSessionsMode = model.sessionStore != nil
         switch path {
         case .newClearsDetail:
             NewEntryDetailView(
                 entries: model.newClears,
-                title: AnalyticsCardType.newClears.titleKey
+                title: AnalyticsCardType.newClears.titleKey,
+                isSessionsMode: isSessionsMode
             )
             .navigationTransition(.zoom(sourceID: "NewClears", in: analyticsNamespace))
         case .newAssistClearsDetail:
             NewEntryDetailView(
                 entries: model.newAssistClears,
-                title: AnalyticsCardType.newAssistClears.titleKey
+                title: AnalyticsCardType.newAssistClears.titleKey,
+                isSessionsMode: isSessionsMode
             )
             .navigationTransition(.zoom(sourceID: "NewAssistClears", in: analyticsNamespace))
         case .newEasyClearsDetail:
             NewEntryDetailView(
                 entries: model.newEasyClears,
-                title: AnalyticsCardType.newEasyClears.titleKey
+                title: AnalyticsCardType.newEasyClears.titleKey,
+                isSessionsMode: isSessionsMode
             )
             .navigationTransition(.zoom(sourceID: "NewEasyClears", in: analyticsNamespace))
         case .newFullComboClearDetail:
             NewEntryDetailView(
                 entries: model.newFullComboClears,
-                title: AnalyticsCardType.newFullComboClear.titleKey
+                title: AnalyticsCardType.newFullComboClear.titleKey,
+                isSessionsMode: isSessionsMode
             )
             .navigationTransition(.zoom(sourceID: "NewFullComboClear", in: analyticsNamespace))
         case .newHardClearDetail:
             NewEntryDetailView(
                 entries: model.newHardClears,
-                title: AnalyticsCardType.newHardClear.titleKey
+                title: AnalyticsCardType.newHardClear.titleKey,
+                isSessionsMode: isSessionsMode
             )
             .navigationTransition(.zoom(sourceID: "NewHardClear", in: analyticsNamespace))
         case .newExHardClearDetail:
             NewEntryDetailView(
                 entries: model.newExHardClears,
-                title: AnalyticsCardType.newExHardClear.titleKey
+                title: AnalyticsCardType.newExHardClear.titleKey,
+                isSessionsMode: isSessionsMode
             )
             .navigationTransition(.zoom(sourceID: "NewExHardClear", in: analyticsNamespace))
         case .newFailedDetail:
             NewEntryDetailView(
                 entries: model.newFailed,
-                title: AnalyticsCardType.newFailed.titleKey
+                title: AnalyticsCardType.newFailed.titleKey,
+                isSessionsMode: isSessionsMode
             )
             .navigationTransition(.zoom(sourceID: "NewFailed", in: analyticsNamespace))
         case .newHighScoresDetail:
@@ -126,13 +134,15 @@ struct AnalyticsDestinationView: View {
                 entries: model.newHighScores,
                 title: NSLocalizedString("Analytics.NewHighScores", comment: ""),
                 showsClearTypeBreakdown: true,
+                isSessionsMode: isSessionsMode,
                 scoreDelta: { $0.score.score - $0.previousScore }
             )
             .navigationTransition(.zoom(sourceID: "NewHighScores", in: analyticsNamespace))
         case .newClearLampsDetail:
             NewEntryDetailView(
                 entries: model.newClearLamps,
-                title: AnalyticsCardType.newClearLamps.titleKey
+                title: AnalyticsCardType.newClearLamps.titleKey,
+                isSessionsMode: isSessionsMode
             )
             .navigationTransition(.zoom(sourceID: "NewClearLamps", in: analyticsNamespace))
         case .newScoreUpdatesDetail:
@@ -140,25 +150,29 @@ struct AnalyticsDestinationView: View {
                 entries: model.newScoreUpdates,
                 title: AnalyticsCardType.newScoreUpdates.titleKey,
                 showsClearTypeBreakdown: true,
+                isSessionsMode: isSessionsMode,
                 scoreDelta: { $0.score.score - $0.previousScore }
             )
             .navigationTransition(.zoom(sourceID: "NewScoreUpdates", in: analyticsNamespace))
         case .newAAADetail:
             NewEntryDetailView(
                 entries: model.newAAA,
-                title: AnalyticsCardType.newAAA.titleKey
+                title: AnalyticsCardType.newAAA.titleKey,
+                isSessionsMode: isSessionsMode
             )
             .navigationTransition(.zoom(sourceID: "NewAAA", in: analyticsNamespace))
         case .newAADetail:
             NewEntryDetailView(
                 entries: model.newAA,
-                title: AnalyticsCardType.newAA.titleKey
+                title: AnalyticsCardType.newAA.titleKey,
+                isSessionsMode: isSessionsMode
             )
             .navigationTransition(.zoom(sourceID: "NewAA", in: analyticsNamespace))
         case .newADetail:
             NewEntryDetailView(
                 entries: model.newA,
-                title: AnalyticsCardType.newA.titleKey
+                title: AnalyticsCardType.newA.titleKey,
+                isSessionsMode: isSessionsMode
             )
             .navigationTransition(.zoom(sourceID: "NewA", in: analyticsNamespace))
         default:
@@ -204,6 +218,17 @@ struct IIDXGradeBreakdownDetailView: View {
                                 y: .value("Shared.ClearCount", element.value)
                             )
                             .foregroundStyle(IIDXDJLevel.color(for: element.key))
+                        }
+                        .chartXAxis {
+                            AxisMarks(values: Array(IIDXDJLevel.sortedStrings.reversed())) { value in
+                                AxisValueLabel {
+                                    if let djLevel = value.as(String.self) {
+                                        IIDXMetallicText.djLevel(djLevel)
+                                            .font(.caption2)
+                                            .fixedSize()
+                                    }
+                                }
+                            }
                         }
                         .chartXScale(domain: Array(IIDXDJLevel.sortedStrings.reversed()))
                         .frame(height: 140.0)

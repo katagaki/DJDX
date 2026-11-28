@@ -19,8 +19,6 @@ struct IIDXScoresView<Header: View>: View {
     @AppStorage(wrappedValue: .lastPlayDate, "ScoresView.SortOrder") var sortMode: SortMode
     @AppStorage(wrappedValue: .descending, "ScoresView.SortDirection") var sortOrder: SortOrder
 
-    @State var playDataDate: Date = .now
-
     @State var songRecords: [IIDXSongRecord]?
     @State var songRecordClearRates: [IIDXSongRecord: [IIDXLevel: Float]] = [:]
 
@@ -33,12 +31,7 @@ struct IIDXScoresView<Header: View>: View {
     @State var isSystemChangingFilterAndSort: Bool = false
     @State var isShowingFilterSheet: Bool = false
     @State var isShowingShareCard: Bool = false
-    @State var isSystemChangingCalendarDate: Bool = false
     @State var isSystemChangingAllRecords: Bool = false
-
-    var isTimeTravellingKey: String = "ScoresView.IsTimeTravelling"
-    @State var isTimeTravelling: Bool
-    @State var isShowingDatePopover: Bool = false
 
     @AppStorage(wrappedValue: false, "ScoresView.GenreVisible") var isGenreVisible: Bool
     @AppStorage(wrappedValue: true, "ScoresView.ArtistVisible") var isArtistVisible: Bool
@@ -50,6 +43,7 @@ struct IIDXScoresView<Header: View>: View {
 
     var isScoreDataExpandedKey: String = "ScoresView.ScoreDataExpanded"
     @State var isScoreDataExpanded: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.scoreDataKey) var isScoreDataVisible: Bool
 
     let actor = IIDXReader()
 
@@ -99,7 +93,6 @@ struct IIDXScoresView<Header: View>: View {
         self._clearTypesToShow = AppStorage(wrappedValue: [], "\(filterKeyPrefix).ClearTypeFilters")
         self._djLevelsToShow = AppStorage(wrappedValue: [], "\(filterKeyPrefix).DJLevelFilters")
         self._versionsToShow = AppStorage(wrappedValue: [], "\(filterKeyPrefix).VersionFilters")
-        self.isTimeTravelling = UserDefaults.standard.bool(forKey: isTimeTravellingKey)
         self.isScoreDataExpanded = (UserDefaults.standard.object(
             forKey: isScoreDataExpandedKey
         ) as? Bool) ?? true
@@ -107,53 +100,6 @@ struct IIDXScoresView<Header: View>: View {
 
     var searchPlacement: SearchFieldPlacement {
         .automatic
-    }
-
-    @ViewBuilder var timeTravelButton: some View {
-        let button = Button {
-            if isTimeTravelling {
-                // Already time travelling: tapping turns it off without showing the popover.
-                withAnimation {
-                    isTimeTravelling = false
-                }
-            } else {
-                isShowingDatePopover = true
-            }
-        } label: {
-            Label(
-                "Shared.ShowPastData",
-                systemImage: isTimeTravelling ? "arrowshape.turn.up.backward.badge.clock.fill" :
-                    "arrowshape.turn.up.backward.badge.clock"
-            )
-        }
-        .popover(isPresented: $isShowingDatePopover) {
-            VStack(alignment: .leading, spacing: 12.0) {
-                Text("Shared.SelectDate")
-                    .font(.headline)
-                DatePicker("Shared.SelectDate",
-                           selection: $playDataDate.animation(.smooth.speed(2.0)),
-                           in: ...Date.now,
-                           displayedComponents: .date)
-                .datePickerStyle(.graphical)
-                .labelsHidden()
-            }
-            .frame(minWidth: 320.0)
-            .padding()
-            .presentationCompactAdaptation(.popover)
-        }
-
-        if isTimeTravelling {
-            button.buttonStyle(.glassProminent)
-        } else {
-            button
-        }
-    }
-
-    @ViewBuilder var sortControl: some View {
-        IIDXScoreSortMenu(
-            sortMode: $sortMode.animation(.smooth.speed(2.0)),
-            sortOrder: $sortOrder.animation(.smooth.speed(2.0))
-        )
     }
 
     @ViewBuilder var filterControl: some View {
@@ -168,7 +114,7 @@ struct IIDXScoresView<Header: View>: View {
             LazyVStack(spacing: 0.0) {
                 if searchTerm.isEmpty {
                     header
-                    if !isEditingAnalytics {
+                    if !isEditingAnalytics, isScoreDataVisible {
                         AnalyticsSectionHeader(
                             title: "Analytics.Section.ScoreData",
                             isCollapsible: true,
@@ -176,15 +122,23 @@ struct IIDXScoresView<Header: View>: View {
                         ) {
                             withAnimation(.smooth.speed(2.0)) { isScoreDataExpanded.toggle() }
                             UserDefaults.standard.set(isScoreDataExpanded, forKey: isScoreDataExpandedKey)
+                        } accessory: {
+                            if !(searchResults ?? songRecords ?? []).isEmpty {
+                                Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
+                                    isShowingShareCard = true
+                                }
+                                .labelStyle(.iconOnly)
+                                .font(.subheadline.weight(.bold))
+                            }
                         }
-                        .padding(.top, 16.0)
-                        .padding(.bottom, 12.0)
+                        .padding(.top, DesignMetrics.sectionGap)
+                        .padding(.bottom, isScoreDataExpanded ? 8.0 : 0.0)
                         if isScoreDataExpanded {
                             Divider()
                         }
                     }
                 }
-                if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
+                if !isEditingAnalytics, (isScoreDataVisible && isScoreDataExpanded) || !searchTerm.isEmpty {
                     let entries = levelEntries(from: searchResults ?? songRecords ?? [])
                     ForEach(entries, id: \.id) { entry in
                         Button {
@@ -216,14 +170,9 @@ struct IIDXScoresView<Header: View>: View {
                 AppBackgroundGradient()
             }
             .toolbar {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    timeTravelButton
-                }
-                ToolbarSpacer(.fixed, placement: .bottomBar)
                 DefaultToolbarItem(kind: .search, placement: .bottomBar)
                 ToolbarSpacer(.fixed, placement: .bottomBar)
                 ToolbarItemGroup(placement: .bottomBar) {
-                    sortControl
                     filterControl
                 }
             }
@@ -240,6 +189,8 @@ struct IIDXScoresView<Header: View>: View {
                         prompt: "Scores.Search.Prompt")
             .sheet(isPresented: $isShowingFilterSheet) {
                 ScoreFilterSheet(
+                    sortMode: $sortMode.animation(.smooth.speed(2.0)),
+                    sortOrder: $sortOrder.animation(.smooth.speed(2.0)),
                     isShowingOnlyPlayDataWithScores: $isShowingOnlyPlayDataWithScores,
                     difficultiesToShow: $difficultiesToShow.animation(.smooth.speed(2.0)),
                     levelsToShow: $levelsToShow.animation(.smooth.speed(2.0)),
@@ -261,9 +212,6 @@ struct IIDXScoresView<Header: View>: View {
                 .presentationDragIndicator(.hidden)
                 .interactiveDismissDisabled()
             }
-            .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
-                isShowingShareCard = true
-            }
             .sheet(isPresented: $isShowingShareCard) {
                 ShareCardComposer(
                     game: Game.stored,
@@ -277,11 +225,6 @@ struct IIDXScoresView<Header: View>: View {
             }
             .onAppear {
                 if dataState == .initializing {
-                    if !isTimeTravelling {
-                        isSystemChangingCalendarDate = true
-                        playDataDate = .now
-                        isSystemChangingCalendarDate = false
-                    }
                     reloadDisplay()
                 }
             }
@@ -298,24 +241,6 @@ struct IIDXScoresView<Header: View>: View {
             }
             .onChange(of: searchTerm) {_, _ in
                 filterSongRecords()
-            }
-            .onChange(of: isTimeTravelling) { _, newValue in
-                UserDefaults.standard.set(newValue, forKey: isTimeTravellingKey)
-                if !isTimeTravelling {
-                    playDataDate = .now
-                }
-            }
-            .onChange(of: playDataDate) { oldValue, newValue in
-                if !isSystemChangingCalendarDate,
-                   !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
-                    if !isTimeTravelling, !Calendar.current.isDateInToday(newValue) {
-                        // Selecting a date other than today turns on time travelling.
-                        withAnimation {
-                            isTimeTravelling = true
-                        }
-                    }
-                    reloadDisplay()
-                }
             }
             .onReceive(NotificationCenter.default.publisher(for: .dataImported)) { _ in
                 dataState = .initializing
@@ -336,8 +261,6 @@ struct IIDXScoresView<Header: View>: View {
                         noteCount: noteCount,
                         initialLevel: initialLevel
                     )
-                    .navigationTransition(.zoom(sourceID: "\(songRecord.title).\(initialLevel.rawValue)",
-                                                   in: scoresNamespace))
                 case .textageViewer(let legacyURL, let chartViewerURL):
                     TextageViewer(legacyURL: legacyURL, chartViewerURL: chartViewerURL)
                 }

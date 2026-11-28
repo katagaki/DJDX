@@ -5,7 +5,7 @@ struct SDVXVolforceSuggestionRow: View {
     let suggestion: SDVXVolforceSuggestion
 
     var body: some View {
-        SDVXScoreRow(namespace: namespace, record: suggestion.record) {
+        var row = SDVXScoreRow(namespace: namespace, record: suggestion.record) {
             AnalyticsSuggestionTarget {
                 Text(verbatim: suggestion.targetGrade)
                     .fontWidth(.expanded)
@@ -19,6 +19,8 @@ struct SDVXVolforceSuggestionRow: View {
                 AnalyticsSuggestionGain(text: SDVXVolforce.gainText(suggestion.volforceGain))
             }
         }
+        row.verticalPadding = 5.0
+        return row
     }
 }
 

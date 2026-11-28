@@ -1,14 +1,6 @@
 import SwiftUI
 
 extension SessionsView {
-
-    @ViewBuilder var sortControl: some View {
-        IIDXScoreSortMenu(
-            sortMode: $sortMode.animation(.smooth.speed(2.0)),
-            sortOrder: $sortOrder.animation(.smooth.speed(2.0))
-        )
-    }
-
     @ViewBuilder var filterControl: some View {
         ScoreFilterButton(
             isShowingFilterSheet: $isShowingFilterSheet,
@@ -33,7 +25,7 @@ extension SessionsView {
     }
 
     var historySection: some View {
-        VStack(spacing: 12.0) {
+        VStack(spacing: DesignMetrics.gap) {
             AnalyticsSectionHeader(
                 title: "Sessions.History.Title",
                 isCollapsible: true,
@@ -73,6 +65,6 @@ extension SessionsView {
         return content()
             .padding(12.0)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .cardBackground(cornerRadius: cornerRadius)
+            .cardBackground()
     }
 }

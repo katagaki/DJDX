@@ -59,6 +59,7 @@ struct DDRClearBreakdownDetailView: View {
                     }
                 } header: {
                     Text("Shared.Level")
+                        .sectionListHeader()
                 }
             }
         }
@@ -97,7 +98,6 @@ struct DDRClearTypeLevelRow: View {
                             .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
                     }
                 }
-                .clipShape(.rect(cornerRadius: 4.0))
             }
             .frame(height: 16.0)
         }
@@ -155,7 +155,7 @@ struct DDRFlareSkillSuggestionRow: View {
     let suggestion: DDRFlareSkillSuggestion
 
     var body: some View {
-        DDRScoreRow(record: suggestion.record) {
+        var row = DDRScoreRow(record: suggestion.record) {
             AnalyticsSuggestionTarget {
                 Text(verbatim: "FLARE \(DDRFlareSkill.rankLabel(suggestion.targetFlareRank))")
                     .foregroundStyle(.secondary)
@@ -164,6 +164,8 @@ struct DDRFlareSkillSuggestionRow: View {
                 AnalyticsSuggestionGain(text: "+\(suggestion.flareSkillGain)")
             }
         }
+        row.verticalPadding = 5.0
+        return row
     }
 }
 

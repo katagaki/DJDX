@@ -48,39 +48,17 @@ struct AnalyticsView: View {
     // Collapsed sections
     @AppStorage(wrappedValue: Data(), "Analytics.CollapsedSections") var collapsedSectionsData: Data
     @State var collapsedSections: Set<AnalyticsSection> = []
-
-    @AppStorage(wrappedValue: IIDXClearType.hardClear, "Analytics.Suggestions.TargetClearType")
-    var suggestionTargetClearType: IIDXClearType
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.overviewKey) var isOverviewVisible: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.lastPlayKey) var isLastPlayVisible: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.perLevelKey) var isPerLevelVisible: Bool
 
     // Width of the layout container, measured rather than read from UIScreen.
-    @State var containerWidth: CGFloat = 0.0
 
     var isRegularWidth: Bool { horizontalSizeClass == .regular }
 
-    // Overview grid: 4 columns on iPad, 2 on iPhone.
-    var cardColumns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 12.0), count: isRegularWidth ? 4 : 2)
-    }
+    var cardColumnCount: Int { isRegularWidth ? 4 : 2 }
 
-    // Per-level grid: 2 columns on iPad, a single column (vertical list) on iPhone.
-    var perLevelColumns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 12.0), count: isRegularWidth ? 2 : 1)
-    }
-
-    // Grade/half-width cards take half the standard width on iPad, 60% on iPhone.
-    var halfCardWidthRatio: CGFloat { isRegularWidth ? 0.5 : 0.6 }
-
-    // Size summary cards.
-    var summaryCardWidth: CGFloat {
-        guard containerWidth > 0.0 else { return 130.0 }
-        let gridGap = 12.0
-        if isRegularWidth {
-            let availableWidth = containerWidth - 40.0 - (5.0 * gridGap)
-            return availableWidth / 5.0
-        }
-        let availableWidth = containerWidth - 40.0 - (2.0 * gridGap)
-        return (availableWidth / 3.0) + 20.0
-    }
+    var perLevelColumnCount: Int { isRegularWidth ? 2 : 1 }
 
     var analyticsNamespace: Namespace.ID
     var towerNamespace: Namespace.ID
@@ -128,7 +106,7 @@ struct AnalyticsView: View {
                                                   levelLimit: 3,
                                                   shownLevels: Set(clearTypeCardLevels.compactMap(Int.init)))
                         .chartLegend(.hidden)
-                        .chartXAxis { AxisMarks { AxisGridLine() } }
+                        .chartXAxis(.hidden)
                 }
                 .perLevelCaption("Analytics.ClearType.Overall")
             }
@@ -144,20 +122,27 @@ struct AnalyticsView: View {
                     let counts = djLevelCardLevels.isEmpty
                         ? Array(totalDJLevelCounts.elements.filter { $0.value > 0 }.prefix(3))
                         : totalDJLevelCounts.elements.filter { djLevelCardLevels.contains($0.key) }
-                    Chart(counts, id: \.key) { element in
-                        BarMark(
-                            x: .value("Shared.ClearCount", element.value),
-                            y: .value("Shared.IIDX.DJLevel", element.key)
-                        )
-                        .foregroundStyle(IIDXDJLevel.color(for: element.key))
-                    }
-                    .chartXAxis { AxisMarks { AxisGridLine() } }
-                    .chartYAxis {
-                        AxisMarks(preset: .extended, position: .leading) {
-                            AxisValueLabel()
+                    HStack(spacing: 6.0) {
+                        VStack(alignment: .trailing, spacing: 0.0) {
+                            ForEach(counts, id: \.key) { element in
+                                IIDXMetallicText.djLevel(element.key)
+                                    .font(.caption2)
+                                    .fixedSize()
+                                    .frame(maxHeight: .infinity)
+                            }
                         }
+                        Chart(counts, id: \.key) { element in
+                            BarMark(
+                                x: .value("Shared.ClearCount", element.value),
+                                y: .value("Shared.IIDX.DJLevel", element.key)
+                            )
+                            .foregroundStyle(IIDXDJLevel.color(for: element.key))
+                            .cornerRadius(0.0)
+                        }
+                        .chartXAxis(.hidden)
+                        .chartYAxis(.hidden)
+                        .chartYScale(domain: counts.map(\.key))
                     }
-                    .chartYScale(domain: counts.map(\.key))
                 }
                 .perLevelCaption("Analytics.DJLevel.Overall")
             }
@@ -178,22 +163,23 @@ struct AnalyticsView: View {
                     Group {
                         if cardType == .towerRecent {
                             TowerBarChart(entries: model.towerChartEntries, usesDateAxis: false)
-                                .chartXAxis { AxisMarks { AxisGridLine() } }
-                                .chartYAxis { AxisMarks { AxisGridLine() } }
+                                .chartXAxis(.hidden)
+                                .chartYAxis(.hidden)
                         } else {
                             TowerTotalsChart(
                                 totalKeyCount: model.towerTotalKeyCount,
                                 totalScratchCount: model.towerTotalScratchCount,
                                 showsAnnotations: true
                             )
-                            .chartXAxis { AxisMarks { AxisGridLine() } }
-                            .chartYAxis { AxisMarks { AxisGridLine() } }
+                            .chartXAxis(.hidden)
+                            .chartYAxis(.hidden)
                         }
                     }
                     .opacity(model.towerEntries.isEmpty ? 0.25 : 1.0)
                     .overlay {
                         if model.towerEntries.isEmpty {
                             Text("Shared.NoData")
+                                .emptyLabel()
                                 .font(.caption.bold())
                                 .foregroundStyle(.secondary)
                         }
@@ -233,14 +219,26 @@ struct AnalyticsView: View {
     }
 
     var body: some View {
-        VStack(spacing: 20.0) {
+        let overviewCards = cardOrder.filter {
+            $0.isOverviewCard && (selectedGame.supportsTower || !$0.isTowerCard)
+        }
+        let shownOverviewCards = isOverviewVisible
+            ? (isEditing ? overviewCards : overviewCards.filter { visibleCards.contains($0) })
+            : []
+        let summaryCards = cardOrder.filter { $0.isSummaryCard }
+        let shownSummaryCards = isLastPlayVisible
+            ? (isEditing ? summaryCards : summaryCards.filter {
+                visibleCards.contains($0) && summaryCount(for: $0) > 0
+            })
+            : []
+        let shownPerLevelCards = isPerLevelVisible
+            ? (isEditing ? perLevelCardOrder : visiblePerLevelCards)
+            : []
+        let hasVisibleSection = !shownOverviewCards.isEmpty || !shownSummaryCards.isEmpty || !shownPerLevelCards.isEmpty
+        VStack(spacing: DesignMetrics.sectionGap) {
                 // MARK: Overview section
-                let overviewCards = cardOrder.filter {
-                    $0.isOverviewCard && (selectedGame.supportsTower || !$0.isTowerCard)
-                }
-                let shownOverviewCards = isEditing ? overviewCards : overviewCards.filter { visibleCards.contains($0) }
                 if !shownOverviewCards.isEmpty {
-                    VStack(spacing: 12.0) {
+                    VStack(spacing: DesignMetrics.gap) {
                         AnalyticsSectionHeader(
                             title: AnalyticsSection.overview.titleKey,
                             isCollapsible: !isEditing,
@@ -249,18 +247,16 @@ struct AnalyticsView: View {
                             toggleSection(.overview)
                         }
                         if isSectionExpanded(.overview) {
-                            LazyVGrid(columns: cardColumns, spacing: 12.0) {
-                                ForEach(shownOverviewCards, id: \.self) { cardType in
-                                    overviewCard(for: cardType)
-                                        .editableCard(isVisible: visibleCards.contains(cardType),
-                                                      isEditing: isEditing,
-                                                      seed: cardOrder.firstIndex(of: cardType) ?? 0) {
-                                            toggleCard(cardType)
-                                        }
-                                        .cardDraggable(cardType, editing: isEditing,
-                                                       draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                                       onReorder: saveCardOrder)
-                                }
+                            AnalyticsCardGrid(items: shownOverviewCards, columns: cardColumnCount, spacing: DesignMetrics.gap) { cardType in
+                                overviewCard(for: cardType)
+                                    .editableCard(isVisible: visibleCards.contains(cardType),
+                                                  isEditing: isEditing,
+                                                  seed: cardOrder.firstIndex(of: cardType) ?? 0) {
+                                        toggleCard(cardType)
+                                    }
+                                    .cardDraggable(cardType, editing: isEditing,
+                                                   draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                                   onReorder: saveCardOrder)
                             }
                             .padding(.horizontal)
                         }
@@ -268,10 +264,8 @@ struct AnalyticsView: View {
                 }
 
                 // MARK: Last Play section
-                let summaryCards = cardOrder.filter { $0.isSummaryCard }
-                let shownSummaryCards = isEditing ? summaryCards : summaryCards.filter { visibleCards.contains($0) }
                 if !shownSummaryCards.isEmpty {
-                    VStack(spacing: 12.0) {
+                    VStack(spacing: DesignMetrics.gap) {
                         AnalyticsSectionHeader(
                             title: AnalyticsSection.lastPlay.titleKey,
                             isCollapsible: !isEditing,
@@ -281,11 +275,9 @@ struct AnalyticsView: View {
                         }
                         if isSectionExpanded(.lastPlay) {
                             ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 12.0) {
+                                HStack(spacing: DesignMetrics.gap) {
                                     ForEach(shownSummaryCards, id: \.self) { cardType in
                                         cardView(for: cardType)
-                                            .frame(width: cardType.isGradeCard
-                                                   ? summaryCardWidth * halfCardWidthRatio : summaryCardWidth)
                                             .editableCard(isVisible: visibleCards.contains(cardType),
                                                           isEditing: isEditing,
                                                           seed: cardOrder.firstIndex(of: cardType) ?? 0) {
@@ -303,9 +295,8 @@ struct AnalyticsView: View {
                 }
 
                 // MARK: Per-level section
-                let shownPerLevelCards = isEditing ? perLevelCardOrder : visiblePerLevelCards
                 if !shownPerLevelCards.isEmpty {
-                    VStack(spacing: 12.0) {
+                    VStack(spacing: DesignMetrics.gap) {
                         AnalyticsSectionHeader(
                             title: AnalyticsSection.perLevel.titleKey,
                             isCollapsible: !isEditing,
@@ -314,36 +305,27 @@ struct AnalyticsView: View {
                             toggleSection(.perLevel)
                         }
                         if isSectionExpanded(.perLevel) {
-                            LazyVGrid(columns: perLevelColumns, spacing: 12.0) {
-                                ForEach(shownPerLevelCards, id: \.self) { card in
-                                    perLevelCard(difficulty: card.difficulty, category: card.category)
-                                        .editableCard(
-                                            isVisible: visiblePerLevelCardSet.contains(card),
-                                            isEditing: isEditing,
-                                            seed: card.difficulty * 10 +
-                                                (AnalyticsPerLevelCategory.allCases.firstIndex(of: card.category) ?? 0)
-                                        ) {
-                                            togglePerLevelCard(card)
-                                        }
-                                        .perLevelCardDraggable(card, editing: isEditing,
-                                                               draggedCard: $draggedPerLevelCard,
-                                                               cardOrder: $perLevelCardOrder,
-                                                               onReorder: savePerLevelCardOrder)
-                                }
+                            AnalyticsCardGrid(items: shownPerLevelCards, columns: perLevelColumnCount, spacing: DesignMetrics.gap) { card in
+                                perLevelCard(difficulty: card.difficulty, category: card.category)
+                                    .editableCard(
+                                        isVisible: visiblePerLevelCardSet.contains(card),
+                                        isEditing: isEditing,
+                                        seed: card.difficulty * 10 +
+                                            (AnalyticsPerLevelCategory.allCases.firstIndex(of: card.category) ?? 0)
+                                    ) {
+                                        togglePerLevelCard(card)
+                                    }
+                                    .perLevelCardDraggable(card, editing: isEditing,
+                                                           draggedCard: $draggedPerLevelCard,
+                                                           cardOrder: $perLevelCardOrder,
+                                                           onReorder: savePerLevelCardOrder)
                             }
                             .padding(.horizontal)
                         }
                     }
                 }
-
-                suggestionsSection
             }
-            .padding(.top, 20.0)
-            .onGeometryChange(for: CGFloat.self) { proxy in
-                proxy.size.width
-            } action: { newWidth in
-                containerWidth = newWidth
-            }
+            .padding(.top, hasVisibleSection ? DesignMetrics.topPadding : 0.0)
             .task {
                 loadVisibleCards()
                 loadCardOrder()
@@ -415,5 +397,4 @@ struct AnalyticsView: View {
     func reload() async {
         await model.reload(playType: playTypeToShow, iidxVersion: iidxVersion, filters: filters)
     }
-
 }

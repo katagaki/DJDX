@@ -36,40 +36,17 @@ struct IIDXScoreSection: View {
     func scoreSection() -> some View {
         Section {
             if score.djLevelEnum() != .none {
-                HStack {
-                    Group {
-                        Text(score.djLevel)
-                            .foregroundStyle(IIDXDJLevel.style(for: score.djLevel))
-                            .strokeText(color: .black, width: 0.6)
-                        Spacer()
-                        if let noteCount {
-                            Text(Float(score.score) / Float(noteCount * 2),
-                                 format: .percent.precision(.fractionLength(1)))
-                            .font(.scoreline(.largeTitle, width: .condensed))
-                            .fontWidth(.condensed)
-                            .foregroundStyle(LinearGradient(
-                                colors: [.primary.opacity(0.35), .primary.opacity(0.2)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            ))
-                        }
-                    }
-                    .font(.largeTitle)
-                    .fontWidth(.expanded)
-                    .fontWeight(.black)
-                }
-                VStack(alignment: .leading, spacing: 8.0) {
-                    IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
-                    IIDXDetailRow("SCORE", score: score.score)
-                }
-                IIDXJudgmentBreakdown(entries: score.perfectGreatCount + score.greatCount > 0 ? [
+                IIDXCompactResultSummary(
+                    djLevel: score.djLevel, clearType: score.clearType, score: score.score,
+                    scoreRate: noteCount.map { Float(score.score) / Float($0 * 2) }
+                )
+                IIDXCompactJudgments(entries: score.perfectGreatCount + score.greatCount > 0 ? [
                     (.perfectGreat, score.perfectGreatCount),
                     (.great, score.greatCount),
                     (.miss, score.missCount)
                 ] : [
                     (.miss, score.missCount)
                 ])
-                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
             } else {
                 Text("Scores.Viewer.NoDataForCurrentVersion")
                     .font(.subheadline)
@@ -82,6 +59,7 @@ struct IIDXScoreSection: View {
                 ScoreHistoryRows(history: scoreHistory, yDomain: historyYDomain, thresholds: historyThresholds)
             }
         }
+        .clearSection()
     }
 
     private var historyYDomain: ClosedRange<Double> {

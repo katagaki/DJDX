@@ -15,10 +15,8 @@ struct UnifiedView: View {
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
     @AppStorage(wrappedValue: DDRPlayStyle.single, "Global.DDR.Style") var ddrStyleToShow: DDRPlayStyle
-    @AppStorage(wrappedValue: false, "ExternalData.DDR.Enabled") var isDDRExternalDataEnabled: Bool
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: true, "More.General.ShowProfileHeader") var showProfileHeader: Bool
-    @AppStorage(wrappedValue: true, "More.General.ShowAnalytics") var showAnalytics: Bool
     @AppStorage(wrappedValue: AppMode.imports, "Global.AppMode") var appMode: AppMode
 
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
@@ -30,6 +28,7 @@ struct UnifiedView: View {
     @State var isPresentingImport: Bool = false
     @State var isPresentingOnboarding: Bool = false
     @State var isEditingAnalytics: Bool = false
+    @State var hasDDRMetadata: Bool = true
 
     @State var availableBackupDate: Date?
     @State var isPromptingBackupRestore: Bool = false
@@ -125,21 +124,14 @@ struct UnifiedView: View {
                         .matchedTransitionSource(id: "Import", in: importNamespace)
                     }
                 }
-                if !isSessionsMode || showAnalytics {
-                    ToolbarItemGroup(placement: .topBarTrailing) {
-                        Button {
-                            withAnimation(.smooth.speed(2.0)) { isEditingAnalytics.toggle() }
-                        } label: {
-                            if isEditingAnalytics {
-                                Label("Shared.Done", systemImage: "checkmark")
-                            } else {
-                                Label("Shared.Edit", systemImage: "pencil")
-                            }
-                        }
-                        if !isSessionsMode {
-                            Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
-                                NotificationCenter.default.post(name: .shareCardRequested, object: nil)
-                            }
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button {
+                        withAnimation(.smooth.speed(2.0)) { isEditingAnalytics.toggle() }
+                    } label: {
+                        if isEditingAnalytics {
+                            Label("Shared.Done", systemImage: "checkmark")
+                        } else {
+                            Label("Shared.Edit", systemImage: "pencil")
                         }
                     }
                 }
@@ -277,7 +269,14 @@ struct UnifiedView: View {
                 sessionStore.endSession()
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .externalDataChanged)
+            .receive(on: RunLoop.main)) { _ in
+            Task {
+                hasDDRMetadata = await DDRMetadataImporter().songMetaCount() > 0
+            }
+        }
         .task {
+            hasDDRMetadata = await DDRMetadataImporter().songMetaCount() > 0
             try? Tips.configure([
                 .displayFrequency(.immediate),
                 .datastoreLocation(.applicationDefault)
@@ -346,5 +345,5 @@ struct UnifiedView: View {
             Text(storageReportSummary)
         }
     }
-
 }
+

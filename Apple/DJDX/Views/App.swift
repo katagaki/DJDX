@@ -13,6 +13,7 @@ struct DJDXApp: App {
     var body: some Scene {
         WindowGroup {
             UnifiedView()
+                .sectionListStyle()
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {
                         IIDXSessionLiveActivityController.shared.reconcile()

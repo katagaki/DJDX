@@ -28,11 +28,13 @@ struct AnalyticsGoalDetailView: View {
                         .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets(top: 8.0, leading: 16.0, bottom: 8.0, trailing: 16.0))
                 }
+                .sectionStyle()
                 Section {
                     row("Goals.Start", progress.goal.formatted(progress.baseline))
                     row("Goals.Expected", progress.goal.formatted(progress.expected))
                     row("Goals.Remaining", progress.goal.formatted(progress.remaining))
                 }
+                .sectionStyle()
                 Section {
                     row("Goals.StartDate", progress.goal.startDate.formatted(date: .long, time: .omitted),
                         isNumeric: false)
@@ -45,13 +47,16 @@ struct AnalyticsGoalDetailView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                .sectionStyle()
                 Section {
                     Button("Goals.Delete", role: .destructive) {
                         isConfirmingDelete = true
                     }
                 }
+                .sectionStyle()
             }
         }
+        .insetList()
         .scrollContentBackground(.hidden)
         .navigationTitle("Goals.Title")
         .navigationBarTitleDisplayMode(.inline)

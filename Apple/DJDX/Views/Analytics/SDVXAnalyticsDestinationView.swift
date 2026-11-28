@@ -268,6 +268,7 @@ struct SDVXClearBreakdownDetailView: View {
                     }
                 } header: {
                     Text("Shared.Level")
+                        .sectionListHeader()
                 }
             }
         }
@@ -306,7 +307,6 @@ struct SDVXClearTypeLevelRow: View {
                             .frame(width: geometry.size.width * CGFloat(segment.count) / CGFloat(max(total, 1)))
                     }
                 }
-                .clipShape(.rect(cornerRadius: 4.0))
             }
             .frame(height: 16.0)
         }
@@ -344,6 +344,7 @@ struct SDVXGradeBreakdownDetailView: View {
                     } header: {
                         Text(verbatim: difficulty.abbreviation)
                             .foregroundStyle(difficulty.color)
+                            .sectionListHeader()
                     }
                 }
             }

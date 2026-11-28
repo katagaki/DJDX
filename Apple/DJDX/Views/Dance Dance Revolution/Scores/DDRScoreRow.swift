@@ -4,6 +4,7 @@ struct DDRScoreRow<Accessory: View>: View {
 
     var record: DDRSongRecord
     var accessory: Accessory
+    var verticalPadding: CGFloat = 8.0
 
     init(record: DDRSongRecord, @ViewBuilder accessory: () -> Accessory) {
         self.record = record
@@ -28,6 +29,7 @@ struct DDRScoreRow<Accessory: View>: View {
                                                             startPoint: .top, endPoint: .bottom))
                             .font(.scoreline(.caption))
                             .fontWidth(.standard)
+                            .fixedSize()
                     }
                     if !record.rankDisplay.isEmpty {
                         Divider().frame(maxHeight: 14.0)
@@ -35,6 +37,7 @@ struct DDRScoreRow<Accessory: View>: View {
                             .foregroundStyle(DDRSongRecord.rankColor(forStem: record.rank))
                             .fontWidth(.expanded)
                             .fontWeight(.black)
+                            .fixedSize()
                     }
                     if !record.clearDisplay.isEmpty {
                         Divider().frame(maxHeight: 14.0)
@@ -42,20 +45,21 @@ struct DDRScoreRow<Accessory: View>: View {
                             .foregroundStyle(DDRSongRecord.clearColor(for: record.clearKind))
                             .fontWidth(.expanded)
                             .fontWeight(.bold)
+                            .fixedSize()
                     }
                 }
                 .font(.caption)
                 accessory
                     .font(.caption)
             }
-            .padding([.top, .bottom], 8.0)
+            .padding([.top, .bottom], verticalPadding)
 
             Spacer(minLength: 0.0)
 
             LevelBadge(name: record.difficultyEnum.rawValue,
                        level: record.level > 0 ? String(record.level) : "",
                        tint: record.difficultyEnum.color, layout: .horizontal)
-                .padding([.top, .bottom], 8.0)
+                .padding([.top, .bottom], verticalPadding)
         }
         .frame(maxWidth: .infinity)
         .padding(.trailing)

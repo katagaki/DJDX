@@ -27,7 +27,7 @@ enum AnalyticsPath: Hashable {
     case newAADetail
     case newADetail
     case djLevelSuggestionsDetail
-    case clearLampSuggestionsDetail
+    case clearLampSuggestionsDetail(target: IIDXClearType)
     case notPlayedRecentlySuggestionsDetail
 }
 

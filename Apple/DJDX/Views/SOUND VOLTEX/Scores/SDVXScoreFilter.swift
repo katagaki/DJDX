@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SDVXScoreFilterSheet: View {
 
+    @Binding var sortMode: SDVXSortMode
+    @Binding var sortOrder: SortOrder
     @Binding var difficultiesToShow: Set<SDVXDifficulty>
     @Binding var levelBucketsToShow: Set<Double>
     @Binding var clearTypesToShow: Set<SDVXClearType>
@@ -10,83 +12,179 @@ struct SDVXScoreFilterSheet: View {
     let availableLevelBuckets: [Double]
     var onReset: () -> Void
 
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.overviewKey) var isOverviewVisible: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.lastPlayKey) var isLastPlayVisible: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.goalsKey) var isGoalsVisible: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.scoreDataKey) var isScoreDataVisible: Bool
+    @AppStorage(wrappedValue: Data(), AnalyticsSuggestionCardID.hiddenCardsKey) var hiddenSuggestionCardsData: Data
+
     @Environment(\.dismiss) var dismiss
+
+    var isVolforceSuggestionsVisible: Bool {
+        !AnalyticsSuggestionCardID.decodedHidden(from: hiddenSuggestionCardsData).contains(.sdvxVolforce)
+    }
+
+    func toggleVolforceSuggestions() {
+        var hidden = AnalyticsSuggestionCardID.decodedHidden(from: hiddenSuggestionCardsData)
+        if hidden.contains(.sdvxVolforce) {
+            hidden.remove(.sdvxVolforce)
+        } else {
+            hidden.insert(.sdvxVolforce)
+        }
+        hiddenSuggestionCardsData = AnalyticsSuggestionCardID.encodedHidden(hidden)
+    }
+
+    func resetFilters() {
+        difficultiesToShow = []
+        levelBucketsToShow = []
+        clearTypesToShow = []
+        gradesToShow = []
+        scoreBelow = 0
+        onReset()
+    }
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    Button("Shared.Filter.ResetAll", systemImage: "arrow.clockwise") {
-                        difficultiesToShow = []
-                        levelBucketsToShow = []
-                        clearTypesToShow = []
-                        gradesToShow = []
-                        scoreBelow = 0
-                        onReset()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14.0) {
+                    Text("Shared.Sort")
+                        .sectionListHeader()
+                    sortGroups
+                    Text("Shared.Filter")
+                        .sectionListHeader()
+                        .padding(.top, 6.0)
+                    filterGroups
+                    Text("More.PlayDataDisplay.Header")
+                        .sectionListHeader()
+                        .padding(.top, 6.0)
+                    displayGroups
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 24.0)
+            }
+            .navigationTitle("Scores.CustomizeDisplay")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(.sharedFilterResetAll, systemImage: "arrow.clockwise") {
+                        resetFilters()
                     }
                 }
-                Section("Shared.Filter") {
-                    DisclosureGroup {
-                        ForEach(SDVXDifficulty.sorted.sorted { $0.abbreviation < $1.abbreviation },
-                                id: \.self) { difficulty in
-                            SDVXSelectableRow(isSelected: difficultiesToShow.contains(difficulty)) {
-                                Text(verbatim: difficulty.abbreviation)
-                            } action: {
-                                toggle(difficulty, in: $difficultiesToShow)
-                            }
-                        }
-                    } label: {
-                        SDVXFilterDisclosureLabel("Shared.Level", count: difficultiesToShow.count)
-                    }
-                    FilterLevelDisclosure {
-                        FilterLevelGrid(
-                            items: availableLevelBuckets,
-                            selection: levelBucketsToShow,
-                            title: { String(format: "%.1f", $0) },
-                            onToggle: { toggle($0, in: $levelBucketsToShow) }
-                        )
-                    } label: {
-                        SDVXFilterDisclosureLabel("Shared.Sort.Difficulty", count: levelBucketsToShow.count)
-                    }
-                    DisclosureGroup {
-                        ForEach(SDVXClearType.sorted, id: \.self) { clearType in
-                            SDVXSelectableRow(isSelected: clearTypesToShow.contains(clearType)) {
-                                Text(verbatim: clearType.rawValue)
-                            } action: {
-                                toggle(clearType, in: $clearTypesToShow)
-                            }
-                        }
-                    } label: {
-                        SDVXFilterDisclosureLabel("Shared.SDVX.ClearType", count: clearTypesToShow.count)
-                    }
-                    DisclosureGroup {
-                        ForEach(SDVXGrade.sorted, id: \.self) { grade in
-                            SDVXSelectableRow(isSelected: gradesToShow.contains(grade)) {
-                                Text(verbatim: grade.rawValue)
-                            } action: {
-                                toggle(grade, in: $gradesToShow)
-                            }
-                        }
-                    } label: {
-                        SDVXFilterDisclosureLabel("Shared.SDVX.Grade", count: gradesToShow.count)
-                    }
-                    Picker("Scores.Filter.SDVX.ScoreBelow", selection: $scoreBelow) {
-                        Text("Shared.All")
-                            .tag(0)
-                        ForEach(SDVXFilterOptions.scoreThresholds, id: \.self) { threshold in
-                            Text("Scores.Filter.SDVX.ScoreBelow.\(threshold.formatted())")
-                                .tag(threshold)
-                        }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(role: .confirm) {
+                        dismiss()
                     }
                 }
             }
-            .listSectionSpacing(.compact)
-            .navigationTitle("Shared.Filter")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(role: .confirm) { dismiss() }
+        }
+    }
+
+    @ViewBuilder
+    var sortGroups: some View {
+        FlowLayout(horizontalSpacing: 6.0, verticalSpacing: 6.0) {
+            ForEach(SDVXSortMode.allCases, id: \.self) { mode in
+                FilterTextChip(title: Text(LocalizedStringKey(mode.rawValue)), isOn: sortMode == mode) {
+                    sortMode = mode
                 }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        FilterChipGroup(title: Text("Shared.Sort.Order")) {
+            FilterTextChip(title: Text("Shared.Sort.Ascending"), isOn: sortOrder == .ascending) {
+                sortOrder = .ascending
+            }
+            FilterTextChip(title: Text("Shared.Sort.Descending"), isOn: sortOrder == .descending) {
+                sortOrder = .descending
+            }
+        }
+    }
+
+    @ViewBuilder
+    var filterGroups: some View {
+        FilterChipGroup(title: Text("Shared.Level")) {
+            ForEach(SDVXDifficulty.sorted, id: \.self) { difficulty in
+                let tint = difficulty.color
+                FilterChip(isOn: difficultiesToShow.contains(difficulty),
+                              isDimmed: !difficultiesToShow.isEmpty && !difficultiesToShow.contains(difficulty),
+                              fill: tint) {
+                    toggle(difficulty, in: $difficultiesToShow)
+                } label: {
+                    Text(verbatim: difficulty.abbreviation)
+                        .font(.system(size: 11.0, weight: .black))
+                        .foregroundStyle(.white)
+                        .strokeText(color: tint.mix(with: .black, by: 0.55), width: 0.55)
+                }
+            }
+        }
+        if !availableLevelBuckets.isEmpty {
+            FilterChipGroup(title: Text("Shared.Sort.Difficulty")) {
+                ForEach(availableLevelBuckets, id: \.self) { bucket in
+                    FilterChip(isOn: levelBucketsToShow.contains(bucket),
+                                  isDimmed: !levelBucketsToShow.isEmpty && !levelBucketsToShow.contains(bucket)) {
+                        toggle(bucket, in: $levelBucketsToShow)
+                    } label: {
+                        LevelNumber(level: String(format: "%.1f", bucket), size: 15.0)
+                    }
+                }
+            }
+        }
+        FilterChipGroup(title: Text("Shared.SDVX.ClearType")) {
+            ForEach(SDVXClearType.sorted, id: \.self) { clearType in
+                FilterChip(isOn: clearTypesToShow.contains(clearType),
+                              isDimmed: !clearTypesToShow.isEmpty && !clearTypesToShow.contains(clearType)) {
+                    toggle(clearType, in: $clearTypesToShow)
+                } label: {
+                    Text(verbatim: clearType.abbreviation)
+                        .font(.system(size: 12.0, weight: .bold))
+                        .fontWidth(.expanded)
+                        .foregroundStyle(clearType.color)
+                }
+            }
+        }
+        FilterChipGroup(title: Text("Shared.SDVX.Grade")) {
+            ForEach(SDVXGrade.sorted, id: \.self) { grade in
+                FilterChip(isOn: gradesToShow.contains(grade),
+                              isDimmed: !gradesToShow.isEmpty && !gradesToShow.contains(grade)) {
+                    toggle(grade, in: $gradesToShow)
+                } label: {
+                    Text(verbatim: grade.rawValue)
+                        .font(.system(size: 13.0, weight: .black))
+                        .fontWidth(.expanded)
+                        .sdvxGradeText()
+                }
+            }
+        }
+        FilterChipGroup(title: Text("Scores.Filter.SDVX.ScoreBelow")) {
+            ForEach(SDVXFilterOptions.scoreThresholds, id: \.self) { threshold in
+                FilterChip(isOn: scoreBelow == threshold,
+                              isDimmed: scoreBelow > 0 && scoreBelow != threshold) {
+                    scoreBelow = scoreBelow == threshold ? 0 : threshold
+                } label: {
+                    Text("Scores.Filter.SDVX.ScoreBelow.\(threshold.formatted())")
+                        .font(.system(size: 12.0))
+                        .sdvxScoreText()
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    var displayGroups: some View {
+        FilterChipGroup(title: Text("More.PlayDataDisplay.Sections")) {
+            FilterTextChip(title: Text("Analytics.Section.Overview"), isOn: isOverviewVisible) {
+                isOverviewVisible.toggle()
+            }
+            FilterTextChip(title: Text("Analytics.Section.LastPlay"), isOn: isLastPlayVisible) {
+                isLastPlayVisible.toggle()
+            }
+            FilterTextChip(title: Text("Goals.Title"), isOn: isGoalsVisible) {
+                isGoalsVisible.toggle()
+            }
+            FilterTextChip(title: Text(verbatim: "VOLFORCE"), isOn: isVolforceSuggestionsVisible) {
+                toggleVolforceSuggestions()
+            }
+            FilterTextChip(title: Text("Analytics.Section.ScoreData"), isOn: isScoreDataVisible) {
+                isScoreDataVisible.toggle()
             }
         }
     }
@@ -97,53 +195,5 @@ struct SDVXScoreFilterSheet: View {
         } else {
             binding.wrappedValue.insert(element)
         }
-    }
-}
-
-private struct SDVXFilterDisclosureLabel: View {
-    let title: LocalizedStringKey
-    let count: Int
-
-    init(_ title: LocalizedStringKey, count: Int) {
-        self.title = title
-        self.count = count
-    }
-
-    var body: some View {
-        HStack {
-            Text(title)
-            Spacer()
-            if count > 0 {
-                Text(verbatim: "\(count)")
-                    .foregroundStyle(.secondary)
-            } else {
-                Text("Shared.All")
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-}
-
-private struct SDVXSelectableRow<Label: View>: View {
-    var isSelected: Bool
-    @ViewBuilder var label: Label
-    var action: () -> Void
-
-    var body: some View {
-        Button {
-            action()
-        } label: {
-            HStack {
-                label
-                Spacer()
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .foregroundStyle(.tint)
-                        .fontWeight(.semibold)
-                }
-            }
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
     }
 }
