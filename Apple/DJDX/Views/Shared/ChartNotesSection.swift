@@ -9,21 +9,29 @@ struct ChartNotesSection: View {
 
     @State private var note: ChartNote?
     @State private var savedNote: ChartNote?
+    @FocusState private var focusedField: Field?
+    @Environment(\.colorScheme) private var colorScheme
 
     private let database = ChartNotesDatabase.shared
 
     var body: some View {
         Section {
             if showsPlaySettings {
-                numberRow("Scores.Notes.GreenNumber", value: binding(\.greenNumber),
-                          keyboardType: .numberPad)
-                numberRow("Scores.Notes.LaneCover", value: binding(\.laneCover),
-                          keyboardType: .numberPad)
-                numberRow("Scores.Notes.JudgmentOffset", value: binding(\.judgmentOffset),
-                          keyboardType: .numbersAndPunctuation)
+                numberRow("Scores.Notes.GreenNumber", field: .greenNumber,
+                          value: binding(\.greenNumber), keyboardType: .numberPad)
+                numberRow("Scores.Notes.LaneCover", field: .laneCover,
+                          value: binding(\.laneCover), keyboardType: .numberPad)
+                numberRow("Scores.Notes.JudgmentOffset", field: .judgmentOffset,
+                          value: binding(\.judgmentOffset), keyboardType: .numbersAndPunctuation)
             }
             TextField("Scores.Notes.Placeholder", text: binding(\.text), axis: .vertical)
                 .lineLimit(3...)
+                .focused($focusedField, equals: .text)
+                .padding(.horizontal, 12.0)
+                .padding(.vertical, 10.0)
+                .background(ink.opacity(0.06), in: .rect(cornerRadius: 8.0))
+                .contentShape(.rect)
+                .onTapGesture { focusedField = .text }
         } header: {
             Text("Scores.Notes")
                 .sectionListHeader()
@@ -62,14 +70,23 @@ struct ChartNotesSection: View {
         }
     }
 
-    private func numberRow(_ titleKey: LocalizedStringKey, value: Binding<Int?>,
+    private var ink: Color { colorScheme == .dark ? .white : .black }
+
+    private func numberRow(_ titleKey: LocalizedStringKey, field: Field, value: Binding<Int?>,
                            keyboardType: UIKeyboardType) -> some View {
         LabeledContent(titleKey) {
-            TextField("Scores.Notes.NotSet", value: value, format: .number)
+            TextField("Scores.Notes.NotSet", value: value, format: .number.grouping(.never))
                 .keyboardType(keyboardType)
                 .multilineTextAlignment(.trailing)
                 .monospacedDigit()
+                .focused($focusedField, equals: field)
         }
+        .contentShape(.rect)
+        .onTapGesture { focusedField = field }
+    }
+
+    private enum Field: Hashable {
+        case greenNumber, laneCover, judgmentOffset, text
     }
 }
 
@@ -99,7 +116,7 @@ struct ChartNotesSheet: View {
             }
             .insetList()
             .navigationTitle("Scores.Notes")
-            .scrollDismissesKeyboard(.immediately)
+            .scrollDismissesKeyboard(.interactively)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

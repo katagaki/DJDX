@@ -61,10 +61,12 @@ struct DDRScoreViewer: View {
             }
         }
         .listStyle(.plain)
-        .scrollDismissesKeyboard(.immediately)
+        .listSectionSpacing(0.0)
+        .scrollDismissesKeyboard(.interactively)
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
         .contentMargins(.top, 0.0, for: .scrollContent)
+        .contentMargins(.bottom, 72.0, for: .scrollContent)
         .scrollEdgeEffectStyle(.soft, for: .top)
         .scrollEdgeEffectStyle(.soft, for: .bottom)
         .toolbarBackground(.hidden, for: .navigationBar)
