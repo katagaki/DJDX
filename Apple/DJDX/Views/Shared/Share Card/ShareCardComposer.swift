@@ -10,6 +10,7 @@ struct ShareCardComposer: View {
     @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
+    @AppStorage(wrappedValue: PopnVersion.highCheers, "Global.Popn.Version") var popnVersion: PopnVersion
     @AppStorage(wrappedValue: true, "ShareCard.ProfileVisible") var isProfileVisible: Bool
     @AppStorage(wrappedValue: 10, "ShareCard.RowLimit") var rowLimit: Int
     @AppStorage(wrappedValue: 0x7A4DFF, "ShareCard.CustomColor") var customColorValue: Int
@@ -48,7 +49,8 @@ struct ShareCardComposer: View {
             iidxVersion: iidxVersion,
             sdvxVersion: sdvxVersion,
             polarisChordVersion: polarisChordVersion,
-            ddrVersion: ddrVersion
+            ddrVersion: ddrVersion,
+            popnVersion: popnVersion
         )
     }
 

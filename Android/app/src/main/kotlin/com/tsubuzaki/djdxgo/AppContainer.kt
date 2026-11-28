@@ -13,6 +13,7 @@ import com.tsubuzaki.djdxgo.data.importsummary.ImportSummaryBuilder
 import com.tsubuzaki.djdxgo.data.notes.ChartNotesDatabase
 import com.tsubuzaki.djdxgo.data.notes.ChartNotesRepository
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordRepository
+import com.tsubuzaki.djdxgo.data.popn.PopnRepository
 import com.tsubuzaki.djdxgo.data.profile.ProfileRepository
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXRepository
 import com.tsubuzaki.djdxgo.data.tierlist.TierListStore
@@ -31,11 +32,18 @@ class AppContainer(context: Context) {
     val iidxRepository = IIDXRepository(database.iidxDao())
     val sdvxRepository = SDVXRepository(database.sdvxDao())
     val polarisChordRepository = PolarisChordRepository(database.polarisChordDao())
+    val popnRepository = PopnRepository(database.popnDao())
     val externalDataDao = database.externalDataDao()
     val ddrRepository = DDRRepository(database.ddrDao(), externalDataDao)
     val externalDataReloader = ExternalDataReloader(externalDataDao)
     val analyticsStore = AnalyticsStore(database, ddrRepository)
-    val importSummaryBuilder = ImportSummaryBuilder(iidxRepository, sdvxRepository, polarisChordRepository, ddrRepository)
+    val importSummaryBuilder = ImportSummaryBuilder(
+        iidxRepository,
+        sdvxRepository,
+        polarisChordRepository,
+        ddrRepository,
+        popnRepository
+    )
     val goalEvaluator = AnalyticsGoalEvaluator(context.applicationContext, database, ddrRepository)
     val profileRepository = ProfileRepository(context.applicationContext)
     val chartAnalyzer = IIDXChartAnalyzer(context.applicationContext.cacheDir)

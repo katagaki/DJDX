@@ -23,6 +23,9 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXTowerEntry
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordDao
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordImportGroup
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordSongRecord
+import com.tsubuzaki.djdxgo.data.popn.PopnDao
+import com.tsubuzaki.djdxgo.data.popn.PopnImportGroup
+import com.tsubuzaki.djdxgo.data.popn.PopnSongRecord
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXDao
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXImportGroup
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
@@ -38,6 +41,8 @@ import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
         PolarisChordSongRecord::class,
         DDRImportGroup::class,
         DDRSongRecord::class,
+        PopnImportGroup::class,
+        PopnSongRecord::class,
         IIDXSong::class,
         TextageChartViewerChart::class,
         SDVXInChart::class,
@@ -45,7 +50,7 @@ import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
         DDRSongMeta::class,
         TextageChart::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class DJDXDatabase : RoomDatabase() {
@@ -53,6 +58,7 @@ abstract class DJDXDatabase : RoomDatabase() {
     abstract fun sdvxDao(): SDVXDao
     abstract fun polarisChordDao(): PolarisChordDao
     abstract fun ddrDao(): DDRDao
+    abstract fun popnDao(): PopnDao
     abstract fun externalDataDao(): ExternalDataDao
 
     companion object {
@@ -71,6 +77,24 @@ abstract class DJDXDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `PopnImportGroup` (`id` TEXT NOT NULL, " +
+                        "`importDate` INTEGER NOT NULL, `version` INTEGER, PRIMARY KEY(`id`))"
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `PopnSongRecord` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`importGroupID` TEXT NOT NULL, `title` TEXT NOT NULL, `genre` TEXT NOT NULL, " +
+                        "`artist` TEXT NOT NULL, `difficulty` TEXT NOT NULL, `level` INTEGER NOT NULL, " +
+                        "`score` INTEGER NOT NULL, `medal` TEXT NOT NULL, `rank` TEXT NOT NULL)"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_PopnSongRecord_importGroupID` ON `PopnSongRecord` (`importGroupID`)"
+                )
+            }
+        }
+
         @Volatile
         private var instance: DJDXDatabase? = null
 
@@ -80,7 +104,7 @@ abstract class DJDXDatabase : RoomDatabase() {
                     context.applicationContext,
                     DJDXDatabase::class.java,
                     "PlayData.db"
-                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
             }
     }
 }

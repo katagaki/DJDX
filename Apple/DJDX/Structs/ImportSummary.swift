@@ -5,11 +5,12 @@ enum ImportSummaryGame: Hashable {
     case sdvx
     case polarisChord
     case ddr
+    case popn
 
     var gradeTitle: String {
         switch self {
         case .iidx: return "DJ LEVEL"
-        case .ddr: return "RANK"
+        case .ddr, .popn: return "RANK"
         case .sdvx, .polarisChord: return "GRADE"
         }
     }

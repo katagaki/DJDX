@@ -11,6 +11,11 @@ import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordDifficulty
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordGrade
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordSongRecord
+import com.tsubuzaki.djdxgo.data.popn.PopnClass
+import com.tsubuzaki.djdxgo.data.popn.PopnClearType
+import com.tsubuzaki.djdxgo.data.popn.PopnDifficulty
+import com.tsubuzaki.djdxgo.data.popn.PopnRank
+import com.tsubuzaki.djdxgo.data.popn.PopnSongRecord
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXDifficulty
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXGrade
@@ -39,6 +44,7 @@ data class ChartAnalyticsData(
     val newHighScores: List<ChartNewEntry> = emptyList(),
     val newClears: Map<String, List<ChartNewEntry>> = emptyMap(),
     val newGrades: Map<String, List<ChartNewEntry>> = emptyMap(),
+    val classValue: Double? = null,
     val suggestions: List<ChartSuggestion> = emptyList(),
     val trend: List<TrendPoint> = emptyList()
 ) {
@@ -78,6 +84,19 @@ data class PolarisChordFilterOptions(
             (levels.isEmpty() || record.level in levels) &&
             (clearTypes.isEmpty() || record.clearType in clearTypes) &&
             (grades.isEmpty() || record.grade in grades)
+}
+
+data class PopnFilterOptions(
+    val difficulties: Set<String> = emptySet(),
+    val levels: Set<String> = emptySet(),
+    val clearTypes: Set<String> = emptySet(),
+    val ranks: Set<String> = emptySet()
+) {
+    fun matches(record: PopnSongRecord): Boolean =
+        (difficulties.isEmpty() || record.difficulty in difficulties) &&
+            (levels.isEmpty() || record.level.toString() in levels) &&
+            (clearTypes.isEmpty() || record.clearType in clearTypes) &&
+            (ranks.isEmpty() || record.rank in ranks)
 }
 
 data class DDRFilterOptions(
@@ -120,6 +139,13 @@ object ChartAnalytics {
     val polarisChordTrackedGrades = listOf(
         PolarisChordGrade.SSS_PLUS, PolarisChordGrade.SSS, PolarisChordGrade.SS, PolarisChordGrade.S
     ).map { it.value }
+
+    val popnClearKeys = PopnClearType.sorted.filter { it != PopnClearType.NO_PLAY }.map { it.value }
+    val popnRankKeys = PopnRank.sorted.map { it.value }
+    val popnTrackedClearTypes = listOf(
+        PopnClearType.CLEAR, PopnClearType.FULL_COMBO, PopnClearType.PERFECT
+    ).map { it.value }
+    val popnTrackedRanks = listOf(PopnRank.S, PopnRank.AAA, PopnRank.AA).map { it.value }
 
     const val DDR_NO_CLEAR = "noclear"
     val ddrClearKeys = DDRClearLamp.order + DDR_NO_CLEAR
@@ -242,6 +268,57 @@ object ChartAnalytics {
         )
     }
 
+    fun popn(
+        latestRecords: List<PopnSongRecord>,
+        previousRecords: List<PopnSongRecord>?,
+        filters: PopnFilterOptions
+    ): ChartAnalyticsData {
+        val records = latestRecords.filter(filters::matches)
+        val clearByDifficulty = Counter(popnClearKeys)
+        val rankByDifficulty = Counter(popnRankKeys)
+        val clearByLevel = Counter(popnClearKeys)
+        val rankByLevel = Counter(popnRankKeys)
+        records.forEach { record ->
+            clearByDifficulty.ensure(record.difficulty)
+            rankByDifficulty.ensure(record.difficulty)
+            clearByDifficulty.add(record.difficulty, record.clearType)
+            rankByDifficulty.add(record.difficulty, record.rank)
+            if (record.level > 0) {
+                clearByLevel.ensure(record.level)
+                rankByLevel.ensure(record.level)
+                clearByLevel.add(record.level, record.clearType)
+                rankByLevel.add(record.level, record.rank)
+            }
+        }
+        val lastPlay = previousRecords?.let { previous ->
+            newEntries(
+                latest = records,
+                previous = previous,
+                key = { "${it.title.compact}|${it.genre}|${it.difficulty}" },
+                title = { it.title },
+                level = { it.level.toString() },
+                difficulty = { it.difficulty },
+                clearType = { it.clearType },
+                grade = { it.rank },
+                score = { it.score },
+                noPlay = PopnClearType.NO_PLAY.value,
+                noGrade = PopnRank.NONE.value,
+                trackedClearTypes = popnTrackedClearTypes,
+                trackedGrades = popnTrackedRanks
+            )
+        }
+        return ChartAnalyticsData(
+            clearTypePerDifficulty = clearByDifficulty.result(),
+            gradePerDifficulty = rankByDifficulty.result(),
+            clearTypePerLevel = clearByLevel.result(),
+            gradePerLevel = rankByLevel.result(),
+            newHighScores = lastPlay?.first.orEmpty(),
+            newClears = lastPlay?.second.orEmpty(),
+            newGrades = lastPlay?.third.orEmpty(),
+            classValue = PopnClass.value(latestRecords)
+        )
+    }
+
     fun ddr(
         records: List<DDRSongRecord>,
         filters: DDRFilterOptions,
@@ -284,6 +361,7 @@ object ChartAnalytics {
 
     val ddrDifficultyOrder: List<String> = DDRDifficulty.entries.map { it.value }
     val polarisChordDifficultyOrder: List<String> = PolarisChordDifficulty.entries.map { it.value }
+    val popnDifficultyOrder: List<String> = PopnDifficulty.entries.map { it.value }
     val sdvxDifficultyOrder: List<String> = SDVXDifficulty.sorted.map { it.value }
 
     private fun <T> newEntries(

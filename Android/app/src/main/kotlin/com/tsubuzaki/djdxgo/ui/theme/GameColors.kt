@@ -13,6 +13,9 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXVersion
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordDifficulty
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordGrade
+import com.tsubuzaki.djdxgo.data.popn.PopnClearType
+import com.tsubuzaki.djdxgo.data.popn.PopnDifficulty
+import com.tsubuzaki.djdxgo.data.popn.PopnRank
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXDifficulty
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXGrade
@@ -336,6 +339,59 @@ object PolarisChordColors {
                 Brush.horizontalGradient(listOf(Palette.yellow, Palette.orange))
             else -> Brush.horizontalGradient(listOf(Palette.cyan, Palette.blue))
         }
+    }
+}
+
+object PopnColors {
+    fun difficultyColor(difficulty: String): Color = when (PopnDifficulty.fromValue(difficulty)) {
+        PopnDifficulty.EASY -> Palette.blue
+        PopnDifficulty.NORMAL -> Palette.green
+        PopnDifficulty.HYPER -> Palette.orange
+        PopnDifficulty.EX -> Palette.red
+        else -> Palette.gray
+    }
+
+    fun clearTypeColor(clearType: String): Color = when (PopnClearType.fromValue(clearType)) {
+        PopnClearType.PERFECT -> Palette.yellow
+        PopnClearType.FULL_COMBO -> Palette.cyan
+        PopnClearType.CLEAR -> Palette.orange
+        PopnClearType.EASY_CLEAR -> Palette.green
+        PopnClearType.ASSIST_CLEAR -> Palette.purple
+        PopnClearType.FAILED -> Palette.red
+        else -> Palette.gray
+    }
+
+    fun rankColor(rank: String): Color = when (PopnRank.fromValue(rank)) {
+        PopnRank.S -> Palette.orange
+        PopnRank.AAA -> Palette.yellow
+        PopnRank.AA_PLUS, PopnRank.AA -> Color(0xFFD99921)
+        PopnRank.A_PLUS, PopnRank.A -> Palette.cyan
+        PopnRank.B_PLUS, PopnRank.B -> Palette.blue
+        PopnRank.C -> Palette.indigo
+        PopnRank.D -> Palette.purple
+        else -> Palette.gray
+    }
+
+    fun rankBrush(rank: String, darkTheme: Boolean): Brush = when (PopnRank.fromValue(rank)) {
+        PopnRank.S -> Brush.verticalGradient(
+            if (darkTheme) listOf(Palette.yellow, Palette.orange) else listOf(Palette.orange, Palette.red)
+        )
+        PopnRank.AAA, PopnRank.AA_PLUS, PopnRank.AA ->
+            Brush.verticalGradient(listOf(Color(0xFFFFD666), Color(0xFFD99921)))
+        else -> Brush.verticalGradient(
+            if (darkTheme) listOf(Color.White, Palette.cyan) else listOf(Palette.cyan, Palette.blue)
+        )
+    }
+
+    fun classTierColor(value: Double): Color = when {
+        value >= 91 -> Color(0xFFD0203A)
+        value >= 79 -> Color(0xFFC03050)
+        value >= 68 -> Color(0xFFC08020)
+        value >= 59 -> Color(0xFFB0A010)
+        value >= 46 -> Color(0xFF209040)
+        value >= 34 -> Color(0xFF1A9080)
+        value >= 21 -> Color(0xFF2E70C0)
+        else -> Color(0xFF907860)
     }
 }
 

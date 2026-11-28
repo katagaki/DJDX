@@ -20,6 +20,11 @@ import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordDifficulty
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordGrade
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordRepository
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordSongRecord
+import com.tsubuzaki.djdxgo.data.popn.PopnClearType
+import com.tsubuzaki.djdxgo.data.popn.PopnDifficulty
+import com.tsubuzaki.djdxgo.data.popn.PopnRank
+import com.tsubuzaki.djdxgo.data.popn.PopnRepository
+import com.tsubuzaki.djdxgo.data.popn.PopnSongRecord
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXDifficulty
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXGrade
@@ -31,7 +36,8 @@ class ImportSummaryBuilder(
     private val iidxRepository: IIDXRepository,
     private val sdvxRepository: SDVXRepository,
     private val polarisChordRepository: PolarisChordRepository,
-    private val ddrRepository: DDRRepository
+    private val ddrRepository: DDRRepository,
+    private val popnRepository: PopnRepository
 ) {
 
     suspend fun importGroupID(game: Game, date: Long): String? = when (game) {
@@ -39,6 +45,7 @@ class ImportSummaryBuilder(
         Game.SOUND_VOLTEX -> sdvxRepository.importGroupFor(date)?.id
         Game.POLARIS_CHORD -> polarisChordRepository.importGroupFor(date)?.id
         Game.DANCE_DANCE_REVOLUTION -> ddrRepository.importGroupFor(date)?.id
+        Game.POPN -> popnRepository.importGroupFor(date)?.id
     }
 
     suspend fun summary(game: Game, groupID: String): ImportSummary? = when (game) {
@@ -46,6 +53,7 @@ class ImportSummaryBuilder(
         Game.SOUND_VOLTEX -> sdvxSummary(groupID)
         Game.POLARIS_CHORD -> polarisChordSummary(groupID)
         Game.DANCE_DANCE_REVOLUTION -> ddrSummary(groupID)
+        Game.POPN -> popnSummary(groupID)
     }
 
     // MARK: beatmania IIDX
@@ -224,6 +232,59 @@ class ImportSummaryBuilder(
                 score = record.score.takeIf { isNewScore },
                 lamp = if (isNewLamp) ImportSummaryChange(previousClearType, record.clearType) else null,
                 grade = if (isNewGrade) ImportSummaryChange(previousGrade, record.grade) else null
+            )
+        }.sortedWith(entryOrder)
+    }
+
+    // MARK: pop'n music
+
+    private suspend fun popnSummary(groupID: String): ImportSummary? {
+        val groups = popnRepository.importGroups()
+        val index = groups.indexOfFirst { it.id == groupID }
+        if (index == -1) return null
+        val group = groups[index]
+        val previousGroup = groups.drop(index + 1).firstOrNull { it.version == group.version }
+
+        val entries = previousGroup?.let {
+            popnPersonalBests(popnRepository.songRecords(group.id), popnRepository.songRecords(it.id))
+        }.orEmpty()
+        return ImportSummary(
+            game = Game.POPN,
+            importDate = group.importDate,
+            previousImportDate = previousGroup?.importDate,
+            ratings = emptyList(),
+            personalBests = entries
+        )
+    }
+
+    private fun popnPersonalBests(
+        latestRecords: List<PopnSongRecord>,
+        previousRecords: List<PopnSongRecord>
+    ): List<ImportSummaryEntry> {
+        fun key(record: PopnSongRecord) = record.title.compact + "|" + record.genre + "|" + record.difficulty
+        val previousByKey = previousRecords.associateBy(::key)
+        val lampOrder = PopnClearType.sorted.dropLast(2).map { it.value }
+        val gradeOrder = PopnRank.sorted.map { it.value }
+
+        return latestRecords.mapNotNull { record ->
+            val previous = previousByKey[key(record)]
+            val previousScore = previous?.score ?: 0
+            val previousClearType = previous?.clearType?.takeIf { it != PopnClearType.NO_PLAY.value }
+            val previousGrade = previous?.rank?.takeIf { it != PopnRank.NONE.value }
+            val isNewScore = record.score > previousScore
+            val isNewLamp = isRankImprovement(previousClearType, record.clearType, lampOrder)
+            val isNewGrade = isRankImprovement(previousGrade, record.rank, gradeOrder)
+            if (!isNewScore && !isNewLamp && !isNewGrade) return@mapNotNull null
+            val abbreviation = PopnDifficulty.fromValue(record.difficulty)?.abbreviation ?: record.difficulty
+            ImportSummaryEntry(
+                title = record.title,
+                chart = "$abbreviation ${record.level}",
+                difficulty = record.difficulty,
+                levelValue = record.level.toDouble(),
+                previousScore = previousScore.takeIf { isNewScore && it > 0 },
+                score = record.score.takeIf { isNewScore },
+                lamp = if (isNewLamp) ImportSummaryChange(previousClearType, record.clearType) else null,
+                grade = if (isNewGrade) ImportSummaryChange(previousGrade, record.rank) else null
             )
         }.sortedWith(entryOrder)
     }

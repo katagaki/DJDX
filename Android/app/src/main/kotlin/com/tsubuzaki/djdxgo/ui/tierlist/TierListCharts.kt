@@ -8,12 +8,16 @@ import com.tsubuzaki.djdxgo.data.iidx.IIDXLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordDifficulty
+import com.tsubuzaki.djdxgo.data.popn.PopnDifficulty
+import com.tsubuzaki.djdxgo.data.popn.PopnMedal
+import com.tsubuzaki.djdxgo.data.popn.PopnRank
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXDifficulty
 import com.tsubuzaki.djdxgo.ui.theme.DDRColors
 import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
 import com.tsubuzaki.djdxgo.ui.theme.Palette
 import com.tsubuzaki.djdxgo.ui.theme.PolarisChordColors
+import com.tsubuzaki.djdxgo.ui.theme.PopnColors
 import com.tsubuzaki.djdxgo.ui.theme.SDVXColors
 
 data class TierListChart(
@@ -35,6 +39,7 @@ val Game.tierListCode: String
         Game.SOUND_VOLTEX -> "sdvx"
         Game.POLARIS_CHORD -> "polarischord"
         Game.DANCE_DANCE_REVOLUTION -> "ddr"
+        Game.POPN -> "popn"
     }
 
 val Game.supportsTierListPlayType: Boolean
@@ -122,6 +127,25 @@ suspend fun loadTierListCharts(
                     },
                     grade = grade,
                     gradeColor = PolarisChordColors.gradeColor(grade)
+                )
+            }
+        Game.POPN -> container.popnRepository.songRecords(now)
+            .filter { it.level > 0 }
+            .map { record ->
+                val grade = if (record.rank == PopnRank.NONE.value) "" else record.rank
+                TierListChart(
+                    id = tierListChartID(record.title, record.difficulty),
+                    title = record.title,
+                    level = record.level.toString(),
+                    difficultyLabel = PopnDifficulty.fromValue(record.difficulty)?.abbreviation.orEmpty(),
+                    difficultyColor = PopnColors.difficultyColor(record.difficulty),
+                    lampColor = if (record.medalEnum == PopnMedal.NO_PLAY) {
+                        Palette.gray
+                    } else {
+                        PopnColors.clearTypeColor(record.clearType)
+                    },
+                    grade = grade,
+                    gradeColor = PopnColors.rankColor(grade)
                 )
             }
         Game.DANCE_DANCE_REVOLUTION -> {

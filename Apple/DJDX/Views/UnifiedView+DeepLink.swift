@@ -100,6 +100,7 @@ extension UnifiedView {
         case "sdvx", "soundvoltex": .soundVoltex
         case "polaris", "polarischord": .polarisChord
         case "ddr", "ddrworld", "dancedancerevolution": .danceDanceRevolution
+        case "popn", "popnmusic": .popn
         default: nil
         }
     }

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.outlined.Whatshot
 import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.Preferences
 import com.tsubuzaki.djdxgo.AppContainer
@@ -39,12 +42,16 @@ import com.tsubuzaki.djdxgo.data.analytics.ChartAnalytics
 import com.tsubuzaki.djdxgo.data.analytics.ChartAnalyticsData
 import com.tsubuzaki.djdxgo.data.analytics.DDRFilterOptions
 import com.tsubuzaki.djdxgo.data.analytics.PolarisChordFilterOptions
+import com.tsubuzaki.djdxgo.data.analytics.PopnFilterOptions
 import com.tsubuzaki.djdxgo.data.analytics.SDVXFilterOptions
 import com.tsubuzaki.djdxgo.data.ddr.DDRClearLamp
 import com.tsubuzaki.djdxgo.data.ddr.DDRPlayStyle
 import com.tsubuzaki.djdxgo.data.ddr.DDRRank
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordDifficulty
+import com.tsubuzaki.djdxgo.data.popn.PopnClass
+import com.tsubuzaki.djdxgo.data.popn.PopnClearType
+import com.tsubuzaki.djdxgo.data.popn.PopnDifficulty
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXDifficulty
 import com.tsubuzaki.djdxgo.ui.Routes
@@ -52,6 +59,8 @@ import com.tsubuzaki.djdxgo.ui.iidx.rememberSetting
 import com.tsubuzaki.djdxgo.ui.theme.DDRColors
 import com.tsubuzaki.djdxgo.ui.theme.Palette
 import com.tsubuzaki.djdxgo.ui.theme.PolarisChordColors
+import com.tsubuzaki.djdxgo.ui.theme.PopnColors
+import com.tsubuzaki.djdxgo.ui.theme.gameFont
 import com.tsubuzaki.djdxgo.ui.theme.SDVXColors
 import java.text.NumberFormat
 import java.util.Locale
@@ -60,6 +69,7 @@ internal const val CHART_CARD_CLEAR_BREAKDOWN = "clearBreakdown"
 internal const val CHART_CARD_GRADE_BREAKDOWN = "gradeBreakdown"
 internal const val CHART_CARD_TREND = "trend"
 internal const val CHART_CARD_NEW_HIGH_SCORES = "newHighScores"
+internal const val CHART_CARD_CLASS = "class"
 private const val CHART_CARD_NEW_CLEAR_PREFIX = "newClear:"
 private const val CHART_CARD_NEW_GRADE_PREFIX = "newGrade:"
 private const val SECTION_OVERVIEW = "overview"
@@ -85,6 +95,8 @@ internal class ChartGameSpec(
     val clearCaptionRes: Int,
     val gradeCaptionRes: Int,
     val clearIcon: (String) -> ImageVector,
+    val classCaptionRes: Int? = null,
+    val gradeBreakdownPerLevel: Boolean = false,
     val suggestionTitle: String? = null,
     val suggestionIcon: ImageVector = Icons.Outlined.Whatshot,
     val suggestionColor: Color = Palette.orange,
@@ -102,6 +114,7 @@ internal class ChartGameSpec(
         }
 
     val overviewCards: List<String> = listOfNotNull(
+        CHART_CARD_CLASS.takeIf { classCaptionRes != null },
         CHART_CARD_CLEAR_BREAKDOWN,
         CHART_CARD_GRADE_BREAKDOWN,
         CHART_CARD_TREND.takeIf { trendCaptionRes != null }
@@ -164,6 +177,32 @@ internal val polarisChordSpec = ChartGameSpec(
     }
 )
 
+internal val popnSpec = ChartGameSpec(
+    game = Game.POPN,
+    orderKey = SettingsKeys.popnCardOrder,
+    visibleKey = SettingsKeys.popnVisibleCards,
+    collapsedKey = SettingsKeys.popnCollapsedSections,
+    clearKeys = ChartAnalytics.popnClearKeys,
+    gradeKeys = ChartAnalytics.popnRankKeys,
+    trackedClearTypes = ChartAnalytics.popnTrackedClearTypes,
+    trackedGrades = ChartAnalytics.popnTrackedRanks,
+    difficultyOrder = ChartAnalytics.popnDifficultyOrder,
+    defaultVisible = { it.toSet() },
+    clearLabel = { PopnClearType.fromValue(it)?.abbreviation ?: it },
+    gradeLabel = { it },
+    clearColor = { value, _ -> PopnColors.clearTypeColor(value) },
+    gradeColor = { value, _ -> PopnColors.rankColor(value) },
+    difficultyLabel = { PopnDifficulty.fromValue(it)?.value ?: it },
+    difficultyColor = { PopnColors.difficultyColor(it) },
+    clearCaptionRes = R.string.popn_medal_breakdown,
+    gradeCaptionRes = R.string.analytics_rank_breakdown,
+    clearIcon = {
+        if (it == PopnClearType.CLEAR.value) Icons.Outlined.CheckCircle else Icons.Outlined.StarOutline
+    },
+    classCaptionRes = R.string.popn_class,
+    gradeBreakdownPerLevel = true
+)
+
 internal val ddrSpec = ChartGameSpec(
     game = Game.DANCE_DANCE_REVOLUTION,
     orderKey = SettingsKeys.ddrCardOrder,
@@ -193,6 +232,7 @@ internal val ddrSpec = ChartGameSpec(
 internal fun chartGameSpec(game: Game): ChartGameSpec = when (game) {
     Game.SOUND_VOLTEX -> sdvxSpec
     Game.POLARIS_CHORD -> polarisChordSpec
+    Game.POPN -> popnSpec
     else -> ddrSpec
 }
 
@@ -223,6 +263,20 @@ fun PolarisChordAnalyticsSection(container: AppContainer, isEditing: Boolean, on
 }
 
 @Composable
+fun PopnAnalyticsSection(container: AppContainer, isEditing: Boolean, onNavigate: (String) -> Unit) {
+    val difficulties by rememberSetting(SettingsKeys.popnDifficultyFilters, emptySet())
+    val levels by rememberSetting(SettingsKeys.popnLevelFilters, emptySet())
+    val clearTypes by rememberSetting(SettingsKeys.popnClearTypeFilters, emptySet())
+    val ranks by rememberSetting(SettingsKeys.popnRankFilters, emptySet())
+    val dataVersion by container.dataVersion.collectAsState()
+    val filters = PopnFilterOptions(difficulties, levels, clearTypes, ranks)
+    LaunchedEffect(filters, dataVersion) { container.analyticsStore.reloadPopn(filters) }
+    val data by container.analyticsStore.popn.collectAsState()
+    val profile by container.profileRepository.popn.collectAsState()
+    ChartAnalyticsSection(popnSpec, data ?: ChartAnalyticsData(), isEditing, onNavigate, profile.popnClass)
+}
+
+@Composable
 fun DDRAnalyticsSection(
     container: AppContainer,
     playStyle: DDRPlayStyle,
@@ -246,7 +300,8 @@ private fun ChartAnalyticsSection(
     spec: ChartGameSpec,
     data: ChartAnalyticsData,
     isEditing: Boolean,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    officialClass: String? = null
 ) {
     val darkTheme = isSystemInDarkTheme()
     val layout = rememberCardLayout(
@@ -272,6 +327,10 @@ private fun ChartAnalyticsSection(
                         onMoveBackward = { layout.move(id, -1) { it in spec.overviewCards } },
                         onMoveForward = { layout.move(id, 1) { it in spec.overviewCards } }
                     ) {
+                        if (id == CHART_CARD_CLASS) {
+                            ClassCard(spec, data, officialClass)
+                            return@EditableCard
+                        }
                         if (id == CHART_CARD_TREND) {
                             OverviewCard(
                                 caption = spec.trendCaptionRes?.let { stringResource(it) }.orEmpty(),
@@ -415,6 +474,37 @@ private fun ChartAnalyticsSection(
                     onClick = { onNavigate(Routes.chartAnalytics(spec.game, Routes.CHART_DETAIL_SUGGESTIONS)) }
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun ClassCard(spec: ChartGameSpec, data: ChartAnalyticsData, officialClass: String?) {
+    val value = officialClass?.toDoubleOrNull() ?: data.classValue ?: 0.0
+    val text = officialClass ?: String.format(java.util.Locale.ROOT, "%.2f", value)
+    val tier = PopnClass.tier(value)
+    OverviewCard(
+        caption = stringResource(spec.classCaptionRes ?: R.string.popn_class),
+        contentHeight = 160.dp,
+        onClick = null
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            Text(
+                text = tier.name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = PopnColors.classTierColor(value)
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.headlineLarge.gameFont(),
+                fontWeight = FontWeight.Black,
+                fontSize = 32.sp,
+                maxLines = 1
+            )
         }
     }
 }

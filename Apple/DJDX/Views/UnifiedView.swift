@@ -14,6 +14,7 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
+    @AppStorage(wrappedValue: PopnVersion.highCheers, "Global.Popn.Version") var popnVersion: PopnVersion
     @AppStorage(wrappedValue: DDRPlayStyle.single, "Global.DDR.Style") var ddrStyleToShow: DDRPlayStyle
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: true, "More.General.ShowProfileHeader") var showProfileHeader: Bool
@@ -46,6 +47,7 @@ struct UnifiedView: View {
     @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
     @State var polarisChordAnalyticsModel = PolarisChordAnalyticsModel()
     @State var ddrAnalyticsModel = DDRAnalyticsModel()
+    @State var popnAnalyticsModel = PopnAnalyticsModel()
     @State var sessionStore: IIDXSessionStore
     @State var sessionAnalyticsModel: AnalyticsModel
 
@@ -59,6 +61,7 @@ struct UnifiedView: View {
     @Namespace var sdvxAnalyticsNamespace
     @Namespace var polarisChordAnalyticsNamespace
     @Namespace var ddrAnalyticsNamespace
+    @Namespace var popnAnalyticsNamespace
     @Namespace var towerNamespace
     @Namespace var importNamespace
 
@@ -86,6 +89,10 @@ struct UnifiedView: View {
                 } else if selectedGame == .danceDanceRevolution {
                     DDRScoresView(isEditingAnalytics: $isEditingAnalytics) {
                         ddrHeader
+                    }
+                } else if selectedGame == .popn {
+                    PopnScoresView(isEditingAnalytics: $isEditingAnalytics) {
+                        popnHeader
                     }
                 } else {
                     IIDXScoresView(isEditingAnalytics: $isEditingAnalytics) {
@@ -176,6 +183,9 @@ struct UnifiedView: View {
             .navigationDestination(for: DDRAnalyticsPath.self) { path in
                 DDRAnalyticsDestinationView(model: ddrAnalyticsModel, path: path, namespace: ddrAnalyticsNamespace)
             }
+            .navigationDestination(for: PopnAnalyticsPath.self) { path in
+                PopnAnalyticsDestinationView(model: popnAnalyticsModel, path: path, namespace: popnAnalyticsNamespace)
+            }
             .navigationDestination(for: AnalyticsGoalPath.self) { path in
                 switch path {
                 case .detail(let id):
@@ -193,6 +203,8 @@ struct UnifiedView: View {
                     PolarisChordImportView()
                 } else if selectedGame == .danceDanceRevolution {
                     DDRImportView()
+                } else if selectedGame == .popn {
+                    PopnImportView()
                 } else {
                     IIDXImportView()
                 }

@@ -53,6 +53,13 @@ object SettingsKeys {
     val polarisChordClearTypeFilters = stringSetPreferencesKey("PolarisChordScoresView.ClearTypeFilters")
     val polarisChordGradeFilters = stringSetPreferencesKey("PolarisChordScoresView.GradeFilters")
 
+    val popnSortMode = stringPreferencesKey("PopnScoresView.SortMode")
+    val popnSortDescending = booleanPreferencesKey("PopnScoresView.SortDescending")
+    val popnDifficultyFilters = stringSetPreferencesKey("PopnScoresView.DifficultyFilters")
+    val popnLevelFilters = stringSetPreferencesKey("PopnScoresView.LevelFilters")
+    val popnClearTypeFilters = stringSetPreferencesKey("PopnScoresView.ClearTypeFilters")
+    val popnRankFilters = stringSetPreferencesKey("PopnScoresView.RankFilters")
+
     val ddrSortMode = stringPreferencesKey("DDRScoresView.SortMode")
     val ddrSortDescending = booleanPreferencesKey("DDRScoresView.SortDescending")
     val ddrPlayStyle = stringPreferencesKey("Global.DDR.Style")
@@ -87,6 +94,9 @@ object SettingsKeys {
     val polarisChordCardOrder = stringPreferencesKey("Analytics.PolarisChord.CardOrder")
     val polarisChordVisibleCards = stringSetPreferencesKey("Analytics.PolarisChord.VisibleCards")
     val polarisChordCollapsedSections = stringSetPreferencesKey("Analytics.PolarisChord.CollapsedSections")
+    val popnCardOrder = stringPreferencesKey("Analytics.Popn.CardOrder")
+    val popnVisibleCards = stringSetPreferencesKey("Analytics.Popn.VisibleCards")
+    val popnCollapsedSections = stringSetPreferencesKey("Analytics.Popn.CollapsedSections")
     val ddrCardOrder = stringPreferencesKey("Analytics.DDR.CardOrder")
     val ddrVisibleCards = stringSetPreferencesKey("Analytics.DDR.VisibleCards")
     val ddrCollapsedSections = stringSetPreferencesKey("Analytics.DDR.CollapsedSections")
@@ -113,7 +123,10 @@ val analyticsLayoutKeys: List<Preferences.Key<*>> = listOf(
     SettingsKeys.polarisChordCollapsedSections,
     SettingsKeys.ddrCardOrder,
     SettingsKeys.ddrVisibleCards,
-    SettingsKeys.ddrCollapsedSections
+    SettingsKeys.ddrCollapsedSections,
+    SettingsKeys.popnCardOrder,
+    SettingsKeys.popnVisibleCards,
+    SettingsKeys.popnCollapsedSections
 )
 
 fun <T> Context.settingFlow(key: Preferences.Key<T>, default: T): Flow<T> =

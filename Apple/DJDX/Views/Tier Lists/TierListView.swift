@@ -9,6 +9,7 @@ struct TierListView: View {
     @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
+    @AppStorage(wrappedValue: PopnVersion.highCheers, "Global.Popn.Version") var popnVersion: PopnVersion
 
     var store = TierListStore.shared
     let initialShare: TierListShare?
@@ -356,7 +357,8 @@ struct TierListView: View {
             iidxVersion: iidxVersion,
             sdvxVersion: sdvxVersion,
             polarisChordVersion: polarisChordVersion,
-            ddrVersion: ddrVersion
+            ddrVersion: ddrVersion,
+            popnVersion: popnVersion
         )
         charts = loaded
         if !levels.contains(level) {

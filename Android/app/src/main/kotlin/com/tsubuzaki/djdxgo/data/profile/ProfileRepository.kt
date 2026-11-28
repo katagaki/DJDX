@@ -13,6 +13,7 @@ import com.tsubuzaki.djdxgo.data.ddr.DDRPlayStyle
 import com.tsubuzaki.djdxgo.data.ddr.DDRVersionInfo
 import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordVersionInfo
+import com.tsubuzaki.djdxgo.data.popn.PopnVersionInfo
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVersion
 import com.tsubuzaki.djdxgo.data.settingsDataStore
 import java.io.File
@@ -65,6 +66,15 @@ data class PolarisChordProfile(
         get() = playerName != null || title != null || paClass != null || paSkill != null
 }
 
+data class PopnProfile(
+    val playerName: String? = null,
+    val popnClass: String? = null,
+    val popnClassIcon: Bitmap? = null
+) {
+    val hasData: Boolean
+        get() = playerName != null || popnClass != null
+}
+
 data class DDRProfile(
     val dancerName: String? = null,
     val flareSkill: Map<DDRPlayStyle, String> = emptyMap(),
@@ -84,11 +94,13 @@ class ProfileRepository(private val context: Context) {
     private val sdvxState = MutableStateFlow(SDVXProfile())
     private val polarisChordState = MutableStateFlow(PolarisChordProfile())
     private val ddrState = MutableStateFlow(DDRProfile())
+    private val popnState = MutableStateFlow(PopnProfile())
 
     val iidx: StateFlow<IIDXProfile> = iidxState.asStateFlow()
     val sdvx: StateFlow<SDVXProfile> = sdvxState.asStateFlow()
     val polarisChord: StateFlow<PolarisChordProfile> = polarisChordState.asStateFlow()
     val ddr: StateFlow<DDRProfile> = ddrState.asStateFlow()
+    val popn: StateFlow<PopnProfile> = popnState.asStateFlow()
 
     suspend fun loadCached() = withContext(Dispatchers.IO) {
         val preferences = context.settingsDataStore.data.first()
@@ -113,6 +125,11 @@ class ProfileRepository(private val context: Context) {
             paSkill = preferences[Keys.polarisChordPASkill],
             paClassIcon = loadImage(POLARIS_CHORD_PA_CLASS_ICON_FILE),
             paSkillIcon = loadImage(POLARIS_CHORD_PA_SKILL_ICON_FILE)
+        )
+        popnState.value = PopnProfile(
+            playerName = preferences[Keys.popnPlayerName],
+            popnClass = preferences[Keys.popnClass],
+            popnClassIcon = loadImage(POPN_CLASS_ICON_FILE)
         )
         ddrState.value = DDRProfile(
             dancerName = preferences[Keys.ddrDancerName],
@@ -238,6 +255,30 @@ class ProfileRepository(private val context: Context) {
                 if (paClass != null) preferences[Keys.polarisChordPAClass] = paClass
                 if (paSkill != null) preferences[Keys.polarisChordPASkill] = paSkill
                 if (!title.isNullOrEmpty()) preferences[Keys.polarisChordTitle] = title
+            }
+        }
+        loadCached()
+    }
+
+    suspend fun refreshPopn() = withContext(Dispatchers.IO) {
+        runCatching {
+            val document = fetchDocument(PopnVersionInfo.profilePageURL)
+            val legacyName = document.select("div.st_box div.item")
+                .firstOrNull { it.text().contains("プレーヤー名") }
+                ?.nextElementSibling()?.text()
+            val name = (legacyName ?: document.select("div.st_box ul li")
+                .firstOrNull { it.selectFirst("p")?.text()?.contains("プレーヤー名") == true }
+                ?.selectFirst("div")?.text())
+                ?.trim()?.takeIf { it.isNotEmpty() }
+            val classElement = document.selectFirst("#popnclass")
+            val popnClass = classElement?.text()?.trim()?.toDoubleOrNull()
+                ?.let { String.format(java.util.Locale.ROOT, "%.2f", it) }
+            classElement?.selectFirst("img")?.absUrl("src")?.takeIf { it.isNotEmpty() }?.let {
+                downloadImage(it, POPN_CLASS_ICON_FILE)
+            }
+            context.settingsDataStore.edit { preferences ->
+                if (name != null) preferences[Keys.popnPlayerName] = name
+                if (popnClass != null) preferences[Keys.popnClass] = popnClass
             }
         }
         loadCached()
@@ -371,6 +412,8 @@ class ProfileRepository(private val context: Context) {
         val polarisChordPAClass = stringPreferencesKey("PolarisChordProfile.PAClass")
         val polarisChordPASkill = stringPreferencesKey("PolarisChordProfile.PASkill")
         val ddrDancerName = stringPreferencesKey("DDRProfile.DancerName")
+        val popnPlayerName = stringPreferencesKey("PopnProfile.${PopnVersionInfo.SLUG}.PlayerName")
+        val popnClass = stringPreferencesKey("PopnProfile.${PopnVersionInfo.SLUG}.PopnClass")
 
         fun ddrFlareSkill(style: DDRPlayStyle) = stringPreferencesKey("DDRProfile.FlareSkill.${style.value}")
 
@@ -384,5 +427,6 @@ class ProfileRepository(private val context: Context) {
         private const val SDVX_VOLFORCE_ICON_FILE = "VolforceIcon.png"
         private const val POLARIS_CHORD_PA_CLASS_ICON_FILE = "PolarisChordProfile.PAClassIcon.png"
         private const val POLARIS_CHORD_PA_SKILL_ICON_FILE = "PolarisChordProfile.PASkillIcon.png"
+        private const val POPN_CLASS_ICON_FILE = "PopnProfile.${PopnVersionInfo.SLUG}.PopnClassIcon.png"
     }
 }

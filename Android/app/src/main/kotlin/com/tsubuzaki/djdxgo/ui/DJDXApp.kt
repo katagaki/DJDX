@@ -81,6 +81,7 @@ import com.tsubuzaki.djdxgo.data.external.ExternalDataSource
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordVersionInfo
+import com.tsubuzaki.djdxgo.data.popn.PopnVersionInfo
 import com.tsubuzaki.djdxgo.data.removeSettings
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVersion
 import com.tsubuzaki.djdxgo.data.setSetting
@@ -93,11 +94,13 @@ import com.tsubuzaki.djdxgo.ui.analytics.DDRAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.IIDXAnalyticsDetailScreen
 import com.tsubuzaki.djdxgo.ui.analytics.IIDXAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.PolarisChordAnalyticsSection
+import com.tsubuzaki.djdxgo.ui.analytics.PopnAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.SDVXAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.TowerDetailScreen
 import com.tsubuzaki.djdxgo.ui.games.DDRScoreViewerScreen
 import com.tsubuzaki.djdxgo.ui.games.DDRScoresScreen
 import com.tsubuzaki.djdxgo.ui.games.PolarisChordScoresScreen
+import com.tsubuzaki.djdxgo.ui.games.PopnScoresScreen
 import com.tsubuzaki.djdxgo.ui.games.SDVXScoreViewerScreen
 import com.tsubuzaki.djdxgo.ui.games.SDVXScoresScreen
 import com.tsubuzaki.djdxgo.ui.iidx.IIDXScoreViewerScreen
@@ -114,6 +117,7 @@ import com.tsubuzaki.djdxgo.ui.profile.DDRDataSourceWarning
 import com.tsubuzaki.djdxgo.ui.profile.DDRProfileHeader
 import com.tsubuzaki.djdxgo.ui.profile.IIDXProfileHeader
 import com.tsubuzaki.djdxgo.ui.profile.PolarisChordProfileHeader
+import com.tsubuzaki.djdxgo.ui.profile.PopnProfileHeader
 import com.tsubuzaki.djdxgo.ui.profile.SDVXProfileHeader
 import com.tsubuzaki.djdxgo.ui.web.SDVXInChartViewerScreen
 import com.tsubuzaki.djdxgo.ui.web.TextageViewerScreen
@@ -129,6 +133,7 @@ internal fun gameIconRes(game: Game): Int = when (game) {
     Game.SOUND_VOLTEX -> R.drawable.ic_game_sdvx
     Game.POLARIS_CHORD -> R.drawable.ic_game_polaris
     Game.DANCE_DANCE_REVOLUTION -> R.drawable.ic_game_ddr
+    Game.POPN -> R.drawable.ic_game_popn
 }
 
 private fun gameNamed(name: String): Game? = when (name.lowercase()) {
@@ -136,6 +141,7 @@ private fun gameNamed(name: String): Game? = when (name.lowercase()) {
     "sdvx", "soundvoltex" -> Game.SOUND_VOLTEX
     "polaris", "polarischord" -> Game.POLARIS_CHORD
     "ddr", "ddrworld", "dancedancerevolution" -> Game.DANCE_DANCE_REVOLUTION
+    "popn", "popnmusic" -> Game.POPN
     else -> null
 }
 
@@ -449,6 +455,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
             Game.SOUND_VOLTEX -> container.profileRepository.refreshSDVX(SDVXVersion.fromNumber(sdvxVersionNumber))
             Game.POLARIS_CHORD -> container.profileRepository.refreshPolarisChord()
             Game.DANCE_DANCE_REVOLUTION -> container.profileRepository.refreshDDR()
+            Game.POPN -> container.profileRepository.refreshPopn()
         }
     }
 
@@ -516,6 +523,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                             Game.SOUND_VOLTEX -> SDVXVersion.fromNumber(sdvxVersionNumber).marketingName
                             Game.POLARIS_CHORD -> PolarisChordVersionInfo.MARKETING_NAME
                             Game.DANCE_DANCE_REVOLUTION -> DDRVersionInfo.MARKETING_NAME
+                            Game.POPN -> PopnVersionInfo.MARKETING_NAME
                         }
                         DropdownMenuItem(
                             text = { Text(versionName) },
@@ -629,6 +637,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                                 Game.SOUND_VOLTEX -> SDVXProfileHeader(container, headerModifier)
                                 Game.POLARIS_CHORD -> PolarisChordProfileHeader(container, headerModifier)
                                 Game.DANCE_DANCE_REVOLUTION -> DDRProfileHeader(container, headerModifier)
+                                Game.POPN -> PopnProfileHeader(container, headerModifier)
                             }
                         }
                     }
@@ -652,6 +661,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                                 Game.DANCE_DANCE_REVOLUTION -> DDRAnalyticsSection(
                                     container, ddrPlayStyle, isEditingAnalytics, onNavigate
                                 )
+                                Game.POPN -> PopnAnalyticsSection(container, isEditingAnalytics, onNavigate)
                             }
                             AnalyticsGoalsSection(
                                 container = container,
@@ -699,6 +709,11 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                                 onNavigate(Routes.ddrViewer(songIndex, date, style, difficulty))
                             }
                         )
+                        Game.POPN -> PopnScoresScreen(
+                            container = container,
+                            contentPadding = PaddingValues(),
+                            analyticsContent = header
+                        )
                     }
                 }
             }
@@ -733,6 +748,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                 container.sdvxRepository.deleteAllData()
                 container.polarisChordRepository.deleteAllData()
                 container.ddrRepository.deleteAllData()
+                container.popnRepository.deleteAllData()
                 container.notifyDataChanged()
             }
             Toast.makeText(context, context.getString(R.string.more_delete_score_data_done), Toast.LENGTH_SHORT).show()

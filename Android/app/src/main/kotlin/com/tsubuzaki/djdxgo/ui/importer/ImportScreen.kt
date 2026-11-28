@@ -66,6 +66,7 @@ import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.SettingsKeys
 import com.tsubuzaki.djdxgo.data.ddr.DDRVersionInfo
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordVersionInfo
+import com.tsubuzaki.djdxgo.data.popn.PopnVersionInfo
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVersion
@@ -234,6 +235,9 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                             Game.DANCE_DANCE_REVOLUTION -> container.ddrRepository.importJSON(
                                 result.payload, importDate
                             )
+                            Game.POPN -> container.popnRepository.importJSON(
+                                result.payload, importDate
+                            )
                         }
                         container.notifyImportCompleted()
                         withContext(Dispatchers.Main) {
@@ -321,6 +325,7 @@ fun ImportScreen(container: AppContainer, game: Game, onDismiss: () -> Unit) {
                                         Game.SOUND_VOLTEX -> WebImporterSpecs.sdvx(sdvxVersion)
                                         Game.POLARIS_CHORD -> WebImporterSpecs.polarisChord()
                                         Game.DANCE_DANCE_REVOLUTION -> WebImporterSpecs.ddr()
+                                        Game.POPN -> WebImporterSpecs.popn()
                                     },
                                     if (game == Game.IIDX_ARCADE) csvPlayType else null
                                 )
@@ -579,6 +584,8 @@ private fun importGroupRowsFlow(container: AppContainer, game: Game): Flow<List<
             }
         Game.DANCE_DANCE_REVOLUTION -> container.database.ddrDao().importGroupsFlow()
             .map { groups -> groups.map { ImportGroupRow(it.id, it.importDate, DDRVersionInfo.MARKETING_NAME) } }
+        Game.POPN -> container.database.popnDao().importGroupsFlow()
+            .map { groups -> groups.map { ImportGroupRow(it.id, it.importDate, PopnVersionInfo.MARKETING_NAME) } }
     }
 
 private suspend fun deleteImportGroup(container: AppContainer, game: Game, groupID: String) {
@@ -587,6 +594,7 @@ private suspend fun deleteImportGroup(container: AppContainer, game: Game, group
         Game.SOUND_VOLTEX -> container.sdvxRepository.deleteImportGroup(groupID)
         Game.POLARIS_CHORD -> container.polarisChordRepository.deleteImportGroup(groupID)
         Game.DANCE_DANCE_REVOLUTION -> container.ddrRepository.deleteImportGroup(groupID)
+        Game.POPN -> container.popnRepository.deleteImportGroup(groupID)
     }
 }
 

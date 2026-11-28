@@ -204,6 +204,28 @@ fun PolarisChordProfileHeader(container: AppContainer, modifier: Modifier = Modi
 }
 
 @Composable
+fun PopnProfileHeader(container: AppContainer, modifier: Modifier = Modifier) {
+    val profile by container.profileRepository.popn.collectAsState()
+    if (!profile.hasData) return
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(72.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            profile.playerName?.let {
+                Text(text = it, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, maxLines = 1)
+            }
+        }
+        profile.popnClass?.let {
+            StatBlock(stringResource(R.string.popn_class), it, profile.popnClassIcon)
+        }
+    }
+}
+
+@Composable
 fun DDRProfileHeader(container: AppContainer, modifier: Modifier = Modifier) {
     val profile by container.profileRepository.ddr.collectAsState()
     if (!profile.hasData) return

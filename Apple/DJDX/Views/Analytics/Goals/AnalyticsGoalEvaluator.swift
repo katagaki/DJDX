@@ -17,7 +17,7 @@ enum AnalyticsGoalEvaluator {
             histories = await sdvxHistories(for: goals, version: sdvxVersion)
         case .danceDanceRevolution:
             histories = await ddrHistories(for: goals, version: ddrVersion)
-        case .polarisChord:
+        case .polarisChord, .popn:
             histories = [:]
         }
         let progresses = goals.map { AnalyticsGoalProgress(goal: $0, history: histories[$0.id] ?? []) }

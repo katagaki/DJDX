@@ -58,6 +58,15 @@ enum PolarisChordAnalyticsPath: Hashable {
     case newGradesDetail(grade: String)
 }
 
+enum PopnAnalyticsPath: Hashable {
+    case popnClassDetail
+    case medalBreakdownDetail
+    case rankBreakdownDetail
+    case newHighScoresDetail
+    case newClearsDetail(clearType: String)
+    case newRanksDetail(rank: String)
+}
+
 enum ImportPath: Hashable {
     case importerWebIIDXSingle
     case importerWebIIDXDouble

@@ -43,7 +43,7 @@ enum class AnalyticsGoalKind {
         fun available(game: Game): List<AnalyticsGoalKind> = when (game) {
             Game.SOUND_VOLTEX, Game.DANCE_DANCE_REVOLUTION -> listOf(RATING, CLEAR_COUNT, GRADE_COUNT)
             Game.IIDX_ARCADE -> listOf(CLEAR_COUNT, GRADE_COUNT)
-            Game.POLARIS_CHORD -> emptyList()
+            Game.POLARIS_CHORD, Game.POPN -> emptyList()
         }
     }
 }
@@ -95,13 +95,13 @@ data class AnalyticsGoal(
                     .filter { it != SDVXClearType.NO_PLAY && it != SDVXClearType.PLAYED }
                     .map { it.value }
                 Game.DANCE_DANCE_REVOLUTION -> DDRClearLamp.order.filter { it != "fail" }
-                Game.POLARIS_CHORD -> emptyList()
+                Game.POLARIS_CHORD, Game.POPN -> emptyList()
             }
             AnalyticsGoalKind.GRADE_COUNT -> when (game) {
                 Game.IIDX_ARCADE -> IIDXDJLevel.sorted.reversed().map { it.value }
                 Game.SOUND_VOLTEX -> SDVXGrade.sorted.filter { it != SDVXGrade.NONE }.map { it.value }
                 Game.DANCE_DANCE_REVOLUTION -> DDRRank.order
-                Game.POLARIS_CHORD -> emptyList()
+                Game.POLARIS_CHORD, Game.POPN -> emptyList()
             }
         }
 
@@ -115,7 +115,7 @@ data class AnalyticsGoal(
             Game.IIDX_ARCADE -> (1..12).toList()
             Game.SOUND_VOLTEX -> (1..20).toList()
             Game.DANCE_DANCE_REVOLUTION -> (1..19).toList()
-            Game.POLARIS_CHORD -> emptyList()
+            Game.POLARIS_CHORD, Game.POPN -> emptyList()
         }
 
         fun thresholdDisplay(threshold: String, kind: AnalyticsGoalKind, game: Game): String =
@@ -265,7 +265,7 @@ class AnalyticsGoalEvaluator(
                 Game.IIDX_ARCADE -> iidxHistories(gameGoals)
                 Game.SOUND_VOLTEX -> sdvxHistories(gameGoals)
                 Game.DANCE_DANCE_REVOLUTION -> ddrHistories(gameGoals)
-                Game.POLARIS_CHORD -> emptyList()
+                Game.POLARIS_CHORD, Game.POPN -> emptyList()
             }
         }.toMap()
         val progresses = goals.map { AnalyticsGoalProgress(it, histories[it.id].orEmpty()) }

@@ -33,6 +33,7 @@ extension Game {
         case .soundVoltex: "sdvx"
         case .polarisChord: "polarischord"
         case .danceDanceRevolution: "ddr"
+        case .popn: "popn"
         }
     }
 
@@ -62,7 +63,8 @@ enum TierListChartProvider {
         iidxVersion: IIDXVersion,
         sdvxVersion: SDVXVersion,
         polarisChordVersion: PolarisChordVersion,
-        ddrVersion: DDRVersion
+        ddrVersion: DDRVersion,
+        popnVersion: PopnVersion
     ) async -> [TierListChart] {
         switch game {
         case .iidxArcade, .iidxInfinitas:
@@ -73,6 +75,8 @@ enum TierListChartProvider {
             await polarisChordCharts(version: polarisChordVersion)
         case .danceDanceRevolution:
             await ddrCharts(playType: playType, version: ddrVersion)
+        case .popn:
+            await popnCharts(version: popnVersion)
         }
     }
 
@@ -157,6 +161,26 @@ enum TierListChartProvider {
                 lampColor: clearType.color,
                 grade: grade,
                 gradeColor: .secondary
+            )
+        }
+    }
+
+    static func popnCharts(version: PopnVersion) async -> [TierListChart] {
+        await PopnReader().latestSongRecords(for: version).compactMap { record in
+            guard record.level > 0 else { return nil }
+            let difficulty = record.difficultyEnum
+            let medal = record.medalEnum
+            let rank = record.rankEnum
+            return TierListChart(
+                id: TierListChart.chartID(title: record.title, difficulty: record.difficulty),
+                title: record.title,
+                level: String(record.level),
+                difficultyLabel: difficulty.abbreviation,
+                difficultyColor: difficulty.color,
+                lampLabel: medal.abbreviation,
+                lampColor: medal.clearType.color,
+                grade: rank == .none ? "" : rank.rawValue,
+                gradeColor: rank.color
             )
         }
     }

@@ -484,6 +484,195 @@ for (let attempt = 0; attempt < 3; attempt++) {
 return 'ERR:network';
 """
 
+let popnScoreDataFetchBody = """
+async function fetchPopnScoreData(basePath, verAll) {
+    const maxLevel = 50;
+    const workerCount = 3;
+
+    async function fetchDoc(url) {
+        const response = await fetch(url, { method: 'GET', credentials: 'same-origin' });
+        const finalURL = response.url || '';
+        if (finalURL.indexOf('/error/') !== -1 || finalURL.indexOf('login.html') !== -1) {
+            const match = finalURL.match(/[?&]err=([0-9]+)/);
+            throw { sentinel: match ? match[1] : 'server' };
+        }
+        const html = await response.text();
+        return new DOMParser().parseFromString(html, 'text/html');
+    }
+
+    function text(el) {
+        return el ? el.textContent.replace(/\\s+/g, ' ').trim() : '';
+    }
+
+    function imageCode(img, pattern) {
+        if (!img) { return ''; }
+        const match = (img.getAttribute('src') || '').match(pattern);
+        return match ? match[1] : '';
+    }
+
+    function scoreCell(cell) {
+        const imgs = cell.querySelectorAll('img');
+        let medal = '';
+        let rank = '';
+        imgs.forEach(function(img) {
+            medal = medal || imageCode(img, /meda_([a-z]+)\\.png/);
+            rank = rank || imageCode(img, /rank_([a-z0-9_]+)\\.png/);
+        });
+        const digits = text(cell).replace(/[^0-9]/g, '');
+        return { score: digits ? parseInt(digits, 10) : 0, medal: medal || 'none', rank: rank || 'none' };
+    }
+
+    function absoluteURL(img) {
+        if (!img) { return ''; }
+        try { return new URL(img.getAttribute('src') || '', location.href).href; } catch (e) { return ''; }
+    }
+
+    function parseProfile(doc) {
+        const profile = { name: '', popnClass: '', popnClassIcon: '' };
+        doc.querySelectorAll('div.st_box div.item').forEach(function(item) {
+            const value = item.nextElementSibling;
+            if (!profile.name && text(item).indexOf('プレーヤー名') !== -1 && value) {
+                profile.name = text(value);
+            }
+        });
+        doc.querySelectorAll('div.st_box ul li').forEach(function(li) {
+            const label = li.querySelector('p');
+            const value = li.querySelector('div');
+            if (!profile.name && label && value && text(label).indexOf('プレーヤー名') !== -1) {
+                profile.name = text(value);
+            }
+        });
+        const classEl = doc.querySelector('#popnclass');
+        if (classEl) {
+            const value = parseFloat(text(classEl));
+            if (!isNaN(value)) { profile.popnClass = value.toFixed(2); }
+            profile.popnClassIcon = absoluteURL(classEl.querySelector('img'));
+        }
+        return profile;
+    }
+
+    function parseLevelPage(doc, level) {
+        const rows = [];
+        const legacyRows = doc.querySelectorAll('ul.mu_list_table > li');
+        if (legacyRows.length > 0) {
+            legacyRows.forEach(function(li) {
+                const music = li.querySelector('div.col_music_lv');
+                const scoreEl = li.querySelector('div.col_ex_lv');
+                if (!music || !scoreEl) { return; }
+                const link = music.querySelector('a');
+                const subDivs = music.querySelectorAll('div');
+                const cell = scoreCell(scoreEl);
+                rows.push({
+                    title: text(link),
+                    genre: text(subDivs[0]),
+                    artist: text(subDivs[1]),
+                    difficulty: text(li.querySelector('div.col_normal_lv')),
+                    level: parseInt(text(li.querySelector('div.col_hyper_lv')), 10) || level,
+                    score: cell.score, medal: cell.medal, rank: cell.rank
+                });
+            });
+            return rows;
+        }
+        doc.querySelectorAll('ul.mu_list_lv_table > li').forEach(function(li) {
+            if (li.classList.contains('st_th')) { return; }
+            const cells = li.children;
+            if (cells.length < 4) { return; }
+            const link = cells[0].querySelector('a');
+            const paras = cells[0].querySelectorAll('p');
+            const cell = scoreCell(cells[3]);
+            rows.push({
+                title: text(link),
+                genre: text(paras[0]),
+                artist: text(paras[1]),
+                difficulty: text(cells[1]),
+                level: parseInt(text(cells[2]), 10) || level,
+                score: cell.score, medal: cell.medal, rank: cell.rank
+            });
+        });
+        return rows;
+    }
+
+    function totalPages(doc) {
+        const last = doc.querySelector('select#s_page option:last-child');
+        const value = last ? parseInt(last.value, 10) : 0;
+        return isNaN(value) ? 1 : value + 1;
+    }
+
+    function levelURL(level, page) {
+        return basePath + '/playdata/mu_lv.html?page=' + page + '&version=' + verAll
+            + '&bemani=0&category=0&keyword=&lv=' + level + '&sort=music&sort_type=up';
+    }
+
+    const profile = parseProfile(await fetchDoc(basePath + '/playdata/index.html'));
+
+    const seen = new Set();
+    const rows = [];
+    let levelsDone = 0;
+    let nextLevel = 1;
+
+    function addRows(pageRows) {
+        pageRows.forEach(function(row) {
+            if (!row.title || !row.difficulty) { return; }
+            const key = row.title + '|' + row.genre + '|' + row.difficulty.toUpperCase();
+            if (seen.has(key)) { return; }
+            seen.add(key);
+            rows.push(row);
+        });
+    }
+
+    async function scrapeLevel(level) {
+        const firstDoc = await fetchDoc(levelURL(level, 0));
+        const firstRows = parseLevelPage(firstDoc, level);
+        addRows(firstRows);
+        if (firstRows.length === 0) { return; }
+        const pages = Math.min(totalPages(firstDoc), 100);
+        for (let page = 1; page < pages; page++) {
+            const pageRows = parseLevelPage(await fetchDoc(levelURL(level, page)), level);
+            if (pageRows.length === 0) { break; }
+            addRows(pageRows);
+        }
+    }
+
+    async function worker() {
+        while (nextLevel <= maxLevel) {
+            const level = nextLevel++;
+            let lastError = null;
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    await scrapeLevel(level);
+                    lastError = null;
+                    break;
+                } catch (error) {
+                    if (error && error.sentinel) { throw error; }
+                    lastError = error;
+                    await new Promise(function(resolve) { setTimeout(resolve, 600 * (attempt + 1)); });
+                }
+            }
+            if (lastError) { throw lastError; }
+            levelsDone++;
+            if (window.webkit && window.webkit.messageHandlers
+                && window.webkit.messageHandlers.popnProgress) {
+                window.webkit.messageHandlers.popnProgress.postMessage({ done: levelsDone, total: maxLevel });
+            }
+        }
+    }
+
+    const workers = [];
+    for (let i = 0; i < workerCount; i++) { workers.push(worker()); }
+    await Promise.all(workers);
+
+    if (rows.length === 0) { return 'ERR:empty'; }
+    return JSON.stringify({ profile: profile, rows: rows });
+}
+
+try {
+    return await fetchPopnScoreData(basePath, verAll);
+} catch (error) {
+    if (error && error.sentinel) { return 'ERR:' + error.sentinel; }
+    return 'ERR:network';
+}
+"""
+
 let scoreDataReadBody = """
 function readScoreData() {
     const node = document.getElementById('score_data');
