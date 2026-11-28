@@ -58,7 +58,9 @@ struct ShareCardView: View {
                         .font(.playline(size: 15.0))
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
-                    Text(date, format: .dateTime.year().month().day())
+                    Text(verbatim: date.formatted(.verbatim(
+                        "\(year: .defaultDigits)/\(month: .twoDigits)/\(day: .twoDigits)",
+                        timeZone: .current, calendar: Calendar(identifier: .gregorian))))
                         .font(.playline(size: 11.0, weight: .regular))
                         .foregroundStyle(.white.opacity(0.7))
                 }
