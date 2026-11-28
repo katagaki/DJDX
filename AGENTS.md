@@ -4,6 +4,8 @@
 - `Android/` — DJDXGo, the Android port of the iOS app (Gradle, Kotlin, Jetpack Compose).
 - `Studio/` — DJDX PEAK Studio, a macOS tool for labeling IIDX result screens and
   training/exporting the Core ML models used by the iOS app (SwiftPM + Python).
+- `Lamp/` — the opt-in community score server (Cloudflare Workers + D1 + R2) at
+  `djdx.ktgk.app`.
 
 Run build commands from inside the relevant folder.
 
@@ -28,6 +30,9 @@ Run build commands from inside the relevant folder.
   SwiftUI wrapper over a `UIViewRepresentable` `WKWebView` + a `WKNavigationDelegate`
   coordinator. Changes to import behavior usually need applying to all four.
 - `Apple/DJDX.xcodeproj/xcshareddata/xcodecloud/` is gitignored and must never be staged.
+- The Lamp server URL comes from the Xcode Cloud environment variable `LAMP_SERVER_URL`,
+  written into `LampServerURL` in `DJDX/Info.plist` by `ci_scripts/ci_pre_xcodebuild.sh`.
+  Keep the committed value empty.
 - Game data must always be styled exactly as the Play Data rows style it
   (`Views/*/Scores/*ScoreRow.swift`) on every screen, never with ad-hoc colors or fonts:
   - Song titles: IIDX uses the version-tinted title (`IIDXVersion.rowTitleTextColor` /
@@ -69,3 +74,11 @@ Run build commands from inside the relevant folder.
   app bundle) are gitignored and must never be committed. Only labels are tracked.
 - Exported `.mlpackage` models are copied into
   `Apple/DJDX/Games/beatmania IIDX/Sessions/Models/` for the iOS app's result detection.
+
+# Lamp
+
+- Run from `Lamp/`: `npm run db:migrate:local`, `npm run dev`, `npm test`, `npm run e2e`.
+  The client protocol is documented in `Lamp/README.md`.
+- Never deploy (`wrangler deploy`, remote D1 migrations) unless explicitly asked.
+- The admin page (`Lamp/public/admin/`) is protected by Cloudflare Access in production.
+- `Lamp/.dev.vars`, `Lamp/.wrangler/` and `Lamp/node_modules/` are gitignored and must never be staged.

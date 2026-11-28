@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lamp Admin</title>
+  <link rel="stylesheet" href="/admin/app.css">
+  <script src="/admin/app.js" defer></script>
+</head>
+<body>
+  <header class="bar">
+    <div class="brand"><strong>Lamp</strong>Admin</div>
+    <nav class="tabs" role="tablist">
+      <button class="tab" data-view="reports" role="tab">Reports</button>
+      <button class="tab" data-view="chart" role="tab">Chart</button>
+      <button class="tab" data-view="tools" role="tab">Tools</button>
+    </nav>
+    <div class="who" id="who"></div>
+  </header>
+
+  <main>
+    <section class="view" id="view-reports">
+      <h1 class="page-title">Reports</h1>
+      <div class="toolbar">
+        <div class="segmented" id="report-status">
+          <button data-status="open">Open</button>
+          <button data-status="resolved">Resolved</button>
+          <button data-status="dismissed">Dismissed</button>
+        </div>
+        <button class="ghost" id="reports-refresh">Refresh</button>
+      </div>
+      <div id="reports-list" class="list"></div>
+    </section>
+
+    <section class="view" id="view-chart">
+      <h1 class="page-title">Chart</h1>
+      <form class="card form-row" id="chart-form">
+        <label>Source<input name="source" placeholder="arcade-33" required></label>
+        <label class="grow">Title<input name="title" placeholder="Song title" required></label>
+        <label>Play<select name="playType"><option>SP</option><option>DP</option></select></label>
+        <label>Difficulty
+          <select name="difficulty">
+            <option>BEGINNER</option><option>NORMAL</option><option>HYPER</option><option selected>ANOTHER</option><option>LEGGENDARIA</option>
+          </select>
+        </label>
+        <button class="primary" type="submit">Load chart</button>
+      </form>
+      <div id="chart-result"></div>
+    </section>
+
+    <section class="view" id="view-tools">
+      <h1 class="page-title">Tools</h1>
+      <div class="grid">
+        <form class="card" id="rebuild-form">
+          <h3>Rebuild snapshots</h3>
+          <p class="muted">Snapshots rebuild daily at 05:00 JST. Leave the source empty to rebuild every snapshot now.</p>
+          <label>Source<input name="source" placeholder="arcade-33"></label>
+          <button class="primary" type="submit">Rebuild</button>
+        </form>
+        <form class="card" id="alias-form">
+          <h3>Merge song titles</h3>
+          <p class="muted">Moves every score from the alias title to the canonical title.</p>
+          <label>Alias<input name="alias" required></label>
+          <label>Canonical<input name="canonical" required></label>
+          <button class="primary" type="submit">Merge</button>
+        </form>
+        <form class="card" id="purge-form">
+          <h3>Purge scores</h3>
+          <p class="muted">Deletes a contributor's scores in one source, optionally only at or above an EX score.</p>
+          <label>Source<input name="source" placeholder="arcade-33" required></label>
+          <label>Contributor<input name="contributorId" required></label>
+          <label>Minimum EX score<input name="minExScore" type="number" min="0"></label>
+          <button class="danger" type="submit">Purge</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+</body>
+</html>

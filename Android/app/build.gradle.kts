@@ -99,6 +99,11 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
+    // CameraX
+    implementation(libs.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.view)
+
     // Compose
     implementation(libs.activity.compose)
     implementation(platform(libs.compose.bom))
@@ -106,4 +111,7 @@ dependencies {
     implementation(libs.compose.material.icons.extended)
     implementation(libs.material3)
     implementation(libs.navigation.compose)
+
+    // Testing
+    testImplementation(libs.junit)
 }

@@ -30,19 +30,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDX uses the camera to capture your result screens during a session."
+            "value" : "DJDX uses the camera to capture your result screens during a session and to receive transfers from your other devices."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッション中にリザルト画面を撮影するためにカメラを使用します。"
+            "value" : "セッション中のリザルト画面の撮影と、他のデバイスからの引き継ぎの受け取りにカメラを使用します。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DJDX 會在遊玩過程中使用相機拍攝成績畫面。"
+            "value" : "DJDX 會使用相機在遊玩過程中拍攝成績畫面，以及接收從其他裝置轉移的資料。"
           }
         }
       }

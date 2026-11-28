@@ -1,0 +1,20 @@
+{
+  "name": "lamp",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --test-scheduled --ip 127.0.0.1 --port 8787 --local-upstream 127.0.0.1:8787",
+    "db:migrate:local": "wrangler d1 migrations apply djdx-lamp --local",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "node scripts/e2e.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261125.1",
+    "@peculiar/x509": "3.1.0",
+    "reflect-metadata": "0.2.2",
+    "typescript": "7.0.2",
+    "vitest": "5.1.2",
+    "wrangler": "4.168.0"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "djdx-lamp",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "djdx.ktgk.app", "custom_domain": true }],
+  "triggers": { "crons": ["*/5 * * * *", "0 20 * * *"] },
+  "assets": { "directory": "public", "binding": "ASSETS", "run_worker_first": true },
+  "d1_databases": [{ "binding": "DB", "database_name": "djdx-lamp", "migrations_dir": "migrations" }],
+  "r2_buckets": [{ "binding": "SNAPSHOTS", "bucket_name": "djdx-lamp-snapshots" }],
+  "ratelimits": [
+    { "name": "IP_LIMITER", "namespace_id": "1001", "simple": { "limit": 60, "period": 60 } }
+  ],
+  "vars": {
+    "APP_ATTEST_APP_IDS": "YYM4Z6MU8F.com.tsubuzaki.DJDX",
+    "ALLOW_UNATTESTED": "true",
+    "REPOSITORY_URL": "https://github.com/katagaki/DJDX",
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": ""
+  }
+}

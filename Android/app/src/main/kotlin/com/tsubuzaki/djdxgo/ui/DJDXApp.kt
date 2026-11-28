@@ -106,6 +106,7 @@ import com.tsubuzaki.djdxgo.ui.importer.ImportScreen
 import com.tsubuzaki.djdxgo.ui.more.AttributionsScreen
 import com.tsubuzaki.djdxgo.ui.more.DeleteScoreDataDialog
 import com.tsubuzaki.djdxgo.ui.more.FreeUpSpaceDialog
+import com.tsubuzaki.djdxgo.ui.more.LampTransferScreen
 import com.tsubuzaki.djdxgo.ui.more.ExternalDataSourcesScreen
 import com.tsubuzaki.djdxgo.ui.more.RadarMakerScreen
 import com.tsubuzaki.djdxgo.ui.tierlist.TierListScreen
@@ -327,6 +328,9 @@ fun DJDXApp() {
         }
         composable(Routes.RADAR_MAKER) {
             RadarMakerScreen(onBack = back)
+        }
+        composable(Routes.LAMP_TRANSFER) {
+            LampTransferScreen(onBack = back)
         }
         composable(
             route = Routes.TIER_LIST,
@@ -815,6 +819,10 @@ private fun MoreMenu(
             onClick = { onNavigate(Routes.tierList()) }
         )
         HorizontalDivider()
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.lamp_title)) },
+            onClick = { onNavigate(Routes.LAMP_TRANSFER) }
+        )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.more_free_up_space)) },
             onClick = { onShowDialog(PendingDialog.FREE_UP_SPACE) }

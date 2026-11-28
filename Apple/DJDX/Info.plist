@@ -19,6 +19,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>LampServerURL</key>
+	<string></string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
