@@ -71,6 +71,7 @@ struct CapturedPlayScoreView: View {
             }
         }
         .listStyle(.plain)
+        .listSectionSpacing(0.0)
         .scrollContentBackground(.hidden)
         .background {
             AppBackgroundGradient()
