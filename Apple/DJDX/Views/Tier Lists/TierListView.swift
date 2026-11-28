@@ -26,6 +26,8 @@ struct TierListView: View {
     @State var isConfirmingImport: Bool = false
     @State var isImportFailed: Bool = false
     @State var isConfirmingReset: Bool = false
+    @State var exportedImage: ExportedRadarImage?
+    @State var isExportFailed: Bool = false
 
     init(game: Game, playType: IIDXPlayType? = nil, initialShare: TierListShare? = nil) {
         let playType = playType ?? UserDefaults.standard.string(forKey: "ScoresView.PlayTypeFilter")
@@ -157,6 +159,14 @@ struct TierListView: View {
         .alert("TierList.Import.Failed", isPresented: $isImportFailed) {
             Button("Shared.OK", role: .cancel) {
                 // Dismisses the alert; no further action needed
+            }
+        }
+        .sheet(item: $exportedImage) { image in
+            ExportShareSheet(url: image.url)
+        }
+        .alert("TierList.Share.Image.Failed", isPresented: $isExportFailed) {
+            Button("Shared.OK", role: .cancel) {
+                isExportFailed = false
             }
         }
         .alert("TierList.Reset.Title", isPresented: $isConfirmingReset) {
@@ -291,6 +301,10 @@ struct TierListView: View {
                     Label("TierList.Share.Link", systemImage: "link")
                 }
             }
+            Button("TierList.Share.Image", systemImage: "photo") {
+                exportImage()
+            }
+            .disabled(list.isEmpty)
             Button("TierList.Share.CopyCode", systemImage: "doc.on.doc") {
                 UIPasteboard.general.string = TierListShare(key: key, list: list).code
             }
@@ -318,6 +332,32 @@ struct TierListView: View {
         return list.charts(in: tier)
             .map { id in chartsByID[id] ?? placeholderChart(id: id) }
             .filter(matchesSearch)
+    }
+
+    @MainActor
+    func exportImage() {
+        let chartsByID = chartsByID
+        let list = list
+        let level = level
+        let title = [game.shortName, game.supportsTierListPlayType ? playType.rawValue : "", "LEVEL \(level)"]
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+        let image = TierListImage.render(title: title) { tier in
+            list.charts(in: tier).map { id in chartsByID[id] ?? placeholderChart(id: id) }
+        }
+        guard let data = image?.pngData() else {
+            isExportFailed = true
+            return
+        }
+        let fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("TierList-\(Int(Date.now.timeIntervalSince1970)).png")
+        do {
+            try data.write(to: fileURL, options: .atomic)
+            exportedImage = ExportedRadarImage(url: fileURL)
+        } catch {
+            debugPrint(error.localizedDescription)
+            isExportFailed = true
+        }
     }
 
     func matchesSearch(_ chart: TierListChart) -> Bool {
