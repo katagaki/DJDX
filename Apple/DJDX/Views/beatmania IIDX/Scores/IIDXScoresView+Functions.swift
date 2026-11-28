@@ -109,6 +109,7 @@ extension IIDXScoresView {
             return Self.allLevels.compactMap { level, keyPath -> SongLevelEntry? in
                 let score = record[keyPath: keyPath]
                 guard score.difficulty > 0 else { return nil }
+                if isShowingOnlyPlayDataWithScores && score.score == 0 { return nil }
                 if level == .beginner && isBeginnerLevelHidden { return nil }
                 if !levelsToShow.isEmpty && !levelsToShow.contains(level) { return nil }
                 if !difficultiesToShow.isEmpty && !difficultyRawValues.contains(score.difficulty) { return nil }
