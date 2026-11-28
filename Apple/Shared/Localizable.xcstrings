@@ -8713,29 +8713,6 @@
         }
       }
     },
-    "Sessions.HeartRate" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Heart Rate"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "心拍数"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "心率"
-          }
-        }
-      }
-    },
     "Sessions.HeartRate.Average" : {
       "extractionState" : "manual",
       "localizations" : {
