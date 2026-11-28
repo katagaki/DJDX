@@ -40,7 +40,6 @@ extension AnalyticsView {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     func summaryCount(for cardType: AnalyticsCardType) -> Int {
         switch cardType {
         case .newClears: model.newClears.count
