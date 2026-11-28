@@ -91,22 +91,30 @@ struct NotesRadarWidgetView: View {
     func radarTable(data: WidgetRadarData) -> some View {
         VStack(spacing: 2.0) {
             ForEach(Self.displayOrder, id: \.self) { label in
-                HStack {
+                HStack(spacing: 4.0) {
                     Text(verbatim: label)
                         .font(.radarline(size: 10))
                         .foregroundStyle(Self.displayColors[label] ?? .primary)
-                    Spacer()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                    Spacer(minLength: 0)
                     Text(verbatim: String(format: "%.2f", value(for: label)))
                         .font(.scoreline(size: 10, weight: .bold))
+                        .lineLimit(1)
+                        .fixedSize()
                 }
             }
             Divider()
-            HStack {
+            HStack(spacing: 4.0) {
                 Text(verbatim: "TOTAL")
                     .font(.radarline(size: 10))
-                Spacer()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                Spacer(minLength: 0)
                 Text(verbatim: String(format: "%.2f", data.sum))
                     .font(.scoreline(size: 10))
+                    .lineLimit(1)
+                    .fixedSize()
             }
         }
     }
