@@ -8690,29 +8690,6 @@
         }
       }
     },
-    "Sessions.HealthKit.Toggle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Track Workouts with Health"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ヘルスケアでワークアウトを記録"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在「健康」記錄體能訓練"
-          }
-        }
-      }
-    },
     "Sessions.HeartRate.Average" : {
       "extractionState" : "manual",
       "localizations" : {
