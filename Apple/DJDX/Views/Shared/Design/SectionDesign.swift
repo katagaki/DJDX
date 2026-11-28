@@ -37,7 +37,7 @@ struct CardFill: View {
 
 struct SectionChevron: View {
     let context: SectionHeaderContext
-    var font: Font = .caption.weight(.bold)
+    var font: Font = .footnote.weight(.bold)
 
     var body: some View {
         if context.isCollapsible {
@@ -45,6 +45,7 @@ struct SectionChevron: View {
                 .font(font)
                 .foregroundStyle(.secondary)
                 .rotationEffect(.degrees(context.isExpanded ? 0.0 : -90.0))
+                .frame(minWidth: 28.0, minHeight: 28.0)
                 .animation(.smooth.speed(2.0), value: context.isExpanded)
         }
     }
@@ -75,7 +76,7 @@ extension Color {
 }
 
 extension View {
-    func sectionHeaderTitle(size: CGFloat = 12.0) -> some View {
+    func sectionHeaderTitle(size: CGFloat = 14.0) -> some View {
         self.font(.playline(size: size))
             .textCase(.uppercase)
             .lineLimit(1)

@@ -132,8 +132,8 @@ struct AnalyticsSectionHeader<Accessory: View>: View {
             }
         }
         .padding(.horizontal)
-        .padding(.top, 6.0)
-        .padding(.bottom, 4.0)
+        .padding(.top, 8.0)
+        .padding(.bottom, 6.0)
     }
 
     @ViewBuilder

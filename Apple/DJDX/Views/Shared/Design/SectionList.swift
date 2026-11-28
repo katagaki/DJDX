@@ -10,8 +10,8 @@ struct SectionListHeaderModifier: ViewModifier {
                 .fill(Color.hairline)
                 .frame(height: 1.0)
         }
-        .padding(.top, 6.0)
-        .padding(.bottom, 4.0)
+        .padding(.top, 8.0)
+        .padding(.bottom, 6.0)
     }
 }
 
