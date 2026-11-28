@@ -1,32 +1,107 @@
 import SwiftUI
 
-enum AnalyticsSuggestionCardID: String, Codable, Hashable, CaseIterable {
+enum AnalyticsSuggestionCardID: String, Codable, Hashable, CaseIterable, Identifiable {
     case iidxDJLevel
-    case iidxClearLamp
+    case iidxAlmostFullCombo
+    case iidxAlmostExHard
+    case iidxAlmostHard
+    case iidxAlmostClear
+    case iidxAlmostEasy
+    case iidxAlmostAssist
     case iidxNotPlayedRecently
     case sdvxVolforce
     case ddrFlareSkill
 
-    static let iidxCards: [AnalyticsSuggestionCardID] = [.iidxDJLevel, .iidxClearLamp, .iidxNotPlayedRecently]
+    var id: Self { self }
+
+    static let iidxClearLampCards: [AnalyticsSuggestionCardID] = [
+        .iidxAlmostFullCombo, .iidxAlmostExHard, .iidxAlmostHard,
+        .iidxAlmostClear, .iidxAlmostEasy, .iidxAlmostAssist
+    ]
+    static let iidxCards: [AnalyticsSuggestionCardID] = [.iidxDJLevel] + iidxClearLampCards + [.iidxNotPlayedRecently]
     static let sdvxCards: [AnalyticsSuggestionCardID] = [.sdvxVolforce]
     static let ddrCards: [AnalyticsSuggestionCardID] = [.ddrFlareSkill]
+    static let hiddenCardsKey = "Analytics.Suggestions.HiddenCards.v2"
+    static let sectionLimit = 20
+    static let editingPreviewLimit = 3
+    static let defaultHidden: Set<AnalyticsSuggestionCardID> = [
+        .iidxAlmostFullCombo, .iidxAlmostExHard, .iidxAlmostClear, .iidxAlmostEasy, .iidxAlmostAssist
+    ]
 
-    var transitionID: String { "Suggestions.\(rawValue)" }
+    var targetClearType: IIDXClearType? {
+        switch self {
+        case .iidxAlmostFullCombo: .fullComboClear
+        case .iidxAlmostExHard: .exHardClear
+        case .iidxAlmostHard: .hardClear
+        case .iidxAlmostClear: .clear
+        case .iidxAlmostEasy: .easyClear
+        case .iidxAlmostAssist: .assistClear
+        default: nil
+        }
+    }
+
+    static func clearLampID(for target: IIDXClearType) -> AnalyticsSuggestionCardID {
+        switch target {
+        case .fullComboClear: .iidxAlmostFullCombo
+        case .exHardClear: .iidxAlmostExHard
+        case .hardClear: .iidxAlmostHard
+        case .clear: .iidxAlmostClear
+        case .easyClear: .iidxAlmostEasy
+        case .assistClear: .iidxAlmostAssist
+        default: .iidxAlmostHard
+        }
+    }
+
+    static func decodedHidden(from data: Data) -> Set<AnalyticsSuggestionCardID> {
+        if !data.isEmpty, let decoded = try? JSONDecoder().decode(Set<AnalyticsSuggestionCardID>.self, from: data) {
+            return decoded
+        }
+        return migratedLegacyHidden()
+    }
+
+    static func encodedHidden(_ set: Set<AnalyticsSuggestionCardID>) -> Data {
+        (try? JSONEncoder().encode(set)) ?? Data()
+    }
+
+    private static func migratedLegacyHidden() -> Set<AnalyticsSuggestionCardID> {
+        let defaults = UserDefaults.standard
+        let activeClearLamp: AnalyticsSuggestionCardID
+        if let rawTarget = defaults.string(forKey: "Analytics.Suggestions.TargetClearType"),
+           let target = IIDXClearType(rawValue: rawTarget) {
+            activeClearLamp = clearLampID(for: target)
+        } else {
+            activeClearLamp = .iidxAlmostHard
+        }
+        var hidden = Set(iidxClearLampCards)
+        hidden.remove(activeClearLamp)
+        if let legacyData = defaults.data(forKey: "Analytics.Suggestions.HiddenCards"),
+           let legacyRaw = try? JSONDecoder().decode([String].self, from: legacyData) {
+            for raw in legacyRaw {
+                if raw == "iidxClearLamp" {
+                    hidden.formUnion(iidxClearLampCards)
+                } else if let id = AnalyticsSuggestionCardID(rawValue: raw) {
+                    hidden.insert(id)
+                }
+            }
+        }
+        return hidden
+    }
 }
 
-struct AnalyticsSuggestionsSection<Card: View>: View {
-
+struct AnalyticsSuggestionsSection<Content: View>: View {
     let cards: [AnalyticsSuggestionCardID]
-    let columns: [GridItem]
     let isEditing: Bool
-    let isExpanded: Bool
-    let onToggle: () -> Void
-    @ViewBuilder let card: (AnalyticsSuggestionCardID) -> Card
+    let title: (AnalyticsSuggestionCardID) -> LocalizedStringKey
+    let canShare: (AnalyticsSuggestionCardID) -> Bool
+    let onShare: (AnalyticsSuggestionCardID) -> Void
+    @ViewBuilder let content: (AnalyticsSuggestionCardID) -> Content
 
     @AppStorage(wrappedValue: Data(), "Analytics.Suggestions.CardOrder") var cardOrderData: Data
-    @AppStorage(wrappedValue: Data(), "Analytics.Suggestions.HiddenCards") var hiddenCardsData: Data
+    @AppStorage(wrappedValue: Data(), AnalyticsSuggestionCardID.hiddenCardsKey) var hiddenCardsData: Data
+    @AppStorage(wrappedValue: Data(), "Analytics.Suggestions.CollapsedCards") var collapsedCardsData: Data
     @State var cardOrder: [AnalyticsSuggestionCardID] = AnalyticsSuggestionCardID.allCases
-    @State var hiddenCards: Set<AnalyticsSuggestionCardID> = []
+    @State var hiddenCards: Set<AnalyticsSuggestionCardID> = AnalyticsSuggestionCardID.defaultHidden
+    @State var collapsedCards: Set<AnalyticsSuggestionCardID> = []
     @State var draggedCard: AnalyticsSuggestionCardID?
 
     var orderedCards: [AnalyticsSuggestionCardID] {
@@ -37,37 +112,54 @@ struct AnalyticsSuggestionsSection<Card: View>: View {
         let shownCards = isEditing ? orderedCards : orderedCards.filter { !hiddenCards.contains($0) }
         Group {
             if !shownCards.isEmpty {
-                VStack(spacing: 12.0) {
-                    AnalyticsSectionHeader(
-                        title: AnalyticsSection.suggestions.titleKey,
-                        isCollapsible: !isEditing,
-                        isExpanded: isEditing || isExpanded,
-                        onToggle: onToggle
-                    )
-                    if isEditing || isExpanded {
-                        LazyVGrid(columns: columns, spacing: 12.0) {
-                            ForEach(shownCards, id: \.self) { cardID in
-                                card(cardID)
-                                    .editableCard(isVisible: !hiddenCards.contains(cardID),
-                                                  isEditing: isEditing,
-                                                  seed: (cardOrder.firstIndex(of: cardID) ?? 0) + 100) {
-                                        toggle(cardID)
+                VStack(spacing: DesignMetrics.sectionGap) {
+                    ForEach(shownCards, id: \.self) { cardID in
+                        let isExpanded = isEditing || !collapsedCards.contains(cardID)
+                        VStack(spacing: 0.0) {
+                            AnalyticsSectionHeader(
+                                title: title(cardID),
+                                isCollapsible: !isEditing,
+                                isExpanded: isExpanded,
+                                onToggle: { toggleCollapsed(cardID) }
+                            ) {
+                                if !isEditing, canShare(cardID) {
+                                    Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
+                                        onShare(cardID)
                                     }
-                                    .suggestionCardDraggable(cardID, editing: isEditing,
-                                                             draggedCard: $draggedCard, cardOrder: $cardOrder,
-                                                             onReorder: save)
+                                    .labelStyle(.iconOnly)
+                                    .font(.subheadline.weight(.bold))
+                                }
+                            }
+                            .padding(.bottom, isExpanded ? 8.0 : 0.0)
+                            if isExpanded {
+                                content(cardID)
                             }
                         }
-                        .padding(.horizontal)
+                        .editableCard(isVisible: !hiddenCards.contains(cardID),
+                                      isEditing: isEditing,
+                                      seed: (cardOrder.firstIndex(of: cardID) ?? 0) + 100,
+                                      cornerRadius: 0.0) {
+                            toggle(cardID)
+                        }
+                        .suggestionCardDraggable(cardID, editing: isEditing,
+                                                 draggedCard: $draggedCard, cardOrder: $cardOrder,
+                                                 onReorder: save)
                     }
                 }
+                .padding(.top, DesignMetrics.sectionGap)
             }
         }
         .onAppear(perform: load)
+        .onChange(of: hiddenCardsData) { _, _ in
+            withAnimation(.smooth.speed(2.0)) {
+                hiddenCards = AnalyticsSuggestionCardID.decodedHidden(from: hiddenCardsData)
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .analyticsLayoutReset)) { _ in
             withAnimation(.smooth.speed(2.0)) {
                 cardOrder = AnalyticsSuggestionCardID.allCases
-                hiddenCards = []
+                hiddenCards = AnalyticsSuggestionCardID.defaultHidden
+                collapsedCards = []
             }
             save()
         }
@@ -84,9 +176,20 @@ struct AnalyticsSuggestionsSection<Card: View>: View {
         save()
     }
 
+    func toggleCollapsed(_ cardID: AnalyticsSuggestionCardID) {
+        withAnimation(.smooth.speed(2.0)) {
+            if collapsedCards.contains(cardID) {
+                collapsedCards.remove(cardID)
+            } else {
+                collapsedCards.insert(cardID)
+            }
+        }
+        save()
+    }
+
     func load() {
-        if let decoded = try? JSONDecoder().decode([AnalyticsSuggestionCardID].self, from: cardOrderData) {
-            var order = decoded.filter { AnalyticsSuggestionCardID.allCases.contains($0) }
+        if let decoded = try? JSONDecoder().decode([String].self, from: cardOrderData) {
+            var order = decoded.compactMap { AnalyticsSuggestionCardID(rawValue: $0) }
             for (index, cardID) in AnalyticsSuggestionCardID.allCases.enumerated() where !order.contains(cardID) {
                 if index > 0,
                    let predecessorIndex = order.firstIndex(of: AnalyticsSuggestionCardID.allCases[index - 1]) {
@@ -97,14 +200,16 @@ struct AnalyticsSuggestionsSection<Card: View>: View {
             }
             cardOrder = order
         }
-        if let decoded = try? JSONDecoder().decode(Set<AnalyticsSuggestionCardID>.self, from: hiddenCardsData) {
-            hiddenCards = decoded
+        hiddenCards = AnalyticsSuggestionCardID.decodedHidden(from: hiddenCardsData)
+        if let decoded = try? JSONDecoder().decode(Set<AnalyticsSuggestionCardID>.self, from: collapsedCardsData) {
+            collapsedCards = decoded
         }
     }
 
     func save() {
         cardOrderData = (try? JSONEncoder().encode(cardOrder)) ?? Data()
         hiddenCardsData = (try? JSONEncoder().encode(hiddenCards)) ?? Data()
+        collapsedCardsData = (try? JSONEncoder().encode(collapsedCards)) ?? Data()
     }
 }
 
@@ -165,95 +270,49 @@ struct SuggestionCardReorderDropDelegate: DropDelegate {
     }
 }
 
-struct AnalyticsSuggestionCard<Item: Identifiable, Row: View>: View {
-
-    let title: Text
-    let systemImage: String
-    let iconColor: Color
+struct AnalyticsSuggestionPreviewRows<Item: Identifiable, Row: View>: View {
     let items: [Item]
+    var limit: Int = AnalyticsSuggestionCardID.sectionLimit
+    let onSelect: (Item) -> Void
     @ViewBuilder let row: (Item) -> Row
 
-    static var previewLimit: Int { 3 }
-
-    var cornerRadius: CGFloat {
-        if #available(iOS 26.0, *) {
-            return 20.0
-        } else {
-            return 12.0
-        }
-    }
-
     var body: some View {
-        VStack(alignment: .leading, spacing: 0.0) {
-            HStack(spacing: 5.0) {
-                Image(systemName: systemImage)
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundStyle(iconColor)
-                    .frame(width: 12.0, height: 12.0)
-                title
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                Spacer(minLength: 0.0)
-                Image(systemName: "chevron.right")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(12.0)
+        VStack(spacing: 0.0) {
+            Divider()
             if items.isEmpty {
                 Text("Analytics.Suggestions.Empty")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 120.0, alignment: .center)
+                    .frame(maxWidth: .infinity, minHeight: DesignMetrics.emptyCardHeight, alignment: .center)
+                Divider()
             } else {
-                ForEach(Array(items.prefix(Self.previewLimit))) { item in
-                    Divider()
-                    row(item)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .clipShape(.rect(cornerRadius: cornerRadius))
-        .cardBackground(cornerRadius: cornerRadius)
-    }
-}
-
-struct AnalyticsSuggestionList<Item: Identifiable, Row: View>: View {
-    let items: [Item]
-    @ViewBuilder let row: (Item) -> Row
-
-    var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 0.0) {
-                if items.isEmpty {
-                    Text("Analytics.Suggestions.Empty")
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 24.0)
-                } else {
-                    ForEach(items) { item in
+                ForEach(Array(items.prefix(limit))) { item in
+                    Button {
+                        onSelect(item)
+                    } label: {
                         row(item)
-                        Divider()
+                            .contentShape(.rect)
                     }
+                    .buttonStyle(.plain)
+                    Divider()
                 }
             }
         }
-        .scrollContentBackground(.hidden)
     }
 }
 
 struct AnalyticsSuggestionTarget<Content: View>: View {
+    var isInline: Bool = false
     @ViewBuilder let content: Content
 
     var body: some View {
-        HStack(alignment: .center, spacing: 6.0) {
-            Image(systemName: "arrow.turn.down.right")
+        HStack(alignment: .center, spacing: isInline ? 4.0 : 6.0) {
+            Image(systemName: isInline ? "arrow.right" : "arrow.turn.down.right")
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(.secondary)
             content
         }
-        .offset(y: 1.0)
+        .offset(y: isInline ? 0.0 : 1.0)
     }
 }
 

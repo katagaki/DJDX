@@ -26,9 +26,6 @@ enum AnalyticsPath: Hashable {
     case newAAADetail
     case newAADetail
     case newADetail
-    case djLevelSuggestionsDetail
-    case clearLampSuggestionsDetail
-    case notPlayedRecentlySuggestionsDetail
 }
 
 enum AnalyticsGoalPath: Hashable {
@@ -51,7 +48,6 @@ enum SDVXAnalyticsPath: Hashable {
     case newHighScoresDetail
     case newClearsDetail(clearType: String)
     case newGradesDetail(grade: String)
-    case volforceSuggestionsDetail
 }
 
 enum PolarisChordAnalyticsPath: Hashable {
@@ -65,13 +61,10 @@ enum PolarisChordAnalyticsPath: Hashable {
 enum ImportPath: Hashable {
     case importerWebIIDXSingle
     case importerWebIIDXDouble
-    case importerWebIIDXTower
-    case importerManual
 }
 
 enum MorePath: Hashable {
     case moreExternalDataSources
-    case moreAttributions
 }
 
 enum TowerPath: Hashable {

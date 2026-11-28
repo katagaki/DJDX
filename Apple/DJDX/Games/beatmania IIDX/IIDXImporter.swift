@@ -349,6 +349,11 @@ actor IIDXImporter {
 
     // MARK: BM2DX Notes Radar
 
+    func deleteAllNotesRadarEntries() {
+        guard let database = try? BM2DXDatabase.shared.getWriteConnection() else { return }
+        _ = try? database.run(BM2DXDatabase.notesRadarTable.delete())
+    }
+
     func replaceAllNotesRadarEntries(_ entries: [ChartRadarData]) -> Bool {
         guard !entries.isEmpty,
               let database = try? BM2DXDatabase.shared.getWriteConnection() else { return false }

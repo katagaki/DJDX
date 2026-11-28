@@ -29,6 +29,7 @@ struct SDVXScoreViewer: View {
             Section {
                 header()
             }
+            .sectionStyle()
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
@@ -57,11 +58,12 @@ struct SDVXScoreViewer: View {
                 )
                 chartActions()
             }
+            .clearSection()
             if selectedDifficulty != .unknown {
                 ChartNotesSection(game: .soundVoltex, title: title, chart: difficulty.rawValue)
             }
         }
-        .listSectionSpacing(.compact)
+        .listStyle(.plain)
         .scrollDismissesKeyboard(.immediately)
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)

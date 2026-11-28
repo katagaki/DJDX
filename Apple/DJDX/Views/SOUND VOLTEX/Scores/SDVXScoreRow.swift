@@ -6,6 +6,7 @@ struct SDVXScoreRow<Accessory: View>: View {
 
     var record: SDVXSongRecord
     var accessory: Accessory
+    var verticalPadding: CGFloat = 8.0
 
     init(namespace: Namespace.ID, record: SDVXSongRecord, @ViewBuilder accessory: () -> Accessory) {
         self.namespace = namespace
@@ -31,6 +32,7 @@ struct SDVXScoreRow<Accessory: View>: View {
                             .fontWidth(.expanded)
                             .fontWeight(.black)
                             .sdvxGradeText()
+                            .fixedSize()
                     }
                     if record.highScore > 0 {
                         Divider().frame(maxHeight: 14.0)
@@ -38,26 +40,26 @@ struct SDVXScoreRow<Accessory: View>: View {
                             .font(.scoreline(.caption))
                             .fontWidth(.standard)
                             .sdvxScoreText()
+                            .fixedSize()
                     }
                     Divider().frame(maxHeight: 14.0)
                     Text(verbatim: record.clearTypeEnum.abbreviation)
                         .foregroundStyle(record.clearTypeEnum.color)
-                        .fontWidth(.expanded)
-                        .fontWeight(.bold)
+                        .font(.playline(.caption, weight: .regular))
+                        .fixedSize()
                 }
                 .font(.caption)
                 accessory
                     .font(.caption)
             }
-            .padding([.top, .bottom], 8.0)
-            .matchedTransitionSource(id: "\(record.title).\(record.difficulty)", in: namespace)
+            .padding([.top, .bottom], verticalPadding)
 
             Spacer(minLength: 0.0)
 
             // Difficulty + level label
             LevelBadge(name: record.difficultyEnum.rawValue, level: record.level,
                        tint: record.difficultyEnum.color, layout: .horizontal)
-                .padding([.top, .bottom], 8.0)
+                .padding([.top, .bottom], verticalPadding)
         }
         .frame(maxWidth: .infinity)
         .padding(.trailing)

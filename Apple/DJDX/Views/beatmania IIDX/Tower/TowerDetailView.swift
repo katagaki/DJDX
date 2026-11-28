@@ -67,6 +67,7 @@ struct TowerDetailView<Chart: View>: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                    .listRowInsets(EdgeInsets(top: 12.0, leading: 16.0, bottom: 12.0, trailing: 16.0))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             }
@@ -102,6 +103,7 @@ struct TowerDetailView<Chart: View>: View {
                 }
             }
         }
+        .listStyle(.plain)
         .navigator(title, inline: true)
         .scrollContentBackground(.hidden)
     }

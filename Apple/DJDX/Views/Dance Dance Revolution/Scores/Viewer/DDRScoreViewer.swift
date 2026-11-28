@@ -31,6 +31,7 @@ struct DDRScoreViewer: View {
                     .padding(.vertical, 8.0)
                     .padding(.horizontal, 20.0)
             }
+            .sectionStyle()
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
@@ -53,12 +54,13 @@ struct DDRScoreViewer: View {
                     thresholds: Self.historyThresholds
                 )
             }
+            .clearSection()
             if selectedDifficulty != .unknown {
                 ChartNotesSection(game: .danceDanceRevolution, title: title,
                                   chart: songRecord.chartNoteTarget.chart)
             }
         }
-        .listSectionSpacing(.compact)
+        .listStyle(.plain)
         .scrollDismissesKeyboard(.immediately)
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)

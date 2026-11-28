@@ -165,57 +165,58 @@ struct ActiveSessionView: View {
         fileExport = SessionFileExportRequest(urls: urls)
     }
 
-    private var numberFont: Font {
-        .system(.largeTitle, design: .rounded)
-        .weight(.bold)
-        .monospacedDigit()
-    }
-
     @ViewBuilder
     private var header: some View {
         if let session = store.activeSession {
             TimelineView(.periodic(from: .now, by: 1.0)) { context in
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 0.0) {
-                        Text("Sessions.Elapsed")
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                        Text(verbatim: elapsedString(for: session, now: context.date))
-                            .font(numberFont)
+                HStack(spacing: DesignMetrics.gap) {
+                    metricCard(title: "TIME") {
+                        Text(verbatim: "0:00:00")
+                            .hidden()
+                            .overlay(alignment: .leading) {
+                                Text(verbatim: elapsedString(for: session, now: context.date))
+                            }
                     }
-                    Spacer()
+                    .fixedSize(horizontal: true, vertical: false)
                     if workoutBridge.isWorkoutActive {
-                        VStack(alignment: .center, spacing: 0.0) {
-                            Text("Sessions.HeartRate")
-                                .font(.body)
-                                .foregroundStyle(.secondary)
-                            HStack(spacing: 6.0) {
+                        metricCard(title: "HEARTRATE", railColor: .red) {
+                            HStack(spacing: 4.0) {
                                 Image(systemName: "heart.fill")
-                                    .font(.title3)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.red)
                                     .heartbeat(isActive: workoutBridge.heartRate > 0)
                                 Text(verbatim: workoutBridge.heartRate > 0 ? "\(workoutBridge.heartRate)" : "--")
-                                    .font(numberFont)
-                            }
-                            .foregroundStyle(.red)
-                            if workoutBridge.activeCalories > 0 {
-                                Text(verbatim: "\(workoutBridge.activeCalories) kcal")
-                                    .font(.caption.monospacedDigit())
-                                    .foregroundStyle(.secondary)
                             }
                         }
-                        Spacer()
                     }
-                    VStack(alignment: .trailing, spacing: 0.0) {
-                        Text("Sessions.Plays")
-                            .font(.body)
-                            .foregroundStyle(.secondary)
+                    metricCard(title: "PLAY COUNT") {
                         Text(verbatim: "\(store.plays.count)")
-                            .font(numberFont)
                     }
                 }
-                .padding()
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal)
+                .padding(.vertical, DesignMetrics.topPadding)
             }
         }
+    }
+
+    private func metricCard(title: String, railColor: Color? = nil,
+                            @ViewBuilder value: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: 2.0) {
+            Text(verbatim: title)
+                .cardLabel()
+                .foregroundStyle(.secondary)
+            value()
+                .font(.scoreline(size: 24.0))
+                .fontWidth(.standard)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(.horizontal, DesignMetrics.cardPadding)
+        .padding(.vertical, 6.0)
+        .cardBackground()
+        .environment(\.cardRailColor, railColor)
     }
 
     @ViewBuilder
@@ -228,12 +229,14 @@ struct ActiveSessionView: View {
                 Button("Sessions.Watch.Retry") { workoutBridge.retryWatchWorkout() }
             }
             .padding([.horizontal, .bottom])
+            .padding(.top, 6.0)
         } else if workoutBridge.isStartingWatch {
             HStack {
                 ProgressView()
                 Text("Sessions.Watch.Starting").font(.caption)
             }
             .padding(.bottom)
+            .padding(.top, 6.0)
         }
     }
 
@@ -262,6 +265,7 @@ struct ActiveSessionView: View {
                                 store.deletePlay(play)
                             }
                         }
+                        Divider()
                     }
                 }
             }

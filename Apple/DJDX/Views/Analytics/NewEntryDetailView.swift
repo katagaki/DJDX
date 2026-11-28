@@ -12,6 +12,10 @@ struct NewEntryDetailView<Entry: IIDXNewEntry>: View {
     var showsClearTypeBreakdown: Bool = false
     var scoreDelta: ((Entry) -> Int)?
 
+    @AppStorage var sortMode: SortMode
+    @AppStorage var sortOrder: SortOrder
+    @AppStorage(wrappedValue: true, "ScoresView.BeginnerLevelHidden") var isBeginnerLevelHidden: Bool
+
     @Namespace private var namespace
 
     @State private var songCompactTitles: [String: IIDXSong] = [:]
@@ -24,11 +28,76 @@ struct NewEntryDetailView<Entry: IIDXNewEntry>: View {
     init(entries: [Entry],
          title: String,
          showsClearTypeBreakdown: Bool = false,
+         isSessionsMode: Bool = false,
          scoreDelta: ((Entry) -> Int)? = nil) {
         self.entries = entries
         self.title = title
         self.showsClearTypeBreakdown = showsClearTypeBreakdown
         self.scoreDelta = scoreDelta
+        self._sortMode = AppStorage(
+            wrappedValue: .lastPlayDate,
+            isSessionsMode ? "SessionsView.SortOrder" : "ScoresView.SortOrder"
+        )
+        self._sortOrder = AppStorage(
+            wrappedValue: .descending,
+            isSessionsMode ? "SessionsView.SortDirection" : "ScoresView.SortDirection"
+        )
+    }
+
+    private var displayedEntries: [Entry] {
+        var result = entries.filter { !isBeginnerLevelHidden || $0.level != .beginner }
+        let isAscending = sortOrder == .ascending
+        switch sortMode {
+        case .title:
+            result.sort { isAscending ? $0.songRecord.title < $1.songRecord.title
+                : $0.songRecord.title > $1.songRecord.title }
+        case .clearType:
+            let order = IIDXClearType.ascending.filter { $0 != .noPlay }.map(\.rawValue)
+            result.sort { lhs, rhs in
+                let lhsIndex = order.firstIndex(of: lhs.score.clearType)
+                let rhsIndex = order.firstIndex(of: rhs.score.clearType)
+                if lhsIndex == rhsIndex { return lhs.songRecord.title < rhs.songRecord.title }
+                guard let lhsIndex, let rhsIndex else { return lhsIndex != nil }
+                return isAscending ? lhsIndex < rhsIndex : lhsIndex > rhsIndex
+            }
+        case .djLevel:
+            let order = IIDXDJLevel.sorted
+            result.sort { lhs, rhs in
+                let leftIndex = order.firstIndex(of: IIDXDJLevel(rawValue: lhs.score.djLevel) ?? .none)
+                let rightIndex = order.firstIndex(of: IIDXDJLevel(rawValue: rhs.score.djLevel) ?? .none)
+                if leftIndex == rightIndex { return lhs.songRecord.title < rhs.songRecord.title }
+                guard let leftIndex, let rightIndex else { return leftIndex != nil }
+                return isAscending ? leftIndex < rightIndex : leftIndex > rightIndex
+            }
+        case .scoreRate:
+            result.sort { lhs, rhs in
+                let leftRate = scoreRate(for: lhs) ?? 0
+                let rightRate = scoreRate(for: rhs) ?? 0
+                if leftRate == rightRate { return lhs.songRecord.title < rhs.songRecord.title }
+                return isAscending ? leftRate < rightRate : leftRate > rightRate
+            }
+        case .score:
+            result.sort { lhs, rhs in
+                if lhs.score.score == rhs.score.score { return lhs.songRecord.title < rhs.songRecord.title }
+                return isAscending ? lhs.score.score < rhs.score.score : lhs.score.score > rhs.score.score
+            }
+        case .missCount:
+            result.sort { lhs, rhs in
+                if lhs.score.missCount == rhs.score.missCount { return lhs.songRecord.title < rhs.songRecord.title }
+                return isAscending ? lhs.score.missCount < rhs.score.missCount
+                    : lhs.score.missCount > rhs.score.missCount
+            }
+        case .difficulty:
+            result.sort { lhs, rhs in
+                if lhs.score.difficulty == rhs.score.difficulty { return lhs.songRecord.title < rhs.songRecord.title }
+                return isAscending ? lhs.score.difficulty < rhs.score.difficulty
+                    : lhs.score.difficulty > rhs.score.difficulty
+            }
+        case .lastPlayDate:
+            result.sort { isAscending ? $0.songRecord.lastPlayDate < $1.songRecord.lastPlayDate
+                : $0.songRecord.lastPlayDate > $1.songRecord.lastPlayDate }
+        }
+        return result
     }
 
     var body: some View {
@@ -57,17 +126,13 @@ struct NewEntryDetailView<Entry: IIDXNewEntry>: View {
                     .padding(.top, 12.0)
                     .padding(.bottom, 20.0)
                     if isLoaded {
-                        ForEach(entries) { entry in
+                        ForEach(displayedEntries) { entry in
                             NavigationLink {
                                 IIDXScoreViewer(
                                     songRecord: entry.songRecord,
                                     noteCount: noteCount,
                                     initialLevel: entry.level
                                 )
-                                .navigationTransition(.zoom(
-                                    sourceID: "\(entry.songRecord.title).\(entry.level.rawValue)",
-                                    in: namespace
-                                ))
                             } label: {
                                 IIDXScoreRow(
                                     namespace: namespace,
@@ -120,19 +185,20 @@ struct NewEntryDetailView<Entry: IIDXNewEntry>: View {
 
     private var levelItems: [BreakdownBarItem] {
         (1...12).compactMap { difficulty in
-            let count = entries.filter { $0.score.difficulty == difficulty }.count
+            let count = displayedEntries.filter { $0.score.difficulty == difficulty }.count
             guard count > 0 else { return nil }
             return BreakdownBarItem(
                 label: "LEVEL \(difficulty)",
                 count: count,
-                color: Self.levelColor(difficulty)
+                color: Self.levelColor(difficulty),
+                levelBadge: String(difficulty)
             )
         }
     }
 
     private var clearTypeItems: [BreakdownBarItem] {
         IIDXClearType.sortedWithoutNoPlay.compactMap { clearType in
-            let count = entries.filter { $0.score.clearType == clearType.rawValue }.count
+            let count = displayedEntries.filter { $0.score.clearType == clearType.rawValue }.count
             guard count > 0 else { return nil }
             return BreakdownBarItem(
                 label: IIDXClearType.abbreviation(for: clearType.rawValue),

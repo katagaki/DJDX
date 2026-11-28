@@ -18,6 +18,7 @@ struct SDVXScoresView<Header: View>: View {
 
     var isScoreDataExpandedKey: String = "SDVXScoresView.ScoreDataExpanded"
     @State var isScoreDataExpanded: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.scoreDataKey) var isScoreDataVisible: Bool
 
     @State var dataState: DataState = .initializing
     @State var records: [SDVXSongRecord] = []
@@ -107,29 +108,6 @@ struct SDVXScoresView<Header: View>: View {
         SDVXClearType.sorted.firstIndex(of: record.clearTypeEnum) ?? SDVXClearType.sorted.count
     }
 
-    @ViewBuilder var sortControl: some View {
-        Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
-            Picker("Shared.Sort", selection: $sortMode.animation(.smooth.speed(2.0))) {
-                ForEach(SDVXSortMode.allCases, id: \.self) { mode in
-                    Text(LocalizedStringKey(mode.rawValue))
-                        .tag(mode)
-                }
-            }
-            .pickerStyle(.inline)
-            Section {
-                Picker("Shared.Sort.Order", selection: $sortOrder.animation(.smooth.speed(2.0))) {
-                    Label("Shared.Sort.Ascending", systemImage: "arrow.up")
-                        .tag(SortOrder.ascending)
-                    Label("Shared.Sort.Descending", systemImage: "arrow.down")
-                        .tag(SortOrder.descending)
-                }
-                .pickerStyle(.inline)
-            }
-        }
-        .menuOrder(.fixed)
-        .menuActionDismissBehavior(.disabled)
-    }
-
     @ViewBuilder var filterControl: some View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
@@ -142,7 +120,7 @@ struct SDVXScoresView<Header: View>: View {
             LazyVStack(spacing: 0.0) {
                 if searchTerm.isEmpty {
                     header
-                    if !isEditingAnalytics {
+                    if !isEditingAnalytics, isScoreDataVisible {
                         AnalyticsSectionHeader(
                             title: "Analytics.Section.ScoreData",
                             isCollapsible: true,
@@ -150,15 +128,23 @@ struct SDVXScoresView<Header: View>: View {
                         ) {
                             withAnimation(.smooth.speed(2.0)) { isScoreDataExpanded.toggle() }
                             UserDefaults.standard.set(isScoreDataExpanded, forKey: isScoreDataExpandedKey)
+                        } accessory: {
+                            if !sortedRecords.isEmpty {
+                                Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
+                                    isShowingShareCard = true
+                                }
+                                .labelStyle(.iconOnly)
+                                .font(.subheadline.weight(.bold))
+                            }
                         }
-                        .padding(.top, 16.0)
-                        .padding(.bottom, 12.0)
+                        .padding(.top, DesignMetrics.sectionGap)
+                        .padding(.bottom, isScoreDataExpanded ? 8.0 : 0.0)
                         if isScoreDataExpanded {
                             Divider()
                         }
                     }
                 }
-                if !isEditingAnalytics, isScoreDataExpanded || !searchTerm.isEmpty {
+                if !isEditingAnalytics, (isScoreDataVisible && isScoreDataExpanded) || !searchTerm.isEmpty {
                     let sortedRecords = sortedRecords
                     ForEach(sortedRecords, id: \.self) { record in
                         Button {
@@ -187,21 +173,20 @@ struct SDVXScoresView<Header: View>: View {
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
             ToolbarSpacer(.fixed, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
-                sortControl
                 filterControl
             }
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             SDVXScoreFilterSheet(
+                sortMode: $sortMode.animation(.smooth.speed(2.0)),
+                sortOrder: $sortOrder.animation(.smooth.speed(2.0)),
                 difficultiesToShow: $difficultiesToShow.animation(.smooth.speed(2.0)),
                 levelBucketsToShow: $levelBucketsToShow.animation(.smooth.speed(2.0)),
                 clearTypesToShow: $clearTypesToShow.animation(.smooth.speed(2.0)),
                 gradesToShow: $gradesToShow.animation(.smooth.speed(2.0)),
                 scoreBelow: $scoreBelow.animation(.smooth.speed(2.0)),
                 availableLevelBuckets: availableLevelBuckets,
-                onReset: {
-                    // No additional handling needed when filters are reset
-                }
+                onReset: {}
             )
             .navigationTransition(.zoom(sourceID: "SDVXScoreFilterSheet", in: sdvxNamespace))
             .presentationDetents([.medium, .large])
@@ -212,9 +197,6 @@ struct SDVXScoresView<Header: View>: View {
             if dataState == .presenting && records.isEmpty {
                 ContentUnavailableView("Shared.NoData", systemImage: "questionmark.square.dashed")
             }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
-            isShowingShareCard = true
         }
         .sheet(isPresented: $isShowingShareCard) {
             ShareCardComposer(
@@ -228,8 +210,6 @@ struct SDVXScoresView<Header: View>: View {
             case .scoreViewer(let songRecord):
                 SDVXScoreViewer(songRecords: siblingCharts(of: songRecord),
                                 initialDifficulty: songRecord.difficultyEnum)
-                    .navigationTransition(.zoom(sourceID: "\(songRecord.title).\(songRecord.difficulty)",
-                                                   in: sdvxNamespace))
             case .chartViewer(let chart):
                 SDVXInChartViewer(chart: chart)
             }

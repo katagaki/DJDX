@@ -9,7 +9,6 @@ import WatchConnectivity
 final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
     static let shared = IIDXSessionWorkoutBridge()
 
-    static let healthKitEnabledKey = "Sessions.HealthKitEnabled"
     static let pendingWorkoutUUIDsKey = "Sessions.PendingWorkoutUUIDs"
     nonisolated static let dismissedWorkoutUUIDsKey = "Sessions.DismissedWorkoutUUIDs"
 
@@ -39,9 +38,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         set { UserDefaults.standard.set(newValue, forKey: "Sessions.PendingWatchCommands") }
     }
 
-    var isEnabled: Bool {
-        UserDefaults.standard.bool(forKey: Self.healthKitEnabledKey)
-    }
+    var isEnabled: Bool { true }
 
     var isSessionActive: Bool { activeSessionID != nil }
 
@@ -135,6 +132,7 @@ final class IIDXSessionWorkoutBridge: NSObject, ObservableObject {
         if !isResuming {
             heartRate = 0
             activeCalories = 0
+            Task { _ = await requestAuthorization() }
         }
         isWorkoutActive = isEnabled
         if isEnabled {

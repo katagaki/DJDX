@@ -66,6 +66,7 @@ struct MoreICloudBackup: View {
                 Text("Backup.Export.Footer")
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Backup.Title")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

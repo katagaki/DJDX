@@ -53,6 +53,7 @@ struct MoreRadarMaker: View {
                     .padding(.vertical, 40.0)
                     .listRowBackground(Color.clear)
             }
+            .clearSection()
             Section {
                 Picker(selection: $selectedPaletteIndex) {
                     ForEach(0..<Self.paletteCount, id: \.self) { index in
@@ -68,7 +69,9 @@ struct MoreRadarMaker: View {
                 colorCarousel()
             } header: {
                 Text("More.RadarMaker.Color")
+                    .sectionListHeader()
             }
+            .clearSection()
             Section {
                 valueSlider("NOTES", value: $notes, color: color(for: "NOTES"))
                 valueSlider("CHORD", value: $chord, color: color(for: "CHORD"))
@@ -78,6 +81,7 @@ struct MoreRadarMaker: View {
                 valueSlider("SOF-LAN", value: $soflan, color: color(for: "SOF-LAN"))
             } header: {
                 Text("More.RadarMaker.Values")
+                    .sectionListHeader()
             } footer: {
                 HStack {
                     Text("More.NotesRadar.Total")
@@ -87,6 +91,7 @@ struct MoreRadarMaker: View {
                 }
                 .font(.system(size: 12.0, weight: .bold))
             }
+            .clearSection()
             Section {
                 Button {
                     exportImage()
@@ -94,7 +99,10 @@ struct MoreRadarMaker: View {
                     Label("More.RadarMaker.Export", systemImage: "square.and.arrow.up")
                 }
             }
+            .clearSection()
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .navigationTitle("More.RadarMaker.Header")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

@@ -40,6 +40,25 @@ extension AnalyticsView {
         }
     }
 
+    func summaryCount(for cardType: AnalyticsCardType) -> Int {
+        switch cardType {
+        case .newClears: model.newClears.count
+        case .newAssistClears: model.newAssistClears.count
+        case .newEasyClears: model.newEasyClears.count
+        case .newFullComboClear: model.newFullComboClears.count
+        case .newHardClear: model.newHardClears.count
+        case .newExHardClear: model.newExHardClears.count
+        case .newFailed: model.newFailed.count
+        case .newHighScores: model.newHighScores.count
+        case .newClearLamps: model.newClearLamps.count
+        case .newScoreUpdates: model.newScoreUpdates.count
+        case .newAAA: model.newAAA.count
+        case .newAA: model.newAA.count
+        case .newA: model.newA.count
+        default: 0
+        }
+    }
+
     func progressCard(_ kind: IIDXProgressKind) -> some View {
         Button {
             if !isEditingCards && !model.progressPerImportGroup.isEmpty {
@@ -50,11 +69,12 @@ extension AnalyticsView {
                 IIDXProgressGraph(points: model.progressPerImportGroup, kind: kind)
                     .chartLegend(.hidden)
                     .chartXAxis(.hidden)
-                    .chartYAxis { AxisMarks { AxisGridLine() } }
+                    .chartYAxis(.hidden)
                     .opacity(model.progressPerImportGroup.isEmpty ? 0.25 : 1.0)
                     .overlay {
                         if model.progressPerImportGroup.isEmpty {
                             Text("Shared.NoData")
+                                .emptyLabel()
                                 .font(.caption.bold())
                                 .foregroundStyle(.secondary)
                         }
@@ -367,6 +387,7 @@ extension AnalyticsView {
     func djLevelTrendsForLevelCard(difficulty: Int) -> some View {
         Button {
             if !isEditingCards && model.djLevelPerImportGroup.count > 0 {
+
                 navigationManager.push(AnalyticsPath.djLevelTrendsForLevel(difficulty: difficulty))
             }
         } label: {
@@ -388,5 +409,4 @@ extension AnalyticsView {
             id: "DJLevelTrends.Level.\(difficulty)", in: analyticsNamespace
         )
     }
-
 }

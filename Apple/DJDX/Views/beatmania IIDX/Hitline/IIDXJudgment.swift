@@ -37,42 +37,21 @@ struct IIDXJudgmentLabel: View {
     var judgment: IIDXJudgment
     var text: String?
     var size: CGFloat
+    var outlineScale: CGFloat?
 
-    private let outlineScale: CGFloat = 0.6
+    private var resolvedOutlineScale: CGFloat { outlineScale ?? size * 0.025 }
 
     private var displayText: String { text ?? judgment.label }
 
     var body: some View {
         Group {
             if let style = judgment.style {
-                HitlineJudgmentText(text: displayText, size: size, style: style, outlineScale: outlineScale)
+                HitlineJudgmentText(text: displayText, size: size, style: style, outlineScale: resolvedOutlineScale)
             } else {
-                HitlineRainbowText(text: displayText, size: size, outlineScale: outlineScale)
+                HitlineRainbowText(text: displayText, size: size, outlineScale: resolvedOutlineScale)
             }
         }
         .accessibilityElement()
         .accessibilityLabel(Text(verbatim: text ?? judgment.accessibilityName))
-    }
-}
-
-struct IIDXJudgmentBreakdown: View {
-    var entries: [(judgment: IIDXJudgment, value: Int)]
-
-    private let size: CGFloat = 24.0
-
-    var body: some View {
-        VStack(spacing: 10.0) {
-            ForEach(entries.indices, id: \.self) { index in
-                HStack(spacing: 0.0) {
-                    IIDXJudgmentLabel(judgment: entries[index].judgment, size: size)
-                    Spacer(minLength: 0.0)
-                    IIDXJudgmentLabel(
-                        judgment: entries[index].judgment,
-                        text: String(entries[index].value),
-                        size: size
-                    )
-                }
-            }
-        }
     }
 }

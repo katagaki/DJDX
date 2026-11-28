@@ -25,6 +25,7 @@ struct CapturedPlayDetailView: View {
     @State private var isReanalyzing: Bool = false
     @State private var needsReview: Bool = false
     @FocusState private var songFieldFocused: Bool
+    @Environment(\.colorScheme) private var colorScheme
 
     private let reader = IIDXReader()
 
@@ -72,71 +73,82 @@ struct CapturedPlayDetailView: View {
     }
 
     private var editorForm: some View {
-        Form {
-            Section("Sessions.Detail.Chart") {
-                marked(songNeedsAttention) {
-                    TextField("Sessions.Detail.Song", text: $songTitle)
-                        .focused($songFieldFocused)
-                }
-                if songFieldFocused {
-                    ForEach(songSuggestions, id: \.title) { song in
-                        Button {
-                            songTitle = song.title
-                            songSuggestions = []
-                            songFieldFocused = false
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14.0) {
+                Text("Sessions.Detail.Chart")
+                    .sectionListHeader()
+                songField
+                FilterChipGroup(title: chipTitle("Shared.Level", needsAttention: levelNeedsAttention)) {
+                    ForEach(IIDXLevel.sorted, id: \.self) { option in
+                        let tint = IIDXLevelLabel(levelType: option, score: IIDXLevelScore()).foregroundColor()
+                        FilterChip(isOn: level == option,
+                                   isDimmed: level != .unknown && level != option, fill: tint) {
+                            level = option
                         } label: {
-                            Label(song.title, systemImage: "music.note")
-                                .foregroundStyle(.primary)
-                                .lineLimit(1)
+                            Text(LocalizedStringKey(option.rawValue))
+                                .font(.system(size: 11.0, weight: .black))
+                                .foregroundStyle(.white)
+                                .strokeText(color: tint.mix(with: .black, by: 0.55), width: 0.55)
                         }
                     }
                 }
-                marked(levelNeedsAttention) {
-                    Picker("Shared.Level", selection: $level) {
-                        ForEach(IIDXLevel.sorted, id: \.self) { value in
-                            Text(verbatim: levelName(value)).tag(value)
+                FilterChipGroup(title: chipTitle("Shared.Difficulty", needsAttention: difficultyNeedsAttention)) {
+                    ForEach(IIDXDifficulty.sortedInts, id: \.self) { option in
+                        FilterChip(isOn: difficulty == option,
+                                   isDimmed: difficulty > 0 && difficulty != option) {
+                            difficulty = option
+                        } label: {
+                            LevelNumber(level: String(option), size: 15.0)
                         }
                     }
                 }
-                marked(difficultyNeedsAttention) {
-                    Picker("Shared.Difficulty", selection: $difficulty) {
-                        Text(verbatim: "---").tag(0)
-                        ForEach(IIDXDifficulty.sortedInts, id: \.self) { value in
-                            Text(verbatim: "\(value)").tag(value)
+                FilterChipGroup(title: Text("Shared.PlayType")) {
+                    FilterTextChip(title: Text(verbatim: "SP"), isOn: playType == .single) {
+                        playType = .single
+                    }
+                    FilterTextChip(title: Text(verbatim: "DP"), isOn: playType == .double) {
+                        playType = .double
+                    }
+                }
+                Text("Sessions.Detail.Result")
+                    .sectionListHeader()
+                    .padding(.top, 6.0)
+                FilterChipGroup(title: chipTitle("Sessions.Detail.ClearType",
+                                                 needsAttention: clearTypeNeedsAttention)) {
+                    ForEach(IIDXClearType.ascending.reversed(), id: \.self) { option in
+                        FilterChip(isOn: clearType == option,
+                                   isDimmed: clearType != .unknown && clearType != option) {
+                            clearType = option
+                        } label: {
+                            IIDXMetallicText.clearType(option.rawValue)
+                                .font(.system(size: 12.0))
                         }
                     }
                 }
-                Picker("Shared.PlayType", selection: $playType) {
-                    Text(verbatim: "SP").tag(IIDXPlayType.single)
-                    Text(verbatim: "DP").tag(IIDXPlayType.double)
+                FilterChipGroup(title: chipTitle("Sessions.Detail.DJLevel", needsAttention: djLevelNeedsAttention)) {
+                    ForEach(IIDXDJLevel.sorted.reversed(), id: \.self) { option in
+                        FilterChip(isOn: djLevel == option,
+                                   isDimmed: djLevel != .none && djLevel != option) {
+                            djLevel = option
+                        } label: {
+                            IIDXMetallicText.djLevel(option.rawValue)
+                                .font(.system(size: 14.0))
+                        }
+                    }
                 }
+                resultEditor
             }
-
-            Section("Sessions.Detail.Result") {
-                marked(clearTypeNeedsAttention) {
-                    Picker("Sessions.Detail.ClearType", selection: $clearType) {
-                        ForEach(IIDXClearType.sorted, id: \.self) { value in
-                            Text(verbatim: value.rawValue).tag(value)
-                        }
-                    }
-                }
-                marked(djLevelNeedsAttention) {
-                    Picker("Sessions.Detail.DJLevel", selection: $djLevel) {
-                        ForEach(IIDXDJLevel.sorted.reversed(), id: \.self) { value in
-                            Text(verbatim: value.rawValue).tag(value)
-                        }
-                    }
-                }
-                marked(exScoreNeedsAttention) { numberRow("Sessions.Detail.ExScore", value: $exScore) }
-                marked(judgmentNeedsAttention) { numberRow("Sessions.Detail.PGreat", value: $perfectGreat) }
-                marked(judgmentNeedsAttention) { numberRow("Sessions.Detail.Great", value: $great) }
-                numberRow("Sessions.Detail.Good", value: $good)
-                numberRow("Sessions.Detail.Bad", value: $bad)
-                numberRow("Sessions.Detail.Poor", value: $poor)
+            .padding(.horizontal)
+            .padding(.top, 8.0)
+            .padding(.bottom, 24.0)
+            .background {
+                Color.clear
+                    .contentShape(.rect)
+                    .onTapGesture { dismissKeyboard() }
             }
         }
-        .scrollContentBackground(.hidden)
-        .scrollDismissesKeyboard(.immediately)
+        .contentMargins(.bottom, 72.0, for: .scrollContent)
+        .scrollDismissesKeyboard(.interactively)
         .disabled(isReanalyzing)
     }
 
@@ -172,20 +184,6 @@ struct CapturedPlayDetailView: View {
             Label("Sessions.Detail.AcceptAll", systemImage: "checkmark")
         }
         .disabled(isReanalyzing || !needsReview)
-    }
-
-    private func marked<Content: View>(
-        _ needsAttention: Bool,
-        @ViewBuilder content: () -> Content
-    ) -> some View {
-        HStack(spacing: 8.0) {
-            content()
-            if needsAttention {
-                Image(systemName: "exclamationmark.circle.fill")
-                    .foregroundStyle(.orange)
-                    .accessibilityLabel(Text("Sessions.Detail.NeedsAttention"))
-            }
-        }
     }
 
     private var songNeedsAttention: Bool {
@@ -294,25 +292,6 @@ struct CapturedPlayDetailView: View {
          perfectGreat, great, good, bad, poor, clearType, djLevel]
     }
 
-    private func numberRow(_ titleKey: LocalizedStringKey, value: Binding<Int>) -> some View {
-        LabeledContent(titleKey) {
-            TextField("", value: value, format: .number)
-                .keyboardType(.numberPad)
-                .multilineTextAlignment(.trailing)
-        }
-    }
-
-    private func levelName(_ level: IIDXLevel) -> String {
-        switch level {
-        case .beginner: "BEGINNER"
-        case .normal: "NORMAL"
-        case .hyper: "HYPER"
-        case .another: "ANOTHER"
-        case .leggendaria: "LEGGENDARIA"
-        default: "---"
-        }
-    }
-
     private func loadFields() {
         songTitle = play.songTitle ?? ""
         level = play.level
@@ -371,6 +350,132 @@ struct CapturedPlayDetailView: View {
         play.clearType = clearType.rawValue
         play.djLevel = djLevel.rawValue
         store.saveCorrected(play)
+    }
+}
+
+extension CapturedPlayDetailView {
+    private func dismissKeyboard() {
+        songFieldFocused = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+
+    private var ink: Color { colorScheme == .dark ? .white : .black }
+
+    private var songField: some View {
+        VStack(spacing: 0.0) {
+            HStack(spacing: 8.0) {
+                TextField("Sessions.Detail.Song", text: $songTitle)
+                    .fontWeight(.heavy)
+                    .fontWidth(.compressed)
+                    .focused($songFieldFocused)
+                attentionMark(songNeedsAttention)
+            }
+            .padding(.horizontal, 12.0)
+            .padding(.vertical, 10.0)
+            if songFieldFocused {
+                ForEach(songSuggestions, id: \.title) { song in
+                    Divider()
+                    Button {
+                        songTitle = song.title
+                        songSuggestions = []
+                        songFieldFocused = false
+                    } label: {
+                        Text(verbatim: song.title)
+                            .fontWeight(.heavy)
+                            .fontWidth(.compressed)
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 12.0)
+                            .padding(.vertical, 8.0)
+                            .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .background(ink.opacity(0.06), in: .rect(cornerRadius: 8.0))
+    }
+
+    private func chipTitle(_ key: LocalizedStringKey, needsAttention: Bool) -> Text {
+        if needsAttention {
+            return Text(key) + Text(verbatim: " ") + Text(Image(systemName: "exclamationmark.circle.fill"))
+                .foregroundColor(.orange)
+        }
+        return Text(key)
+    }
+
+    @ViewBuilder
+    private func attentionMark(_ needsAttention: Bool) -> some View {
+        if needsAttention {
+            Image(systemName: "exclamationmark.circle.fill")
+                .foregroundStyle(.orange)
+                .accessibilityLabel(Text("Sessions.Detail.NeedsAttention"))
+        }
+    }
+
+    private var resultEditor: some View {
+        VStack(spacing: 10.0) {
+            Divider()
+            HStack(alignment: .center, spacing: 8.0) {
+                Text("Sessions.Detail.ExScore")
+                    .cardLabel()
+                    .foregroundStyle(.secondary)
+                attentionMark(exScoreNeedsAttention)
+                Spacer(minLength: 8.0)
+                StyledNumberField(value: $exScore, font: .scoreline(.title3)) { value in
+                    IIDXScoreText(value, style: .title3)
+                }
+            }
+            Divider()
+            judgmentRow(.perfectGreat, value: $perfectGreat, needsAttention: judgmentNeedsAttention)
+            Divider()
+            judgmentRow(.great, value: $great, needsAttention: judgmentNeedsAttention)
+            Divider()
+            judgmentRow(.good, value: $good)
+            Divider()
+            judgmentRow(.bad, value: $bad)
+            Divider()
+            judgmentRow(.poor, value: $poor)
+            Divider()
+        }
+    }
+
+    private func judgmentRow(_ judgment: IIDXJudgment, value: Binding<Int>,
+                             needsAttention: Bool = false) -> some View {
+        HStack(alignment: .center, spacing: 8.0) {
+            IIDXJudgmentLabel(judgment: judgment, size: 20.0, outlineScale: 0.4)
+            attentionMark(needsAttention)
+            Spacer(minLength: 8.0)
+            StyledNumberField(value: value, font: HitlineFont.swiftUI(size: 22.0)) { number in
+                IIDXJudgmentLabel(judgment: judgment, text: String(number), size: 22.0, outlineScale: 0.44)
+            }
+        }
+    }
+}
+
+private struct StyledNumberField<Label: View>: View {
+    @Binding var value: Int
+    let font: Font
+    @ViewBuilder let label: (Int) -> Label
+    @FocusState private var isFocused: Bool
+
+    var body: some View {
+        ZStack {
+            TextField("", value: $value, format: .number.grouping(.never))
+                .font(font)
+                .keyboardType(.numberPad)
+                .multilineTextAlignment(.center)
+                .fixedSize()
+                .focused($isFocused)
+                .opacity(isFocused ? 1.0 : 0.0)
+            if !isFocused {
+                label(value)
+                    .allowsHitTesting(false)
+            }
+        }
+        .contentShape(.rect)
+        .onTapGesture { isFocused = true }
     }
 }
 

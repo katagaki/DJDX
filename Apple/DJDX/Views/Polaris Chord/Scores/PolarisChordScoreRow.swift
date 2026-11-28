@@ -35,8 +35,7 @@ struct PolarisChordScoreRow: View {
                     Divider().frame(maxHeight: 14.0)
                     Text(verbatim: record.clearTypeEnum.abbreviation)
                         .foregroundStyle(record.clearTypeEnum.color)
-                        .fontWidth(.expanded)
-                        .fontWeight(.bold)
+                        .font(.playline(.caption, weight: .regular))
                     if record.score > 0 {
                         Divider().frame(maxHeight: 14.0)
                         Text(record.score.formatted(.number))
@@ -46,6 +45,7 @@ struct PolarisChordScoreRow: View {
                     }
                 }
                 .font(.caption)
+                .squashedHorizontally()
             }
             .padding([.top, .bottom], 8.0)
 

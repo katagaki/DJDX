@@ -6,6 +6,7 @@ struct BreakdownBarItem: Identifiable {
     let count: Int
     let color: Color
     var metallicLabel: IIDXMetallicText?
+    var levelBadge: String?
     var isFullCombo: Bool = false
 }
 
@@ -36,7 +37,7 @@ struct BreakdownBarView: View {
             }
         }
         .frame(height: 18.0)
-        .clipShape(Capsule())
+        .clipShape(.rect)
     }
 
     private var legend: some View {
@@ -45,6 +46,11 @@ struct BreakdownBarView: View {
                 HStack(spacing: 4.0) {
                     if let metallicLabel = item.metallicLabel {
                         metallicLabel
+                    } else if let levelBadge = item.levelBadge {
+                        RoundedRectangle(cornerRadius: 2.0)
+                            .fill(item.color)
+                            .frame(width: 8.0, height: 8.0)
+                        LevelNumberBadge(level: levelBadge)
                     } else {
                         RoundedRectangle(cornerRadius: 2.0)
                             .fill(item.color)
@@ -59,6 +65,7 @@ struct BreakdownBarView: View {
                 }
                 .font(.caption)
                 .lineLimit(1)
+                .fixedSize()
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

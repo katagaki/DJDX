@@ -17,6 +17,10 @@ struct DDRScoresView<Header: View>: View {
     @AppStorage(wrappedValue: [], "DDRScoresView.ClearLampFilters") var clearLampsToShow: Set<String>
     @AppStorage(wrappedValue: [], "DDRScoresView.RankFilters") var ranksToShow: Set<String>
 
+    var isScoreDataExpandedKey: String = "DDRScoresView.ScoreDataExpanded"
+    @State var isScoreDataExpanded: Bool
+    @AppStorage(wrappedValue: true, AnalyticsSectionVisibility.scoreDataKey) var isScoreDataVisible: Bool
+
     @State var dataState: DataState = .initializing
     @State var records: [DDRSongRecord] = []
     @State var searchTerm: String = ""
@@ -30,6 +34,9 @@ struct DDRScoresView<Header: View>: View {
     init(isEditingAnalytics: Binding<Bool> = .constant(false), @ViewBuilder header: () -> Header) {
         self.header = header()
         self._isEditingAnalytics = isEditingAnalytics
+        self.isScoreDataExpanded = (UserDefaults.standard.object(
+            forKey: isScoreDataExpandedKey
+        ) as? Bool) ?? true
     }
 
     var styleRecords: [DDRSongRecord] {
@@ -117,29 +124,6 @@ struct DDRScoresView<Header: View>: View {
         return lhsRank < rhsRank
     }
 
-    @ViewBuilder var sortControl: some View {
-        Menu("Shared.Sort", systemImage: "arrow.up.arrow.down") {
-            Picker("Shared.Sort", selection: $sortMode.animation(.smooth.speed(2.0))) {
-                ForEach(DDRSortMode.allCases, id: \.self) { mode in
-                    Text(LocalizedStringKey(mode.rawValue))
-                        .tag(mode)
-                }
-            }
-            .pickerStyle(.inline)
-            Section {
-                Picker("Shared.Sort.Order", selection: $sortOrder.animation(.smooth.speed(2.0))) {
-                    Label("Shared.Sort.Ascending", systemImage: "arrow.up")
-                        .tag(SortOrder.ascending)
-                    Label("Shared.Sort.Descending", systemImage: "arrow.down")
-                        .tag(SortOrder.descending)
-                }
-                .pickerStyle(.inline)
-            }
-        }
-        .menuOrder(.fixed)
-        .menuActionDismissBehavior(.disabled)
-    }
-
     @ViewBuilder var filterControl: some View {
         Button("Shared.Filter", systemImage: "line.3.horizontal.decrease") {
             isShowingFilterSheet = true
@@ -152,8 +136,31 @@ struct DDRScoresView<Header: View>: View {
             LazyVStack(spacing: 0.0) {
                 if searchTerm.isEmpty {
                     header
+                    if !isEditingAnalytics, isScoreDataVisible {
+                        AnalyticsSectionHeader(
+                            title: "Analytics.Section.ScoreData",
+                            isCollapsible: true,
+                            isExpanded: isScoreDataExpanded
+                        ) {
+                            withAnimation(.smooth.speed(2.0)) { isScoreDataExpanded.toggle() }
+                            UserDefaults.standard.set(isScoreDataExpanded, forKey: isScoreDataExpandedKey)
+                        } accessory: {
+                            if !sortedRecords.isEmpty {
+                                Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
+                                    isShowingShareCard = true
+                                }
+                                .labelStyle(.iconOnly)
+                                .font(.subheadline.weight(.bold))
+                            }
+                        }
+                        .padding(.top, DesignMetrics.sectionGap)
+                        .padding(.bottom, isScoreDataExpanded ? 8.0 : 0.0)
+                        if isScoreDataExpanded {
+                            Divider()
+                        }
+                    }
                 }
-                if !isEditingAnalytics {
+                if !isEditingAnalytics, (isScoreDataVisible && isScoreDataExpanded) || !searchTerm.isEmpty {
                     let sortedRecords = sortedRecords
                     ForEach(sortedRecords, id: \.self) { record in
                         Button {
@@ -182,12 +189,8 @@ struct DDRScoresView<Header: View>: View {
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
             ToolbarSpacer(.fixed, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
-                sortControl
                 filterControl
             }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .shareCardRequested)) { _ in
-            isShowingShareCard = true
         }
         .sheet(isPresented: $isShowingShareCard) {
             ShareCardComposer(
@@ -199,6 +202,8 @@ struct DDRScoresView<Header: View>: View {
         }
         .sheet(isPresented: $isShowingFilterSheet) {
             DDRScoreFilterSheet(
+                sortMode: $sortMode.animation(.smooth.speed(2.0)),
+                sortOrder: $sortOrder.animation(.smooth.speed(2.0)),
                 isShowingOnlyPlayedCharts: $isShowingOnlyPlayedCharts.animation(.smooth.speed(2.0)),
                 difficultiesToShow: $difficultiesToShow.animation(.smooth.speed(2.0)),
                 levelsToShow: $levelsToShow.animation(.smooth.speed(2.0)),
@@ -207,8 +212,7 @@ struct DDRScoresView<Header: View>: View {
                 availableLevels: availableLevels,
                 availableClearLamps: availableClearLamps,
                 availableRanks: availableRanks,
-                onReset: {
-                }
+                onReset: {}
             )
             .navigationTransition(.zoom(sourceID: "DDRScoreFilterSheet", in: ddrNamespace))
             .presentationDetents([.medium, .large])

@@ -35,6 +35,7 @@ struct CapturedPlayScoreView: View {
             Section {
                 header()
             }
+            .sectionStyle()
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
@@ -42,9 +43,10 @@ struct CapturedPlayScoreView: View {
             Section {
                 scoreContent()
             }
+            .clearSection()
 
             if !history.isEmpty {
-                Section("Sessions.Score.History") {
+                TitledSection("Sessions.Score.History", isClear: true) {
                     CapturedPlayHistoryChart(plays: history + [play], noteCount: matchedNoteCount)
                         .listRowInsets(.init(top: 18.0, leading: 20.0, bottom: 18.0, trailing: 20.0))
                     ForEach(history) { pastPlay in
@@ -68,7 +70,7 @@ struct CapturedPlayScoreView: View {
                 }
             }
         }
-        .listSectionSpacing(.compact)
+        .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background {
             AppBackgroundGradient()
@@ -139,86 +141,47 @@ struct CapturedPlayScoreView: View {
 
     @ViewBuilder
     private func difficultyChip() -> some View {
-        HStack(spacing: 6.0) {
-            if play.level != .unknown {
-                Text(LocalizedStringKey(play.level.rawValue))
+        HStack(spacing: 8.0) {
+            if play.level != .unknown, play.difficulty > 0 {
+                LevelBadge(name: String(localized: String.LocalizationValue(play.level.rawValue)),
+                           level: String(play.difficulty), tint: levelColor, layout: .horizontal)
+            } else if play.difficulty > 0 {
+                LevelNumberBadge(level: String(play.difficulty), isCompact: false)
             }
-            if play.difficulty > 0 {
-                Text(verbatim: "\(play.difficulty)")
-            }
-            Text(verbatim: play.playType.displayName())
+            IIDXPlayTypeBadge(playType: play.playType, size: 13.0)
         }
-        .font(.caption)
-        .fontWeight(.heavy)
-        .fontWidth(.expanded)
-        .foregroundStyle(.white)
-        .padding(.horizontal, 12.0)
-        .padding(.vertical, 5.0)
-        .background(levelColor, in: Capsule())
     }
 
     @ViewBuilder
     private func scoreContent() -> some View {
         if score.djLevelEnum() != .none {
-            HStack {
-                Group {
-                    Text(score.djLevel)
-                        .foregroundStyle(IIDXDJLevel.style(for: score.djLevel))
-                        .strokeText(color: .black, width: 0.6)
-                    Spacer()
-                    if let scoreRate {
-                        Text(scoreRate, format: .percent.precision(.fractionLength(1)))
-                            .font(.scoreline(.largeTitle, width: .condensed))
-                            .fontWidth(.condensed)
-                            .foregroundStyle(LinearGradient(
-                                colors: [.primary.opacity(0.35), .primary.opacity(0.2)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            ))
-                    }
-                }
-                .font(.largeTitle)
-                .fontWidth(.expanded)
-                .fontWeight(.black)
-            }
-            detailRows()
-            noteBreakdown()
+            IIDXCompactResultSummary(djLevel: score.djLevel, clearType: score.clearType,
+                                     score: score.score, scoreRate: scoreRate)
         } else {
-            detailRows()
-            noteBreakdown()
-        }
-    }
-
-    @ViewBuilder
-    private func detailRows() -> some View {
-        VStack(alignment: .leading, spacing: 8.0) {
             IIDXClearTypeDetailRow("CLEAR TYPE", value: score.clearType)
             IIDXDetailRow("SCORE", score: score.score)
-            if let matchedNoteCount {
-                IIDXDetailRow("NOTES", value: matchedNoteCount, style: Color.secondary)
-            }
-            if let time = matchedSong?.time, !time.isEmpty {
-                IIDXDetailRow("LENGTH", value: time, style: Color.secondary)
-            }
         }
-    }
-
-    private var scoreRate: Float? {
-        guard let matchedNoteCount, matchedNoteCount > 0 else { return nil }
-        return Float(score.score) / Float(matchedNoteCount * 2)
-    }
-
-    @ViewBuilder
-    private func noteBreakdown() -> some View {
-        IIDXJudgmentBreakdown(entries: [
+        IIDXCompactJudgments(entries: [
             (.perfectGreat, play.perfectGreat),
             (.great, play.great),
             (.good, play.good),
             (.bad, play.bad),
             (.poor, play.poor)
         ])
-        .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+        if let matchedNoteCount {
+            IIDXDetailRow("NOTES", value: matchedNoteCount, style: Color.secondary)
+        }
+        if let time = matchedSong?.time, !time.isEmpty {
+            IIDXDetailRow("LENGTH", value: time, style: Color.secondary)
+        }
     }
+
+
+    private var scoreRate: Float? {
+        guard let matchedNoteCount, matchedNoteCount > 0 else { return nil }
+        return Float(score.score) / Float(matchedNoteCount * 2)
+    }
+
 
     private func historyRow(_ play: IIDXCapturedPlay) -> some View {
         HStack(alignment: .center, spacing: 8.0) {

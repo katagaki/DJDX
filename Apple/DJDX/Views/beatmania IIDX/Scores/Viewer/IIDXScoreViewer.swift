@@ -35,6 +35,7 @@ struct IIDXScoreViewer: View {
             Section {
                 header()
             }
+            .sectionStyle()
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
@@ -82,7 +83,7 @@ struct IIDXScoreViewer: View {
                 )
             }
         }
-        .listSectionSpacing(.compact)
+        .listStyle(.plain)
         .scrollDismissesKeyboard(.immediately)
         .navigator("ViewTitle.Scores.Song", group: true, inline: true)
         .scrollContentBackground(.hidden)
@@ -218,13 +219,8 @@ Scores.Viewer.LastPlayDate.\(songRecord.lastPlayDate.formatted(date: .long, time
     func versionNumberToolbarItemContent() -> some View {
         Group {
             if let iidxVersion = IIDXVersion.marketingNames[songRecord.version] {
-                if colorScheme == .dark {
-                    Text(songRecord.version)
-                        .foregroundStyle(Color(uiColor: iidxVersion.darkModeColor))
-                } else {
-                    Text(songRecord.version)
-                        .foregroundStyle(Color(uiColor: iidxVersion.lightModeColor))
-                }
+                IIDXVersionBadge(version: iidxVersion)
+                    .italic(false)
             } else {
                 Text(songRecord.version)
                     .foregroundStyle(.secondary)
