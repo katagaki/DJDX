@@ -10,7 +10,7 @@ enum AnalyticsGoalKind: String, Codable, CaseIterable, Hashable {
         switch game {
         case .soundVoltex, .danceDanceRevolution: [.rating, .clearCount, .gradeCount]
         case .iidxArcade, .iidxInfinitas: [.clearCount, .gradeCount]
-        case .polarisChord: []
+        case .polarisChord, .gitadora: []
         }
     }
 
@@ -89,7 +89,7 @@ struct AnalyticsGoal: Codable, Identifiable, Hashable {
         case .iidxArcade, .iidxInfinitas: Array(1...12)
         case .soundVoltex: Array(1...20)
         case .danceDanceRevolution: Array(1...19)
-        case .polarisChord: []
+        case .polarisChord, .gitadora: []
         }
     }
 

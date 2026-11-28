@@ -4,6 +4,9 @@ import androidx.compose.ui.graphics.Color
 import com.tsubuzaki.djdxgo.AppContainer
 import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.ddr.DDRPlayStyle
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORADifficulty
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAInstrument
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORARank
 import com.tsubuzaki.djdxgo.data.iidx.IIDXLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
@@ -11,6 +14,7 @@ import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordDifficulty
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXDifficulty
 import com.tsubuzaki.djdxgo.ui.theme.DDRColors
+import com.tsubuzaki.djdxgo.ui.theme.GITADORAColors
 import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
 import com.tsubuzaki.djdxgo.ui.theme.Palette
 import com.tsubuzaki.djdxgo.ui.theme.PolarisChordColors
@@ -35,10 +39,21 @@ val Game.tierListCode: String
         Game.SOUND_VOLTEX -> "sdvx"
         Game.POLARIS_CHORD -> "polarischord"
         Game.DANCE_DANCE_REVOLUTION -> "ddr"
+        Game.GITADORA -> "gitadora"
+    }
+
+val Game.tierListPlayTypes: List<String>
+    get() = when (this) {
+        Game.IIDX_ARCADE, Game.DANCE_DANCE_REVOLUTION -> listOf("SP", "DP")
+        Game.GITADORA -> GITADORAInstrument.entries.map { it.value }
+        Game.SOUND_VOLTEX, Game.POLARIS_CHORD -> emptyList()
     }
 
 val Game.supportsTierListPlayType: Boolean
-    get() = this == Game.IIDX_ARCADE || this == Game.DANCE_DANCE_REVOLUTION
+    get() = tierListPlayTypes.isNotEmpty()
+
+fun Game.tierListPlayType(selected: String): String =
+    tierListPlayTypes.let { types -> if (types.isEmpty()) "" else selected.takeIf { it in types } ?: types.first() }
 
 fun gameForTierListCode(code: String): Game? = Game.entries.firstOrNull { it.tierListCode == code }
 
@@ -141,6 +156,21 @@ suspend fun loadTierListCharts(
                     )
                 }
         }
+        Game.GITADORA -> container.gitadoraRepository.songRecords(now)
+            .filter { it.instrument == playType && it.levelBucket.isNotEmpty() }
+            .map { record ->
+                val rank = if (GITADORARank.fromValue(record.rank) in GITADORARank.sorted) record.rank else ""
+                TierListChart(
+                    id = tierListChartID(record.title, record.difficulty),
+                    title = record.title,
+                    level = record.levelBucket,
+                    difficultyLabel = GITADORADifficulty.fromValue(record.difficulty)?.abbreviation.orEmpty(),
+                    difficultyColor = GITADORAColors.difficultyColor(record.difficulty),
+                    lampColor = GITADORAColors.clearTypeColor(record.clearType),
+                    grade = rank,
+                    gradeColor = GITADORAColors.rankColor(rank)
+                )
+            }
     }
 }
 

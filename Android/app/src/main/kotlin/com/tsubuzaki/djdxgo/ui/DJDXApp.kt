@@ -76,6 +76,8 @@ import com.tsubuzaki.djdxgo.data.SettingsKeys
 import com.tsubuzaki.djdxgo.data.analyticsLayoutKeys
 import com.tsubuzaki.djdxgo.data.compact
 import com.tsubuzaki.djdxgo.data.ddr.DDRPlayStyle
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAInstrument
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAVersionInfo
 import com.tsubuzaki.djdxgo.data.ddr.DDRVersionInfo
 import com.tsubuzaki.djdxgo.data.external.ExternalDataSource
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
@@ -92,11 +94,13 @@ import com.tsubuzaki.djdxgo.ui.analytics.ChartAnalyticsDetailScreen
 import com.tsubuzaki.djdxgo.ui.analytics.DDRAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.IIDXAnalyticsDetailScreen
 import com.tsubuzaki.djdxgo.ui.analytics.IIDXAnalyticsSection
+import com.tsubuzaki.djdxgo.ui.analytics.GITADORAAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.PolarisChordAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.SDVXAnalyticsSection
 import com.tsubuzaki.djdxgo.ui.analytics.TowerDetailScreen
 import com.tsubuzaki.djdxgo.ui.games.DDRScoreViewerScreen
 import com.tsubuzaki.djdxgo.ui.games.DDRScoresScreen
+import com.tsubuzaki.djdxgo.ui.games.GITADORAScoresScreen
 import com.tsubuzaki.djdxgo.ui.games.PolarisChordScoresScreen
 import com.tsubuzaki.djdxgo.ui.games.SDVXScoreViewerScreen
 import com.tsubuzaki.djdxgo.ui.games.SDVXScoresScreen
@@ -113,6 +117,7 @@ import com.tsubuzaki.djdxgo.ui.onboarding.OnboardingScreen
 import com.tsubuzaki.djdxgo.ui.profile.DDRDataSourceWarning
 import com.tsubuzaki.djdxgo.ui.profile.DDRProfileHeader
 import com.tsubuzaki.djdxgo.ui.profile.IIDXProfileHeader
+import com.tsubuzaki.djdxgo.ui.profile.GITADORAProfileHeader
 import com.tsubuzaki.djdxgo.ui.profile.PolarisChordProfileHeader
 import com.tsubuzaki.djdxgo.ui.profile.SDVXProfileHeader
 import com.tsubuzaki.djdxgo.ui.web.SDVXInChartViewerScreen
@@ -129,6 +134,7 @@ internal fun gameIconRes(game: Game): Int = when (game) {
     Game.SOUND_VOLTEX -> R.drawable.ic_game_sdvx
     Game.POLARIS_CHORD -> R.drawable.ic_game_polaris
     Game.DANCE_DANCE_REVOLUTION -> R.drawable.ic_game_ddr
+    Game.GITADORA -> R.drawable.ic_game_gitadora
 }
 
 private fun gameNamed(name: String): Game? = when (name.lowercase()) {
@@ -136,6 +142,7 @@ private fun gameNamed(name: String): Game? = when (name.lowercase()) {
     "sdvx", "soundvoltex" -> Game.SOUND_VOLTEX
     "polaris", "polarischord" -> Game.POLARIS_CHORD
     "ddr", "ddrworld", "dancedancerevolution" -> Game.DANCE_DANCE_REVOLUTION
+    "gitadora", "gfdm", "guitarfreaks", "drummania" -> Game.GITADORA
     else -> null
 }
 
@@ -433,6 +440,9 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
     val ddrPlayStyleValue by context.settingFlow(SettingsKeys.ddrPlayStyle, DDRPlayStyle.SINGLE.value)
         .collectAsState(initial = DDRPlayStyle.SINGLE.value)
     val ddrPlayStyle = DDRPlayStyle.fromValue(ddrPlayStyleValue)
+    val gitadoraInstrumentValue by context.settingFlow(SettingsKeys.gitadoraInstrument, GITADORAInstrument.GUITAR.value)
+        .collectAsState(initial = GITADORAInstrument.GUITAR.value)
+    val gitadoraInstrument = GITADORAInstrument.fromValue(gitadoraInstrumentValue) ?: GITADORAInstrument.GUITAR
 
     var isGameMenuExpanded by remember { mutableStateOf(false) }
     var isMoreMenuExpanded by remember { mutableStateOf(false) }
@@ -449,6 +459,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
             Game.SOUND_VOLTEX -> container.profileRepository.refreshSDVX(SDVXVersion.fromNumber(sdvxVersionNumber))
             Game.POLARIS_CHORD -> container.profileRepository.refreshPolarisChord()
             Game.DANCE_DANCE_REVOLUTION -> container.profileRepository.refreshDDR()
+            Game.GITADORA -> container.profileRepository.refreshGITADORA()
         }
     }
 
@@ -516,6 +527,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                             Game.SOUND_VOLTEX -> SDVXVersion.fromNumber(sdvxVersionNumber).marketingName
                             Game.POLARIS_CHORD -> PolarisChordVersionInfo.MARKETING_NAME
                             Game.DANCE_DANCE_REVOLUTION -> DDRVersionInfo.MARKETING_NAME
+                            Game.GITADORA -> GITADORAVersionInfo.MARKETING_NAME
                         }
                         DropdownMenuItem(
                             text = { Text(versionName) },
@@ -580,6 +592,14 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                 ) { index ->
                     scope.launch { context.setSetting(SettingsKeys.ddrPlayStyle, DDRPlayStyle.entries[index].value) }
                 }
+                Game.GITADORA -> PlayStyleSwitcher(
+                    labels = GITADORAInstrument.entries.map { it.value },
+                    selectedIndex = GITADORAInstrument.entries.indexOf(gitadoraInstrument)
+                ) { index ->
+                    scope.launch {
+                        context.setSetting(SettingsKeys.gitadoraInstrument, GITADORAInstrument.entries[index].value)
+                    }
+                }
                 else -> Unit
             }
             if (showAnalytics) {
@@ -629,6 +649,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                                 Game.SOUND_VOLTEX -> SDVXProfileHeader(container, headerModifier)
                                 Game.POLARIS_CHORD -> PolarisChordProfileHeader(container, headerModifier)
                                 Game.DANCE_DANCE_REVOLUTION -> DDRProfileHeader(container, headerModifier)
+                                Game.GITADORA -> GITADORAProfileHeader(container, headerModifier)
                             }
                         }
                     }
@@ -651,6 +672,9 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                                     PolarisChordAnalyticsSection(container, isEditingAnalytics, onNavigate)
                                 Game.DANCE_DANCE_REVOLUTION -> DDRAnalyticsSection(
                                     container, ddrPlayStyle, isEditingAnalytics, onNavigate
+                                )
+                                Game.GITADORA -> GITADORAAnalyticsSection(
+                                    container, gitadoraInstrument, isEditingAnalytics, onNavigate
                                 )
                             }
                             AnalyticsGoalsSection(
@@ -699,6 +723,13 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                                 onNavigate(Routes.ddrViewer(songIndex, date, style, difficulty))
                             }
                         )
+                        Game.GITADORA -> GITADORAScoresScreen(
+                            container = container,
+                            contentPadding = PaddingValues(),
+                            instrument = gitadoraInstrument,
+                            analyticsContent = header,
+                            shareRequests = shareRequests
+                        )
                     }
                 }
             }
@@ -733,6 +764,7 @@ private fun ScoresShell(container: AppContainer, onNavigate: (String) -> Unit) {
                 container.sdvxRepository.deleteAllData()
                 container.polarisChordRepository.deleteAllData()
                 container.ddrRepository.deleteAllData()
+                container.gitadoraRepository.deleteAllData()
                 container.notifyDataChanged()
             }
             Toast.makeText(context, context.getString(R.string.more_delete_score_data_done), Toast.LENGTH_SHORT).show()

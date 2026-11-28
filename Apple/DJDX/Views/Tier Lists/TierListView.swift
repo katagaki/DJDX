@@ -9,6 +9,10 @@ struct TierListView: View {
     @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
+    @AppStorage(wrappedValue: GITADORAVersion.galaxyWaveDelta, "Global.GITADORA.Version")
+    var gitadoraVersion: GITADORAVersion
+    @AppStorage(wrappedValue: GITADORAInstrument.guitar, "Global.GITADORA.Instrument")
+    var gitadoraInstrument: GITADORAInstrument
 
     var store = TierListStore.shared
     let initialShare: TierListShare?
@@ -42,9 +46,14 @@ struct TierListView: View {
     var key: TierListKey {
         TierListKey(
             game: game.tierListCode,
-            playType: game.supportsTierListPlayType ? playType.rawValue : "",
+            playType: tierListPlayTypeCode,
             level: level
         )
+    }
+
+    var tierListPlayTypeCode: String {
+        if game == .gitadora { return gitadoraInstrument.rawValue }
+        return game.supportsTierListPlayType ? playType.rawValue : ""
     }
 
     var list: TierList { store.list(for: key) }
@@ -73,7 +82,8 @@ struct TierListView: View {
 
     var loadTaskID: String {
         [game.tierListCode, playType.rawValue, iidxVersion.rawValue, sdvxVersion.rawValue,
-         polarisChordVersion.rawValue, ddrVersion.rawValue].map { "\($0)" }.joined(separator: "/")
+         polarisChordVersion.rawValue, ddrVersion.rawValue, gitadoraVersion.rawValue,
+         gitadoraInstrument.rawValue].map { "\($0)" }.joined(separator: "/")
     }
 
     var body: some View {
@@ -223,7 +233,17 @@ struct TierListView: View {
 
     @ViewBuilder
     var playTypePicker: some View {
-        if game.supportsTierListPlayType {
+        if game == .gitadora {
+            Menu {
+                Picker("Shared.GITADORA.Instrument", selection: $gitadoraInstrument) {
+                    ForEach(GITADORAInstrument.allCases, id: \.self) { instrument in
+                        Text(instrument.displayName).tag(instrument)
+                    }
+                }
+            } label: {
+                pickerLabel(Text(gitadoraInstrument.displayName))
+            }
+        } else if game.supportsTierListPlayType {
             Menu {
                 Picker("TierList.PlayType", selection: $playType) {
                     ForEach(TierListPlayType.allCases) { playType in
@@ -356,7 +376,9 @@ struct TierListView: View {
             iidxVersion: iidxVersion,
             sdvxVersion: sdvxVersion,
             polarisChordVersion: polarisChordVersion,
-            ddrVersion: ddrVersion
+            ddrVersion: ddrVersion,
+            gitadoraVersion: gitadoraVersion,
+            gitadoraInstrument: gitadoraInstrument
         )
         charts = loaded
         if !levels.contains(level) {
@@ -380,6 +402,9 @@ struct TierListView: View {
         }
         if let target = TierListPlayType(rawValue: share.playType) {
             playType = target
+        }
+        if let target = GITADORAInstrument(rawValue: share.playType) {
+            gitadoraInstrument = target
         }
         level = share.level
         store.replace(share.key, with: TierList(tiers: share.tiers))

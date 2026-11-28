@@ -59,6 +59,13 @@ extension UnifiedView {
                             }
                         }
                         .pickerStyle(.inline)
+                    } else if selectedGame == .gitadora {
+                        Picker("Shared.Version", selection: $gitadoraVersion) {
+                            ForEach(GITADORAVersion.supportedVersions.reversed(), id: \.self) { version in
+                                Text(version.marketingName).tag(version)
+                            }
+                        }
+                        .pickerStyle(.inline)
                     } else if selectedGame == .danceDanceRevolution {
                         Picker("Shared.Version", selection: $ddrVersion) {
                             ForEach(DDRVersion.supportedVersions, id: \.self) { version in

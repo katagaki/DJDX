@@ -38,6 +38,14 @@ struct ChartNoteTarget: Identifiable, Hashable {
     var id: String { "\(game.rawValue)|\(title)|\(chart)" }
 }
 
+extension GITADORASongRecord {
+    var chartNoteTarget: ChartNoteTarget {
+        ChartNoteTarget(game: .gitadora, title: title,
+                        chart: "\(instrument)-\(difficulty)",
+                        chartLabel: "\(instrument) \(difficulty) \(level)")
+    }
+}
+
 extension DDRSongRecord {
     var chartNoteTarget: ChartNoteTarget {
         ChartNoteTarget(game: .danceDanceRevolution, title: title,

@@ -130,7 +130,8 @@ fun TierListScreen(
     var isMenuExpanded by remember { mutableStateOf(false) }
     var searchTerm by remember { mutableStateOf("") }
 
-    val key = TierListKey(game.tierListCode, if (game.supportsTierListPlayType) playType else "", level)
+    val activePlayType = game.tierListPlayType(playType)
+    val key = TierListKey(game.tierListCode, activePlayType, level)
     val list = lists[key.storageKey] ?: TierList()
     val levelPrefix = "${game.tierListCode}/${key.playType}/"
     val levels = (charts.map { it.level } + lists.keys.filter { it.startsWith(levelPrefix) }
@@ -143,9 +144,9 @@ fun TierListScreen(
     val unplaced = chartsAtLevel.values.filter { list.tierOf(it.id) == null && matchesSearch(it) }
         .sortedBy { it.title.lowercase() }
 
-    LaunchedEffect(game, playType, darkTheme) {
+    LaunchedEffect(game, activePlayType, darkTheme) {
         isLoading = true
-        charts = withContext(Dispatchers.IO) { loadTierListCharts(container, game, playType, darkTheme) }
+        charts = withContext(Dispatchers.IO) { loadTierListCharts(container, game, activePlayType, darkTheme) }
         isLoading = false
     }
 
@@ -231,11 +232,12 @@ fun TierListScreen(
                 GamePicker(game = game, onSelect = { game = it })
                 if (game.supportsTierListPlayType) {
                     SingleChoiceSegmentedButtonRow {
-                        listOf("SP", "DP").forEachIndexed { index, value ->
+                        val playTypes = game.tierListPlayTypes
+                        playTypes.forEachIndexed { index, value ->
                             SegmentedButton(
-                                selected = playType == value,
+                                selected = activePlayType == value,
                                 onClick = { playType = value },
-                                shape = SegmentedButtonDefaults.itemShape(index, 2)
+                                shape = SegmentedButtonDefaults.itemShape(index, playTypes.size)
                             ) { Text(value) }
                         }
                     }

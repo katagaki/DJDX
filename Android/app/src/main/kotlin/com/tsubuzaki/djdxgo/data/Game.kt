@@ -4,7 +4,8 @@ enum class Game(val id: Int) {
     IIDX_ARCADE(0),
     SOUND_VOLTEX(1),
     POLARIS_CHORD(3),
-    DANCE_DANCE_REVOLUTION(4);
+    DANCE_DANCE_REVOLUTION(4),
+    GITADORA(5);
 
     val displayName: String
         get() = when (this) {
@@ -12,6 +13,7 @@ enum class Game(val id: Int) {
             SOUND_VOLTEX -> "SOUND VOLTEX"
             POLARIS_CHORD -> "ポラリスコード"
             DANCE_DANCE_REVOLUTION -> "DanceDanceRevolution"
+            GITADORA -> "GITADORA"
         }
 
     val shortName: String
@@ -20,6 +22,7 @@ enum class Game(val id: Int) {
             SOUND_VOLTEX -> "SDVX"
             POLARIS_CHORD -> "ぽらりこ"
             DANCE_DANCE_REVOLUTION -> "DDR"
+            GITADORA -> "GITADORA"
         }
 
     val supportsPlayType: Boolean

@@ -35,6 +35,7 @@ import com.tsubuzaki.djdxgo.R
 import com.tsubuzaki.djdxgo.data.Game
 import com.tsubuzaki.djdxgo.data.ddr.DDRClearLamp
 import com.tsubuzaki.djdxgo.data.ddr.DDRRank
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAClearType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXLevel
 import com.tsubuzaki.djdxgo.data.importsummary.ImportSummary
@@ -43,6 +44,7 @@ import com.tsubuzaki.djdxgo.data.importsummary.ImportSummaryRating
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXClearType
 import com.tsubuzaki.djdxgo.ui.theme.DDRColors
+import com.tsubuzaki.djdxgo.ui.theme.GITADORAColors
 import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
 import com.tsubuzaki.djdxgo.ui.theme.Palette
 import com.tsubuzaki.djdxgo.ui.theme.PolarisChordColors
@@ -250,6 +252,7 @@ private fun difficultyColor(game: Game, difficulty: String): Color = when (game)
     Game.SOUND_VOLTEX -> SDVXColors.difficultyColor(difficulty)
     Game.POLARIS_CHORD -> PolarisChordColors.difficultyColor(difficulty)
     Game.DANCE_DANCE_REVOLUTION -> DDRColors.difficultyColor(difficulty)
+    Game.GITADORA -> GITADORAColors.difficultyColor(difficulty)
 }
 
 private fun lampStyle(game: Game, value: String, darkTheme: Boolean): ChangeStyle = when (game) {
@@ -269,6 +272,10 @@ private fun lampStyle(game: Game, value: String, darkTheme: Boolean): ChangeStyl
         DDRClearLamp.display(value),
         DDRColors.clearColor(value, darkTheme)
     )
+    Game.GITADORA -> ChangeStyle(
+        GITADORAClearType.fromValue(value)?.abbreviation ?: value,
+        GITADORAColors.clearTypeColor(value)
+    )
 }
 
 private fun gradeStyle(game: Game, value: String, darkTheme: Boolean): ChangeStyle = when (game) {
@@ -276,4 +283,5 @@ private fun gradeStyle(game: Game, value: String, darkTheme: Boolean): ChangeSty
     Game.SOUND_VOLTEX -> ChangeStyle(value, SDVXColors.gradeColor(value, darkTheme))
     Game.POLARIS_CHORD -> ChangeStyle(value, PolarisChordColors.gradeColor(value))
     Game.DANCE_DANCE_REVOLUTION -> ChangeStyle(DDRRank.display(value), DDRColors.rankColor(value, darkTheme))
+    Game.GITADORA -> ChangeStyle(value, GITADORAColors.rankColor(value))
 }

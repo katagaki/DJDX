@@ -7,6 +7,7 @@ import com.tsubuzaki.djdxgo.data.analytics.AnalyticsGoalEvaluator
 import com.tsubuzaki.djdxgo.data.analytics.AnalyticsStore
 import com.tsubuzaki.djdxgo.data.ddr.DDRRepository
 import com.tsubuzaki.djdxgo.data.external.ExternalDataReloader
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORARepository
 import com.tsubuzaki.djdxgo.data.iidx.IIDXChartAnalyzer
 import com.tsubuzaki.djdxgo.data.iidx.IIDXRepository
 import com.tsubuzaki.djdxgo.data.importsummary.ImportSummaryBuilder
@@ -31,11 +32,18 @@ class AppContainer(context: Context) {
     val iidxRepository = IIDXRepository(database.iidxDao())
     val sdvxRepository = SDVXRepository(database.sdvxDao())
     val polarisChordRepository = PolarisChordRepository(database.polarisChordDao())
+    val gitadoraRepository = GITADORARepository(database.gitadoraDao())
     val externalDataDao = database.externalDataDao()
     val ddrRepository = DDRRepository(database.ddrDao(), externalDataDao)
     val externalDataReloader = ExternalDataReloader(externalDataDao)
     val analyticsStore = AnalyticsStore(database, ddrRepository)
-    val importSummaryBuilder = ImportSummaryBuilder(iidxRepository, sdvxRepository, polarisChordRepository, ddrRepository)
+    val importSummaryBuilder = ImportSummaryBuilder(
+        iidxRepository,
+        sdvxRepository,
+        polarisChordRepository,
+        ddrRepository,
+        gitadoraRepository
+    )
     val goalEvaluator = AnalyticsGoalEvaluator(context.applicationContext, database, ddrRepository)
     val profileRepository = ProfileRepository(context.applicationContext)
     val chartAnalyzer = IIDXChartAnalyzer(context.applicationContext.cacheDir)

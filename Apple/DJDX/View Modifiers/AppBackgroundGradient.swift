@@ -8,13 +8,16 @@ struct AppBackgroundGradient: View {
     @AppStorage(wrappedValue: PolarisChordVersion.polarisChord, "Global.PolarisChord.Version")
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
+    @AppStorage(wrappedValue: GITADORAVersion.galaxyWaveDelta, "Global.GITADORA.Version")
+    var gitadoraVersion: GITADORAVersion
 
     var accentColor: Color {
         selectedGame.accentColor(
             iidxVersion: iidxVersion,
             sdvxVersion: sdvxVersion,
             polarisChordVersion: polarisChordVersion,
-            ddrVersion: ddrVersion
+            ddrVersion: ddrVersion,
+            gitadoraVersion: gitadoraVersion
         )
     }
 

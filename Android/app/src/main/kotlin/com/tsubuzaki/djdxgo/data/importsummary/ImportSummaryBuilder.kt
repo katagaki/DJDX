@@ -10,6 +10,12 @@ import com.tsubuzaki.djdxgo.data.ddr.DDRRank
 import com.tsubuzaki.djdxgo.data.ddr.DDRRepository
 import com.tsubuzaki.djdxgo.data.ddr.DDRSongRecord
 import com.tsubuzaki.djdxgo.data.ddrCompact
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAClearType
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORADifficulty
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAInstrument
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORARank
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORARepository
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORASongRecord
 import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXDJLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
@@ -31,7 +37,8 @@ class ImportSummaryBuilder(
     private val iidxRepository: IIDXRepository,
     private val sdvxRepository: SDVXRepository,
     private val polarisChordRepository: PolarisChordRepository,
-    private val ddrRepository: DDRRepository
+    private val ddrRepository: DDRRepository,
+    private val gitadoraRepository: GITADORARepository
 ) {
 
     suspend fun importGroupID(game: Game, date: Long): String? = when (game) {
@@ -39,6 +46,7 @@ class ImportSummaryBuilder(
         Game.SOUND_VOLTEX -> sdvxRepository.importGroupFor(date)?.id
         Game.POLARIS_CHORD -> polarisChordRepository.importGroupFor(date)?.id
         Game.DANCE_DANCE_REVOLUTION -> ddrRepository.importGroupFor(date)?.id
+        Game.GITADORA -> gitadoraRepository.importGroupFor(date)?.id
     }
 
     suspend fun summary(game: Game, groupID: String): ImportSummary? = when (game) {
@@ -46,6 +54,7 @@ class ImportSummaryBuilder(
         Game.SOUND_VOLTEX -> sdvxSummary(groupID)
         Game.POLARIS_CHORD -> polarisChordSummary(groupID)
         Game.DANCE_DANCE_REVOLUTION -> ddrSummary(groupID)
+        Game.GITADORA -> gitadoraSummary(groupID)
     }
 
     // MARK: beatmania IIDX
@@ -224,6 +233,63 @@ class ImportSummaryBuilder(
                 score = record.score.takeIf { isNewScore },
                 lamp = if (isNewLamp) ImportSummaryChange(previousClearType, record.clearType) else null,
                 grade = if (isNewGrade) ImportSummaryChange(previousGrade, record.grade) else null
+            )
+        }.sortedWith(entryOrder)
+    }
+
+    // MARK: GITADORA
+
+    private suspend fun gitadoraSummary(groupID: String): ImportSummary? {
+        val groups = gitadoraRepository.importGroups()
+        val index = groups.indexOfFirst { it.id == groupID }
+        if (index == -1) return null
+        val group = groups[index]
+        val previousGroup = groups.drop(index + 1).firstOrNull { it.version == group.version }
+
+        val entries = previousGroup?.let {
+            gitadoraPersonalBests(
+                gitadoraRepository.songRecords(group.id),
+                gitadoraRepository.songRecords(it.id)
+            )
+        }.orEmpty()
+        return ImportSummary(
+            game = Game.GITADORA,
+            importDate = group.importDate,
+            previousImportDate = previousGroup?.importDate,
+            ratings = emptyList(),
+            personalBests = entries
+        )
+    }
+
+    private fun gitadoraPersonalBests(
+        latestRecords: List<GITADORASongRecord>,
+        previousRecords: List<GITADORASongRecord>
+    ): List<ImportSummaryEntry> {
+        fun key(record: GITADORASongRecord) = record.title.compact + "|" + record.instrument + "|" + record.difficulty
+        val previousByKey = previousRecords.associateBy(::key)
+        val lampOrder = GITADORAClearType.sorted.filter { it != GITADORAClearType.NO_PLAY }.map { it.value }
+        val rankOrder = GITADORARank.sorted.map { it.value }
+
+        return latestRecords.mapNotNull { record ->
+            val previous = previousByKey[key(record)]
+            val previousScore = previous?.score ?: 0
+            val previousClearType = previous?.clearType?.takeIf { it != GITADORAClearType.NO_PLAY.value }
+            val previousRank = previous?.rank?.takeIf { it != GITADORARank.NONE.value }
+            val isNewScore = record.score > previousScore
+            val isNewLamp = isRankImprovement(previousClearType, record.clearType, lampOrder)
+            val isNewRank = isRankImprovement(previousRank, record.rank, rankOrder)
+            if (!isNewScore && !isNewLamp && !isNewRank) return@mapNotNull null
+            val instrument = GITADORAInstrument.fromValue(record.instrument)?.value ?: record.instrument
+            val abbreviation = GITADORADifficulty.fromValue(record.difficulty)?.abbreviation ?: record.difficulty
+            ImportSummaryEntry(
+                title = record.title,
+                chart = "$instrument $abbreviation ${record.level}",
+                difficulty = record.difficulty,
+                levelValue = record.levelValue,
+                previousScore = previousScore.takeIf { isNewScore && it > 0 },
+                score = record.score.takeIf { isNewScore },
+                lamp = if (isNewLamp) ImportSummaryChange(previousClearType, record.clearType) else null,
+                grade = if (isNewRank) ImportSummaryChange(previousRank, record.rank) else null
             )
         }.sortedWith(entryOrder)
     }

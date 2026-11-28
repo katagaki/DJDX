@@ -4,6 +4,7 @@ import com.tsubuzaki.djdxgo.data.DJDXDatabase
 import com.tsubuzaki.djdxgo.data.TrendPoint
 import com.tsubuzaki.djdxgo.data.ddr.DDRPlayStyle
 import com.tsubuzaki.djdxgo.data.ddr.DDRRepository
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAInstrument
 import com.tsubuzaki.djdxgo.data.iidx.IIDXPlayType
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVolforce
 import kotlinx.coroutines.Dispatchers
@@ -20,11 +21,13 @@ class AnalyticsStore(
     private val sdvxState = MutableStateFlow<ChartAnalyticsData?>(null)
     private val polarisChordState = MutableStateFlow<ChartAnalyticsData?>(null)
     private val ddrState = MutableStateFlow<ChartAnalyticsData?>(null)
+    private val gitadoraState = MutableStateFlow<ChartAnalyticsData?>(null)
 
     val iidx: StateFlow<IIDXAnalyticsData?> = iidxState.asStateFlow()
     val sdvx: StateFlow<ChartAnalyticsData?> = sdvxState.asStateFlow()
     val polarisChord: StateFlow<ChartAnalyticsData?> = polarisChordState.asStateFlow()
     val ddr: StateFlow<ChartAnalyticsData?> = ddrState.asStateFlow()
+    val gitadora: StateFlow<ChartAnalyticsData?> = gitadoraState.asStateFlow()
 
     suspend fun reloadIIDX(playType: IIDXPlayType, filters: IIDXFilterOptions) {
         iidxState.value = withContext(Dispatchers.IO) {
@@ -54,6 +57,18 @@ class AnalyticsStore(
             val latest = groups.getOrNull(0)?.let { dao.songRecords(it.id) }.orEmpty()
             val previous = groups.getOrNull(1)?.let { dao.songRecords(it.id) }
             ChartAnalytics.polarisChord(latest, previous, filters)
+        }
+    }
+
+    suspend fun reloadGITADORA(instrument: GITADORAInstrument, filters: GITADORAFilterOptions, skill: String?) {
+        gitadoraState.value = withContext(Dispatchers.IO) {
+            val dao = database.gitadoraDao()
+            val groups = dao.importGroups()
+            val latest = groups.getOrNull(0)?.let { dao.songRecords(it.id) }.orEmpty()
+                .filter { it.instrument == instrument.value }
+            val previous = groups.getOrNull(1)?.let { dao.songRecords(it.id) }
+                ?.filter { it.instrument == instrument.value }
+            ChartAnalytics.gitadora(latest, previous, filters, skill)
         }
     }
 

@@ -103,7 +103,7 @@ struct ImportSummaryEntryRow: View {
         case .sdvx:
             Text(verbatim: value)
                 .sdvxScoreText()
-        case .polarisChord:
+        case .polarisChord, .gitadora:
             Text(verbatim: value)
                 .foregroundStyle(.secondary)
         case .ddr:
@@ -134,7 +134,7 @@ struct ImportSummaryEntryRow: View {
 
     func scoreString(_ value: Int) -> String {
         switch game {
-        case .sdvx, .polarisChord: return value.formatted(.number)
+        case .sdvx, .polarisChord, .gitadora: return value.formatted(.number)
         case .iidx, .ddr: return String(value)
         }
     }

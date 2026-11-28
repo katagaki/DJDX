@@ -15,6 +15,10 @@ struct UnifiedView: View {
     var polarisChordVersion: PolarisChordVersion
     @AppStorage(wrappedValue: DDRVersion.world, "Global.DDR.Version") var ddrVersion: DDRVersion
     @AppStorage(wrappedValue: DDRPlayStyle.single, "Global.DDR.Style") var ddrStyleToShow: DDRPlayStyle
+    @AppStorage(wrappedValue: GITADORAVersion.galaxyWaveDelta, "Global.GITADORA.Version")
+    var gitadoraVersion: GITADORAVersion
+    @AppStorage(wrappedValue: GITADORAInstrument.guitar, "Global.GITADORA.Instrument")
+    var gitadoraInstrument: GITADORAInstrument
     @AppStorage(wrappedValue: .single, "ScoresView.PlayTypeFilter") var playTypeToShow: IIDXPlayType
     @AppStorage(wrappedValue: true, "More.General.ShowProfileHeader") var showProfileHeader: Bool
     @AppStorage(wrappedValue: AppMode.imports, "Global.AppMode") var appMode: AppMode
@@ -46,6 +50,7 @@ struct UnifiedView: View {
     @State var sdvxAnalyticsModel = SDVXAnalyticsModel()
     @State var polarisChordAnalyticsModel = PolarisChordAnalyticsModel()
     @State var ddrAnalyticsModel = DDRAnalyticsModel()
+    @State var gitadoraAnalyticsModel = GITADORAAnalyticsModel()
     @State var sessionStore: IIDXSessionStore
     @State var sessionAnalyticsModel: AnalyticsModel
 
@@ -59,6 +64,7 @@ struct UnifiedView: View {
     @Namespace var sdvxAnalyticsNamespace
     @Namespace var polarisChordAnalyticsNamespace
     @Namespace var ddrAnalyticsNamespace
+    @Namespace var gitadoraAnalyticsNamespace
     @Namespace var towerNamespace
     @Namespace var importNamespace
 
@@ -86,6 +92,10 @@ struct UnifiedView: View {
                 } else if selectedGame == .danceDanceRevolution {
                     DDRScoresView(isEditingAnalytics: $isEditingAnalytics) {
                         ddrHeader
+                    }
+                } else if selectedGame == .gitadora {
+                    GITADORAScoresView(isEditingAnalytics: $isEditingAnalytics) {
+                        gitadoraHeader
                     }
                 } else {
                     IIDXScoresView(isEditingAnalytics: $isEditingAnalytics) {
@@ -176,6 +186,13 @@ struct UnifiedView: View {
             .navigationDestination(for: DDRAnalyticsPath.self) { path in
                 DDRAnalyticsDestinationView(model: ddrAnalyticsModel, path: path, namespace: ddrAnalyticsNamespace)
             }
+            .navigationDestination(for: GITADORAAnalyticsPath.self) { path in
+                GITADORAAnalyticsDestinationView(
+                    model: gitadoraAnalyticsModel,
+                    path: path,
+                    namespace: gitadoraAnalyticsNamespace
+                )
+            }
             .navigationDestination(for: AnalyticsGoalPath.self) { path in
                 switch path {
                 case .detail(let id):
@@ -193,6 +210,8 @@ struct UnifiedView: View {
                     PolarisChordImportView()
                 } else if selectedGame == .danceDanceRevolution {
                     DDRImportView()
+                } else if selectedGame == .gitadora {
+                    GITADORAImportView()
                 } else {
                     IIDXImportView()
                 }

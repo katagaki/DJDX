@@ -11,14 +11,17 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.tsubuzaki.djdxgo.data.RadarData
 import com.tsubuzaki.djdxgo.data.ddr.DDRPlayStyle
 import com.tsubuzaki.djdxgo.data.ddr.DDRVersionInfo
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAVersionInfo
 import com.tsubuzaki.djdxgo.data.iidx.IIDXVersionInfo
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordVersionInfo
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXVersion
 import com.tsubuzaki.djdxgo.data.settingsDataStore
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -75,6 +78,14 @@ data class DDRProfile(
         get() = dancerName != null || flareSkill.isNotEmpty() || flareIcon.isNotEmpty() || danRank.isNotEmpty()
 }
 
+data class GITADORAProfile(
+    val playerName: String? = null,
+    val skill: Map<String, String> = emptyMap()
+) {
+    val hasData: Boolean
+        get() = playerName != null || skill.isNotEmpty()
+}
+
 class ProfileRepository(private val context: Context) {
 
     private val imagesDirectory = File(context.filesDir, "images")
@@ -84,11 +95,13 @@ class ProfileRepository(private val context: Context) {
     private val sdvxState = MutableStateFlow(SDVXProfile())
     private val polarisChordState = MutableStateFlow(PolarisChordProfile())
     private val ddrState = MutableStateFlow(DDRProfile())
+    private val gitadoraState = MutableStateFlow(GITADORAProfile())
 
     val iidx: StateFlow<IIDXProfile> = iidxState.asStateFlow()
     val sdvx: StateFlow<SDVXProfile> = sdvxState.asStateFlow()
     val polarisChord: StateFlow<PolarisChordProfile> = polarisChordState.asStateFlow()
     val ddr: StateFlow<DDRProfile> = ddrState.asStateFlow()
+    val gitadora: StateFlow<GITADORAProfile> = gitadoraState.asStateFlow()
 
     suspend fun loadCached() = withContext(Dispatchers.IO) {
         val preferences = context.settingsDataStore.data.first()
@@ -113,6 +126,12 @@ class ProfileRepository(private val context: Context) {
             paSkill = preferences[Keys.polarisChordPASkill],
             paClassIcon = loadImage(POLARIS_CHORD_PA_CLASS_ICON_FILE),
             paSkillIcon = loadImage(POLARIS_CHORD_PA_SKILL_ICON_FILE)
+        )
+        gitadoraState.value = GITADORAProfile(
+            playerName = preferences[Keys.gitadoraPlayerName],
+            skill = GITADORA_GAME_TYPES.mapNotNull { gameType ->
+                preferences[Keys.gitadoraSkill(gameType)]?.let { gameType to it }
+            }.toMap()
         )
         ddrState.value = DDRProfile(
             dancerName = preferences[Keys.ddrDancerName],
@@ -243,6 +262,41 @@ class ProfileRepository(private val context: Context) {
         loadCached()
     }
 
+    suspend fun saveGITADORAProfile(name: String?, skills: Map<String, Double>) = withContext(Dispatchers.IO) {
+        context.settingsDataStore.edit { preferences ->
+            if (!name.isNullOrBlank()) preferences[Keys.gitadoraPlayerName] = name.trim()
+            skills.filterValues { it > 0 }.forEach { (gameType, skill) ->
+                preferences[Keys.gitadoraSkill(gameType)] = String.format(Locale.US, "%.2f", skill)
+            }
+        }
+        loadCached()
+    }
+
+    suspend fun refreshGITADORA() = withContext(Dispatchers.IO) {
+        runCatching {
+            val profile = fetchDetectedDocument(GITADORAVersionInfo.profilePageURL)
+            val name = profile.select(".profile_name_frame").first()?.text()?.trim()
+            val skills = mutableMapOf<String, Double>()
+            for (gameType in GITADORA_GAME_TYPES) {
+                var total = 0.0
+                var hasTable = false
+                for (skillType in 0..1) {
+                    val document = runCatching {
+                        fetchDetectedDocument(GITADORAVersionInfo.skillPageURL(gameType, skillType))
+                    }.getOrNull() ?: continue
+                    if (document.select(".skill_table_tb").isEmpty()) continue
+                    hasTable = true
+                    document.select(".skill_table_tb td.skill_cell").forEach { cell ->
+                        total += SKILL_VALUE_PATTERN.find(cell.text())?.value?.toDoubleOrNull() ?: 0.0
+                    }
+                }
+                if (hasTable) skills[gameType] = total
+            }
+            saveGITADORAProfile(name, skills)
+        }
+        loadCached()
+    }
+
     suspend fun refreshDDR() = withContext(Dispatchers.IO) {
         runCatching {
             val document = fetchDocument(DDRVersionInfo.profilePageURL)
@@ -306,6 +360,9 @@ class ProfileRepository(private val context: Context) {
             connection.disconnect()
         }
     }
+
+    private suspend fun fetchDetectedDocument(url: String): Document =
+        Jsoup.parse(ByteArrayInputStream(fetchBytes(url)), null, url)
 
     private suspend fun fetchDocument(url: String): Document =
         Jsoup.parse(fetchBytes(url).toString(Charsets.UTF_8), url)
@@ -371,6 +428,9 @@ class ProfileRepository(private val context: Context) {
         val polarisChordPAClass = stringPreferencesKey("PolarisChordProfile.PAClass")
         val polarisChordPASkill = stringPreferencesKey("PolarisChordProfile.PASkill")
         val ddrDancerName = stringPreferencesKey("DDRProfile.DancerName")
+        val gitadoraPlayerName = stringPreferencesKey("GITADORAProfile.PlayerName")
+
+        fun gitadoraSkill(gameType: String) = stringPreferencesKey("GITADORAProfile.Skill.$gameType")
 
         fun ddrFlareSkill(style: DDRPlayStyle) = stringPreferencesKey("DDRProfile.FlareSkill.${style.value}")
 
@@ -379,6 +439,8 @@ class ProfileRepository(private val context: Context) {
 
     companion object {
         private const val TIMEOUT_MILLIS = 20_000
+        private val GITADORA_GAME_TYPES = listOf("gf", "dm")
+        private val SKILL_VALUE_PATTERN = Regex("[0-9]+(?:[.][0-9]+)?")
         private const val QPRO_FILE = "Qpro.png"
         private const val SDVX_AP_CARD_FILE = "APCard.png"
         private const val SDVX_VOLFORCE_ICON_FILE = "VolforceIcon.png"

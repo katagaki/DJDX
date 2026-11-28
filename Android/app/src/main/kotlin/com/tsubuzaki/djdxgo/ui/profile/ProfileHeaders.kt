@@ -204,6 +204,30 @@ fun PolarisChordProfileHeader(container: AppContainer, modifier: Modifier = Modi
 }
 
 @Composable
+fun GITADORAProfileHeader(container: AppContainer, modifier: Modifier = Modifier) {
+    val profile by container.profileRepository.gitadora.collectAsState()
+    if (!profile.hasData) return
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(72.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = profile.playerName.orEmpty(),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+        StatBlock("GF ${stringResource(R.string.gitadora_skill)}", profile.skill["gf"] ?: "0.00", null)
+        StatBlock("DM ${stringResource(R.string.gitadora_skill)}", profile.skill["dm"] ?: "0.00", null)
+    }
+}
+
+@Composable
 fun DDRProfileHeader(container: AppContainer, modifier: Modifier = Modifier) {
     val profile by container.profileRepository.ddr.collectAsState()
     if (!profile.hasData) return

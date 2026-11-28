@@ -129,6 +129,28 @@ extension ShareCardEntry {
             metrics: metrics
         )
     }
+
+    init(gitadoraSongRecord record: GITADORASongRecord) {
+        var metrics: [ShareCardMetric] = []
+        if !record.achievementRate.isEmpty {
+            metrics.append(ShareCardMetric(
+                "\(record.achievementRate)%",
+                style: LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom)
+            ))
+        }
+        if GITADORARank.sorted.contains(record.rankEnum) {
+            metrics.append(ShareCardMetric(record.rank, style: GITADORARank.color(for: record.rank)))
+        }
+        metrics.append(ShareCardMetric(record.clearTypeEnum.abbreviation, style: record.clearTypeEnum.color))
+        self.init(
+            title: record.title,
+            lampStyle: AnyShapeStyle(record.clearTypeEnum.color),
+            levelText: record.level,
+            difficultyText: record.difficultyEnum.rawValue,
+            difficultyColor: record.difficultyEnum.color,
+            metrics: metrics
+        )
+    }
 }
 
 extension ShareCardProfile {
@@ -190,6 +212,16 @@ extension ShareCardProfile {
             ratings.append(ShareCardRating(label: "PA SKILL", value: paSkill))
         }
         return ShareCardProfile(playerName: defaults.string(forKey: "PolarisChordProfile.PlayerName"),
+                                ratings: ratings)
+    }
+
+    static func gitadora(instrument: GITADORAInstrument) -> ShareCardProfile {
+        let defaults = UserDefaults.standard
+        var ratings: [ShareCardRating] = []
+        if let skill = defaults.string(forKey: "GITADORAProfile.Skill.\(instrument.gameType)"), !skill.isEmpty {
+            ratings.append(ShareCardRating(label: "SKILL", value: skill))
+        }
+        return ShareCardProfile(playerName: defaults.string(forKey: "GITADORAProfile.PlayerName"),
                                 ratings: ratings)
     }
 }

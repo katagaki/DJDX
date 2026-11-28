@@ -8,6 +8,10 @@ import com.tsubuzaki.djdxgo.data.ddr.DDRClearLamp
 import com.tsubuzaki.djdxgo.data.ddr.DDRPlayStyle
 import com.tsubuzaki.djdxgo.data.ddr.DDRRank
 import com.tsubuzaki.djdxgo.data.ddr.DDRSongRecord
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAClearType
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORAInstrument
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORARank
+import com.tsubuzaki.djdxgo.data.gitadora.GITADORASongRecord
 import com.tsubuzaki.djdxgo.data.iidx.IIDXClearType
 import com.tsubuzaki.djdxgo.data.iidx.IIDXLevel
 import com.tsubuzaki.djdxgo.data.iidx.IIDXLevelScore
@@ -17,6 +21,7 @@ import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordClearType
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordGrade
 import com.tsubuzaki.djdxgo.data.polarischord.PolarisChordSongRecord
 import com.tsubuzaki.djdxgo.data.profile.DDRProfile
+import com.tsubuzaki.djdxgo.data.profile.GITADORAProfile
 import com.tsubuzaki.djdxgo.data.profile.IIDXProfile
 import com.tsubuzaki.djdxgo.data.profile.PolarisChordProfile
 import com.tsubuzaki.djdxgo.data.profile.SDVXProfile
@@ -26,6 +31,7 @@ import com.tsubuzaki.djdxgo.data.sdvx.SDVXGrade
 import com.tsubuzaki.djdxgo.data.sdvx.SDVXSongRecord
 import com.tsubuzaki.djdxgo.ui.games.scoreGradientBrush
 import com.tsubuzaki.djdxgo.ui.theme.DDRColors
+import com.tsubuzaki.djdxgo.ui.theme.GITADORAColors
 import com.tsubuzaki.djdxgo.ui.theme.IIDXColors
 import com.tsubuzaki.djdxgo.ui.theme.PolarisChordColors
 import com.tsubuzaki.djdxgo.ui.theme.SDVXColors
@@ -154,6 +160,31 @@ fun PolarisChordSongRecord.toShareCardEntry(): ShareCardEntry {
     )
 }
 
+fun GITADORASongRecord.toShareCardEntry(): ShareCardEntry {
+    val clearType = GITADORAClearType.fromValue(clearType)
+    val metrics = buildList {
+        if (achievementRate.isNotEmpty()) add(ShareCardMetric("$achievementRate%", scoreGradientBrush))
+        if (GITADORARank.fromValue(rank) in GITADORARank.sorted) {
+            add(ShareCardMetric(rank, GITADORAColors.rankBrush(rank, darkTheme = true)))
+        }
+        add(ShareCardMetric(
+            clearType?.abbreviation ?: this@toShareCardEntry.clearType,
+            SolidColor(GITADORAColors.clearTypeColor(this@toShareCardEntry.clearType))
+        ))
+    }
+    return ShareCardEntry(
+        title = title,
+        lamp = lampBrush(
+            clearType == null || clearType == GITADORAClearType.NO_PLAY,
+            GITADORAColors.clearTypeColor(this.clearType)
+        ),
+        levelText = level.ifEmpty { "-" },
+        difficultyText = difficulty,
+        difficultyColor = GITADORAColors.difficultyColor(difficulty),
+        metrics = metrics
+    )
+}
+
 private fun lampBrush(isEmpty: Boolean, color: Color): Brush =
     SolidColor(if (isEmpty) Color.Transparent else color)
 
@@ -183,3 +214,11 @@ fun PolarisChordProfile.toShareCardProfile(): ShareCardProfile = ShareCardProfil
     playerName = playerName,
     ratings = listOfNotNull(paSkill?.takeIf { it.isNotEmpty() }?.let { ShareCardRating("PA SKILL", it) })
 )
+
+fun GITADORAProfile.toShareCardProfile(instrument: GITADORAInstrument): ShareCardProfile = ShareCardProfile(
+    playerName = playerName,
+    ratings = listOfNotNull(
+        skill[instrument.gameType]?.takeIf { it.isNotEmpty() }?.let { ShareCardRating("SKILL", it) }
+    )
+)
+

@@ -33,6 +33,7 @@ extension Game {
         case .soundVoltex: "sdvx"
         case .polarisChord: "polarischord"
         case .danceDanceRevolution: "ddr"
+        case .gitadora: "gitadora"
         }
     }
 
@@ -62,7 +63,9 @@ enum TierListChartProvider {
         iidxVersion: IIDXVersion,
         sdvxVersion: SDVXVersion,
         polarisChordVersion: PolarisChordVersion,
-        ddrVersion: DDRVersion
+        ddrVersion: DDRVersion,
+        gitadoraVersion: GITADORAVersion,
+        gitadoraInstrument: GITADORAInstrument
     ) async -> [TierListChart] {
         switch game {
         case .iidxArcade, .iidxInfinitas:
@@ -73,6 +76,8 @@ enum TierListChartProvider {
             await polarisChordCharts(version: polarisChordVersion)
         case .danceDanceRevolution:
             await ddrCharts(playType: playType, version: ddrVersion)
+        case .gitadora:
+            await gitadoraCharts(instrument: gitadoraInstrument, version: gitadoraVersion)
         }
     }
 
@@ -176,6 +181,26 @@ enum TierListChartProvider {
                 lampColor: DDRSongRecord.clearColor(for: record.clearKind),
                 grade: record.rankDisplay,
                 gradeColor: DDRSongRecord.rankColor(forStem: record.rank)
+            )
+        }
+    }
+
+    static func gitadoraCharts(instrument: GITADORAInstrument, version: GITADORAVersion) async -> [TierListChart] {
+        await GITADORAReader().latestSongRecords(for: version).compactMap { record in
+            guard record.instrumentEnum == instrument, !record.levelBucket.isEmpty else { return nil }
+            let difficulty = record.difficultyEnum
+            let clearType = record.clearTypeEnum
+            let grade = GITADORARank.sorted.contains(record.rankEnum) ? record.rank : ""
+            return TierListChart(
+                id: TierListChart.chartID(title: record.title, difficulty: record.difficulty),
+                title: record.title,
+                level: record.levelBucket,
+                difficultyLabel: difficulty.abbreviation,
+                difficultyColor: difficulty.color,
+                lampLabel: clearType.abbreviation,
+                lampColor: clearType.color,
+                grade: grade,
+                gradeColor: GITADORARank.color(for: grade)
             )
         }
     }
