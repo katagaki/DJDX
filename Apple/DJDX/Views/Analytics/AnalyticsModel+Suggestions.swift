@@ -23,6 +23,7 @@ struct IIDXChartSuggestion: Identifiable {
     var level: IIDXLevel { score.level }
     var difficulty: Int { score.difficulty }
     var clearType: String { score.clearType }
+    var missSortKey: Int { score.missCount > 0 ? score.missCount : .max }
 }
 
 struct IIDXSuggestionSet {
@@ -70,7 +71,12 @@ extension AnalyticsModel {
 
     func clearLampSuggestions(for target: IIDXClearType) -> [IIDXChartSuggestion] {
         guard let previous = Self.clearType(before: target) else { return [] }
-        return clearLampSuggestionCandidates.filter { $0.clearType == previous.rawValue }
+        let candidates = clearLampSuggestionCandidates.filter { $0.clearType == previous.rawValue }
+        guard target == .fullComboClear else { return candidates }
+        return candidates.sorted {
+            if $0.missSortKey != $1.missSortKey { return $0.missSortKey < $1.missSortKey }
+            return ($0.scoreRate ?? -1) > ($1.scoreRate ?? -1)
+        }
     }
 
     nonisolated static func computeSuggestions(
@@ -113,8 +119,10 @@ extension AnalyticsModel {
             return $0.difficulty > $1.difficulty
         }
         clearLamps.sort {
-            if $0.difficulty != $1.difficulty { return $0.difficulty > $1.difficulty }
-            return $0.score.score > $1.score.score
+            let lhsRate = $0.scoreRate ?? -1, rhsRate = $1.scoreRate ?? -1
+            if lhsRate != rhsRate { return lhsRate > rhsRate }
+            if $0.missSortKey != $1.missSortKey { return $0.missSortKey < $1.missSortKey }
+            return $0.difficulty > $1.difficulty
         }
         let longUnplayed = clearLamps
             .filter { $0.songRecord.lastPlayDate > .distantPast }
