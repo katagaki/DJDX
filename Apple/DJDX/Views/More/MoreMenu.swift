@@ -29,16 +29,6 @@ struct MoreMenu: View {
     @State var scoreDeleteCode: String = ""
     @State var scoreDeleteCodeEntry: String = ""
 
-    let appIcons: [AppIconChoice] = [
-        AppIconChoice("Default", imageName: nil, isNameLocalized: true),
-        AppIconChoice("ZINRAI", imageName: "AppIcon.34"),
-        AppIconChoice("Sparkle Shower", imageName: "AppIcon.33"),
-        AppIconChoice("Pinky Crush", imageName: "AppIcon.32"),
-        AppIconChoice("EPOLIS", imageName: "AppIcon.31"),
-        AppIconChoice("NABLA", imageName: "AppIcon.VII"),
-        AppIconChoice("EXCEED GEAR", imageName: "AppIcon.VI")
-    ]
-
     var body: some View {
         Menu {
             Section("More.General.Header") {
@@ -55,30 +45,6 @@ struct MoreMenu: View {
                 }
             }
             Section {
-                Menu("More.General.AppIcon", systemImage: "app.dashed") {
-                    ForEach(appIcons, id: \.name) { icon in
-                        Button {
-                            UIApplication.shared.setAlternateIconName(icon.imageName) { error in
-                                if let error {
-                                    debugPrint(error.localizedDescription)
-                                }
-                            }
-                        } label: {
-                            Label {
-                                if icon.isNameLocalized {
-                                    Text(LocalizedStringKey(icon.name))
-                                } else {
-                                    Text(verbatim: icon.name)
-                                }
-                            } icon: {
-                                Image(icon.previewImageName)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .clipShape(.rect(cornerRadius: 8.0))
-                            }
-                        }
-                    }
-                }
                 Button("More.RadarMaker.Header", systemImage: "hexagon") {
                     isPresentingRadarMaker = true
                 }
@@ -270,25 +236,5 @@ struct MoreMenu: View {
         defaults.set((try? encoder.encode(PerLevelCardID.defaultVisible)) ?? Data(),
                      forKey: "Analytics.VisiblePerLevelCards")
         NotificationCenter.default.post(name: .analyticsLayoutReset, object: nil)
-    }
-}
-
-struct AppIconChoice {
-    let name: String
-    let imageName: String?
-    let isNameLocalized: Bool
-
-    init(_ name: String, imageName: String?, isNameLocalized: Bool = false) {
-        self.name = name
-        self.imageName = imageName
-        self.isNameLocalized = isNameLocalized
-    }
-
-    var previewImageName: String {
-        if let imageName {
-            "\(imageName).Preview"
-        } else {
-            "AppIcon.Preview"
-        }
     }
 }

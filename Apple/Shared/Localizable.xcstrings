@@ -5379,29 +5379,6 @@
         }
       }
     },
-    "More.General.AppIcon" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App Icon"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリアイコン"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App 圖示"
-          }
-        }
-      }
-    },
     "More.General.Header" : {
       "extractionState" : "manual",
       "localizations" : {
