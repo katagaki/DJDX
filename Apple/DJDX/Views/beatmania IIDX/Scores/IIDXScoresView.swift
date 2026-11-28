@@ -103,7 +103,7 @@ struct IIDXScoresView<Header: View>: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 0.0) {
+            VStack(spacing: 0.0) {
                 if searchTerm.isEmpty {
                     header
                     if !isEditingAnalytics, isScoreDataVisible {
@@ -119,8 +119,7 @@ struct IIDXScoresView<Header: View>: View {
                                 Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
                                     isShowingShareCard = true
                                 }
-                                .labelStyle(.iconOnly)
-                                .font(.subheadline.weight(.bold))
+                                .sectionHeaderButton()
                             }
                         }
                         .padding(.top, DesignMetrics.sectionGap)
@@ -131,23 +130,25 @@ struct IIDXScoresView<Header: View>: View {
                     }
                 }
                 if !isEditingAnalytics, (isScoreDataVisible && isScoreDataExpanded) || !searchTerm.isEmpty {
-                    ForEach(displayedEntries, id: \.id) { entry in
-                        Button {
-                            navigationManager.push(
-                                ScoresPath.scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level)
-                            )
-                        } label: {
-                            IIDXScoreRow(
-                                namespace: scoresNamespace,
-                                songRecord: entry.songRecord,
-                                level: entry.level,
-                                score: entry.score,
-                                scoreRate: entry.scoreRate
-                            )
-                            .contentShape(.rect)
+                    LazyVStack(spacing: 0.0) {
+                        ForEach(displayedEntries, id: \.id) { entry in
+                            Button {
+                                navigationManager.push(
+                                    ScoresPath.scoreViewer(songRecord: entry.songRecord, initialLevel: entry.level)
+                                )
+                            } label: {
+                                IIDXScoreRow(
+                                    namespace: scoresNamespace,
+                                    songRecord: entry.songRecord,
+                                    level: entry.level,
+                                    score: entry.score,
+                                    scoreRate: entry.scoreRate
+                                )
+                                .contentShape(.rect)
+                            }
+                            .buttonStyle(.plain)
+                            Divider()
                         }
-                        .buttonStyle(.plain)
-                        Divider()
                     }
                 }
             }

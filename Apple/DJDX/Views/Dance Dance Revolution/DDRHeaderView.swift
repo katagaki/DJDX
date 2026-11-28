@@ -31,10 +31,10 @@ extension UnifiedView {
                 .transition(.scale(scale: 0.9).combined(with: .opacity))
             AnalyticsGoalsSection(game: .danceDanceRevolution, playStyle: ddrStyleToShow.rawValue)
                 .transition(.scale(scale: 0.9).combined(with: .opacity))
-            DDRSuggestionsSection(model: ddrAnalyticsModel,
-                                  isEditing: $isEditingAnalytics,
-                                  analyticsNamespace: ddrAnalyticsNamespace)
-                .transition(.scale(scale: 0.9).combined(with: .opacity))
+            if !isEditingAnalytics {
+                DDRSuggestionsSection(model: ddrAnalyticsModel, analyticsNamespace: ddrAnalyticsNamespace)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
+            }
         }
         .animation(.smooth.speed(2.0), value: hasDDRMetadata)
         .animation(.smooth.speed(2.0), value: showProfileHeader)

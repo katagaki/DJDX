@@ -123,11 +123,13 @@ struct AnalyticsSectionHeader<Accessory: View>: View {
                 }
                 .contentShape(.rect)
             }
-            accessory()
-            if isCollapsible {
-                toggleWrapper {
-                    SectionChevron(context: context)
-                        .contentShape(.rect)
+            HStack(spacing: 0.0) {
+                accessory()
+                if isCollapsible {
+                    toggleWrapper {
+                        SectionChevron(context: context)
+                            .contentShape(.rect)
+                    }
                 }
             }
         }
@@ -156,31 +158,53 @@ struct AnalyticsCardGrid<Item: Hashable, Content: View>: View {
     @ViewBuilder let content: (Item) -> Content
 
     var body: some View {
-        if columns <= 1 {
-            VStack(spacing: spacing) {
-                ForEach(items, id: \.self) { item in
-                    content(item)
-                }
+        EqualColumnsLayout(columns: max(columns, 1), spacing: spacing) {
+            ForEach(items, id: \.self) { item in
+                content(item)
             }
-        } else {
-            let rowCount = (items.count + columns - 1) / columns
-            VStack(spacing: spacing) {
-                ForEach(0..<rowCount, id: \.self) { row in
-                    HStack(spacing: spacing) {
-                        ForEach(0..<columns, id: \.self) { col in
-                            let index = row * columns + col
-                            if index < items.count {
-                                content(items[index])
-                                    .id(items[index])
-                                    .frame(maxWidth: .infinity)
-                            } else {
-                                Color.clear
-                                    .frame(maxWidth: .infinity)
-                            }
-                        }
-                    }
-                }
+        }
+    }
+}
+
+struct EqualColumnsLayout: Layout {
+    let columns: Int
+    let spacing: CGFloat
+
+    func columnWidth(for width: CGFloat) -> CGFloat {
+        max((width - spacing * CGFloat(columns - 1)) / CGFloat(columns), 0.0)
+    }
+
+    func rowHeights(subviews: Subviews, columnWidth: CGFloat) -> [CGFloat] {
+        stride(from: 0, to: subviews.count, by: columns).map { start in
+            subviews[start..<min(start + columns, subviews.count)]
+                .map { $0.sizeThatFits(ProposedViewSize(width: columnWidth, height: nil)).height }
+                .max() ?? 0.0
+        }
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.replacingUnspecifiedDimensions().width
+        let heights = rowHeights(subviews: subviews, columnWidth: columnWidth(for: width))
+        let height = heights.reduce(0.0, +) + spacing * CGFloat(max(heights.count - 1, 0))
+        return CGSize(width: width, height: height)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let width = columnWidth(for: bounds.width)
+        let heights = rowHeights(subviews: subviews, columnWidth: width)
+        var y = bounds.minY
+        for (row, rowHeight) in heights.enumerated() {
+            for column in 0..<columns {
+                let index = row * columns + column
+                guard index < subviews.count else { break }
+                let x = bounds.minX + CGFloat(column) * (width + spacing)
+                subviews[index].place(
+                    at: CGPoint(x: x + width / 2.0, y: y + rowHeight / 2.0),
+                    anchor: .center,
+                    proposal: ProposedViewSize(width: width, height: nil)
+                )
             }
+            y += rowHeight + spacing
         }
     }
 }

@@ -327,6 +327,12 @@ struct AnalyticsView: View {
                 }
             }
             .padding(.top, hasVisibleSection ? DesignMetrics.topPadding : 0.0)
+            .onChange(of: isEditing) { _, isEditing in
+                if !isEditing {
+                    saveCardOrder()
+                    savePerLevelCardOrder()
+                }
+            }
             .task {
                 loadVisibleCards()
                 loadCardOrder()

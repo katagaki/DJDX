@@ -149,6 +149,7 @@ struct SDVXCardReorderDropDelegate: DropDelegate {
 
     func performDrop(info _: DropInfo) -> Bool {
         draggedCard = nil
+        onReorder()
         return true
     }
 
@@ -165,7 +166,6 @@ struct SDVXCardReorderDropDelegate: DropDelegate {
                 toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
             )
         }
-        onReorder()
     }
 
     func dropExited(info _: DropInfo) {

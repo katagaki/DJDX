@@ -129,6 +129,7 @@ struct PolarisChordCardReorderDropDelegate: DropDelegate {
 
     func performDrop(info _: DropInfo) -> Bool {
         draggedCard = nil
+        onReorder()
         return true
     }
 
@@ -145,7 +146,6 @@ struct PolarisChordCardReorderDropDelegate: DropDelegate {
                 toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
             )
         }
-        onReorder()
     }
 
     func dropExited(info _: DropInfo) {

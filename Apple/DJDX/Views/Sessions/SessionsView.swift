@@ -47,7 +47,7 @@ struct SessionsView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 0.0) {
+            VStack(spacing: 0.0) {
                 if !isSearching {
                     if !isEditingAnalytics, !hasBemaniWikiData {
                         sessionsCard { bemaniWikiWarning }

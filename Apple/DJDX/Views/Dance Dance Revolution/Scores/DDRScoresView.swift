@@ -133,7 +133,7 @@ struct DDRScoresView<Header: View>: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 0.0) {
+            VStack(spacing: 0.0) {
                 if searchTerm.isEmpty {
                     header
                     if !isEditingAnalytics, isScoreDataVisible {
@@ -149,8 +149,7 @@ struct DDRScoresView<Header: View>: View {
                                 Button("ShareCard.Title", systemImage: "square.and.arrow.up") {
                                     isShowingShareCard = true
                                 }
-                                .labelStyle(.iconOnly)
-                                .font(.subheadline.weight(.bold))
+                                .sectionHeaderButton()
                             }
                         }
                         .padding(.top, DesignMetrics.sectionGap)
@@ -162,16 +161,18 @@ struct DDRScoresView<Header: View>: View {
                 }
                 if !isEditingAnalytics, (isScoreDataVisible && isScoreDataExpanded) || !searchTerm.isEmpty {
                     let sortedRecords = sortedRecords
-                    ForEach(sortedRecords, id: \.self) { record in
-                        Button {
-                            navigationManager.push(DDRScoresPath.scoreViewer(songRecord: record))
-                        } label: {
-                            DDRScoreRow(record: record)
-                                .contentShape(.rect)
+                    LazyVStack(spacing: 0.0) {
+                        ForEach(sortedRecords, id: \.self) { record in
+                            Button {
+                                navigationManager.push(DDRScoresPath.scoreViewer(songRecord: record))
+                            } label: {
+                                DDRScoreRow(record: record)
+                                    .contentShape(.rect)
+                            }
+                            .buttonStyle(.plain)
+                            Divider()
+                                .padding(.leading, 16.0)
                         }
-                        .buttonStyle(.plain)
-                        Divider()
-                            .padding(.leading, 16.0)
                     }
                 }
             }

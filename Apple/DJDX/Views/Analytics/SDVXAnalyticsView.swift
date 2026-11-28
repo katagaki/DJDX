@@ -55,6 +55,11 @@ struct SDVXAnalyticsView: View {
             isOverviewCollapsed = isOverviewCollapsedStored
             isLastPlayCollapsed = isLastPlayCollapsedStored
         }
+        .onChange(of: isEditing) { _, isEditing in
+            if !isEditing {
+                saveCardOrder()
+            }
+        }
         .task {
             if model.dataState == .initializing {
                 await reload()
@@ -317,24 +322,18 @@ struct SDVXSuggestionsSection: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @Bindable var model: SDVXAnalyticsModel
-    @Binding var isEditing: Bool
     var analyticsNamespace: Namespace.ID
 
     @State var isShowingShareCard: Bool = false
 
-    var rowLimit: Int {
-        isEditing ? AnalyticsSuggestionCardID.editingPreviewLimit : AnalyticsSuggestionCardID.sectionLimit
-    }
-
     var body: some View {
         AnalyticsSuggestionsSection(
             cards: AnalyticsSuggestionCardID.sdvxCards,
-            isEditing: isEditing,
             title: { _ in LocalizedStringKey("VOLFORCE") },
             canShare: { _ in !model.volforceSuggestions.isEmpty },
             onShare: { _ in isShowingShareCard = true }
         ) { _ in
-            AnalyticsSuggestionPreviewRows(items: model.volforceSuggestions, limit: rowLimit) { suggestion in
+            AnalyticsSuggestionPreviewRows(items: model.volforceSuggestions) { suggestion in
                 navigationManager.push(SDVXScoresPath.scoreViewer(songRecord: suggestion.record))
             } row: { suggestion in
                 SDVXVolforceSuggestionRow(namespace: analyticsNamespace, suggestion: suggestion)

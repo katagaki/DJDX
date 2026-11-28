@@ -48,6 +48,11 @@ struct DDRAnalyticsView: View {
             loadVisibleCards()
             isOverviewCollapsed = isOverviewCollapsedStored
         }
+        .onChange(of: isEditing) { _, isEditing in
+            if !isEditing {
+                saveCardOrder()
+            }
+        }
         .task {
             if model.dataState == .initializing {
                 await reload()
@@ -243,25 +248,19 @@ struct DDRSuggestionsSection: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @Bindable var model: DDRAnalyticsModel
-    @Binding var isEditing: Bool
     var analyticsNamespace: Namespace.ID
 
     @AppStorage(wrappedValue: DDRPlayStyle.single, "Global.DDR.Style") var ddrStyleToShow: DDRPlayStyle
     @State var isShowingShareCard: Bool = false
 
-    var rowLimit: Int {
-        isEditing ? AnalyticsSuggestionCardID.editingPreviewLimit : AnalyticsSuggestionCardID.sectionLimit
-    }
-
     var body: some View {
         AnalyticsSuggestionsSection(
             cards: AnalyticsSuggestionCardID.ddrCards,
-            isEditing: isEditing,
             title: { _ in LocalizedStringKey("FLARE SKILL") },
             canShare: { _ in !model.flareSkillSuggestions.isEmpty },
             onShare: { _ in isShowingShareCard = true }
         ) { _ in
-            AnalyticsSuggestionPreviewRows(items: model.flareSkillSuggestions, limit: rowLimit) { suggestion in
+            AnalyticsSuggestionPreviewRows(items: model.flareSkillSuggestions) { suggestion in
                 navigationManager.push(DDRScoresPath.scoreViewer(songRecord: suggestion.record))
             } row: { suggestion in
                 DDRFlareSkillSuggestionRow(suggestion: suggestion)
